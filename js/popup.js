@@ -14,6 +14,16 @@ function ShowMedia(data) {
     
     var medialist=document.all("medialist");
     for(var i = 0; i < data.length; i++){
+        if(localStorage['TitleName'] == "true"){
+            if( data[i].ext ){
+                DownName = data[i].title + '.' + data[i].ext;
+            }else{
+                DownName = data[i].title;
+            }
+            
+        }else{
+            DownName = data[i].name;
+        }
         fullname = data[i].name;
         if(fullname.length >= 40){
             fullname = fullname.replace(/\.[^.\/]+$/, "");
@@ -26,7 +36,7 @@ function ShowMedia(data) {
         }else{
             $('#medialist').append('<li class="medialistLoop" id="Media_'+i+'"><span class="number">' + (i+1) + '.</span><span>' + name +'</span><div class="Size">'+data[i].size+'</div><div class="copyblock" title="复制"></div><div class="playblock" title="播放"></div><div class="downblock" title="下载"></div></li>');
         }
-        $('#medialist').append('<li class="mediaDown" id="Media_'+i+'_Down"><a href="'+data[i].url+'" target="_blank" download="'+fullname+'">'+data[i].url+'</a></li>');
+        $('#medialist').append('<li class="mediaDown" id="Media_'+i+'_Down"><a href="'+data[i].url+'" target="_blank" download="'+DownName+'">'+data[i].url+'</a></li>');
     }
     ///////////////绑定事件////////////////
     //复制

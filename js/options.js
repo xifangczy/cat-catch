@@ -21,6 +21,10 @@ if(localStorage['Debug'] == "true"){
     $('#Debug').attr("checked","checked");
 }
 
+if(localStorage['TitleName'] == "true"){
+    $('#TitleName').attr("checked","checked");
+}
+
 /////////////////////事件绑定/////////////////////
 //新增格式
 $('#AddExt').bind("click", function(){
@@ -135,6 +139,17 @@ $('#Debug').bind("click", function(){
     }
 });
 
+//使用网页标题做文件名
+$('#TitleName').bind("click", function(){
+    if(!$(this).prop("checked")){
+        $('#TitleName').removeAttr("checked");
+        localStorage['TitleName'] = false;
+    }else{
+        $('#TitleName').attr("checked","true");
+        localStorage['TitleName'] = true;
+    }
+});
+
 //重置
 $('#ResetExt').bind("click", function(){
     delete localStorage['Ext'];
@@ -142,5 +157,6 @@ $('#ResetExt').bind("click", function(){
     delete localStorage['repeat'];
     delete localStorage['Debug'];
     delete localStorage['Type'];
+    delete localStorage['TitleName'];
     location.reload();
 });

@@ -48,6 +48,9 @@ function(data){
 },
 {urls: ["http://*/*", "https://*/*"],types: ["object","other","xmlhttprequest"]},
 ["responseHeaders"]);
+
+var title;  //网页标题
+
 //开始判断
 function findMedia(data){
 	if(data.tabId==-1)//不是标签的请求则返回
@@ -56,9 +59,13 @@ function findMedia(data){
     var name = GetFileName(data.url);//获得文件名
     var ext = GetExt(name);//获得扩展名
     var contentType = getHeaderValue("content-type", data);
+    /* 获得标题 */
+    chrome.tabs.get(data.tabId, function(info){
+        title = info.title;
+    });
     //调试模式
     if(localStorage['Debug'] == "true"){
-        console.log({name:name,url:data.url,size:size,ext:ext,type:contentType,all:data});
+        console.log({name:name,url:data.url,size:size,ext:ext,type:contentType,tabid:data.tabId,title:title,all:data});
     }
     //得到设置的扩展名
     Exts = JSON.parse(localStorage['Ext']); 
@@ -128,7 +135,7 @@ function findMedia(data){
                 return;
         }
         size=Math.round( 100 * size / 1024 / 1024 ) / 100 +"MB";
-        var info={name:name,url:url,size:size,ext:ext,type:contentType};
+        var info={name:name,url:url,size:size,ext:ext,type:contentType,tabid:data.tabId,title:title};
         mediaurls[id].push(info);
         chrome.browserAction.setBadgeText({text:mediaurls[id].length.toString(),tabId:data.tabId});//数字提示
         chrome.browserAction.setTitle({title:"抓到"+mediaurls[id].length.toString()+"条资源",tabId:data.tabId});//文字提示

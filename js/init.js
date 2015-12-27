@@ -35,3 +35,7 @@ if(typeof localStorage['repeatReg']==='undefined'){
 if(typeof localStorage['Debug']==='undefined'){
     localStorage['Debug'] = false;
 }
+
+if(typeof localStorage['TitleName']==='undefined'){
+    localStorage['TitleName'] = false;
+}
