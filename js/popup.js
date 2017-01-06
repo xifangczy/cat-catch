@@ -1,94 +1,129 @@
 var BG = chrome.extension.getBackgroundPage();
-var repeatReg = new RegExp(localStorage['repeatReg'],'g');
+var tabid;
 chrome.windows.getCurrent(function(wnd){
     chrome.tabs.getSelected(wnd.id, function(tab){
+        tabid = tab.id;
         var id="tabid"+tab.id;
         ShowMedia(BG.mediaurls[id]);
     });
 });
-function ShowMedia(data) {
+
+//html5播放器允许格式
+function isPlay(ext){
+    var arr = ['ogg','ogv','mp4','webm','mp3','wav','m3u8'];
+    if(arr.indexOf(ext) > -1){
+        return '<img src="img/play.png" class="ico" id="play">';
+    }
+    return '';
+}
+
+//监听数据
+chrome.runtime.onMessage.addListener(function(data){
+    if(data.tabid == tabid){
+        $('#tempntc').hide();
+        AddMedia(data);
+    }
+});
+
+function ShowMedia(data){
     if(data==undefined || data.length==0){
         $('#tempntc').fadeIn(500);
         return;
     }
-    
-    var medialist=document.all("medialist");
     for(var i = 0; i < data.length; i++){
-        if(localStorage['TitleName'] == "true"){
-            if( data[i].ext ){
-                DownName = data[i].title + '.' + data[i].ext;
-            }else{
-                DownName = data[i].title;
-            }
-            
-        }else{
-            DownName = data[i].name;
-        }
-        fullname = data[i].name;
-        if(fullname.length >= 40){
-            fullname = fullname.replace(/\.[^.\/]+$/, "");
-            name = fullname.substr(0,13) + '...' +fullname.substr(-20)+ '.' + data[i].ext;
-        }else{
-            name = fullname;
-        }
-        if( data[i].type == "application/octet-stream" ){
-            $('#medialist').append('<li class="medialistLoop" id="Media_'+i+'"><span class="number">' + (i+1) + '.</span><span>' + name +'</span><div class="Size" style="width:50px;right:40px;">[stream]</div><div class="copyblock" title="复制" style="right:20px;"></div><div class="downblock" title="下载"></div></li>');
-        }else{
-            $('#medialist').append('<li class="medialistLoop" id="Media_'+i+'"><span class="number">' + (i+1) + '.</span><span>' + name +'</span><div class="Size">'+data[i].size+'</div><div class="copyblock" title="复制"></div><div class="playblock" title="播放"></div><div class="downblock" title="下载"></div></li>');
-        }
-        $('#medialist').append('<li class="mediaDown" id="Media_'+i+'_Down"><a href="'+data[i].url+'" target="_blank" download="'+DownName+'">'+data[i].url+'</a></li>');
+        AddMedia(data[i]);
     }
-    ///////////////绑定事件////////////////
+}
+
+function AddMedia(data){
+    //网页标题做文件名
+    if(localStorage['TitleName'] == "true"){
+        if( data.ext ){
+            DownName = data.title + '.' + data.ext;
+        }else{
+            DownName = data.title;
+        }
+        
+    }else{
+        DownName = data.name;
+    }
+    
+    //截取文件名长度
+    fullname = data.name;
+    if(fullname.length >= 50){
+        fullname = fullname.replace(/\.[^.\/]+$/, "");
+        name = fullname.substr(0,22) + '...' +fullname.substr(-20)+ '.' + data.ext;
+    }else{
+        name = fullname;
+    }
+    
+    //添加html
+    /*
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span></span>
+                <img src="img/download.png" class="ico" id="download" />
+                <img src="img/play.png" class="ico" id="play" />
+                <img src="img/copy.png" class="ico" id="copy" />
+                <span class="size">
+                </span>
+            </div>
+            <div class="url">
+                <a href="" target="_blank" download=""></a>
+            </div>
+        </div>
+    */
+    if( data.type == 'application/octet-stream' ){
+        data.size = '[stream]';
+    }
+    var html = '<div class="panel panel-default"><div class="panel-heading">';
+    html += '<span>'+name+'</span>';
+    html += '<img src="img/download.png" class="ico" id="download">';
+    html += isPlay(data.ext);
+    html += '<img src="img/copy.png" class="ico" id="copy">';
+    html += '<span class="size">'+data.size+'</span>';
+    html += '</div><div class="url"><a href="'+data.url+'" target="_blank" download="'+DownName+'">'+data.url+'</a></div></div>';
+    $('#medialist').append(html);
+    
+    //显示完整地址
+    $('#medialist .panel-heading').off().on('click',function(){
+        id = $(this).next();
+        $(id).toggle();
+    });
+    
     //复制
-    $('.copyblock').bind("click", function(){
-        id = '#'+$(this).parent().attr("id")+'_Down a';
-        url = $(id).attr("href");
-        //CopyLink(url);
-        var text = $('<input id="copy" value="'+url+'" />');
+    $('#medialist #copy').off().on('click',function(){
+        url = $(this).parents().find('.url a').attr('href');
+        var text = $('<input id="copy_tmp" value="'+url+'" />');
         $('body').append(text);
         text.select();
         document.execCommand('Copy');
-        $('#copy').remove();
+        $('#copy_tmp').remove();
         $('#tempntc').html('已复制到剪贴板').fadeIn(500).delay(500).fadeOut(500);
         return false;
     });
+    
     //下载
-    $('.downblock').bind("click", function(){
-        id = '#'+$(this).parent().attr("id")+'_Down a';
-        //jquery trigger 无效
+    $('#medialist #download').off().on('click',function(){
+        id = $(this).parents().find('.url a');
         var theEvent = document.createEvent("MouseEvent");
         theEvent.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
         $(id)[0].dispatchEvent(theEvent);
         return false;
     });
+    
     //播放
-    $('.playblock').bind("click", function(){
-        id = '#'+$(this).parent().attr("id")+'_Down a';
-        url = $(id).attr("href");
-        $('#player').empty();
-        //去掉开始参数
-        // url=url.replace(repeatReg,"");
-        url=url.replace(/(fs|start|begin)=[0-9]+/g,"");
-        //播放器所需
-        url+="?";
-        url=encodeURIComponent(url+"&nvhnocache=1");
-        play = "<embed width='100%' height='70%' src='player/NetMediaPlayer.swf' allowfullscreen='true' allowscriptaccess='always' flashvars='autostart=true&amp;showstop=true&amp;usefullscreen=true&amp;file="+url+"' /><input id='CloseBtn' type='button' title='关闭播放器' value='关闭' />";
-        $('#player').append(play);
+    $('#medialist #play').off().on('click',function(){ 
+        url = $(this).parents().find('.url a').attr('href');
+        $('video').attr('src',url);
+        $('#player').show();
         
         //播放关闭按钮
         $('#CloseBtn').bind("click", function(){
-            $('#player').empty();
+            $('video').attr('src','');
+            $('#player').hide();
             return false;
         });
         return false;
-    });
-    //显示完整地址
-    $('.medialistLoop').bind("click", function(){
-        id = '#'+$(this).attr("id")+'_Down';
-        if($(id).is(":hidden")){
-            $(id).show();
-        }else{
-            $(id).hide();
-        }
     });
 }

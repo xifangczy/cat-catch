@@ -1,4 +1,4 @@
-﻿//初始化
+//初始化
 if(typeof mediaurls==='undefined'){
     var mediaurls = new Array();
 }
@@ -46,7 +46,7 @@ chrome.webRequest.onResponseStarted.addListener(
 function(data){
 	findMedia(data);
 },
-{urls: ["http://*/*", "https://*/*"],types: ["object","other","xmlhttprequest"]},
+{urls: ["http://*/*", "https://*/*"],types: ["main_frame","sub_frame","object","other","xmlhttprequest"]},
 ["responseHeaders"]);
 
 var title;  //网页标题
@@ -106,7 +106,11 @@ function findMedia(data){
         var res = Disposition.match(/filename="(.*?)"/);
         if(res && res[1]){
             name=decodeURIComponent(res[1]);    //编码
-            filter = true;
+            name = GetFileName(name);
+            ext = GetExt(name);
+            if(data_ext.indexOf(ext) > -1){
+                filter = true;
+            }
         }
     }
     
@@ -139,12 +143,14 @@ function findMedia(data){
         mediaurls[id].push(info);
         chrome.browserAction.setBadgeText({text:mediaurls[id].length.toString(),tabId:data.tabId});//数字提示
         chrome.browserAction.setTitle({title:"抓到"+mediaurls[id].length.toString()+"条资源",tabId:data.tabId});//文字提示
+        chrome.runtime.sendMessage(info);//发送数据给popup
     }
 }
 function GetFileName(url){
 	var str = url.split("?");//url按？分开
 	str = str[0].split( "/" );//按/分开
-	return str[str.length-1].toLowerCase();//得到带后缀的名字
+	str = str[str.length-1].split( "#" );//按#分开
+	return str[0].toLowerCase();//得到带后缀的名字
 }
 function GetExt(FileName){
 	var str=FileName.split(".");
