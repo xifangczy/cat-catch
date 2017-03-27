@@ -17,11 +17,19 @@ function isPlay(ext){
     return '';
 }
 
+//超过3个显示全部下载
+function isAllDow(){
+    if( $('#medialist #download').length >= 3 ){
+        $('#AllDow').show();
+    }
+}
+
 //监听数据
 chrome.runtime.onMessage.addListener(function(data){
     if(data.tabid == tabid){
         $('#tempntc').hide();
         AddMedia(data);
+        isAllDow();
     }
 });
 
@@ -33,6 +41,7 @@ function ShowMedia(data){
     for(var i = 0; i < data.length; i++){
         AddMedia(data[i]);
     }
+    isAllDow();
 }
 
 function AddMedia(data){
@@ -52,7 +61,7 @@ function AddMedia(data){
     fullname = data.name;
     if(fullname.length >= 50){
         fullname = fullname.replace(/\.[^.\/]+$/, "");
-        name = fullname.substr(0,22) + '...' +fullname.substr(-20)+ '.' + data.ext;
+        name = fullname.substr(0,20) + '...' +fullname.substr(-20)+ '.' + data.ext;
     }else{
         name = fullname;
     }
@@ -125,5 +134,16 @@ function AddMedia(data){
             return false;
         });
         return false;
+    });
+    
+    //全部下载
+    $('#AllDow').off().on('click',function(){
+        var obj = $('#medialist #download');
+        if( obj.length >= 5 ){
+            if(! window.confirm('共'+obj.length+'个文件，确定全部下载？')){
+                return false;
+            }
+        }
+        obj.click();
     });
 }

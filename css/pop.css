@@ -24,7 +24,7 @@ body{
     margin-bottom: 2px;
 }
 .panel-heading{
-    padding: 10px 15px;
+    padding: 10px 5px 10px 10px;
     /* border-bottom: 1px solid transparent; */
     background-color: #f5f5f5;
     border-color:#ddd;
@@ -81,4 +81,15 @@ body{
 	}
 #player{
     display: none;
+}
+
+#AllDow{
+    padding: 5px 5px;
+    background-color: #e5e9ef;
+    text-align: center;
+    cursor:pointer;
+    display: none;
+}
+#AllDow:hover{
+    background-color: #ccd0d7;
 }

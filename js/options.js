@@ -49,7 +49,7 @@ $('#AddType').bind("click", function(){
 //获得html_格式
 function GethtmlExt(){
     var ext = arguments[0] ? arguments[0]: '';
-    var size = arguments[1] ? arguments[1]: '';
+    var size = arguments[1] ? arguments[1]: '0';
     return '<tr><td><input type="text" class="ext" placeholder="扩展名" value="'+ext+'"></td><td class="TdSize"><input type="text" class="size" placeholder="大小限制" value="'+size+'"></td><td class="SizeButton">kb</td><td id="RemoveExt" class="RemoveButton">X</td></tr>';
 }
 

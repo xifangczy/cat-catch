@@ -14,7 +14,8 @@ if(typeof localStorage['Ext']==='undefined' || localStorage['Ext'] == ''){
         {"ext":"ogg","size":10},
         {"ext":"ogv","size":10},
         {"ext":"acc","size":10},
-        {"ext":"m3u8","size":1}
+        {"ext":"mov","size":10},
+        {"ext":"m3u8","size":0}
     );
     localStorage['Ext'] = JSON.stringify(Ext);
 }
