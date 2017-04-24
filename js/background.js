@@ -46,10 +46,10 @@ chrome.webRequest.onResponseStarted.addListener(
 function(data){
 	findMedia(data);
 },
-{urls: ["http://*/*", "https://*/*"],types: ["main_frame","sub_frame","object","other","xmlhttprequest"]},
+{urls: ["http://*/*", "https://*/*"]},
 ["responseHeaders"]);
 
-var title;  //网页标题
+var title = 'Null';  //网页标题
 
 //开始判断
 function findMedia(data){

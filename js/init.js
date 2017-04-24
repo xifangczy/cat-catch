@@ -23,8 +23,7 @@ if(typeof localStorage['Ext']==='undefined' || localStorage['Ext'] == ''){
 if(typeof localStorage['Type']==='undefined'){
     var Type = new Array(
         {"Type":"video/*"},
-        {"Type":"audio/*"},
-        {"Type":"application/octet-stream"}
+        {"Type":"audio/*"}
     );
     localStorage['Type'] = JSON.stringify(Type);
 }
