@@ -10,7 +10,7 @@ chrome.windows.getCurrent(function(wnd){
 
 //html5播放器允许格式
 function isPlay(ext){
-    var arr = ['ogg','ogv','mp4','webm','mp3','wav','m3u8'];
+    var arr = ['ogg','ogv','mp4','webm','mp3','wav','flv','m4a'];
     if(arr.indexOf(ext) > -1){
         return '<img src="img/play.png" class="ico" id="play">';
     }
@@ -45,6 +45,11 @@ function ShowMedia(data){
 }
 
 function AddMedia(data){
+    //文件名是否为空
+    if(data.name == undefined || data.name == ''){
+        data.name = data.title;
+    }
+    
     //网页标题做文件名
     if(localStorage['TitleName'] == "true"){
         if( data.ext ){
@@ -59,9 +64,9 @@ function AddMedia(data){
     
     //截取文件名长度
     fullname = data.name;
-    if(fullname.length >= 50){
+    if(fullname.length >= 43){
         fullname = fullname.replace(/\.[^.\/]+$/, "");
-        name = fullname.substr(0,20) + '...' +fullname.substr(-20)+ '.' + data.ext;
+        name = fullname.substr(0,13) + '...' +fullname.substr(-20)+ '.' + data.ext;
     }else{
         name = fullname;
     }
@@ -85,8 +90,11 @@ function AddMedia(data){
     if( data.type == 'application/octet-stream' ){
         data.size = '[stream]';
     }
-    var html = '<div class="panel panel-default"><div class="panel-heading">';
+    var html = '<div class="panel"><div class="panel-heading">';
     html += '<span>'+name+'</span>';
+    if(data.ext == 'm3u8'){
+		html += '<img src="img/parsing.png" class="ico" id="m3u8">';
+	}
     html += '<img src="img/download.png" class="ico" id="download">';
     html += isPlay(data.ext);
     html += '<img src="img/copy.png" class="ico" id="copy">';
@@ -129,11 +137,18 @@ function AddMedia(data){
         
         //播放关闭按钮
         $('#CloseBtn').bind("click", function(){
-            $('video').attr('src','');
+            $('video').removeAttr('src');
             $('#player').hide();
             return false;
         });
         return false;
+    });
+	
+	//解析m3u8
+    $('#medialist #m3u8').off().on('click',function(){ 
+		var url = $(this).parents().find('.url a').attr('href');
+		chrome.tabs.create({ url: '/m3u8.html?m3u8_url='+url });
+		return false;
     });
     
     //全部下载

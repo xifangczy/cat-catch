@@ -105,21 +105,21 @@ function findMedia(data){
         // var res = Disposition.match(/^(inline|attachment);\s*filename="?(.*?)"?\s*;?$/i);
         var res = Disposition.match(/filename="(.*?)"/);
         if(res && res[1]){
-            name=decodeURIComponent(res[1]);    //编码
+            name = decodeURIComponent(res[1]);    //编码
             name = GetFileName(name);
-            ext = GetExt(name);
-            if(data_ext.indexOf(ext) > -1){
-                filter = true;
+            ext  = GetExt(name);
+            for(var i = 0; i < Exts.length; i++){
+                data_ext = Exts[i].ext.toLowerCase();
+                if(data_ext.indexOf(ext)== -1){
+                    filter = true;
+                    break;
+                }
             }
         }
     }
     
     if(filter){
-        try{
-            var url = decodeURIComponent(data.url);
-        }catch(err){
-            var url = data.url;
-        }
+        var url = data.url;
         var dealurl = url;
         var id="tabid"+data.tabId;//记录当前请求所属标签的id
         //去除参数

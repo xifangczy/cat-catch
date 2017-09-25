@@ -18,8 +18,6 @@ body{
 }
 .panel{
     border:1px solid transparent;
-}
-.panel-default{
     border-color: #ddd;
     margin-bottom: 2px;
 }

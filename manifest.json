@@ -8,6 +8,7 @@
    },
    "description": "网页媒体嗅探工具",
    "icons": {
+      "40": "img/icon.png",
       "48": "img/icon.png",
       "128": "img/icon128.png"
    },
@@ -15,6 +16,6 @@
    "minimum_chrome_version": "30",
    "name": "猫抓",
    "options_page": "options.html",
-   "permissions": [ "tabs", "webRequest", "webRequestBlocking", "http://*/*", "https://*/*" ],
-   "version": "1.0.7"
+   "permissions": [ "tabs", "webRequest", "webRequestBlocking", "*://*/*", "<all_urls>"],
+   "version": "1.0.11"
 }

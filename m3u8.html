@@ -1,0 +1,52 @@
+<html>
+    <head>
+        <title>猫抓 m3u8解析</title>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
+    </head>
+
+  <body>
+    <div id="wrapper">
+      <header>猫抓 m3u8解析</header>
+      
+      <table id="options">
+      <tbody>
+        <tr id="textarea">
+          <td id="mappingsHelp">
+			<div id="m3u8_url"></div>
+			<br />
+			<div>共<div id="num" class="inline"></div>个文件<div id="key" class="inline"></div></div>
+            <div class="help">
+              <div class="example">
+                m3u8解析功能测试中
+				<br />
+				发现BUG请提交在扩展页评论...
+              </div>
+            </div>
+            <textarea rows="20" cols="100" id="html"></textarea>
+          </td>
+        </tr>
+
+		   <tr id="next_m3u8_tr" style="display:none">
+            <td>
+				<div>选择下一级m3u8文件</div>
+                <div class="help">
+                  <div class="example">
+                    该m3u8文件中嵌套另外m3u8文件
+                  </div>
+                </div>
+              <div id="next_m3u8"></div>
+            </td>
+          </tr>
+		  
+      </tbody>
+      </table>
+      <button id="DownText">下载文本格式</button>
+      <button id="Text">文本格式</button>
+      <button id="Aria2Text">aria2格式</button>
+      <button id="WgetText">wget格式</button>
+
+	<script src="js/jquery.min.js"></script>
+	<script src="js/m3u8.js"></script>
+</body>
+</html>
