@@ -17,5 +17,5 @@
    "name": "猫抓",
    "options_page": "options.html",
    "permissions": [ "tabs", "webRequest", "webRequestBlocking", "*://*/*", "<all_urls>"],
-   "version": "1.0.11"
+   "version": "1.0.12"
 }

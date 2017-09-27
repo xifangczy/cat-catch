@@ -110,7 +110,7 @@ function findMedia(data){
             ext  = GetExt(name);
             for(var i = 0; i < Exts.length; i++){
                 data_ext = Exts[i].ext.toLowerCase();
-                if(data_ext.indexOf(ext)== -1){
+                if(data_ext.indexOf(ext) != -1){
                     filter = true;
                     break;
                 }
@@ -159,7 +159,7 @@ function GetExt(FileName){
     }
 	var ext = str[str.length-1];
     ext = ext.match(/[0-9a-zA-Z]*/);
-    return ext[0];
+    return ext[0].toLowerCase();
 }
 function getHeaderValue(name, data){
 	name = name.toLowerCase();
