@@ -130,10 +130,16 @@ function AddMedia(data){
     
     //下载
     $('#medialist #download').off().on('click',function(){
-        id = $(this).parents().find('.url a');
-        var theEvent = document.createEvent("MouseEvent");
-        theEvent.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-        $(id)[0].dispatchEvent(theEvent);
+        // id = $(this).parents().find('.url a');
+        // var theEvent = document.createEvent("MouseEvent");
+        // theEvent.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+        // $(id)[0].dispatchEvent(theEvent);
+        var url = $(this).parents().find('.url a').attr('href');
+        var fileName = $(this).parents().find('.url a').attr('download');
+        chrome.downloads.download({
+            url: url,
+            filename: fileName
+        });
         return false;
     });
     
