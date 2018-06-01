@@ -10,13 +10,6 @@ results = new RegExp('\\.m3u8\\?([^\n]*)').exec(url);
 if(results){
     var m3u8_arg = results[1];
 }
-
-//dmm.co.jp url特殊处理
-if (url.indexOf('.dmm.co.jp') != -1) {
-	url = url.replace('=','%3D');
-	url = url.replace('+','%2B');
-}
-
 $('#m3u8_url').html(url);
 
 //获取url内容
@@ -24,8 +17,11 @@ var html = $.ajax({url:url,async:false}).responseText;
 html = html.split("\n");
 
 //基本文件目录
-var getManifestUrlBase = function() {
-	var url_decode = decodeURIComponent(url);
+var getManifestUrlBase = function(URL_flag) {
+    var url_decode = decodeURIComponent(url);
+    if(!URL_flag){
+        url_decode = url;
+    }
 	url_decode = url_decode.split("?")[0];
 	var parts = url_decode.split('/');
 	parts.pop();
@@ -36,7 +32,7 @@ var getManifestUrlRoot = function() {
 	var Path = url.split("/");
 	return Path[0] + '//' + Path[2];
 }
-var BasePath = getManifestUrlBase();
+var BasePath = getManifestUrlBase(true);
 var RootPath = getManifestUrlRoot();
 
 //验证是否远程文件
@@ -72,13 +68,17 @@ var show_list = function(str){
 		if (link.indexOf('URI=') != -1) {
 			var re = /URI="(.*)"/.exec(link);
 			$('#key').html('，该媒体已加密，请注意下载key文件');
-			
-			//dmm.co.jp url特殊处理
-			if (re[1].indexOf('.dmm.co.jp') != -1) {
-				re[1] = re[1].replace('ld%3D','ld=');
+            
+			KeyURL = re[1];
+			if (isRelative(KeyURL)) {
+				if (KeyURL[0] == '/'){
+					KeyURL = RootPath + KeyURL;
+				}else{
+					KeyURL = BasePath + KeyURL;
+				}
 			}
-			
-			add_textarea(str + re[1]);
+            
+			add_textarea(str + KeyURL);
 		}
 		
 		//ts文件
@@ -129,4 +129,16 @@ $('#DownText').bind("click", function(){
 	a.href = "data:application/json," + txt;
 	a.setAttribute('download', 'm3u8.txt');
 	a.dispatchEvent(new MouseEvent('click'));
+});
+
+//UrlDecode编码 按钮
+$('#UrlDecode').bind("click", function(){
+    BasePath = getManifestUrlBase(false);
+	show_list();
+});
+
+//刷新还原 按钮
+$('#Refresh').bind("click", function(){
+    BasePath = getManifestUrlBase(true);
+	show_list();
 });

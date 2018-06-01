@@ -21,6 +21,8 @@
                 m3u8解析功能测试中
 				<br />
 				发现BUG请提交在扩展页评论...
+                <br />
+                如遇到解析出的ts文件无法下载，请尝试UrlDecode解码
               </div>
             </div>
             <textarea rows="20" cols="100" id="html"></textarea>
@@ -45,6 +47,9 @@
       <button id="Text">文本格式</button>
       <button id="Aria2Text">aria2格式</button>
       <button id="WgetText">wget格式</button>
+      <button id="UrlDecode">UrlDecode解码</button>
+      <button id="Refresh">还原</button>
+      <div class="ffmpeg">ffmpeg合并ts命令: ffmpeg -i xxx.m3u8 -vcodec copy -acodec copy xxx.mp4</div>
 
 	<script src="js/jquery.min.js"></script>
 	<script src="js/m3u8.js"></script>

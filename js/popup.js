@@ -12,15 +12,16 @@ chrome.windows.getCurrent(function(wnd){
 function isPlay(ext){
     var arr = ['ogg','ogv','mp4','webm','mp3','wav','flv','m4a'];
     if(arr.indexOf(ext) > -1){
-        return '<img src="img/play.png" class="ico" id="play">';
+        return true;
     }
-    return '';
+    return false;
 }
 
 //超过3个显示全部下载
 function isAllDow(){
     if( $('#medialist #download').length >= 3 ){
-        $('#AllDow').show();
+        $('#down').show();
+        $('.DownCheck').show();
     }
 }
 
@@ -76,6 +77,7 @@ function AddMedia(data){
         <div class="panel panel-default">
             <div class="panel-heading">
                 <span></span>
+                <input type="checkbox" class="DownCheck" checked="true"/>
                 <img src="img/download.png" class="ico" id="download" />
                 <img src="img/play.png" class="ico" id="play" />
                 <img src="img/copy.png" class="ico" id="copy" />
@@ -95,17 +97,23 @@ function AddMedia(data){
     if(data.ext == 'm3u8'){
 		html += '<img src="img/parsing.png" class="ico" id="m3u8">';
 	}
+    html += '<input type="checkbox" class="DownCheck" checked="true"/>';
     html += '<img src="img/download.png" class="ico" id="download">';
-    html += isPlay(data.ext);
+    if( isPlay(data.ext) ){
+        html += '<img src="img/play.png" class="ico" id="play">';
+    }
     html += '<img src="img/copy.png" class="ico" id="copy">';
     html += '<span class="size">'+data.size+'</span>';
-    html += '</div><div class="url"><a href="'+data.url+'" target="_blank" download="'+DownName+'">'+data.url+'</a></div></div>';
-    $('#medialist').append(html);
+    html += '</div><div class="url"><a href="'+data.url+'" target="_blank" download="'+DownName+'">'+data.url+'</a></div>';
     
+    html += '</div>';
+    $('#medialist').append(html);
+
     //显示完整地址
     $('#medialist .panel-heading').off().on('click',function(){
         id = $(this).next();
         $(id).toggle();
+        return true;
     });
     
     //复制
@@ -130,15 +138,17 @@ function AddMedia(data){
     });
     
     //播放
-    $('#medialist #play').off().on('click',function(){ 
-        url = $(this).parents().find('.url a').attr('href');
+    $('#medialist #play').off().on('click',function(){
+        var url = $(this).parents().find('.url a').attr('href');
+        $('#player').appendTo(  $(this).parent().parent() );
         $('video').attr('src',url);
         $('#player').show();
-        
-        //播放关闭按钮
+       
+       //播放关闭按钮
         $('#CloseBtn').bind("click", function(){
             $('video').removeAttr('src');
-            $('#player').hide();
+            $("#player").hide();
+            $('#player').appendTo('body');
             return false;
         });
         return false;
@@ -151,14 +161,59 @@ function AddMedia(data){
 		return false;
     });
     
-    //全部下载
-    $('#AllDow').off().on('click',function(){
-        var obj = $('#medialist #download');
-        if( obj.length >= 5 ){
-            if(! window.confirm('共'+obj.length+'个文件，确定全部下载？')){
-                return false;
-            }
-        }
-        obj.click();
+    //多选框
+    $('.DownCheck').off().on('click',function(w){
+        //防止显示网完整地址
+        id = $(this).parent().next();
+        $(id).toggle();
+        return true;
+    });
+    
+    //下载选中文件
+    $('#DownFile').off().on('click',function(){      
+        $('#medialist input').each(function(){
+           if( $(this).prop('checked') ){
+               $(this).siblings('#download').click();
+           }
+        });
+        return false;
+    });
+    
+    //复制选中文件
+    $('#AllCopy').off().on('click',function(){
+        var text = $('<textarea id="copy_tmp"></textarea>');
+        var url = '';
+        $('#medialist input').each(function(){
+           if( $(this).prop('checked') ){
+               url += $(this).parents().find('.url a').attr('href') + "\n";
+           }
+        });
+        $(text).val(url);
+        $('body').append(text);
+        text.select();
+        document.execCommand('Copy');
+        $('#copy_tmp').remove();
+        $('#tempntc').html('已复制到剪贴板').fadeIn(500).delay(500).fadeOut(500);
+        return false;
+    });
+    
+    //全选
+    $('#AllSelect').off().on('click',function(){
+        $('#medialist input').each(function(){
+           $(this).attr("checked",'true');
+        });
+        return false;
+    });
+    
+    //反选
+    $('#ReSelect').off().on('click',function(){
+        $('#medialist input').each(function(){
+           if( $(this).prop('checked') ){
+               $(this).attr('checked',false);
+           }else{
+               $(this).attr('checked',true);
+           }
+        });
+        return false;
     });
 }

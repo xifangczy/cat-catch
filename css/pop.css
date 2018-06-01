@@ -80,14 +80,35 @@ body{
 #player{
     display: none;
 }
-
-#AllDow{
-    padding: 5px 5px;
-    background-color: #e5e9ef;
-    text-align: center;
-    cursor:pointer;
+#down{
     display: none;
 }
-#AllDow:hover{
+#down div{
+    /* padding: 5px 5px; */
+    /* background-color: #e5e9ef; */
+    /* text-align: center; */
+    /* cursor:pointer; */
+    /* float:left; */
+
+    margin: 2px 5px 2px;
+    background-color: #e5e9ef;
+    text-align: center;
+    border: 1px solid #e0e6ed;
+    height: 22px;
+    line-height: 22px;
+    border-radius:4px;
+    cursor:pointer;
+    width: 100px;
+    float: left;
+}
+#down div:hover{
     background-color: #ccd0d7;
+}
+.DownCheck{
+    display:none;
+    float:left;
+    vertical-align:middle; 
+    margin-right:5px;
+    width: 15px;
+    height: 15px;
 }

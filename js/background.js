@@ -68,7 +68,7 @@ function findMedia(data){
         console.log({name:name,url:data.url,size:size,ext:ext,type:contentType,tabid:data.tabId,title:title,all:data});
     }
     //得到设置的扩展名
-    Exts = JSON.parse(localStorage['Ext']); 
+    Exts = JSON.parse(localStorage['Ext']);
 
     var filter = false;//过滤器开关
 
