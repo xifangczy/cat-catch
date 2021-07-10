@@ -1,7 +1,10 @@
 ## 简介
 猫抓 chrome媒体嗅探插件
-安装地址
-https://chrome.google.com/webstore/detail/jfedfbgedapdagkghmgibemcoggfppbb
+## 已被下载
+因为Chrome官方扩展网站政策原因，已经被下架。
+下架原因
+"协助用户擅自访问或下载受版权保护的内容或媒体。"
+之后只会在github更新和发布.
 
 ## License
 MIT
