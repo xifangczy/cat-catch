@@ -68,6 +68,7 @@ var show_list = function(str){
 		if (link.indexOf('URI=') != -1) {
 			var re = /URI="(.*)"/.exec(link);
 			$('#key').html('，该媒体已加密，请注意下载key文件');
+			$('.ffmpeg').html('ffmpeg合并ts命令: ffmpeg -allowed_extensions ALL -i xxx.m3u8 -vcodec copy -acodec copy xxx.mp4');
             
 			KeyURL = re[1];
 			if (isRelative(KeyURL)) {
