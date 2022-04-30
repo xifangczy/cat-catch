@@ -22,26 +22,48 @@ var defaultExt = new Array(
 var defaultDebug = false;
 var defaultTitleName = false;
 var defaultAutoClear = 500;
+var defaultPotplayer = false;
+var Options = new Array();
 
 // Init
 chrome.storage.sync.get("Ext", function(items) {
     if(items.Ext === undefined){
         chrome.storage.sync.set({"Ext": defaultExt});
+        Options["Ext"] = defaultExt;
+    }else{
+        Options["Ext"] = items.Ext;
     }
 });
 chrome.storage.sync.get("Debug", function(items) {
     if(items.Debug === undefined){
         chrome.storage.sync.set({"Debug": defaultDebug});
+        Options["Debug"] = defaultDebug;
+    }else{
+        Options["Debug"] = items.Debug;
     }
 });
 chrome.storage.sync.get("TitleName", function(items) {
     if(items.TitleName === undefined){
         chrome.storage.sync.set({"TitleName": defaultTitleName});
+        Options["TitleName"] = defaultTitleName;
+    }else{
+        Options["TitleName"] = items.TitleName;
     }
 });
 chrome.storage.sync.get("AutoClear", function(items) {
     if(items.AutoClear === undefined){
         chrome.storage.sync.set({"AutoClear": defaultAutoClear});
+        Options["AutoClear"] = defaultAutoClear;
+    }else{
+        Options["AutoClear"] = items.AutoClear;
+    }
+});
+chrome.storage.sync.get("Potplayer", function(items) {
+    if(items.Potplayer === undefined){
+        chrome.storage.sync.set({"Potplayer": defaultPotplayer});
+        Options['Potplayer'] = defaultPotplayer;
+    }else{
+        Options['Potplayer'] = items.Potplayer;
     }
 });
 

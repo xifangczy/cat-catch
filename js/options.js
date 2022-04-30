@@ -30,6 +30,12 @@ chrome.storage.sync.get("AutoClear", function(items) {
     $('#AutoClear').val(items.AutoClear);
 });
 
+chrome.storage.sync.get("Potplayer", function(items) {
+    if(items.Potplayer){
+        $('#Potplayer').attr("checked","checked");
+    }
+});
+
 /////////////////////事件绑定/////////////////////
 //新增格式
 $('#AddExt').bind("click", function(){
@@ -69,6 +75,11 @@ $('#TitleName').bind("click", function(){
     chrome.storage.sync.set({"TitleName": $(this).prop("checked")});
 });
 
+//使用PotPlayer预览
+$('#Potplayer').bind("click", function(){
+    chrome.storage.sync.set({"Potplayer": $(this).prop("checked")});
+});
+
 //失去焦点 保存自动清理数
 $('#AutoClear').blur(function(){
     chrome.storage.sync.set({"AutoClear": $(this).val()});
@@ -80,6 +91,7 @@ $('#ResetExt').bind("click", function(){
     chrome.storage.sync.set({"Debug": defaultDebug});
     chrome.storage.sync.set({"TitleName": defaultTitleName});
     chrome.storage.sync.set({"AutoClear": defaultAutoClear});
+    chrome.storage.sync.set({"Potplayer": defaultPotplayer});
     location.reload();
 });
 

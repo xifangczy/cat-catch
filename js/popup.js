@@ -1,7 +1,7 @@
-chrome.storage.local.get('MediaData', function(items){
+chrome.storage.local.get("MediaData", function(items){
     for(var i = 0; i < items.MediaData.length; i++){
         AddMedia(items.MediaData[i]);
-    }
+    };
     UItoggle();
 });
 
@@ -41,10 +41,7 @@ function AddMedia(data){
             </div>
         </div>
     */
-    if( data.type == 'application/octet-stream'){
-        data.size = '[stream]';
-    }
-    if(data.size == "0MB"){
+    if( data.type == 'application/octet-stream' || data.size == "0MB"){
         data.size = '';
     }
     var html = '<div class="panel"><div class="panel-heading">';
@@ -54,7 +51,7 @@ function AddMedia(data){
     }
     html += '<input type="checkbox" class="DownCheck" checked="true"/>';
     html += '<img src="img/download.png" class="ico" id="download">';
-    if( isPlay(data.ext) ){
+    if( isPlay(data.ext) || Options['Potplayer']){
         html += '<img src="img/play.png" class="ico" id="play">';
     }
     html += '<img src="img/copy.png" class="ico" id="copy">';
@@ -97,16 +94,23 @@ function AddMedia(data){
     //播放
     $('#medialist #play').off().on('click',function(){
         var url = $(this).parents().find('.url a').attr('href');
-        $('#player').appendTo(  $(this).parent().parent() );
-        $('video').attr('src',url);
-        $('#player').show();
-       
-       //播放关闭按钮
-        $('#CloseBtn').bind("click", function(){
-            $('video').removeAttr('src');
-            $("#player").hide();
-            $('#player').appendTo('body');
-            return false;
+        chrome.storage.sync.get('Potplayer', function(items){
+            if(items.Potplayer){
+                // chrome.tabs.create({url: 'potplayer://' + url});
+                window.location.href = 'potplayer://' + url;
+            }else{
+                $('#player').appendTo(  $(this).parent().parent() );
+                $('video').attr('src',url);
+                $('#player').show();
+               //播放关闭按钮
+                $('#CloseBtn').bind("click", function(){
+                    $('video').removeAttr('src');
+                    $("#player").hide();
+                    $('#player').appendTo('body');
+                    return false;
+                });
+                $(document).scrollTop($(document).height());
+            }
         });
         return false;
     });
