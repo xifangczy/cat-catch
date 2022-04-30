@@ -4,6 +4,7 @@
         <meta charset="UTF-8">
         <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
         <script src="js/jquery.min.js"></script>
+        <script src="js/init.js"></script>
     </head>
 
   <body>
@@ -36,63 +37,10 @@
                     </tbody>
                   </table>
                </div>
-               <button id="AddExt" class="AddButton">新增一个</button>
+               <button id="AddExt" class="AddButton">新增</button>
             </div>
           </td>
         </tr>
-
-        <tr>
-          <td class="caption">Content-Type</td>
-          <td>
-            <div class="help">
-              <div class="example">
-                一些媒体文件使用非正常扩展名，需要通过MIME判断
-                <br><br>
-                常用格式对照表 <a href="http://tool.oschina.net/commons" target="_blank">http://tool.oschina.net/commons</a>
-                <br><br>
-                支持通配符，优先匹配扩展名
-              </div>
-            </div>
-            <div>
-               <div id="exclusionScrollBox">
-                  <table id="exclusionRules">
-                    <tbody>
-                     <tr>
-                        <td><span class="ExtType">MIME类型</span></td>
-                     </tr>
-                    </tbody>
-                    <tbody id="ExtTy">  
-                    </tbody>
-                  </table>
-               </div>
-               <button id="AddType" class="AddButton">新增一个</button>
-            </div>
-          </td>
-        </tr>        
-        <tr>
-          <td class="caption">其他选项</td>
-          <td class="booleanOption">
-            <div class="help">
-              <div class="example">
-                某些网站媒体资源自带参数。
-                <br>
-                勾选忽略参数过滤重复数据。
-              </div>
-            </div>
-              <label>
-                <input id="repeat" type="checkbox">
-                忽略参数(避免重复)
-              </label>
-          </td>
-        </tr>
-          <tr>
-            <td class="caption"></td>
-            <td>
-              <input id="repeatReg" type="text">
-              <div class="example info">匹配视频参数的正则，用于去除参数。不了解正则请勿动，可使用重置还原。</div>
-            </td>
-          </tr>
-          
           <tr>
             <td class="caption"></td>
               <td class="booleanOption">
@@ -102,7 +50,16 @@
                   </label>
               </td>
           </tr>
-          
+          <tr>
+            <td class="caption"></td>
+              <td class="booleanOption">
+                  <label>
+                    避免卡顿, 默认500条后自动清理数据
+                    <br>
+                    <input id="AutoClear" type="number" class="ext" style="width:100px;">
+                  </label>
+              </td>
+          </tr>
           <tr>
             <td class="caption"></td>
               <td class="booleanOption">
@@ -122,7 +79,7 @@
       </tbody>
       </table>
       <button id="ResetExt" class="AddButton">重置设置</button>
-      <button id="SaveExt" class="AddButton">保存全部设置</button>
+      <!-- <button id="SaveExt" class="AddButton">保存全部设置</button> -->
     </div>
     
 <div id="tempntc" class="tempntc">
@@ -130,8 +87,6 @@
         <div id="TempntcText" class="tempntc">test</div>
     </div>
 </div>
-
-    <script src="js/init.js"></script>
     <script src="js/options.js"></script>
 </body>
 </html>

@@ -10,7 +10,7 @@ results = new RegExp('\\.m3u8\\?([^\n]*)').exec(url);
 if(results){
     var m3u8_arg = results[1];
 }
-$('#m3u8_url').html(url);
+$('#m3u8_url').html("m3u8文件<br><a href='"+url+"' style='overflow: hidden; white-space: nowrap;'>"+url+"</a>");
 
 //获取url内容
 var html = $.ajax({url:url,async:false}).responseText;
@@ -67,9 +67,7 @@ var show_list = function(str){
 		//密钥
 		if (link.indexOf('URI=') != -1) {
 			var re = /URI="(.*)"/.exec(link);
-			$('#key').html('，该媒体已加密，请注意下载key文件');
-			$('.ffmpeg').html('ffmpeg合并ts命令: ffmpeg -allowed_extensions ALL -i xxx.m3u8 -vcodec copy -acodec copy xxx.mp4');
-            
+
 			KeyURL = re[1];
 			if (isRelative(KeyURL)) {
 				if (KeyURL[0] == '/'){
@@ -78,8 +76,8 @@ var show_list = function(str){
 					KeyURL = BasePath + KeyURL;
 				}
 			}
-            
-			add_textarea(str + KeyURL);
+            $('#key').html("该媒体已加密，请注意下载key文件<br> <a href='"+KeyURL+"' style='overflow: hidden; white-space: nowrap;'>"+KeyURL+"</a>");
+			// add_textarea(str + KeyURL);
 		}
 		
 		//ts文件
@@ -91,7 +89,9 @@ var show_list = function(str){
 					link = BasePath + link;
 				}
 			}
-			$('#num').html(++num);
+			// $('#num').html(++num);
+			num++;
+			$('#num').html('共' + num + '个文件');
 			add_textarea(str + link);
 			
 			//判断是否m3u8

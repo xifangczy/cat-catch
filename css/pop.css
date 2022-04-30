@@ -49,7 +49,7 @@ body{
 	text-align:center;
 	z-index:11;
 	pointer-events:none;
-	display:none;
+	/* display:none; */
 	color:#444;
 	font-weight:bold;
     
@@ -83,7 +83,7 @@ body{
 #down{
     display: none;
 }
-#down div{
+.button{
     /* padding: 5px 5px; */
     /* background-color: #e5e9ef; */
     /* text-align: center; */
@@ -98,10 +98,22 @@ body{
     line-height: 22px;
     border-radius:4px;
     cursor:pointer;
-    width: 100px;
+    width: 78px;
     float: left;
 }
-#down div:hover{
+#ToBottom{
+    margin: 2px 2px 2px;
+    background-color: #e5e9ef;
+    text-align: center;
+    border: 1px solid #e0e6ed;
+    height: 20px;
+    line-height: 22px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    display: none;
+}
+.button:hover, #ToBottom:hover{
     background-color: #ccd0d7;
 }
 .DownCheck{

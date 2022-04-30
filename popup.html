@@ -4,18 +4,21 @@
 	<meta charset="UTF-8">
 	<link rel="stylesheet" type="text/css" href="css/pop.css" media="all" />
     <script src="js/jquery.min.js"></script>
+    <script src="js/init.js"></script>
     <script src="js/popup.js"></script>
 </head>
 <body>
 
     <div id="tempntc">没有抓到资源</div>
+    <div id="ToBottom">到最底部↓</div>
     <div id="medialist"></div>
     <div id="down">
-        <div id="DownFile">下载所选</div>
-        <div id="AllCopy">复制所选</div>
-        <div id="AllSelect">全选</div>
-        <div id="ReSelect">反选</div>
+        <div id="DownFile" class="button">下载所选</div>
+        <div id="AllCopy" class="button">复制所选</div>
+        <div id="AllSelect" class="button">全选</div>
+        <div id="ReSelect" class="button">反选</div>
+        <div id="Clear" class="button">清空</div>
     </div>
-    <div id="player"><video autoplay controls width="100%"></video><input id="CloseBtn" type="button" value="关闭" /></div>
+    <div id="player"><video autoplay controls width="100%"></video><input id="CloseBtn" type="button" value="关闭"/></div>
 </body>
 </html>
