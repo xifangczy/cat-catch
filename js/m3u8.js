@@ -97,18 +97,7 @@ function show_list(str) {
 		}
 
 		//ts文件
-		if (
-			link.indexOf("#EXTINF") != -1 ||
-			link.indexOf("#EXT-X-ENDLIST") != -1 ||
-			link.indexOf("#EXTM3U") != -1 ||
-			link.indexOf("#EXT-X-MEDIA-SEQUENCE") != -1 ||
-			link.indexOf("#EXT-X-TARGETDURATION") != -1
-		) { continue; }
-		if (link == "" || link == " " || link == "\n" || link == "\r") {
-			continue;
-		}
-		console.log(link);
-		if (link.indexOf("#") == -1 && link !== "") {
+		if (link.indexOf("#") == -1 && link !== "" && link !== " " && link !== "\n" && link !== "\r") {
 			if (isRelative(link)) {
 				if (link[0] == "/") {
 					link = RootPath + link;

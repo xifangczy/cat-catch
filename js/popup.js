@@ -91,8 +91,7 @@ function AddMedia(data) {
     //播放
     html.find('#play').click(function () {
         if (Options.Potplayer) {
-            // chrome.tabs.create({url: 'potplayer://' + url});
-            window.location.href = 'potplayer://' + data.url;
+            window.open('potplayer://' + data.url);
         } else {
             $('video').attr('src', data.url);
             $('#player').show();
@@ -187,7 +186,7 @@ function UItoggle() {
         $('#down').show();
         $('.DownCheck').show();
     }
-    if (length >= 20) {
+    if (length >= 30) {
         $('#ToBottom').show();
     }
 }
