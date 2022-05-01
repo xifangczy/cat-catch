@@ -1,23 +1,12 @@
 //////////////////////初始化//////////////////////
-chrome.storage.sync.get("Ext", function (items) {
-    for (var i = 0; i < items.Ext.length; i++) {
-        $('#ExtTd').append(GethtmlExt(items.Ext[i].ext, items.Ext[i].size));
-    }
-});
-
-chrome.storage.sync.get("Debug", function (items) {
+chrome.storage.sync.get(["Ext", "Debug", "TitleName", "AutoClear", "Potplayer", "MoreType"], function (items) {
+    items.Ext.forEach(function (item) {
+        $('#ExtTd').append(GethtmlExt(item.ext, item.size));
+    });
     $('#Debug').attr("checked", items.Debug);
-});
-chrome.storage.sync.get("TitleName", function (items) {
     $('#TitleName').attr("checked", items.TitleName);
-});
-chrome.storage.sync.get("AutoClear", function (items) {
     $('#AutoClear').val(items.AutoClear);
-});
-chrome.storage.sync.get("Potplayer", function (items) {
     $('#Potplayer').attr("checked", items.Potplayer);
-});
-chrome.storage.sync.get("MoreType", function (items) {
     $('#MoreType').attr("checked", items.MoreType);
 });
 

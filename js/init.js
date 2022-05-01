@@ -27,52 +27,30 @@ var defaultMoreType = false;
 var Options = new Object();
 
 // Init
-chrome.storage.sync.get("Ext", function (items) {
+chrome.storage.sync.get(["Ext", "Debug", "TitleName", "AutoClear", "Potplayer", "MoreType"], function (items) {
+    Options.Ext = items.Ext ? items.Ext : defaultExt;
+    Options.Debug = items.Debug ? items.Debug : defaultDebug;
+    Options.TitleName = items.TitleName ? items.TitleName : defaultTitleName;
+    Options.AutoClear = items.AutoClear ? items.AutoClear : defaultAutoClear;
+    Options.Potplayer = items.Potplayer ? items.Potplayer : defaultPotplayer;
+    Options.MoreType = items.MoreType ? items.MoreType : defaultMoreType;
     if (items.Ext === undefined) {
         chrome.storage.sync.set({ "Ext": defaultExt });
-        Options.Ext = defaultExt;
-    } else {
-        Options.Ext = items.Ext;
     }
-});
-chrome.storage.sync.get("Debug", function (items) {
     if (items.Debug === undefined) {
         chrome.storage.sync.set({ "Debug": defaultDebug });
-        Options.Debug = defaultDebug;
-    } else {
-        Options.Debug = items.Debug;
     }
-});
-chrome.storage.sync.get("TitleName", function (items) {
     if (items.TitleName === undefined) {
         chrome.storage.sync.set({ "TitleName": defaultTitleName });
-        Options.TitleName = defaultTitleName;
-    } else {
-        Options.TitleName = items.TitleName;
     }
-});
-chrome.storage.sync.get("AutoClear", function (items) {
     if (items.AutoClear === undefined) {
         chrome.storage.sync.set({ "AutoClear": defaultAutoClear });
-        Options.AutoClear = defaultAutoClear;
-    } else {
-        Options.AutoClear = items.AutoClear;
     }
-});
-chrome.storage.sync.get("Potplayer", function (items) {
     if (items.Potplayer === undefined) {
         chrome.storage.sync.set({ "Potplayer": defaultPotplayer });
-        Options.Potplayer = defaultPotplayer;
-    } else {
-        Options.Potplayer = items.Potplayer;
     }
-});
-chrome.storage.sync.get("MoreType", function (items) {
     if (items.MoreType === undefined) {
         chrome.storage.sync.set({ "MoreType": defaultMoreType });
-        Options.MoreType = defaultMoreType;
-    } else {
-        Options.MoreType = items.MoreType;
     }
 });
 

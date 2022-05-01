@@ -1,8 +1,8 @@
 chrome.storage.local.get("MediaData", function (items) {
     if (items.MediaData === undefined) { return; }
-    for (var i = 0; i < items.MediaData.length; i++) {
-        AddMedia(items.MediaData[i]);
-    };
+    items.MediaData.forEach(function (item) {
+        AddMedia(item);
+    });
     UItoggle();
 });
 
@@ -59,7 +59,7 @@ function AddMedia(data) {
         html += '<img src="img/play.png" class="ico" id="play">';
     }
     html += '<img src="img/copy.png" class="ico" id="copy">';
-    if (data.type != 'application/octet-stream' || data.size != 0) {
+    if (data.type != 'application/octet-stream' && data.size != 0) {
         html += '<span class="size">' + data.size + 'MB</span>';
     }
     html += '</div><div class="url">';
