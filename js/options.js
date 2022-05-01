@@ -1,122 +1,110 @@
 //////////////////////初始化//////////////////////
-chrome.storage.sync.get("Ext", function(items) {
-    for(var i = 0; i < items.Ext.length; i++){
-        $('#ExtTd').append(GethtmlExt(items.Ext[i].ext,items.Ext[i].size));
-    }
-    //删除格式
-    $('#RemoveExt*').bind("click", function(){
-        $(this).parent().remove();
-        SaveExt();
-    });
-    //失去焦点自动保存
-    $('.ext').blur(function(){
-        SaveExt();
-    });
-});
-
-chrome.storage.sync.get("Debug", function(items) {
-    if(items.Debug){
-        $('#Debug').attr("checked","checked");
+chrome.storage.sync.get("Ext", function (items) {
+    for (var i = 0; i < items.Ext.length; i++) {
+        $('#ExtTd').append(GethtmlExt(items.Ext[i].ext, items.Ext[i].size));
     }
 });
 
-chrome.storage.sync.get("TitleName", function(items) {
-    if(items.TitleName){
-        $('#TitleName').attr("checked","checked");
-    }
+chrome.storage.sync.get("Debug", function (items) {
+    $('#Debug').attr("checked", items.Debug);
 });
-
-chrome.storage.sync.get("AutoClear", function(items) {
+chrome.storage.sync.get("TitleName", function (items) {
+    $('#TitleName').attr("checked", items.TitleName);
+});
+chrome.storage.sync.get("AutoClear", function (items) {
     $('#AutoClear').val(items.AutoClear);
 });
-
-chrome.storage.sync.get("Potplayer", function(items) {
-    if(items.Potplayer){
-        $('#Potplayer').attr("checked","checked");
-    }
+chrome.storage.sync.get("Potplayer", function (items) {
+    $('#Potplayer').attr("checked", items.Potplayer);
+});
+chrome.storage.sync.get("MoreType", function (items) {
+    $('#MoreType').attr("checked", items.MoreType);
 });
 
-/////////////////////事件绑定/////////////////////
 //新增格式
-$('#AddExt').bind("click", function(){
+$('#AddExt').bind("click", function () {
     $('#ExtTd').append(GethtmlExt());
-    
-    //删除
-    $('#RemoveExt*').bind("click", function(){
-        $(this).parent().remove();
-        SaveExt();
-    });
-    //失去焦点自动保存
-    $('.ext').blur(function(){
-        SaveExt();
-    });
 });
 
 //获得html_格式
-function GethtmlExt(){
-    var ext = arguments[0] ? arguments[0]: '';
-    var size = arguments[1] ? arguments[1]: '0';
-    return (
-        '<tr><td><input type="text" class="ext" placeholder="扩展名" value="' +
-        ext +
-        '"></td><td class="TdSize"><input type="number" class="size" placeholder="大小限制" value="' +
-        size +
-        '"></td><td class="SizeButton">kb</td><td id="RemoveExt" class="RemoveButton">X</td></tr>'
-    );
+function GethtmlExt() {
+    var ext = arguments[0] ? arguments[0] : '';
+    var size = arguments[1] ? arguments[1] : '0';
+    var html = '<tr><td><input type="text" class="ext" placeholder="扩展名" value="' + ext + '">';
+    html += '</td><td class="TdSize"><input type="number" class="size" placeholder="大小限制" value="' + size + '">';
+    html += '</td><td class="SizeButton">kb</td><td class="RemoveButton">X</td></tr>';
+    html = $(html);
+    html.find('.RemoveButton').click(function () {
+        html.remove();
+        SaveExt();
+    });
+    html.find('.ext').blur(function () {
+        SaveExt();
+    });
+    html.find('.size').click(function () {
+        SaveExt();
+    });
+    return html;
 }
 
 //调试模式
-$('#Debug').bind("click", function(){
-    chrome.storage.sync.set({"Debug": $(this).prop("checked")});
+$('#Debug').bind("click", function () {
+    chrome.storage.sync.set({ "Debug": $(this).prop("checked") });
 });
 
 //使用网页标题做文件名
-$('#TitleName').bind("click", function(){
-    chrome.storage.sync.set({"TitleName": $(this).prop("checked")});
+$('#TitleName').bind("click", function () {
+    chrome.storage.sync.set({ "TitleName": $(this).prop("checked") });
 });
 
 //使用PotPlayer预览
-$('#Potplayer').bind("click", function(){
-    chrome.storage.sync.set({"Potplayer": $(this).prop("checked")});
+$('#Potplayer').bind("click", function () {
+    chrome.storage.sync.set({ "Potplayer": $(this).prop("checked") });
+});
+
+//包含application/octet-stream文件
+$('#MoreType').bind("click", function () {
+    chrome.storage.sync.set({ "MoreType": $(this).prop("checked") });
 });
 
 //失去焦点 保存自动清理数
-$('#AutoClear').blur(function(){
-    chrome.storage.sync.set({"AutoClear": $(this).val()});
+$('#AutoClear').blur(function () {
+    chrome.storage.sync.set({ "AutoClear": $(this).val() });
 });
 
 //重置
-$('#ResetExt').bind("click", function(){
-    chrome.storage.sync.set({"Ext": defaultExt});
-    chrome.storage.sync.set({"Debug": defaultDebug});
-    chrome.storage.sync.set({"TitleName": defaultTitleName});
-    chrome.storage.sync.set({"AutoClear": defaultAutoClear});
-    chrome.storage.sync.set({"Potplayer": defaultPotplayer});
+$('#ResetExt').bind("click", function () {
+    chrome.storage.sync.set({
+        "Ext": defaultExt,
+        "Debug": defaultDebug,
+        "TitleName": defaultTitleName,
+        "AutoClear": defaultAutoClear,
+        "Potplayer": defaultPotplayer,
+        "MoreType": defaultMoreType
+    });
     location.reload();
 });
 
 //提示
-function Prompt(str,sec){
+function Prompt(str) {
     $('#TempntcText').html(str);
-    $('.tempntc').fadeIn(500).delay(sec).fadeOut(500);
+    $('.tempntc').fadeIn(500).delay(1000).fadeOut(500);
 }
 
 //保存
-function SaveExt(){
+function SaveExt() {
     var Ext = new Array();
-    $('#ExtTd tr').each(function(){
+    $('#ExtTd tr').each(function () {
         Tempext = $(this).find('.ext').val();
-        if(Tempext == null || Tempext == undefined || Tempext == ''){
+        if (Tempext == null || Tempext === undefined || Tempext == '' || Tempext == ' ') {
             return true;
         }
         Tempsize = $(this).find('.size').val();
-        if(Tempsize == null || Tempsize == undefined || Tempsize == ''){
+        if (Tempsize == null || Tempsize === undefined || Tempsize == '') {
             Tempsize = 0;
-            $(this).find('.size').val('0');
         }
-        Ext.push({ext:Tempext,size:Tempsize});
+        Ext.push({ ext: Tempext, size: Tempsize });
     });
-    console.log(Ext);
-    chrome.storage.sync.set({"Ext": Ext});
-    location.reload();
+    chrome.storage.sync.set({ "Ext": Ext });
+    // location.reload();
 }

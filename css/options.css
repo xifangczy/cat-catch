@@ -24,7 +24,6 @@ header {
   width: 100%;
 }
 button {
-  -webkit-user-select: none;
   -webkit-appearance: none;
   background-image: -webkit-linear-gradient(#ededed, #ededed 38%, #dedede);
   border: 1px solid rgba(0, 0, 0, 0.25);
@@ -60,9 +59,6 @@ button[disabled]:active {
   text-shadow: 0 1px 0 #f0f0f0;
   color: #888;
 }
-input[type="checkbox"] {
-  -webkit-user-select: none;
-}
 label:hover {
   color: black;
 }
@@ -81,7 +77,6 @@ textarea {
   box-sizing: border-box;
 }
 textarea {
-  /* Horizontal resizing is pretty screwy-looking. */
   resize: vertical;
 }
 table#options {
@@ -149,7 +144,6 @@ input#searchUrl {
   margin-left: 10px;
   font-size: 80%;
 }
-/* Make the caption in the settings table as small as possible, to pull the other fields to the right. */
 .caption {
   width: 1px;
   white-space: nowrap;
@@ -172,7 +166,6 @@ input:read-only {
   background-color: #eee;
   color: #666;
   pointer-events: none;
-  -webkit-user-select: none;
 }
 input[type="text"],
 textarea {
@@ -189,21 +182,16 @@ input[type="text"] {
 button:focus,
 input[type="text"]:focus,
 textarea:focus {
-  -webkit-transition: border-color 200ms;
   border-color: #4d90fe;
   outline: none;
 }
-/* Boolean options have a tighter form representation than text options. */
 td.booleanOption {
   font-size: 12px;
 }
-/* Ids and classes for rendering exclusionRules */
 #exclusionScrollBox {
   overflow: scroll;
   overflow-x: hidden;
   overflow-y: auto;
-  /* Each exclusion rule is about 30px, so this allows 7 before scrolling
-    max-height: 215px;*/
   min-height: 75px;
   border-radius: 2px;
   color: #444;
@@ -216,7 +204,7 @@ td.booleanOption {
   width: 33%;
 }
 .exclusionRemoveButton {
-  width: 1px; /* 1px; smaller than the button itself. */
+  width: 1px;
 }
 .RemoveButton {
   border: none;
@@ -261,7 +249,6 @@ input.size,
   width: 100%;
 }
 #endSpace {
-  /* Leave space for the fixed footer. */
   min-height: 30px;
   max-height: 30px;
 }
@@ -327,7 +314,6 @@ input.size,
   left: 50%;
   margin-left: -320px;
   top: 50px;
-  -webkit-box-shadow: rgba(0, 0, 0, 0.4) 0px 0px 6px;
   overflow-y: auto;
   z-index: 1;
 }
