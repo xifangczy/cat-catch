@@ -23,7 +23,7 @@ body {
   margin-bottom: 2px;
 }
 .panel-heading {
-  padding: 5px 5px 5px 5px;
+  padding: 8px 5px 8px 5px;
   /* border-bottom: 1px solid transparent; */
   background-color: #f5f5f5;
   border-color: #ddd;
@@ -36,6 +36,10 @@ body {
 .ico {
   float: right;
   padding-left: 5px;
+  transition: all 0.1s;
+}
+.ico:hover {
+  transform:scale(1.1);
 }
 .size {
   float: right;

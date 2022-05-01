@@ -37,9 +37,10 @@ function AddMedia(data) {
             <div class="panel-heading">
                 <span></span>
                 <input type="checkbox" class="DownCheck" checked="true"/>
-                <img src="img/download.png" class="ico" id="download" />
-                <img src="img/play.png" class="ico" id="play" />
-                <img src="img/copy.png" class="ico" id="copy" />
+                <img src="img/parsing.png" class="ico" id="m3u8" title="解析"/>
+                <img src="img/download.png" class="ico" id="download" title="下载"/>
+                <img src="img/play.png" class="ico" id="play" title="预览"/>
+                <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
                 <span class="size">
                 </span>
             </div>
@@ -51,14 +52,14 @@ function AddMedia(data) {
     var html = '<div class="panel"><div class="panel-heading">';
     html += '<span>' + trimName + '</span>';
     if (data.ext == 'm3u8') {
-        html += '<img src="img/parsing.png" class="ico" id="m3u8">';
+        html += '<img src="img/parsing.png" class="ico" id="m3u8" title="解析"/>';
     }
     html += '<input type="checkbox" class="DownCheck" checked="true"/>';
-    html += '<img src="img/download.png" class="ico" id="download">';
+    html += '<img src="img/download.png" class="ico" id="download" title="下载"/>';
     if (isPlay(data.ext) || Options.Potplayer) {
-        html += '<img src="img/play.png" class="ico" id="play">';
+        html += '<img src="img/play.png" class="ico" id="play" title="预览"/>';
     }
-    html += '<img src="img/copy.png" class="ico" id="copy">';
+    html += '<img src="img/copy.png" class="ico" id="copy" title="复制地址"/>';
     if (data.type != 'application/octet-stream' && data.size != 0) {
         html += '<span class="size">' + data.size + 'MB</span>';
     }
@@ -71,8 +72,9 @@ function AddMedia(data) {
 
     ////////////////////////绑定事件////////////////////////
     html = $(html);
-    html.click(function () {
-        $(this).find(".url").toggle();
+    //展开网址
+    html.find('.panel-heading').click(function () {
+        html.find(".url").toggle();
     });
     //点击复制网址
     html.find('#copy').click(function () {
