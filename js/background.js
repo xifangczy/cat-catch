@@ -15,8 +15,7 @@ chrome.webRequest.onResponseStarted.addListener(
 );
 
 function findMedia(data) {
-    if (
-        Options.Ext === undefined ||
+    if (Options.Ext === undefined ||
         Options.Debug === undefined ||
         Options.AutoClear === undefined ||
         Options.TitleName === undefined ||
@@ -35,6 +34,8 @@ function findMedia(data) {
     var ext = GetExt(name);
     //获得content-type
     var contentType = getHeaderValue("content-type", data);
+    //获得content-disposition
+    var Disposition = getHeaderValue('Content-Disposition', data);
     //获取网页标题
     if (data.tabId !== -1) {
         chrome.tabs.get(data.tabId, function (info) {
@@ -53,47 +54,32 @@ function findMedia(data) {
         return;
     }
 
-    //判断后缀名
-    for (var i = 0; i < Options.Ext.length; i++) {
-        data_ext = Options.Ext[i].ext.toLowerCase();
-        if (data_ext.indexOf(ext) == -1) {
-            continue;
-        } else if (Options.Ext[i].size == 0 || size >= Options.Ext[i].size * 1024 || size == null) {
-            filter = true;
-            break;
-        } else {
-            return;
-        }
-    }
-
-    //判断MIME类型
-    if (Options.MoreType && contentType != null && contentType.toLowerCase() == 'application/octet-stream') {
-        filter = true;
-    }
-    if (contentType != null && !filter) {
-        var contentType = contentType.split("/")[0].toLowerCase();
-        if (contentType == "audio" || contentType == "video") {
+    if (ext == null) {
+        //判断MIME类型
+        if (Options.MoreType && contentType != null && contentType.toLowerCase() == 'application/octet-stream') {
             filter = true;
         }
+        if (!filter && contentType != null) {
+            var contentType = contentType.split("/")[0].toLowerCase();
+            if (contentType == "audio" || contentType == "video") {
+                filter = true;
+            }
+        }
+    } else {
+        filter = CheckExtension(ext, size);
     }
 
     //查找附件
-    var Disposition = getHeaderValue('Content-Disposition', data);
-    if (Disposition && !filter) {
+    if (!filter && Disposition) {
         var res = Disposition.match(/filename="(.*?)"/);
         if (res && res[1]) {
             name = decodeURIComponent(res[1]);  //编码
             name = GetFileName(name);
             ext = GetExt(name);
-            for (var i = 0; i < Options.Ext.length; i++) {
-                data_ext = Options.Ext[i].ext.toLowerCase();
-                if (data_ext.indexOf(ext) != -1) {
-                    filter = true;
-                    break;
-                }
-            }
+            filter = CheckExtension(ext, 0);
         }
     }
+
     if (filter) {
         chrome.storage.local.get('MediaData', function (items) {
             if (items.MediaData === undefined) {
@@ -128,6 +114,28 @@ function findMedia(data) {
             chrome.runtime.sendMessage(info);
         });
     }
+}
+
+chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
+    if(Message == 'RefreshOption'){
+        SetOptions();
+    }
+});
+
+//检查扩展名以及大小限制
+function CheckExtension(ext, size) {
+    var result = false;
+    Options.Ext.forEach(function (item) {
+        if (item.ext.toLowerCase() == ext) {
+            if (item.size != 0 && size != null && size <= item.size * 1024) {
+                return;
+            } else {
+                result = true;
+                return;
+            }
+        }
+    });
+    return result;
 }
 
 //获取文件名

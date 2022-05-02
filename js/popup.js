@@ -67,8 +67,8 @@ function AddMedia(data) {
     if (data.webInfo) {
         html += '来自: ' + data.webInfo.title + '<br>URL: ' + data.webInfo.url + '<br>';
     }
-    html += '<a href="' + data.url + '" target="_blank" download="' + DownFileName + '">' + data.url + '</a></div>';
-    html += '</div>';
+    html += '<a href="' + data.url + '" target="_blank" download="' + DownFileName + '">' + data.url + '</a>';
+    html += '</div></div>';
 
     ////////////////////////绑定事件////////////////////////
     html = $(html);
@@ -112,7 +112,6 @@ function AddMedia(data) {
         html.find(".url").toggle();
         return true;
     });
-
     //添加页面
     $('#medialist').append(html);
 }
