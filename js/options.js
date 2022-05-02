@@ -1,15 +1,14 @@
 //////////////////////初始化//////////////////////
-chrome.storage.sync.get(["Ext", "Debug", "TitleName", "AutoClear", "Potplayer", "MoreType"],function (items) {
-    items.Ext.forEach(function (item) {
-      $("#ExtTd").append(GethtmlExt(item.ext, item.size));
-    });
-    $("#Debug").attr("checked", items.Debug);
-    $("#TitleName").attr("checked", items.TitleName);
-    $("#AutoClear").val(items.AutoClear);
-    $("#Potplayer").attr("checked", items.Potplayer);
-    $("#MoreType").attr("checked", items.MoreType);
+chrome.storage.sync.get(["Ext", "Debug", "TitleName", "AutoClear", "Potplayer", "MoreType"], function (items) {
+  for (let item of items.Ext) {
+    $("#ExtTd").append(GethtmlExt(item.ext, item.size));
   }
-);
+  $("#Debug").attr("checked", items.Debug);
+  $("#TitleName").attr("checked", items.TitleName);
+  $("#AutoClear").val(items.AutoClear);
+  $("#Potplayer").attr("checked", items.Potplayer);
+  $("#MoreType").attr("checked", items.MoreType);
+});
 
 //新增格式
 $("#AddExt").bind("click", function () {
@@ -86,7 +85,7 @@ function Prompt(str) {
 function SaveExt() {
   var Ext = new Array();
   $("#ExtTd tr").each(function () {
-    Tempext = $(this).find(".ext").val();
+    Tempext = $(this).find(".ext").val().toLowerCase();
     if (Tempext == null || Tempext === undefined || Tempext == "" || Tempext == " ") {
       return true;
     }

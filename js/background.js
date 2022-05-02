@@ -21,6 +21,10 @@ function findMedia(data) {
         Options.TitleName === undefined ||
         Options.MoreType === undefined
     ) { return; }
+    //调试模式
+    if (Options.Debug) {
+        console.log(data);
+    }
     //网页标题
     var title = 'Null';
     var webInfo = undefined;
@@ -44,10 +48,6 @@ function findMedia(data) {
                 webInfo = info;
             }
         });
-    }
-    //调试模式
-    if (Options.Debug) {
-        console.log(data);
     }
     //屏蔽Youtube
     if (data.url.indexOf(".youtube.com/") !== -1 || data.url.indexOf(".googlevideo.com/") !== -1) {
@@ -73,26 +73,22 @@ function findMedia(data) {
     if (!filter && Disposition) {
         var res = Disposition.match(/filename="(.*?)"/);
         if (res && res[1]) {
-            name = decodeURIComponent(res[1]);  //编码
-            name = GetFileName(name);
+            name = GetFileName(decodeURIComponent(res[1]));
             ext = GetExt(name);
             filter = CheckExtension(ext, 0);
         }
     }
 
     if (filter) {
-        chrome.storage.local.get('MediaData', function (items) {
-            if (items.MediaData === undefined) {
-                items.MediaData = new Array();
-            }
+        chrome.storage.local.get({ "MediaData": [] }, function (items) {
             //大于500条 清空 避免卡死
             if (items.MediaData.length > Options.AutoClear) {
                 chrome.storage.local.clear("MediaData");
                 return;
             }
             //查重
-            for (var i = 0; i < items.MediaData.length; i++) {
-                if (items.MediaData[i].url == data.url) {
+            for (let item of items.MediaData) {
+                if (item.url == data.url) {
                     return;
                 }
             }
@@ -117,25 +113,23 @@ function findMedia(data) {
 }
 
 chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
-    if(Message == 'RefreshOption'){
+    if (Message == 'RefreshOption') {
         SetOptions();
     }
 });
 
 //检查扩展名以及大小限制
 function CheckExtension(ext, size) {
-    var result = false;
-    Options.Ext.forEach(function (item) {
+    for (let item of Options.Ext) {
         if (item.ext.toLowerCase() == ext) {
             if (item.size != 0 && size != null && size <= item.size * 1024) {
-                return;
+                return false;
             } else {
-                result = true;
-                return;
+                return true;
             }
         }
-    });
-    return result;
+    }
+    return false;
 }
 
 //获取文件名
@@ -158,9 +152,9 @@ function GetExt(FileName) {
 //获取Header属性的值
 function getHeaderValue(name, data) {
     name = name.toLowerCase();
-    for (var i = 0; i < data.responseHeaders.length; i++) {
-        if (data.responseHeaders[i].name.toLowerCase() == name) {
-            return data.responseHeaders[i].value.toLowerCase();
+    for (let item of data.responseHeaders) {
+        if (item.name.toLowerCase() == name) {
+            return item.value.toLowerCase();
         }
     }
     return null;

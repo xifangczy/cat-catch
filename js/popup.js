@@ -1,9 +1,10 @@
 chrome.storage.local.get("MediaData", function (items) {
     if (items.MediaData === undefined) { return; }
-    items.MediaData.forEach(function (item) {
+    for(let item of items.MediaData){
         AddMedia(item);
-    });
+    }
     UItoggle();
+    $(document).scrollTop($(document).height());
 });
 
 //监听数据

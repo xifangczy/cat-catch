@@ -71,9 +71,7 @@ function show_list(str) {
 	}
 	var num = 0;
 	$("#html").text("");
-	for (i in html) {
-		var link = html[i];
-
+	for (let link of html) {
 		//密钥
 		if (link.indexOf("URI=") != -1) {
 			var re = /URI="(.*)"/.exec(link);
