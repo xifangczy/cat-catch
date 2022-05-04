@@ -39,14 +39,17 @@ body {
   transition: all 0.1s;
 }
 .ico:hover {
-  transform:scale(1.1);
+  transform: scale(1.1);
+}
+.ico:active {
+  transform: scale(1);
 }
 .size {
   float: right;
   font-weight: bold;
 }
-#tempntc {
-  position: fixed;
+#Tips {
+  /* position: fixed; */
   left: 0;
   right: 0;
   height: 20px;
@@ -88,12 +91,6 @@ body {
   margin-left: 150px;
   margin: auto;
 }
-#player {
-  display: none;
-}
-#down {
-  display: none;
-}
 .button {
   /* padding: 5px 5px; */
   /* background-color: #e5e9ef; */
@@ -101,7 +98,7 @@ body {
   /* cursor:pointer; */
   /* float:left; */
 
-  margin: 2px 5px 2px;
+  margin: 2px 2px 2px;
   background-color: #e5e9ef;
   text-align: center;
   border: 1px solid #e0e6ed;
@@ -109,8 +106,24 @@ body {
   line-height: 22px;
   border-radius: 4px;
   cursor: pointer;
-  width: 78px;
+  width: 84px;
   float: left;
+}
+.Tabs {
+  display: flex;
+}
+.TabButton {
+  background-color: #e5e9ef;
+  text-align: center;
+  border: 1px solid #e0e6ed;
+  height: 22px;
+  line-height: 22px;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 50%;
+}
+.TabButton.Active {
+  background-color: #ccd0d7;
 }
 #ToBottom {
   margin: 2px 2px 2px;
@@ -135,4 +148,16 @@ body {
   margin-right: 5px;
   width: 15px;
   height: 15px;
+}
+#player,
+#down,
+.mediaList {
+  display: none;
+}
+.TabShow {
+  display: block !important;
+}
+.TabButton {
+  display: flex;
+  justify-content: center;
 }

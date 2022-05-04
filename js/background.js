@@ -4,20 +4,23 @@ importScripts("init.js");
 // https://bugs.chromium.org/p/chromium/issues/detail?id=1271154
 // https://stackoverflow.com/questions/66618136/persistent-service-worker-in-chrome-extension/70003493#70003493
 chrome.webNavigation.onBeforeNavigate.addListener(function () {
-    console.log('Miao~');
+    console.log("Miao~");
 });
 
 //响应开始(用来检测媒体文件地址大小等信息)
 chrome.webRequest.onResponseStarted.addListener(
     function (data) {
         findMedia(data);
-    }, { urls: ["<all_urls>"] }, ["responseHeaders"]
+    },
+    { urls: ["<all_urls>"] },
+    ["responseHeaders"]
 );
 
 function findMedia(data) {
-    if (Options.Ext === undefined ||
+    if (
+        Options.Ext === undefined ||
         Options.Debug === undefined ||
-        Options.AutoClear === undefined ||
+        Options.OtherAutoClear === undefined ||
         Options.TitleName === undefined ||
         Options.MoreType === undefined
     ) { return; }
@@ -26,7 +29,7 @@ function findMedia(data) {
         console.log(data);
     }
     //网页标题
-    var title = 'Null';
+    var title = "Null";
     var webInfo = undefined;
     //过滤器开关
     var filter = false;
@@ -39,7 +42,7 @@ function findMedia(data) {
     //获得content-type
     var contentType = getHeaderValue("content-type", data);
     //获得content-disposition
-    var Disposition = getHeaderValue('Content-Disposition', data);
+    var Disposition = getHeaderValue("Content-Disposition", data);
     //获取网页标题
     if (data.tabId !== -1) {
         chrome.tabs.get(data.tabId, function (info) {
@@ -50,20 +53,24 @@ function findMedia(data) {
         });
     }
     //屏蔽Youtube
-    if (data.url.indexOf(".youtube.com/") !== -1 || data.url.indexOf(".googlevideo.com/") !== -1) {
-        return;
-    }
+    if (
+        data.url.indexOf(".youtube.com/") !== -1 ||
+        data.url.indexOf(".googlevideo.com/") !== -1
+    ) { return; }
 
     if (ext == null) {
         //判断MIME类型
-        if (Options.MoreType && contentType != null && contentType.toLowerCase() == 'application/octet-stream') {
+        if (Options.MoreType && contentType != null && contentType.toLowerCase() == "application/octet-stream") {
             filter = true;
         }
         if (!filter && contentType != null) {
-            var contentType = contentType.split("/")[0].toLowerCase();
-            if (contentType == "audio" || contentType == "video") {
-                filter = true;
-            }
+            let Type = contentType.toLowerCase();
+            Type = Type.split("/");
+            if (Type[0] == "audio" ||
+                Type[0] == "video" ||
+                Type[1] == "vnd.apple.mpegurl" ||
+                Type[1] == "x-mpegurl"
+            ) { filter = true; }
         }
     } else {
         filter = CheckExtension(ext, size);
@@ -80,42 +87,83 @@ function findMedia(data) {
     }
 
     if (filter) {
-        chrome.storage.local.get({ "MediaData": [] }, function (items) {
-            //大于500条 清空 避免卡死
-            if (items.MediaData.length > Options.AutoClear) {
-                chrome.storage.local.clear("MediaData");
-                return;
+        chrome.storage.local.get({ MediaData: {} }, function (items) {
+            var tabId = "tabId" + data.tabId;
+            if (items.MediaData[tabId] === undefined) {
+                items.MediaData[tabId] = new Array();
             }
-            //查重
-            for (let item of items.MediaData) {
-                if (item.url == data.url) {
-                    return;
-                }
+            for (let item of items.MediaData[tabId]) {
+                if (item.url == data.url) { return; }
             }
-            //添加数据
             var info = {
                 name: name,
                 url: data.url,
-                size: Math.round(100 * size / 1024 / 1024) / 100,
+                size: Math.round((100 * size) / 1024 / 1024) / 100,
                 ext: ext,
                 type: contentType,
-                tabid: data.tabId,
+                tabId: data.tabId,
                 title: title,
-                webInfo: webInfo
+                webInfo: webInfo,
             };
-            items.MediaData.push(info);
-            chrome.storage.local.set({ "MediaData": items.MediaData });
-            chrome.action.setBadgeText({ text: items.MediaData.length.toString() });
-            chrome.action.setTitle({ title: "抓到 " + items.MediaData.length.toString() + " 条资源" });
+            items.MediaData[tabId].push(info);
+            chrome.storage.local.set({ MediaData: items.MediaData });
+            if (data.tabId != -1) {
+                SetIcon(items.MediaData[tabId].length, data.tabId);
+            }
+
+            //自动清理幽灵数据
+            if (items.MediaData["tabId-1"] !== undefined && items.MediaData["tabId-1"].length > Options.OtherAutoClear) {
+                delete items.MediaData["tabId-1"];
+                chrome.storage.local.set({ MediaData: items.MediaData });
+            }
+
             chrome.runtime.sendMessage(info);
         });
     }
 }
 
+//监听来自popup 和 options的请求
 chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
-    if (Message == 'RefreshOption') {
+    if (Message == "RefreshOption") {
         SetOptions();
+    } else if (Message == "ClearIcon") {
+        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+            SetIcon(0, tabs[0].id);
+        });
     }
+});
+
+//切换标签，更新图标
+chrome.tabs.onActivated.addListener(function (info) {
+    let tabId = info.tabId;
+    chrome.storage.local.get({ MediaData: {} }, function (items) {
+        if (items.MediaData["tabId" + tabId] !== undefined) {
+            SetIcon(items.MediaData["tabId" + tabId].length, tabId);
+        } else {
+            SetIcon(0, tabId);
+        }
+    });
+});
+//标签更新，清除该标签的记录
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
+    if (changeInfo.status == "loading") {
+        chrome.storage.local.get({ MediaData: {} }, function (items) {
+            delete items.MediaData["tabId" + tabId];
+            chrome.storage.local.set({ MediaData: items.MediaData });
+            SetIcon(0, tabId);
+        });
+    }
+});
+//标签关闭，清除该标签的记录
+chrome.tabs.onRemoved.addListener(function (tabId) {
+    var tabIdObject = "tabId" + tabId;
+    chrome.storage.local.get({ MediaData: {} }, function (items) {
+        if (items.MediaData[tabIdObject] === undefined) {
+            return;
+        }
+        delete items.MediaData[tabIdObject];
+        chrome.storage.local.set({ MediaData: items.MediaData });
+    });
 });
 
 //检查扩展名以及大小限制
@@ -134,10 +182,10 @@ function CheckExtension(ext, size) {
 
 //获取文件名
 function GetFileName(url) {
-    var str = url.split("?");//url按？分开
-    str = str[0].split("/");//按/分开
-    str = str[str.length - 1].split("#");//按#分开
-    return str[0].toLowerCase();//得到带后缀的名字
+    var str = url.split("?"); //url按？分开
+    str = str[0].split("/"); //按/分开
+    str = str[str.length - 1].split("#"); //按#分开
+    return str[0].toLowerCase(); //得到带后缀的名字
 }
 //获取后缀名
 function GetExt(FileName) {
@@ -158,4 +206,15 @@ function getHeaderValue(name, data) {
         }
     }
     return null;
+}
+
+//设置扩展图标
+function SetIcon(Num, tabId) {
+    if (Num == 0) {
+        chrome.action.setBadgeText({ text: "", tabId: tabId });
+        chrome.action.setTitle({ title: "还没闻到味儿~", tabId: tabId });
+    } else {
+        chrome.action.setBadgeText({ text: Num.toString(), tabId: tabId });
+        chrome.action.setTitle({ title: "抓到 " + Num.toString() + " 条鱼", tabId: tabId });
+    }
 }

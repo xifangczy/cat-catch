@@ -1,11 +1,11 @@
 //////////////////////初始化//////////////////////
-chrome.storage.sync.get(["Ext", "Debug", "TitleName", "AutoClear", "Potplayer", "MoreType"], function (items) {
+chrome.storage.sync.get(["Ext", "Debug", "TitleName", "OtherAutoClear", "Potplayer", "MoreType"], function (items) {
   for (let item of items.Ext) {
     $("#ExtTd").append(GethtmlExt(item.ext, item.size));
   }
   $("#Debug").attr("checked", items.Debug);
   $("#TitleName").attr("checked", items.TitleName);
-  $("#AutoClear").val(items.AutoClear);
+  $("#OtherAutoClear").val(items.OtherAutoClear);
   $("#Potplayer").attr("checked", items.Potplayer);
   $("#MoreType").attr("checked", items.MoreType);
 });
@@ -57,8 +57,8 @@ $("#MoreType").bind("click", function () {
 });
 
 //失去焦点 保存自动清理数
-$("#AutoClear").blur(function () {
-  chrome.storage.sync.set({ AutoClear: $(this).val() });
+$("#OtherAutoClear").blur(function () {
+  chrome.storage.sync.set({ OtherAutoClear: $(this).val() });
 });
 
 //重置
@@ -67,7 +67,7 @@ $("#ResetExt").bind("click", function () {
     Ext: defaultExt,
     Debug: defaultDebug,
     TitleName: defaultTitleName,
-    AutoClear: defaultAutoClear,
+    OtherAutoClear: defaultOtherAutoClear,
     Potplayer: defaultPotplayer,
     MoreType: defaultMoreType,
   });

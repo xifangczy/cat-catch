@@ -25,5 +25,5 @@
     "webNavigation"
   ],
   "host_permissions": ["*://*/*", "<all_urls>"],
-  "version": "1.0.18"
+  "version": "1.0.19"
 }

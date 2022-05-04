@@ -1,17 +1,36 @@
-chrome.storage.local.get("MediaData", function (items) {
+//当前标签ID
+var tabIdObject = null;
+var tabId = null;
+chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    tabId = tabs[0].id;
+    tabIdObject = "tabId" + tabs[0].id;
+});
+
+//填充数据
+chrome.storage.local.get({ "MediaData": {} }, function (items) {
     if (items.MediaData === undefined) { return; }
-    for(let item of items.MediaData){
-        AddMedia(item);
+    if (items.MediaData[tabIdObject] !== undefined) {
+        for (let item of items.MediaData[tabIdObject]) {
+            AddMedia(item);
+        }
+    }
+    if (items.MediaData["tabId-1"] !== undefined) {
+        for (let item of items.MediaData["tabId-1"]) {
+            AddMedia(item);
+        }
     }
     UItoggle();
-    $(document).scrollTop($(document).height());
+    // $(document).scrollTop($(document).height());
 });
 
 //监听数据
 chrome.runtime.onMessage.addListener(function (MediaData, sender, sendResponse) {
-    AddMedia(MediaData);
-    UItoggle();
+    if (MediaData.tabId == tabId || MediaData.tabId == -1) {
+        AddMedia(MediaData);
+        UItoggle();
+    }
 });
+
 
 function AddMedia(data) {
     //文件名是否为空
@@ -20,14 +39,14 @@ function AddMedia(data) {
     }
 
     //截取文件名长度
-    trimName = data.name;
+    var trimName = data.name;
     if (data.name.length >= 43) {
         trimName = data.name.replace(/\.[^.\/]+$/, "");
         trimName = trimName.substr(0, 13) + '...' + trimName.substr(-20) + '.' + data.ext;
     }
 
     //添加下载文件名
-    DownFileName = data.name;
+    var DownFileName = data.name;
     if (Options.TitleName) {
         DownFileName = data.ext ? data.title + '.' + data.ext : data.title;
     }
@@ -65,9 +84,9 @@ function AddMedia(data) {
         html += '<span class="size">' + data.size + 'MB</span>';
     }
     html += '</div><div class="url">';
-    if (data.webInfo) {
-        html += '来自: ' + data.webInfo.title + '<br>URL: ' + data.webInfo.url + '<br>';
-    }
+    // if (data.webInfo) {
+    //     html += '来自: ' + data.webInfo.title + '<br>URL: ' + data.webInfo.url + '<br>';
+    // }
     html += '<a href="' + data.url + '" target="_blank" download="' + DownFileName + '">' + data.url + '</a>';
     html += '</div></div>';
 
@@ -80,7 +99,7 @@ function AddMedia(data) {
     //点击复制网址
     html.find('#copy').click(function () {
         navigator.clipboard.writeText(data.url);
-        $("#tempntc").html("已复制到剪贴板").fadeIn(500).delay(500).fadeOut(500);
+        Tips("已复制到剪贴板");
         return false;
     });
     // 下载
@@ -114,51 +133,64 @@ function AddMedia(data) {
         return true;
     });
     //添加页面
-    $('#medialist').append(html);
+    if (data.tabId === -1) {
+        $('#otherMediaList').append(html);
+    } else {
+        $('#mediaList').append(html);
+    }
 }
 
+//绑定事件
 $(function () {
+    //到页面底部
+    $("#ToBottom").click(function () {
+        $(document).scrollTop($(document).height());
+    });
+    //标签切换
+    $(".Tabs .TabButton").click(function () {
+        var index = $(this).index();
+        $(".Tabs .TabButton").removeClass('Active');
+        $(this).addClass("Active");
+        $(".mediaList").removeClass("TabShow");
+        $(".mediaList").eq(index).addClass("TabShow");
+        UItoggle();
+    });
     //下载选中文件
     $('#DownFile').click(function () {
-        var FileNum = $(':checked').size();
+        var FileNum = $('.TabShow :checked').size();
         if (FileNum >= 10 && !confirm("共 " + FileNum + "个文件，是否确认下载?")) {
             return;
         }
-        $(':checked').each(function () {
+        $('.TabShow :checked').each(function () {
             $(this).siblings('#download').click();
         });
     });
     //复制选中文件
     $('#AllCopy').click(function () {
         var url = '';
-        $(':checked').each(function () {
+        $('.TabShow :checked').each(function () {
             url += $(this).parents('.panel').find('.url a').attr('href') + "\n";
         });
         navigator.clipboard.writeText(url);
-        $('#tempntc').html('已复制到剪贴板').fadeIn(500).delay(500).fadeOut(500);
+        Tips("已复制到剪贴板");
     });
     //全选
     $('#AllSelect').click(function () {
-        $('#medialist input').each(function () {
+        $('.TabShow input').each(function () {
             $(this).attr("checked", true);
         });
     });
     //反选
     $('#ReSelect').click(function () {
-        $('#medialist input').each(function () {
+        $('.TabShow input').each(function () {
             $(this).attr('checked', !$(this).prop('checked'));
         });
     });
-    //清空
+    //清空全部数据
     $('#Clear').click(function () {
         chrome.storage.local.clear("MediaData");
-        chrome.action.setBadgeText({ text: '' });
-        chrome.action.setTitle({ title: "还没闻到味儿~" });
+        chrome.runtime.sendMessage('ClearIcon');
         location.reload();
-    });
-    //到页面底部
-    $("#ToBottom").click(function () {
-        $(document).scrollTop($(document).height());
     });
     //预览播放关闭按钮
     $('#CloseBtn').click(function () {
@@ -180,16 +212,31 @@ function isPlay(ext) {
 
 //取消提示 3个以上显示操作按钮
 function UItoggle() {
-    var length = $('#medialist #download').length;
+    var length = $('.TabShow #download').length;
     if (length > 0) {
-        $('#tempntc').hide();
+        $('#Tips').hide();
+    } else {
+        $('#Tips').show();
     }
     if (length >= 3) {
-        $('#down').show();
-        $('.DownCheck').show();
+        $('#down,.DownCheck').show();
+    } else {
+        $('#down,.DownCheck').hide();
     }
     if (length >= 30) {
         $('#ToBottom').show();
+    } else {
+        $('#ToBottom').hide();
     }
+    length = $('#mediaList .panel').length;
+    $("#mediaQuantity").text(length);
+    length = $('#otherMediaList .panel').length;
+    $("#otherQuantity").text(length);
 }
 
+function Tips(text) {
+    $('#Tips').css("position", "fixed");
+    $('#Tips').html(text).fadeIn(500).delay(200).fadeOut(500, function () {
+        $(this).css("position", "static");
+    });
+}

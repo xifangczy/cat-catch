@@ -21,19 +21,19 @@ var defaultExt = new Array(
 );
 var defaultDebug = false;
 var defaultTitleName = false;
-var defaultAutoClear = 500;
+var defaultOtherAutoClear = 500;
 var defaultPotplayer = false;
 var defaultMoreType = false;
 var Options = new Object();
 
 // Init
 SetOptions();
-function SetOptions(){
-    chrome.storage.sync.get(["Ext", "Debug", "TitleName", "AutoClear", "Potplayer", "MoreType"], function (items) {
+function SetOptions() {
+    chrome.storage.sync.get(["Ext", "Debug", "TitleName", "OtherAutoClear", "Potplayer", "MoreType"], function (items) {
         Options.Ext = items.Ext ? items.Ext : defaultExt;
         Options.Debug = items.Debug ? items.Debug : defaultDebug;
         Options.TitleName = items.TitleName ? items.TitleName : defaultTitleName;
-        Options.AutoClear = items.AutoClear ? items.AutoClear : defaultAutoClear;
+        Options.OtherAutoClear = items.OtherAutoClear ? items.OtherAutoClear : defaultOtherAutoClear;
         Options.Potplayer = items.Potplayer ? items.Potplayer : defaultPotplayer;
         Options.MoreType = items.MoreType ? items.MoreType : defaultMoreType;
         if (items.Ext === undefined) {
@@ -45,8 +45,8 @@ function SetOptions(){
         if (items.TitleName === undefined) {
             chrome.storage.sync.set({ "TitleName": defaultTitleName });
         }
-        if (items.AutoClear === undefined) {
-            chrome.storage.sync.set({ "AutoClear": defaultAutoClear });
+        if (items.OtherAutoClear === undefined) {
+            chrome.storage.sync.set({ "OtherAutoClear": defaultOtherAutoClear });
         }
         if (items.Potplayer === undefined) {
             chrome.storage.sync.set({ "Potplayer": defaultPotplayer });
@@ -56,10 +56,3 @@ function SetOptions(){
         }
     });
 }
-
-chrome.storage.local.get("MediaData", function (items) {
-    if (items.MediaData !== undefined) {
-        chrome.action.setBadgeText({ text: items.MediaData.length.toString() });
-        chrome.action.setTitle({ title: "抓到 " + items.MediaData.length.toString() + " 条资源" });
-    }
-});
