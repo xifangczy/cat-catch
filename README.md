@@ -10,7 +10,7 @@ https://chrome.google.com/webstore/detail/%E7%8C%AB%E6%8A%93/jfedfbgedapdagkghmg
 ### 1.0.18
 增加application/octet-stream选项，继续部分代码重写
 ### 1.0.17
-Manifest 更新到 V3 部分代码重写
+Manifest 更新到 V3 部分代码重写，增加“使用PotPlayer预览媒体”选项。
 
 ## 源码加载方法
 1. https://github.com/xifangczy/cat-catch/releases 下载 Source code 并解压。
