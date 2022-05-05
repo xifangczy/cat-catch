@@ -28,6 +28,18 @@ function findMedia(data) {
     if (Options.Debug) {
         console.log(data);
     }
+    //URL 分析
+    var urlParsing = new URL(data.url);
+    //屏蔽特殊页面
+    if (urlParsing.protocol == "chrome-extension:" ||
+        urlParsing.protocol == "chrome:" ||
+        urlParsing.protocol == "extension:") { return; }
+    //屏蔽Youtube
+    if (
+        urlParsing.host.indexOf("youtube.com") != -1 ||
+        urlParsing.host.indexOf("googlevideo.com") != -1
+    ) { return; }
+
     //网页标题
     var title = "Null";
     var webInfo = undefined;
@@ -52,12 +64,6 @@ function findMedia(data) {
             }
         });
     }
-    //屏蔽Youtube
-    if (
-        data.url.indexOf(".youtube.com/") !== -1 ||
-        data.url.indexOf(".googlevideo.com/") !== -1
-    ) { return; }
-
     if (ext == null) {
         //判断MIME类型
         if (Options.MoreType && contentType != null && contentType.toLowerCase() == "application/octet-stream") {
@@ -158,9 +164,6 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
 chrome.tabs.onRemoved.addListener(function (tabId) {
     var tabIdObject = "tabId" + tabId;
     chrome.storage.local.get({ MediaData: {} }, function (items) {
-        if (items.MediaData[tabIdObject] === undefined) {
-            return;
-        }
         delete items.MediaData[tabIdObject];
         chrome.storage.local.set({ MediaData: items.MediaData });
     });

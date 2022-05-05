@@ -39,26 +39,31 @@ function GethtmlExt() {
 //调试模式
 $("#Debug").bind("click", function () {
   chrome.storage.sync.set({ Debug: $(this).prop("checked") });
+  chrome.runtime.sendMessage('RefreshOption');
 });
 
 //使用网页标题做文件名
 $("#TitleName").bind("click", function () {
   chrome.storage.sync.set({ TitleName: $(this).prop("checked") });
+  chrome.runtime.sendMessage('RefreshOption');
 });
 
 //使用PotPlayer预览
 $("#Potplayer").bind("click", function () {
   chrome.storage.sync.set({ Potplayer: $(this).prop("checked") });
+  chrome.runtime.sendMessage('RefreshOption');
 });
 
 //包含application/octet-stream文件
 $("#MoreType").bind("click", function () {
   chrome.storage.sync.set({ MoreType: $(this).prop("checked") });
+  chrome.runtime.sendMessage('RefreshOption');
 });
 
 //失去焦点 保存自动清理数
 $("#OtherAutoClear").blur(function () {
   chrome.storage.sync.set({ OtherAutoClear: $(this).val() });
+  chrome.runtime.sendMessage('RefreshOption');
 });
 
 //重置

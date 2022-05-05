@@ -1,21 +1,24 @@
 <html>
-    <head>
-        <title>猫抓 - m3u8解析</title>
-        <meta charset="UTF-8">
-        <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
-    </head>
 
-  <body>
-    <div id="wrapper">
-      <header>猫抓 m3u8解析</header>
-      
-      <table id="options">
+<head>
+  <title>猫抓 - m3u8解析</title>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
+</head>
+
+<body>
+  <div id="wrapper">
+    <header>猫抓 m3u8解析</header>
+
+    <table id="options">
       <tbody>
         <tr id="textarea">
           <td id="mappingsHelp">
-			<div id="m3u8_url"></div>
-			<br />
-			<div id="num"></div><div id="key"></div>
+            <div id="loading" class="display: none;">文件载入中...</div>
+            <div id="m3u8_url"></div>
+            <br />
+            <div id="num"></div>
+            <div id="key"></div>
             <!-- <div class="help">
               <div class="example">
                 m3u8解析功能测试中
@@ -28,29 +31,30 @@
           </td>
         </tr>
 
-		   <tr id="next_m3u8_tr" style="display:none">
-            <td>
-				<div>选择下一级m3u8文件</div>
-                <div class="help">
-                  <div class="example">
-                    该m3u8文件中嵌套另外m3u8文件
-                  </div>
-                </div>
-              <div id="next_m3u8"></div>
-            </td>
-          </tr>
-		  
-      </tbody>
-      </table>
-      <button id="DownText">下载文本格式</button>
-      <button id="Text">文本格式</button>
-      <button id="Aria2Text">aria2格式</button>
-      <button id="WgetText">wget格式</button>
-      <button id="UrlDecode">UrlDecode解码</button>
-      <button id="Refresh">还原</button>
-      <div class="ffmpeg">ffmpeg合并ts命令: ffmpeg -i xxx.m3u8 -vcodec copy -acodec copy xxx.mp4</div>
+        <tr id="next_m3u8_tr" style="display:none">
+          <td>
+            <div>选择下一级m3u8文件</div>
+            <div class="help">
+              <div class="example">
+                该m3u8文件中嵌套另外m3u8文件
+              </div>
+            </div>
+            <div id="next_m3u8"></div>
+          </td>
+        </tr>
 
-	<script src="js/jquery.min.js"></script>
-	<script src="js/m3u8.js"></script>
+      </tbody>
+    </table>
+    <button id="DownText">下载文本格式</button>
+    <button id="Text">文本格式</button>
+    <button id="Aria2Text">aria2格式</button>
+    <button id="WgetText">wget格式</button>
+    <button id="UrlDecode">UrlDecode解码</button>
+    <button id="Refresh">还原</button>
+    <div class="ffmpeg">ffmpeg合并ts命令: ffmpeg -i xxx.m3u8 -vcodec copy -acodec copy xxx.mp4</div>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/m3u8.js"></script>
 </body>
+
 </html>

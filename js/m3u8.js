@@ -66,6 +66,7 @@ function add_next_m3u8(str) {
 
 //链接列表
 function show_list(str) {
+	$('#loading').show();
 	if (str === undefined) {
 		str = "";
 	}
@@ -117,6 +118,7 @@ function show_list(str) {
 			}
 		}
 	}
+	$('#loading').hide();
 }
 show_list();
 

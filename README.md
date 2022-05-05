@@ -4,7 +4,7 @@
 ## Chrome 安装地址
 https://chrome.google.com/webstore/detail/%E7%8C%AB%E6%8A%93/jfedfbgedapdagkghmgibemcoggfppbb
 
-Chrome扩展审核很漫长 导致版本号会滞后一些 如果差别太多 可以先使用源码加载办法使用GitHub版。
+目前商店版本1.0.17有很多严重的BUG，影响使用，官方审核新版本非常漫长，优先使用GitHub里Releases发布的版本。非Crhome浏览器可以使用crx文件。
 
 接下来还是GitHub版本为主 避免官方再次下架扩展。
 
