@@ -11,9 +11,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(function () {
 chrome.webRequest.onResponseStarted.addListener(
     function (data) {
         findMedia(data);
-    },
-    { urls: ["<all_urls>"] },
-    ["responseHeaders"]
+    }, { urls: ["<all_urls>"] }, ["responseHeaders", "extraHeaders"]
 );
 
 function findMedia(data) {
@@ -24,13 +22,13 @@ function findMedia(data) {
         Options.TitleName === undefined ||
         Options.MoreType === undefined
     ) { return; }
-    //调试模式
-    if (Options.Debug) {
-        console.log(data);
-    }
-    //URL 分析
-    var urlParsing = new URL(data.url);
-    //屏蔽特殊页面
+    //屏蔽特殊页面发起的资源
+    var urlParsing = new URL(data.initiator);
+    if (urlParsing.protocol == "chrome-extension:" ||
+        urlParsing.protocol == "chrome:" ||
+        urlParsing.protocol == "extension:") { return; }
+    //屏蔽特殊页面的资源
+    urlParsing = new URL(data.url);
     if (urlParsing.protocol == "chrome-extension:" ||
         urlParsing.protocol == "chrome:" ||
         urlParsing.protocol == "extension:") { return; }
@@ -39,7 +37,10 @@ function findMedia(data) {
         urlParsing.host.indexOf("youtube.com") != -1 ||
         urlParsing.host.indexOf("googlevideo.com") != -1
     ) { return; }
-
+    //调试模式
+    if (Options.Debug) {
+        console.log(data);
+    }
     //网页标题
     var title = "Null";
     var webInfo = undefined;
@@ -91,7 +92,6 @@ function findMedia(data) {
             filter = CheckExtension(ext, 0);
         }
     }
-
     if (filter) {
         chrome.storage.local.get({ MediaData: {} }, function (items) {
             var tabId = "tabId" + data.tabId;
@@ -109,7 +109,7 @@ function findMedia(data) {
                 type: contentType,
                 tabId: data.tabId,
                 title: title,
-                webInfo: webInfo,
+                webInfo: webInfo
             };
             items.MediaData[tabId].push(info);
             chrome.storage.local.set({ MediaData: items.MediaData });
@@ -203,6 +203,7 @@ function GetExt(FileName) {
 //获取Header属性的值
 function getHeaderValue(name, data) {
     name = name.toLowerCase();
+    if (data.responseHeaders == undefined) { return null; }
     for (let item of data.responseHeaders) {
         if (item.name.toLowerCase() == name) {
             return item.value.toLowerCase();
