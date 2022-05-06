@@ -23,10 +23,13 @@ function findMedia(data) {
         Options.MoreType === undefined
     ) { return; }
     //屏蔽特殊页面发起的资源
-    var urlParsing = new URL(data.initiator);
-    if (urlParsing.protocol == "chrome-extension:" ||
-        urlParsing.protocol == "chrome:" ||
-        urlParsing.protocol == "extension:") { return; }
+    var urlParsing = new Object();
+    if (data.initiator !== undefined) {
+        urlParsing = new URL(data.initiator);
+        if (urlParsing.protocol == "chrome-extension:" ||
+            urlParsing.protocol == "chrome:" ||
+            urlParsing.protocol == "extension:") { return; }
+    }
     //屏蔽特殊页面的资源
     urlParsing = new URL(data.url);
     if (urlParsing.protocol == "chrome-extension:" ||
@@ -116,14 +119,15 @@ function findMedia(data) {
             if (data.tabId != -1) {
                 SetIcon(items.MediaData[tabId].length, data.tabId);
             }
-
             //自动清理幽灵数据
             if (items.MediaData["tabId-1"] !== undefined && items.MediaData["tabId-1"].length > Options.OtherAutoClear) {
                 delete items.MediaData["tabId-1"];
                 chrome.storage.local.set({ MediaData: items.MediaData });
             }
-
-            chrome.runtime.sendMessage(info);
+            chrome.runtime.sendMessage(info, function () {
+                // console.log(chrome.runtime.lastError.message);
+                return chrome.runtime.lastError;
+            });
         });
     }
 }
@@ -137,8 +141,8 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             SetIcon(0, tabs[0].id);
         });
     }
+    sendResponse("OK");
 });
-
 //切换标签，更新图标
 chrome.tabs.onActivated.addListener(function (info) {
     let tabId = info.tabId;
@@ -182,7 +186,6 @@ function CheckExtension(ext, size) {
     }
     return false;
 }
-
 //获取文件名
 function GetFileName(url) {
     var str = url.split("?"); //url按？分开
@@ -211,7 +214,6 @@ function getHeaderValue(name, data) {
     }
     return null;
 }
-
 //设置扩展图标
 function SetIcon(Num, tabId) {
     if (Num == 0) {

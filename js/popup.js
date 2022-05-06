@@ -29,6 +29,7 @@ chrome.runtime.onMessage.addListener(function (MediaData, sender, sendResponse) 
         AddMedia(MediaData);
         UItoggle();
     }
+    sendResponse("OK");
 });
 
 
