@@ -68,22 +68,24 @@ function findMedia(data) {
             }
         });
     }
-    if (ext == null) {
-        //判断MIME类型
-        if (Options.MoreType && contentType != null && contentType.toLowerCase() == "application/octet-stream") {
-            filter = true;
-        }
-        if (!filter && contentType != null) {
-            let Type = contentType.toLowerCase();
-            Type = Type.split("/");
-            if (Type[0] == "audio" ||
-                Type[0] == "video" ||
-                Type[1] == "vnd.apple.mpegurl" ||
-                Type[1] == "x-mpegurl"
+
+    if (ext != null) {
+        filter = CheckExtension(ext, size);
+    } else if (contentType != null) {
+        let Type = contentType.toLowerCase();
+        let TypeSplit = Type.split("/");
+        if (Options.MoreType) {
+            if (Type == "application/octet-stream" ||
+                TypeSplit[0] == "image"
             ) { filter = true; }
         }
-    } else {
-        filter = CheckExtension(ext, size);
+        if (!filter) {
+            if (TypeSplit[0] == "audio" ||
+                TypeSplit[0] == "video" ||
+                TypeSplit[1] == "vnd.apple.mpegurl" ||
+                TypeSplit[1] == "x-mpegurl"
+            ) { filter = true; }
+        }
     }
 
     //查找附件

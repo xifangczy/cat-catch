@@ -14,6 +14,8 @@ https://chrome.google.com/webstore/detail/jfedfbgedapdagkghmgibemcoggfppbb
 3. 左上角点击 "加载已解压的扩展程序" 然后选中你解压好的猫抓的目录即可。
 
 ## 更新说明
+### 1.0.20
+一些小修改 设置增加抓取image/*类型文件选项，避免网站把媒体伪装成图片导致无法抓取。
 ### 1.0.19
 重写导致的巨多BUG修复
 ### 1.0.18
