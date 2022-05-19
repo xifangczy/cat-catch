@@ -116,9 +116,15 @@ $("#ClearData").bind("click", function () {
 });
 //重置所有设置
 $("#ResetAllOption").bind("click", function () {
-  chrome.storage.sync.set({ Ext: defaultExt });
-  chrome.storage.sync.set({ Type: defaultType });
-  chrome.storage.sync.set({ Debug: defaultDebug, TitleName: defaultTitleName, OtherAutoClear: defaultOtherAutoClear, Potplayer: defaultPotplayer, });
+  chrome.storage.sync.clear();
+  chrome.storage.sync.set({
+    Ext: defaultExt,
+    Type: defaultType,
+    Debug: defaultDebug,
+    TitleName: defaultTitleName,
+    OtherAutoClear: defaultOtherAutoClear,
+    Potplayer: defaultPotplayer
+  });
   chrome.runtime.sendMessage('RefreshOption');
   location.reload();
 });

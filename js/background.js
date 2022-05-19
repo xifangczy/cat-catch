@@ -171,12 +171,14 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
 //检查扩展名以及大小限制
 function CheckExtension(ext, size) {
     for (let item of Options.Ext) {
-        if (!item.state) { continue; }
+        // if (!item.state) { continue; }
         if (item.ext.toLowerCase() == ext) {
             if (item.size != 0 && size != null && size <= item.size * 1024) {
                 return "break";
-            } else {
+            } else if(item.state){
                 return true;
+            }else{
+                return "break";
             }
         }
     }
@@ -185,14 +187,16 @@ function CheckExtension(ext, size) {
 //检查类型以及大小限制
 function CheckType(dataType, dataSize) {
     for (let item of Options.Type) {
-        if (!item.state) { continue; }
+        // if (!item.state) { continue; }
         let TypeSplit = dataType.split("/");
         let OptionSplit = item.type.split("/");
         if (OptionSplit[0] == TypeSplit[0] && (OptionSplit[1] == TypeSplit[1] || OptionSplit[1] == "*")) {
             if (item.size != 0 && dataSize != null && dataSize <= item.size * 1024) {
                 return "break";
-            } else {
+            } else if(item.state){
                 return true;
+            }else{
+                return "break";
             }
         }
     }

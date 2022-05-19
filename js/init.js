@@ -51,7 +51,7 @@ function SetOptions() {
         Options.OtherAutoClear = items.OtherAutoClear ? items.OtherAutoClear : defaultOtherAutoClear;
         Options.Potplayer = items.Potplayer ? items.Potplayer : defaultPotplayer;
         Options.Type = items.Type ? items.Type : defaultType;
-        if (items.Ext === undefined) {
+        if (items.Ext === undefined || items.Ext[0].state === undefined) {
             chrome.storage.sync.set({ "Ext": defaultExt });
         }
         if (items.Debug === undefined) {
@@ -71,3 +71,10 @@ function SetOptions() {
         }
     });
 }
+
+// chrome.runtime.onInstalled.addListener(function (details) {
+//     if(details.reason == "update"){
+//         chrome.storage.sync.clear();
+//         SetOptions();
+//     }
+// });
