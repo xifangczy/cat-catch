@@ -1,118 +1,126 @@
+<!DOCTYPE html>
 <html>
-  <head>
-    <title>猫抓 - 设置</title>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
-    <script src="js/jquery.min.js"></script>
-    <script src="js/init.js"></script>
-  </head>
-  <body>
-    <div id="wrapper">
-      <header>猫抓 设置</header>
-      <table id="options">
-        <tbody>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>猫抓 设置</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
+  <script src="js/jquery.min.js"></script>
+  <script src="js/init.js"></script>
+</head>
+
+<body>
+  <div class="wrapper">
+    <section>
+      <h1 class="optionsTitle">后缀设置</h1>
+      <div class="optionBox">
+        <span class="explain">填写不含"."的后缀, 不过滤大小填0</span>
+        <table id="extList">
           <tr>
-            <td class="caption">自定义后缀抓取</td>
-            <td>
-              <div class="help">
-                <div class="example">
-                  不带“.”的扩展名
-                  <br /><br />
-                  小于此大小的文件被过滤，忽略文件大小填0。
-                  <br /><br />
-                  部分非媒体资源文件不会被抓取。
-                </div>
-              </div>
-              <div>
-                <div id="exclusionScrollBox">
-                  <table id="exclusionRules">
-                    <tbody>
-                      <tr>
-                        <td><span class="ExtText">扩展名</span></td>
-                        <td><span class="ExtText">大小限制</span></td>
-                      </tr>
-                    </tbody>
-                    <tbody id="ExtTd"></tbody>
-                  </table>
-                </div>
-                <button id="AddExt" class="AddButton">新增</button>
-              </div>
-            </td>
+            <th>扩展名</th>
+            <th>过滤大小</th>
+            <th>启用</th>
+            <th>删除</th>
           </tr>
-          <tr>
-            <td class="caption"></td>
-            <td class="booleanOption">
-              <label>
-                <input id="MoreType" type="checkbox" />
-                更多类型的文件
-              </label>
-            </td>
-            <td>
-              <div class="help">
-                <div class="example">
-                  打开application/octet-stream 和 image/* 文件。
-                  image/* 避免一些网站把资源伪装成图片，在找不到资源的情况下开启。
-                </div>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td class="caption"></td>
-            <td class="booleanOption">
-              <label>
-                <input id="TitleName" type="checkbox" />
-                下载时使用网页标题做文件名
-              </label>
-            </td>
-          </tr>
-          <tr>
-            <td class="caption"></td>
-            <td class="booleanOption">
-              <label>
-                默认当幽灵数据达到500条后，自动清除。
-                <br />
-                <input
-                  id="OtherAutoClear"
-                  type="number"
-                  class="ext"
-                  style="width: 100px"
-                />
-              </label>
-            </td>
-          </tr>
-          <tr>
-            <td class="caption"></td>
-            <td class="booleanOption">
-              <label>
-                <input id="Potplayer" type="checkbox" />
-                使用PotPlayer预览媒体
-              </label>
-            </td>
-          </tr>
-          <tr>
-            <td class="caption"></td>
-            <td class="booleanOption">
-              <label>
-                <input id="Debug" type="checkbox" />
-                调试模式
-              </label>
-            </td>
-          </tr>
-          <tr>
-            <td class="caption">说明</td>
-            <td class="booleanOption">
-              什么？设置页面好丑？啊？风太大我听不见.
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <button id="ResetExt" class="AddButton">重置设置</button>
-    </div>
-    <div id="tempntc" class="tempntc">
-      <div id="tempntcDia" class="tempntc">
-        <div id="TempntcText" class="tempntc">test</div>
+        </table>
+        <div class="button">
+          <button type="button" id="AddExt">添加后缀</button><button type="button" id="ResetExt">重置后缀</button>
+        </div>
       </div>
-    </div>
-    <script src="js/options.js"></script>
-  </body>
+    </section>
+
+    <section>
+      <h1 class="optionsTitle">抓取类型</h1>
+      <div class="optionBox">
+        <span class="explain">填入正确的content-type类型, 不过滤大小填0</span>
+        <table id="typeList">
+          <tr>
+            <th>类型</th>
+            <th>过滤大小</th>
+            <th>启用</th>
+            <th>删除</th>
+          </tr>
+        </table>
+        <div class="button">
+          <button type="button" id="AddType">添加类型</button><button type="button" id="ResetType">重置类型</button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h1 class="optionsTitle">其他设置</h1>
+      <div class="optionBox">
+        <div class="list">
+          <div class="item">
+            <div>自动清理幽灵数据(默认500条后自动清理)</div>
+            <input id="OtherAutoClear" type="number" />
+          </div>
+
+          <div class="item">
+            <div>调用PotPlayer预览资源</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="Potplayer" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div>保存文件名使用网页标题</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="TitleName" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div>调试模式</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="Debug" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="button">
+          <button type="button" id="ResetOption">重置设置</button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h1 class="optionsTitle">操作</h1>
+      <div class="optionBox">
+        <div class="button" style="justify-content: center">
+          <button type="button" id="ClearData">清空抓取的数据</button>
+          <button type="button" id="ResetAllOption">重置所有设置</button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h1 class="optionsTitle">关于</h1>
+      <div class="optionBox">
+        <div class="item">
+          <div>猫抓 v1.0.21</div>
+        </div>
+        <div class="item">
+          <div>
+            Github:
+            <a href="https://github.com/xifangczy/cat-catch"
+              target="_blank">https://github.com/xifangczy/cat-catch</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="js/options.js"></script>
+</body>
+
 </html>

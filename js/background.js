@@ -20,7 +20,7 @@ function findMedia(data) {
         Options.Debug === undefined ||
         Options.OtherAutoClear === undefined ||
         Options.TitleName === undefined ||
-        Options.MoreType === undefined
+        Options.Type === undefined
     ) { return; }
     //屏蔽特殊页面发起的资源
     var urlParsing = new Object();
@@ -69,27 +69,18 @@ function findMedia(data) {
         });
     }
 
+    //检查后缀
     if (ext != null) {
         filter = CheckExtension(ext, size);
-    } else if (contentType != null) {
-        let Type = contentType.toLowerCase();
-        let TypeSplit = Type.split("/");
-        if (Options.MoreType) {
-            if (Type == "application/octet-stream" ||
-                TypeSplit[0] == "image"
-            ) { filter = true; }
-        }
-        if (!filter) {
-            if (TypeSplit[0] == "audio" ||
-                TypeSplit[0] == "video" ||
-                TypeSplit[1] == "vnd.apple.mpegurl" ||
-                TypeSplit[1] == "x-mpegurl"
-            ) { filter = true; }
-        }
+    }
+
+    //检查类型
+    if (!filter && contentType != null) {
+        filter = CheckType(contentType, size);
     }
 
     //查找附件
-    if (!filter && Disposition) {
+    if (!filter && Disposition != null) {
         var res = Disposition.match(/filename="(.*?)"/);
         if (res && res[1]) {
             name = GetFileName(decodeURIComponent(res[1]));
@@ -178,8 +169,25 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
 //检查扩展名以及大小限制
 function CheckExtension(ext, size) {
     for (let item of Options.Ext) {
+        if (!item.state) { continue; }
         if (item.ext.toLowerCase() == ext) {
             if (item.size != 0 && size != null && size <= item.size * 1024) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+//检查类型以及大小限制
+function CheckType(dataType, dataSize) {
+    for (let item of Options.Type) {
+        if (!item.state) { continue; }
+        let TypeSplit = dataType.split("/");
+        let OptionSplit = item.type.split("/");
+        if (OptionSplit[0] == TypeSplit[0] && (OptionSplit[1] == TypeSplit[1] || OptionSplit[1] == "*")) {
+            if (item.size != 0 && dataSize != null && dataSize <= item.size * 1024) {
                 return false;
             } else {
                 return true;
