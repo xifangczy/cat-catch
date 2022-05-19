@@ -72,11 +72,13 @@ function findMedia(data) {
     //检查后缀
     if (ext != null) {
         filter = CheckExtension(ext, size);
+        if (filter == "break") { return; }
     }
 
     //检查类型
     if (!filter && contentType != null) {
         filter = CheckType(contentType, size);
+        if (filter == "break") { return; }
     }
 
     //查找附件
@@ -172,7 +174,7 @@ function CheckExtension(ext, size) {
         if (!item.state) { continue; }
         if (item.ext.toLowerCase() == ext) {
             if (item.size != 0 && size != null && size <= item.size * 1024) {
-                return false;
+                return "break";
             } else {
                 return true;
             }
@@ -188,7 +190,7 @@ function CheckType(dataType, dataSize) {
         let OptionSplit = item.type.split("/");
         if (OptionSplit[0] == TypeSplit[0] && (OptionSplit[1] == TypeSplit[1] || OptionSplit[1] == "*")) {
             if (item.size != 0 && dataSize != null && dataSize <= item.size * 1024) {
-                return false;
+                return "break";
             } else {
                 return true;
             }
