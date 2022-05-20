@@ -73,6 +73,9 @@ body {
   cursor: pointer;
   padding: calc(0.5em - 1px) 1em;
 }
+#CloseBtn:active {
+  background: #eee;
+}
 #player {
   text-align: center;
 }

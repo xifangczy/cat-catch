@@ -88,6 +88,7 @@ function findMedia(data) {
             name = GetFileName(decodeURIComponent(res[1]));
             ext = GetExt(name);
             filter = CheckExtension(ext, 0);
+            if (filter == "break") { return; }
         }
     }
     if (filter) {
