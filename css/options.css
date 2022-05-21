@@ -20,7 +20,7 @@ h2 {
 p {
   margin: auto;
 }
-.hide{
+.hide {
   display: none;
 }
 .optionBox {
@@ -125,8 +125,11 @@ button {
   margin-right: 20px;
   margin-top: 10px;
 }
+button:hover {
+  background: #f5f5f5;
+}
 button:active {
-  background: #eee;
+  background: #ddd;
 }
 .button {
   display: flex;
@@ -157,10 +160,10 @@ button:active {
 .ffmpeg {
   margin-top: 20px;
 }
-textarea{
+textarea {
   font-size: 12px;
   font-family: "Microsoft YaHei", "Helvetica", "Arial", sans-serif;
 }
-#formatStr{
+#formatStr {
   width: 200px;
 }

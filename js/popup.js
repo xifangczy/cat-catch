@@ -57,7 +57,7 @@ function AddMedia(data) {
         <div class="panel panel-default">
             <div class="panel-heading">
                 <span></span>
-                <input type="checkbox" class="DownCheck" checked="true"/>
+                <input type="checkbox" class="DownCheck hide" checked="true"/>
                 <img src="img/parsing.png" class="ico" id="m3u8" title="解析"/>
                 <img src="img/download.png" class="ico" id="download" title="下载"/>
                 <img src="img/play.png" class="ico" id="play" title="预览"/>
@@ -65,7 +65,7 @@ function AddMedia(data) {
                 <span class="size">
                 </span>
             </div>
-            <div class="url">来自: ...<br> URL: ...<br>
+            <div class="url hide">来自: ...<br> URL: ...<br>
                 <a href="" target="_blank" download=""></a>
             </div>
         </div>
@@ -75,7 +75,7 @@ function AddMedia(data) {
     if (data.ext == 'm3u8') {
         html += '<img src="img/parsing.png" class="ico" id="m3u8" title="解析"/>';
     }
-    html += '<input type="checkbox" class="DownCheck" checked="true"/>';
+    html += '<input type="checkbox" class="DownCheck hide" checked="true"/>';
     html += '<img src="img/download.png" class="ico" id="download" title="下载"/>';
     if (isPlay(data.ext) || Options.Potplayer) {
         html += '<img src="img/play.png" class="ico" id="play" title="预览"/>';
@@ -84,18 +84,36 @@ function AddMedia(data) {
     if (data.type != 'application/octet-stream' && data.size != 0) {
         html += '<span class="size">' + data.size + 'MB</span>';
     }
-    html += '</div><div class="url">';
-    // if (data.webInfo) {
-    //     html += '来自: ' + data.webInfo.title + '<br>URL: ' + data.webInfo.url + '<br>';
-    // }
+    html += '</div><div class="url hide">';
+    if (data.webInfo) {
+        html += '标题: ' + data.webInfo.title + '<br>MIME: ' + data.type + '<br><div id="duration"></div>';
+    }
+    // html += 'MIME: ' + data.type + '<br>';
     html += '<a href="' + data.url + '" target="_blank" download="' + DownFileName + '">' + data.url + '</a>';
-    html += '</div></div>';
+    html += '</div><video class="getMediaInfo hide"></video></div>';
 
     ////////////////////////绑定事件////////////////////////
     html = $(html);
     //展开网址
     html.find('.panel-heading').click(function () {
         html.find(".url").toggle();
+        //获取时长
+        let getMediaInfo = html.find(".getMediaInfo");
+        if (html.find(".url").is(":visible")) {
+            getMediaInfo.attr('src', data.url);
+            getMediaInfo[0].ondurationchange = function () {
+                let duration = getMediaInfo[0].duration;
+                if (duration) {
+                    let h = Math.floor(duration / 3600 % 24);
+                    let m = Math.floor(duration / 60 % 60);
+                    let s = Math.floor((duration % 60));
+                    html.find("#duration").html("时长: " + String(h).padStart(2, 0) + ":" + String(m).padStart(2, 0) + ":" + String(s).padStart(2, 0));
+                }
+                getMediaInfo.removeAttr('src');
+            }
+        } else {
+            getMediaInfo.removeAttr('src');
+        }
     });
     //点击复制网址
     html.find('#copy').click(function () {

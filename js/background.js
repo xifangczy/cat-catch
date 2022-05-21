@@ -224,6 +224,9 @@ function getHeaderValue(name, data) {
     if (data.responseHeaders == undefined) { return null; }
     for (let item of data.responseHeaders) {
         if (item.name.toLowerCase() == name) {
+            if (name == "content-type") {
+                return item.value.split(";")[0].toLowerCase();
+            }
             return item.value.toLowerCase();
         }
     }

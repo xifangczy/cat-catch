@@ -18,6 +18,10 @@ https://microsoftedge.microsoft.com/addons/detail/oohmdefbjalncfplafanlagojlakmj
 ## 幽灵数据？
 之前版本经常出现某条资源不属于任何网页（具体原因不详，有可能是因为通过JS加载的视频 Chrome无法判断来源页面），老版本会丢弃该数据。1.0.17之后得到修复并称这部分数据称为“幽灵数据”。
 
+## 界面
+![界面](https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/a.png)
+![界面](https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/b.png)
+
 ## 更新说明
 ### 1.0.21
 自定义抓取类型, 设置页面新界面

@@ -18,8 +18,7 @@ body {
   background: #fff;
 }
 .panel {
-  border: 1px solid transparent;
-  border-color: #ddd;
+  border: 1px solid #ddd;
   margin-bottom: 2px;
 }
 .panel-heading {
@@ -30,7 +29,6 @@ body {
 }
 .url {
   padding: 5px;
-  display: none;
 }
 .ico {
   float: right;
@@ -48,7 +46,6 @@ body {
   font-weight: bold;
 }
 #Tips {
-  /* position: fixed; */
   left: 0;
   right: 0;
   height: 20px;
@@ -56,7 +53,6 @@ body {
   text-align: center;
   z-index: 11;
   pointer-events: none;
-  /* display:none; */
   color: #444;
   font-weight: bold;
 
@@ -73,6 +69,9 @@ body {
   cursor: pointer;
   padding: calc(0.5em - 1px) 1em;
 }
+#CloseBtn:hover {
+  background: #f5f5f5;
+}
 #CloseBtn:active {
   background: #eee;
 }
@@ -80,66 +79,70 @@ body {
   text-align: center;
 }
 .button {
-  margin: 2px 2px 2px;
-  background-color: #e5e9ef;
-  text-align: center;
-  border: 1px solid #e0e6ed;
-  height: 22px;
-  line-height: 22px;
+  background: #fff;
+  border: solid 1px #c7c7c7;
   border-radius: 4px;
+  color: rgb(26, 115, 232);
   cursor: pointer;
-  width: 84px;
+  padding: 5px 10px 5px 10px;
+  margin: 2px 10px 4px 20px;
   float: left;
+}
+.button:hover {
+  background: #f5f5f5;
+}
+.button:active {
+  background: #ddd;
 }
 .Tabs {
   display: flex;
 }
 .TabButton {
-  background-color: #e5e9ef;
   text-align: center;
-  border: 1px solid #e0e6ed;
-  height: 22px;
-  line-height: 22px;
-  border-radius: 4px;
+  border: solid 1px #c7c7c7;
+  color: rgb(26, 115, 232);
+  border-radius: 5px 5px 0 0;
   cursor: pointer;
   width: 50%;
+  display: flex;
+  justify-content: center;
+  padding: 3px;
+  margin: 1px 1px 0 1px;
+  align-items: flex-end;
 }
 .TabButton.Active {
-  background-color: #ccd0d7;
+  background-color: #f5f5f5;
+  border-bottom-color: transparent;
+}
+.TabButton:nth-child(1) {
+  margin-right: 5px;
 }
 #ToBottom {
-  margin: 2px 2px 2px;
-  background-color: #e5e9ef;
   text-align: center;
-  border: 1px solid #e0e6ed;
-  height: 20px;
-  line-height: 22px;
+  background: #fff;
+  border: solid 1px #c7c7c7;
   border-radius: 4px;
+  color: rgb(26, 115, 232);
   cursor: pointer;
-  width: 100%;
-  display: none;
+  padding: 2px 10px 2px 10px;
+  margin-bottom: 1px;
 }
-.button:hover,
 #ToBottom:hover {
-  background-color: #ccd0d7;
+  background: #f5f5f5;
+}
+#ToBottom:active {
+  background: #ddd;
 }
 .DownCheck {
-  display: none;
   float: left;
   vertical-align: middle;
   margin-right: 5px;
   width: 15px;
   height: 15px;
 }
-#player,
-#down,
-.mediaList {
+.hide {
   display: none;
 }
 .TabShow {
   display: block !important;
-}
-.TabButton {
-  display: flex;
-  justify-content: center;
 }
