@@ -81,7 +81,7 @@ function AddMedia(data) {
         html += '<img src="img/play.png" class="ico" id="play" title="预览"/>';
     }
     html += '<img src="img/copy.png" class="ico" id="copy" title="复制地址"/>';
-    if (data.type != 'application/octet-stream' && data.size != 0) {
+    if (data.size != 0) {
         html += '<span class="size">' + data.size + 'MB</span>';
     }
     html += '</div><div class="url hide">';
