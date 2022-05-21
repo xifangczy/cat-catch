@@ -25,34 +25,35 @@
         </div>
       </section>
 
-      <section id="m3u8">
+      <section id="m3u8" class="hide">
         <h1 class="optionsTitle">m3u8解析</h1>
         <span class="explain" id="key"></span>
         <div class="optionBox">
           <div class="block">
-            m3u8文件
+            m3u8文件地址
             <p><a id="m3u8_url"></a></p>
-          </div>
-
-          <div class="block">
-            <p id="count"></p>
           </div>
 
           <div class="block keyUrl hide">
             该媒体已加密, 请注意下载key文件
             <p><a id="keyUrl"></a></p>
+            <p id="KeyIV"></p>
           </div>
 
+          <div class="block">
+            <p id="count"></p>
+          </div>
+          
           <div class="block">
             <textarea rows="50" cols="160" id="media_file" spellcheck="false"></textarea>
           </div>
 
           <div class="block" id="button">
-            <button id="Downm3u8">下载m3u8文件</button>
-            <button id="DownText">下载格式化文件</button>
+            <button id="DownText">下载显示的内容</button>
             <button id="UrlDecode">UrlDecode解码</button>
             <input type="text" value='wget "$url$"' id="formatStr" spellcheck="false" />
-            <button id="format">格式化</button>
+            <button id="format">自定义格式化</button>
+            <button id="DownFixm3u8">格式化成本地m3u8</button>
             <button id="Refresh">还原</button>
             <div class="ffmpeg">ffmpeg合并ts命令: <p>ffmpeg -i xxx.m3u8 -vcodec copy -acodec copy xxx.mp4</p></div>
           </div>
