@@ -116,9 +116,13 @@ function findMedia(data) {
                 SetIcon(items.MediaData[tabId].length, data.tabId);
             }
             //自动清理幽灵数据
-            if (items.MediaData["tabId-1"] !== undefined && items.MediaData["tabId-1"].length > Options.OtherAutoClear) {
-                delete items.MediaData["tabId-1"];
-                chrome.storage.local.set({ MediaData: items.MediaData });
+            if (items.MediaData["tabId-1"] !== undefined) {
+                chrome.action.setIcon({ path: "/img/icon-tips.png" });
+                if (items.MediaData["tabId-1"].length > Options.OtherAutoClear) {
+                    delete items.MediaData["tabId-1"];
+                    chrome.storage.local.set({ MediaData: items.MediaData });
+                    chrome.action.setIcon({ path: "/img/icon.png" });
+                }
             }
             chrome.runtime.sendMessage(info, function () {
                 // console.log(chrome.runtime.lastError.message);
@@ -136,6 +140,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
             SetIcon(0, tabs[0].id);
         });
+        chrome.action.setIcon({ path: "/img/icon.png" });
     }
     sendResponse("OK");
 });

@@ -65,7 +65,7 @@ function AddMedia(data) {
                 <span class="size">
                 </span>
             </div>
-            <div class="url hide">来自: ...<br> URL: ...<br>
+            <div class="url hide">标题: ...<br> MIME: ...<br><div id="duration"></div>
                 <a href="" target="_blank" download=""></a>
             </div>
         </div>
@@ -86,9 +86,9 @@ function AddMedia(data) {
     }
     html += '</div><div class="url hide">';
     if (data.webInfo) {
-        html += '标题: ' + data.webInfo.title + '<br>MIME: ' + data.type + '<br><div id="duration"></div>';
+        html += '标题: ' + data.webInfo.title + '<br>';
     }
-    // html += 'MIME: ' + data.type + '<br>';
+    html += 'MIME: ' + data.type + '<br><div id="duration"></div>';
     html += '<a href="' + data.url + '" target="_blank" download="' + DownFileName + '">' + data.url + '</a>';
     html += '</div><video class="getMediaInfo hide"></video></div>';
 
@@ -173,6 +173,10 @@ $(function () {
         $(".mediaList").removeClass("TabShow");
         $(".mediaList").eq(index).addClass("TabShow");
         UItoggle();
+    });
+    //设置
+    $("#Options").click(function () {
+        chrome.tabs.create({ url: '/options.html' });
     });
     //下载选中文件
     $('#DownFile').click(function () {

@@ -107,15 +107,12 @@ body {
   display: flex;
   justify-content: center;
   padding: 3px;
-  margin: 1px 1px 0 1px;
+  margin: 1px 2px 0 2px;
   align-items: flex-end;
 }
 .TabButton.Active {
   background-color: #f5f5f5;
   border-bottom-color: transparent;
-}
-.TabButton:nth-child(1) {
-  margin-right: 5px;
 }
 #ToBottom {
   text-align: center;
