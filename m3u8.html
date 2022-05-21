@@ -1,60 +1,66 @@
+<!DOCTYPE html>
 <html>
-
-<head>
-  <title>猫抓 - m3u8解析</title>
-  <meta charset="UTF-8">
-  <link rel="stylesheet" type="text/css" href="css/m3u8.css" media="all" />
-</head>
-
-<body>
-  <div id="wrapper">
-    <header>猫抓 m3u8解析</header>
-
-    <table id="options">
-      <tbody>
-        <tr id="textarea">
-          <td id="mappingsHelp">
-            <div id="loading" class="display: none;">文件载入中...</div>
-            <div id="m3u8_url"></div>
-            <br />
-            <div id="num"></div>
-            <div id="key"></div>
-            <!-- <div class="help">
-              <div class="example">
-                m3u8解析功能测试中
-				        <br>发现BUG请提交在扩展页评论...
-                <br>
-                如遇到解析出的ts文件无法下载, 请尝试UrlDecode解码
-              </div>
-            </div> -->
-            <textarea rows="50" cols="100" id="html"></textarea>
-          </td>
-        </tr>
-
-        <tr id="next_m3u8_tr" style="display:none">
-          <td>
-            <div>选择下一级m3u8文件</div>
-            <div class="help">
-              <div class="example">
-                该m3u8文件中嵌套另外m3u8文件
-              </div>
-            </div>
-            <div id="next_m3u8"></div>
-          </td>
-        </tr>
-
-      </tbody>
-    </table>
-    <button id="DownText">下载文本格式</button>
-    <button id="Text">文本格式</button>
-    <button id="Aria2Text">aria2格式</button>
-    <button id="WgetText">wget格式</button>
-    <button id="UrlDecode">UrlDecode解码</button>
-    <button id="Refresh">还原</button>
-    <div class="ffmpeg">ffmpeg合并ts命令: ffmpeg -i xxx.m3u8 -vcodec copy -acodec copy xxx.mp4</div>
-
+  <head>
+    <meta charset="UTF-8" />
+    <title>猫抓 M3U8解析</title>
+    <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
     <script src="js/jquery.min.js"></script>
-    <script src="js/m3u8.js"></script>
-</body>
+    <script src="js/init.js"></script>
+  </head>
 
+  <body>
+    <div class="m3u8_wrapper">
+
+      <section id="loading">
+        <div class="optionBox">
+          文件载入中...
+        </div>
+      </section>
+
+      <section id="more_m3u8" class="hide">
+        <h1 class="optionsTitle">下一级文件</h1>
+        <span class="explain">该m3u8文件中嵌套多个m3u8文件</span>
+        <div class="optionBox">
+          <div id="next_m3u8"></div>
+        </div>
+      </section>
+
+      <section id="m3u8">
+        <h1 class="optionsTitle">m3u8解析</h1>
+        <span class="explain" id="key"></span>
+        <div class="optionBox">
+          <div class="block">
+            m3u8文件
+            <p><a id="m3u8_url"></a></p>
+          </div>
+
+          <div class="block">
+            <p id="count"></p>
+          </div>
+
+          <div class="block keyUrl hide">
+            该媒体已加密, 请注意下载key文件
+            <p><a id="keyUrl"></a></p>
+          </div>
+
+          <div class="block">
+            <textarea rows="50" cols="160" id="media_file" spellcheck="false"></textarea>
+          </div>
+
+          <div class="block" id="button">
+            <button id="Downm3u8">下载m3u8文件</button>
+            <button id="DownText">下载格式化文件</button>
+            <button id="UrlDecode">UrlDecode解码</button>
+            <input type="text" value='wget "$url$"' id="formatStr" spellcheck="false" />
+            <button id="format">格式化</button>
+            <button id="Refresh">还原</button>
+            <div class="ffmpeg">ffmpeg合并ts命令: <p>ffmpeg -i xxx.m3u8 -vcodec copy -acodec copy xxx.mp4</p></div>
+          </div>
+        </div>
+      </div>
+      </section>
+
+    </div>
+    <script src="js/m3u8.js"></script>
+  </body>
 </html>

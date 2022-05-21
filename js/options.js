@@ -43,11 +43,9 @@ function Gethtml(Type, Text = "", Size = 0, State = true) {
 
   html = $(html);
   if (Type == "Ext") {
-    html.find("#text").attr("placeholder", "后缀名");
-    html.find("#text").attr("class", "ext");
+    html.find("#text").attr({ placeholder: "后缀名", class: "ext" });
   } else {
-    html.find("#text").attr("placeholder", "类型");
-    html.find("#text").attr("class", "type");
+    html.find("#text").attr({ placeholder: "类型", class: "type" });
   }
   html.find("#state").attr("checked", State);
   html.find(".RemoveButton").click(function () {
@@ -144,13 +142,11 @@ function Save() {
     }
     if ($(this).data("type") == "Ext") {
       Ext.push({ ext: GetText.toLowerCase(), size: GetSize, state: GetState });
+    } else if (/^[^\/]+\/[^\/]+$/ig.test(GetText)) {
+      Type.push({ type: GetText.toLowerCase(), size: GetSize, state: GetState });
     } else {
-      if (GetText.includes("/")) {
-        Type.push({ type: GetText.toLowerCase(), size: GetSize, state: GetState });
-      } else {
-        alert("类型输入不正确");
-        location.reload();
-      }
+      alert("类型输入不正确");
+      location.reload();
     }
   });
   chrome.storage.sync.set({ Ext: Ext });

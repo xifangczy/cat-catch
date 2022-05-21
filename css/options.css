@@ -17,6 +17,12 @@ h2 {
   font-weight: normal;
   margin: 0;
 }
+p {
+  margin: auto;
+}
+.hide{
+  display: none;
+}
 .optionBox {
   background: white;
   border-radius: 4px;
@@ -115,7 +121,8 @@ button {
   color: rgb(26, 115, 232);
   cursor: pointer;
   padding: calc(0.5em - 1px) 1em;
-  margin-left: 20px;
+  /* margin-left: 20px; */
+  margin-right: 20px;
   margin-top: 10px;
 }
 button:active {
@@ -131,4 +138,29 @@ button:active {
 #typeList,
 #extList {
   margin-top: 10px;
+}
+#m3u8_url,
+#keyUrl {
+  overflow: hidden;
+  display: block;
+  text-overflow: ellipsis;
+}
+.block {
+  border-bottom: solid 1px rgba(0, 0, 0, 0.06);
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+}
+.m3u8_wrapper {
+  margin: 0 auto;
+  width: 1024px;
+}
+.ffmpeg {
+  margin-top: 20px;
+}
+textarea{
+  font-size: 12px;
+  font-family: "Microsoft YaHei", "Helvetica", "Arial", sans-serif;
+}
+#formatStr{
+  width: 200px;
 }

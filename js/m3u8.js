@@ -10,13 +10,7 @@ results = new RegExp("\\.m3u8\\?([^\n]*)").exec(url);
 if (results) {
 	var m3u8_arg = results[1];
 }
-$("#m3u8_url").html(
-	"m3u8文件<br><a href='" +
-	url +
-	"' style='overflow: hidden; white-space: nowrap;'>" +
-	url +
-	"</a>"
-);
+$("#m3u8_url").attr("href", url).html(url)
 
 //获取url内容
 var html = $.ajax({ url: url, async: false }).responseText;
@@ -24,17 +18,14 @@ html = html.split("\n");
 
 //基本文件目录
 function getManifestUrlBase(URL_flag) {
-	var url_decode = decodeURIComponent(url);
-	if (!URL_flag) {
-		url_decode = url;
-	}
+	let url_decode = URL_flag ? decodeURIComponent(url) : url;
 	url_decode = url_decode.split("?")[0];
-	var parts = url_decode.split("/");
+	let parts = url_decode.split("/");
 	parts.pop();
 	return parts.join("/") + "/";
 }
 //根目录
-var getManifestUrlRoot = function () {
+function getManifestUrlRoot() {
 	var Path = url.split("/");
 	return Path[0] + "//" + Path[2];
 };
@@ -54,24 +45,24 @@ function add_textarea(str) {
 	if (!results && m3u8_arg) {
 		str = str + "?" + m3u8_arg;
 	}
-	link = $("#html").text() + str + "\n";
-	$("#html").text(link);
+	link = $("#media_file").val() + str + "\n";
+	$("#media_file").val(link);
 }
 
-function add_next_m3u8(str) {
+function add_next_m3u8(link) {
 	$("#next_m3u8").append(
-		'<p><a href="/m3u8.html?m3u8_url=' + str + '">' + str + "</a></p>"
+		'<p><a href="/m3u8.html?m3u8_url=' + link + '">' + link + "</a></p>"
 	);
 }
 
 //链接列表
-function show_list(str) {
-	$('#loading').show();
-	if (str === undefined) {
-		str = "";
+function show_list(format) {
+	if (format === undefined) {
+		format = "";
 	}
-	var num = 0;
-	$("#html").text("");
+	var count = 0;
+	var KeyURL = "";
+	$("#media_file").val("");
 	for (let link of html) {
 		//密钥
 		if (link.indexOf("URI=") != -1) {
@@ -85,14 +76,6 @@ function show_list(str) {
 					KeyURL = BasePath + KeyURL;
 				}
 			}
-			$("#key").html(
-				"该媒体已加密, 请注意下载key文件<br> <a href='" +
-				KeyURL +
-				"' style='overflow: hidden; white-space: nowrap;'>" +
-				KeyURL +
-				"</a>"
-			);
-			// add_textarea(str + KeyURL);
 		}
 
 		//ts文件
@@ -104,48 +87,48 @@ function show_list(str) {
 					link = BasePath + link;
 				}
 			}
-			// $('#num').html(++num);
-			num++;
-			$("#num").html("共" + num + "个文件");
-			add_textarea(str + link);
-
+			count++;
 			//判断是否m3u8
 			if (link.indexOf(".m3u8") != -1) {
-				$("#textarea").hide();
+				$("#m3u8").hide();
 				$("button").hide();
-				$("#next_m3u8_tr").show();
+				$("#more_m3u8").show();
 				add_next_m3u8(link);
+				continue;
 			}
+			link = link.replace("\n", '');
+			link = link.replace("\r", '');
+			if (format != "") {
+				link = format.replace("$url$", link);
+			}
+			add_textarea(link);
 		}
+	}
+	$("#count").html("共" + count + "个文件");
+	if (KeyURL !== "") {
+		$(".keyUrl").show();
+		$("#keyUrl").attr("href", KeyURL).html(KeyURL);
 	}
 	$('#loading').hide();
 }
 show_list();
 
-//文本 格式 按钮
-$("#Text").click(function () {
-	show_list();
-});
-
-//wget 格式 按钮
-$("#WgetText").click(function () {
-	show_list("wget ");
-});
-
-//aria2 格式 按钮
-$("#Aria2Text").click(function () {
-	show_list("aria2c -c -s10 -x10 ");
+//格式化
+$("#format").click(function () {
+	let formatStr = $("#formatStr").val();
+	show_list(formatStr);
 });
 
 //下载 文本格式 按钮
 $("#DownText").click(function () {
-	show_list();
-	var txt = $("#html").html().toString();
+	var txt = $("#media_file").val();
 	txt = encodeURIComponent(txt);
-	var a = document.createElement("a");
-	a.href = "data:application/json," + txt;
-	a.setAttribute("download", "m3u8.txt");
-	a.dispatchEvent(new MouseEvent("click"));
+	chrome.downloads.download({
+		url: "data:text/plain," + txt
+	});
+});
+$("#Downm3u8").click(function () {
+	chrome.downloads.download({ url: url });
 });
 
 //UrlDecode编码 按钮
@@ -157,5 +140,6 @@ $("#UrlDecode").click(function () {
 //刷新还原 按钮
 $("#Refresh").click(function () {
 	BasePath = getManifestUrlBase(true);
+	$("#formatStr").val('wget "$url$"');
 	show_list();
 });
