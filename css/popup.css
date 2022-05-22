@@ -86,6 +86,9 @@ body {
 #player {
   text-align: center;
 }
+#player video {
+  max-height: 300px;
+}
 .button {
   background: #fff;
   border: solid 1px #c7c7c7;

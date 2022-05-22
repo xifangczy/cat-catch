@@ -100,6 +100,15 @@ function findMedia(data) {
             for (let item of items.MediaData[tabId]) {
                 if (item.url == data.url) { return; }
             }
+            //幽灵数据与当前标签资源查重
+            if (data.tabId == -1) {
+                chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+                    let tabId = "tabId" + tabs[0].id;
+                    for (let item of items.MediaData[tabId]) {
+                        if (item.url == data.url) { return; }
+                    }
+                });
+            }
             var info = {
                 name: name,
                 url: data.url,
