@@ -263,8 +263,10 @@ function UItoggle() {
 }
 
 function Tips(text) {
+    let Original = $('#Tips').html();
     $('#Tips').css("position", "fixed");
     $('#Tips').html(text).fadeIn(500).delay(200).fadeOut(500, function () {
         $(this).css("position", "static");
+        $('#Tips').html(Original);
     });
 }

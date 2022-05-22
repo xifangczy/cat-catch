@@ -56,18 +56,16 @@ body {
 #Tips {
   left: 0;
   right: 0;
-  height: 20px;
-  line-height: 18px;
   text-align: center;
-  z-index: 11;
+  z-index: 999;
   pointer-events: none;
-  color: #444;
+  color: rgb(26, 115, 232);
   font-weight: bold;
-
-  border: 2px solid #ffe475;
+  border: 2px solid #cdcdcd;
   border-radius: 2px;
-  background: #fef7cb;
+  background: #f5f5f5;
   padding: 0 10px;
+  margin-bottom: 1px;
 }
 #CloseBtn {
   background: #fff;
