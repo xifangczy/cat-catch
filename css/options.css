@@ -142,8 +142,7 @@ button:active {
 #extList {
   margin-top: 10px;
 }
-#m3u8_url,
-#keyUrl {
+#m3u8_url {
   overflow: hidden;
   display: block;
   text-overflow: ellipsis;
@@ -166,4 +165,10 @@ textarea {
 }
 #formatStr {
   width: 200px;
+}
+#tips input {
+  width: 975px;
+}
+#tips {
+  color: rgb(26, 115, 232);
 }

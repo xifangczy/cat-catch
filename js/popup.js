@@ -68,11 +68,12 @@ function AddMedia(data) {
             <div class="url hide">标题: ...<br> MIME: ...<br><div id="duration"></div>
                 <a href="" target="_blank" download=""></a>
             </div>
+            <video class="getMediaInfo hide"></video>
         </div>
     */
     var html = '<div class="panel"><div class="panel-heading">';
     html += '<span>' + trimName + '</span>';
-    if (data.ext == 'm3u8') {
+    if (data.ext == "m3u8" || data.type == "application/vnd.apple.mpegurl" || data.type == "application/x-mpegurl") {
         html += '<img src="img/parsing.png" class="ico" id="m3u8" title="解析"/>';
     }
     html += '<input type="checkbox" class="DownCheck hide" checked="true"/>';
@@ -84,6 +85,9 @@ function AddMedia(data) {
     if (data.size != 0) {
         html += '<span class="size">' + data.size + 'MB</span>';
     }
+    // if (data.webInfo?.favIconUrl) {
+    //     html += '<img src="'+data.webInfo.favIconUrl+'" class="webIco"/>'
+    // }
     html += '</div><div class="url hide">';
     if (data.webInfo) {
         html += '标题: ' + data.webInfo.title + '<br>';
@@ -99,7 +103,8 @@ function AddMedia(data) {
         html.find(".url").toggle();
         //获取时长
         let getMediaInfo = html.find(".getMediaInfo");
-        if (html.find(".url").is(":visible")) {
+        let durationNode = html.find("#duration");
+        if (html.find(".url").is(":visible") && durationNode.html() == "") {
             getMediaInfo.attr('src', data.url);
             getMediaInfo[0].ondurationchange = function () {
                 let duration = getMediaInfo[0].duration;
@@ -107,7 +112,7 @@ function AddMedia(data) {
                     let h = Math.floor(duration / 3600 % 24);
                     let m = Math.floor(duration / 60 % 60);
                     let s = Math.floor((duration % 60));
-                    html.find("#duration").html("时长: " + String(h).padStart(2, 0) + ":" + String(m).padStart(2, 0) + ":" + String(s).padStart(2, 0));
+                    durationNode.html("时长: " + String(h).padStart(2, 0) + ":" + String(m).padStart(2, 0) + ":" + String(s).padStart(2, 0));
                 }
                 getMediaInfo.removeAttr('src');
             }

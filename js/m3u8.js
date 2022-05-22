@@ -44,7 +44,7 @@ function getManifestUrlRoot() {
 
 //修复url路劲
 function fixUrl(url) {
-    if (/^http[s]?:\/\/.+/i.test(url)) {
+    if (/^data:/i.test(url) || /^[\w]+:\/\/.+/i.test(url)) {
         return url;
     }
     if (url[0] == "/") {
@@ -59,24 +59,36 @@ function GetFile(str) {
 
 function show_list(format = "") {
     let count = 0;
-    let KeyURL = "";
-    let KeyIV = "";
+    let ExistKey = false;
     let textarea = "";
     $("#media_file").val("");
+    $("#tips").html("");
     let m3u8_split = m3u8_content.split("\n");
     for (let line of m3u8_split) {
         if (line == "\n" || line == "\r" || line == "" || line == " ") {
             continue;
         }
-        //存在密钥
-        if (line.includes("URI=")) {
-            KeyURL = /URI="(.*)"/.exec(line)[1];
+        //重要信息
+        if (line.includes("#EXT-X-MAP")) {
+            ExistKey = true;
+            let MapURI = /URI="(.*)"/.exec(line)[1];
+            MapURI = fixUrl(MapURI);
+            $("#tips").append('#EXT-X-MAP URI: <input type="text" value="' + MapURI + '" spellcheck="false">');
+            count++; line = MapURI;
+        }
+        if (line.includes("#EXT-X-KEY")) {
+            ExistKey = true;
+            let KeyURL = /URI="([^"]*)"/.exec(line)[1];
             KeyURL = fixUrl(KeyURL);
+            $("#tips").append('#EXT-X-KEY URI: <input type="text" value="' + KeyURL + '" spellcheck="false">');
+            count++; line = KeyURL;
         }
-        if (line.includes("IV=")) {
-            KeyIV = /IV="(.*)"/.exec(line)[1];
-            KeyIV = fixUrl(KeyIV);
+        if (line.includes("IV=") && line.includes("#EXT-X-KEY")) {
+            ExistKey = true;
+            let KeyIV = /IV=([^,\n]*)/.exec(line)[1];
+            $("#tips").append('#IV: <input type="text" value="' + KeyIV + '" spellcheck="false">');
         }
+
         //ts文件
         if (!line.includes("#")) {
             count++;
@@ -104,17 +116,8 @@ function show_list(format = "") {
         }
     }
     $("#media_file").val(textarea);
-
+    if (ExistKey) { $("#tips").show(); }
     $("#count").html("共" + count + "个文件");
-    if (KeyURL !== "") {
-        $(".keyUrl").show();
-        $("#keyUrl").attr("href", KeyURL).html(KeyURL);
-        if (KeyIV != "") {
-            $("#KeyIV").html("IV: " + KeyIV);
-        } else {
-            $("#KeyIV").hide();
-        }
-    }
     $('#loading').hide();
 }
 

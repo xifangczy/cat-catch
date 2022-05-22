@@ -43,6 +43,12 @@ body {
 .ico:active {
   transform: scale(1);
 }
+.webIco {
+  float: left;
+  width: 16px;
+  height: 16px;
+  padding-right: 2px;
+}
 .size {
   float: right;
   font-weight: bold;
