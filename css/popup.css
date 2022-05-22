@@ -34,6 +34,8 @@ body {
   float: right;
   padding-left: 5px;
   transition: all 0.1s;
+  width: 16px;
+  height: 16px;
 }
 .ico:hover {
   transform: scale(1.1);
