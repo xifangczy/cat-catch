@@ -91,7 +91,7 @@ function findMedia(data) {
             if (filter == "break") { return; }
         }
     }
-    if (filter) {
+    if (filter || data.type == "media") {
         chrome.storage.local.get({ MediaData: {} }, function (items) {
             var tabId = "tabId" + data.tabId;
             if (items.MediaData[tabId] === undefined) {
