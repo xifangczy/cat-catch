@@ -1,6 +1,9 @@
 ## 简介
 猫抓 Chrome资源嗅探扩展
 
+## 老版本升级
+1.0.17之后 重写地方较多。**需要手动在设置页面 重置所有设置**。
+
 ## 安装地址
 ### Chrome
 https://chrome.google.com/webstore/detail/jfedfbgedapdagkghmgibemcoggfppbb
