@@ -40,14 +40,14 @@ function AddMedia(data) {
     }
 
     //截取文件名长度
-    var trimName = data.name;
+    let trimName = data.name;
     if (data.name.length >= 43) {
         trimName = data.name.replace(/\.[^.\/]+$/, "");
         trimName = trimName.substr(0, 13) + '...' + trimName.substr(-20) + '.' + data.ext;
     }
 
     //添加下载文件名
-    var DownFileName = data.name;
+    let DownFileName = data.name;
     if (Options.TitleName) {
         DownFileName = data.ext ? data.title + '.' + data.ext : data.title;
     }
@@ -62,8 +62,8 @@ function AddMedia(data) {
                 <img src="img/download.png" class="ico" id="download" title="下载"/>
                 <img src="img/play.png" class="ico" id="play" title="预览"/>
                 <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
-                <span class="size">
-                </span>
+                <span class="size"></span>
+                <img src="${data.webInfo.favIconUrl}" class="webIco"/>
             </div>
             <div class="url hide">标题: ...<br> MIME: ...<br><div id="duration"></div>
                 <a href="" target="_blank" download=""></a>
@@ -71,30 +71,26 @@ function AddMedia(data) {
             <video class="getMediaInfo hide"></video>
         </div>
     */
-    var html = '<div class="panel"><div class="panel-heading">';
-    html += '<span>' + trimName + '</span>';
-    if (data.ext == "m3u8" || data.type == "application/vnd.apple.mpegurl" || data.type == "application/x-mpegurl") {
-        html += '<img src="img/parsing.png" class="ico" id="m3u8" title="解析"/>';
-    }
-    html += '<input type="checkbox" class="DownCheck hide" checked="true"/>';
-    html += '<img src="img/download.png" class="ico" id="download" title="下载"/>';
-    if (isPlay(data.ext) || Options.Potplayer) {
-        html += '<img src="img/play.png" class="ico" id="play" title="预览"/>';
-    }
-    html += '<img src="img/copy.png" class="ico" id="copy" title="复制地址"/>';
-    if (data.size != 0) {
-        html += '<span class="size">' + data.size + 'MB</span>';
-    }
-    // if (data.webInfo?.favIconUrl) {
-    //     html += '<img src="'+data.webInfo.favIconUrl+'" class="webIco"/>'
-    // }
-    html += '</div><div class="url hide">';
-    if (data.webInfo) {
-        html += '标题: ' + data.webInfo.title + '<br>';
-    }
-    html += 'MIME: ' + data.type + '<br><div id="duration"></div>';
-    html += '<a href="' + data.url + '" target="_blank" download="' + DownFileName + '">' + data.url + '</a>';
-    html += '</div><video class="getMediaInfo hide"></video></div>';
+    let html = `
+        <div class="panel">
+            <div class="panel-heading">
+                <span>${trimName}</span>
+                <img src="img/parsing.png" class="ico ${isM3U8(data) ? "" : "hide"}" id="m3u8" title="解析"/>
+                <input type="checkbox" class="DownCheck" checked="true"/>
+                <img src="img/download.png" class="ico" id="download" title="下载"/>
+                <img src="img/play.png" class="ico ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
+                <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
+                ${data.size != 0 ? `<span class="size">${data.size}MB</span>` : ""}
+                ${data.webInfo?.favIconUrl && false ? `<img src="${data.webInfo.favIconUrl}" class="webIco"/>` : ""}
+            </div>
+            <div class="url hide">
+                ${data.webInfo ? `标题: ${data.webInfo.title}<br>` : ""}
+                MIME: ${data.type} <br>
+                <div id="duration"></div>
+                <a href="${data.url}" target="_blank" download="${DownFileName}">${data.url}</a>
+            </div>
+            <video class="getMediaInfo hide"></video>
+        </div>`;
 
     ////////////////////////绑定事件////////////////////////
     html = $(html);
@@ -172,7 +168,7 @@ $(function () {
     });
     //标签切换
     $(".Tabs .TabButton").click(function () {
-        var index = $(this).index();
+        let index = $(this).index();
         $(".Tabs .TabButton").removeClass('Active');
         $(this).addClass("Active");
         $(".mediaList").removeClass("TabShow");
@@ -185,7 +181,7 @@ $(function () {
     });
     //下载选中文件
     $('#DownFile').click(function () {
-        var FileNum = $('.TabShow :checked').size();
+        let FileNum = $('.TabShow :checked').size();
         if (FileNum >= 10 && !confirm("共 " + FileNum + "个文件，是否确认下载?")) {
             return;
         }
@@ -195,7 +191,9 @@ $(function () {
     });
     //复制选中文件
     $('#AllCopy').click(function () {
-        var url = '';
+        let count = $('.TabShow :checked').size();
+        if (count == 0) { return false };
+        let url = '';
         $('.TabShow :checked').each(function () {
             url += $(this).parents('.panel').find('.url a').attr('href') + "\n";
         });
@@ -214,9 +212,13 @@ $(function () {
             $(this).attr('checked', !$(this).prop('checked'));
         });
     });
-    //清空全部数据
+    //清空数据
     $('#Clear').click(function () {
-        chrome.storage.local.clear("MediaData");
+        let tab = $("#mediaList").is(":visible") ? tabIdObject : "tabId-1";
+        chrome.storage.local.get({ "MediaData": {} }, function (items) {
+            delete items.MediaData[tab];
+            chrome.storage.local.set({ MediaData: items.MediaData });
+        });
         chrome.runtime.sendMessage('ClearIcon');
         location.reload();
     });
@@ -230,9 +232,16 @@ $(function () {
 });
 
 //html5播放器允许格式
-function isPlay(ext) {
-    var arr = ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'flv', 'm4a'];
-    if (arr.indexOf(ext) > -1) {
+function isPlay(data) {
+    if (Options.Potplayer) { return true }
+    let arr = ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'flv', 'm4a'];
+    if (arr.indexOf(data.ext) > -1) {
+        return true;
+    }
+    return false;
+}
+function isM3U8(data) {
+    if (data.ext == "m3u8" || data.type == "application/vnd.apple.mpegurl" || data.type == "application/x-mpegurl") {
         return true;
     }
     return false;
@@ -240,16 +249,11 @@ function isPlay(ext) {
 
 //取消提示 3个以上显示操作按钮
 function UItoggle() {
-    var length = $('.TabShow #download').length;
+    let length = $('.TabShow #download').length;
     if (length > 0) {
         $('#Tips').hide();
     } else {
         $('#Tips').show();
-    }
-    if (length >= 3) {
-        $('#down,.DownCheck').show();
-    } else {
-        $('#down,.DownCheck').hide();
     }
     if (length >= 30) {
         $('#ToBottom').show();

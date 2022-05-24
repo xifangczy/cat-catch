@@ -44,7 +44,7 @@ function getManifestUrlRoot() {
 
 //修复url路劲
 function fixUrl(url) {
-    if (/^data:/i.test(url) || /^[\w]+:\/\/.+/i.test(url)) {
+    if (/^[\w]+:\/\/.+/i.test(url)) {
         return url;
     }
     if (url[0] == "/") {

@@ -22,32 +22,28 @@ $("#AddType").bind("click", function () {
   $("#typeList #text").last().focus();
 });
 
+$("#version").html("猫抓 v" + Version);
+
 function Gethtml(Type, Text = "", Size = 0, State = true) {
-  let html = '<tr data-type="' + Type + '">\
-      <td><input type="text" value="' + Text + '" id="text"></td>\
-      <td><input type="number" placeholder="大小限制" value="' + Size + '" class="size" id="size">KB</td>\
-      <td>\
-        <div class="switch">\
-          <label class="switchLabel switchRadius">\
-            <input type="checkbox" id="state" class="switchInput"/>\
-            <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>\
-          </label>\
-        </div>\
-      </td>\
-      <td>\
-        <svg viewBox="0 0 24 24" class="RemoveButton"><g>\
-          <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>\
-        </g></svg>\
-      </td>\
-    </tr>';
+  let html = `<tr data-type="${Type}">
+      <td><input type="text" value="${Text}" id="text" placeholder="${Type == "Ext" ? "后缀名" : "类型"}" class="${Type == "Ext" ? "ext" : "type"}"></td>
+      <td><input type="number" placeholder="大小限制" value="${Size}" class="size" id="size">KB</td>
+      <td>
+        <div class="switch">
+          <label class="switchLabel switchRadius">
+            <input type="checkbox" id="state" class="switchInput" ${State ? 'checked="checked"' : ""}/>
+            <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+          </label>
+        </div>
+      </td>
+      <td>
+        <svg viewBox="0 0 24 24" class="RemoveButton"><g>
+          <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
+        </g></svg>
+      </td>
+    </tr>`;
 
   html = $(html);
-  if (Type == "Ext") {
-    html.find("#text").attr({ placeholder: "后缀名", class: "ext" });
-  } else {
-    html.find("#text").attr({ placeholder: "类型", class: "type" });
-  }
-  html.find("#state").attr("checked", State);
   html.find(".RemoveButton").click(function () {
     html.remove();
     Save();
@@ -124,6 +120,8 @@ $("#ResetAllOption").bind("click", function () {
     Potplayer: defaultPotplayer
   });
   chrome.runtime.sendMessage('RefreshOption');
+  chrome.storage.local.clear("MediaData");
+  chrome.runtime.sendMessage('ClearIcon');
   location.reload();
 });
 

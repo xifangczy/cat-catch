@@ -40,6 +40,7 @@ var defaultTitleName = false;
 var defaultOtherAutoClear = 500;
 var defaultPotplayer = false;
 var Options = new Object();
+var Version = "1.0.22";
 
 // Init
 SetOptions();
@@ -75,6 +76,7 @@ function SetOptions() {
 // chrome.runtime.onInstalled.addListener(function (details) {
 //     if(details.reason == "update"){
 //         chrome.storage.sync.clear();
+//         chrome.storage.local.clear();
 //         SetOptions();
 //     }
 // });

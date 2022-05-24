@@ -10,7 +10,11 @@ chrome.webNavigation.onBeforeNavigate.addListener(function () {
 //响应开始(用来检测媒体文件地址大小等信息)
 chrome.webRequest.onResponseStarted.addListener(
     function (data) {
-        findMedia(data);
+        try {
+            findMedia(data);
+        } catch (e) {
+            console.log(e);
+        }
     }, { urls: ["<all_urls>"] }, ["responseHeaders", "extraHeaders"]
 );
 
@@ -24,7 +28,7 @@ function findMedia(data) {
     ) { return; }
     //屏蔽特殊页面发起的资源
     var urlParsing = new Object();
-    if (data.initiator !== undefined) {
+    if (data.initiator != "null" && data.initiator !== undefined) {
         urlParsing = new URL(data.initiator);
         if (urlParsing.protocol == "chrome-extension:" ||
             urlParsing.protocol == "chrome:" ||
@@ -104,8 +108,10 @@ function findMedia(data) {
             if (data.tabId == -1) {
                 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
                     let tabId = "tabId" + tabs[0].id;
-                    for (let item of items.MediaData[tabId]) {
-                        if (item.url == data.url) { return; }
+                    if (items.MediaData[tabId] !== undefined) {
+                        for (let item of items.MediaData[tabId]) {
+                            if (item.url == data.url) { return; }
+                        }
                     }
                 });
             }
