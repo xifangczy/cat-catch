@@ -149,13 +149,19 @@ function findMedia(data) {
 
 //监听来自popup 和 options的请求
 chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
-    if (Message == "RefreshOption") {
+    if (Message.Message == "RefreshOption") {
         SetOptions();
-    } else if (Message == "ClearIcon") {
-        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-            SetIcon(0, tabs[0].id);
-        });
-        chrome.action.setIcon({ path: "/img/icon.png" });
+    } else if (Message.Message == "ClearIcon") {
+        if (Message.tab == undefined || Message.tab == "-1") {
+            chrome.action.setIcon({ path: "/img/icon.png" });
+        }
+        if (Message.tab == undefined) {
+            chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+                SetIcon(0, tabs[0].id);
+            });
+        } else if (Message.tab != "-1") {
+            SetIcon(0, Message.tab);
+        }
     }
     sendResponse("OK");
 });

@@ -40,7 +40,7 @@ var defaultTitleName = false;
 var defaultOtherAutoClear = 500;
 var defaultPotplayer = false;
 var Options = new Object();
-var Version = "1.0.22";
+var Version = "1.0.23";
 
 // Init
 SetOptions();

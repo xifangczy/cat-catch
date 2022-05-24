@@ -63,49 +63,49 @@ function Gethtml(Type, Text = "", Size = 0, State = true) {
 //调试模式
 $("#Debug").bind("click", function () {
   chrome.storage.sync.set({ Debug: $(this).prop("checked") });
-  chrome.runtime.sendMessage('RefreshOption');
+  chrome.runtime.sendMessage({Message: "RefreshOption"});
 });
 
 //使用网页标题做文件名
 $("#TitleName").bind("click", function () {
   chrome.storage.sync.set({ TitleName: $(this).prop("checked") });
-  chrome.runtime.sendMessage('RefreshOption');
+  chrome.runtime.sendMessage({Message: "RefreshOption"});
 });
 
 //使用PotPlayer预览
 $("#Potplayer").bind("click", function () {
   chrome.storage.sync.set({ Potplayer: $(this).prop("checked") });
-  chrome.runtime.sendMessage('RefreshOption');
+  chrome.runtime.sendMessage({Message: "RefreshOption"});
 });
 
 //失去焦点 保存自动清理数
 $("#OtherAutoClear").blur(function () {
   chrome.storage.sync.set({ OtherAutoClear: $(this).val() });
-  chrome.runtime.sendMessage('RefreshOption');
+  chrome.runtime.sendMessage({Message: "RefreshOption"});
 });
 
 //重置后缀
 $("#ResetExt").bind("click", function () {
   chrome.storage.sync.set({ Ext: defaultExt });
-  chrome.runtime.sendMessage('RefreshOption');
+  chrome.runtime.sendMessage({Message: "RefreshOption"});
   location.reload();
 });
 //重置类型
 $("#ResetType").bind("click", function () {
   chrome.storage.sync.set({ Type: defaultType });
-  chrome.runtime.sendMessage('RefreshOption');
+  chrome.runtime.sendMessage({Message: "RefreshOption"});
   location.reload();
 });
 //重置其他设置
 $("#ResetOption").bind("click", function () {
   chrome.storage.sync.set({ Debug: defaultDebug, TitleName: defaultTitleName, OtherAutoClear: defaultOtherAutoClear, Potplayer: defaultPotplayer, });
-  chrome.runtime.sendMessage('RefreshOption');
+  chrome.runtime.sendMessage({Message: "RefreshOption"});
   location.reload();
 });
 //清空数据
 $("#ClearData").bind("click", function () {
   chrome.storage.local.clear("MediaData");
-  chrome.runtime.sendMessage('ClearIcon');
+  chrome.runtime.sendMessage({Message: "ClearIcon"});
   location.reload();
 });
 //重置所有设置
@@ -119,9 +119,9 @@ $("#ResetAllOption").bind("click", function () {
     OtherAutoClear: defaultOtherAutoClear,
     Potplayer: defaultPotplayer
   });
-  chrome.runtime.sendMessage('RefreshOption');
+  chrome.runtime.sendMessage({Message: "RefreshOption"});
   chrome.storage.local.clear("MediaData");
-  chrome.runtime.sendMessage('ClearIcon');
+  chrome.runtime.sendMessage({Message: "ClearIcon"});
   location.reload();
 });
 
@@ -149,6 +149,6 @@ function Save() {
   });
   chrome.storage.sync.set({ Ext: Ext });
   chrome.storage.sync.set({ Type: Type });
-  chrome.runtime.sendMessage('RefreshOption');
+  chrome.runtime.sendMessage({Message: "RefreshOption"});
   // location.reload();
 }

@@ -78,7 +78,7 @@ function AddMedia(data) {
                 <img src="img/parsing.png" class="ico ${isM3U8(data) ? "" : "hide"}" id="m3u8" title="解析"/>
                 <input type="checkbox" class="DownCheck" checked="true"/>
                 <img src="img/download.png" class="ico" id="download" title="下载"/>
-                <img src="img/play.png" class="ico ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
+                <img src="img/${Options.Potplayer ? "potplayer.png" : "play.png"}" class="ico ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
                 <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
                 ${data.size != 0 ? `<span class="size">${data.size}MB</span>` : ""}
                 ${data.webInfo?.favIconUrl && false ? `<img src="${data.webInfo.favIconUrl}" class="webIco"/>` : ""}
@@ -214,12 +214,12 @@ $(function () {
     });
     //清空数据
     $('#Clear').click(function () {
-        let tab = $("#mediaList").is(":visible") ? tabIdObject : "tabId-1";
+        let tab = $("#mediaList").is(":visible") ? tabId : "-1";
         chrome.storage.local.get({ "MediaData": {} }, function (items) {
-            delete items.MediaData[tab];
+            delete items.MediaData["tabId" + tab];
             chrome.storage.local.set({ MediaData: items.MediaData });
         });
-        chrome.runtime.sendMessage('ClearIcon');
+        chrome.runtime.sendMessage({Message: "ClearIcon", tab: tab});
         location.reload();
     });
     //预览播放关闭按钮
