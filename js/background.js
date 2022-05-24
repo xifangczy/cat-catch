@@ -23,7 +23,6 @@ function findMedia(data) {
         Options.Ext === undefined ||
         Options.Debug === undefined ||
         Options.OtherAutoClear === undefined ||
-        Options.TitleName === undefined ||
         Options.Type === undefined
     ) { return; }
     //屏蔽特殊页面发起的资源

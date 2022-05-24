@@ -24,7 +24,8 @@ var defaultExt = new Array(
     { "ext": "asf", "size": 0, "state": true },
     { "ext": "movie", "size": 0, "state": true },
     { "ext": "divx", "size": 0, "state": true },
-    { "ext": "mpeg4", "size": 0, "state": true }
+    { "ext": "mpeg4", "size": 0, "state": true },
+    { "ext": "webp", "size": 5120, "state": true }
 );
 var defaultType = new Array(
     { "type": "audio/*", "size": 0, "state": true },
