@@ -27,6 +27,8 @@ https://microsoftedge.microsoft.com/addons/detail/oohmdefbjalncfplafanlagojlakmj
 ![界面](https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/b.png)
 
 ## 更新说明
+### 1.0.22
+修复一个严重BUG，导致Service Worker无法使用
 ### 1.0.21
 自定义抓取类型, 设置页面新界面
 ### 1.0.20
