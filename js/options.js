@@ -29,7 +29,7 @@ $("#AddType").bind("click", function () {
   $("#typeList #text").last().focus();
 });
 $("#AddRegex").bind("click", function () {
-  $("#regexList").append(Gethtml("Regex", { type: 1, state: true }));
+  $("#regexList").append(Gethtml("Regex", { type: "ig", state: true }));
   $("#regexList #text").last().focus();
 });
 $("#version").html("猫抓 v" + G.Version);
