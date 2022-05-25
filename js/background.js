@@ -7,7 +7,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(function () {
     console.log("Miao~");
 });
 
-//响应开始(用来检测媒体文件地址大小等信息)
+//onResponseStarted 浏览器接收到第一个字节触发，保证有更多信息判断资源类型
 chrome.webRequest.onResponseStarted.addListener(
     function (data) {
         try {
@@ -17,6 +17,7 @@ chrome.webRequest.onResponseStarted.addListener(
         }
     }, { urls: ["<all_urls>"] }, ["responseHeaders", "extraHeaders"]
 );
+//onBeforeRequest 浏览器发送请求之前使用正则匹配发送请求的URL
 chrome.webRequest.onBeforeRequest.addListener(
     function (data) {
         try {
@@ -28,15 +29,14 @@ chrome.webRequest.onBeforeRequest.addListener(
 );
 
 function findMedia(data, apiType = false) {
-    if (
-        G.Options.Ext === undefined ||
+    if (G.Options.Ext === undefined ||
         G.Options.Debug === undefined ||
         G.Options.OtherAutoClear === undefined ||
         G.Options.Type === undefined ||
         G.Options.Regex === undefined
     ) { return; }
     //屏蔽特殊页面发起的资源
-    var urlParsing = new Object();
+    let urlParsing = new Object();
     if (data.initiator != "null" && data.initiator !== undefined) {
         urlParsing = new URL(data.initiator);
         if (urlParsing.protocol == "chrome-extension:" ||
@@ -50,8 +50,8 @@ function findMedia(data, apiType = false) {
         urlParsing.protocol == "extension:") { return; }
     //屏蔽Youtube
     if (
-        urlParsing.host.indexOf("youtube.com") != -1 ||
-        urlParsing.host.indexOf("googlevideo.com") != -1
+        urlParsing.host.includes("youtube.com") ||
+        urlParsing.host.includes("googlevideo.com")
     ) { return; }
     //调试模式
     if (G.Options.Debug) {
@@ -111,7 +111,7 @@ function findMedia(data, apiType = false) {
     if (!apiType && data.type == "media") {
         filter = true;
     }
-    
+
     if (!filter) { return; }
 
     chrome.storage.local.get({ MediaData: {} }, function (items) {
@@ -178,7 +178,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     sendResponse("OK");
 });
-//切换标签，更新图标
+//切换标签，更新全局变量G.tabId 更新图标
 chrome.tabs.onActivated.addListener(function () {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         G.tabId = tabs[0].id;

@@ -50,14 +50,18 @@ function AddMedia(data) {
             <div class="panel-heading">
                 <span></span>
                 <input type="checkbox" class="DownCheck hide" checked="true"/>
+                <img src="${data.webInfo.favIconUrl}" class="leftIco"/>
+                <img src="img/regex.png" class="leftIco" title="正则表达式匹配"/>
                 <img src="img/parsing.png" class="ico" id="m3u8" title="解析"/>
                 <img src="img/download.png" class="ico" id="download" title="下载"/>
                 <img src="img/play.png" class="ico" id="play" title="预览"/>
                 <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
-                <span class="size"></span>
-                <img src="${data.webInfo.favIconUrl}" class="webIco"/>
+                <span class="size">0MB</span>
             </div>
-            <div class="url hide">标题: ...<br> MIME: ...<br><div id="duration"></div>
+            <div class="url hide">
+                标题: ...<br>
+                MIME: ...<br>
+                <div id="duration"></div>
                 <a href="" target="_blank" download=""></a>
             </div>
             <video class="getMediaInfo hide"></video>
@@ -68,10 +72,8 @@ function AddMedia(data) {
             <div class="panel-heading">
                 <span>${trimName}</span>
                 <input type="checkbox" class="DownCheck" checked="true"/>
-
                 ${data.webInfo?.favIconUrl && G.Options.ShowWebIco ? `<img src="${data.webInfo.favIconUrl}" class="leftIco"/>` : ""}
                 ${data.isRegex ? `<img src="img/regex.png" class="leftIco" title="正则表达式匹配"/>` : ""}
-
                 <img src="img/parsing.png" class="ico ${isM3U8(data) ? "" : "hide"}" id="m3u8" title="解析"/>
                 <img src="img/download.png" class="ico" id="download" title="下载"/>
                 <img src="img/${G.Options.Potplayer ? "potplayer.png" : "play.png"}" class="ico ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
@@ -229,11 +231,8 @@ $(function () {
 //html5播放器允许格式
 function isPlay(data) {
     if (G.Options.Potplayer) { return true }
-    let arr = ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'flv', 'm4a'];
-    if (arr.indexOf(data.ext) > -1) {
-        return true;
-    }
-    return false;
+    let arr = ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'flv', 'm4a', '3gp', 'mpeg', 'mov'];
+    return arr.includes(data.ext);
 }
 function isM3U8(data) {
     if (data.ext == "m3u8" || data.type == "application/vnd.apple.mpegurl" || data.type == "application/x-mpegurl") {
@@ -245,16 +244,8 @@ function isM3U8(data) {
 //取消提示 3个以上显示操作按钮
 function UItoggle() {
     let length = $('.TabShow #download').length;
-    if (length > 0) {
-        $('#Tips').hide();
-    } else {
-        $('#Tips').show();
-    }
-    if (length >= 30) {
-        $('#ToBottom').show();
-    } else {
-        $('#ToBottom').hide();
-    }
+    length > 0 ? $('#Tips').hide() : $('#Tips').show();
+    length >= 30 ? $('#ToBottom').show() : $('#ToBottom').hide();
     length = $('#mediaList .panel').length;
     $("#mediaQuantity").text(length);
     length = $('#otherMediaList .panel').length;

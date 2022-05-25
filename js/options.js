@@ -1,5 +1,5 @@
 //////////////////////初始化//////////////////////
-chrome.storage.sync.get(G.Options.lists, function (items) {
+chrome.storage.sync.get(G.OptionLists, function (items) {
   if (items.Ext === undefined || items.Type === undefined || items.Regex === undefined) {
     location.reload();
   }

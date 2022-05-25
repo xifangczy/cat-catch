@@ -9,7 +9,7 @@ G.Version = "1.0.23";
 //设置参数
 G.Options = new Object();
 //所有设置变量
-G.Options.lists = ["Ext", "Debug", "TitleName", "OtherAutoClear", "Potplayer", "Type", "Regex", "ShowWebIco"];
+G.OptionLists = ["Ext", "Debug", "TitleName", "OtherAutoClear", "Potplayer", "Type", "Regex", "ShowWebIco"];
 
 // Init
 InitOptions();
@@ -61,7 +61,7 @@ function GetDefault(Obj) {
         case "Type": return defaultType;
         case "Debug": return false;
         case "TitleName": return false;
-        case "OtherAutoClear": return 500;
+        case "OtherAutoClear": return 100;
         case "Potplayer": return false;
         case "Regex": return defaultRegex;
         case "ShowWebIco": return false;
@@ -69,8 +69,8 @@ function GetDefault(Obj) {
 }
 //初始变量
 function InitOptions() {
-    chrome.storage.sync.get(G.Options.lists, function (items) {
-        for(let list of G.Options.lists){
+    chrome.storage.sync.get(G.OptionLists, function (items) {
+        for(let list of G.OptionLists){
             if(items[list] === undefined){
                 chrome.storage.sync.set({ [list]: GetDefault(list) });
                 continue;

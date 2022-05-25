@@ -1,176 +1,163 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>猫抓 设置</title>
-    <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
-    <script src="js/jquery.min.js"></script>
-    <script src="js/init.js"></script>
-  </head>
 
-  <body>
-    <div class="wrapper">
-      <section>
-        <h1 class="optionsTitle">抓取后缀</h1>
-        <div class="optionBox">
-          <span class="explain">填写不含"."的后缀, 不过滤大小填0</span>
-          <table id="extList">
-            <tr>
-              <th>扩展名</th>
-              <th>过滤大小</th>
-              <th>启用</th>
-              <th>删除</th>
-            </tr>
-          </table>
-          <div class="button">
-            <button type="button" id="AddExt">添加后缀</button
-            ><button type="button" id="ResetExt" data-reset="Ext">重置后缀</button>
-          </div>
+<head>
+  <meta charset="UTF-8" />
+  <title>猫抓 设置</title>
+  <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
+  <script src="js/jquery.min.js"></script>
+  <script src="js/init.js"></script>
+</head>
+
+<body>
+  <div class="wrapper">
+    <section>
+      <h1 class="optionsTitle">抓取后缀</h1>
+      <div class="optionBox">
+        <span class="explain">填写不含"."的后缀, 不过滤大小填0</span>
+        <table id="extList">
+          <tr>
+            <th>扩展名</th>
+            <th>过滤大小</th>
+            <th>启用</th>
+            <th>删除</th>
+          </tr>
+        </table>
+        <div class="button">
+          <button type="button" id="AddExt">添加后缀</button><button type="button" id="ResetExt"
+            data-reset="Ext">重置后缀</button>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section>
-        <h1 class="optionsTitle">抓取类型</h1>
-        <div class="optionBox">
-          <span class="explain">填入正确的content-type类型, 不过滤大小填0</span>
-          <table id="typeList">
-            <tr>
-              <th>类型</th>
-              <th>过滤大小</th>
-              <th>启用</th>
-              <th>删除</th>
-            </tr>
-          </table>
-          <div class="button">
-            <button type="button" id="AddType">添加类型</button
-            ><button type="button" id="ResetType" data-reset="Type">重置类型</button>
-          </div>
+    <section>
+      <h1 class="optionsTitle">抓取类型</h1>
+      <div class="optionBox">
+        <span class="explain">填入正确的content-type类型, 不过滤大小填0</span>
+        <table id="typeList">
+          <tr>
+            <th>类型</th>
+            <th>过滤大小</th>
+            <th>启用</th>
+            <th>删除</th>
+          </tr>
+        </table>
+        <div class="button">
+          <button type="button" id="AddType">添加类型</button><button type="button" id="ResetType"
+            data-reset="Type">重置类型</button>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section>
-        <h1 class="optionsTitle">正则匹配</h1>
-        <div class="optionBox">
-          <span class="explain">表达式标志 i: 忽略大小写, g: 全局搜索</span>
-          <table id="regexList">
-            <tr>
-              <th>标志</th>
-              <th>正则表达式</th>
-              <th>启用</th>
-              <th>删除</th>
-            </tr>
-          </table>
-          <div class="button">
-            <button type="button" id="AddRegex">添加正则</button
-            ><button type="button" id="ResetRegex" data-reset="Regex">重置正则</button>
-          </div>
-          <span style="font-weight: bold;font-size: 15px;">正则测试</span><br>
-          <span>要匹配的URL:</span><br>
-          <input type="text" id="testUrl" style="width: 590px;"/><br>
-          <span>正则表达式:</span><br>
-          <input type="text" id="testRegex" style="width: 590px;"/><br>
-          <span>标识符:</span><br>
-          <input type="text" id="testFlag" style="width: 20px;" value="ig"/>
-          结果: <span style="color: #ff0000;" id="testResult">不匹配</span>
+    <section>
+      <h1 class="optionsTitle">正则匹配</h1>
+      <div class="optionBox">
+        <span class="explain">表达式标志 i: 忽略大小写, g: 全局搜索</span>
+        <table id="regexList">
+          <tr>
+            <th>标志</th>
+            <th>正则表达式</th>
+            <th>启用</th>
+            <th>删除</th>
+          </tr>
+        </table>
+        <div class="button">
+          <button type="button" id="AddRegex">添加正则</button><button type="button" id="ResetRegex"
+            data-reset="Regex">重置正则</button>
         </div>
-      </section>
+        <span style="font-weight: bold;font-size: 15px;">正则测试</span><br>
+        <span>要匹配的URL:</span><br>
+        <input type="text" id="testUrl" style="width: 590px;" /><br>
+        <span>正则表达式:</span><br>
+        <input type="text" id="testRegex" style="width: 590px;" /><br>
+        <span>标识符:</span><br>
+        <input type="text" id="testFlag" style="width: 20px;" value="ig" />
+        结果: <span style="color: #ff0000;" id="testResult">不匹配</span>
+      </div>
+    </section>
 
-      <section>
-        <h1 class="optionsTitle">其他设置</h1>
-        <div class="optionBox" id="OtherOption">
-          <div class="list">
-            <div class="item">
-              <div>自动清理幽灵数据(默认500条后自动清理)</div>
-              <input id="OtherAutoClear" type="number" />
-            </div>
-
-            <div class="item">
-              <div>调用本地PotPlayer播放器预览资源</div>
-              <div class="switch">
-                <label class="switchLabel switchRadius">
-                  <input type="checkbox" id="Potplayer" class="switchInput" />
-                  <span class="switchRound switchRadius"
-                    ><em class="switchRoundBtn switchRadius"></em></span>
-                </label>
-              </div>
-            </div>
-
-            <div class="item">
-              <div>保存文件名使用网页标题</div>
-              <div class="switch">
-                <label class="switchLabel switchRadius">
-                  <input type="checkbox" id="TitleName" class="switchInput" />
-                  <span class="switchRound switchRadius"
-                    ><em class="switchRoundBtn switchRadius"></em></span>
-                </label>
-              </div>
-            </div>
-
-            <div class="item">
-              <div>显示网站图标</div>
-              <div class="switch">
-                <label class="switchLabel switchRadius">
-                  <input type="checkbox" id="ShowWebIco" class="switchInput" />
-                  <span class="switchRound switchRadius"
-                    ><em class="switchRoundBtn switchRadius"></em></span>
-                </label>
-              </div>
-            </div>
-
-            <div class="item">
-              <div>调试模式</div>
-              <div class="switch">
-                <label class="switchLabel switchRadius">
-                  <input type="checkbox" id="Debug" class="switchInput" />
-                  <span class="switchRound switchRadius"
-                    ><em class="switchRoundBtn switchRadius"></em
-                  ></span>
-                </label>
-              </div>
-            </div>
-          </div>
-          <div class="button">
-            <button type="button" id="ResetOption">重置其他设置</button>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <h1 class="optionsTitle">操作</h1>
-        <div class="optionBox">
-          <div class="button" style="justify-content: center">
-            <button type="button" id="ClearData">清空抓取的数据</button>
-            <button type="button" id="ResetAllOption">重置所有设置</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- <section>
-        <h1 class="optionsTitle">说明</h1>
-        <div class="optionBox">
-          <span class="explain">正则匹配，高优先级，浏览器发送一条URL请求之前进行匹配，不保证匹配到的资源可用。</span><br>
-          <span class="explain">后缀抓取、类型抓取，为了拥有更多信息判断是否媒体文件，会等待浏览器发送请求并正确收到资源后进行匹配。</span><br>
-        </div>
-      </section> -->
-
-      <section>
-        <h1 class="optionsTitle">关于</h1>
-        <div class="optionBox">
+    <section>
+      <h1 class="optionsTitle">其他设置</h1>
+      <div class="optionBox" id="OtherOption">
+        <div class="list">
           <div class="item">
-            <div id="version"></div>
+            <div>自动清理幽灵数据(默认100条后自动清理)</div>
+            <input id="OtherAutoClear" type="number" />
           </div>
+
           <div class="item">
-            <div>
-              Github:
-              <a href="https://github.com/xifangczy/cat-catch" target="_blank"
-                >https://github.com/xifangczy/cat-catch</a
-              >
+            <div>调用本地PotPlayer播放器预览资源</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="Potplayer" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div>保存文件名使用网页标题</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="TitleName" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div>显示网站图标</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="ShowWebIco" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div>调试模式</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="Debug" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
             </div>
           </div>
         </div>
-      </section>
-    </div>
+        <div class="button">
+          <button type="button" id="ResetOption">重置其他设置</button>
+        </div>
+      </div>
+    </section>
 
-    <script src="js/options.js"></script>
-  </body>
+    <section>
+      <h1 class="optionsTitle">操作</h1>
+      <div class="optionBox">
+        <div class="button" style="justify-content: center">
+          <button type="button" id="ClearData">清空抓取的数据</button>
+          <button type="button" id="ResetAllOption">重置所有设置</button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h1 class="optionsTitle">关于</h1>
+      <div class="optionBox">
+        <div class="item">
+          <div id="version"></div>
+        </div>
+        <div class="item">
+          <div>
+            Github:
+            <a href="https://github.com/xifangczy/cat-catch" target="_blank">https://github.com/xifangczy/cat-catch</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="js/options.js"></script>
+</body>
+
 </html>

@@ -59,7 +59,7 @@ input.regex {
   text-align: center;
 }
 input#OtherAutoClear {
-  margin-left: 65px;
+  margin-left: 230px;
   width: 45px;
 }
 .switch {
@@ -110,9 +110,10 @@ input#OtherAutoClear {
   align-items: center;
   display: flex;
   min-height: 30px;
+  border-bottom: solid 1px rgba(0, 0, 0, 0.06);
 }
 .item .switch {
-  margin-right: 217px;
+  margin-right: 50px;
 }
 .optionsTitle {
   margin-top: 20px;
