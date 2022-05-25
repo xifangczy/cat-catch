@@ -8,6 +8,8 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 G.Version = "1.0.23";
 //设置参数
 G.Options = new Object();
+//所有设置变量
+G.Options.lists = ["Ext", "Debug", "TitleName", "OtherAutoClear", "Potplayer", "Type", "Regex", "ShowWebIco"];
 
 // Init
 InitOptions();
@@ -52,7 +54,7 @@ function GetDefault(Obj) {
         { "type": "image/*", "size": 0, "state": false }
     );
     const defaultRegex = new Array(
-        { "type": "ig", "regex": "music\\.126\\.net.*\\.m4a", "state": false }
+        { "type": "ig", "regex": "video\\.weibocdn\\.com.*\\.mp4", "state": false }
     );
     switch (Obj) {
         case "Ext": return defaultExt;
@@ -62,47 +64,25 @@ function GetDefault(Obj) {
         case "OtherAutoClear": return 500;
         case "Potplayer": return false;
         case "Regex": return defaultRegex;
+        case "ShowWebIco": return false;
     }
 }
 //初始变量
 function InitOptions() {
-    chrome.storage.sync.get(["Ext", "Debug", "TitleName", "OtherAutoClear", "Potplayer", "Type", "Regex"], function (items) {
-        G.Options.Ext = items.Ext ? items.Ext : GetDefault("Ext");
-        G.Options.Debug = items.Debug ? items.Debug : GetDefault("Debug");
-        G.Options.TitleName = items.TitleName ? items.TitleName : GetDefault("TitleName");
-        G.Options.OtherAutoClear = items.OtherAutoClear ? items.OtherAutoClear : GetDefault("OtherAutoClear");
-        G.Options.Potplayer = items.Potplayer ? items.Potplayer : GetDefault("Potplayer");
-        G.Options.Type = items.Type ? items.Type : GetDefault("Type");
-        G.Options.Regex = items.Regex ? items.Regex : GetDefault("Regex");
-        if (items.Ext === undefined) {
-            chrome.storage.sync.set({ "Ext": GetDefault("Ext") });
-        }
-        if (items.Debug === undefined) {
-            chrome.storage.sync.set({ "Debug": GetDefault("Debug") });
-        }
-        if (items.TitleName === undefined) {
-            chrome.storage.sync.set({ "TitleName": GetDefault("TitleName") });
-        }
-        if (items.OtherAutoClear === undefined) {
-            chrome.storage.sync.set({ "OtherAutoClear": GetDefault("OtherAutoClear") });
-        }
-        if (items.Potplayer === undefined) {
-            chrome.storage.sync.set({ "Potplayer": GetDefault("Potplayer") });
-        }
-        if (items.Type === undefined) {
-            chrome.storage.sync.set({ "Type": GetDefault("Type") });
-        }
-        if (items.Regex === undefined) {
-            chrome.storage.sync.set({ "Regex": GetDefault("Regex") });
+    chrome.storage.sync.get(G.Options.lists, function (items) {
+        for(let list of G.Options.lists){
+            if(items[list] === undefined){
+                chrome.storage.sync.set({ [list]: GetDefault(list) });
+                continue;
+            }
+            G.Options[list] = items[list];
         }
     });
 }
 //设置变量
 function SetOption(obj, val) {
-    if (obj != undefined) {
-        val = val ? val : GetDefault(obj);
-        chrome.storage.sync.set({ [obj]: val });
-    }
+    val = val ? val : GetDefault(obj);
+    chrome.storage.sync.set({ [obj]: val });
 }
 //重置所有变量
 function ResetOptions() {

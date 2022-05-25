@@ -1,10 +1,9 @@
 //////////////////////初始化//////////////////////
-chrome.storage.sync.get(["Ext", "Debug", "TitleName", "OtherAutoClear", "Potplayer", "Type", "Regex"], function (items) {
-  if (items.Ext === undefined) {
+chrome.storage.sync.get(G.Options.lists, function (items) {
+  if (items.Ext === undefined || items.Type === undefined || items.Regex === undefined) {
     location.reload();
   }
   for (let item of items.Ext) {
-    // $("#extList").append(Gethtml("Ext", item.ext, item.size, item.state));
     $("#extList").append(Gethtml("Ext", { ext: item.ext, size: item.size, state: item.state }));
   }
   for (let item of items.Type) {
@@ -17,6 +16,7 @@ chrome.storage.sync.get(["Ext", "Debug", "TitleName", "OtherAutoClear", "Potplay
   $("#TitleName").attr("checked", items.TitleName);
   $("#OtherAutoClear").val(items.OtherAutoClear);
   $("#Potplayer").attr("checked", items.Potplayer);
+  $("#ShowWebIco").attr("checked", items.ShowWebIco);
 });
 
 //新增格式
@@ -32,7 +32,6 @@ $("#AddRegex").bind("click", function () {
   $("#regexList").append(Gethtml("Regex", { type: 1, state: true }));
   $("#regexList #text").last().focus();
 });
-
 $("#version").html("猫抓 v" + G.Version);
 
 function Gethtml(Type, Param = new Object()) {
@@ -81,67 +80,40 @@ function Gethtml(Type, Param = new Object()) {
   return html;
 }
 
-//调试模式
-$("#Debug").bind("click", function () {
-  chrome.runtime.sendMessage({ Message: "SetOption", obj: "Debug", val: $(this).prop("checked") });
-});
-
-//使用网页标题做文件名
-$("#TitleName").bind("click", function () {
-  chrome.runtime.sendMessage({ Message: "SetOption", obj: "TitleName", val: $(this).prop("checked") });
-});
-
-//使用PotPlayer预览
-$("#Potplayer").bind("click", function () {
-  chrome.runtime.sendMessage({ Message: "SetOption", obj: "Potplayer", val: $(this).prop("checked") });
-});
-
 //失去焦点 保存自动清理数
 $("#OtherAutoClear").blur(function () {
   chrome.runtime.sendMessage({ Message: "SetOption", obj: "OtherAutoClear", val: $(this).val() });
 });
-
-//重置后缀
-$("#ResetExt").bind("click", function () {
-  chrome.runtime.sendMessage({ Message: "SetOption", obj: "Ext" });
-  location.reload();
+// 调试模式 使用网页标题做文件名 使用PotPlayer预览 显示网站图标
+$("#Debug, #TitleName, #Potplayer, #ShowWebIco").bind("click", function () {
+  chrome.runtime.sendMessage({ Message: "SetOption", obj: $(this).attr("id"), val: $(this).prop("checked") });
 });
-//重置类型
-$("#ResetType").bind("click", function () {
-  chrome.runtime.sendMessage({ Message: "SetOption", obj: "Type" });
-  location.reload();
-});
-//重置正则
-$("#ResetRegex").bind("click", function () {
-  chrome.runtime.sendMessage({ Message: "SetOption", obj: "Regex" });
+//重置后缀 重置类型 重置正则
+$("#ResetExt, #ResetType, #ResetRegex").bind("click", function () {
+  chrome.runtime.sendMessage({ Message: "SetOption", obj: $(this).data("reset") });
   location.reload();
 });
 //重置其他设置
 $("#ResetOption").bind("click", function () {
-  chrome.runtime.sendMessage({ Message: "SetOption", obj: "Debug" });
-  chrome.runtime.sendMessage({ Message: "SetOption", obj: "TitleName" });
-  chrome.runtime.sendMessage({ Message: "SetOption", obj: "OtherAutoClear" });
-  chrome.runtime.sendMessage({ Message: "SetOption", obj: "Potplayer" });
+  $("#OtherOption input").each(function () {
+    chrome.runtime.sendMessage({ Message: "SetOption", obj: $(this).attr("id") });
+  });
   location.reload();
 });
-//清空数据
-$("#ClearData").bind("click", function () {
-  chrome.storage.local.clear("MediaData");
-  chrome.runtime.sendMessage({ Message: "ClearIcon" });
-  location.reload();
-});
-//重置所有设置
-$("#ResetAllOption").bind("click", function () {
-  chrome.runtime.sendMessage({ Message: "ResetOptions" });
+//清空数据 重置所有设置
+$("#ClearData, #ResetAllOption").bind("click", function () {
+  if ($(this).attr("id") == "ResetAllOption") {
+    chrome.runtime.sendMessage({ Message: "ResetOptions" });
+  }
   chrome.storage.local.clear("MediaData");
   chrome.runtime.sendMessage({ Message: "ClearIcon" });
   location.reload();
 });
 //正则表达式 测试
 $("#testRegex").keyup(function () {
-  let testUrl = $("#testUrl").val();
-  let testRegex = $("#testRegex").val();
-  let testFlag = $("#testFlag").val();
+  const testUrl = $("#testUrl").val();
+  const testRegex = $("#testRegex").val();
+  const testFlag = $("#testFlag").val();
   const reg = new RegExp(testRegex, testFlag);
   if (reg.test(testUrl)) {
     $("#testResult").html("匹配");

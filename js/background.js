@@ -111,52 +111,53 @@ function findMedia(data, apiType = false) {
     if (!apiType && data.type == "media") {
         filter = true;
     }
-    if (filter) {
-        chrome.storage.local.get({ MediaData: {} }, function (items) {
-            let tabId = "tabId" + data.tabId;
-            if (items.MediaData[tabId] === undefined) {
-                items.MediaData[tabId] = new Array();
-            }
-            for (let item of items.MediaData[tabId]) {
+    
+    if (!filter) { return; }
+
+    chrome.storage.local.get({ MediaData: {} }, function (items) {
+        let tabId = "tabId" + data.tabId;
+        if (items.MediaData[tabId] === undefined) {
+            items.MediaData[tabId] = new Array();
+        }
+        for (let item of items.MediaData[tabId]) {
+            if (item.url == data.url) { return; }
+        }
+        //幽灵数据与当前标签资源查重
+        if (data.tabId == -1 && items.MediaData[G.tabIdStr] !== undefined) {
+            for (let item of items.MediaData[G.tabIdStr]) {
                 if (item.url == data.url) { return; }
             }
-            //幽灵数据与当前标签资源查重
-            if (data.tabId == -1 && items.MediaData[G.tabIdStr] !== undefined) {
-                for (let item of items.MediaData[G.tabIdStr]) {
-                    if (item.url == data.url) { return; }
-                }
+        }
+        let info = {
+            name: name,
+            url: data.url,
+            size: Math.round((100 * size) / 1024 / 1024) / 100,
+            ext: ext,
+            type: contentType,
+            tabId: data.tabId,
+            title: title,
+            webInfo: webInfo,
+            isRegex: apiType
+        };
+        items.MediaData[tabId].push(info);
+        chrome.storage.local.set({ MediaData: items.MediaData });
+        if (data.tabId != -1) {
+            SetIcon(items.MediaData[tabId].length, data.tabId);
+        }
+        //自动清理幽灵数据
+        if (items.MediaData["tabId-1"] !== undefined) {
+            chrome.action.setIcon({ path: "/img/icon-tips.png" });
+            if (items.MediaData["tabId-1"].length > G.Options.OtherAutoClear) {
+                delete items.MediaData["tabId-1"];
+                chrome.storage.local.set({ MediaData: items.MediaData });
+                chrome.action.setIcon({ path: "/img/icon.png" });
             }
-            let info = {
-                name: name,
-                url: data.url,
-                size: Math.round((100 * size) / 1024 / 1024) / 100,
-                ext: ext,
-                type: contentType,
-                tabId: data.tabId,
-                title: title,
-                webInfo: webInfo,
-                isRegex: apiType
-            };
-            items.MediaData[tabId].push(info);
-            chrome.storage.local.set({ MediaData: items.MediaData });
-            if (data.tabId != -1) {
-                SetIcon(items.MediaData[tabId].length, data.tabId);
-            }
-            //自动清理幽灵数据
-            if (items.MediaData["tabId-1"] !== undefined) {
-                chrome.action.setIcon({ path: "/img/icon-tips.png" });
-                if (items.MediaData["tabId-1"].length > G.Options.OtherAutoClear) {
-                    delete items.MediaData["tabId-1"];
-                    chrome.storage.local.set({ MediaData: items.MediaData });
-                    chrome.action.setIcon({ path: "/img/icon.png" });
-                }
-            }
-            chrome.runtime.sendMessage(info, function () {
-                // console.log(chrome.runtime.lastError.message);
-                return chrome.runtime.lastError;
-            });
+        }
+        chrome.runtime.sendMessage(info, function () {
+            // console.log(chrome.runtime.lastError.message);
+            return chrome.runtime.lastError;
         });
-    }
+    });
 }
 
 //监听来自popup 和 options的请求

@@ -67,14 +67,16 @@ function AddMedia(data) {
         <div class="panel">
             <div class="panel-heading">
                 <span>${trimName}</span>
-                <img src="img/parsing.png" class="ico ${isM3U8(data) ? "" : "hide"}" id="m3u8" title="解析"/>
                 <input type="checkbox" class="DownCheck" checked="true"/>
+
+                ${data.webInfo?.favIconUrl && G.Options.ShowWebIco ? `<img src="${data.webInfo.favIconUrl}" class="leftIco"/>` : ""}
+                ${data.isRegex ? `<img src="img/regex.png" class="leftIco" title="正则表达式匹配"/>` : ""}
+
+                <img src="img/parsing.png" class="ico ${isM3U8(data) ? "" : "hide"}" id="m3u8" title="解析"/>
                 <img src="img/download.png" class="ico" id="download" title="下载"/>
                 <img src="img/${G.Options.Potplayer ? "potplayer.png" : "play.png"}" class="ico ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
                 <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
                 ${data.size != 0 ? `<span class="size">${data.size}MB</span>` : ""}
-                ${data.isRegex ? `<img src="img/regex.png" class="webIco" title="正则表达式匹配"/>` : ""}
-                ${data.webInfo?.favIconUrl && false ? `<img src="${data.webInfo.favIconUrl}" class="webIco"/>` : ""}
             </div>
             <div class="url hide">
                 ${data.webInfo ? `标题: ${data.webInfo.title}<br>` : ""}

@@ -24,7 +24,7 @@
           </table>
           <div class="button">
             <button type="button" id="AddExt">添加后缀</button
-            ><button type="button" id="ResetExt">重置后缀</button>
+            ><button type="button" id="ResetExt" data-reset="Ext">重置后缀</button>
           </div>
         </div>
       </section>
@@ -43,7 +43,7 @@
           </table>
           <div class="button">
             <button type="button" id="AddType">添加类型</button
-            ><button type="button" id="ResetType">重置类型</button>
+            ><button type="button" id="ResetType" data-reset="Type">重置类型</button>
           </div>
         </div>
       </section>
@@ -62,7 +62,7 @@
           </table>
           <div class="button">
             <button type="button" id="AddRegex">添加正则</button
-            ><button type="button" id="ResetRegex">重置正则</button>
+            ><button type="button" id="ResetRegex" data-reset="Regex">重置正则</button>
           </div>
           <span style="font-weight: bold;font-size: 15px;">正则测试</span><br>
           <span>要匹配的URL:</span><br>
@@ -77,7 +77,7 @@
 
       <section>
         <h1 class="optionsTitle">其他设置</h1>
-        <div class="optionBox">
+        <div class="optionBox" id="OtherOption">
           <div class="list">
             <div class="item">
               <div>自动清理幽灵数据(默认500条后自动清理)</div>
@@ -90,8 +90,7 @@
                 <label class="switchLabel switchRadius">
                   <input type="checkbox" id="Potplayer" class="switchInput" />
                   <span class="switchRound switchRadius"
-                    ><em class="switchRoundBtn switchRadius"></em
-                  ></span>
+                    ><em class="switchRoundBtn switchRadius"></em></span>
                 </label>
               </div>
             </div>
@@ -102,8 +101,18 @@
                 <label class="switchLabel switchRadius">
                   <input type="checkbox" id="TitleName" class="switchInput" />
                   <span class="switchRound switchRadius"
-                    ><em class="switchRoundBtn switchRadius"></em
-                  ></span>
+                    ><em class="switchRoundBtn switchRadius"></em></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="item">
+              <div>显示网站图标</div>
+              <div class="switch">
+                <label class="switchLabel switchRadius">
+                  <input type="checkbox" id="ShowWebIco" class="switchInput" />
+                  <span class="switchRound switchRadius"
+                    ><em class="switchRoundBtn switchRadius"></em></span>
                 </label>
               </div>
             </div>
