@@ -20,10 +20,10 @@ chrome.webRequest.onResponseStarted.addListener(
 
 function findMedia(data) {
     if (
-        Options.Ext === undefined ||
-        Options.Debug === undefined ||
-        Options.OtherAutoClear === undefined ||
-        Options.Type === undefined
+        G.Options.Ext === undefined ||
+        G.Options.Debug === undefined ||
+        G.Options.OtherAutoClear === undefined ||
+        G.Options.Type === undefined
     ) { return; }
     //屏蔽特殊页面发起的资源
     var urlParsing = new Object();
@@ -44,7 +44,7 @@ function findMedia(data) {
         urlParsing.host.indexOf("googlevideo.com") != -1
     ) { return; }
     //调试模式
-    if (Options.Debug) {
+    if (G.Options.Debug) {
         console.log(data);
     }
     //网页标题
@@ -86,7 +86,7 @@ function findMedia(data) {
 
     //查找附件
     if (!filter && Disposition != null) {
-        var res = Disposition.match(/filename="(.*?)"/);
+        let res = Disposition.match(/filename="(.*?)"/);
         if (res && res[1]) {
             name = GetFileName(decodeURIComponent(res[1]));
             ext = GetExt(name);
@@ -96,7 +96,7 @@ function findMedia(data) {
     }
     if (filter || data.type == "media") {
         chrome.storage.local.get({ MediaData: {} }, function (items) {
-            var tabId = "tabId" + data.tabId;
+            let tabId = "tabId" + data.tabId;
             if (items.MediaData[tabId] === undefined) {
                 items.MediaData[tabId] = new Array();
             }
@@ -104,17 +104,12 @@ function findMedia(data) {
                 if (item.url == data.url) { return; }
             }
             //幽灵数据与当前标签资源查重
-            if (data.tabId == -1) {
-                chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-                    let tabId = "tabId" + tabs[0].id;
-                    if (items.MediaData[tabId] !== undefined) {
-                        for (let item of items.MediaData[tabId]) {
-                            if (item.url == data.url) { return; }
-                        }
-                    }
-                });
+            if (data.tabId == -1 && items.MediaData[G.tabIdStr] !== undefined) {
+                for (let item of items.MediaData[G.tabIdStr]) {
+                    if (item.url == data.url) { return; }
+                }
             }
-            var info = {
+            let info = {
                 name: name,
                 url: data.url,
                 size: Math.round((100 * size) / 1024 / 1024) / 100,
@@ -132,7 +127,7 @@ function findMedia(data) {
             //自动清理幽灵数据
             if (items.MediaData["tabId-1"] !== undefined) {
                 chrome.action.setIcon({ path: "/img/icon-tips.png" });
-                if (items.MediaData["tabId-1"].length > Options.OtherAutoClear) {
+                if (items.MediaData["tabId-1"].length > G.Options.OtherAutoClear) {
                     delete items.MediaData["tabId-1"];
                     chrome.storage.local.set({ MediaData: items.MediaData });
                     chrome.action.setIcon({ path: "/img/icon.png" });
@@ -148,31 +143,34 @@ function findMedia(data) {
 
 //监听来自popup 和 options的请求
 chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
-    if (Message.Message == "RefreshOption") {
-        SetOptions();
+    if (Message.Message == "SetOption") {
+        SetOption(Message.obj, Message.val);
     } else if (Message.Message == "ClearIcon") {
         if (Message.tab == undefined || Message.tab == "-1") {
             chrome.action.setIcon({ path: "/img/icon.png" });
         }
         if (Message.tab == undefined) {
-            chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-                SetIcon(0, tabs[0].id);
-            });
+            SetIcon(0, G.tabId);
         } else if (Message.tab != "-1") {
             SetIcon(0, Message.tab);
         }
+    } else if (Message.Message = "ResetOptions") {
+        ResetOptions();
     }
     sendResponse("OK");
 });
 //切换标签，更新图标
-chrome.tabs.onActivated.addListener(function (info) {
-    let tabId = info.tabId;
-    chrome.storage.local.get({ MediaData: {} }, function (items) {
-        if (items.MediaData["tabId" + tabId] !== undefined) {
-            SetIcon(items.MediaData["tabId" + tabId].length, tabId);
-        } else {
-            SetIcon(0, tabId);
-        }
+chrome.tabs.onActivated.addListener(function () {
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        G.tabId = tabs[0].id;
+        G.tabIdStr = "tabId" + G.tabId;
+        chrome.storage.local.get({ MediaData: {} }, function (items) {
+            if (items.MediaData[G.tabIdStr] !== undefined) {
+                SetIcon(items.MediaData[G.tabIdStr].length, G.tabId);
+            } else {
+                SetIcon(0, G.tabId);
+            }
+        });
     });
 });
 //标签更新，清除该标签的记录
@@ -196,7 +194,7 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
 
 //检查扩展名以及大小限制
 function CheckExtension(ext, size) {
-    for (let item of Options.Ext) {
+    for (let item of G.Options.Ext) {
         if (item.ext == ext) {
             if (item.size != 0 && size != null && size <= item.size * 1024) {
                 return "break";
@@ -211,7 +209,7 @@ function CheckExtension(ext, size) {
 }
 //检查类型以及大小限制
 function CheckType(dataType, dataSize) {
-    for (let item of Options.Type) {
+    for (let item of G.Options.Type) {
         let TypeSplit = dataType.split("/");
         let OptionSplit = item.type.split("/");
         if (OptionSplit[0] == TypeSplit[0] && (OptionSplit[1] == TypeSplit[1] || OptionSplit[1] == "*")) {

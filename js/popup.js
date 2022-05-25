@@ -1,16 +1,8 @@
-//当前标签ID
-var tabIdObject = null;
-var tabId = null;
-chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    tabId = tabs[0].id;
-    tabIdObject = "tabId" + tabs[0].id;
-});
-
 //填充数据
 chrome.storage.local.get({ "MediaData": {} }, function (items) {
     if (items.MediaData === undefined) { return; }
-    if (items.MediaData[tabIdObject] !== undefined) {
-        for (let item of items.MediaData[tabIdObject]) {
+    if (items.MediaData[G.tabIdStr] !== undefined) {
+        for (let item of items.MediaData[G.tabIdStr]) {
             AddMedia(item);
         }
     }
@@ -25,7 +17,7 @@ chrome.storage.local.get({ "MediaData": {} }, function (items) {
 
 //监听数据
 chrome.runtime.onMessage.addListener(function (MediaData, sender, sendResponse) {
-    if (MediaData.tabId == tabId || MediaData.tabId == -1) {
+    if (MediaData.tabId == G.tabId || MediaData.tabId == -1) {
         AddMedia(MediaData);
         UItoggle();
     }
@@ -48,7 +40,7 @@ function AddMedia(data) {
 
     //添加下载文件名
     let DownFileName = data.name;
-    if (Options.TitleName) {
+    if (G.Options.TitleName) {
         DownFileName = data.ext ? data.title + '.' + data.ext : data.title;
     }
 
@@ -78,7 +70,7 @@ function AddMedia(data) {
                 <img src="img/parsing.png" class="ico ${isM3U8(data) ? "" : "hide"}" id="m3u8" title="解析"/>
                 <input type="checkbox" class="DownCheck" checked="true"/>
                 <img src="img/download.png" class="ico" id="download" title="下载"/>
-                <img src="img/${Options.Potplayer ? "potplayer.png" : "play.png"}" class="ico ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
+                <img src="img/${G.Options.Potplayer ? "potplayer.png" : "play.png"}" class="ico ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
                 <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
                 ${data.size != 0 ? `<span class="size">${data.size}MB</span>` : ""}
                 ${data.webInfo?.favIconUrl && false ? `<img src="${data.webInfo.favIconUrl}" class="webIco"/>` : ""}
@@ -132,7 +124,7 @@ function AddMedia(data) {
     });
     //播放
     html.find('#play').click(function () {
-        if (Options.Potplayer) {
+        if (G.Options.Potplayer) {
             window.open('potplayer://' + data.url);
         } else {
             $('video').attr('src', data.url);
@@ -214,12 +206,12 @@ $(function () {
     });
     //清空数据
     $('#Clear').click(function () {
-        let tab = $("#mediaList").is(":visible") ? tabId : "-1";
+        let tab = $("#mediaList").is(":visible") ? G.tabId : "-1";
         chrome.storage.local.get({ "MediaData": {} }, function (items) {
             delete items.MediaData["tabId" + tab];
             chrome.storage.local.set({ MediaData: items.MediaData });
         });
-        chrome.runtime.sendMessage({Message: "ClearIcon", tab: tab});
+        chrome.runtime.sendMessage({ Message: "ClearIcon", tab: tab });
         location.reload();
     });
     //预览播放关闭按钮
@@ -233,7 +225,7 @@ $(function () {
 
 //html5播放器允许格式
 function isPlay(data) {
-    if (Options.Potplayer) { return true }
+    if (G.Options.Potplayer) { return true }
     let arr = ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'flv', 'm4a'];
     if (arr.indexOf(data.ext) > -1) {
         return true;

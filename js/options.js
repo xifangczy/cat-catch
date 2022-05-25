@@ -1,5 +1,8 @@
 //////////////////////初始化//////////////////////
 chrome.storage.sync.get(["Ext", "Debug", "TitleName", "OtherAutoClear", "Potplayer", "Type"], function (items) {
+  if(items.Ext === undefined){
+    location.reload();
+  }
   for (let item of items.Ext) {
     $("#extList").append(Gethtml("Ext", item.ext, item.size, item.state));
   }
@@ -22,7 +25,7 @@ $("#AddType").bind("click", function () {
   $("#typeList #text").last().focus();
 });
 
-$("#version").html("猫抓 v" + Version);
+$("#version").html("猫抓 v" + G.Version);
 
 function Gethtml(Type, Text = "", Size = 0, State = true) {
   let html = `<tr data-type="${Type}">
@@ -62,66 +65,53 @@ function Gethtml(Type, Text = "", Size = 0, State = true) {
 
 //调试模式
 $("#Debug").bind("click", function () {
-  chrome.storage.sync.set({ Debug: $(this).prop("checked") });
-  chrome.runtime.sendMessage({Message: "RefreshOption"});
+  chrome.runtime.sendMessage({ Message: "SetOption", obj: "Debug", val: $(this).prop("checked") });
 });
 
 //使用网页标题做文件名
 $("#TitleName").bind("click", function () {
-  chrome.storage.sync.set({ TitleName: $(this).prop("checked") });
-  chrome.runtime.sendMessage({Message: "RefreshOption"});
+  chrome.runtime.sendMessage({ Message: "SetOption", obj: "TitleName", val: $(this).prop("checked") });
 });
 
 //使用PotPlayer预览
 $("#Potplayer").bind("click", function () {
-  chrome.storage.sync.set({ Potplayer: $(this).prop("checked") });
-  chrome.runtime.sendMessage({Message: "RefreshOption"});
+  chrome.runtime.sendMessage({ Message: "SetOption", obj: "Potplayer", val: $(this).prop("checked") });
 });
 
 //失去焦点 保存自动清理数
 $("#OtherAutoClear").blur(function () {
-  chrome.storage.sync.set({ OtherAutoClear: $(this).val() });
-  chrome.runtime.sendMessage({Message: "RefreshOption"});
+  chrome.runtime.sendMessage({ Message: "SetOption", obj: "OtherAutoClear", val: $(this).val() });
 });
 
 //重置后缀
 $("#ResetExt").bind("click", function () {
-  chrome.storage.sync.set({ Ext: defaultExt });
-  chrome.runtime.sendMessage({Message: "RefreshOption"});
+  chrome.runtime.sendMessage({ Message: "SetOption", obj: "Ext" });
   location.reload();
 });
 //重置类型
 $("#ResetType").bind("click", function () {
-  chrome.storage.sync.set({ Type: defaultType });
-  chrome.runtime.sendMessage({Message: "RefreshOption"});
+  chrome.runtime.sendMessage({ Message: "SetOption", obj: "Type" });
   location.reload();
 });
 //重置其他设置
 $("#ResetOption").bind("click", function () {
-  chrome.storage.sync.set({ Debug: defaultDebug, TitleName: defaultTitleName, OtherAutoClear: defaultOtherAutoClear, Potplayer: defaultPotplayer, });
-  chrome.runtime.sendMessage({Message: "RefreshOption"});
+  chrome.runtime.sendMessage({ Message: "SetOption", obj: "Debug" });
+  chrome.runtime.sendMessage({ Message: "SetOption", obj: "TitleName" });
+  chrome.runtime.sendMessage({ Message: "SetOption", obj: "OtherAutoClear" });
+  chrome.runtime.sendMessage({ Message: "SetOption", obj: "Potplayer" });
   location.reload();
 });
 //清空数据
 $("#ClearData").bind("click", function () {
   chrome.storage.local.clear("MediaData");
-  chrome.runtime.sendMessage({Message: "ClearIcon"});
+  chrome.runtime.sendMessage({ Message: "ClearIcon" });
   location.reload();
 });
 //重置所有设置
 $("#ResetAllOption").bind("click", function () {
-  chrome.storage.sync.clear();
-  chrome.storage.sync.set({
-    Ext: defaultExt,
-    Type: defaultType,
-    Debug: defaultDebug,
-    TitleName: defaultTitleName,
-    OtherAutoClear: defaultOtherAutoClear,
-    Potplayer: defaultPotplayer
-  });
-  chrome.runtime.sendMessage({Message: "RefreshOption"});
+  chrome.runtime.sendMessage({ Message: "ResetOptions" });
   chrome.storage.local.clear("MediaData");
-  chrome.runtime.sendMessage({Message: "ClearIcon"});
+  chrome.runtime.sendMessage({ Message: "ClearIcon" });
   location.reload();
 });
 
@@ -149,6 +139,6 @@ function Save() {
   });
   chrome.storage.sync.set({ Ext: Ext });
   chrome.storage.sync.set({ Type: Type });
-  chrome.runtime.sendMessage({Message: "RefreshOption"});
+  chrome.runtime.sendMessage({ Message: "SetOption" });
   // location.reload();
 }
