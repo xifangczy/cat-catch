@@ -27,6 +27,8 @@ https://microsoftedge.microsoft.com/addons/detail/oohmdefbjalncfplafanlagojlakmj
 ![界面](https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/b.png)
 
 ## 更新说明
+### 1.0.23
+增加正则匹配
 ### 1.0.22
 修复一个严重BUG，导致Service Worker无法使用
 ### 1.0.21

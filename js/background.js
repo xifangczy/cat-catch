@@ -11,19 +11,29 @@ chrome.webNavigation.onBeforeNavigate.addListener(function () {
 chrome.webRequest.onResponseStarted.addListener(
     function (data) {
         try {
-            findMedia(data);
+            findMedia(data, false);
         } catch (e) {
             console.log(e);
         }
     }, { urls: ["<all_urls>"] }, ["responseHeaders", "extraHeaders"]
 );
+chrome.webRequest.onBeforeRequest.addListener(
+    function (data) {
+        try {
+            findMedia(data, true);
+        } catch (e) {
+            console.log(e);
+        }
+    }, { urls: ["<all_urls>"] }, ["requestBody", "extraHeaders"]
+);
 
-function findMedia(data) {
+function findMedia(data, apiType = false) {
     if (
         G.Options.Ext === undefined ||
         G.Options.Debug === undefined ||
         G.Options.OtherAutoClear === undefined ||
-        G.Options.Type === undefined
+        G.Options.Type === undefined ||
+        G.Options.Regex === undefined
     ) { return; }
     //屏蔽特殊页面发起的资源
     var urlParsing = new Object();
@@ -71,21 +81,24 @@ function findMedia(data) {
             }
         });
     }
+    //正则匹配
+    if (apiType && !filter) {
+        filter = CheckRegex(data.url);
+        if (filter == "break") { return; }
+    }
 
     //检查后缀
-    if (ext != null) {
+    if (!apiType && !filter && ext != null) {
         filter = CheckExtension(ext, size);
         if (filter == "break") { return; }
     }
-
     //检查类型
-    if (!filter && contentType != null) {
+    if (!apiType && !filter && contentType != null) {
         filter = CheckType(contentType, size);
         if (filter == "break") { return; }
     }
-
     //查找附件
-    if (!filter && Disposition != null) {
+    if (!apiType && !filter && Disposition != null) {
         let res = Disposition.match(/filename="(.*?)"/);
         if (res && res[1]) {
             name = GetFileName(decodeURIComponent(res[1]));
@@ -94,7 +107,11 @@ function findMedia(data) {
             if (filter == "break") { return; }
         }
     }
-    if (filter || data.type == "media") {
+    //放过类型为media的资源
+    if (!apiType && data.type == "media") {
+        filter = true;
+    }
+    if (filter) {
         chrome.storage.local.get({ MediaData: {} }, function (items) {
             let tabId = "tabId" + data.tabId;
             if (items.MediaData[tabId] === undefined) {
@@ -117,7 +134,8 @@ function findMedia(data) {
                 type: contentType,
                 tabId: data.tabId,
                 title: title,
-                webInfo: webInfo
+                webInfo: webInfo,
+                isRegex: apiType
             };
             items.MediaData[tabId].push(info);
             chrome.storage.local.set({ MediaData: items.MediaData });
@@ -216,6 +234,20 @@ function CheckType(dataType, dataSize) {
             if (item.size != 0 && dataSize != null && dataSize <= item.size * 1024) {
                 return "break";
             } else if (item.state) {
+                return true;
+            } else {
+                return "break";
+            }
+        }
+    }
+    return false;
+}
+//正则匹配
+function CheckRegex(url) {
+    for (let item of G.Options.Regex) {
+        const reg = new RegExp(item.regex, item.type);
+        if (reg.test(url)) {
+            if (item.state) {
                 return true;
             } else {
                 return "break";

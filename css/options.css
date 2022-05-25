@@ -50,6 +50,14 @@ input.size {
   width: 100px;
   text-align: center;
 }
+input.regexType {
+  width: 20px;
+  text-align: center;
+}
+input.regex {
+  width: 440px;
+  text-align: center;
+}
 input#OtherAutoClear {
   margin-left: 65px;
   width: 45px;

@@ -40,7 +40,7 @@ function GetDefault(Obj) {
         { "ext": "movie", "size": 0, "state": true },
         { "ext": "divx", "size": 0, "state": true },
         { "ext": "mpeg4", "size": 0, "state": true },
-        { "ext": "webp", "size": 5120, "state": true }
+        { "ext": "webp", "size": 5120, "state": false }
     );
     const defaultType = new Array(
         { "type": "audio/*", "size": 0, "state": true },
@@ -51,6 +51,9 @@ function GetDefault(Obj) {
         { "type": "application/octet-stream", "size": 0, "state": false },
         { "type": "image/*", "size": 0, "state": false }
     );
+    const defaultRegex = new Array(
+        { "type": "ig", "regex": "music\\.126\\.net.*\\.m4a", "state": false }
+    );
     switch (Obj) {
         case "Ext": return defaultExt;
         case "Type": return defaultType;
@@ -58,17 +61,19 @@ function GetDefault(Obj) {
         case "TitleName": return false;
         case "OtherAutoClear": return 500;
         case "Potplayer": return false;
+        case "Regex": return defaultRegex;
     }
 }
 //初始变量
 function InitOptions() {
-    chrome.storage.sync.get(["Ext", "Debug", "TitleName", "OtherAutoClear", "Potplayer", "Type"], function (items) {
+    chrome.storage.sync.get(["Ext", "Debug", "TitleName", "OtherAutoClear", "Potplayer", "Type", "Regex"], function (items) {
         G.Options.Ext = items.Ext ? items.Ext : GetDefault("Ext");
         G.Options.Debug = items.Debug ? items.Debug : GetDefault("Debug");
         G.Options.TitleName = items.TitleName ? items.TitleName : GetDefault("TitleName");
         G.Options.OtherAutoClear = items.OtherAutoClear ? items.OtherAutoClear : GetDefault("OtherAutoClear");
         G.Options.Potplayer = items.Potplayer ? items.Potplayer : GetDefault("Potplayer");
         G.Options.Type = items.Type ? items.Type : GetDefault("Type");
+        G.Options.Regex = items.Regex ? items.Regex : GetDefault("Regex");
         if (items.Ext === undefined) {
             chrome.storage.sync.set({ "Ext": GetDefault("Ext") });
         }
@@ -86,6 +91,9 @@ function InitOptions() {
         }
         if (items.Type === undefined) {
             chrome.storage.sync.set({ "Type": GetDefault("Type") });
+        }
+        if (items.Regex === undefined) {
+            chrome.storage.sync.set({ "Regex": GetDefault("Regex") });
         }
     });
 }

@@ -1,13 +1,17 @@
 //////////////////////初始化//////////////////////
-chrome.storage.sync.get(["Ext", "Debug", "TitleName", "OtherAutoClear", "Potplayer", "Type"], function (items) {
-  if(items.Ext === undefined){
+chrome.storage.sync.get(["Ext", "Debug", "TitleName", "OtherAutoClear", "Potplayer", "Type", "Regex"], function (items) {
+  if (items.Ext === undefined) {
     location.reload();
   }
   for (let item of items.Ext) {
-    $("#extList").append(Gethtml("Ext", item.ext, item.size, item.state));
+    // $("#extList").append(Gethtml("Ext", item.ext, item.size, item.state));
+    $("#extList").append(Gethtml("Ext", { ext: item.ext, size: item.size, state: item.state }));
   }
   for (let item of items.Type) {
-    $("#typeList").append(Gethtml("Type", item.type, item.size, item.state));
+    $("#typeList").append(Gethtml("Type", { type: item.type, size: item.size, state: item.state }));
+  }
+  for (let item of items.Regex) {
+    $("#regexList").append(Gethtml("Regex", { type: item.type, regex: item.regex, state: item.state }));
   }
   $("#Debug").attr("checked", items.Debug);
   $("#TitleName").attr("checked", items.TitleName);
@@ -17,24 +21,41 @@ chrome.storage.sync.get(["Ext", "Debug", "TitleName", "OtherAutoClear", "Potplay
 
 //新增格式
 $("#AddExt").bind("click", function () {
-  $("#extList").append(Gethtml("Ext"));
+  $("#extList").append(Gethtml("Ext", { state: true }));
   $("#extList #text").last().focus();
 });
 $("#AddType").bind("click", function () {
-  $("#typeList").append(Gethtml("Type"));
+  $("#typeList").append(Gethtml("Type", { state: true }));
   $("#typeList #text").last().focus();
+});
+$("#AddRegex").bind("click", function () {
+  $("#regexList").append(Gethtml("Regex", { type: 1, state: true }));
+  $("#regexList #text").last().focus();
 });
 
 $("#version").html("猫抓 v" + G.Version);
 
-function Gethtml(Type, Text = "", Size = 0, State = true) {
-  let html = `<tr data-type="${Type}">
-      <td><input type="text" value="${Text}" id="text" placeholder="${Type == "Ext" ? "后缀名" : "类型"}" class="${Type == "Ext" ? "ext" : "type"}"></td>
-      <td><input type="number" placeholder="大小限制" value="${Size}" class="size" id="size">KB</td>
+function Gethtml(Type, Param = new Object()) {
+  let html = "";
+  switch (Type) {
+    case "Ext":
+      html = `<td><input type="text" value="${Param.ext ? Param.ext : ""}" id="text" placeholder="后缀名" class="ext"></td>`
+      html += `<td><input type="number" placeholder="大小限制" value="${Param.size ? Param.size : 0}" class="size" id="size">KB</td>`
+      break;
+    case "Type":
+      html = `<td><input type="text" value="${Param.type ? Param.type : ""}" id="text" placeholder="类型" class="type"></td>`
+      html += `<td><input type="number" placeholder="大小限制" value="${Param.size ? Param.size : 0}" class="size" id="size">KB</td>`
+      break;
+    case "Regex":
+      html = `<td><input type="text" value="${Param.type ? Param.type : ""}" id="type" class="regexType"></td>`
+      html += `<td><input type="text" value="${Param.regex ? Param.regex : ""}" placeholder="正则表达式" id="regex" class="regex"></td>`
+  }
+  html = `<tr data-type="${Type}">
+      ${html}
       <td>
         <div class="switch">
           <label class="switchLabel switchRadius">
-            <input type="checkbox" id="state" class="switchInput" ${State ? 'checked="checked"' : ""}/>
+            <input type="checkbox" id="state" class="switchInput" ${Param.state ? 'checked="checked"' : ""}/>
             <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
           </label>
         </div>
@@ -51,13 +72,10 @@ function Gethtml(Type, Text = "", Size = 0, State = true) {
     html.remove();
     Save();
   });
-  html.find("#text").blur(function () {
+  html.find("input").blur(function () {
     Save();
   });
-  html.find("#size").on("click blur", function () {
-    Save();
-  });
-  html.find("#state").on("click", function () {
+  html.find("#size, #state").on("click", function () {
     Save();
   });
   return html;
@@ -93,6 +111,11 @@ $("#ResetType").bind("click", function () {
   chrome.runtime.sendMessage({ Message: "SetOption", obj: "Type" });
   location.reload();
 });
+//重置正则
+$("#ResetRegex").bind("click", function () {
+  chrome.runtime.sendMessage({ Message: "SetOption", obj: "Regex" });
+  location.reload();
+});
 //重置其他设置
 $("#ResetOption").bind("click", function () {
   chrome.runtime.sendMessage({ Message: "SetOption", obj: "Debug" });
@@ -114,10 +137,24 @@ $("#ResetAllOption").bind("click", function () {
   chrome.runtime.sendMessage({ Message: "ClearIcon" });
   location.reload();
 });
+//正则表达式 测试
+$("#testRegex").keyup(function () {
+  let testUrl = $("#testUrl").val();
+  let testRegex = $("#testRegex").val();
+  let testFlag = $("#testFlag").val();
+  const reg = new RegExp(testRegex, testFlag);
+  if (reg.test(testUrl)) {
+    $("#testResult").html("匹配");
+  } else {
+    $("#testResult").html("不匹配");
+  }
+});
+
 
 function Save() {
   let Ext = new Array();
   let Type = new Array();
+  let Regex = new Array();
   $("#extList tr, #typeList tr").each(function () {
     let GetText = $(this).find("#text").val();
     let GetSize = $(this).find("#size").val();
@@ -137,8 +174,26 @@ function Save() {
       location.reload();
     }
   });
+  $("#regexList tr").each(function () {
+    let GetType = $(this).find("#type").val();
+    let GetRegex = $(this).find("#regex").val();
+    let GetState = $(this).find("#state").prop("checked");
+    if (GetType == null || GetType === undefined || GetType == "" || GetType == " ") {
+      GetType = "ig";
+    }
+    try {
+      new RegExp("", GetType)
+    } catch (e) {
+      GetType = "ig";
+    }
+    if (GetRegex == null || GetRegex === undefined || GetRegex == "" || GetRegex == " ") {
+      return true;
+    }
+    Regex.push({ type: GetType, regex: GetRegex, state: GetState });
+  });
   chrome.storage.sync.set({ Ext: Ext });
   chrome.storage.sync.set({ Type: Type });
-  chrome.runtime.sendMessage({ Message: "SetOption" });
+  chrome.storage.sync.set({ Regex: Regex });
+  // chrome.runtime.sendMessage({ Message: "SetOption" });
   // location.reload();
 }

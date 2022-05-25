@@ -73,6 +73,7 @@ function AddMedia(data) {
                 <img src="img/${G.Options.Potplayer ? "potplayer.png" : "play.png"}" class="ico ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
                 <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
                 ${data.size != 0 ? `<span class="size">${data.size}MB</span>` : ""}
+                ${data.isRegex ? `<img src="img/regex.png" class="webIco" title="正则表达式匹配"/>` : ""}
                 ${data.webInfo?.favIconUrl && false ? `<img src="${data.webInfo.favIconUrl}" class="webIco"/>` : ""}
             </div>
             <div class="url hide">

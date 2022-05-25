@@ -49,6 +49,33 @@
       </section>
 
       <section>
+        <h1 class="optionsTitle">正则匹配</h1>
+        <div class="optionBox">
+          <span class="explain">表达式标志 i: 忽略大小写, g: 全局搜索</span>
+          <table id="regexList">
+            <tr>
+              <th>标志</th>
+              <th>正则表达式</th>
+              <th>启用</th>
+              <th>删除</th>
+            </tr>
+          </table>
+          <div class="button">
+            <button type="button" id="AddRegex">添加正则</button
+            ><button type="button" id="ResetRegex">重置正则</button>
+          </div>
+          <span style="font-weight: bold;font-size: 15px;">正则测试</span><br>
+          <span>要匹配的URL:</span><br>
+          <input type="text" id="testUrl" style="width: 590px;"/><br>
+          <span>正则表达式:</span><br>
+          <input type="text" id="testRegex" style="width: 590px;"/><br>
+          <span>标识符:</span><br>
+          <input type="text" id="testFlag" style="width: 20px;" value="ig"/>
+          结果: <span style="color: #ff0000;" id="testResult">不匹配</span>
+        </div>
+      </section>
+
+      <section>
         <h1 class="optionsTitle">其他设置</h1>
         <div class="optionBox">
           <div class="list">
@@ -108,6 +135,14 @@
           </div>
         </div>
       </section>
+
+      <!-- <section>
+        <h1 class="optionsTitle">说明</h1>
+        <div class="optionBox">
+          <span class="explain">正则匹配，高优先级，浏览器发送一条URL请求之前进行匹配，不保证匹配到的资源可用。</span><br>
+          <span class="explain">后缀抓取、类型抓取，为了拥有更多信息判断是否媒体文件，会等待浏览器发送请求并正确收到资源后进行匹配。</span><br>
+        </div>
+      </section> -->
 
       <section>
         <h1 class="optionsTitle">关于</h1>
