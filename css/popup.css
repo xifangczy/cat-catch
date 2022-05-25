@@ -114,10 +114,11 @@ body {
   cursor: pointer;
   width: 50%;
   display: flex;
-  justify-content: center;
   padding: 3px;
   margin: 1px 2px 0 2px;
-  align-items: flex-end;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: center;
 }
 .TabButton.Active {
   background-color: #f5f5f5;
@@ -152,4 +153,7 @@ body {
 }
 .TabShow {
   display: block !important;
+}
+#mediaQuantity, #otherQuantity{
+  font-weight: bold;
 }

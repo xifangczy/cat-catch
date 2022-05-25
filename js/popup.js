@@ -150,11 +150,7 @@ function AddMedia(data) {
         return true;
     });
     //添加页面
-    if (data.tabId === -1) {
-        $('#otherMediaList').append(html);
-    } else {
-        $('#mediaList').append(html);
-    }
+    data.tabId == -1 ? $('#otherMediaList').append(html) : $('#mediaList').append(html);
 }
 
 //绑定事件
@@ -247,9 +243,9 @@ function UItoggle() {
     length > 0 ? $('#Tips').hide() : $('#Tips').show();
     length >= 30 ? $('#ToBottom').show() : $('#ToBottom').hide();
     length = $('#mediaList .panel').length;
-    $("#mediaQuantity").text(length);
+    $("#mediaQuantity").text("[" + length + "]");
     length = $('#otherMediaList .panel').length;
-    $("#otherQuantity").text(length);
+    $("#otherQuantity").text("[" + length + "]");
 }
 
 function Tips(text) {

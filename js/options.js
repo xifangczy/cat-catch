@@ -115,11 +115,7 @@ $("#testRegex").keyup(function () {
   const testRegex = $("#testRegex").val();
   const testFlag = $("#testFlag").val();
   const reg = new RegExp(testRegex, testFlag);
-  if (reg.test(testUrl)) {
-    $("#testResult").html("匹配");
-  } else {
-    $("#testResult").html("不匹配");
-  }
+  reg.test(testUrl) ? $("#testResult").html("匹配") : $("#testResult").html("不匹配");
 });
 
 
