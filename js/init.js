@@ -2,8 +2,10 @@
 var G = new Object();
 //当前tabID
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    G.tabId = tabs[0].id;
-    G.tabIdStr = "tabId" + tabs[0].id;
+    if (tabs[0].id) {
+        G.tabId = tabs[0].id;
+        G.tabIdStr = "tabId" + tabs[0].id;
+    }
 });
 //设置参数
 G.Options = new Object();
@@ -78,17 +80,6 @@ function InitOptions() {
         }
     });
 }
-//设置变量
-function SetOption(obj, val) {
-    val = val ? val : GetDefault(obj);
-    chrome.storage.sync.set({ [obj]: val });
-}
-//重置所有变量
-function ResetOptions() {
-    chrome.storage.sync.clear();
-    InitOptions();
-}
-
 //监听变化，新值给全局变量
 chrome.storage.onChanged.addListener(function (changes, namespace) {
     if (namespace != "sync") { return; }
@@ -99,6 +90,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 
 // chrome.runtime.onInstalled.addListener(function (details) {
 //     if(details.reason == "update"){
-//         ResetOptions();
+//         chrome.storage.sync.clear();
+//         InitOptions()
 //     }
 // });

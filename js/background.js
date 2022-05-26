@@ -151,18 +151,15 @@ function findMedia(data, apiType = false) {
         }
         try {
             chrome.runtime.sendMessage(info, function () {
-                // console.log(chrome.runtime.lastError.message);
                 return chrome.runtime.lastError;
             });
-        } catch (e) { }
+        } catch (e) {}
     });
 }
 
 //监听来自popup 和 options的请求
 chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
-    if (Message.Message == "SetOption") {
-        SetOption(Message.obj, Message.val);
-    } else if (Message.Message == "ClearIcon") {
+    if (Message.Message == "ClearIcon") {
         if (Message.tab == undefined || Message.tab == "-1") {
             chrome.action.setIcon({ path: "/img/icon.png" });
         }
@@ -171,8 +168,6 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         } else if (Message.tab != "-1") {
             SetIcon(0, Message.tab);
         }
-    } else if (Message.Message = "ResetOptions") {
-        ResetOptions();
     }
     sendResponse("OK");
 });
@@ -215,11 +210,8 @@ function CheckExtension(ext, size) {
         if (item.ext == ext) {
             if (item.size != 0 && size != undefined && size <= item.size * 1024) {
                 return "break";
-            } else if (item.state) {
-                return true;
-            } else {
-                return "break";
             }
+            return item.state ? true : "break";
         }
     }
     return false;
@@ -232,11 +224,8 @@ function CheckType(dataType, dataSize) {
         if (OptionSplit[0] == TypeSplit[0] && (OptionSplit[1] == TypeSplit[1] || OptionSplit[1] == "*")) {
             if (item.size != 0 && dataSize != undefined && dataSize <= item.size * 1024) {
                 return "break";
-            } else if (item.state) {
-                return true;
-            } else {
-                return "break";
             }
+            return item.state ? true : "break";
         }
     }
     return false;
@@ -246,11 +235,7 @@ function CheckRegex(url) {
     for (let item of G.Options.Regex) {
         const reg = new RegExp(item.regex, item.type);
         if (reg.test(url)) {
-            if (item.state) {
-                return true;
-            } else {
-                return "break";
-            }
+            return item.state ? true : "break";
         }
     }
     return false;

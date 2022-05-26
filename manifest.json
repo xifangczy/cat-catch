@@ -1,31 +1,34 @@
 {
-  "background": {
-    "service_worker": "js/background.js"
-  },
-  "action": {
-    "default_icon": "img/icon.png",
-    "default_title": "还没闻到味儿~",
-    "default_popup": "popup.html"
-  },
-  "description": "网页媒体嗅探工具",
-  "icons": {
-    "40": "img/icon.png",
-    "48": "img/icon.png",
-    "128": "img/icon128.png"
-  },
-  "manifest_version": 3,
-  "minimum_chrome_version": "93",
-  "name": "猫抓",
-  "homepage_url": "https://github.com/xifangczy/cat-catch",
-  "options_page": "options.html",
-  "permissions": [
-    "tabs",
-    "webRequest",
-    "downloads",
-    "storage",
-    "webNavigation",
-    "alarms"
-  ],
-  "host_permissions": ["*://*/*", "<all_urls>"],
-  "version": "1.0.24"
+    "background": {
+        "service_worker": "js/background.js"
+    },
+    "action": {
+        "default_icon": "img/icon.png",
+        "default_title": "还没闻到味儿~",
+        "default_popup": "popup.html"
+    },
+    "description": "网页媒体嗅探工具",
+    "icons": {
+        "40": "img/icon.png",
+        "48": "img/icon.png",
+        "128": "img/icon128.png"
+    },
+    "manifest_version": 3,
+    "minimum_chrome_version": "93",
+    "name": "猫抓",
+    "homepage_url": "https://github.com/xifangczy/cat-catch",
+    "options_page": "options.html",
+    "permissions": [
+        "tabs",
+        "webRequest",
+        "downloads",
+        "storage",
+        "webNavigation",
+        "alarms"
+    ],
+    "host_permissions": [
+        "*://*/*",
+        "<all_urls>"
+    ],
+    "version": "1.0.24"
 }
