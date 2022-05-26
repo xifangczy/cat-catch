@@ -23,8 +23,9 @@
     "webRequest",
     "downloads",
     "storage",
-    "webNavigation"
+    "webNavigation",
+    "alarms"
   ],
   "host_permissions": ["*://*/*", "<all_urls>"],
-  "version": "1.0.23"
+  "version": "1.0.24"
 }

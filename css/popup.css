@@ -13,7 +13,7 @@ a:hover {
 body {
   font-family: arial, sans-serif;
   font-size: 12px;
-  width: 450px;
+  width: 470px;
   overflow-x: hidden;
   background: #fff;
 }
@@ -22,17 +22,26 @@ body {
   margin-bottom: 2px;
 }
 .panel-heading {
-  padding: 8px 5px 8px 5px;
+  padding: 5px 5px 5px 5px;
   background-color: #f5f5f5;
   border-color: #ddd;
   cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.panel-heading .name {
+  flex: auto;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .url {
   padding: 5px;
 }
 .ico {
-  float: right;
-  padding-left: 5px;
+  padding-left: 2px;
+  padding-right: 2px;
   transition: all 0.1s;
   width: 18px;
   height: 18px;
@@ -95,7 +104,6 @@ body {
   cursor: pointer;
   padding: 3px 10px 3px 10px;
   margin: 2px 10px 4px 10px;
-  float: left;
 }
 .button:hover {
   background: #f5f5f5;
@@ -142,11 +150,10 @@ body {
   background: #ddd;
 }
 .DownCheck {
-  float: left;
-  vertical-align: middle;
-  margin-right: 5px;
+  margin-right: 2px;
   width: 15px;
   height: 15px;
+  flex: 0 0 auto;
 }
 .hide {
   display: none;
@@ -154,6 +161,11 @@ body {
 .TabShow {
   display: block !important;
 }
-#mediaQuantity, #otherQuantity{
+#mediaQuantity,
+#otherQuantity {
   font-weight: bold;
+}
+#down {
+  display: flex;
+  justify-content: space-between;
 }

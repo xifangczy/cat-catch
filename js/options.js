@@ -32,7 +32,7 @@ $("#AddRegex").bind("click", function () {
   $("#regexList").append(Gethtml("Regex", { type: "ig", state: true }));
   $("#regexList #text").last().focus();
 });
-$("#version").html("猫抓 v" + G.Version);
+$("#version").html("猫抓 v" + chrome.runtime.getManifest().version);
 
 function Gethtml(Type, Param = new Object()) {
   let html = "";
@@ -110,12 +110,17 @@ $("#ClearData, #ResetAllOption").bind("click", function () {
   location.reload();
 });
 //正则表达式 测试
-$("#testRegex").keyup(function () {
+$("#testRegex, #testUrl").keyup(function () {
   const testUrl = $("#testUrl").val();
   const testRegex = $("#testRegex").val();
   const testFlag = $("#testFlag").val();
-  const reg = new RegExp(testRegex, testFlag);
-  reg.test(testUrl) ? $("#testResult").html("匹配") : $("#testResult").html("不匹配");
+  try {
+    const reg = new RegExp(testRegex, testFlag);
+    reg.test(testUrl) ? $("#testResult").html("匹配") : $("#testResult").html("不匹配");
+  } catch (e) {
+    $("#testResult").html(e.message);
+    return;
+  }
 });
 
 

@@ -26,6 +26,10 @@ chrome.runtime.onMessage.addListener(function (MediaData, sender, sendResponse) 
 
 
 function AddMedia(data) {
+    if (data.ext === undefined && data.type !== undefined) {
+        data.ext = data.type.split("/")[1];
+    }
+
     //文件名是否为空
     if (data.name === undefined || data.name == '') {
         data.name = data.title + '.' + data.ext;
@@ -39,24 +43,23 @@ function AddMedia(data) {
     }
 
     //添加下载文件名
-    let DownFileName = data.name;
+    let downFileName = data.name;
     if (G.Options.TitleName) {
-        DownFileName = data.ext ? data.title + '.' + data.ext : data.title;
+        downFileName = data.title + '.' + data.ext;
     }
-
     //添加html
     /*
         <div class="panel panel-default">
             <div class="panel-heading">
-                <span></span>
                 <input type="checkbox" class="DownCheck hide" checked="true"/>
                 <img src="${data.webInfo.favIconUrl}" class="leftIco"/>
                 <img src="img/regex.png" class="leftIco" title="正则表达式匹配"/>
-                <img src="img/parsing.png" class="ico" id="m3u8" title="解析"/>
-                <img src="img/download.png" class="ico" id="download" title="下载"/>
-                <img src="img/play.png" class="ico" id="play" title="预览"/>
-                <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
+                <span class="name"></span>
                 <span class="size">0MB</span>
+                <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
+                <img src="img/parsing.png" class="ico" id="m3u8" title="解析"/>
+                <img src="img/play.png" class="ico" id="play" title="预览"/>
+                <img src="img/download.png" class="ico" id="download" title="下载"/>
             </div>
             <div class="url hide">
                 标题: ...<br>
@@ -70,21 +73,21 @@ function AddMedia(data) {
     let html = `
         <div class="panel">
             <div class="panel-heading">
-                <span>${trimName}</span>
                 <input type="checkbox" class="DownCheck" checked="true"/>
-                ${data.webInfo?.favIconUrl && G.Options.ShowWebIco ? `<img src="${data.webInfo.favIconUrl}" class="leftIco"/>` : ""}
-                ${data.isRegex ? `<img src="img/regex.png" class="leftIco" title="正则表达式匹配"/>` : ""}
-                <img src="img/parsing.png" class="ico ${isM3U8(data) ? "" : "hide"}" id="m3u8" title="解析"/>
-                <img src="img/download.png" class="ico" id="download" title="下载"/>
-                <img src="img/${G.Options.Potplayer ? "potplayer.png" : "play.png"}" class="ico ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
+                <img src="${data.webInfo?.favIconUrl}" class="ico ${G.Options.ShowWebIco ? "" : "hide"}"/>
+                <img src="img/regex.png" class="ico ${data.isRegex ? "" : "hide"}" title="正则表达式匹配"/>
+                <span class="name">${trimName}</span>
+                <span class="size ${data.size ? "" : "hide"}">${data.size}MB</span>
                 <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
-                ${data.size != 0 ? `<span class="size">${data.size}MB</span>` : ""}
+                <img src="img/parsing.png" class="ico ${isM3U8(data) ? "" : "hide"}" id="m3u8" title="解析"/>
+                <img src="img/${G.Options.Potplayer ? "potplayer.png" : "play.png"}" class="ico ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
+                <img src="img/download.png" class="ico" id="download" title="下载"/>
             </div>
             <div class="url hide">
                 ${data.webInfo ? `标题: ${data.webInfo.title}<br>` : ""}
-                MIME: ${data.type} <br>
+                ${data.type ? `MIME:  ${data.type}<br>` : ""}
                 <div id="duration"></div>
-                <a href="${data.url}" target="_blank" download="${DownFileName}">${data.url}</a>
+                <a href="${data.url}" target="_blank" download="${downFileName}">${data.url}</a>
             </div>
             <video class="getMediaInfo hide"></video>
         </div>`;
@@ -101,7 +104,7 @@ function AddMedia(data) {
             getMediaInfo.attr('src', data.url);
             getMediaInfo[0].ondurationchange = function () {
                 let duration = getMediaInfo[0].duration;
-                if (duration) {
+                if (duration && duration != Infinity) {
                     let h = Math.floor(duration / 3600 % 24);
                     let m = Math.floor(duration / 60 % 60);
                     let s = Math.floor((duration % 60));
@@ -123,7 +126,7 @@ function AddMedia(data) {
     html.find('#download').click(function () {
         chrome.downloads.download({
             url: data.url,
-            filename: DownFileName
+            filename: downFileName
         });
         return false;
     });
@@ -231,9 +234,10 @@ function isPlay(data) {
     return arr.includes(data.ext);
 }
 function isM3U8(data) {
-    if (data.ext == "m3u8" || data.type == "application/vnd.apple.mpegurl" || data.type == "application/x-mpegurl") {
-        return true;
-    }
+    if (data.ext == "m3u8" ||
+        data.type == "application/vnd.apple.mpegurl" ||
+        data.type == "application/x-mpegurl"
+    ) { return true; }
     return false;
 }
 

@@ -1,30 +1,26 @@
 importScripts("init.js");
 
-// 保持 Service Worker 活跃，这似乎是BUG?
+// Service Worker 5分钟后会强制终止扩展
 // https://bugs.chromium.org/p/chromium/issues/detail?id=1271154
 // https://stackoverflow.com/questions/66618136/persistent-service-worker-in-chrome-extension/70003493#70003493
 chrome.webNavigation.onBeforeNavigate.addListener(function () {
-    console.log("Miao~");
+    console.log("Start Miao~");
+});
+chrome.alarms.create({ periodInMinutes: 4.9 })
+chrome.alarms.onAlarm.addListener(() => {
+    console.log('HeartBeat Miao~')
 });
 
 //onResponseStarted 浏览器接收到第一个字节触发，保证有更多信息判断资源类型
 chrome.webRequest.onResponseStarted.addListener(
     function (data) {
-        try {
-            findMedia(data, false);
-        } catch (e) {
-            console.log(e);
-        }
+        try { findMedia(data, false); } catch (e) { console.log(e); }
     }, { urls: ["<all_urls>"] }, ["responseHeaders", "extraHeaders"]
 );
 //onBeforeRequest 浏览器发送请求之前使用正则匹配发送请求的URL
 chrome.webRequest.onBeforeRequest.addListener(
     function (data) {
-        try {
-            findMedia(data, true);
-        } catch (e) {
-            console.log(e);
-        }
+        try { findMedia(data, true); } catch (e) { console.log(e); }
     }, { urls: ["<all_urls>"] }, ["requestBody", "extraHeaders"]
 );
 
@@ -88,17 +84,17 @@ function findMedia(data, apiType = false) {
     }
 
     //检查后缀
-    if (!apiType && !filter && ext != null) {
+    if (!apiType && !filter && ext != undefined) {
         filter = CheckExtension(ext, size);
         if (filter == "break") { return; }
     }
     //检查类型
-    if (!apiType && !filter && contentType != null) {
+    if (!apiType && !filter && contentType != undefined) {
         filter = CheckType(contentType, size);
         if (filter == "break") { return; }
     }
     //查找附件
-    if (!apiType && !filter && Disposition != null) {
+    if (!apiType && !filter && Disposition != undefined) {
         let res = Disposition.match(/filename="(.*?)"/);
         if (res && res[1]) {
             name = GetFileName(decodeURIComponent(res[1]));
@@ -153,10 +149,12 @@ function findMedia(data, apiType = false) {
                 chrome.action.setIcon({ path: "/img/icon.png" });
             }
         }
-        chrome.runtime.sendMessage(info, function () {
-            // console.log(chrome.runtime.lastError.message);
-            return chrome.runtime.lastError;
-        });
+        try {
+            chrome.runtime.sendMessage(info, function () {
+                // console.log(chrome.runtime.lastError.message);
+                return chrome.runtime.lastError;
+            });
+        } catch (e) { }
     });
 }
 
@@ -204,7 +202,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
 });
 //标签关闭，清除该标签的记录
 chrome.tabs.onRemoved.addListener(function (tabId) {
-    var tabIdObject = "tabId" + tabId;
+    let tabIdObject = "tabId" + tabId;
     chrome.storage.local.get({ MediaData: {} }, function (items) {
         delete items.MediaData[tabIdObject];
         chrome.storage.local.set({ MediaData: items.MediaData });
@@ -215,7 +213,7 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
 function CheckExtension(ext, size) {
     for (let item of G.Options.Ext) {
         if (item.ext == ext) {
-            if (item.size != 0 && size != null && size <= item.size * 1024) {
+            if (item.size != 0 && size != undefined && size <= item.size * 1024) {
                 return "break";
             } else if (item.state) {
                 return true;
@@ -232,7 +230,7 @@ function CheckType(dataType, dataSize) {
         let TypeSplit = dataType.split("/");
         let OptionSplit = item.type.split("/");
         if (OptionSplit[0] == TypeSplit[0] && (OptionSplit[1] == TypeSplit[1] || OptionSplit[1] == "*")) {
-            if (item.size != 0 && dataSize != null && dataSize <= item.size * 1024) {
+            if (item.size != 0 && dataSize != undefined && dataSize <= item.size * 1024) {
                 return "break";
             } else if (item.state) {
                 return true;
@@ -259,25 +257,25 @@ function CheckRegex(url) {
 }
 //获取文件名
 function GetFileName(url) {
-    var str = url.split("?"); //url按？分开
+    let str = url.split("?"); //url按？分开
     str = str[0].split("/"); //按/分开
     str = str[str.length - 1].split("#"); //按#分开
     return str[0].toLowerCase(); //得到带后缀的名字
 }
 //获取后缀名
 function GetExt(FileName) {
-    var str = FileName.split(".");
+    let str = FileName.split(".");
     if (str.length == 1) {
-        return null;
+        return undefined;
     }
-    var ext = str[str.length - 1];
+    let ext = str[str.length - 1];
     ext = ext.match(/[0-9a-zA-Z]*/);
     return ext[0].toLowerCase();
 }
 //获取Header属性的值
 function getHeaderValue(name, data) {
     name = name.toLowerCase();
-    if (data.responseHeaders == undefined) { return null; }
+    if (data.responseHeaders == undefined) { return undefined; }
     for (let item of data.responseHeaders) {
         if (item.name.toLowerCase() == name) {
             if (name == "content-type") {
@@ -286,7 +284,7 @@ function getHeaderValue(name, data) {
             return item.value.toLowerCase();
         }
     }
-    return null;
+    return undefined;
 }
 //设置扩展图标
 function SetIcon(Num, tabId) {

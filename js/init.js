@@ -5,7 +5,6 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     G.tabId = tabs[0].id;
     G.tabIdStr = "tabId" + tabs[0].id;
 });
-G.Version = "1.0.23";
 //设置参数
 G.Options = new Object();
 //所有设置变量
@@ -70,8 +69,8 @@ function GetDefault(Obj) {
 //初始变量
 function InitOptions() {
     chrome.storage.sync.get(G.OptionLists, function (items) {
-        for(let list of G.OptionLists){
-            if(items[list] === undefined){
+        for (let list of G.OptionLists) {
+            if (items[list] === undefined) {
                 chrome.storage.sync.set({ [list]: GetDefault(list) });
                 continue;
             }

@@ -20,10 +20,11 @@ $.ajax({
         RootPath = getManifestUrlRoot();
         m3u8_content = result;
         show_list();
-    }, error: function () {
+    }, error: function (result) {
+        console.log(result);
         $("#loading").show();
         $("#m3u8").hide();
-        $("#loading .optionBox").html("获取m3u8内容失败");
+        $("#loading .optionBox").html(`获取m3u8内容失败, 请尝试手动下载 <a href="${m3u8_url}">${m3u8_url}</a>`);
     }
 });
 
