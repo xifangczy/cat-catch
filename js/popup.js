@@ -74,8 +74,8 @@ function AddMedia(data) {
         <div class="panel">
             <div class="panel-heading">
                 <input type="checkbox" class="DownCheck" checked="true"/>
-                <img src="${data.webInfo?.favIconUrl}" class="ico ${G.Options.ShowWebIco ? "" : "hide"}"/>
-                <img src="img/regex.png" class="ico ${data.isRegex ? "" : "hide"}" title="正则表达式匹配"/>
+                <img src="${data.webInfo?.favIconUrl}" class="icon ${G.Options.ShowWebIco ? "" : "hide"}"/>
+                <img src="img/regex.png" class="icon ${data.isRegex ? "" : "hide"}" title="正则表达式匹配"/>
                 <span class="name">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}MB</span>
                 <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>

@@ -27,12 +27,17 @@ https://microsoftedge.microsoft.com/addons/detail/oohmdefbjalncfplafanlagojlakmj
 ![界面](https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/b.png)
 
 ## 更新说明
+### 1.0.24
+增加 导入/导出配置。
+一些小BUG修复。
+解决Service Worker休眠问题，增加alarms权限。
 ### 1.0.23
 增加正则匹配
 ### 1.0.22
 修复一个严重BUG，导致Service Worker无法使用
 ### 1.0.21
-自定义抓取类型, 设置页面新界面
+自定义抓取类型
+设置页面新界面
 ### 1.0.20
 一些小修改 设置增加抓取image/*类型文件选项，避免网站把媒体伪装成图片导致无法抓取。
 ### 1.0.19
@@ -40,7 +45,8 @@ https://microsoftedge.microsoft.com/addons/detail/oohmdefbjalncfplafanlagojlakmj
 ### 1.0.18
 增加application/octet-stream选项，继续部分代码重写
 ### 1.0.17
-Manifest 更新到 V3 部分代码重写，增加“使用PotPlayer预览媒体”选项。
+Manifest 更新到 V3 部分代码重写
+增加“使用PotPlayer预览媒体”选项。
 
 ## License
 MIT

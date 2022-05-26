@@ -39,7 +39,7 @@ body {
 .url {
   padding: 5px;
 }
-.ico {
+.ico,.icon {
   padding-left: 2px;
   padding-right: 2px;
   transition: all 0.1s;
