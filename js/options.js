@@ -199,11 +199,8 @@ function Save() {
         let GetType = $(this).find("#type").val();
         let GetRegex = $(this).find("#regex").val();
         let GetState = $(this).find("#state").prop("checked");
-        if (GetType == null || GetType === undefined || GetType == "" || GetType == " ") {
-            GetType = "ig";
-        }
         try {
-            new RegExp("", GetType)
+            new RegExp("", GetType);
         } catch (e) {
             GetType = "ig";
         }

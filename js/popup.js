@@ -135,7 +135,8 @@ function AddMedia(data) {
         if (G.Options.Potplayer) {
             window.open('potplayer://' + data.url);
         } else {
-            $('video').attr('src', data.url);
+            $('#player video').attr('src', data.url);
+            $('#player video').trigger('play');
             $('#player').show();
             $('#player').appendTo(html);
         }
@@ -220,7 +221,8 @@ $(function () {
     });
     //预览播放关闭按钮
     $('#CloseBtn').click(function () {
-        $('video').removeAttr('src');
+        $('#player video').trigger('pause');
+        $('#player video').removeAttr('src');
         $("#player").hide();
         $("#player").appendTo('body');
         return false;
