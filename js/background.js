@@ -8,7 +8,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(function () {
 });
 chrome.alarms.create({ periodInMinutes: 4.9 })
 chrome.alarms.onAlarm.addListener(() => {
-    console.log('HeartBeat Miao~')
+    console.log('HeartBeat Miao~');
 });
 
 //onResponseStarted 浏览器接收到第一个字节触发，保证有更多信息判断资源类型
@@ -24,7 +24,7 @@ chrome.webRequest.onBeforeRequest.addListener(
     }, { urls: ["<all_urls>"] }, ["requestBody", "extraHeaders"]
 );
 
-function findMedia(data, apiType = false) {
+function findMedia(data, isRegex = false) {
     if (G.Options.Ext === undefined ||
         G.Options.Debug === undefined ||
         G.Options.OtherAutoClear === undefined ||
@@ -54,20 +54,20 @@ function findMedia(data, apiType = false) {
         console.log(data);
     }
     //网页标题
-    var title = "Null";
-    var webInfo = undefined;
+    let title = "NULL";
+    let webInfo = undefined;
     //过滤器开关
-    var filter = false;
+    let filter = false;
     //获得文件大小
-    var size = getHeaderValue("content-length", data);
+    let size = getHeaderValue("content-length", data);
     //获得文件名
-    var name = GetFileName(data.url);
+    let name = GetFileName(data.url);
     //获得扩展名
-    var ext = GetExt(name);
+    let ext = GetExt(name);
     //获得content-type
-    var contentType = getHeaderValue("content-type", data);
+    let contentType = getHeaderValue("content-type", data);
     //获得content-disposition
-    var Disposition = getHeaderValue("Content-Disposition", data);
+    let Disposition = getHeaderValue("Content-Disposition", data);
     //获取网页标题
     if (data.tabId !== -1) {
         chrome.tabs.get(data.tabId, function (info) {
@@ -78,23 +78,23 @@ function findMedia(data, apiType = false) {
         });
     }
     //正则匹配
-    if (apiType && !filter) {
+    if (isRegex) {
         filter = CheckRegex(data.url);
         if (filter == "break") { return; }
     }
 
     //检查后缀
-    if (!apiType && !filter && ext != undefined) {
+    if (!isRegex && !filter && ext != undefined) {
         filter = CheckExtension(ext, size);
         if (filter == "break") { return; }
     }
     //检查类型
-    if (!apiType && !filter && contentType != undefined) {
+    if (!isRegex && !filter && contentType != undefined) {
         filter = CheckType(contentType, size);
         if (filter == "break") { return; }
     }
     //查找附件
-    if (!apiType && !filter && Disposition != undefined) {
+    if (!isRegex && !filter && Disposition != undefined) {
         let res = Disposition.match(/filename="(.*?)"/);
         if (res && res[1]) {
             name = GetFileName(decodeURIComponent(res[1]));
@@ -104,7 +104,7 @@ function findMedia(data, apiType = false) {
         }
     }
     //放过类型为media的资源
-    if (!apiType && data.type == "media") {
+    if (!isRegex && data.type == "media") {
         filter = true;
     }
 
@@ -133,7 +133,7 @@ function findMedia(data, apiType = false) {
             tabId: data.tabId,
             title: title,
             webInfo: webInfo,
-            isRegex: apiType
+            isRegex: isRegex
         };
         items.MediaData[tabId].push(info);
         chrome.storage.local.set({ MediaData: items.MediaData });
@@ -153,7 +153,7 @@ function findMedia(data, apiType = false) {
             chrome.runtime.sendMessage(info, function () {
                 return chrome.runtime.lastError;
             });
-        } catch (e) {}
+        } catch (e) { }
     });
 }
 
@@ -172,17 +172,15 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     sendResponse("OK");
 });
 //切换标签，更新全局变量G.tabId 更新图标
-chrome.tabs.onActivated.addListener(function () {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        G.tabId = tabs[0].id;
-        G.tabIdStr = "tabId" + G.tabId;
-        chrome.storage.local.get({ MediaData: {} }, function (items) {
-            if (items.MediaData[G.tabIdStr] !== undefined) {
-                SetIcon(items.MediaData[G.tabIdStr].length, G.tabId);
-            } else {
-                SetIcon(0, G.tabId);
-            }
-        });
+chrome.tabs.onActivated.addListener(function (activeInfo) {
+    G.tabId = activeInfo.tabsId;
+    G.tabIdStr = "tabId" + G.tabId;
+    chrome.storage.local.get({ MediaData: {} }, function (items) {
+        if (items.MediaData[G.tabIdStr] !== undefined) {
+            SetIcon(items.MediaData[G.tabIdStr].length, G.tabId);
+        } else {
+            SetIcon(0, G.tabId);
+        }
     });
 });
 //标签更新，清除该标签的记录
