@@ -55,7 +55,8 @@ function GetDefault(Obj) {
         { "type": "image/*", "size": 0, "state": false }
     );
     const defaultRegex = new Array(
-        { "type": "ig", "regex": "video\\.weibocdn\\.com.*\\.mp4", "state": false }
+        { "type": "ig", "regex": "video\\.weibocdn\\.com.*\\.mp4", "state": false },
+        { "type": "ig", "regex": "btrace\\.video\.qq\\.com.*vurl=([^&]*)", "state": true }
     );
     switch (Obj) {
         case "Ext": return defaultExt;

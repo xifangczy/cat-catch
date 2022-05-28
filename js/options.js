@@ -128,12 +128,21 @@ $("#testRegex, #testUrl").keyup(function () {
     const testUrl = $("#testUrl").val();
     const testRegex = $("#testRegex").val();
     const testFlag = $("#testFlag").val();
+    let regex;
     try {
-        const reg = new RegExp(testRegex, testFlag);
-        reg.test(testUrl) ? $("#testResult").html("匹配") : $("#testResult").html("不匹配");
+        regex = new RegExp(testRegex, testFlag);
     } catch (e) {
         $("#testResult").html(e.message);
         return;
+    }
+    const result = regex.exec(testUrl);
+    result == null ? $("#testResult").html("不匹配") : $("#testResult").html("匹配");
+    for (let i = 1; i < result.length; i++) {
+        if (result[i] != "") {
+            $("#testResult").append(
+                `<input type="text" style="width: 590px; color: #ff0000" value="${decodeURIComponent(result[i])}">`
+            );
+        }
     }
 });
 

@@ -7,6 +7,6 @@ if(typeof(browser) == "object"){
     function importScripts(script){
         let js = document.createElement('script');
         js.src = script;
-        document.getElementsByTagName('head')[0].appendChild(js);
+        document.head.appendChild(js);
     }
 }

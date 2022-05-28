@@ -27,6 +27,8 @@ https://microsoftedge.microsoft.com/addons/detail/oohmdefbjalncfplafanlagojlakmj
 ![界面](https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/b.png)
 
 ## 更新说明
+### 1.0.25
+增强正则匹配
 ### 1.0.24
 增加 导入/导出配置。
 

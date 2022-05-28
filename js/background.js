@@ -14,7 +14,7 @@ chrome.alarms.onAlarm.addListener(() => {
 //onResponseStarted 浏览器接收到第一个字节触发，保证有更多信息判断资源类型
 chrome.webRequest.onResponseStarted.addListener(
     function (data) {
-        try { findMedia(data, false); } catch (e) { console.log(e); }
+        try { findMedia(data); } catch (e) { console.log(e); }
     }, { urls: ["<all_urls>"] }, ["responseHeaders"]
 );
 //onBeforeRequest 浏览器发送请求之前使用正则匹配发送请求的URL
@@ -24,7 +24,10 @@ chrome.webRequest.onBeforeRequest.addListener(
     }, { urls: ["<all_urls>"] }, ["requestBody"]
 );
 
-function findMedia(data, isRegex = false) {
+function findMedia(data, isRegex = false, filter = false) {
+    // if(filter){
+    //     console.log(data);
+    // }
     if (G.Options.Ext === undefined ||
         G.Options.Debug === undefined ||
         G.Options.OtherAutoClear === undefined ||
@@ -56,8 +59,6 @@ function findMedia(data, isRegex = false) {
     //网页标题
     let title = "NULL";
     let webInfo = undefined;
-    //过滤器开关
-    let filter = false;
     //获得文件大小
     let size = getHeaderValue("content-length", data);
     //获得文件名
@@ -78,7 +79,7 @@ function findMedia(data, isRegex = false) {
         });
     }
     //正则匹配
-    if (isRegex) {
+    if (isRegex && !filter) {
         filter = CheckRegex(data.url);
         if (filter == "break") { return; }
     }
@@ -231,9 +232,18 @@ function CheckType(dataType, dataSize) {
 //正则匹配
 function CheckRegex(url) {
     for (let item of G.Options.Regex) {
-        const reg = new RegExp(item.regex, item.type);
-        if (reg.test(url)) {
-            return item.state ? true : "break";
+        const regex = new RegExp(item.regex, item.type);
+        const result = regex.exec(url);
+        if (result == null) { continue; }
+        if (!item.state) { return "break"; }
+        if (result.length == 1) { return true; }
+        for (let i = 1; i < result.length; i++) {
+            let data = new Object();
+            data.url = decodeURIComponent(result[i]);
+            data.tabId = G.tabId;
+            if (/^[\w]+:\/\/.+/i.test(data.url)) {
+                findMedia(data, true, true);
+            }
         }
     }
     return false;
