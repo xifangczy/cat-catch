@@ -173,7 +173,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
 });
 //切换标签，更新全局变量G.tabId 更新图标
 chrome.tabs.onActivated.addListener(function (activeInfo) {
-    G.tabId = activeInfo.tabsId;
+    G.tabId = activeInfo.tabId;
     G.tabIdStr = "tabId" + G.tabId;
     chrome.storage.local.get({ MediaData: {} }, function (items) {
         if (items.MediaData[G.tabIdStr] !== undefined) {
