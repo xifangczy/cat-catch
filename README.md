@@ -29,8 +29,12 @@ https://microsoftedge.microsoft.com/addons/detail/oohmdefbjalncfplafanlagojlakmj
 ## 更新说明
 ### 1.0.24
 增加 导入/导出配置。
+
 一些小BUG修复。
+
 解决Service Worker休眠问题，增加alarms权限。
+
+增加firefox.js兼容层 并上架Firefox
 ### 1.0.23
 增加正则匹配
 ### 1.0.22
@@ -46,6 +50,7 @@ https://microsoftedge.microsoft.com/addons/detail/oohmdefbjalncfplafanlagojlakmj
 增加application/octet-stream选项，继续部分代码重写
 ### 1.0.17
 Manifest 更新到 V3 部分代码重写
+
 增加“使用PotPlayer预览媒体”选项。
 
 ## License
