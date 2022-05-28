@@ -1,4 +1,6 @@
-importScripts("init.js");
+if(typeof(browser) == "undefined"){
+    importScripts("init.js");
+}
 
 // Service Worker 5分钟后会强制终止扩展
 // https://bugs.chromium.org/p/chromium/issues/detail?id=1271154
@@ -15,13 +17,13 @@ chrome.alarms.onAlarm.addListener(() => {
 chrome.webRequest.onResponseStarted.addListener(
     function (data) {
         try { findMedia(data, false); } catch (e) { console.log(e); }
-    }, { urls: ["<all_urls>"] }, ["responseHeaders", "extraHeaders"]
+    }, { urls: ["<all_urls>"] }, ["responseHeaders"]
 );
 //onBeforeRequest 浏览器发送请求之前使用正则匹配发送请求的URL
 chrome.webRequest.onBeforeRequest.addListener(
     function (data) {
         try { findMedia(data, true); } catch (e) { console.log(e); }
-    }, { urls: ["<all_urls>"] }, ["requestBody", "extraHeaders"]
+    }, { urls: ["<all_urls>"] }, ["requestBody"]
 );
 
 function findMedia(data, isRegex = false) {

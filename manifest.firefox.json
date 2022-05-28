@@ -1,8 +1,8 @@
 {
     "background": {
-        "service_worker": "js/background.js"
+        "scripts": ["js/init.js", "js/background.js"]
     },
-    "action": {
+    "browser_action": {
         "default_icon": "img/icon.png",
         "default_title": "还没闻到味儿~",
         "default_popup": "popup.html"
@@ -13,7 +13,7 @@
         "48": "img/icon.png",
         "128": "img/icon128.png"
     },
-    "manifest_version": 3,
+    "manifest_version": 2,
     "minimum_chrome_version": "93",
     "name": "猫抓",
     "homepage_url": "https://github.com/xifangczy/cat-catch",
@@ -27,9 +27,7 @@
         "downloads",
         "storage",
         "webNavigation",
-        "alarms"
-    ],
-    "host_permissions": [
+        "alarms",
         "*://*/*",
         "<all_urls>"
     ],
