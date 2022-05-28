@@ -1,6 +1,4 @@
-if(typeof(browser) == "undefined"){
-    importScripts("init.js");
-}
+importScripts("/js/init.js");
 
 // Service Worker 5分钟后会强制终止扩展
 // https://bugs.chromium.org/p/chromium/issues/detail?id=1271154
@@ -140,15 +138,15 @@ function findMedia(data, isRegex = false) {
         items.MediaData[tabId].push(info);
         chrome.storage.local.set({ MediaData: items.MediaData });
         if (data.tabId != -1) {
-            SetIcon(items.MediaData[tabId].length, data.tabId);
+            SetIcon({ number: items.MediaData[tabId].length, tabId: data.tabId });
         }
         //自动清理幽灵数据
         if (items.MediaData["tabId-1"] !== undefined) {
-            chrome.action.setIcon({ path: "/img/icon-tips.png" });
+            SetIcon({ tips: true });
             if (items.MediaData["tabId-1"].length > G.Options.OtherAutoClear) {
                 delete items.MediaData["tabId-1"];
                 chrome.storage.local.set({ MediaData: items.MediaData });
-                chrome.action.setIcon({ path: "/img/icon.png" });
+                SetIcon({ tips: false });
             }
         }
         try {
@@ -163,12 +161,12 @@ function findMedia(data, isRegex = false) {
 chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     if (Message.Message == "ClearIcon") {
         if (Message.tab == undefined || Message.tab == "-1") {
-            chrome.action.setIcon({ path: "/img/icon.png" });
+            SetIcon({ tips: false });
         }
         if (Message.tab == undefined) {
-            SetIcon(0, G.tabId);
+            SetIcon({ tabId: G.tabId });
         } else if (Message.tab != "-1") {
-            SetIcon(0, Message.tab);
+            SetIcon({ tabId: Message.tab });
         }
     }
     sendResponse("OK");
@@ -179,9 +177,9 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
     G.tabIdStr = "tabId" + G.tabId;
     chrome.storage.local.get({ MediaData: {} }, function (items) {
         if (items.MediaData[G.tabIdStr] !== undefined) {
-            SetIcon(items.MediaData[G.tabIdStr].length, G.tabId);
+            SetIcon({ number: items.MediaData[G.tabIdStr].length, tabId: G.tabId });
         } else {
-            SetIcon(0, G.tabId);
+            SetIcon({ tabId: G.tabId });
         }
     });
 });
@@ -191,7 +189,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
         chrome.storage.local.get({ MediaData: {} }, function (items) {
             delete items.MediaData["tabId" + tabId];
             chrome.storage.local.set({ MediaData: items.MediaData });
-            SetIcon(0, tabId);
+            SetIcon({ tabId: tabId });
         });
     }
 });
@@ -272,12 +270,16 @@ function getHeaderValue(name, data) {
     return undefined;
 }
 //设置扩展图标
-function SetIcon(Num, tabId) {
-    if (Num == 0) {
-        chrome.action.setBadgeText({ text: "", tabId: tabId });
-        chrome.action.setTitle({ title: "还没闻到味儿~", tabId: tabId });
+function SetIcon(obj) {
+    if (obj.tips != undefined) {
+        let path = obj.tips ? "/img/icon-tips.png" : "/img/icon.png";
+        chrome.action.setIcon({ path: path });
+    } else if (obj.number == 0 || obj.number == undefined) {
+        chrome.action.setBadgeText({ text: "", tabId: obj.tabId });
+        chrome.action.setTitle({ title: "还没闻到味儿~", tabId: obj.tabId });
     } else {
-        chrome.action.setBadgeText({ text: Num.toString(), tabId: tabId });
-        chrome.action.setTitle({ title: "抓到 " + Num.toString() + " 条鱼", tabId: tabId });
+        obj.number = obj.number > 99 ? "99+" : obj.number.toString();
+        chrome.action.setBadgeText({ text: obj.number, tabId: obj.tabId });
+        chrome.action.setTitle({ title: "抓到 " + obj.number + " 条鱼", tabId: obj.tabId });
     }
 }

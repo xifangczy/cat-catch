@@ -1,13 +1,3 @@
-// 兼容Firefox
-if(typeof(browser) == "object"){
-    chrome.storage.sync = chrome.storage.local;
-    chrome.storage.sync.get = chrome.storage.local.get;
-    chrome.storage.sync.set = chrome.storage.local.set;
-    chrome.action = chrome.browserAction;
-    chrome.action.setBadgeText = chrome.browserAction.setBadgeText;
-    chrome.action.setTitle = chrome.browserAction.setTitle;
-}
-
 //全局变量
 var G = new Object();
 //当前tabID

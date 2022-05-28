@@ -1,6 +1,9 @@
 {
     "background": {
-        "scripts": ["js/init.js", "js/background.js"]
+        "scripts": [
+            "js/firefox.js",
+            "js/background.js"
+        ]
     },
     "browser_action": {
         "default_icon": "img/icon.png",
@@ -31,5 +34,10 @@
         "*://*/*",
         "<all_urls>"
     ],
-    "version": "1.0.24"
+    "version": "1.0.24",
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "xifangczy@gmail.com"
+        }
+    }
 }
