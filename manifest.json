@@ -27,7 +27,8 @@
         "downloads",
         "storage",
         "webNavigation",
-        "alarms"
+        "alarms",
+        "declarativeNetRequest"
     ],
     "host_permissions": [
         "*://*/*",

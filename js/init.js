@@ -10,7 +10,8 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 //设置参数
 G.Options = new Object();
 //所有设置变量
-G.OptionLists = ["Ext", "Debug", "TitleName", "OtherAutoClear", "Potplayer", "Type", "Regex", "ShowWebIco"];
+G.OptionLists = ["Ext", "Debug", "TitleName", "OtherAutoClear", "Potplayer", "Type", "Regex", "ShowWebIco", "MobileUserAgent"];
+G.MobileTabId = [];
 
 // Init
 InitOptions();
@@ -58,6 +59,7 @@ function GetDefault(Obj) {
         { "type": "ig", "regex": "video\\.weibocdn\\.com.*\\.mp4", "state": false },
         { "type": "ig", "regex": "btrace\\.video\.qq\\.com.*vurl=([^&]*)", "state": true }
     );
+    const defaultMobileUserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
     switch (Obj) {
         case "Ext": return defaultExt;
         case "Type": return defaultType;
@@ -67,6 +69,7 @@ function GetDefault(Obj) {
         case "Potplayer": return false;
         case "Regex": return defaultRegex;
         case "ShowWebIco": return false;
+        case "MobileUserAgent": return defaultMobileUserAgent;
     }
 }
 //初始变量

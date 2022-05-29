@@ -11,13 +11,13 @@ chrome.alarms.onAlarm.addListener(() => {
     console.log('HeartBeat Miao~');
 });
 
-//onResponseStarted 浏览器接收到第一个字节触发，保证有更多信息判断资源类型
+// onResponseStarted 浏览器接收到第一个字节触发，保证有更多信息判断资源类型
 chrome.webRequest.onResponseStarted.addListener(
     function (data) {
         try { findMedia(data); } catch (e) { console.log(e); }
     }, { urls: ["<all_urls>"] }, ["responseHeaders"]
 );
-//onBeforeRequest 浏览器发送请求之前使用正则匹配发送请求的URL
+// onBeforeRequest 浏览器发送请求之前使用正则匹配发送请求的URL
 chrome.webRequest.onBeforeRequest.addListener(
     function (data) {
         try { findMedia(data, true); } catch (e) { console.log(e); }
@@ -25,9 +25,6 @@ chrome.webRequest.onBeforeRequest.addListener(
 );
 
 function findMedia(data, isRegex = false, filter = false) {
-    // if(filter){
-    //     console.log(data);
-    // }
     if (G.Options.Ext === undefined ||
         G.Options.Debug === undefined ||
         G.Options.OtherAutoClear === undefined ||
@@ -161,16 +158,31 @@ function findMedia(data, isRegex = false, filter = false) {
 //监听来自popup 和 options的请求
 chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     if (Message.Message == "ClearIcon") {
-        if (Message.tab == undefined || Message.tab == "-1") {
+        if (Message.tabId == undefined || Message.tabId == "-1") {
             SetIcon({ tips: false });
         }
-        if (Message.tab == undefined) {
+        if (Message.tabId == undefined) {
             SetIcon({ tabId: G.tabId });
-        } else if (Message.tab != "-1") {
-            SetIcon({ tabId: Message.tab });
+        } else if (Message.tabId != "-1") {
+            SetIcon({ tabId: Message.tabId });
         }
+        return;
     }
-    sendResponse("OK");
+    if (Message.Message == "getRulesTabId") {
+        sendResponse(G.MobileTabId);
+        return;
+    }
+    if (Message.Message == "OnMobileUserAgent") {
+        OnMobileUserAgent(Message.tabId);
+        chrome.tabs.reload(Message.tabId);
+        return;
+    }
+    if (Message.Message == "OffMobileUserAgent") {
+        OffMobileUserAgent(Message.tabId);
+        chrome.tabs.reload(Message.tabId);
+        return;
+    }
+    sendResponse("Error");
 });
 //切换标签，更新全局变量G.tabId 更新图标
 chrome.tabs.onActivated.addListener(function (activeInfo) {
@@ -201,6 +213,7 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
         delete items.MediaData[tabIdObject];
         chrome.storage.local.set({ MediaData: items.MediaData });
     });
+    OffMobileUserAgent(tabId);
 });
 
 //检查扩展名以及大小限制
@@ -292,4 +305,34 @@ function SetIcon(obj) {
         chrome.action.setBadgeText({ text: obj.number, tabId: obj.tabId });
         chrome.action.setTitle({ title: "抓到 " + obj.number + " 条鱼", tabId: obj.tabId });
     }
+}
+function OnMobileUserAgent(tabId) {
+    G.MobileTabId.push(tabId);
+    chrome.declarativeNetRequest.updateSessionRules({
+        removeRuleIds: [tabId],
+        addRules: [{
+            "id": tabId,
+            "action": {
+                "type": "modifyHeaders",
+                "requestHeaders": [{
+                    "header": "user-agent",
+                    "operation": "set",
+                    "value": G.Options.MobileUserAgent
+                }]
+            },
+            "condition": {
+                "tabIds": G.MobileTabId,
+                "resourceTypes": ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "object", "xmlhttprequest", "ping", "csp_report", "media", "websocket", "webtransport", "webbundle", "other"]
+            }
+        }]
+    });
+}
+function OffMobileUserAgent(tabId) {
+    let index = G.MobileTabId.indexOf(tabId);
+    if (index > -1) {
+        G.MobileTabId.splice(index, 1);
+    }
+    chrome.declarativeNetRequest.updateSessionRules({
+        removeRuleIds: [tabId]
+    });
 }

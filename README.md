@@ -29,6 +29,8 @@ https://microsoftedge.microsoft.com/addons/detail/oohmdefbjalncfplafanlagojlakmj
 ## 更新说明
 ### 1.0.25
 增强正则匹配
+
+增加手机端模拟，手机环境下有更多资源可以被下载。
 ### 1.0.24
 增加 导入/导出配置。
 

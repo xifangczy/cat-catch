@@ -59,8 +59,11 @@ input.regex {
   text-align: center;
 }
 input#OtherAutoClear {
-  margin-left: 230px;
+  margin-left: 250px;
   width: 45px;
+}
+input#MobileUserAgent {
+  width: 100%;
 }
 .switch {
   height: 22px;
@@ -103,14 +106,16 @@ input#OtherAutoClear {
   margin-left: 5px;
 }
 .list {
-  padding-left: 30px;
-  padding-top: 20px;
+  padding-left: 10px;
+  padding-top: 5px;
 }
 .item {
   align-items: center;
   display: flex;
   min-height: 30px;
   border-bottom: solid 1px rgba(0, 0, 0, 0.06);
+  flex-wrap: wrap;
+  align-items: flex-end;
 }
 .item .switch {
   margin-right: 50px;

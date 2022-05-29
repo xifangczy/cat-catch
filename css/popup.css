@@ -102,8 +102,8 @@ body {
   border-radius: 4px;
   color: rgb(26, 115, 232);
   cursor: pointer;
-  padding: 3px 10px 3px 10px;
-  margin: 2px 10px 4px 10px;
+  padding: 3px 5px 3px 5px;
+  margin: 2px 5px 4px 5px;
 }
 .button:hover {
   background: #f5f5f5;

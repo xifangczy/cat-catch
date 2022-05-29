@@ -27,6 +27,7 @@
     "permissions": [
         "tabs",
         "webRequest",
+        "webRequestBlocking",
         "downloads",
         "storage",
         "webNavigation",

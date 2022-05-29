@@ -211,12 +211,12 @@ $(function () {
     });
     //清空数据
     $('#Clear').click(function () {
-        let tab = $("#mediaList").is(":visible") ? G.tabId : "-1";
+        let tabId = $("#mediaList").is(":visible") ? G.tabId : "-1";
         chrome.storage.local.get({ "MediaData": {} }, function (items) {
-            delete items.MediaData["tabId" + tab];
+            delete items.MediaData["tabId" + tabId];
             chrome.storage.local.set({ MediaData: items.MediaData });
         });
-        chrome.runtime.sendMessage({ Message: "ClearIcon", tab: tab });
+        chrome.runtime.sendMessage({ Message: "ClearIcon", tabId: tabId });
         location.reload();
     });
     //预览播放关闭按钮
@@ -226,6 +226,27 @@ $(function () {
         $("#player").hide();
         $("#player").appendTo('body');
         return false;
+    });
+
+    // 模拟手机端
+    chrome.runtime.sendMessage({ Message: "getRulesTabId" }, function (tabId) {
+        if(tabId.includes(G.tabId)){
+            $("#MobileUserAgent").html("关闭手机模拟");
+            $("#MobileUserAgent").data("switch", "OffMobileUserAgent");
+        }
+    });
+    $("#MobileUserAgent").click(function () {
+        let switchStatus = $(this).data("switch");
+        if (switchStatus == "OnMobileUserAgent") {
+            $("#MobileUserAgent").html("关闭手机模拟");
+            $("#MobileUserAgent").data("switch", "OffMobileUserAgent");
+        } else {
+            $("#MobileUserAgent").html("模拟手机端");
+            $("#MobileUserAgent").data("switch", "OnMobileUserAgent");
+        }
+        chrome.runtime.sendMessage({ Message: switchStatus, tabId: G.tabId }, function () {
+            $('#Clear').click();
+        });
     });
 });
 

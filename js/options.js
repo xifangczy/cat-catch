@@ -17,6 +17,7 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
     $("#OtherAutoClear").val(items.OtherAutoClear);
     $("#Potplayer").attr("checked", items.Potplayer);
     $("#ShowWebIco").attr("checked", items.ShowWebIco);
+    $("#MobileUserAgent").val(items.MobileUserAgent);
 });
 
 //新增格式
@@ -82,9 +83,10 @@ function Gethtml(Type, Param = new Object()) {
     return html;
 }
 
-//失去焦点 保存自动清理数
-$("#OtherAutoClear").blur(function () {
-    chrome.storage.sync.set({ "OtherAutoClear": $(this).val() });
+//失去焦点 保存自动清理数 模拟手机User Agent
+$("#OtherAutoClear, #MobileUserAgent").blur(function () {
+    const Option = $(this).attr("id");
+    chrome.storage.sync.set({ [Option]: $(this).val() });
 });
 // 调试模式 使用网页标题做文件名 使用PotPlayer预览 显示网站图标
 $("#Debug, #TitleName, #Potplayer, #ShowWebIco").bind("click", function () {
@@ -152,7 +154,7 @@ $("#exportOptions").bind("click", function () {
         let ExportData = JSON.stringify(items);
         let date = new Date();
         chrome.downloads.download({
-            url: "data:application/json;charset=utf-8," + ExportData,
+            url: "data:application/json;charset=utf-8," + encodeURIComponent(ExportData),
             filename: `cat-catch-${chrome.runtime.getManifest().version}-${date.getFullYear()}-${date.getMonth()}-${date.getDay()}-${date.getTime()}.json`
         });
     });
