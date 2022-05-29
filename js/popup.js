@@ -112,8 +112,9 @@ function AddMedia(data) {
                 }
                 getMediaInfo.removeAttr('src');
             }
-        } else {
-            getMediaInfo.removeAttr('src');
+            getMediaInfo[0].onerror = function () {
+                getMediaInfo.removeAttr('src');
+            }
         }
     });
     //点击复制网址

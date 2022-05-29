@@ -82,7 +82,8 @@ body {
   border-radius: 4px;
   color: rgb(26, 115, 232);
   cursor: pointer;
-  padding: calc(0.5em - 1px) 1em;
+  padding: 2px 10px 2px 10px;
+  margin-bottom: 5px;
 }
 #CloseBtn:hover {
   background: #f5f5f5;

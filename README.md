@@ -1,15 +1,13 @@
 ## 简介
 猫抓 Chrome资源嗅探扩展
 
-## 老版本升级
-1.0.21 之后设置页面重写 **需要手动在设置页面 重置所有设置**, 没考虑到老用户升级上来的问题😂。
-
-
 ## 安装地址
 ### Chrome
 https://chrome.google.com/webstore/detail/jfedfbgedapdagkghmgibemcoggfppbb
 ### Edge
 https://microsoftedge.microsoft.com/addons/detail/oohmdefbjalncfplafanlagojlakmjci
+### Firefox
+https://addons.mozilla.org/addon/cat-catch/
 
 目前上架版本BUG较多，审核新版本非常漫长，优先使用GitHub里Releases发布的版本。非Crhome浏览器可以使用crx文件。
 接下来还是GitHub版本为主 避免官方再次下架扩展。
