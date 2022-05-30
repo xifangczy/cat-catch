@@ -72,22 +72,28 @@ function show_list(format = "") {
         //重要信息
         if (line.includes("#EXT-X-MAP")) {
             ExistKey = true;
-            let MapURI = /URI="(.*)"/.exec(line)[1];
-            MapURI = fixUrl(MapURI);
-            $("#tips").append('#EXT-X-MAP URI: <input type="text" value="' + MapURI + '" spellcheck="false">');
-            count++; line = MapURI;
+            let MapURI = /URI="(.*)"/.exec(line);
+            if(MapURI && MapURI[1]){
+                MapURI = fixUrl(MapURI[1]);
+                $("#tips").append('#EXT-X-MAP URI: <input type="text" value="' + MapURI + '" spellcheck="false">');
+                count++; line = MapURI;
+            }
         }
         if (line.includes("#EXT-X-KEY")) {
             ExistKey = true;
-            let KeyURL = /URI="([^"]*)"/.exec(line)[1];
-            KeyURL = fixUrl(KeyURL);
-            $("#tips").append('#EXT-X-KEY URI: <input type="text" value="' + KeyURL + '" spellcheck="false">');
-            count++; line = KeyURL;
+            let KeyURL = /URI="([^"]*)"/.exec(line);
+            if(KeyURL && KeyURL[1]){
+                KeyURL = fixUrl(KeyURL[1]);
+                $("#tips").append('#EXT-X-KEY URI: <input type="text" value="' + KeyURL + '" spellcheck="false">');
+                count++; line = KeyURL;
+            }
         }
         if (line.includes("IV=") && line.includes("#EXT-X-KEY")) {
             ExistKey = true;
-            let KeyIV = /IV=([^,\n]*)/.exec(line)[1];
-            $("#tips").append('#IV: <input type="text" value="' + KeyIV + '" spellcheck="false">');
+            let KeyIV = /IV=([^,\n]*)/.exec(line);
+            if(KeyIV && KeyIV[1]){
+                $("#tips").append('#IV: <input type="text" value="' + KeyIV[1] + '" spellcheck="false">');
+            }
         }
 
         //ts文件
@@ -153,9 +159,11 @@ $("#DownFixm3u8").click(function () {
     let m3u8_split = m3u8_content.split("\n");
     for (let line of m3u8_split) {
         if (line.includes("URI=")) {
-            let KeyURL = /URI="(.*)"/.exec(line)[1];
-            KeyURL = GetFile(KeyURL);
-            line = line.replace(/URI="(.*)"/, 'URI="' + KeyURL + '"');
+            let KeyURL = /URI="(.*)"/.exec(line);
+            if(KeyURL && KeyURL[1]){
+                KeyURL = GetFile(KeyURL[1]);
+                line = line.replace(/URI="(.*)"/, 'URI="' + KeyURL + '"');
+            }
         }
         if (!line.includes("#")) {
             line = GetFile(line);
