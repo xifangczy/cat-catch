@@ -9,7 +9,10 @@ if (typeof (browser) == "object") {
         js.src = script;
         document.head.appendChild(js);
     }
-    function updateSessionRules(obj) {
+
+    // webRequest.onBeforeSendHeaders To declarativeNetRequest.updateSessionRules
+    chrome.declarativeNetRequest = new Object();
+    chrome.declarativeNetRequest.updateSessionRules = (obj) => {
         if (obj.addRules == undefined) { browser.runtime.reload(); return; }
         browser.webRequest.onBeforeSendHeaders.addListener(
             function (details) {
@@ -21,7 +24,13 @@ if (typeof (browser) == "object") {
                 return { requestHeaders: details.requestHeaders };
             }, { urls: ["<all_urls>"], tabId: G.tabId }, ["blocking", "requestHeaders"]
         );
+    };
+
+    // V3 引入scripting 为解决Service Worker休眠问题
+    // V2 不存在此问题 只需要return
+    chrome.scripting = new Object();
+    chrome.scripting.executeScript = (obj) => {
+        // browser.tabs.executeScript(obj.target.tabId, {code: obj.func.toString()});
+        return;
     }
-    chrome.declarativeNetRequest = new Object();
-    chrome.declarativeNetRequest.updateSessionRules = updateSessionRules;
 }

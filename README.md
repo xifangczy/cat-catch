@@ -2,14 +2,13 @@
 猫抓 Chrome资源嗅探扩展
 
 ## 安装地址
+**官方商店版本审核漫长，如果出现严重BUG，可以使用github版本**
 ### Chrome
 https://chrome.google.com/webstore/detail/jfedfbgedapdagkghmgibemcoggfppbb
 ### Edge
 https://microsoftedge.microsoft.com/addons/detail/oohmdefbjalncfplafanlagojlakmjci
 ### Firefox
 https://addons.mozilla.org/addon/cat-catch/
-
-官方商店版本审核漫长，如果出现严重BUG，可以使用github版本
 
 ## Chrome类浏览器 源码加载方法
 1. https://github.com/xifangczy/cat-catch/releases 下载 Source code 并解压。
@@ -33,7 +32,7 @@ https://addons.mozilla.org/addon/cat-catch/
 
 一些小BUG修复。
 
-解决Service Worker休眠问题，增加alarms权限。
+使用alarms权限 新增Heart Beat 解决Service Worker休眠问题。
 
 增加firefox.js兼容层 并上架Firefox
 ### 1.0.23

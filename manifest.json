@@ -28,7 +28,8 @@
         "storage",
         "webNavigation",
         "alarms",
-        "declarativeNetRequest"
+        "declarativeNetRequest",
+        "scripting"
     ],
     "host_permissions": [
         "*://*/*",

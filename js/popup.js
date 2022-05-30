@@ -47,6 +47,19 @@ function AddMedia(data) {
     if (G.Options.TitleName) {
         downFileName = data.title + '.' + data.ext;
     }
+
+    // 文件大小单位转换
+    if (data.size) {
+        if (data.size < 1024) {
+            data.size = false;
+        } else if (data.size < 1024 * 1024) {
+            data.size = parseFloat((data.size / 1024).toFixed(1)) + "KB";
+        } else if (data.size < 1024 * 1024 * 1024) {
+            data.size = parseFloat((data.size / 1024 / 1024).toFixed(1)) + "MB";
+        } else {
+            data.size = parseFloat((data.size / 1024 / 1024 / 1024).toFixed(1)) + "GB";
+        }
+    }
     //添加html
     /*
         <div class="panel panel-default">
@@ -55,7 +68,7 @@ function AddMedia(data) {
                 <img src="${data.webInfo.favIconUrl}" class="leftIco"/>
                 <img src="img/regex.png" class="leftIco" title="正则表达式匹配"/>
                 <span class="name"></span>
-                <span class="size">0MB</span>
+                <span class="size"></span>
                 <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
                 <img src="img/parsing.png" class="ico" id="m3u8" title="解析"/>
                 <img src="img/play.png" class="ico" id="play" title="预览"/>
@@ -77,7 +90,7 @@ function AddMedia(data) {
                 <img src="${data.webInfo?.favIconUrl}" class="icon ${G.Options.ShowWebIco ? "" : "hide"}"/>
                 <img src="img/regex.png" class="icon ${data.isRegex ? "" : "hide"}" title="正则表达式匹配"/>
                 <span class="name">${trimName}</span>
-                <span class="size ${data.size ? "" : "hide"}">${data.size}MB</span>
+                <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
                 <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
                 <img src="img/parsing.png" class="ico ${isM3U8(data) ? "" : "hide"}" id="m3u8" title="解析"/>
                 <img src="img/${G.Options.Potplayer ? "potplayer.png" : "play.png"}" class="ico ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
@@ -212,13 +225,14 @@ $(function () {
     });
     //清空数据
     $('#Clear').click(function () {
-        let tabId = $("#mediaList").is(":visible") ? G.tabId : "-1";
         chrome.storage.local.get({ "MediaData": {} }, function (items) {
-            delete items.MediaData["tabId" + tabId];
-            chrome.storage.local.set({ MediaData: items.MediaData });
+            delete items.MediaData[G.tabIdStr];
+            delete items.MediaData["tabId-1"];
+            chrome.storage.local.set({ MediaData: items.MediaData }, function () {
+                chrome.runtime.sendMessage({ Message: "ClearIcon" });
+                location.reload();
+            });
         });
-        chrome.runtime.sendMessage({ Message: "ClearIcon", tabId: tabId });
-        location.reload();
     });
     //预览播放关闭按钮
     $('#CloseBtn').click(function () {
@@ -231,7 +245,7 @@ $(function () {
 
     // 模拟手机端
     chrome.runtime.sendMessage({ Message: "getRulesTabId" }, function (tabId) {
-        if(tabId.includes(G.tabId)){
+        if (tabId.includes(G.tabId)) {
             $("#MobileUserAgent").html("关闭手机模拟");
             $("#MobileUserAgent").data("switch", "OffMobileUserAgent");
         }
