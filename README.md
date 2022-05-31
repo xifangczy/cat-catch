@@ -22,7 +22,7 @@ https://addons.mozilla.org/addon/cat-catch/
 ![界面](https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/a.png)
 ![界面](https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/b.png)
 
-## 免责
+## 🤚🏻免责
 扩展是通用嗅探工具和浏览器DevTools功能一致，没有针对任何一家网站进行解密操作，用户下载任何内容与扩展无关，请注意下载资源的权限和版权。
 
 ## 📜License
