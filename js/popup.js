@@ -43,10 +43,7 @@ function AddMedia(data) {
     }
 
     //添加下载文件名
-    let downFileName = data.name;
-    if (G.Options.TitleName) {
-        downFileName = data.title + '.' + data.ext;
-    }
+    let downFileName = G.Options.TitleName ? data.title + '.' + data.ext : data.name;
 
     // 文件大小单位转换
     if (data.size) {
@@ -192,7 +189,7 @@ $(function () {
     });
     //下载选中文件
     $('#DownFile').click(function () {
-        let FileNum = $('.TabShow :checked').size();
+        let FileNum = $('.TabShow :checked').length;
         if (FileNum >= 10 && !confirm("共 " + FileNum + "个文件，是否确认下载?")) {
             return;
         }
@@ -202,7 +199,7 @@ $(function () {
     });
     //复制选中文件
     $('#AllCopy').click(function () {
-        let count = $('.TabShow :checked').size();
+        let count = $('.TabShow :checked').length;
         if (count == 0) { return false };
         let url = '';
         $('.TabShow :checked').each(function () {
@@ -263,6 +260,27 @@ $(function () {
             $('#Clear').click();
         });
     });
+
+    // 自动下载
+    chrome.runtime.sendMessage({ Message: "OffAutoDown", tabId: G.tabId }, function(result){
+        if(result){
+            Tips("已关闭自动下载", 500);
+        }
+    });
+    $("#AutoDown").click(function () {
+        let switchStatus = $(this).data("switch");
+        if (switchStatus == "OnAutoDown") {
+            if (confirm("找到资源立刻尝试下载\n开启后，点击扩展图标会关闭自动下载\n是否确认开启？")) {
+                chrome.runtime.sendMessage({ Message: switchStatus, tabId: G.tabId });
+                $("#AutoDown").html("关闭下载");
+                $("#AutoDown").data("switch", "OffAutoDown");
+            }
+        } else {
+            chrome.runtime.sendMessage({ Message: switchStatus, tabId: G.tabId });
+            $("#AutoDown").html("自动下载");
+            $("#AutoDown").data("switch", "OnAutoDown");
+        }
+    });
 });
 
 //html5播放器允许格式
@@ -290,11 +308,6 @@ function UItoggle() {
     $("#otherQuantity").text("[" + length + "]");
 }
 
-function Tips(text) {
-    let Original = $('#Tips').html();
-    $('#Tips').css("position", "fixed");
-    $('#Tips').html(text).fadeIn(500).delay(200).fadeOut(500, function () {
-        $(this).css("position", "static");
-        $('#Tips').html(Original);
-    });
+function Tips(text, delay = 200) {
+    $('#TipsFixed').html(text).fadeIn(500).delay(delay).fadeOut(500);
 }

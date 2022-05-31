@@ -5,6 +5,8 @@
 [Changed] Heart Beat
 
 [Added] 手机端模拟，手机环境下有更多资源可以被下载。
+
+[Added] 自动下载
 ### 1.0.24
 [Added] 导入/导出配置
 
