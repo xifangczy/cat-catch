@@ -245,6 +245,20 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
                 }
             );
         }
+        // 模拟手机端 修改 navigator 变量
+        if (G.TabIdList.Mobile.includes(tabId)) {
+            chrome.scripting.executeScript(
+                {
+                    args: [G.Options.MobileUserAgent.toString()],
+                    target: { tabId: tabId, allFrames: true },
+                    func: function(){
+                        Object.defineProperty(navigator,'userAgent',{value: arguments[0],writable: false});
+                    },
+                    injectImmediately: true,
+                    world: "MAIN"
+                }
+            );
+        }
     }
 });
 // 标签关闭 清除数据

@@ -39,7 +39,7 @@
     "browser_specific_settings": {
         "gecko": {
             "id": "xifangczy@gmail.com",
-            "strict_min_version": "93.0"
+            "strict_min_version": "102.0"
         }
     }
 }

@@ -14,7 +14,7 @@
         "128": "img/icon128.png"
     },
     "manifest_version": 3,
-    "minimum_chrome_version": "93",
+    "minimum_chrome_version": "102",
     "name": "猫抓",
     "homepage_url": "https://github.com/xifangczy/cat-catch",
     "options_ui": {
