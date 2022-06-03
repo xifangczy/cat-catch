@@ -152,7 +152,7 @@ function findMedia(data, isRegex = false, filter = false) {
         }
         // 发送到popup 并检查自动下载
         chrome.runtime.sendMessage(info, function () {
-            if (G.Options.AutoDownTabId.includes(G.tabId)) {
+            if (G.TabIdList.AutoDown.includes(G.tabId)) {
                 let downFileName = G.Options.TitleName ? info.title + '.' + info.ext : info.name;
                 chrome.downloads.download({
                     url: data.url,
@@ -165,6 +165,7 @@ function findMedia(data, isRegex = false, filter = false) {
 
 //监听来自popup 和 options的请求
 chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
+    // 图标设置
     if (Message.Message == "ClearIcon") {
         if (Message.tabId == undefined || Message.tabId == "-1") {
             SetIcon({ tips: false });
@@ -174,35 +175,42 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         } else if (Message.tabId != "-1") {
             SetIcon({ tabId: Message.tabId });
         }
-        sendResponse("OK");
         return;
     }
-    switch (Message.Message) {
-        case "getRulesTabId":
-            sendResponse(G.Options.MobileTabId);
-            break;
-        case "OnMobileUserAgent":
-            OnMobileUserAgent(Message.tabId);
-            chrome.tabs.reload(Message.tabId);
-            sendResponse("OK");
-            break;
-        case "OffMobileUserAgent":
-            OffMobileUserAgent(Message.tabId);
-            chrome.tabs.reload(Message.tabId);
-            sendResponse("OK");
-            break;
-        case "getAutoDownTabId":
-            sendResponse(G.Options.AutoDownTabId);
-            break;
-        case "OnAutoDown":
-            OnAutoDown(Message.tabId); sendResponse("OK");
-            break;
-        case "OffAutoDown":
-            sendResponse(OffAutoDown(Message.tabId));
-            break;
-        case "HeartBeat":
-            sendResponse("HeartBeat OK"); console.log("HeartBeat OK");
-            break;
+    // 模拟手机
+    if (Message.Message == "mobileUserAgent") {
+        if (Message.action == undefined) {
+            sendResponse(G.TabIdList.Mobile.includes(Message.tabId));
+            return;
+        }
+        Message.action == "on" ? mobileUserAgent(Message.tabId, true) : mobileUserAgent(Message.tabId);
+        chrome.tabs.reload(Message.tabId, { bypassCache: true });
+        return;
+    }
+    // 自动下载
+    if (Message.Message == "autoDown") {
+        if (Message.action == undefined) {
+            // 点击图标 立刻停止下载
+            sendResponse(tabIdListRemove("AutoDown", Message.tabId));
+        }
+        Message.action == "on" ? G.TabIdList.AutoDown.push(Message.tabId) : tabIdListRemove("AutoDown", Message.tabId);
+        return;
+    }
+    // 捕获
+    if (Message.Message == "catch") {
+        if (Message.action == undefined) {
+            sendResponse(G.TabIdList.Catch.includes(Message.tabId));
+            return;
+        }
+        Message.action == "on" ? G.TabIdList.Catch.push(Message.tabId) : tabIdListRemove("Catch", Message.tabId);
+        chrome.tabs.reload(Message.tabId, { bypassCache: true });
+        return;
+    }
+    // Heart Beat
+    if (Message.Message == "HeartBeat") {
+        console.log("HeartBeat OK");
+        sendResponse("HeartBeat OK");
+        return;
     }
     sendResponse("Error");
 });
@@ -226,16 +234,32 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
             chrome.storage.local.set({ MediaData: items.MediaData });
             SetIcon({ tabId: tabId });
         });
+        // 开启捕获
+        if (G.TabIdList.Catch.includes(tabId)) {
+            chrome.scripting.executeScript(
+                {
+                    target: { tabId: tabId, allFrames: true },
+                    files: ["js/catch.js"],
+                    injectImmediately: true,
+                    world: "MAIN"
+                }
+            );
+        }
     }
 });
 // 标签关闭 清除数据
 chrome.tabs.onRemoved.addListener(function (tabId) {
+    // 清理 抓取的数据
     chrome.storage.local.get({ MediaData: {} }, function (items) {
         delete items.MediaData["tabId" + tabId];
         chrome.storage.local.set({ MediaData: items.MediaData });
     });
-    OffMobileUserAgent(tabId);
-    OffAutoDown(tabId);
+    // 清理 模拟手机
+    mobileUserAgent(tabId, false);
+    // 清理 自动下载
+    tabIdListRemove("AutoDown", tabId);
+    // 清理 捕获
+    tabIdListRemove("Catch", tabId);
 });
 
 //检查扩展名以及大小限制
@@ -329,50 +353,41 @@ function SetIcon(obj) {
         chrome.action.setTitle({ title: "抓到 " + obj.number + " 条鱼", tabId: obj.tabId });
     }
 }
-// 手机端模拟
-function OnMobileUserAgent(tabId) {
-    G.Options.MobileTabId.push(tabId);
-    chrome.storage.sync.set({ MobileTabId: G.Options.MobileTabId });
-    chrome.declarativeNetRequest.updateSessionRules({
-        removeRuleIds: [tabId],
-        addRules: [{
-            "id": tabId,
-            "action": {
-                "type": "modifyHeaders",
-                "requestHeaders": [{
-                    "header": "user-agent",
-                    "operation": "set",
-                    "value": G.Options.MobileUserAgent
-                }]
-            },
-            "condition": {
-                "tabIds": G.Options.MobileTabId,
-                "resourceTypes": ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "object", "xmlhttprequest", "ping", "csp_report", "media", "websocket", "webtransport", "webbundle", "other"]
-            }
-        }]
-    });
-}
-function OffMobileUserAgent(tabId) {
-    const index = G.Options.MobileTabId.indexOf(tabId);
-    if (index > -1) {
-        G.Options.MobileTabId.splice(index, 1);
+
+// 模拟手机端
+function mobileUserAgent(tabId, change = false) {
+    if (change) {
+        G.TabIdList.Mobile.push(tabId);
+        chrome.declarativeNetRequest.updateSessionRules({
+            removeRuleIds: [tabId],
+            addRules: [{
+                "id": tabId,
+                "action": {
+                    "type": "modifyHeaders",
+                    "requestHeaders": [{
+                        "header": "user-agent",
+                        "operation": "set",
+                        "value": G.Options.MobileUserAgent
+                    }]
+                },
+                "condition": {
+                    "tabIds": G.TabIdList.Mobile,
+                    "resourceTypes": ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "object", "xmlhttprequest", "ping", "csp_report", "media", "websocket", "webtransport", "webbundle", "other"]
+                }
+            }]
+        });
+        return true;
     }
     chrome.declarativeNetRequest.updateSessionRules({
         removeRuleIds: [tabId]
     });
-    chrome.storage.sync.set({ MobileTabId: G.Options.MobileTabId });
+    return tabIdListRemove("Mobile", tabId);
 }
-// 自动下载
-function OnAutoDown(tabId) {
-    G.Options.AutoDownTabId.push(tabId);
-    chrome.storage.sync.set({ AutoDownTabId: G.Options.AutoDownTabId });
-}
-function OffAutoDown(tabId) {
-    if (G.Options.AutoDownTabId.length == 0) { return false; }
-    const index = G.Options.AutoDownTabId.indexOf(tabId);
+function tabIdListRemove(str, tabId) {
+    if (G.TabIdList[str].length == 0) { return false; }
+    const index = G.TabIdList[str].indexOf(tabId);
     if (index > -1) {
-        G.Options.AutoDownTabId.splice(index, 1);
-        chrome.storage.sync.set({ AutoDownTabId: G.Options.AutoDownTabId });
+        G.TabIdList[str].splice(index, 1);
         return true;
     }
     return false;

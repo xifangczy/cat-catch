@@ -31,10 +31,11 @@
         "storage",
         "webNavigation",
         "alarms",
+        "scripting",
         "*://*/*",
         "<all_urls>"
     ],
-    "version": "1.0.25",
+    "version": "2.0.0",
     "browser_specific_settings": {
         "gecko": {
             "id": "xifangczy@gmail.com",

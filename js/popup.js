@@ -241,44 +241,67 @@ $(function () {
     });
 
     // 模拟手机端
-    chrome.runtime.sendMessage({ Message: "getRulesTabId" }, function (tabId) {
-        if (tabId.includes(G.tabId)) {
+    chrome.runtime.sendMessage({ Message: "mobileUserAgent", tabId: G.tabId }, function (state) {
+        if (state) {
             $("#MobileUserAgent").html("关闭手机模拟");
-            $("#MobileUserAgent").data("switch", "OffMobileUserAgent");
+            $("#MobileUserAgent").data("switch", "off");
         }
     });
     $("#MobileUserAgent").click(function () {
-        let switchStatus = $(this).data("switch");
-        if (switchStatus == "OnMobileUserAgent") {
+        let action = $(this).data("switch");
+        if (action == "on") {
             $("#MobileUserAgent").html("关闭手机模拟");
-            $("#MobileUserAgent").data("switch", "OffMobileUserAgent");
+            $("#MobileUserAgent").data("switch", "off");
         } else {
             $("#MobileUserAgent").html("模拟手机端");
-            $("#MobileUserAgent").data("switch", "OnMobileUserAgent");
+            $("#MobileUserAgent").data("switch", "on");
         }
-        chrome.runtime.sendMessage({ Message: switchStatus, tabId: G.tabId }, function () {
+        chrome.runtime.sendMessage({ Message: "mobileUserAgent", tabId: G.tabId, action: action }, function () {
             $('#Clear').click();
         });
     });
-
     // 自动下载
-    chrome.runtime.sendMessage({ Message: "OffAutoDown", tabId: G.tabId }, function(result){
-        if(result){
+    chrome.runtime.sendMessage({ Message: "autoDown", tabId: G.tabId }, function (state) {
+        if (state) {
             Tips("已关闭自动下载", 500);
         }
     });
     $("#AutoDown").click(function () {
-        let switchStatus = $(this).data("switch");
-        if (switchStatus == "OnAutoDown") {
+        let action = $(this).data("switch");
+        if (action == "on") {
             if (confirm("找到资源立刻尝试下载\n开启后，点击扩展图标会关闭自动下载\n是否确认开启？")) {
-                chrome.runtime.sendMessage({ Message: switchStatus, tabId: G.tabId });
                 $("#AutoDown").html("关闭下载");
-                $("#AutoDown").data("switch", "OffAutoDown");
+                $("#AutoDown").data("switch", "off");
+                chrome.runtime.sendMessage({ Message: "autoDown", tabId: G.tabId, action: action });
             }
         } else {
-            chrome.runtime.sendMessage({ Message: switchStatus, tabId: G.tabId });
             $("#AutoDown").html("自动下载");
-            $("#AutoDown").data("switch", "OnAutoDown");
+            $("#AutoDown").data("switch", "on");
+            chrome.runtime.sendMessage({ Message: "autoDown", tabId: G.tabId, action: action });
+        }
+    });
+
+    // 捕获
+    chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId }, function (state) {
+        if (state) {
+            $("#Catch").html("停止捕获");
+            $("#Catch").data("switch", "off");
+        }
+    });
+    $("#Catch").click(function () {
+        let action = $(this).data("switch");
+        if (action == "on") {
+            if (confirm("开启后会刷新网页并开始监听捕获视频\n媒体可能会被分成音频和视频，请使用第三方软件合并\n是否确认开启？")) {
+                $("#Catch").html("关闭捕获");
+                $("#Catch").data("switch", "off");
+                $('#Clear').click();
+                chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId, action: action });
+            }
+        } else {
+            $("#Catch").html("停止捕获");
+            $("#Catch").data("switch", "on");
+            $('#Clear').click();
+            chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId, action: action });
         }
     });
 });

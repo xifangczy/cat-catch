@@ -30,7 +30,6 @@ if (typeof (browser) == "object") {
     // V2 不存在此问题 只需要return
     chrome.scripting = new Object();
     chrome.scripting.executeScript = (obj) => {
-        // browser.tabs.executeScript(obj.target.tabId, {code: obj.func.toString()});
         return;
     }
 }
