@@ -17,29 +17,22 @@
         color: rgb(26, 115, 232);
         cursor: pointer;
         padding: 5px 5px 5px 5px;
-        font-size: 15px;
+        font-size: 12px;
         font-family: "Microsoft YaHei", "Helvetica", "Arial", sans-serif;
         user-select: none;
         display: flex;
         align-items: center;
-        `;
-    let icon = `<img src="
-    data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAALVBMVEUAAABe
-    ADxcADyQPix2FTRoAzheADz/7QDsxgb64AC6fhnYqgeoYCHQoDH/sk7mD2D1AAAAB3RSTlMAdRv77LREGT
-    yG7gAAATtJREFUKM+tzjFLw0AUB/BrBufW2q1DEfsBpAqS1kFwki7W0qlDS/UzvIR2U8g1UZcMlzNFEBII
-    SbsJyWVzECr4CYr3XbxEEzM69M9xj/fj3fHQP7KfXFIj73f6PdH3Bzk0vfdx5Wbt5iMH2qKz7JC7P3ikBO
-    hzEQgAFEEDEFQEDIALMKEyVWVijjKoq0cf4szKGQxBZ1QPFznUCUwDAPOykqaBJnNQPFB1P8nnsidWt7CH
-    rTkGEUN9Q6UTw/cDzGJiM6ACpCEW0cU2Not98QQ1ZYyNwNZsStzkUyTV5NhnemgT8oLSlLp+RCwCSuT+wN
-    4qooqmYsu7LacDF3wjW9rDV5tODxO4XnFnTZ44b4X4dSSgyjfnBnNOudPGs3IKTo3dD664Ww3NBJqts1L3
-    uPFbBEiVERrvZmUr+QaZPYWQMl6R9wAAAABJRU5ErkJggg=="
-    style="-webkit-user-drag: none;width: 20%;margin-right: 2px;">`;
+        justify-content: space-evenly;`;
+    let icon = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAALVBMVEUAAABeADxcADyQPix2FTRoAzheADz/7QDsxgb64AC6fhnYqgeoYCHQoDH/sk7mD2D1AAAAB3RSTlMAdRv77LREGTyG7gAAATtJREFUKM+tzjFLw0AUB/BrBufW2q1DEfsBpAqS1kFwki7W0qlDS/UzvIR2U8g1UZcMlzNFEBIISbsJyWVzECr4CYr3XbxEEzM69M9xj/fj3fHQP7KfXFIj73f6PdH3Bzk0vfdx5Wbt5iMH2qKz7JC7P3ikBOhzEQgAFEEDEFQEDIALMKEyVWVijjKoq0cf4szKGQxBZ1QPFznUCUwDAPOykqaBJnNQPFB1P8nnsidWt7CHrTkGEUN9Q6UTw/cDzGJiM6ACpCEW0cU2Not98QQ1ZYyNwNZsStzkUyTV5NhnemgT8oLSlLp+RCwCSuT+wN4qooqmYsu7LacDF3wjW9rDV5tODxO4XnFnTZ44b4X4dSSgyjfnBnNOudPGs3IKTo3dD664Ww3NBJqts1L3uPFbBEiVERrvZmUr+QaZPYWQMl6R9wAAAABJRU5ErkJggg==" style="-webkit-user-drag: none;width: 20px;">`;
     document.getElementsByTagName('html')[0].appendChild(cat);
 
     // 操作按钮
     let isMove = false;
+    let isComplete = false;
     cat.addEventListener('click', function (event) {
         isMove = !isMove;
         if (isMove) {
+            console.log("catchDownload");
             catchDownload();
             isMove = false;
         }
@@ -66,7 +59,7 @@
         cat.innerHTML = `${icon}捕获数据中...<br>下载已捕获的数据`;
         let sourceBuffer = _AddSourceBuffer.call(this, mimeType);
         let _appendBuffer = sourceBuffer.appendBuffer;
-        let bufferList = []
+        let bufferList = [];
         catchMedia.push({ mimeType, bufferList });
         sourceBuffer.appendBuffer = function (data) {
             bufferList.push(data);
@@ -75,25 +68,31 @@
         return sourceBuffer;
     }
 
-    let _endOfStream = window.MediaSource.prototype.endOfStream
+    let _endOfStream = window.MediaSource.prototype.endOfStream;
     window.MediaSource.prototype.endOfStream = function () {
         console.log("捕获完成");
+        isComplete = true;
         cat.innerHTML = `${icon}捕获完成<br>点击下载`;
         _endOfStream.call(this);
     }
 
     // 下载资源
     function catchDownload() {
-        for (let item of catchMedia) {
-            let mime = item.mimeType.split(';')[0];
-            let type = mime.split('/')[1];
-            let fileBlob = new Blob(item.bufferList, { type: mime });
-            let a = document.createElement('a');
-            a.href = URL.createObjectURL(fileBlob);
-            a.download = `${document.title}.${type}`;
-            a.click();
-            a.remove();
+        if(isComplete || confirm("提前下载可能会导致视频无法播放，确定下载吗？")){
+            for (let item of catchMedia) {
+                let mime = item.mimeType.split(';')[0];
+                let type = mime.split('/')[1];
+                let fileBlob = new Blob(item.bufferList, { type: mime });
+                let a = document.createElement('a');
+                a.href = URL.createObjectURL(fileBlob);
+                a.download = `${document.title}.${type}`;
+                a.click();
+                a.remove();
+            }
+            if(isComplete){
+                catchMedia = [];
+                isComplete = false;
+            }
         }
-        // catchMedia = [];
     }
 })();
