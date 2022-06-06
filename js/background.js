@@ -177,31 +177,28 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         }
         return;
     }
+    if (Message.Message == "getButtonState") {
+        let state = {
+            mobile: G.TabIdList.Mobile.includes(Message.tabId),
+            autodown: tabIdListRemove("AutoDown", Message.tabId), // 点击图标 立刻停止下载
+            catch: G.TabIdList.Catch.includes(Message.tabId)
+        }
+        sendResponse(state);
+        return;
+    }
     // 模拟手机
     if (Message.Message == "mobileUserAgent") {
-        if (Message.action == undefined) {
-            sendResponse(G.TabIdList.Mobile.includes(Message.tabId));
-            return;
-        }
         Message.action == "on" ? mobileUserAgent(Message.tabId, true) : mobileUserAgent(Message.tabId);
         chrome.tabs.reload(Message.tabId, { bypassCache: true });
         return;
     }
     // 自动下载
     if (Message.Message == "autoDown") {
-        if (Message.action == undefined) {
-            // 点击图标 立刻停止下载
-            sendResponse(tabIdListRemove("AutoDown", Message.tabId));
-        }
         Message.action == "on" ? G.TabIdList.AutoDown.push(Message.tabId) : tabIdListRemove("AutoDown", Message.tabId);
         return;
     }
     // 捕获
     if (Message.Message == "catch") {
-        if (Message.action == undefined) {
-            sendResponse(G.TabIdList.Catch.includes(Message.tabId));
-            return;
-        }
         Message.action == "on" ? G.TabIdList.Catch.push(Message.tabId) : tabIdListRemove("Catch", Message.tabId);
         chrome.tabs.reload(Message.tabId, { bypassCache: true });
         return;

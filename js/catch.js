@@ -23,7 +23,7 @@
         display: flex;
         align-items: center;
         justify-content: space-evenly;`;
-    let icon = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAALVBMVEUAAABeADxcADyQPix2FTRoAzheADz/7QDsxgb64AC6fhnYqgeoYCHQoDH/sk7mD2D1AAAAB3RSTlMAdRv77LREGTyG7gAAATtJREFUKM+tzjFLw0AUB/BrBufW2q1DEfsBpAqS1kFwki7W0qlDS/UzvIR2U8g1UZcMlzNFEBIISbsJyWVzECr4CYr3XbxEEzM69M9xj/fj3fHQP7KfXFIj73f6PdH3Bzk0vfdx5Wbt5iMH2qKz7JC7P3ikBOhzEQgAFEEDEFQEDIALMKEyVWVijjKoq0cf4szKGQxBZ1QPFznUCUwDAPOykqaBJnNQPFB1P8nnsidWt7CHrTkGEUN9Q6UTw/cDzGJiM6ACpCEW0cU2Not98QQ1ZYyNwNZsStzkUyTV5NhnemgT8oLSlLp+RCwCSuT+wN4qooqmYsu7LacDF3wjW9rDV5tODxO4XnFnTZ44b4X4dSSgyjfnBnNOudPGs3IKTo3dD664Ww3NBJqts1L3uPFbBEiVERrvZmUr+QaZPYWQMl6R9wAAAABJRU5ErkJggg==" style="-webkit-user-drag: none;width: 20px;">`;
+    let icon = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAAKlBMVEUAAADLlROxbBlRAD16GS5oAjWWQiOCIytgADidUx/95gHqwwTx0gDZqwT6kfLuAAAACnRSTlMA/vUejV7kuzi8za0PswAAANpJREFUGNNjwA1YSxkYTEqhnKZLLi6F1w0gnKA1shdvHYNxdq1atWobjLMKCOAyC3etlVrUAOH4HtNZmLgoAMKpXX37zO1FwcZAwMDguGq1zKpFmTNnzqx0Bpp2WvrU7ttn9py+I8JgLn1R8Pad22vurNkjwsBReHv33junzuyRnOnMwNCSeFH27K5dq1SNgcZxFMnuWrNq1W5VkNntihdv7ToteGcT0C7mIkE1qbWCYjJnM4CqEoWKdoslChXuUgXJqIcLebiphSgCZRhaPDhcDFhdmUMCGIgEAFA+Uc02aZg9AAAAAElFTkSuQmCC" style="-webkit-user-drag: none;width: 20px;">`;
     document.getElementsByTagName('html')[0].appendChild(cat);
 
     // 操作按钮
@@ -78,7 +78,11 @@
 
     // 下载资源
     function catchDownload() {
-        if(isComplete || confirm("提前下载可能会导致视频无法播放，确定下载吗？")){
+        if (catchMedia.length == 0) {
+            alert("没抓到有效数据");
+            return;
+        }
+        if (isComplete || confirm("提前下载可能会导致视频无法播放，确定下载吗？")) {
             for (let item of catchMedia) {
                 let mime = item.mimeType.split(';')[0];
                 let type = mime.split('/')[1];
@@ -89,7 +93,7 @@
                 a.click();
                 a.remove();
             }
-            if(isComplete){
+            if (isComplete) {
                 catchMedia = [];
                 isComplete = false;
             }

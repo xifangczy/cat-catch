@@ -240,13 +240,21 @@ $(function () {
         return false;
     });
 
-    // 模拟手机端
-    chrome.runtime.sendMessage({ Message: "mobileUserAgent", tabId: G.tabId }, function (state) {
-        if (state) {
+    // 获取模拟手机 自动下载 捕获 状态
+    chrome.runtime.sendMessage({ Message: "getButtonState", tabId: G.tabId }, function (state) {
+        if (state.mobile) {
             $("#MobileUserAgent").html("关闭手机模拟");
             $("#MobileUserAgent").data("switch", "off");
         }
+        if (state.autodown) {
+            Tips("已关闭自动下载", 500);
+        }
+        if (state.catch) {
+            $("#Catch").html("停止捕获");
+            $("#Catch").data("switch", "off");
+        }
     });
+    // 模拟手机端
     $("#MobileUserAgent").click(function () {
         let action = $(this).data("switch");
         if (action == "on") {
@@ -261,11 +269,6 @@ $(function () {
         });
     });
     // 自动下载
-    chrome.runtime.sendMessage({ Message: "autoDown", tabId: G.tabId }, function (state) {
-        if (state) {
-            Tips("已关闭自动下载", 500);
-        }
-    });
     $("#AutoDown").click(function () {
         let action = $(this).data("switch");
         if (action == "on") {
@@ -282,16 +285,10 @@ $(function () {
     });
 
     // 捕获
-    chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId }, function (state) {
-        if (state) {
-            $("#Catch").html("停止捕获");
-            $("#Catch").data("switch", "off");
-        }
-    });
     $("#Catch").click(function () {
         let action = $(this).data("switch");
         if (action == "on") {
-            if (confirm("开启后会刷新网页并开始监听捕获视频\n媒体可能会被分成音频和视频，请使用第三方软件合并\n是否确认开启？")) {
+            if (confirm("能够一边播放一边保存数据\n媒体可能会被分成音频和视频\n请注意浏览器提示下载多个文件\n最后使用第三方软件合并\n是否确认开启？")) {
                 $("#Catch").html("关闭捕获");
                 $("#Catch").data("switch", "off");
                 $('#Clear').click();
