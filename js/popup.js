@@ -135,6 +135,13 @@ function AddMedia(data) {
     });
     // 下载
     html.find('#download').click(function () {
+        if(G.Options.m3u8dl && isM3U8(data)){
+            let m3u8dlArg = G.Options.m3u8dlArg.replace("$referer$", data.webInfo.url);
+            m3u8dlArg = m3u8dlArg.replace("$url$", data.url);
+            // console.log(m3u8dlArg);
+            window.open('m3u8dl://' + btoa(m3u8dlArg));
+            return false;
+        }
         chrome.downloads.download({
             url: data.url,
             filename: downFileName

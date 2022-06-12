@@ -18,6 +18,8 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
     $("#Potplayer").attr("checked", items.Potplayer);
     $("#ShowWebIco").attr("checked", items.ShowWebIco);
     $("#MobileUserAgent").val(items.MobileUserAgent);
+    $("#m3u8dl").attr("checked", items.m3u8dl);
+    $("#m3u8dlArg").val(items.m3u8dlArg);
 });
 
 //新增格式
@@ -84,12 +86,12 @@ function Gethtml(Type, Param = new Object()) {
 }
 
 //失去焦点 保存自动清理数 模拟手机User Agent
-$("#OtherAutoClear, #MobileUserAgent").blur(function () {
+$("#OtherAutoClear, #MobileUserAgent, #m3u8dlArg").blur(function () {
     const Option = $(this).attr("id");
     chrome.storage.sync.set({ [Option]: $(this).val() });
 });
 // 调试模式 使用网页标题做文件名 使用PotPlayer预览 显示网站图标
-$("#Debug, #TitleName, #Potplayer, #ShowWebIco").bind("click", function () {
+$("#Debug, #TitleName, #Potplayer, #ShowWebIco, #m3u8dl").bind("click", function () {
     const Option = $(this).attr("id");
     chrome.storage.sync.set({ [Option]: $(this).prop('checked') });
 });

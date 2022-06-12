@@ -91,7 +91,12 @@
 
             <div class="item">
               <div>模拟手机User Agent</div>
-              <input id="MobileUserAgent" type="text" />
+              <input id="MobileUserAgent" type="text" class="width100"/>
+            </div>
+            <div class="item">
+              <div class="width100">N_m3u8DL-CLI 参数</div>
+              <span class="explain">$url$ 标识符 m3u8网址<br>$referer$ 标识符 请求头Referer</span>
+              <input id="m3u8dlArg" type="text"  class="width100"/>
             </div>
 
             <div class="item">
@@ -104,6 +109,18 @@
               <div class="switch">
                 <label class="switchLabel switchRadius">
                   <input type="checkbox" id="Potplayer" class="switchInput" />
+                  <span class="switchRound switchRadius"
+                    ><em class="switchRoundBtn switchRadius"></em
+                  ></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="item">
+              <div>调用m3u8dl://协议下载m3u8</div>
+              <div class="switch">
+                <label class="switchLabel switchRadius">
+                  <input type="checkbox" id="m3u8dl" class="switchInput" />
                   <span class="switchRound switchRadius"
                     ><em class="switchRoundBtn switchRadius"></em
                   ></span>
