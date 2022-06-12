@@ -12,6 +12,19 @@ $("#m3u8_url").attr("href", m3u8_url).html(m3u8_url)
 var BasePath;
 var RootPath;
 var m3u8_content;
+var tsLists = [];    //储存所有ts链接
+var errorTsLists = [];   // 下载错误的ts链接
+var m3u8FileName = GetFileName(m3u8_url);
+var m3u8KEY = "";
+var m3u8IV = "";
+
+function GetFileName(url) {
+    url = url.toLowerCase();
+    let str = url.split("?");
+    str = str[0].split("/");
+    str = str[str.length - 1].split("#");
+    return str[0].split(".")[0];
+}
 //获取url内容
 $.ajax({
     url: m3u8_url, async: true, success: function (result) {
@@ -60,8 +73,10 @@ function GetFile(str) {
 
 function show_list(format = "") {
     let count = 0;
+    tsCount = 0;
     let ExistKey = false;
     let textarea = "";
+    tsList = [];
     $("#media_file").val("");
     $("#tips").html("");
     let m3u8_split = m3u8_content.split("\n");
@@ -73,7 +88,7 @@ function show_list(format = "") {
         if (line.includes("#EXT-X-MAP")) {
             ExistKey = true;
             let MapURI = /URI="(.*)"/.exec(line);
-            if(MapURI && MapURI[1]){
+            if (MapURI && MapURI[1]) {
                 MapURI = fixUrl(MapURI[1]);
                 $("#tips").append('#EXT-X-MAP URI: <input type="text" value="' + MapURI + '" spellcheck="false">');
                 count++; line = MapURI;
@@ -82,16 +97,24 @@ function show_list(format = "") {
         if (line.includes("#EXT-X-KEY")) {
             ExistKey = true;
             let KeyURL = /URI="([^"]*)"/.exec(line);
-            if(KeyURL && KeyURL[1]){
+            if (KeyURL && KeyURL[1]) {
                 KeyURL = fixUrl(KeyURL[1]);
                 $("#tips").append('#EXT-X-KEY URI: <input type="text" value="' + KeyURL + '" spellcheck="false">');
                 count++; line = KeyURL;
+                // 下载Key文件
+                $.ajax({
+                    url: KeyURL,
+                    xhrFields: { responseType: "arraybuffer" }
+                }).done(function (responseData) {
+                    m3u8KEY = responseData;
+                });
             }
         }
         if (line.includes("IV=") && line.includes("#EXT-X-KEY")) {
             ExistKey = true;
             let KeyIV = /IV=([^,\n]*)/.exec(line);
-            if(KeyIV && KeyIV[1]){
+            if (KeyIV && KeyIV[1]) {
+                m3u8IV = KeyIV[1];
                 $("#tips").append('#IV: <input type="text" value="' + KeyIV[1] + '" spellcheck="false">');
             }
         }
@@ -112,12 +135,13 @@ function show_list(format = "") {
             }
             //格式化
             line = line.replace("\n", "").replace("\r", "");
-            if (format != "") {
-                line = format.replace("$url$", line);
-            }
             let results = new RegExp("[?]([^\n]*)").exec(line);
             if (!results && m3u8_arg) {
                 line = line + "?" + m3u8_arg;
+            }
+            tsLists.push(line);
+            if (format != "") {
+                line = format.replace("$url$", line);
             }
             textarea = textarea + line + "\n";
         }
@@ -160,7 +184,7 @@ $("#DownFixm3u8").click(function () {
     for (let line of m3u8_split) {
         if (line.includes("URI=")) {
             let KeyURL = /URI="(.*)"/.exec(line);
-            if(KeyURL && KeyURL[1]){
+            if (KeyURL && KeyURL[1]) {
                 KeyURL = GetFile(KeyURL[1]);
                 line = line.replace(/URI="(.*)"/, 'URI="' + KeyURL + '"');
             }
@@ -172,3 +196,52 @@ $("#DownFixm3u8").click(function () {
     }
     $("#media_file").val(textarea);
 });
+
+// 下载m3u8并合并
+$("#AllDownload").click(function () {
+    $("#progress").html(`等待下载中...`);
+    let tsList = tsLists;
+    let tsCount = tsList.length;
+    let tsIndex = 0;
+    let tsThread = 10;
+    let tsBuffer = [];
+    errorTsList = [];
+    let isEncrypted = false;
+    const decryptor = new AESDecryptor();
+
+    if(m3u8KEY != ""){
+        decryptor.expandKey(m3u8KEY);
+        isEncrypted = true;
+    }
+    let tsInterval = setInterval(function () {
+        if (tsIndex >= tsCount) {
+            clearInterval(tsInterval);
+            downloadTs(tsBuffer);
+        }
+        if (tsThread > 0 && tsIndex < tsCount) {
+            tsIndex++;
+            tsThread--;
+            $.ajax({
+                url: tsList[tsIndex],
+                xhrFields: { responseType: "arraybuffer" }
+            }).fail(function () {
+                errorTsList.push(tsList[tsIndex]);
+            }).done(function (responseData) {
+                if(isEncrypted){
+                    let iv = m3u8IV || new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, tsIndex]);
+                    responseData = decryptor.decrypt(responseData, 0, iv.buffer || iv, true);
+                }
+                tsBuffer.push(responseData);
+                $("#progress").html(`${tsIndex}/${tsCount}`);
+                tsThread++;
+            });
+        }
+    }, 100);
+});
+function downloadTs(tsBuffer) {
+    let fileBlob = new Blob(tsBuffer, { type: "video/mp4" });
+    chrome.downloads.download({
+        url: URL.createObjectURL(fileBlob),
+        filename: `${m3u8FileName}.mp4`
+    });
+}

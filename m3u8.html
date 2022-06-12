@@ -52,15 +52,16 @@
             <input type="text" value='wget "$url$"' id="formatStr" spellcheck="false" />
             <button id="format">自定义格式化</button>
             <button id="DownFixm3u8">格式化成本地m3u8</button>
-            <button id="AllDownload">全部下载</button>
             <button id="Refresh">还原</button>
+            <button id="AllDownload">尝试下载并合并ts</button><div id="progress"></div>
             <div class="ffmpeg">ffmpeg合并ts命令: <p>ffmpeg -i xxx.m3u8 -vcodec copy -acodec copy xxx.mp4</p></div>
           </div>
         </div>
       </div>
       </section>
-
+      <video id="video" class="hide"></video>
     </div>
+    <script src="js/m3u8-decrypt.js"></script>
     <script src="js/m3u8.js"></script>
   </body>
 </html>

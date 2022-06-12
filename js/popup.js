@@ -312,7 +312,8 @@ function isPlay(data) {
 function isM3U8(data) {
     if (data.ext == "m3u8" ||
         data.type == "application/vnd.apple.mpegurl" ||
-        data.type == "application/x-mpegurl"
+        data.type == "application/x-mpegurl" || 
+        data.type == "application/mpegurl"
     ) { return true; }
     return false;
 }
