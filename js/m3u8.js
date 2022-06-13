@@ -212,7 +212,7 @@ $("#DownFixm3u8").click(function () {
 
 // 下载m3u8并合并
 var isComplete = false; // 是否下载完成
-var errorTsLists = [];   // 下载错误的ts序号
+var errorTsList = [];   // 下载错误的ts序号 TODO 重新下载
 var tsBuffer = [];     // ts缓存
 $("#AllDownload").click(function () {
     if (isComplete) {
@@ -224,7 +224,7 @@ $("#AllDownload").click(function () {
     }
     $("#progress").html(`等待下载中...`);
     let tsThread = parseInt($("#thread").val());  // 线程数量
-    let tsList = tsLists; // ts列表
+    let tsList = [...tsLists]; // ts列表
     let tsCount = tsList.length - 1; // ts总数量
     // 解密工具
     let isEncrypted = false;
@@ -233,10 +233,20 @@ $("#AllDownload").click(function () {
         decryptor.expandKey(m3u8KEY);
         isEncrypted = true;
     }
+    let count = 1; // 已下载数量
     let tsInterval = setInterval(function () {
         if (tsList.length == 0) {
-            clearInterval(tsInterval);
-            downloadAllTs();
+            isComplete = true;
+            for (let i = 0; i < tsLists.length; i++) {
+                if (tsBuffer[i] == undefined || tsBuffer[i] == null) {
+                    isComplete = false;
+                    break;
+                }
+            }
+            if(isComplete){
+                clearInterval(tsInterval);
+                downloadAllTs();
+            }
         }
         if (tsThread > 0 && tsList.length > 0) {
             tsThread--;
@@ -254,7 +264,7 @@ $("#AllDownload").click(function () {
                     responseData = decryptor.decrypt(responseData, 0, iv.buffer || iv, true);
                 }
                 tsBuffer[tsIndex] = responseData;
-                $("#progress").html(`${tsIndex + 1}/${tsCount + 1}`);
+                $("#progress").html(`${count++}/${tsCount + 1}`);
                 tsThread++;
             });
         }
@@ -262,23 +272,10 @@ $("#AllDownload").click(function () {
 });
 
 function downloadAllTs() {
-    let tsInterval = setInterval(function () {
-        $("#progress").html(`验证下载文件...`);
-        isComplete = true;
-        for (let i = 0; i < tsLists.length; i++) {
-            if (tsBuffer[i] == undefined) {
-                isComplete = false;
-                break;
-            }
-        }
-        if (isComplete) {
-            clearInterval(tsInterval);
-            let fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });
-            chrome.downloads.download({
-                url: URL.createObjectURL(fileBlob),
-                filename: `${m3u8FileName}.ts`
-            });
-            $("#progress").html(`已完成`);
-        }
-    }, 233);
+    let fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });
+    chrome.downloads.download({
+        url: URL.createObjectURL(fileBlob),
+        filename: `${m3u8FileName}.ts`
+    });
+    $("#progress").html(`已完成`);
 }
