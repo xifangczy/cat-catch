@@ -136,7 +136,7 @@ function AddMedia(data) {
     // 下载
     html.find('#download').click(function () {
         if(G.Options.m3u8dl && isM3U8(data)){
-            let m3u8dlArg = G.Options.m3u8dlArg.replace("$referer$", data.webInfo.url);
+            let m3u8dlArg = G.Options.m3u8dlArg.replace("$referer$", data.initiator);
             m3u8dlArg = m3u8dlArg.replace("$url$", data.url);
             // console.log(m3u8dlArg);
             window.open('m3u8dl://' + btoa(m3u8dlArg));
@@ -162,7 +162,8 @@ function AddMedia(data) {
     });
     //解析m3u8
     html.find('#m3u8').click(function () {
-        chrome.tabs.create({ url: '/m3u8.html?m3u8_url=' + data.url });
+        let title = encodeURIComponent(data.webInfo.title);
+        chrome.tabs.create({ url: `/m3u8.html?m3u8_url=${data.url}&referer=${data.initiator}&title=${title}` });
         return false;
     });
     //多选框

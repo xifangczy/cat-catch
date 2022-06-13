@@ -53,7 +53,10 @@
             <button id="format">自定义格式化</button>
             <button id="DownFixm3u8">格式化成本地m3u8</button>
             <button id="Refresh">还原</button>
-            <button id="AllDownload">尝试下载并合并ts</button><div id="progress"></div>
+            <br>
+            下载线程数 <input type="number" value='10' id="thread" spellcheck="false" style="width: 35px;"/>
+            <button id="AllDownload">尝试下载并合并ts</button> 
+            <div id="progress"></div>
             <div class="ffmpeg">ffmpeg合并ts命令: <p>ffmpeg -i xxx.m3u8 -vcodec copy -acodec copy xxx.mp4</p></div>
           </div>
         </div>

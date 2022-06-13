@@ -125,6 +125,9 @@ function findMedia(data, isRegex = false, filter = false) {
                 if (item.url == data.url) { return; }
             }
         }
+        if(data.initiator == undefined || data.initiator == "null"){
+            data.initiator = webInfo.url;
+        }
         const info = {
             name: name,
             url: data.url,
@@ -134,7 +137,8 @@ function findMedia(data, isRegex = false, filter = false) {
             tabId: data.tabId,
             title: title,
             webInfo: webInfo,
-            isRegex: isRegex
+            isRegex: isRegex,
+            initiator: data.initiator
         };
         items.MediaData[tabId].push(info);
         chrome.storage.local.set({ MediaData: items.MediaData });

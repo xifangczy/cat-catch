@@ -30,6 +30,14 @@ if (typeof (browser) == "object") {
     // V2 不存在此问题 只需要return
     chrome.scripting = new Object();
     chrome.scripting.executeScript = (obj) => {
+        // console.log(obj.files[0]);
+        // if(obj.files[0]){
+        //     browser.tabs.executeScript(obj.target.tabId, {
+        //         allFrames: obj.target.allFrames,
+        //         file: obj.files[0],
+        //         runAt: "document_start"
+        //     });
+        // }
         return;
     }
 }

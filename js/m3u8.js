@@ -1,5 +1,13 @@
 //获取m3u8_url
-var m3u8_url = new RegExp("[?]m3u8_url=([^\n]*)").exec(window.location.href)[1];
+var m3u8_url = new RegExp("[?]m3u8_url=([^\n&]*)").exec(window.location.href)[1];
+var m3u8_referer = new RegExp("referer=([^\n&]*)").exec(window.location.href);
+var m3u8_title = new RegExp("title=([^\n&]*)").exec(window.location.href);
+if(m3u8_referer){
+    m3u8_referer = m3u8_referer[1];
+}
+if(m3u8_title){
+    m3u8_title = m3u8_title[1];
+}
 
 //获取m3u8参数
 var m3u8_arg = new RegExp("\\.m3u8\\?([^\n]*)").exec(m3u8_url);
@@ -19,11 +27,16 @@ var m3u8KEY = "";
 var m3u8IV = "";
 
 function GetFileName(url) {
+    if(G.Options.TitleName && m3u8_title){
+        return decodeURIComponent(m3u8_title);
+    }
     url = url.toLowerCase();
     let str = url.split("?");
     str = str[0].split("/");
-    str = str[str.length - 1].split("#");
-    return str[0].split(".")[0];
+    str = str[str.length - 1].split("#")[0];
+    str = str.split(".");
+    str.pop();
+    return str.join(".");
 }
 //获取url内容
 $.ajax({
@@ -129,7 +142,7 @@ function show_list(format = "") {
                 $("button").hide();
                 $("#more_m3u8").show();
                 $("#next_m3u8").append(
-                    '<p><a href="/m3u8.html?m3u8_url=' + line + '">' + GetFile(line) + "</a></p>"
+                    '<p><a href="/m3u8.html?m3u8_url=' + line + '&referer='+ m3u8_referer +'&title='+m3u8_title+'">' + GetFile(line) + "</a></p>"
                 );
                 continue;
             }
@@ -198,13 +211,22 @@ $("#DownFixm3u8").click(function () {
 });
 
 // 下载m3u8并合并
+var tsBuffer = [];
+var isComplete = false;
 $("#AllDownload").click(function () {
+    if(isComplete){
+        downloadTs();
+        return;
+    }
+    if(tsBuffer.length > 0){
+        return;
+    }
     $("#progress").html(`等待下载中...`);
     let tsList = tsLists;
     let tsCount = tsList.length;
     let tsIndex = 0;
-    let tsThread = 10;
-    let tsBuffer = [];
+    let tsThread = $("#thread").val();
+    // let tsBuffer = [];
     errorTsList = [];
     let isEncrypted = false;
     const decryptor = new AESDecryptor();
@@ -215,8 +237,9 @@ $("#AllDownload").click(function () {
     }
     let tsInterval = setInterval(function () {
         if (tsIndex >= tsCount) {
+            isComplete = true;
             clearInterval(tsInterval);
-            downloadTs(tsBuffer);
+            downloadTs();
         }
         if (tsThread > 0 && tsIndex < tsCount) {
             tsIndex++;
@@ -238,10 +261,10 @@ $("#AllDownload").click(function () {
         }
     }, 100);
 });
-function downloadTs(tsBuffer) {
+function downloadTs() {
     let fileBlob = new Blob(tsBuffer, { type: "video/mp4" });
     chrome.downloads.download({
         url: URL.createObjectURL(fileBlob),
-        filename: `${m3u8FileName}.mp4`
+        filename: `${m3u8FileName}.ts`
     });
 }
