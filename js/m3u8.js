@@ -263,7 +263,7 @@ $("#AllDownload").click(function () {
     }, 100);
 });
 function downloadTs() {
-    let fileBlob = new Blob(tsBuffer, { type: "video/mp4" });
+    let fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });
     chrome.downloads.download({
         url: URL.createObjectURL(fileBlob),
         filename: `${m3u8FileName}.ts`
