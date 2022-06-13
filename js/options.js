@@ -115,7 +115,7 @@ $("#ResetExt, #ResetType, #ResetRegex").bind("click", function () {
 //重置其他设置
 $("#ResetOption").bind("click", function () {
     if (confirm("确认重置吗？")) {
-        $("#OtherOption input").each(function () {
+        $("#OtherOption input, #OtherOption textarea").each(function () {
             const Option = $(this).attr("id");
             chrome.storage.sync.set({ [Option]: GetDefault(Option) });
         });

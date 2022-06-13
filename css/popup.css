@@ -186,4 +186,12 @@ body {
 #down {
   display: flex;
   justify-content: space-between;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 999;
+  background-color: #fff;
+}
+.mediaList{
+  margin-bottom: 30px;
 }
