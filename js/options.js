@@ -20,6 +20,7 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
     $("#MobileUserAgent").val(items.MobileUserAgent);
     $("#m3u8dl").attr("checked", items.m3u8dl);
     $("#m3u8dlArg").val(items.m3u8dlArg);
+    $("#injectScript").val(items.injectScript);
 });
 
 //新增格式
@@ -85,6 +86,14 @@ function Gethtml(Type, Param = new Object()) {
     return html;
 }
 
+// 注入脚本选择
+$("#injectScript").change(function () {
+    const Option = $(this).attr("id");
+    const Value = $(this).val();
+    if(Value == "catch.js" || Value == "recorder.js" ){
+        chrome.storage.sync.set({ [Option]: Value });
+    }
+});
 //失去焦点 保存自动清理数 模拟手机User Agent
 $("#OtherAutoClear, #MobileUserAgent, #m3u8dlArg").blur(function () {
     const Option = $(this).attr("id");

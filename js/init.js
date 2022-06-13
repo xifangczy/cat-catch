@@ -21,7 +21,8 @@ G.OptionLists = [
     "ShowWebIco",
     "MobileUserAgent",
     "m3u8dl",
-    "m3u8dlArg"
+    "m3u8dlArg",
+    "injectScript"
 ];
 // 功能tab id列表
 G.TabIdList = { Mobile: [], AutoDown: [], Catch: [] };
@@ -85,6 +86,7 @@ function GetDefault(Obj) {
             return "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
         case "m3u8dl": return false;
         case "m3u8dlArg": return '"$url$" --workDir "%USERPROFILE%\\Downloads\\m3u8dl" --enableDelAfterDone --headers "Referer:$referer$"';
+        case "injectScript": return 'catch.js';
     }
 }
 //初始变量

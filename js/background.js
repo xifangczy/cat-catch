@@ -237,10 +237,13 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
         });
         // 开启捕获
         if (G.TabIdList.Catch.includes(tabId)) {
+            let injectScript = G.Options.injectScript ? "js/" + G.Options.injectScript : "js/catch.js";
             chrome.scripting.executeScript(
                 {
                     target: { tabId: tabId, allFrames: true },
-                    files: ["js/catch.js"],
+                    // files: ["js/catch.js"],
+                    // files: ["js/recorder.js"],
+                    files: [injectScript],
                     injectImmediately: true,
                     world: "MAIN"
                 }

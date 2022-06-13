@@ -187,3 +187,19 @@ textarea {
 #tips {
   color: rgb(26, 115, 232);
 }
+#injectScript{
+  margin-left: 360px;
+  -webkit-appearance: none;
+  background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIxMiIgZmlsbD0iIzVGNjM2OCI+PHBhdGggZD0iTTAgMGgyNEwxMiAxMnoiLz48L3N2Zz4=) calc(100% - 8px) center no-repeat;
+  background-color: rgb(241, 243, 244);
+  background-size: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  padding-bottom: 6px;
+  padding-inline-end: calc(8px + 10px + 3px);
+  padding-inline-start: 8px;
+  padding-top: 6px;
+}

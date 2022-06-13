@@ -16,7 +16,7 @@ if (m3u8_arg) {
     m3u8_arg = m3u8_arg[1];
 }
 
-$("#m3u8_url").attr("href", m3u8_url).html(m3u8_url)
+$("#m3u8_url").attr("href", m3u8_url).html(m3u8_url);
 
 var BasePath;
 var RootPath;
