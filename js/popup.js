@@ -163,7 +163,9 @@ function AddMedia(data) {
     //解析m3u8
     html.find('#m3u8').click(function () {
         let title = encodeURIComponent(data.webInfo.title);
-        chrome.tabs.create({ url: `/m3u8.html?m3u8_url=${data.url}&referer=${data.initiator}&title=${title}` });
+        let url = encodeURIComponent(data.url);
+        let initiator = encodeURIComponent(data.initiator);
+        chrome.tabs.create({ url: `/m3u8.html?m3u8_url=${url}&referer=${initiator}&title=${title}` });
         return false;
     });
     //多选框

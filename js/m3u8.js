@@ -1,12 +1,13 @@
 //获取m3u8_url
 var m3u8_url = new RegExp("[?]m3u8_url=([^\n&]*)").exec(window.location.href)[1];
+m3u8_url = decodeURIComponent(m3u8_url);
 var m3u8_referer = new RegExp("referer=([^\n&]*)").exec(window.location.href);
 var m3u8_title = new RegExp("title=([^\n&]*)").exec(window.location.href);
 if(m3u8_referer){
-    m3u8_referer = m3u8_referer[1];
+    m3u8_referer = decodeURIComponent(m3u8_referer[1]);
 }
 if(m3u8_title){
-    m3u8_title = m3u8_title[1];
+    m3u8_title = decodeURIComponent(m3u8_title[1]);
 }
 
 //获取m3u8参数
@@ -28,7 +29,7 @@ var m3u8IV = "";
 
 function GetFileName(url) {
     if(G.Options.TitleName && m3u8_title){
-        return decodeURIComponent(m3u8_title);
+        return m3u8_title;
     }
     url = url.toLowerCase();
     let str = url.split("?");
