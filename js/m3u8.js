@@ -224,10 +224,9 @@ $("#AllDownload").click(function () {
     }
     $("#progress").html(`等待下载中...`);
     let tsList = tsLists;
-    let tsCount = tsList.length;
-    let tsIndex = 0;
+    let tsCount = tsList.length-1;
+    let tsIndex = -1;
     let tsThread = $("#thread").val();
-    // let tsBuffer = [];
     errorTsList = [];
     let isEncrypted = false;
     const decryptor = new AESDecryptor();
@@ -242,7 +241,7 @@ $("#AllDownload").click(function () {
             clearInterval(tsInterval);
             downloadTs();
         }
-        if (tsThread > 0 && tsIndex < tsCount) {
+        if (tsThread > 0 && tsIndex <= tsCount) {
             tsIndex++;
             tsThread--;
             $.ajax({
@@ -255,8 +254,8 @@ $("#AllDownload").click(function () {
                     let iv = m3u8IV || new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, tsIndex]);
                     responseData = decryptor.decrypt(responseData, 0, iv.buffer || iv, true);
                 }
-                tsBuffer.push(responseData);
-                $("#progress").html(`${tsIndex}/${tsCount}`);
+                tsBuffer[tsIndex] = responseData;
+                $("#progress").html(`${tsIndex}/${tsCount+1}`);
                 tsThread++;
             });
         }
