@@ -3,10 +3,10 @@ var m3u8_url = new RegExp("[?]m3u8_url=([^\n&]*)").exec(window.location.href)[1]
 m3u8_url = decodeURIComponent(m3u8_url);
 var m3u8_referer = new RegExp("referer=([^\n&]*)").exec(window.location.href);
 var m3u8_title = new RegExp("title=([^\n&]*)").exec(window.location.href);
-if(m3u8_referer){
+if (m3u8_referer) {
     m3u8_referer = decodeURIComponent(m3u8_referer[1]);
 }
-if(m3u8_title){
+if (m3u8_title) {
     m3u8_title = decodeURIComponent(m3u8_title[1]);
 }
 
@@ -22,13 +22,12 @@ var BasePath;
 var RootPath;
 var m3u8_content;
 var tsLists = [];    //储存所有ts链接
-var errorTsLists = [];   // 下载错误的ts链接
 var m3u8FileName = GetFileName(m3u8_url);
 var m3u8KEY = "";
 var m3u8IV = "";
 
 function GetFileName(url) {
-    if(G.Options.TitleName && m3u8_title){
+    if (G.Options.TitleName && m3u8_title) {
         return m3u8_title;
     }
     url = url.toLowerCase();
@@ -143,7 +142,7 @@ function show_list(format = "") {
                 $("button").hide();
                 $("#more_m3u8").show();
                 $("#next_m3u8").append(
-                    '<p><a href="/m3u8.html?m3u8_url=' + line + '&referer='+ m3u8_referer +'&title='+m3u8_title+'">' + GetFile(line) + "</a></p>"
+                    '<p><a href="/m3u8.html?m3u8_url=' + line + '&referer=' + m3u8_referer + '&title=' + m3u8_title + '">' + GetFile(line) + "</a></p>"
                 );
                 continue;
             }
@@ -212,59 +211,74 @@ $("#DownFixm3u8").click(function () {
 });
 
 // 下载m3u8并合并
-var tsBuffer = [];
-var isComplete = false;
+var isComplete = false; // 是否下载完成
+var errorTsLists = [];   // 下载错误的ts序号
+var tsBuffer = [];     // ts缓存
 $("#AllDownload").click(function () {
-    if(isComplete){
-        downloadTs();
+    if (isComplete) {
+        downloadAllTs();
         return;
     }
-    if(tsBuffer.length > 0){
+    if (tsBuffer.length > 0) {
         return;
     }
     $("#progress").html(`等待下载中...`);
-    let tsList = tsLists;
-    let tsCount = tsList.length-1;
-    let tsIndex = -1;
-    let tsThread = $("#thread").val();
-    errorTsList = [];
+    let tsThread = parseInt($("#thread").val());  // 线程数量
+    let tsList = tsLists; // ts列表
+    let tsCount = tsList.length - 1; // ts总数量
+    // 解密工具
     let isEncrypted = false;
     const decryptor = new AESDecryptor();
-
-    if(m3u8KEY != ""){
+    if (m3u8KEY != "") {
         decryptor.expandKey(m3u8KEY);
         isEncrypted = true;
     }
     let tsInterval = setInterval(function () {
-        if (tsIndex >= tsCount) {
-            isComplete = true;
+        if (tsList.length == 0) {
             clearInterval(tsInterval);
-            downloadTs();
+            downloadAllTs();
         }
-        if (tsThread > 0 && tsIndex <= tsCount) {
-            tsIndex++;
+        if (tsThread > 0 && tsList.length > 0) {
             tsThread--;
+            let tsUrl = tsList.shift(); // 取出一个ts地址
+            let tsIndex = tsCount - tsList.length; // 当前下载的ts序号
             $.ajax({
-                url: tsList[tsIndex],
+                url: tsUrl,
                 xhrFields: { responseType: "arraybuffer" }
             }).fail(function () {
-                errorTsList.push(tsList[tsIndex]);
+                errorTsList.push(tsIndex);
+                tsThread++;
             }).done(function (responseData) {
-                if(isEncrypted){
+                if (isEncrypted) {
                     let iv = m3u8IV || new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, tsIndex]);
                     responseData = decryptor.decrypt(responseData, 0, iv.buffer || iv, true);
                 }
                 tsBuffer[tsIndex] = responseData;
-                $("#progress").html(`${tsIndex}/${tsCount+1}`);
+                $("#progress").html(`${tsIndex + 1}/${tsCount + 1}`);
                 tsThread++;
             });
         }
     }, 100);
 });
-function downloadTs() {
-    let fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });
-    chrome.downloads.download({
-        url: URL.createObjectURL(fileBlob),
-        filename: `${m3u8FileName}.ts`
-    });
+
+function downloadAllTs() {
+    let tsInterval = setInterval(function () {
+        $("#progress").html(`验证下载文件...`);
+        isComplete = true;
+        for (let i = 0; i < tsLists.length; i++) {
+            if (tsBuffer[i] == undefined) {
+                isComplete = false;
+                break;
+            }
+        }
+        if (isComplete) {
+            clearInterval(tsInterval);
+            let fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });
+            chrome.downloads.download({
+                url: URL.createObjectURL(fileBlob),
+                filename: `${m3u8FileName}.ts`
+            });
+            $("#progress").html(`已完成`);
+        }
+    }, 233);
 }
