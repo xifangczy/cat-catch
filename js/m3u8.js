@@ -23,8 +23,10 @@ var RootPath;
 var m3u8_content;
 var tsLists = [];    //储存所有ts链接
 var m3u8FileName = GetFileName(m3u8_url);
-var m3u8KEY = "";
+// var m3u8KEY = "";
 var m3u8IV = "";
+var isEncrypted = false;    //是否加密的m3u8
+const decryptor = new AESDecryptor(); //加密工具
 
 function GetFileName(url) {
     if (G.Options.TitleName && m3u8_title) {
@@ -86,10 +88,8 @@ function GetFile(str) {
 
 function show_list(format = "") {
     let count = 0;
-    tsCount = 0;
     let ExistKey = false;
     let textarea = "";
-    tsList = [];
     $("#media_file").val("");
     $("#tips").html("");
     let m3u8_split = m3u8_content.split("\n");
@@ -119,7 +119,9 @@ function show_list(format = "") {
                     url: KeyURL,
                     xhrFields: { responseType: "arraybuffer" }
                 }).done(function (responseData) {
-                    m3u8KEY = responseData;
+                    // m3u8KEY = responseData;
+                    decryptor.expandKey(responseData);
+                    isEncrypted = true;
                 });
             }
         }
@@ -212,8 +214,9 @@ $("#DownFixm3u8").click(function () {
 
 // 下载m3u8并合并
 var isComplete = false; // 是否下载完成
-var errorTsList = [];   // 下载错误的ts序号 TODO 重新下载
+var errorTsList = [];   // 下载错误的ts序号
 var tsBuffer = [];     // ts缓存
+var successCount = 1; // 已下载数量
 $("#AllDownload").click(function () {
     if (isComplete) {
         downloadAllTs();
@@ -226,26 +229,17 @@ $("#AllDownload").click(function () {
     let tsThread = parseInt($("#thread").val());  // 线程数量
     let tsList = [...tsLists]; // ts列表
     let tsCount = tsList.length - 1; // ts总数量
-    // 解密工具
-    let isEncrypted = false;
-    const decryptor = new AESDecryptor();
-    if (m3u8KEY != "") {
-        decryptor.expandKey(m3u8KEY);
-        isEncrypted = true;
-    }
-    let count = 1; // 已下载数量
     let tsInterval = setInterval(function () {
-        if (tsList.length == 0) {
-            isComplete = true;
-            for (let i = 0; i < tsLists.length; i++) {
-                if (tsBuffer[i] == undefined || tsBuffer[i] == null) {
-                    isComplete = false;
-                    break;
-                }
-            }
-            if(isComplete){
+        if (tsList.length == 0 && tsThread == parseInt($("#thread").val())) {
+            isComplete = m3u8Complete();
+            if (isComplete) {
+                $("#progress").html(`数据完整，下载中...`);
                 clearInterval(tsInterval);
                 downloadAllTs();
+            }
+            if (errorTsList.length > 0) {
+                clearInterval(tsInterval);
+                $("#progress").html(`数据不完整...`);
             }
         }
         if (tsThread > 0 && tsList.length > 0) {
@@ -256,26 +250,86 @@ $("#AllDownload").click(function () {
                 url: tsUrl,
                 xhrFields: { responseType: "arraybuffer" }
             }).fail(function () {
+                ErrorTsList(tsIndex);
                 errorTsList.push(tsIndex);
                 tsThread++;
             }).done(function (responseData) {
-                if (isEncrypted) {
-                    let iv = m3u8IV || new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, tsIndex]);
-                    responseData = decryptor.decrypt(responseData, 0, iv.buffer || iv, true);
-                }
-                tsBuffer[tsIndex] = responseData;
-                $("#progress").html(`${count++}/${tsCount + 1}`);
+                tsBuffer[tsIndex] = tsDecrypt(responseData);
+                $("#progress").html(`${successCount++}/${tsCount + 1}`);
                 tsThread++;
             });
         }
-    }, 100);
+    }, 66);
 });
 
+// 添加下载出错的数据 可重新下载
+function ErrorTsList(tsIndex) {
+    if ($("#errorTsList").is(':hidden')) {
+        $("#ForceDownload").show();
+        $("#errorTsList").show();
+    }
+    let html = $(`<p>${tsLists[tsIndex]} <button data-id="${tsIndex}">重新下载</button></p>`);
+    html.find("button").click(function () {
+        $(this).html("正在重新下载");
+        let tsIndex = $(this).data("id");
+        let url = tsLists[tsIndex];
+        $.ajax({
+            url: url,
+            xhrFields: { responseType: "arraybuffer" }
+        }).fail(function () {
+            html.find("button").html("下载失败, 继续重新下载");
+        }).done(function (responseData) {
+            tsBuffer[tsIndex] = tsDecrypt(responseData);
+            for(let i in errorTsList){
+                if(errorTsList[i] == tsIndex){
+                    errorTsList.splice(i, 1);
+                }
+            }
+            html.remove();
+            $("#progress").html(`${successCount++}/${tsLists.length}`);
+            isComplete = m3u8Complete();
+            if (isComplete) {
+                $("#progress").html(`数据完整，下载中...`);
+                downloadAllTs();
+            }
+        });
+    });
+    $('#errorTsList').append(html);
+}
+
+// 强制下载 按钮
+$("#ForceDownload").click(function () {
+    downloadAllTs();
+});
+
+// 合并下载已有的数据
 function downloadAllTs() {
     let fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });
     chrome.downloads.download({
         url: URL.createObjectURL(fileBlob),
         filename: `${m3u8FileName}.ts`
     });
-    $("#progress").html(`已完成`);
+    $("#progress").html(`下载中...`);
+}
+
+// 解密ts文件
+function tsDecrypt(responseData, tsIndex) {
+    if (isEncrypted) {
+        let iv = m3u8IV || new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, tsIndex]);
+        return decryptor.decrypt(responseData, 0, iv.buffer || iv, true);
+    }
+    return responseData;
+}
+
+// 验证ts文件是否完整
+function m3u8Complete(){
+    $("#progress").html(`下载数据校验中...`);
+    for (let i = 0; i < tsLists.length; i++) {
+        if (tsBuffer[i] == undefined) {
+            $("#progress").html(`数据不完整...`);
+            return false;
+        }
+    }
+    $("#progress").html(`数据完整`);
+    return true
 }

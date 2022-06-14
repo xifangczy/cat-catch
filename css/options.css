@@ -203,3 +203,6 @@ textarea {
   padding-inline-start: 8px;
   padding-top: 6px;
 }
+#errorTsList p{
+  color: red;
+}
