@@ -9,12 +9,14 @@ https://microsoftedge.microsoft.com/addons/detail/oohmdefbjalncfplafanlagojlakmj
 ## 🦊Firefox
 https://addons.mozilla.org/addon/cat-catch/
 
-## ✨2.0.0说明
-2.0.0 增加捕获功能，通过Hook Video接口能够捕获一大部分之前无法下载的视频。
+## ✨2.0 说明
+2.0 增加捕获功能，可以使用HOOK脚本或录制脚本，可以解决大部分无法下载的视频。增加了m3u8视频合并功能。
 
 需要Chrome 102版本以上，暂不支持Firefox
 
-2.0对浏览器版本要求较高，暂不上架应用商店
+2.0 对浏览器版本要求较高，暂不上架应用商店。
+
+应用商店暂停功能性更新。使用新功能，请更新Chrome到最新，Github下载新版本，使用源码加载。
 
 # 📓Chrome类浏览器 源码加载方法
 1. https://github.com/xifangczy/cat-catch/releases 下载 Source code 并解压。
