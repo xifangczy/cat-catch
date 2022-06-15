@@ -23,7 +23,7 @@ var RootPath;
 var m3u8_content;
 var tsLists = [];    //储存所有ts链接
 var m3u8FileName = GetFileName(m3u8_url);
-// var m3u8KEY = "";
+var m3u8KEY = "";
 var m3u8IV = "";
 var isEncrypted = false;    //是否加密的m3u8
 const decryptor = new AESDecryptor(); //加密工具
@@ -119,7 +119,7 @@ function show_list(format = "") {
                     url: KeyURL,
                     xhrFields: { responseType: "arraybuffer" }
                 }).done(function (responseData) {
-                    // m3u8KEY = responseData;
+                    m3u8KEY = responseData;
                     decryptor.expandKey(responseData);
                     isEncrypted = true;
                 });
@@ -254,7 +254,7 @@ $("#AllDownload").click(function () {
                 errorTsList.push(tsIndex);
                 tsThread++;
             }).done(function (responseData) {
-                tsBuffer[tsIndex] = tsDecrypt(responseData);
+                tsBuffer[tsIndex] = tsDecrypt(responseData, tsIndex);
                 $("#progress").html(`${successCount++}/${tsCount + 1}`);
                 tsThread++;
             });
@@ -279,9 +279,9 @@ function ErrorTsList(tsIndex) {
         }).fail(function () {
             html.find("button").html("下载失败, 继续重新下载");
         }).done(function (responseData) {
-            tsBuffer[tsIndex] = tsDecrypt(responseData);
-            for(let i in errorTsList){
-                if(errorTsList[i] == tsIndex){
+            tsBuffer[tsIndex] = tsDecrypt(responseData, tsIndex);
+            for (let i in errorTsList) {
+                if (errorTsList[i] == tsIndex) {
                     errorTsList.splice(i, 1);
                 }
             }
@@ -322,7 +322,7 @@ function tsDecrypt(responseData, tsIndex) {
 }
 
 // 验证ts文件是否完整
-function m3u8Complete(){
+function m3u8Complete() {
     $("#progress").html(`下载数据校验中...`);
     for (let i = 0; i < tsLists.length; i++) {
         if (tsBuffer[i] == undefined) {

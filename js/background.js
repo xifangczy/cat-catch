@@ -57,7 +57,7 @@ function findMedia(data, isRegex = false, filter = false) {
     ) { return; }
     //调试模式
     if (G.Options.Debug) {
-        console.log(data);
+        console.log(data, isRegex);
     }
     // 获取网页信息
     let title = "NULL";

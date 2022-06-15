@@ -3,7 +3,6 @@ chrome.storage.local.get({ "MediaData": {} }, function (items) {
     if (items.MediaData === undefined) { return; }
     if (items.MediaData[G.tabIdStr] !== undefined) {
         for (let item of items.MediaData[G.tabIdStr]) {
-            console.log(item);
             AddMedia(item);
         }
     }
