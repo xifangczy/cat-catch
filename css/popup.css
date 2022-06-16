@@ -196,8 +196,8 @@ body {
   margin-bottom: 30px;
 }
 #screenshots{
-  max-width: 100%;
-  max-height: 200px;
+  /* max-width: 100%; */
+  max-height: 260px;
   cursor: pointer;
   margin: auto;
 }

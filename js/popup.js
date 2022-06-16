@@ -120,20 +120,20 @@ function AddMedia(data) {
             getMediaInfo[0].onloadeddata = function () {
                 this.pause();
                 // 截图
-                if(screenshots.attr("src") == undefined){
+                if (screenshots.attr("src") == undefined) {
                     const canvas = document.createElement('canvas');
                     canvas.width = this.videoWidth;
                     canvas.height = this.videoHeight;
                     const blank = canvas.toDataURL('image/jpeg');
                     canvas.getContext('2d').drawImage(this, 0, 0, this.videoWidth, this.videoHeight);
                     const image = canvas.toDataURL('image/jpeg');
-                    if(image != blank){
-                        screenshots.css( "display", "block" );
+                    if (image != blank) { 
+                        html.find("#player").length == 0 && screenshots.css("display", "block");
                         screenshots.attr("src", canvas.toDataURL('image/jpeg'));
                     }
                     delete canvas;
                 }
-                // 获取播放时常
+                // 获取播放时长
                 if (this.duration && this.duration != Infinity) {
                     let h = Math.floor(this.duration / 3600 % 24);
                     let m = Math.floor(this.duration / 60 % 60);
@@ -162,6 +162,8 @@ function AddMedia(data) {
             let m3u8dlArg = G.Options.m3u8dlArg.replace("$referer$", data.initiator);
             m3u8dlArg = m3u8dlArg.replace("$url$", data.url);
             m3u8dlArg = m3u8dlArg.replace("$title$", unescape(encodeURIComponent(data.title)));
+            // console.log(m3u8dlArg.length);
+            // console.log(btoa(m3u8dlArg).length);
             window.open('m3u8dl://' + btoa(m3u8dlArg));
             return false;
         }
@@ -271,7 +273,10 @@ $(function () {
     });
     //预览播放关闭按钮
     $('#CloseBtn').click(function () {
-        $(this).parent().siblings(".url").find("#screenshots").css( "display", "block" );
+        const screenshots = $(this).parent().siblings(".url").find("#screenshots");
+        if (screenshots.attr("src") != "" && screenshots.attr("src") != undefined) {
+            screenshots.css("display", "block");
+        }
         $('#player video').trigger('pause');
         $('#player video').removeAttr('src');
         $("#player").hide();
@@ -311,7 +316,7 @@ $(function () {
     $("#AutoDown").click(function () {
         let action = $(this).data("switch");
         if (action == "on") {
-            if (confirm("找到资源立刻尝试下载\n开启后，点击扩展图标会关闭自动下载\n是否确认开启？")) {
+            if (confirm("找到资源立刻尝试下载\n点击扩展图标将关闭自动下载\n是否确认开启？")) {
                 $("#AutoDown").html("关闭下载");
                 $("#AutoDown").data("switch", "off");
                 chrome.runtime.sendMessage({ Message: "autoDown", tabId: G.tabId, action: action });
@@ -327,7 +332,7 @@ $(function () {
     $("#Catch").click(function () {
         let action = $(this).data("switch");
         if (action == "on") {
-            if (confirm("能够一边播放一边保存数据\n媒体可能会被分成音频和视频\n请注意浏览器提示下载多个文件\n最后使用第三方软件合并\n是否确认开启？")) {
+            if (confirm("保存视频缓存数据\n媒体可能会被分成音频和视频,请注意浏览器提示下载多个文件\n是否确认开启？")) {
                 $("#Catch").html("关闭捕获");
                 $("#Catch").data("switch", "off");
                 $('#Clear').click();

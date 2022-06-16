@@ -125,7 +125,7 @@ function findMedia(data, isRegex = false, filter = false) {
                 if (item.url == data.url) { return; }
             }
         }
-        if(data.initiator == undefined || data.initiator == "null"){
+        if (data.initiator == undefined || data.initiator == "null") {
             data.initiator = webInfo.url;
         }
         const info = {
@@ -163,6 +163,7 @@ function findMedia(data, isRegex = false, filter = false) {
                     filename: "CatCatch-" + G.tabId + "/" + downFileName
                 });
             }
+            if (chrome.runtime.lastError) { return; }
         });
     });
 }
@@ -255,8 +256,8 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
                 {
                     args: [G.Options.MobileUserAgent.toString()],
                     target: { tabId: tabId, allFrames: true },
-                    func: function(){
-                        Object.defineProperty(navigator,'userAgent',{value: arguments[0],writable: false});
+                    func: function () {
+                        Object.defineProperty(navigator, 'userAgent', { value: arguments[0], writable: false });
                     },
                     injectImmediately: true,
                     world: "MAIN"

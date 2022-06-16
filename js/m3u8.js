@@ -42,18 +42,18 @@ function GetFileName(url) {
 }
 //获取url内容
 $.ajax({
-    url: m3u8_url, async: true, success: function (result) {
-        $("#m3u8").show();
-        BasePath = getManifestUrlBase();
-        RootPath = getManifestUrlRoot();
-        m3u8_content = result;
-        show_list();
-    }, error: function (result) {
-        console.log(result);
-        $("#loading").show();
-        $("#m3u8").hide();
-        $("#loading .optionBox").html(`获取m3u8内容失败, 请尝试手动下载 <a href="${m3u8_url}">${m3u8_url}</a>`);
-    }
+    async: true,
+    url: m3u8_url
+}).fail(function (result) {
+    $("#loading").show();
+    $("#m3u8").hide();
+    $("#loading .optionBox").html(`获取m3u8内容失败, 请尝试手动下载 <a href="${m3u8_url}">${m3u8_url}</a>`);
+}).done(function (result) {
+    $("#m3u8").show();
+    BasePath = getManifestUrlBase();
+    RootPath = getManifestUrlRoot();
+    m3u8_content = result;
+    show_list();
 });
 
 //基本文件目录
@@ -73,7 +73,7 @@ function getManifestUrlRoot() {
 
 //修复url路劲
 function fixUrl(url) {
-    if (/^[\w]+:\/\/.+/i.test(url)) {
+    if (/^[\w]+:.+/i.test(url)) {
         return url;
     }
     if (url[0] == "/") {
@@ -83,7 +83,10 @@ function fixUrl(url) {
 }
 function GetFile(str) {
     str = str.split("?")[0];
-    return str.split("/").pop();
+    if (str.substr(0, 5) != "data:" && str.substr(0, 4) != "skd:") {
+        return str.split("/").pop();
+    }
+    return str;
 }
 
 function show_list(format = "") {
@@ -144,7 +147,7 @@ function show_list(format = "") {
                 $("button").hide();
                 $("#more_m3u8").show();
                 $("#next_m3u8").append(
-                    '<p><a href="/m3u8.html?m3u8_url=' + line + '&referer=' + m3u8_referer + '&title=' + m3u8_title + '">' + GetFile(line) + "</a></p>"
+                    `<p><a href="/m3u8.html?m3u8_url=${encodeURIComponent(line)}&referer=${encodeURIComponent(m3u8_referer)}&title=${encodeURIComponent(m3u8_title)}">${GetFile(line)}</a></p>`
                 );
                 continue;
             }
