@@ -76,8 +76,10 @@ function AddMedia(data) {
                 MIME: ...<br>
                 <div id="duration"></div>
                 <a href="" target="_blank" download=""></a>
+                <br>
+                <img id="screenshots" class="hide" width="50%" height="50%" />
+                <video id="getMediaInfo" class="hide" muted autoplay width="100%"></video>
             </div>
-            <video class="getMediaInfo hide"></video>
         </div>
     */
     let html = `
@@ -98,8 +100,10 @@ function AddMedia(data) {
                 ${data.type ? `MIME:  ${data.type}<br>` : ""}
                 <div id="duration"></div>
                 <a href="${data.url}" target="_blank" download="${downFileName}">${data.url}</a>
+                <br>
+                <img id="screenshots" class="hide"/>
+                <video id="getMediaInfo" class="hide" muted autoplay></video>
             </div>
-            <video class="getMediaInfo hide"></video>
         </div>`;
 
     ////////////////////////绑定事件////////////////////////
@@ -108,18 +112,37 @@ function AddMedia(data) {
     html.find('.panel-heading').click(function () {
         html.find(".url").toggle();
         //获取时长
-        let getMediaInfo = html.find(".getMediaInfo");
+        let screenshots = html.find("#screenshots");
+        let getMediaInfo = html.find("#getMediaInfo");
         let durationNode = html.find("#duration");
         if (html.find(".url").is(":visible") && durationNode.html() == "") {
             getMediaInfo.attr('src', data.url);
-            getMediaInfo[0].ondurationchange = function () {
-                let duration = getMediaInfo[0].duration;
-                if (duration && duration != Infinity) {
-                    let h = Math.floor(duration / 3600 % 24);
-                    let m = Math.floor(duration / 60 % 60);
-                    let s = Math.floor((duration % 60));
+            getMediaInfo[0].onloadeddata = function () {
+                this.pause();
+                // 截图
+                if(screenshots.attr("src") == undefined){
+                    const canvas = document.createElement('canvas');
+                    canvas.width = this.videoWidth;
+                    canvas.height = this.videoHeight;
+                    const blank = canvas.toDataURL('image/jpeg');
+                    canvas.getContext('2d').drawImage(this, 0, 0, this.videoWidth, this.videoHeight);
+                    const image = canvas.toDataURL('image/jpeg');
+                    if(image != blank){
+                        screenshots.show();
+                        screenshots.attr("src", canvas.toDataURL('image/jpeg'));
+                    }
+                    delete canvas;
+                }
+                // 获取播放时常
+                if (this.duration && this.duration != Infinity) {
+                    let h = Math.floor(this.duration / 3600 % 24);
+                    let m = Math.floor(this.duration / 60 % 60);
+                    let s = Math.floor((this.duration % 60));
                     durationNode.html("时长: " + String(h).padStart(2, 0) + ":" + String(m).padStart(2, 0) + ":" + String(s).padStart(2, 0));
                 }
+                getMediaInfo.removeAttr('src');
+            }
+            getMediaInfo[0].onplay = function () {
                 getMediaInfo.removeAttr('src');
             }
             getMediaInfo[0].onerror = function () {
@@ -135,11 +158,10 @@ function AddMedia(data) {
     });
     // 下载
     html.find('#download').click(function () {
-        if(G.Options.m3u8dl && isM3U8(data)){
+        if (G.Options.m3u8dl && isM3U8(data)) {
             let m3u8dlArg = G.Options.m3u8dlArg.replace("$referer$", data.initiator);
             m3u8dlArg = m3u8dlArg.replace("$url$", data.url);
             m3u8dlArg = m3u8dlArg.replace("$title$", unescape(encodeURIComponent(data.title)));
-            // console.log(m3u8dlArg);
             window.open('m3u8dl://' + btoa(m3u8dlArg));
             return false;
         }
@@ -149,11 +171,16 @@ function AddMedia(data) {
         });
         return false;
     });
+    // 点击预览图片
+    html.find('#screenshots').click(function () {
+        html.find('#play').click();
+    });
     //播放
     html.find('#play').click(function () {
         if (G.Options.Potplayer) {
             window.open('potplayer://' + data.url);
         } else {
+            html.find("#screenshots").hide();
             $('#player video').attr('src', data.url);
             $('#player video').trigger('play');
             $('#player').show();
@@ -244,6 +271,7 @@ $(function () {
     });
     //预览播放关闭按钮
     $('#CloseBtn').click(function () {
+        $(this).parent().siblings(".url").find("#screenshots").show();
         $('#player video').trigger('pause');
         $('#player video').removeAttr('src');
         $("#player").hide();
@@ -323,7 +351,7 @@ function isPlay(data) {
 function isM3U8(data) {
     if (data.ext == "m3u8" ||
         data.type == "application/vnd.apple.mpegurl" ||
-        data.type == "application/x-mpegurl" || 
+        data.type == "application/x-mpegurl" ||
         data.type == "application/mpegurl"
     ) { return true; }
     return false;
