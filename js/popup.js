@@ -128,7 +128,7 @@ function AddMedia(data) {
                     canvas.getContext('2d').drawImage(this, 0, 0, this.videoWidth, this.videoHeight);
                     const image = canvas.toDataURL('image/jpeg');
                     if(image != blank){
-                        screenshots.show();
+                        screenshots.css( "display", "block" );
                         screenshots.attr("src", canvas.toDataURL('image/jpeg'));
                     }
                     delete canvas;
@@ -271,7 +271,7 @@ $(function () {
     });
     //预览播放关闭按钮
     $('#CloseBtn').click(function () {
-        $(this).parent().siblings(".url").find("#screenshots").show();
+        $(this).parent().siblings(".url").find("#screenshots").css( "display", "block" );
         $('#player video').trigger('pause');
         $('#player video').removeAttr('src');
         $("#player").hide();

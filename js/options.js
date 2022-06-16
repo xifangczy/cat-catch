@@ -132,7 +132,7 @@ $("#ClearData, #ResetAllOption").bind("click", function () {
             return;
         }
     }
-    chrome.storage.local.clear("MediaData");
+    chrome.storage.local.clear();
     chrome.runtime.sendMessage({ Message: "ClearIcon" });
     location.reload();
 });

@@ -199,6 +199,7 @@ body {
   max-width: 100%;
   max-height: 200px;
   cursor: pointer;
+  margin: auto;
 }
 #getMediaInfo{
   width: 100%;
