@@ -6,7 +6,7 @@
 
 [Added] 支持N_m3u8DL-CLI的m3u8dl://协议
 
-[Added] m3u8解析，现在能合并下载m3u8文件
+[Added] m3u8解析增强，现在能合并下载m3u8文件，通过修改Referer能够下载更多文件。
 
 ### 1.0.25
 [Changed] 正则匹配增强
