@@ -162,8 +162,6 @@ function AddMedia(data) {
             let m3u8dlArg = G.Options.m3u8dlArg.replace("$referer$", data.initiator);
             m3u8dlArg = m3u8dlArg.replace("$url$", data.url);
             m3u8dlArg = m3u8dlArg.replace("$title$", unescape(encodeURIComponent(data.title)));
-            // console.log(m3u8dlArg.length);
-            // console.log(btoa(m3u8dlArg).length);
             window.open('m3u8dl://' + btoa(m3u8dlArg));
             return false;
         }
