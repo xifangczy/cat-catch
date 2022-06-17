@@ -28,17 +28,18 @@ $(function () {
     var m3u8KEY = "";
     var m3u8IV = "";
     var isEncrypted = false;    //是否加密的m3u8
-    const decryptor = new AESDecryptor(); //加密工具
+    const decryptor = new AESDecryptor(); //解密工具
+    var tabId;
 
-    // 修改Referer
-    if (m3u8_referer && m3u8_referer != undefined && m3u8_referer != "") {
-        setReferer(m3u8_referer);
-    }
-    if (file_name) {
-        downloadFile();
-    } else {
-        getM3u8Content();
-    }
+    // 获取 当前tabId
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        tabId = tabs[0].id;
+        // 修改Referer
+        if (m3u8_referer && m3u8_referer != undefined && m3u8_referer != "") {
+            setReferer(m3u8_referer);
+        }
+        file_name ? downloadFile() : getM3u8Content();
+    });
 
     // 辅助下载文件
     function downloadFile(){
@@ -87,12 +88,12 @@ $(function () {
         });
     }
 
-    // 修改tReferer
+    // 修改Referer
     function setReferer(referer) {
         chrome.declarativeNetRequest.updateSessionRules({
-            removeRuleIds: [G.tabId],
+            removeRuleIds: [tabId],
             addRules: [{
-                "id": G.tabId,
+                "id": tabId,
                 "action": {
                     "type": "modifyHeaders",
                     "requestHeaders": [{
@@ -102,7 +103,7 @@ $(function () {
                     }]
                 },
                 "condition": {
-                    "tabIds": [G.tabId],
+                    "tabIds": [tabId],
                     "resourceTypes": ["xmlhttprequest"]
                 }
             }]
@@ -235,6 +236,10 @@ $(function () {
         if (ExistKey) { $("#tips").show(); }
         $("#count").html("共" + count + "个文件");
         $('#loading').hide();
+
+        if($("#next_m3u8 a").length == 1){
+            $("#next_m3u8 a")[0].click();
+        }
     }
 
     //格式化
