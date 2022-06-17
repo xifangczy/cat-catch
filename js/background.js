@@ -126,7 +126,7 @@ function findMedia(data, isRegex = false, filter = false) {
             }
         }
         if (data.initiator == undefined || data.initiator == "null") {
-            data.initiator = webInfo.url;
+            data.initiator = webInfo?.url;
         }
         const info = {
             name: name,

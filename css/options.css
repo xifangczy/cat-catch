@@ -206,3 +206,16 @@ textarea {
 #errorTsList p{
   color: red;
 }
+
+.progress-bar{
+  height: 15px;
+  background-color: rgb(189, 193, 198);
+  border-radius: 3px;
+  margin: 3px;
+}
+.progress{
+  width: 0px;
+  height: 100%;
+  background-color: rgb(26, 115, 232);
+  border-radius: 3px;
+}

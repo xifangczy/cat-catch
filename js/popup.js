@@ -127,7 +127,7 @@ function AddMedia(data) {
                     const blank = canvas.toDataURL('image/jpeg');
                     canvas.getContext('2d').drawImage(this, 0, 0, this.videoWidth, this.videoHeight);
                     const image = canvas.toDataURL('image/jpeg');
-                    if (image != blank) { 
+                    if (image != blank) {
                         html.find("#player").length == 0 && screenshots.css("display", "block");
                         screenshots.attr("src", canvas.toDataURL('image/jpeg'));
                     }
@@ -168,6 +168,12 @@ function AddMedia(data) {
         chrome.downloads.download({
             url: data.url,
             filename: downFileName
+        });
+        // 监听下载 下载失败 传递referer重试下载
+        chrome.downloads.onChanged.addListener(function (DownloadItem) {
+            if (DownloadItem.error) {
+                chrome.tabs.create({ url: `/m3u8.html?m3u8_url=${encodeURIComponent(data.url)}&referer=${encodeURIComponent(data.initiator)}&filename=${encodeURIComponent(downFileName)}` });
+            }
         });
         return false;
     });

@@ -1,15 +1,16 @@
-$(function(){
+$(function () {
     //获取m3u8_url
     var m3u8_url = new RegExp("[?]m3u8_url=([^\n&]*)").exec(window.location.href)[1];
     m3u8_url = decodeURIComponent(m3u8_url);
-    var m3u8_referer = new RegExp("referer=([^\n&]*)").exec(window.location.href);
-    var m3u8_title = new RegExp("title=([^\n&]*)").exec(window.location.href);
-    if (m3u8_referer) {
-        m3u8_referer = decodeURIComponent(m3u8_referer[1]);
-    }
-    if (m3u8_title) {
-        m3u8_title = decodeURIComponent(m3u8_title[1]);
-    }
+
+    var m3u8_referer = new RegExp("&referer=([^\n&]*)").exec(window.location.href);
+    m3u8_referer = m3u8_referer ? decodeURIComponent(m3u8_referer[1]) : undefined;
+
+    var m3u8_title = new RegExp("&title=([^\n&]*)").exec(window.location.href);
+    m3u8_title = m3u8_title ? decodeURIComponent(m3u8_title[1]) : undefined;
+
+    var file_name = new RegExp("&filename=([^\n&]*)").exec(window.location.href);
+    file_name = file_name ? decodeURIComponent(file_name[1]) : undefined;
 
     //获取m3u8参数
     var m3u8_arg = new RegExp("\\.m3u8\\?([^\n]*)").exec(m3u8_url);
@@ -33,20 +34,58 @@ $(function(){
     if (m3u8_referer && m3u8_referer != undefined && m3u8_referer != "") {
         setReferer(m3u8_referer);
     }
-    $.ajax({
-        async: true,
-        url: m3u8_url
-    }).fail(function () {
-        $("#loading").show();
-        $("#m3u8").hide();
-        $("#loading .optionBox").html(`获取m3u8内容失败, 请尝试手动下载 <a href="${m3u8_url}">${m3u8_url}</a>`);
-    }).done(function (result) {
-        $("#m3u8").show();
-        BasePath = getManifestUrlBase();
-        RootPath = getManifestUrlRoot();
-        m3u8_content = result;
-        show_list();
-    });
+    if (file_name) {
+        downloadFile();
+    } else {
+        getM3u8Content();
+    }
+
+    // 辅助下载文件
+    function downloadFile(){
+        $("#loading").hide();
+        $("#downfile").show();
+        $("#downFilepProgress").html("后台下载中...");
+        $.ajax({
+            url: m3u8_url,
+            xhrFields: { responseType: "blob" },
+            xhr: function() {
+                let xhr = new XMLHttpRequest();
+                xhr.addEventListener("progress", function (evt) {
+                    let progress = Math.round(evt.loaded / evt.total * 10000) / 100.00 + "%";
+                    $("#downFilepProgress").html(progress);
+                    $(".progress").css("width", progress);
+                });
+                return xhr;
+            }
+        }).fail(function (result) {
+            $("#downFilepProgress").html("下载失败... " + JSON.stringify(result));
+        }).done(function (result) {
+            $("#downFilepProgress").html("下载完成，正在保存到硬盘...");
+            chrome.downloads.download({
+                url: URL.createObjectURL(result),
+                filename: file_name,
+                saveAs: true
+            });
+        });
+    }
+
+    // 下载m3u8内容
+    function getM3u8Content() {
+        $.ajax({
+            async: true,
+            url: m3u8_url
+        }).fail(function () {
+            $("#loading").show();
+            $("#m3u8").hide();
+            $("#loading .optionBox").html(`获取m3u8内容失败, 请尝试手动下载 <a href="${m3u8_url}">${m3u8_url}</a>`);
+        }).done(function (result) {
+            $("#m3u8").show();
+            BasePath = getManifestUrlBase();
+            RootPath = getManifestUrlRoot();
+            m3u8_content = result;
+            show_list();
+        });
+    }
 
     // 修改tReferer
     function setReferer(referer) {
