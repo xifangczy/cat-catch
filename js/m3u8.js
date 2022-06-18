@@ -333,7 +333,8 @@ $(function () {
                 let tsIndex = tsCount - tsList.length; // 当前下载的ts序号
                 $.ajax({
                     url: tsUrl,
-                    xhrFields: { responseType: "arraybuffer" }
+                    xhrFields: { responseType: "arraybuffer" },
+                    timeout: 20000
                 }).fail(function () {
                     if(stopDownload){ return; }
                     ErrorTsList(tsIndex);
@@ -362,7 +363,8 @@ $(function () {
             let url = tsLists[tsIndex];
             $.ajax({
                 url: url,
-                xhrFields: { responseType: "arraybuffer" }
+                xhrFields: { responseType: "arraybuffer" },
+                timeout: 30000
             }).fail(function () {
                 html.find("button").html("下载失败, 继续重新下载");
             }).done(function (responseData) {

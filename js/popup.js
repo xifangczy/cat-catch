@@ -29,6 +29,7 @@ function AddMedia(data) {
     if (data.ext === undefined && data.type !== undefined) {
         data.ext = data.type.split("/")[1];
     }
+    data.title = stringModify(data.title);
 
     //文件名是否为空
     if (data.name === undefined || data.name == '') {
@@ -44,7 +45,7 @@ function AddMedia(data) {
 
     //添加下载文件名
     let downFileName = G.Options.TitleName ? data.title + '.' + data.ext : data.name;
-    downFileName = stringModify(downFileName);
+
 
     // 文件大小单位转换
     if (data.size) {
@@ -97,7 +98,7 @@ function AddMedia(data) {
                 <img src="img/download.png" class="ico" id="download" title="下载"/>
             </div>
             <div class="url hide">
-                ${data.title ? `标题: ${stringModify(data.title)}<br>` : ""}
+                ${data.title ? `标题: ${data.title}<br>` : ""}
                 ${data.type ? `MIME:  ${data.type}<br>` : ""}
                 <div id="duration"></div>
                 <a href="${data.url}" target="_blank" download="${downFileName}">${data.url}</a>
