@@ -324,7 +324,7 @@ $(function () {
             }
             script.onload = function() {
                 const hls = new Hls();
-                hls.loadSource(url);
+                hls.loadSource(m3u8_url);
                 hls.attachMedia(video);
                 video.play();
             }
