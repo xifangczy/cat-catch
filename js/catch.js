@@ -1,5 +1,5 @@
 (function () {
-    console.log("catch.js");
+    console.log("catch.js Start");
     // 添加html
     if (document.getElementById("CatCatch")) {
         return;
@@ -32,7 +32,6 @@
     cat.addEventListener('click', function (event) {
         isMove = !isMove;
         if (isMove) {
-            console.log("catchDownload");
             catchDownload();
             isMove = false;
         }
@@ -70,7 +69,6 @@
 
     let _endOfStream = window.MediaSource.prototype.endOfStream;
     window.MediaSource.prototype.endOfStream = function () {
-        console.log("捕获完成");
         isComplete = true;
         cat.innerHTML = `${icon}捕获完成<br>点击下载`;
         _endOfStream.call(this);
