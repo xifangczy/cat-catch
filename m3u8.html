@@ -11,6 +11,16 @@
   <body>
     <div class="m3u8_wrapper">
 
+      <section id="getURL" class="hide">
+        <h1 class="optionsTitle">m3u8解析器</h1>
+        <span class="explain">如果填入非m3u8文件, 解析器会尝试修改referer后下载文件</span>
+        <div  class="optionBox">
+          <input type="text" id="url" placeholder="请输入 URL" style="width: 965px;margin: 5px;"/>
+          <input type="text" id="referer" placeholder="请输入 请求头referer参数" style="width: 965px;margin: 5px;"/>
+          <button id="getURL_btn" type="button">获取</button>
+        </div>
+      </section>
+
       <section id="downfile" class="hide">
         <h1 class="optionsTitle">常规下载失败，开始辅助下载</h1>
         <div class="optionBox">
@@ -52,17 +62,18 @@
             <p id="count"></p>
           </div>
           
-          <div class="block">
+          <div class="block" id="textarea">
             <textarea rows="50" cols="160" id="media_file" spellcheck="false"></textarea>
           </div>
 
           <div class="block" id="button">
             <button id="DownText">下载显示的内容</button>
-            <button id="UrlDecode">UrlDecode解码</button>
+            <button id="UrlDecode">Url解码</button>
             <input type="text" value='wget "$url$"' id="formatStr" spellcheck="false" />
             <button id="format">自定义格式化</button>
             <button id="DownFixm3u8">格式化成本地m3u8</button>
             <button id="Refresh">还原</button>
+            <button id="play" data-switch="on">播放m3u8</button>
             <br>
             下载线程数 <input type="number" value='10' id="thread" spellcheck="false" style="width: 35px;"/>
             <button id="AllDownload">尝试下载并合并ts</button> 

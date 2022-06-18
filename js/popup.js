@@ -94,7 +94,7 @@ function AddMedia(data) {
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
                 <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
                 <img src="img/parsing.png" class="ico ${isM3U8(data) ? "" : "hide"}" id="m3u8" title="解析"/>
-                <img src="img/${G.Options.Potplayer ? "potplayer.png" : "play.png"}" class="ico ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
+                <img src="img/${G.Options.Potplayer ? "potplayer.png" : "play.png"}" class="ico ${isPlay(data) || isM3U8(data) ? "" : "hide"}" id="play" title="预览"/>
                 <img src="img/download.png" class="ico" id="download" title="下载"/>
             </div>
             <div class="url hide">
@@ -187,12 +187,24 @@ function AddMedia(data) {
     html.find('#play').click(function () {
         if (G.Options.Potplayer) {
             window.open('potplayer://' + data.url);
-        } else {
-            html.find("#screenshots").hide();
-            $('#player video').attr('src', data.url);
-            $('#player video').trigger('play');
-            $('#player').show();
-            $('#player').appendTo(html);
+            return false;
+        }
+        html.find("#screenshots").hide();
+        $('#player video').attr('src', data.url);
+        $('#player video').trigger('play');
+        $('#player').show();
+        $('#player').appendTo(html);
+        if (isM3U8(data)) {
+            const script = document.createElement('script');
+            script.src = "js/hls.min.js"
+            document.body.appendChild(script);
+            script.onload = function() {
+                const hls = new Hls();
+                const video = $('#player video')[0];
+                hls.loadSource(data.url);
+                hls.attachMedia(video);
+                video.play();
+            }
         }
         return false;
     });
@@ -293,7 +305,7 @@ $(function () {
     // 获取模拟手机 自动下载 捕获 状态
     chrome.runtime.sendMessage({ Message: "getButtonState", tabId: G.tabId }, function (state) {
         if (state.mobile) {
-            $("#MobileUserAgent").html("关闭手机模拟");
+            $("#MobileUserAgent").html("关闭模拟");
             $("#MobileUserAgent").data("switch", "off");
         }
         if (state.autodown) {
@@ -308,10 +320,10 @@ $(function () {
     $("#MobileUserAgent").click(function () {
         let action = $(this).data("switch");
         if (action == "on") {
-            $("#MobileUserAgent").html("关闭手机模拟");
+            $("#MobileUserAgent").html("关闭模拟");
             $("#MobileUserAgent").data("switch", "off");
         } else {
-            $("#MobileUserAgent").html("模拟手机端");
+            $("#MobileUserAgent").html("模拟手机");
             $("#MobileUserAgent").data("switch", "on");
         }
         chrome.runtime.sendMessage({ Message: "mobileUserAgent", tabId: G.tabId, action: action }, function () {

@@ -1,7 +1,7 @@
 $(function () {
     //获取m3u8_url
-    var m3u8_url = new RegExp("[?]m3u8_url=([^\n&]*)").exec(window.location.href)[1];
-    m3u8_url = decodeURIComponent(m3u8_url);
+    var m3u8_url = new RegExp("[?]m3u8_url=([^\n&]*)").exec(window.location.href);
+    m3u8_url = m3u8_url ? decodeURIComponent(m3u8_url[1]) : undefined;
 
     var m3u8_referer = new RegExp("&referer=([^\n&]*)").exec(window.location.href);
     m3u8_referer = m3u8_referer ? decodeURIComponent(m3u8_referer[1]) : undefined;
@@ -24,7 +24,6 @@ $(function () {
     var RootPath;
     var m3u8_content;
     var tsLists = [];    //储存所有ts链接
-    var m3u8FileName = GetFileName(m3u8_url);
     var expandKey = false;
     var m3u8IV = "";
     var isEncrypted = false;    //是否加密的m3u8
@@ -35,10 +34,27 @@ $(function () {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         tabId = tabs[0].id;
         // 修改Referer
-        if (m3u8_referer && m3u8_referer != undefined && m3u8_referer != "") {
+        if (m3u8_referer && m3u8_referer != undefined && m3u8_referer != "" && m3u8_referer != "undefined") {
             setReferer(m3u8_referer);
         }
-        file_name ? downloadFile() : getM3u8Content();
+        if (!m3u8_url) {
+            $("#getURL").show();
+            $("#loading").hide();
+            $("#getURL_btn").click(function () {
+                const url = $("#getURL #url").val();
+                const referer = $("#getURL #referer").val();
+                window.location.href = `?m3u8_url=${encodeURIComponent(url)}&referer=${encodeURIComponent(referer)}`;
+            });
+            return;
+        }
+        if (file_name || !m3u8_url.includes(".m3u8")) {
+            if (file_name == "" || file_name == undefined || file_name == "undefined") {
+                file_name = GetFileName(m3u8_url, true);
+            }
+            downloadFile();
+            return;
+        }
+        getM3u8Content();
     });
 
     // 辅助下载文件
@@ -111,7 +127,7 @@ $(function () {
     }
 
     // 获得m3u8文件名
-    function GetFileName(url) {
+    function GetFileName(url, ext = false) {
         if (G.Options.TitleName && m3u8_title) {
             return m3u8_title;
         }
@@ -119,6 +135,7 @@ $(function () {
         let str = url.split("?");
         str = str[0].split("/");
         str = str[str.length - 1].split("#")[0];
+        if (ext) { return str; }
         str = str.split(".");
         str.pop();
         return str.join(".");
@@ -220,7 +237,7 @@ $(function () {
                     $("button").hide();
                     $("#more_m3u8").show();
                     $("#next_m3u8").append(
-                        `<p><a href="/m3u8.html?m3u8_url=${encodeURIComponent(line)}&referer=${encodeURIComponent(m3u8_referer)}&title=${encodeURIComponent(m3u8_title)}">${GetFile(line)}</a></p>`
+                        `<p><a href="/m3u8.html?m3u8_url=${encodeURIComponent(line)}&referer=${encodeURIComponent(m3u8_referer)}&title=${m3u8_title ? encodeURIComponent(m3u8_title) : ""}">${GetFile(line)}</a></p>`
                     );
                     continue;
                 }
@@ -292,6 +309,34 @@ $(function () {
         $("#media_file").val(textarea);
     });
 
+    // 播放m3u8
+    $("#play").click(function () {
+        if($(this).data("switch") == "on"){
+            const script = document.createElement('script');
+            script.src = "js/hls.min.js"
+            document.body.appendChild(script);
+            script.onload = function() {
+                const video = $('<video />', {
+                    controls: true,
+                    width: "100%"
+                })[0];
+                const hls = new Hls();
+                hls.loadSource(m3u8_url);
+                hls.attachMedia(video);
+                $("#textarea textarea").hide();
+                $("#textarea").append(video);
+                video.play();
+                $("#play").html("关闭播放");
+                $("#play").data("switch", "off");
+            };
+            return;
+        }
+        $("video").remove();
+        $("textarea").show();
+        $("#play").html("播放m3u8");
+        $("#play").data("switch", "on");
+    });
+
     // 下载m3u8并合并
     var isComplete = false; // 是否下载完成
     var errorTsList = [];   // 下载错误的ts序号
@@ -311,7 +356,7 @@ $(function () {
         let tsList = [...tsLists]; // ts列表
         let tsCount = tsList.length - 1; // ts总数量
         let tsInterval = setInterval(function () {
-            if(stopDownload){
+            if (stopDownload) {
                 clearInterval(tsInterval);
                 $("#progress").html(stopDownload);
             }
@@ -336,12 +381,12 @@ $(function () {
                     xhrFields: { responseType: "arraybuffer" },
                     timeout: 20000
                 }).fail(function () {
-                    if(stopDownload){ return; }
+                    if (stopDownload) { return; }
                     ErrorTsList(tsIndex);
                     errorTsList.push(tsIndex);
                     tsThread++;
                 }).done(function (responseData) {
-                    if(stopDownload){ return; }
+                    if (stopDownload) { return; }
                     tsBuffer[tsIndex] = tsDecrypt(responseData, tsIndex);
                     $("#progress").html(`${successCount++}/${tsCount + 1}`);
                     tsThread++;
@@ -396,19 +441,19 @@ $(function () {
         let fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });
         chrome.downloads.download({
             url: URL.createObjectURL(fileBlob),
-            filename: `${m3u8FileName}.ts`
+            filename: `${GetFileName(m3u8_url)}.ts`
         });
         $("#progress").html(`下载中...`);
     }
 
     // 解密ts文件
     function tsDecrypt(responseData, tsIndex) {
-        if(!isEncrypted){
+        if (!isEncrypted) {
             return responseData;
         }
         if (expandKey) {
             let iv = m3u8IV || new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, tsIndex]);
-            try{
+            try {
                 return decryptor.decrypt(responseData, 0, iv.buffer || iv, true);
             } catch (e) {
                 stopDownload = "解密出错，无法解密.";
