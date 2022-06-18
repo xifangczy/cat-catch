@@ -37,38 +37,28 @@ function findMedia(data, isRegex = false, filter = false) {
         G.Options.Type === undefined ||
         G.Options.Regex === undefined
     ) { return; }
-    //屏蔽特殊页面发起的资源
-    let urlParsing = new Object();
-    if (data.initiator != "null" && data.initiator !== undefined) {
-        urlParsing = new URL(data.initiator);
-        if (urlParsing.protocol == "chrome-extension:" ||
-            urlParsing.protocol == "chrome:" ||
-            urlParsing.protocol == "extension:") { return; }
-    }
-    //屏蔽特殊页面的资源
-    urlParsing = new URL(data.url);
-    if (urlParsing.protocol == "chrome-extension:" ||
-        urlParsing.protocol == "chrome:" ||
-        urlParsing.protocol == "extension:") { return; }
-    //屏蔽Youtube
+    // 屏蔽特殊页面发起的资源
+    if (data.initiator != "null" &&
+        data.initiator != undefined &&
+        isSpecialPage(data.initiator)) { return; }
+    // 屏蔽特殊页面的资源
+    if (isSpecialPage(data.url)) { return; }
+    // 屏蔽Youtube
+    let urlParsing = new URL(data.url);
     if (
         urlParsing.host.includes("youtube.com") ||
         urlParsing.host.includes("googlevideo.com")
     ) { return; }
-    //调试模式
+    // 调试模式
     if (G.Options.Debug) {
-        console.log(data, isRegex);
+        console.log({data, G, isRegex});
     }
     // 获取网页信息
     let title = "NULL";
     let webInfo = undefined;
-    if (data.tabId !== -1) {
-        chrome.tabs.get(data.tabId, function (info) {
-            if (info !== undefined) {
-                title = info.title;
-                webInfo = info;
-            }
-        });
+    if (data.tabId !== -1 && G.tabInfo) {
+        webInfo = G.tabInfo;
+        title = G.tabTitle;
     }
 
     const header = getHeaderValue(data);
@@ -227,23 +217,37 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
             SetIcon({ tabId: G.tabId });
         }
     });
+    chrome.tabs.get(activeInfo.tabId, function (info) {
+        if (info) {
+            G.tabInfo = info;
+            G.tabTitle = info.title;
+        }
+    });
 });
 // 标签更新 清除数据
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    // 刷新页面 清理数据
     if (changeInfo.status == "loading") {
         chrome.storage.local.get({ MediaData: {} }, function (items) {
             delete items.MediaData["tabId" + tabId];
             chrome.storage.local.set({ MediaData: items.MediaData });
             SetIcon({ tabId: tabId });
         });
+    }
+    // 跳过特殊页面
+    urlParsing = new URL(tab.url);
+    if (urlParsing.protocol == "chrome-extension:" ||
+        urlParsing.protocol == "chrome:" ||
+        urlParsing.protocol == "about:" ||
+        urlParsing.protocol == "extension:") { return; }
+
+    if (changeInfo.status == "loading") {
         // 开启捕获
         if (G.TabIdList.Catch.includes(tabId)) {
             let injectScript = G.Options.injectScript ? "js/" + G.Options.injectScript : "js/catch.js";
             chrome.scripting.executeScript(
                 {
                     target: { tabId: tabId, allFrames: true },
-                    // files: ["js/catch.js"],
-                    // files: ["js/recorder.js"],
                     files: [injectScript],
                     injectImmediately: true,
                     world: "MAIN"
@@ -264,6 +268,13 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
                 }
             );
         }
+    }
+    // 载入网页信息
+    if (changeInfo.status == "loading" || changeInfo.status == "complete") {
+        G.tabInfo = tab;
+    }
+    if (changeInfo.title) {
+        G.tabTitle = changeInfo.title;
     }
 });
 // 标签关闭 清除数据
@@ -409,5 +420,15 @@ function tabIdListRemove(str, tabId) {
         G.TabIdList[str].splice(index, 1);
         return true;
     }
+    return false;
+}
+
+// 判断特殊页面
+function isSpecialPage(url) {
+    const urlParsing = new URL(url);
+    if (urlParsing.protocol == "chrome-extension:" ||
+        urlParsing.protocol == "chrome:" ||
+        urlParsing.protocol == "about:" ||
+        urlParsing.protocol == "extension:") { return true; }
     return false;
 }

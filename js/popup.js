@@ -96,7 +96,7 @@ function AddMedia(data) {
                 <img src="img/download.png" class="ico" id="download" title="下载"/>
             </div>
             <div class="url hide">
-                ${data.webInfo ? `标题: ${data.webInfo.title}<br>` : ""}
+                ${data.title ? `标题: ${data.title}<br>` : ""}
                 ${data.type ? `MIME:  ${data.type}<br>` : ""}
                 <div id="duration"></div>
                 <a href="${data.url}" target="_blank" download="${downFileName}">${data.url}</a>
@@ -196,7 +196,7 @@ function AddMedia(data) {
     });
     //解析m3u8
     html.find('#m3u8').click(function () {
-        let title = encodeURIComponent(data.webInfo.title);
+        let title = encodeURIComponent(data.title);
         let url = encodeURIComponent(data.url);
         let initiator = encodeURIComponent(data.initiator);
         chrome.tabs.create({ url: `/m3u8.html?m3u8_url=${url}&referer=${initiator}&title=${title}` });

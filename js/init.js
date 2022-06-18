@@ -5,6 +5,12 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     if (tabs[0] && tabs[0].id) {
         G.tabId = tabs[0].id;
         G.tabIdStr = "tabId" + tabs[0].id;
+        chrome.tabs.get(tabs[0].id, function (info) {
+            if(info){
+                G.tabInfo = info;
+                G.tabTitle = info.title;
+            }
+        });
     }
 });
 //设置参数
