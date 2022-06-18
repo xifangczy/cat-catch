@@ -25,7 +25,7 @@ $(function () {
     var m3u8_content;
     var tsLists = [];    //储存所有ts链接
     var m3u8FileName = GetFileName(m3u8_url);
-    var m3u8KEY = "";
+    var expandKey = false;
     var m3u8IV = "";
     var isEncrypted = false;    //是否加密的m3u8
     const decryptor = new AESDecryptor(); //解密工具
@@ -42,14 +42,14 @@ $(function () {
     });
 
     // 辅助下载文件
-    function downloadFile(){
+    function downloadFile() {
         $("#loading").hide();
         $("#downfile").show();
         $("#downFilepProgress").html("后台下载中...");
         $.ajax({
             url: m3u8_url,
             xhrFields: { responseType: "blob" },
-            xhr: function() {
+            xhr: function () {
                 let xhr = new XMLHttpRequest();
                 xhr.addEventListener("progress", function (evt) {
                     let progress = Math.round(evt.loaded / evt.total * 10000) / 100.00 + "%";
@@ -190,9 +190,14 @@ $(function () {
                         url: KeyURL,
                         xhrFields: { responseType: "arraybuffer" }
                     }).done(function (responseData) {
-                        m3u8KEY = responseData;
-                        decryptor.expandKey(responseData);
                         isEncrypted = true;
+                        try {
+                            decryptor.expandKey(responseData);
+                            expandKey = true;
+                        } catch (e) {
+                            expandKey = false;
+                            console.log(e);
+                        }
                     });
                 }
             }
@@ -237,7 +242,7 @@ $(function () {
         $("#count").html("共" + count + "个文件");
         $('#loading').hide();
 
-        if($("#next_m3u8 a").length == 1){
+        if ($("#next_m3u8 a").length == 1) {
             $("#next_m3u8 a")[0].click();
         }
     }
@@ -292,6 +297,7 @@ $(function () {
     var errorTsList = [];   // 下载错误的ts序号
     var tsBuffer = [];     // ts缓存
     var successCount = 1; // 已下载数量
+    var stopDownload = false; // 停止下载
     $("#AllDownload").click(function () {
         if (isComplete) {
             downloadAllTs();
@@ -305,6 +311,10 @@ $(function () {
         let tsList = [...tsLists]; // ts列表
         let tsCount = tsList.length - 1; // ts总数量
         let tsInterval = setInterval(function () {
+            if(stopDownload){
+                clearInterval(tsInterval);
+                $("#progress").html(stopDownload);
+            }
             if (tsList.length == 0 && tsThread == parseInt($("#thread").val())) {
                 isComplete = m3u8Complete();
                 if (isComplete) {
@@ -325,10 +335,12 @@ $(function () {
                     url: tsUrl,
                     xhrFields: { responseType: "arraybuffer" }
                 }).fail(function () {
+                    if(stopDownload){ return; }
                     ErrorTsList(tsIndex);
                     errorTsList.push(tsIndex);
                     tsThread++;
                 }).done(function (responseData) {
+                    if(stopDownload){ return; }
                     tsBuffer[tsIndex] = tsDecrypt(responseData, tsIndex);
                     $("#progress").html(`${successCount++}/${tsCount + 1}`);
                     tsThread++;
@@ -389,11 +401,20 @@ $(function () {
 
     // 解密ts文件
     function tsDecrypt(responseData, tsIndex) {
-        if (isEncrypted) {
-            let iv = m3u8IV || new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, tsIndex]);
-            return decryptor.decrypt(responseData, 0, iv.buffer || iv, true);
+        if(!isEncrypted){
+            return responseData;
         }
-        return responseData;
+        if (expandKey) {
+            let iv = m3u8IV || new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, tsIndex]);
+            try{
+                return decryptor.decrypt(responseData, 0, iv.buffer || iv, true);
+            } catch (e) {
+                stopDownload = "解密出错，无法解密.";
+                console.log(e);
+            }
+        } else {
+            stopDownload = "密钥错误，无法解密.";
+        }
     }
 
     // 验证ts文件是否完整

@@ -118,6 +118,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 // chrome.runtime.onInstalled.addListener(function (details) {
 //     if(details.reason == "update"){
 //         chrome.storage.sync.clear();
+//         chrome.storage.local.clear();
 //         InitOptions()
 //     }
 // });

@@ -44,6 +44,7 @@ function AddMedia(data) {
 
     //添加下载文件名
     let downFileName = G.Options.TitleName ? data.title + '.' + data.ext : data.name;
+    downFileName = stringModify(downFileName);
 
     // 文件大小单位转换
     if (data.size) {
@@ -96,7 +97,7 @@ function AddMedia(data) {
                 <img src="img/download.png" class="ico" id="download" title="下载"/>
             </div>
             <div class="url hide">
-                ${data.title ? `标题: ${data.title}<br>` : ""}
+                ${data.title ? `标题: ${stringModify(data.title)}<br>` : ""}
                 ${data.type ? `MIME:  ${data.type}<br>` : ""}
                 <div id="duration"></div>
                 <a href="${data.url}" target="_blank" download="${downFileName}">${data.url}</a>
@@ -379,4 +380,21 @@ function UItoggle() {
 
 function Tips(text, delay = 200) {
     $('#TipsFixed').html(text).fadeIn(500).delay(delay).fadeOut(500);
+}
+
+function stringModify(str){
+    return str.replace(/['\\:\*\?"<\/>\|]/g, function (m) {
+        return {
+            "'": '&#39;',
+            '\\': '&#92;',
+            '/': '&#47;',
+            ':': '&#58;',
+            '*': '&#42;',
+            '?': '&#63;',
+            '"': '&quot;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '|': '&#124;'
+        }[m];
+    });
 }
