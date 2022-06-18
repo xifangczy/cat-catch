@@ -270,6 +270,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
         }
     }
     // 载入网页信息
+    if(G.tabId != tabId){ return; }
     if (changeInfo.status == "loading" || changeInfo.status == "complete") {
         G.tabInfo = tab;
     }
