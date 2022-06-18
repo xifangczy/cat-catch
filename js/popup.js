@@ -194,17 +194,22 @@ function AddMedia(data) {
         $('#player video').trigger('play');
         $('#player').show();
         $('#player').appendTo(html);
-        if (isM3U8(data)) {
-            const script = document.createElement('script');
+        if (!isM3U8(data)) { return false; }
+        let script = {};
+        if (typeof Hls === "undefined") {
+            script = document.createElement('script');
             script.src = "js/hls.min.js"
             document.body.appendChild(script);
-            script.onload = function() {
-                const hls = new Hls();
-                const video = $('#player video')[0];
-                hls.loadSource(data.url);
-                hls.attachMedia(video);
-                video.play();
-            }
+        }
+        script.onload = function() {
+            const hls = new Hls();
+            let video = $('#player video')[0];
+            hls.loadSource(data.url);
+            hls.attachMedia(video);
+            video.play();
+        }
+        if (typeof Hls === "function") {
+            script.onload();
         }
         return false;
     });
@@ -395,7 +400,7 @@ function Tips(text, delay = 200) {
     $('#TipsFixed').html(text).fadeIn(500).delay(delay).fadeOut(500);
 }
 
-function stringModify(str){
+function stringModify(str) {
     return str.replace(/['\\:\*\?"<\/>\|]/g, function (m) {
         return {
             "'": '&#39;',

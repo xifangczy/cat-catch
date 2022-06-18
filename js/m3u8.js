@@ -312,23 +312,30 @@ $(function () {
     // 播放m3u8
     $("#play").click(function () {
         if($(this).data("switch") == "on"){
-            const script = document.createElement('script');
-            script.src = "js/hls.min.js"
-            document.body.appendChild(script);
+            const video = $('<video />', {
+                controls: true,
+                width: "100%"
+            })[0];
+            let script = {};
+            if (typeof Hls === "undefined") {
+                script = document.createElement('script');
+                script.src = "js/hls.min.js"
+                document.body.appendChild(script);
+            }
             script.onload = function() {
-                const video = $('<video />', {
-                    controls: true,
-                    width: "100%"
-                })[0];
                 const hls = new Hls();
-                hls.loadSource(m3u8_url);
+                hls.loadSource(url);
                 hls.attachMedia(video);
-                $("#textarea textarea").hide();
-                $("#textarea").append(video);
                 video.play();
-                $("#play").html("关闭播放");
-                $("#play").data("switch", "off");
-            };
+            }
+            if (typeof Hls === "function") {
+                script.onload();
+            }
+            $("#textarea textarea").hide();
+            $("#textarea").append(video);
+            video.play();
+            $("#play").html("关闭播放");
+            $("#play").data("switch", "off");
             return;
         }
         $("video").remove();

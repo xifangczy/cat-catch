@@ -8,6 +8,8 @@
 
 [Added] m3u8解析增强，现在能合并下载m3u8文件，通过修改Referer能够下载更多文件。
 
+[Added] popup页面和m3u8页面可以在线预览m3u8
+
 ### 1.0.25
 [Changed] 正则匹配增强
 
