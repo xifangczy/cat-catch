@@ -19,6 +19,7 @@ $(function () {
     }
 
     $("#m3u8_url").attr("href", m3u8_url).html(m3u8_url);
+    $("#CatCatch").hide();
 
     var BasePath;
     var RootPath;
@@ -31,6 +32,7 @@ $(function () {
     var tabId;
     var mediaDuration = 0;  // 视频总时长
     var isLive = true; // 是否是直播
+    var hls = {};
 
     // 获取 当前tabId
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -263,6 +265,9 @@ $(function () {
                 textarea = textarea + line + "\n";
             }
         }
+        if(isLive){
+            $("#CatCatch").show();
+        }
         $("#media_file").val(textarea);
         if (ExistKey) { $("#tips").show(); }
         $("#count").html("共" + count + "个文件" + "，总时长: " + secToTime(mediaDuration));
@@ -334,8 +339,9 @@ $(function () {
                 script.src = "js/hls.min.js"
                 document.body.appendChild(script);
             }
+            
             script.onload = function () {
-                const hls = new Hls();
+                hls = new Hls();
                 hls.loadSource(m3u8_url);
                 hls.attachMedia(video);
                 video.play();
@@ -350,6 +356,7 @@ $(function () {
             $("#play").data("switch", "off");
             return;
         }
+        hls.destroy();
         $("video").remove();
         $("textarea").show();
         $("#play").html("播放m3u8");
