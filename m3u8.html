@@ -75,8 +75,9 @@
             <button id="Refresh">还原</button>
             <button id="play" data-switch="on">播放m3u8</button>
             <br>
-            下载线程数 <input type="number" value='10' id="thread" spellcheck="false" style="width: 35px;"/>
-            <button id="AllDownload">尝试下载并合并ts</button> 
+            <div style="display: inline;" id="threadDiv">下载线程数 <input type="number" value='10' id="thread" spellcheck="false" style="width: 35px;"/></div>
+            <!-- <div id="secDiv" class="hide">录制 分段保存<input type="number" value='3600' id="liveSec" spellcheck="false" style="width: 50px;"/>秒</div> -->
+            <button id="AllDownload">下载并合并ts</button> 
             <button id="ForceDownload" class="hide">强制下载已有数据</button> 
             <div id="progress"></div>
 

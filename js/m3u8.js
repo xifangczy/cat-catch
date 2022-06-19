@@ -29,6 +29,8 @@ $(function () {
     var isEncrypted = false;    //是否加密的m3u8
     const decryptor = new AESDecryptor(); //解密工具
     var tabId;
+    var mediaDuration = 0;  // 视频总时长
+    var isLive = true; // 是否是直播
 
     // 获取 当前tabId
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -47,14 +49,13 @@ $(function () {
             });
             return;
         }
-        if (file_name || !m3u8_url.includes(".m3u8")) {
-            if (file_name == "" || file_name == undefined || file_name == "undefined") {
-                file_name = GetFileName(m3u8_url, true);
-            }
-            downloadFile();
+        if (m3u8_title || m3u8_url.includes(".m3u8")) {
+            getM3u8Content();
             return;
         }
-        getM3u8Content();
+        file_name = GetFileName(m3u8_url, true);
+        downloadFile();
+        return;
     });
 
     // 辅助下载文件
@@ -208,6 +209,8 @@ $(function () {
                         xhrFields: { responseType: "arraybuffer" }
                     }).done(function (responseData) {
                         isEncrypted = true;
+                        let count = $("#count").html();
+                        $("#count").html(count + " (加密HLS)");
                         try {
                             decryptor.expandKey(responseData);
                             expandKey = true;
@@ -225,6 +228,12 @@ $(function () {
                     m3u8IV = KeyIV[1];
                     $("#tips").append('#IV: <input type="text" value="' + KeyIV[1] + '" spellcheck="false">');
                 }
+            }
+            if (line.includes("#EXTINF:")) {
+                mediaDuration += parseFloat(/#EXTINF:([^,]*)/.exec(line)[1]);
+            }
+            if (line.includes("#EXT-X-ENDLIST")) {
+                isLive = false;
             }
 
             //ts文件
@@ -256,7 +265,10 @@ $(function () {
         }
         $("#media_file").val(textarea);
         if (ExistKey) { $("#tips").show(); }
-        $("#count").html("共" + count + "个文件");
+        $("#count").html("共" + count + "个文件" + "，总时长: " + secToTime(mediaDuration));
+        if (isLive) {
+            $("#count").html("直播HLS");
+        }
         $('#loading').hide();
 
         if ($("#next_m3u8 a").length == 1) {
@@ -311,7 +323,7 @@ $(function () {
 
     // 播放m3u8
     $("#play").click(function () {
-        if($(this).data("switch") == "on"){
+        if ($(this).data("switch") == "on") {
             const video = $('<video />', {
                 controls: true,
                 width: "100%"
@@ -322,7 +334,7 @@ $(function () {
                 script.src = "js/hls.min.js"
                 document.body.appendChild(script);
             }
-            script.onload = function() {
+            script.onload = function () {
                 const hls = new Hls();
                 hls.loadSource(m3u8_url);
                 hls.attachMedia(video);
@@ -386,7 +398,7 @@ $(function () {
                 $.ajax({
                     url: tsUrl,
                     xhrFields: { responseType: "arraybuffer" },
-                    timeout: 20000
+                    timeout: 30000
                 }).fail(function () {
                     if (stopDownload) { return; }
                     ErrorTsList(tsIndex);
@@ -450,7 +462,7 @@ $(function () {
             url: URL.createObjectURL(fileBlob),
             filename: `${GetFileName(m3u8_url)}.ts`
         });
-        $("#progress").html(`下载中...`);
+        $("#progress").html(`数据合并，下载中...`);
     }
 
     // 解密ts文件
@@ -482,5 +494,25 @@ $(function () {
         }
         $("#progress").html(`数据完整`);
         return true
+    }
+
+    // 秒转换成时间
+    function secToTime(sec) {
+        let time = "";
+        let hour = Math.floor(sec / 3600);
+        let min = Math.floor((sec % 3600) / 60);
+        sec = Math.floor(sec % 60);
+        if (hour > 0) {
+            time = hour + ":";
+        }
+        if (min < 10) {
+            time += "0";
+        }
+        time += min + ":";
+        if (sec < 10) {
+            time += "0";
+        }
+        time += sec;
+        return time;
     }
 })

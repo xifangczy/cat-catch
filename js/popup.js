@@ -173,6 +173,8 @@ function AddMedia(data) {
         });
         // 监听下载 下载失败 传递referer重试下载
         chrome.downloads.onChanged.addListener(function (DownloadItem) {
+            // console.log(DownloadItem.error.current);
+            // SERVER_FORBIDDEN
             if (DownloadItem.error) {
                 chrome.tabs.create({ url: `/m3u8.html?m3u8_url=${encodeURIComponent(data.url)}&referer=${encodeURIComponent(data.initiator)}&filename=${encodeURIComponent(downFileName)}` });
             }
