@@ -5,12 +5,6 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     if (tabs[0] && tabs[0].id) {
         G.tabId = tabs[0].id;
         G.tabIdStr = "tabId" + tabs[0].id;
-        chrome.tabs.get(tabs[0].id, function (info) {
-            if(info){
-                G.tabInfo = info;
-                G.tabTitle = info.title;
-            }
-        });
     }
 });
 //设置参数
@@ -115,10 +109,11 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     }
 });
 
-// chrome.runtime.onInstalled.addListener(function (details) {
-//     if(details.reason == "update"){
-//         chrome.storage.sync.clear();
-//         chrome.storage.local.clear();
-//         InitOptions()
-//     }
-// });
+chrome.runtime.onInstalled.addListener(function (details) {
+    if(details.reason == "update"){
+        chrome.storage.local.clear();
+        // chrome.storage.sync.clear();
+        // chrome.storage.local.clear();
+        // InitOptions()
+    }
+});

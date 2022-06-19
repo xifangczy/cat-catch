@@ -28,7 +28,7 @@ if (typeof (browser) == "object") {
 
     // V3 引入scripting 为解决Service Worker休眠问题
     // V2 不存在此问题 只需要return
-    chrome.scripting = new Object();
+    // chrome.scripting = new Object();
     chrome.scripting.executeScript = (obj) => {
         // console.log(obj.files[0]);
         // if(obj.files[0]){
