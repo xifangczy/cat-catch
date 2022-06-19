@@ -1,3 +1,8 @@
+// chrome.tabs.onRemoved 有时会失效，此方法清理不用的数据
+setTimeout(function(){
+    clearRedundant();
+}, 2000);
+
 //填充数据
 chrome.storage.local.get({ "MediaData": {} }, function (items) {
     if (items.MediaData === undefined) { return; }
@@ -287,6 +292,7 @@ $(function () {
     });
     //清空数据
     $('#Clear').click(function () {
+        clearRedundant();
         chrome.storage.local.get({ "MediaData": {} }, function (items) {
             delete items.MediaData[G.tabIdStr];
             delete items.MediaData["tabId-1"];
@@ -416,5 +422,24 @@ function stringModify(str) {
             '>': '&gt;',
             '|': '&#124;'
         }[m];
+    });
+}
+
+// 清理冗余数据
+function clearRedundant() {
+    chrome.tabs.query({}, function (tabs) {
+        let allTabId = [];
+        for(let item of tabs){
+            allTabId.push("tabId" + item["id"]);
+        }
+        chrome.storage.local.get({ MediaData: {} }, function (items) {
+            if (items.MediaData === undefined) { return; }
+            for (let key in items.MediaData) {
+                if (!allTabId.includes(key)) {
+                    delete items.MediaData[key];
+                    chrome.storage.local.set({ MediaData: items.MediaData });
+                }
+            }
+        });
     });
 }

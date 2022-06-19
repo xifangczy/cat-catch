@@ -28,6 +28,7 @@ $(function () {
     var expandKey = false;
     var m3u8IV = "";
     var keyID = "";
+    var MapURI = "";
     var isEncrypted = false;    //是否加密的m3u8
     const decryptor = new AESDecryptor(); //解密工具
     var tabId;
@@ -194,11 +195,11 @@ $(function () {
             //重要信息
             if (line.includes("#EXT-X-MAP")) {
                 ExistKey = true;
-                let MapURI = /URI="(.*)"/.exec(line);
+                MapURI = /URI="(.*)"/.exec(line);
                 if (MapURI && MapURI[1]) {
                     MapURI = fixUrl(MapURI[1]);
                     $("#tips").append('#EXT-X-MAP URI: <input type="text" value="' + MapURI + '" spellcheck="false">');
-                    count++; line = MapURI;
+                    line = MapURI;
                 }
             }
             if (line.includes("#EXT-X-KEY")) {
@@ -264,6 +265,7 @@ $(function () {
                     $("#next_m3u8").append(
                         `<p><a href="/m3u8.html?m3u8_url=${encodeURIComponent(line)}&referer=${encodeURIComponent(m3u8_referer)}&title=${m3u8_title ? encodeURIComponent(m3u8_title) : ""}">${GetFile(line)}</a></p>`
                     );
+                    isLive = false;
                     continue;
                 }
                 //格式化
