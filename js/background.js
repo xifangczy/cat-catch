@@ -96,6 +96,7 @@ function findMedia(data, isRegex = false, filter = false) {
 
     chrome.storage.local.get({ MediaData: {} }, function (items) {
         chrome.tabs.get(data.tabId, function (webInfo) {
+            let title = webInfo.title ? webInfo.title : "NULL";
             const tabId = "tabId" + data.tabId;
             if (items.MediaData[tabId] === undefined) {
                 items.MediaData[tabId] = new Array();
@@ -112,11 +113,7 @@ function findMedia(data, isRegex = false, filter = false) {
             }
             // initiator 不存在 使用当前网页的url
             if (data.initiator == undefined || data.initiator == "null") {
-                data.initiator = webInfo.url;
-            }
-            // 设置图标数字
-            if (data.tabId != -1) {
-                SetIcon({ number: items.MediaData[tabId].length, tabId: data.tabId });
+                data.initiator = webInfo?.url;
             }
             //自动清理幽灵数据
             if (items.MediaData["tabId-1"] !== undefined) {
@@ -134,13 +131,17 @@ function findMedia(data, isRegex = false, filter = false) {
                 ext: ext,
                 type: header["type"],
                 tabId: data.tabId,
-                title: webInfo.title,
+                title: title,
                 webInfo: webInfo,
                 isRegex: isRegex,
                 initiator: data.initiator
             };
             items.MediaData[tabId].push(info);
             chrome.storage.local.set({ MediaData: items.MediaData });
+            // 设置图标数字
+            if (data.tabId != -1) {
+                SetIcon({ number: items.MediaData[tabId].length, tabId: data.tabId });
+            }
             // 发送到popup 并检查自动下载
             chrome.runtime.sendMessage(info, function () {
                 if (G.TabIdList.AutoDown.includes(G.tabId)) {

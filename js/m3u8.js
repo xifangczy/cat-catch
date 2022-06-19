@@ -27,6 +27,7 @@ $(function () {
     var tsLists = [];    //储存所有ts链接
     var expandKey = false;
     var m3u8IV = "";
+    var keyID = "";
     var isEncrypted = false;    //是否加密的m3u8
     const decryptor = new AESDecryptor(); //解密工具
     var tabId;
@@ -181,13 +182,15 @@ $(function () {
         let count = 0;
         let ExistKey = false;
         let textarea = "";
+        mediaDuration = 0;
         $("#media_file").val("");
         $("#tips").html("");
         let m3u8_split = m3u8_content.split("\n");
         for (let line of m3u8_split) {
-            if (line == "\n" || line == "\r" || line == "" || line == " ") {
+            if (line == "\n" || line == "\r" || line == "" || line == " " || line == undefined) {
                 continue;
             }
+            if(line == undefined){ continue; }
             //重要信息
             if (line.includes("#EXT-X-MAP")) {
                 ExistKey = true;
@@ -204,7 +207,6 @@ $(function () {
                 if (KeyURL && KeyURL[1]) {
                     KeyURL = fixUrl(KeyURL[1]);
                     $("#tips").append('#EXT-X-KEY URI: <input type="text" value="' + KeyURL + '" spellcheck="false">');
-                    count++; line = KeyURL;
                     // 下载Key文件
                     $.ajax({
                         url: KeyURL,
@@ -212,7 +214,9 @@ $(function () {
                     }).done(function (responseData) {
                         isEncrypted = true;
                         let count = $("#count").html();
-                        $("#count").html(count + " (加密HLS)");
+                        if(!count.includes("(加密HLS)")){
+                            $("#count").html(count + " (加密HLS)");
+                        }
                         try {
                             decryptor.expandKey(responseData);
                             expandKey = true;
@@ -222,15 +226,25 @@ $(function () {
                         }
                     });
                 }
-            }
-            if (line.includes("IV=") && line.includes("#EXT-X-KEY")) {
-                ExistKey = true;
-                let KeyIV = /IV=([^,\n]*)/.exec(line);
-                if (KeyIV && KeyIV[1]) {
-                    m3u8IV = KeyIV[1];
-                    $("#tips").append('#IV: <input type="text" value="' + KeyIV[1] + '" spellcheck="false">');
+                if (line.includes("IV=")) {
+                    m3u8IV = /IV=([^,\n]*)/.exec(line);
+                    if (m3u8IV && m3u8IV[1]) {
+                        m3u8IV = m3u8IV[1];
+                        $("#tips").append('IV= <input type="text" value="' + m3u8IV + '" spellcheck="false">');
+                    }
                 }
+                if (line.includes("KEYID=")) {
+                    keyID = /KEYID=([^,\n]*)/.exec(line);
+                    if (keyID && keyID[1]) {
+                        keyID = keyID[1];
+                        $("#tips").append('KEYID= <input type="text" value="' + keyID + '" spellcheck="false">');
+                    }
+                }
+                line = KeyURL;
             }
+            // fix https://test-streams.mux.dev/dai-discontinuity-deltatre/manifest.m3u8
+            if(line == undefined){ continue; }
+
             if (line.includes("#EXTINF:")) {
                 mediaDuration += parseFloat(/#EXTINF:([^,]*)/.exec(line)[1]);
             }
@@ -304,6 +318,10 @@ $(function () {
         BasePath = getManifestUrlBase();
         $("#formatStr").val('wget "$url$"');
         show_list();
+    });
+    // 原始m3u8
+    $("#originalM3U8").click(function () {
+        $("#media_file").val(m3u8_content);
     });
     //把远程文件替换成本地文件
     $("#DownFixm3u8").click(function () {
@@ -478,7 +496,7 @@ $(function () {
             return responseData;
         }
         if (expandKey) {
-            let iv = m3u8IV || new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, tsIndex]);
+            let iv = m3u8IV ? new TextEncoder().encode(m3u8IV) : new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, tsIndex]);
             try {
                 return decryptor.decrypt(responseData, 0, iv.buffer || iv, true);
             } catch (e) {

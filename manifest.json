@@ -33,7 +33,6 @@
     ],
     "host_permissions": [
         "*://*/*",
-        "chrome-extension://*/*",
         "<all_urls>"
     ],
     "version": "2.0.0"
