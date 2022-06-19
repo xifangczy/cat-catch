@@ -95,65 +95,72 @@ function findMedia(data, isRegex = false, filter = false) {
     if (!filter) { return; }
 
     chrome.storage.local.get({ MediaData: {} }, function (items) {
+        const info = {
+            name: name,
+            url: data.url,
+            size: header["size"],
+            ext: ext,
+            type: header["type"],
+            tabId: data.tabId,
+            isRegex: isRegex,
+        };
+        if(data.tabId == -1){
+            pushData(items, data, info);
+            return;
+        }
         chrome.tabs.get(data.tabId, function (webInfo) {
-            let title = webInfo.title ? webInfo.title : "NULL";
-            const tabId = "tabId" + data.tabId;
-            if (items.MediaData[tabId] === undefined) {
-                items.MediaData[tabId] = new Array();
-            }
-            // 查重
-            for (let item of items.MediaData[tabId]) {
-                if (item.url == data.url) { return; }
-            }
-            //幽灵数据与当前标签资源查重
-            if (data.tabId == -1 && items.MediaData[G.tabIdStr] !== undefined) {
-                for (let item of items.MediaData[G.tabIdStr]) {
-                    if (item.url == data.url) { return; }
-                }
-            }
-            // initiator 不存在 使用当前网页的url
-            if (data.initiator == undefined || data.initiator == "null") {
-                data.initiator = webInfo?.url;
-            }
-            //自动清理幽灵数据
-            if (items.MediaData["tabId-1"] !== undefined) {
-                SetIcon({ tips: true });
-                if (items.MediaData["tabId-1"].length > G.Options.OtherAutoClear) {
-                    delete items.MediaData["tabId-1"];
-                    chrome.storage.local.set({ MediaData: items.MediaData });
-                    SetIcon({ tips: false });
-                }
-            }
-            const info = {
-                name: name,
-                url: data.url,
-                size: header["size"],
-                ext: ext,
-                type: header["type"],
-                tabId: data.tabId,
-                title: title,
-                webInfo: webInfo,
-                isRegex: isRegex,
-                initiator: data.initiator
-            };
-            items.MediaData[tabId].push(info);
-            chrome.storage.local.set({ MediaData: items.MediaData });
-            // 设置图标数字
-            if (data.tabId != -1) {
-                SetIcon({ number: items.MediaData[tabId].length, tabId: data.tabId });
-            }
-            // 发送到popup 并检查自动下载
-            chrome.runtime.sendMessage(info, function () {
-                if (G.TabIdList.AutoDown.includes(G.tabId)) {
-                    let downFileName = G.Options.TitleName ? info.title + '.' + info.ext : info.name;
-                    chrome.downloads.download({
-                        url: data.url,
-                        filename: "CatCatch-" + G.tabId + "/" + downFileName
-                    });
-                }
-                if (chrome.runtime.lastError) { return; }
-            });
+            pushData(items, data, info, webInfo);
         });
+    });
+}
+function pushData(items, data, info, webInfo = {}){
+    const tabId = "tabId" + data.tabId;
+    if (items.MediaData[tabId] === undefined) {
+        items.MediaData[tabId] = new Array();
+    }
+    // 查重
+    for (let item of items.MediaData[tabId]) {
+        if (item.url == data.url) { return; }
+    }
+    //幽灵数据与当前标签资源查重
+    if (data.tabId == -1 && items.MediaData[G.tabIdStr] !== undefined) {
+        for (let item of items.MediaData[G.tabIdStr]) {
+            if (item.url == data.url) { return; }
+        }
+    }
+    // initiator 不存在 使用当前网页的url
+    if (data.initiator == undefined || data.initiator == "null") {
+        data.initiator = webInfo?.url;
+    }
+    //自动清理幽灵数据
+    if (items.MediaData["tabId-1"] !== undefined) {
+        SetIcon({ tips: true });
+        if (items.MediaData["tabId-1"].length > G.Options.OtherAutoClear) {
+            delete items.MediaData["tabId-1"];
+            chrome.storage.local.set({ MediaData: items.MediaData });
+            SetIcon({ tips: false });
+        }
+    }
+    info.initiator = data.initiator;
+    info.title = webInfo.title ? webInfo.title : "NULL";
+    info.webInfo = webInfo;
+
+    items.MediaData[tabId].push(info);
+    chrome.storage.local.set({ MediaData: items.MediaData });
+    // 设置图标数字
+    if (data.tabId != -1) {
+        SetIcon({ number: items.MediaData[tabId].length, tabId: data.tabId });
+    }
+    // 发送到popup 并检查自动下载
+    chrome.runtime.sendMessage(info, function () {
+        if (G.TabIdList.AutoDown.includes(G.tabId)) {
+            let downFileName = G.Options.TitleName ? info.title + '.' + info.ext : info.name;
+            chrome.downloads.download({
+                url: data.url,
+                filename: "CatCatch-" + G.tabId + "/" + downFileName
+            });
+        }
+        if (chrome.runtime.lastError) { return; }
     });
 }
 
