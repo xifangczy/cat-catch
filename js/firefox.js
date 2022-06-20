@@ -25,18 +25,27 @@ if (typeof (browser) == "object") {
             }, { urls: ["<all_urls>"], tabId: G.tabId }, ["blocking", "requestHeaders"]
         );
     };
+    chrome.declarativeNetRequest.getSessionRules = () => {
+        return [];
+    }
 
     // V3 引入scripting 为解决Service Worker休眠问题
     // V2 不存在此问题 只需要return
     // chrome.scripting = new Object();
     chrome.scripting.executeScript = (obj) => {
-        // console.log(obj.files[0]);
+        // console.log(obj);
         // if(obj.files[0]){
-        //     browser.tabs.executeScript(obj.target.tabId, {
-        //         allFrames: obj.target.allFrames,
-        //         file: obj.files[0],
-        //         runAt: "document_start"
-        //     });
+            // browser.tabs.executeScript(obj.target.tabId, {
+            //     allFrames: true,
+            //     file: obj.files[0],
+            //     runAt: "document_start",
+            //     matchAboutBlank: true
+            // });
+            // browser.contentScripts.register({
+            //     "js": [{file: obj.files[0]}],
+            //     "runAt": "document_start",
+            //     "allFrames": obj.target.allFrames,
+            // });
         // }
         return;
     }

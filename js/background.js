@@ -9,12 +9,17 @@ chrome.webNavigation.onBeforeNavigate.addListener(function () {
 chrome.alarms.create("heartbeat", { periodInMinutes: 1 });
 chrome.alarms.onAlarm.addListener(function (alarm) {
     console.log("HeartBeat alarm");
-    try {
-        chrome.scripting.executeScript({
-            target: { tabId: G.tabId },
-            func: () => chrome.runtime.sendMessage({ Message: "HeartBeat" })
-        });
-    } catch (e) { }
+    chrome.tabs.query({}, function (tabs) {
+        for (let item of tabs) {
+            if (isSpecialPage(item.url)) { return; }
+            try {
+                chrome.scripting.executeScript({
+                    target: { tabId: item.id },
+                    func: () => chrome.runtime.sendMessage({ Message: "HeartBeat" })
+                });
+            } catch (e) { }
+        }
+    });
 });
 
 // onResponseStarted 浏览器接收到第一个字节触发，保证有更多信息判断资源类型
@@ -208,6 +213,11 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     if (Message.Message == "HeartBeat") {
         console.log("HeartBeat OK");
         sendResponse("HeartBeat OK");
+        return;
+    }
+    // 清理冗余数据
+    if (Message.Message == "clearRedundant") {
+        clearRedundant();
         return;
     }
     sendResponse("Error");
@@ -424,4 +434,35 @@ function isSpecialPage(url) {
         urlParsing.protocol == "about:" ||
         urlParsing.protocol == "extension:") { return true; }
     return false;
+}
+
+// 清理冗余数据
+function clearRedundant() {
+    // 清理捕获列表
+    chrome.tabs.query({}, function (tabs) {
+        let allTabId = [];
+        for (let item of tabs) {
+            allTabId.push("tabId" + item.id);
+        }
+        chrome.storage.local.get({ MediaData: {} }, function (items) {
+            if (items.MediaData === undefined) { return; }
+            for (let key in items.MediaData) {
+                if (!allTabId.includes(key)) {
+                    delete items.MediaData[key];
+                    chrome.storage.local.set({ MediaData: items.MediaData });
+                }
+            }
+        });
+    });
+
+    // 清理 declarativeNetRequest
+    chrome.declarativeNetRequest.getSessionRules(function (rules) {
+        for (let item of rules) {
+            if (!allTabId.includes(item.id)) {
+                chrome.declarativeNetRequest.updateSessionRules({
+                    removeRuleIds: [item.id]
+                });
+            }
+        }
+    });
 }
