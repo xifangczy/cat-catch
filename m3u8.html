@@ -6,7 +6,7 @@
     <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
     <script src="js/jquery.min.js"></script>
     <script src="js/init.js"></script>
-    <script src="js/catch.js"></script>
+    <script src="js/m3u8.js"></script>
   </head>
 
   <body>
@@ -23,7 +23,7 @@
       </section>
 
       <section id="downfile" class="hide">
-        <h1 class="optionsTitle">常规下载失败，开始辅助下载</h1>
+        <h1 class="optionsTitle">修改Referer 下载</h1>
         <div class="optionBox">
           <div id="downFilepProgress"></div>
           <div class="progress-bar">
@@ -76,6 +76,7 @@
             <button id="DownFixm3u8">本地m3u8</button>
             <button id="Refresh">提取ts</button>
             <button id="play" data-switch="on">播放m3u8</button>
+            <button id="catch" data-switch="on">开启捕获</button>
             <br>
             <div style="display: inline;" id="threadDiv">下载线程数 <input type="number" value='10' id="thread" spellcheck="false" style="width: 35px;"/></div>
             <button id="AllDownload">下载并合并ts</button> 
@@ -93,6 +94,6 @@
       <video id="video" class="hide"></video>
     </div>
     <script src="js/m3u8-decrypt.js"></script>
-    <script src="js/m3u8.js"></script>
+    <script src="js/hls.min.js"></script>
   </body>
 </html>

@@ -1,5 +1,5 @@
 // chrome.tabs.onRemoved 有时会失效，此方法清理不用的数据
-setTimeout(function(){
+setTimeout(function () {
     clearRedundant();
 }, 2000);
 
@@ -208,7 +208,7 @@ function AddMedia(data) {
             script.src = "js/hls.min.js"
             document.body.appendChild(script);
         }
-        script.onload = function() {
+        script.onload = function () {
             const hls = new Hls();
             let video = $('#player video')[0];
             hls.loadSource(data.url);
@@ -427,9 +427,10 @@ function stringModify(str) {
 
 // 清理冗余数据
 function clearRedundant() {
+    // 清理捕获列表
     chrome.tabs.query({}, function (tabs) {
         let allTabId = [];
-        for(let item of tabs){
+        for (let item of tabs) {
             allTabId.push("tabId" + item["id"]);
         }
         chrome.storage.local.get({ MediaData: {} }, function (items) {
@@ -441,5 +442,16 @@ function clearRedundant() {
                 }
             }
         });
+    });
+
+    // 清理 declarativeNetRequest
+    chrome.declarativeNetRequest.getSessionRules(function (rules) {
+        for (let item of rules) {
+            if (!allTabId.includes(item.id)) {
+                chrome.declarativeNetRequest.updateSessionRules({
+                    removeRuleIds: [item.id]
+                });
+            }
+        }
     });
 }

@@ -51,7 +51,7 @@ function findMedia(data, isRegex = false, filter = false) {
     ) { return; }
     // 调试模式
     if (G.Options.Debug) {
-        console.log({data, G, isRegex});
+        console.log({ data, G, isRegex });
     }
 
     const header = getHeaderValue(data);
@@ -104,7 +104,7 @@ function findMedia(data, isRegex = false, filter = false) {
             tabId: data.tabId,
             isRegex: isRegex,
         };
-        if(data.tabId == -1){
+        if (data.tabId == -1) {
             pushData(items, data, info);
             return;
         }
@@ -113,7 +113,7 @@ function findMedia(data, isRegex = false, filter = false) {
         });
     });
 }
-function pushData(items, data, info, webInfo = {}){
+function pushData(items, data, info, webInfo = {}) {
     const tabId = "tabId" + data.tabId;
     if (items.MediaData[tabId] === undefined) {
         items.MediaData[tabId] = new Array();

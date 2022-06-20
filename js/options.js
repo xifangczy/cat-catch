@@ -90,7 +90,7 @@ function Gethtml(Type, Param = new Object()) {
 $("#injectScript").change(function () {
     const Option = $(this).attr("id");
     const Value = $(this).val();
-    if(Value == "catch.js" || Value == "recorder.js" ){
+    if (Value == "catch.js" || Value == "recorder.js") {
         chrome.storage.sync.set({ [Option]: Value });
     }
 });

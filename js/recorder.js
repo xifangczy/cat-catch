@@ -32,13 +32,13 @@ window.onload = function () {
         if (isMove) {
             switch (cat.getAttribute("data-switch")) {
                 case "on":
-                    try{
+                    try {
                         recorder.start();
-                    } catch(e){
+                    } catch (e) {
                         cat.innerHTML = `${icon}无法捕获视频<br>点击重试`;
                         cat.setAttribute("data-switch", "error");
                     }
-                break;
+                    break;
                 case "off":
                     recorder.stop(); break;
                 case "error":

@@ -179,7 +179,7 @@ textarea {
   font-family: "Microsoft YaHei", "Helvetica", "Arial", sans-serif;
 }
 #formatStr {
-  width: 200px;
+  width: 145px;
 }
 #tips input {
   width: 975px;
@@ -187,10 +187,11 @@ textarea {
 #tips {
   color: rgb(26, 115, 232);
 }
-#injectScript{
+#injectScript {
   margin-left: 360px;
   -webkit-appearance: none;
-  background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIxMiIgZmlsbD0iIzVGNjM2OCI+PHBhdGggZD0iTTAgMGgyNEwxMiAxMnoiLz48L3N2Zz4=) calc(100% - 8px) center no-repeat;
+  background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIxMiIgZmlsbD0iIzVGNjM2OCI+PHBhdGggZD0iTTAgMGgyNEwxMiAxMnoiLz48L3N2Zz4=)
+    calc(100% - 8px) center no-repeat;
   background-color: rgb(241, 243, 244);
   background-size: 10px;
   border: none;
@@ -203,17 +204,17 @@ textarea {
   padding-inline-start: 8px;
   padding-top: 6px;
 }
-#errorTsList p{
+#errorTsList p {
   color: red;
 }
 
-.progress-bar{
+.progress-bar {
   height: 15px;
   background-color: rgb(189, 193, 198);
   border-radius: 3px;
   margin: 3px;
 }
-.progress{
+.progress {
   width: 0px;
   height: 100%;
   background-color: rgb(26, 115, 232);

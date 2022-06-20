@@ -1,3 +1,9 @@
+var onCatch = new RegExp("&catch=([^\n&]*)").exec(window.location.href);
+if (onCatch) {
+    script = document.createElement('script');
+    script.src = "js/catch.js"
+    document.head.appendChild(script);
+}
 $(function () {
     //获取m3u8_url
     var m3u8_url = new RegExp("[?]m3u8_url=([^\n&]*)").exec(window.location.href);
@@ -12,6 +18,11 @@ $(function () {
     var file_name = new RegExp("&filename=([^\n&]*)").exec(window.location.href);
     file_name = file_name ? decodeURIComponent(file_name[1]) : undefined;
 
+    if (onCatch) {
+        $("#catch").html("关闭捕获");
+        $("#catch").data("switch", "off");
+    }
+
     //获取m3u8参数
     var m3u8_arg = new RegExp("\\.m3u8\\?([^\n]*)").exec(m3u8_url);
     if (m3u8_arg) {
@@ -19,7 +30,6 @@ $(function () {
     }
 
     $("#m3u8_url").attr("href", m3u8_url).html(m3u8_url);
-    $("#CatCatch").hide();
 
     var BasePath;
     var RootPath;
@@ -34,7 +44,7 @@ $(function () {
     var tabId;
     var mediaDuration = 0;  // 视频总时长
     var isLive = true; // 是否是直播
-    var hls = {};
+    var hls = {}  // 在线播放工具
 
     // 获取 当前tabId
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -187,11 +197,12 @@ $(function () {
         $("#media_file").val("");
         $("#tips").html("");
         let m3u8_split = m3u8_content.split("\n");
+        tsLists = [];
         for (let line of m3u8_split) {
             if (line == "\n" || line == "\r" || line == "" || line == " " || line == undefined) {
                 continue;
             }
-            if(line == undefined){ continue; }
+            if (line == undefined) { continue; }
             //重要信息
             if (line.includes("#EXT-X-MAP")) {
                 ExistKey = true;
@@ -215,7 +226,7 @@ $(function () {
                     }).done(function (responseData) {
                         isEncrypted = true;
                         let count = $("#count").html();
-                        if(!count.includes("(加密HLS)")){
+                        if (!count.includes("(加密HLS)")) {
                             $("#count").html(count + " (加密HLS)");
                         }
                         try {
@@ -244,7 +255,7 @@ $(function () {
                 line = KeyURL;
             }
             // fix https://test-streams.mux.dev/dai-discontinuity-deltatre/manifest.m3u8
-            if(line == undefined){ continue; }
+            if (line == undefined) { continue; }
 
             if (line.includes("#EXTINF:")) {
                 mediaDuration += parseFloat(/#EXTINF:([^,]*)/.exec(line)[1]);
@@ -280,9 +291,6 @@ $(function () {
                 }
                 textarea = textarea + line + "\n";
             }
-        }
-        if(isLive){
-            $("#CatCatch").show();
         }
         $("#media_file").val(textarea);
         if (ExistKey) { $("#tips").show(); }
@@ -349,26 +357,13 @@ $(function () {
     // 播放m3u8
     $("#play").click(function () {
         if ($(this).data("switch") == "on") {
+            hls = new Hls();
             const video = $('<video />', {
                 controls: true,
                 width: "100%"
             })[0];
-            let script = {};
-            if (typeof Hls === "undefined") {
-                script = document.createElement('script');
-                script.src = "js/hls.min.js"
-                document.body.appendChild(script);
-            }
-            
-            script.onload = function () {
-                hls = new Hls();
-                hls.loadSource(m3u8_url);
-                hls.attachMedia(video);
-                video.play();
-            }
-            if (typeof Hls === "function") {
-                script.onload();
-            }
+            hls.loadSource(m3u8_url);
+            hls.attachMedia(video);
             $("#textarea textarea").hide();
             $("#textarea").append(video);
             video.play();
@@ -381,6 +376,15 @@ $(function () {
         $("textarea").show();
         $("#play").html("播放m3u8");
         $("#play").data("switch", "on");
+    });
+
+    // 开启/关闭捕获
+    $("#catch").click(function () {
+        if ($(this).data("switch") == "on") {
+            window.location.href = window.location.href + "&catch=on";
+            return;
+        }
+        window.location.href = window.location.href.replace("&catch=on", "");
     });
 
     // 下载m3u8并合并
