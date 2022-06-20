@@ -428,7 +428,10 @@ function tabIdListRemove(str, tabId) {
 
 // 判断特殊页面
 function isSpecialPage(url) {
-    const urlParsing = new URL(url);
+    let urlParsing = {};
+    try {
+        urlParsing = new URL(url);
+    } catch (e) { return true; }
     if (urlParsing.protocol == "chrome-extension:" ||
         urlParsing.protocol == "chrome:" ||
         urlParsing.protocol == "about:" ||

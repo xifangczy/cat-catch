@@ -216,7 +216,9 @@ function AddMedia(data) {
             let video = $('#player video')[0];
             hls.loadSource(data.url);
             hls.attachMedia(video);
-            video.play();
+            hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+                video.play();
+            });
         }
         if (typeof Hls === "function") {
             script.onload();

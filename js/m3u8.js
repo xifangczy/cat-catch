@@ -366,9 +366,11 @@ $(function () {
             hls.attachMedia(video);
             $("#textarea textarea").hide();
             $("#textarea").append(video);
-            video.play();
             $("#play").html("关闭播放");
             $("#play").data("switch", "off");
+            hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+                video.play();
+            });
             return;
         }
         hls.destroy();

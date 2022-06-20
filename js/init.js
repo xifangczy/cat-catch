@@ -58,6 +58,7 @@ function GetDefault(Obj) {
         { "ext": "movie", "size": 0, "state": true },
         { "ext": "divx", "size": 0, "state": true },
         { "ext": "mpeg4", "size": 0, "state": true },
+        { "ext": "vid", "size": 0, "state": true },
         { "ext": "webp", "size": 5120, "state": false }
     );
     const defaultType = new Array(
