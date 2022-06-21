@@ -2,13 +2,20 @@
 ### 2.0.0
 [Changed] 模拟手机端，现在会修改navigator.userAgent变量
 
-[Added] 视频捕获功能，解决被动嗅探无法下载视频的问题。
+[Added] 视频捕获功能，解决被动嗅探无法下载视频的问题
+
+[Added] 视频录制功能，解决被动嗅探无法下载视频的问题
 
 [Added] 支持N_m3u8DL-CLI的m3u8dl://协议
 
-[Added] m3u8解析增强，现在能合并下载m3u8文件，通过修改Referer能够下载更多文件。
+[Added] m3u8解析器增强，现在能在线合并下载m3u8文件
+
+[Added] popup页面出现无法下载的视频，会交给m3u8解析器修改Referer下载
 
 [Added] popup页面和m3u8页面可以在线预览m3u8
+
+### 1.0.26
+[Fixed] 解决关闭网页不能正确删除当前页面储存的数据问题
 
 ### 1.0.25
 [Changed] 正则匹配增强

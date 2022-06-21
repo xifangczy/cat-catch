@@ -1,4 +1,5 @@
 importScripts("/js/init.js");
+clearRedundant();
 
 // Service Worker 5分钟后会强制终止扩展
 // https://bugs.chromium.org/p/chromium/issues/detail?id=1271154

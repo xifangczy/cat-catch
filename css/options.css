@@ -198,6 +198,7 @@ textarea {
   border-radius: 4px;
   cursor: pointer;
   padding: 5px 10px;
+  width: 158px;
 }
 #errorTsList p {
   color: red;

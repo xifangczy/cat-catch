@@ -1,8 +1,3 @@
-// chrome.tabs.onRemoved 有时会失效，此方法清理不用的数据
-setTimeout(function () {
-    chrome.runtime.sendMessage({ Message: "clearRedundant" });
-}, 2000);
-
 // HeartBeat
 chrome.runtime.sendMessage({ Message: "HeartBeat" });
 
