@@ -442,12 +442,13 @@ function isSpecialPage(url) {
 
 // 清理冗余数据
 function clearRedundant() {
-    let allTabId = [];
-    // 清理捕获列表
     chrome.tabs.query({}, function (tabs) {
+        let allTabId = [];
         for (let item of tabs) {
-            allTabId.push("tabId" + item.id);
+            allTabId.push("tabId" + item["id"]);
         }
+        
+        // 清理捕获列表
         chrome.storage.local.get({ MediaData: {} }, function (items) {
             if (items.MediaData === undefined) { return; }
             for (let key in items.MediaData) {
@@ -457,15 +458,16 @@ function clearRedundant() {
                 }
             }
         });
-    });
-    // 清理 declarativeNetRequest
-    chrome.declarativeNetRequest.getSessionRules(function (rules) {
-        for (let item of rules) {
-            if (!allTabId.includes(item.id)) {
-                chrome.declarativeNetRequest.updateSessionRules({
-                    removeRuleIds: [item.id]
-                });
+
+        // 清理 declarativeNetRequest
+        chrome.declarativeNetRequest.getSessionRules(function (rules) {
+            for (let item of rules) {
+                if (!allTabId.includes(item.id)) {
+                    chrome.declarativeNetRequest.updateSessionRules({
+                        removeRuleIds: [item.id]
+                    });
+                }
             }
-        }
+        });
     });
 }
