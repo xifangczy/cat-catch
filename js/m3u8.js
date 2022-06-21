@@ -41,17 +41,33 @@ $(function () {
     var MapURI = "";
     var isEncrypted = false;    //是否加密的m3u8
     const decryptor = new AESDecryptor(); //解密工具
-    var tabId;
     var mediaDuration = 0;  // 视频总时长
     var isLive = true; // 是否是直播
     var hls = {}  // 在线播放工具
 
     // 获取 当前tabId
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        tabId = tabs[0].id;
+        let tabId = tabs[0].id;
         // 修改Referer
         if (m3u8_referer && m3u8_referer != undefined && m3u8_referer != "" && m3u8_referer != "undefined") {
-            setReferer(m3u8_referer);
+            chrome.declarativeNetRequest.updateSessionRules({
+                removeRuleIds: [tabId],
+                addRules: [{
+                    "id": tabId,
+                    "action": {
+                        "type": "modifyHeaders",
+                        "requestHeaders": [{
+                            "header": "Referer",
+                            "operation": "set",
+                            "value": m3u8_referer
+                        }]
+                    },
+                    "condition": {
+                        "tabIds": [tabId],
+                        "resourceTypes": ["xmlhttprequest"]
+                    }
+                }]
+            });
         }
         if (!m3u8_url) {
             $("#getURL").show();
@@ -70,6 +86,15 @@ $(function () {
         file_name = GetFileName(m3u8_url, true);
         downloadFile();
         return;
+    });
+
+    chrome.downloads.onChanged.addListener(function (DownloadDelta) {
+        console.log(DownloadDelta);
+        if (!DownloadDelta.state) { return; }
+        if(DownloadDelta.state.current == "complete"){
+            $("#downFilepProgress").html("已保存到硬盘");
+            $("#progress").html("已保存到硬盘");
+        }
     });
 
     // 辅助下载文件
@@ -95,8 +120,7 @@ $(function () {
             $("#downFilepProgress").html("下载完成，正在保存到硬盘...");
             chrome.downloads.download({
                 url: URL.createObjectURL(result),
-                filename: file_name,
-                saveAs: true
+                filename: file_name
             });
         });
     }
@@ -116,28 +140,6 @@ $(function () {
             RootPath = getManifestUrlRoot();
             m3u8_content = result;
             show_list();
-        });
-    }
-
-    // 修改Referer
-    function setReferer(referer) {
-        chrome.declarativeNetRequest.updateSessionRules({
-            removeRuleIds: [tabId],
-            addRules: [{
-                "id": tabId,
-                "action": {
-                    "type": "modifyHeaders",
-                    "requestHeaders": [{
-                        "header": "Referer",
-                        "operation": "set",
-                        "value": referer
-                    }]
-                },
-                "condition": {
-                    "tabIds": [tabId],
-                    "resourceTypes": ["xmlhttprequest"]
-                }
-            }]
         });
     }
 
@@ -294,7 +296,7 @@ $(function () {
         }
         $("#media_file").val(textarea);
         if (ExistKey) { $("#tips").show(); }
-        $("#count").html("共" + count + "个文件" + "，总时长: " + secToTime(mediaDuration));
+        $("#count").html("共 " + count + " 个文件" + "，总时长: " + secToTime(mediaDuration));
         if (isLive) {
             $("#count").html("直播HLS");
         }

@@ -3,6 +3,9 @@ setTimeout(function () {
     chrome.runtime.sendMessage({ Message: "clearRedundant" });
 }, 2000);
 
+// HeartBeat
+chrome.runtime.sendMessage({ Message: "HeartBeat" });
+
 //填充数据
 chrome.storage.local.get({ "MediaData": {} }, function (items) {
     if (items.MediaData === undefined) { return; }
@@ -201,10 +204,12 @@ function AddMedia(data) {
         }
         html.find("#screenshots").hide();
         $('#player video').attr('src', data.url);
-        $('#player video').trigger('play');
         $('#player').show();
         $('#player').appendTo(html);
-        if (!isM3U8(data)) { return false; }
+        if (!isM3U8(data)) {
+            $('#player video').trigger('play');
+            return false;
+        }
         let script = {};
         if (typeof Hls === "undefined") {
             script = document.createElement('script');

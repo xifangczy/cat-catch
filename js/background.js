@@ -6,12 +6,15 @@ importScripts("/js/init.js");
 chrome.webNavigation.onBeforeNavigate.addListener(function () {
     console.log("HeartBeat onBeforeNavigate");
 });
+chrome.webNavigation.onHistoryStateUpdated.addListener(function () {
+    console.log("HeartBeat onHistoryStateUpdated");
+});
 chrome.alarms.create("heartbeat", { periodInMinutes: 1 });
 chrome.alarms.onAlarm.addListener(function (alarm) {
     console.log("HeartBeat alarm");
     chrome.tabs.query({}, function (tabs) {
         for (let item of tabs) {
-            if (isSpecialPage(item.url)) { return; }
+            if (isSpecialPage(item.url) || item.id == -1 || item.id == 0) { return; }
             try {
                 chrome.scripting.executeScript({
                     target: { tabId: item.id },
@@ -212,7 +215,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     // Heart Beat
     if (Message.Message == "HeartBeat") {
         console.log("HeartBeat OK");
-        sendResponse("HeartBeat OK");
+        sendResponse("HeartBeat OK~");
         return;
     }
     // 清理冗余数据
@@ -245,11 +248,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
         });
     }
     // 跳过特殊页面
-    urlParsing = new URL(tab.url);
-    if (urlParsing.protocol == "chrome-extension:" ||
-        urlParsing.protocol == "chrome:" ||
-        urlParsing.protocol == "about:" ||
-        urlParsing.protocol == "extension:") { return; }
+    if (isSpecialPage(tab.url)) { return; }
 
     if (changeInfo.status == "loading") {
         // 开启捕获
@@ -428,6 +427,7 @@ function tabIdListRemove(str, tabId) {
 
 // 判断特殊页面
 function isSpecialPage(url) {
+    if (url == "" || url == undefined || url == "null") { return true; }
     let urlParsing = {};
     try {
         urlParsing = new URL(url);
@@ -441,9 +441,9 @@ function isSpecialPage(url) {
 
 // 清理冗余数据
 function clearRedundant() {
+    let allTabId = [];
     // 清理捕获列表
     chrome.tabs.query({}, function (tabs) {
-        let allTabId = [];
         for (let item of tabs) {
             allTabId.push("tabId" + item.id);
         }
@@ -457,7 +457,6 @@ function clearRedundant() {
             }
         });
     });
-
     // 清理 declarativeNetRequest
     chrome.declarativeNetRequest.getSessionRules(function (rules) {
         for (let item of rules) {

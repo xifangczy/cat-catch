@@ -197,17 +197,11 @@ textarea {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-family: inherit;
-  font-size: inherit;
-  padding-bottom: 6px;
-  padding-inline-end: calc(8px + 10px + 3px);
-  padding-inline-start: 8px;
-  padding-top: 6px;
+  padding: 5px 10px;
 }
 #errorTsList p {
   color: red;
 }
-
 .progress-bar {
   height: 15px;
   background-color: rgb(189, 193, 198);
