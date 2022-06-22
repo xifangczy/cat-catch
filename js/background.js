@@ -12,18 +12,22 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(function () {
 });
 chrome.alarms.create("heartbeat", { periodInMinutes: 1 });
 chrome.alarms.onAlarm.addListener(function (alarm) {
-    console.log("HeartBeat alarm");
+    console.log("HeartBeat alarm start");
     chrome.tabs.query({}, function (tabs) {
         for (let item of tabs) {
             if (isSpecialPage(item.url) || item.id == -1 || item.id == 0) { return; }
             try {
                 chrome.scripting.executeScript({
+                    args: [chrome.runtime.id],
                     target: { tabId: item.id },
-                    func: () => chrome.runtime.sendMessage({ Message: "HeartBeat" })
+                    func: (cid) => chrome.runtime.sendMessage(cid, { Message: "HeartBeat", type: "alarm" }),
                 });
             } catch (e) { }
         }
     });
+});
+chrome.runtime.onConnect.addListener(function (Port) {
+    console.log(Port);
 });
 
 // onResponseStarted 浏览器接收到第一个字节触发，保证有更多信息判断资源类型
@@ -215,8 +219,8 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // Heart Beat
     if (Message.Message == "HeartBeat") {
-        console.log("HeartBeat OK");
-        sendResponse("HeartBeat OK~");
+        console.log("HeartBeat " + Message.type + " OK");
+        sendResponse("HeartBeat OK");
         return;
     }
     // 清理冗余数据
@@ -238,6 +242,7 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
         }
     });
 });
+
 // 标签更新 清除数据
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     // 刷新页面 清理数据
@@ -278,6 +283,16 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
                 }
             );
         }
+    }
+    if (changeInfo.status == "complete") {
+        // HeartBeat
+        chrome.scripting.executeScript({
+            args: [chrome.runtime.id],
+            target: { tabId: tabId },
+            func: function (cid) {
+                chrome.runtime.connect(cid, {name: "HeartBeat"});
+            }
+        });
     }
 });
 // 标签关闭 清除数据
@@ -445,9 +460,9 @@ function clearRedundant() {
     chrome.tabs.query({}, function (tabs) {
         let allTabId = [];
         for (let item of tabs) {
-            allTabId.push("tabId" + item["id"]);
+            allTabId.push("tabId" + item.id);
         }
-        
+
         // 清理捕获列表
         chrome.storage.local.get({ MediaData: {} }, function (items) {
             if (items.MediaData === undefined) { return; }
