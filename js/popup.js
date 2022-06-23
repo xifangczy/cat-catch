@@ -182,7 +182,10 @@ function AddMedia(data) {
             // console.log(DownloadItem.error.current);
             // SERVER_FORBIDDEN
             if (DownloadItem.error) {
-                chrome.tabs.create({ url: `/m3u8.html?m3u8_url=${encodeURIComponent(data.url)}&referer=${encodeURIComponent(data.initiator)}&filename=${encodeURIComponent(downFileName)}` });
+                chrome.tabs.get(G.tabId, function (tab) {
+                    let url = `/m3u8.html?m3u8_url=${encodeURIComponent(data.url)}&referer=${encodeURIComponent(data.initiator)}&filename=${encodeURIComponent(downFileName)}`;
+                    chrome.tabs.create({ url: url, index: tab.index + 1 });
+                });
             }
         });
         return false;
@@ -230,7 +233,9 @@ function AddMedia(data) {
         let title = encodeURIComponent(data.title);
         let url = encodeURIComponent(data.url);
         let initiator = encodeURIComponent(data.initiator);
-        chrome.tabs.create({ url: `/m3u8.html?m3u8_url=${url}&referer=${initiator}&title=${title}` });
+        chrome.tabs.get(G.tabId, function (tab) {
+            chrome.tabs.create({ url: `/m3u8.html?m3u8_url=${url}&referer=${initiator}&title=${title}`, index: tab.index + 1 });
+        });
         return false;
     });
     //多选框

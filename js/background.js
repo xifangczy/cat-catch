@@ -228,7 +228,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // Heart Beat
     if (Message.Message == "HeartBeat") {
-        console.log("HeartBeat " + Message.type + " OK");
+        console.log("HeartBeat OK");
         sendResponse("HeartBeat OK");
         return;
     }
@@ -263,7 +263,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
         });
     }
     // 跳过特殊页面
-    if (isSpecialPage(tab.url)) { return; }
+    if (isSpecialPage(tab.url) || tabId == 0 || tabId == -1) { return; }
 
     if (changeInfo.status == "loading") {
         // 开启捕获
