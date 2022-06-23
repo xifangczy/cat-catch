@@ -27,7 +27,16 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
     });
 });
 chrome.runtime.onConnect.addListener(function (Port) {
-    console.log(Port);
+    if (Port.name !== "HeartBeat") return;
+    Port.postMessage("HeartBeat");
+    Port.onMessage.addListener(function (message, Port) { return; });
+    let interval = setInterval(function () {
+        clearInterval(interval);
+        Port.disconnect();
+    }, 250000);
+    Port.onDisconnect.addListener(function () {
+        if (interval) { clearInterval(interval); }
+    });
 });
 
 // onResponseStarted 浏览器接收到第一个字节触发，保证有更多信息判断资源类型
@@ -290,7 +299,14 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
             args: [chrome.runtime.id],
             target: { tabId: tabId },
             func: function (cid) {
-                chrome.runtime.connect(cid, {name: "HeartBeat"});
+                let Port
+                function connect() {
+                    Port = chrome.runtime.connect(cid, { name: "HeartBeat" });
+                    Port.postMessage("HeartBeat");
+                    Port.onMessage.addListener(function (message, Port) { return; });
+                    Port.onDisconnect.addListener(connect);
+                }
+                connect();
             }
         });
     }

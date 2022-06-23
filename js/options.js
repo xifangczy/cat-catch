@@ -123,7 +123,7 @@ $("#ResetOption").bind("click", function () {
     }
 });
 //清空数据 重置所有设置
-$("#ClearData, #ResetAllOption").bind("click", function () {
+$("#ClearData, #ResetAllOption, #extensionReload").bind("click", function () {
     if ($(this).attr("id") == "ResetAllOption") {
         if (confirm("确认重置所有设置吗？")) {
             chrome.storage.sync.clear();
@@ -134,6 +134,9 @@ $("#ClearData, #ResetAllOption").bind("click", function () {
     }
     chrome.storage.local.clear();
     chrome.runtime.sendMessage({ Message: "ClearIcon" });
+    if($(this).attr("id") == "extensionReload"){
+        chrome.runtime.reload();
+    }
     location.reload();
 });
 //正则表达式 测试

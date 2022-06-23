@@ -1,5 +1,5 @@
 // HeartBeat
-chrome.runtime.sendMessage({ Message: "HeartBeat" });
+chrome.runtime.sendMessage(chrome.runtime.id, { Message: "HeartBeat" });
 
 //填充数据
 chrome.storage.local.get({ "MediaData": {} }, function (items) {

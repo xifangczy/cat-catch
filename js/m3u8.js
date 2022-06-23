@@ -89,11 +89,11 @@ $(function () {
     });
 
     chrome.downloads.onChanged.addListener(function (DownloadDelta) {
-        console.log(DownloadDelta);
         if (!DownloadDelta.state) { return; }
-        if(DownloadDelta.state.current == "complete"){
+        if (DownloadDelta.state.current == "complete") {
             $("#downFilepProgress").html("已保存到硬盘");
             $("#progress").html("已保存到硬盘");
+            document.title = "已保存到硬盘";
         }
     });
 
@@ -108,16 +108,25 @@ $(function () {
             xhr: function () {
                 let xhr = new XMLHttpRequest();
                 xhr.addEventListener("progress", function (evt) {
-                    let progress = Math.round(evt.loaded / evt.total * 10000) / 100.00 + "%";
-                    $("#downFilepProgress").html(progress);
-                    $(".progress").css("width", progress);
+                    let progress = Math.round(evt.loaded / evt.total * 10000) / 100.00;
+                    if (progress != Infinity) {
+                        progress = progress + "%";
+                        document.title = progress;
+                        $("#downFilepProgress").html(progress);
+                        $(".progress").css("width", progress);
+                    } else {
+                        $("#downFilepProgress").html("未知大小...");
+                        $(".progress").css("width", "100%");
+                    }
                 });
                 return xhr;
             }
         }).fail(function (result) {
             $("#downFilepProgress").html("下载失败... " + JSON.stringify(result));
+            document.title = "下载失败";
         }).done(function (result) {
             $("#downFilepProgress").html("下载完成，正在保存到硬盘...");
+            document.title = "下载完成";
             chrome.downloads.download({
                 url: URL.createObjectURL(result),
                 filename: file_name
@@ -418,12 +427,14 @@ $(function () {
                 isComplete = m3u8Complete();
                 if (isComplete) {
                     $("#progress").html(`数据完整，下载中...`);
+                    document.title = `数据完整，下载中...`;
                     clearInterval(tsInterval);
                     downloadAllTs();
                 }
                 if (errorTsList.length > 0) {
                     clearInterval(tsInterval);
                     $("#progress").html(`数据不完整...`);
+                    document.title = `数据不完整...`;
                 }
             }
             if (tsThread > 0 && tsList.length > 0) {
@@ -443,6 +454,7 @@ $(function () {
                     if (stopDownload) { return; }
                     tsBuffer[tsIndex] = tsDecrypt(responseData, tsIndex);
                     $("#progress").html(`${successCount++}/${tsCount + 1}`);
+                    document.title = `${successCount}/${tsCount}`;
                     tsThread++;
                 });
             }
@@ -498,6 +510,7 @@ $(function () {
             filename: `${GetFileName(m3u8_url)}.ts`
         });
         $("#progress").html(`数据合并，下载中...`);
+        document.title = `数据合并，下载中...`;
     }
 
     // 解密ts文件
@@ -511,10 +524,12 @@ $(function () {
                 return decryptor.decrypt(responseData, 0, iv.buffer || iv, true);
             } catch (e) {
                 stopDownload = "解密出错，无法解密.";
+                document.title = `解密出错，无法解密.`;
                 console.log(e);
             }
         } else {
             stopDownload = "密钥错误，无法解密.";
+            document.title = `解密出错，无法解密.`;
         }
     }
 
