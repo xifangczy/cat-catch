@@ -93,7 +93,6 @@ $(function () {
         if (DownloadDelta.state.current == "complete") {
             $("#downFilepProgress").html("已保存到硬盘");
             $("#progress").html("已保存到硬盘");
-            document.title = "已保存到硬盘";
         }
     });
 
@@ -111,7 +110,6 @@ $(function () {
                     let progress = Math.round(evt.loaded / evt.total * 10000) / 100.00;
                     if (progress != Infinity) {
                         progress = progress + "%";
-                        document.title = progress;
                         $("#downFilepProgress").html(progress);
                         $(".progress").css("width", progress);
                     } else {
@@ -123,10 +121,8 @@ $(function () {
             }
         }).fail(function (result) {
             $("#downFilepProgress").html("下载失败... " + JSON.stringify(result));
-            document.title = "下载失败";
         }).done(function (result) {
             $("#downFilepProgress").html("下载完成，正在保存到硬盘...");
-            document.title = "下载完成";
             chrome.downloads.download({
                 url: URL.createObjectURL(result),
                 filename: file_name
@@ -135,7 +131,10 @@ $(function () {
     }
     // 返回上一页
     $("#historyBack").click(function () {
-        window.history.back();
+        if(window.history.length > 1){
+            window.history.back();
+        }
+        window.location.href = "/m3u8.html";
     });
 
     // 下载m3u8内容
@@ -158,7 +157,7 @@ $(function () {
 
     // 获得m3u8文件名
     function GetFileName(url, ext = false) {
-        if (G.Options.TitleName && m3u8_title) {
+        if (G.TitleName && m3u8_title) {
             return m3u8_title;
         }
         url = url.toLowerCase();
@@ -394,7 +393,6 @@ $(function () {
         $("#play").html("播放m3u8");
         $("#play").data("switch", "on");
     });
-
     // 开启/关闭捕获
     $("#catch").click(function () {
         if ($(this).data("switch") == "on") {
@@ -402,6 +400,11 @@ $(function () {
             return;
         }
         window.location.href = window.location.href.replace("&catch=on", "");
+    });
+
+    // 监听提示变化修改网页标题
+    $("#progress, #downFilepProgress").bind("DOMNodeInserted", function (e) {
+        document.title = e.target.innerHTML;
     });
 
     // 下载m3u8并合并
@@ -431,14 +434,12 @@ $(function () {
                 isComplete = m3u8Complete();
                 if (isComplete) {
                     $("#progress").html(`数据完整，下载中...`);
-                    document.title = `数据完整，下载中...`;
                     clearInterval(tsInterval);
                     downloadAllTs();
                 }
                 if (errorTsList.length > 0) {
                     clearInterval(tsInterval);
-                    $("#progress").html(`数据不完整...`);
-                    document.title = `数据不完整...`;
+                    $("#progress").html(`数据不完整... 下载失败: ${errorTsList.length}`);
                 }
             }
             if (tsThread > 0 && tsList.length > 0) {
@@ -457,8 +458,10 @@ $(function () {
                 }).done(function (responseData) {
                     if (stopDownload) { return; }
                     tsBuffer[tsIndex] = tsDecrypt(responseData, tsIndex);
-                    $("#progress").html(`${successCount++}/${tsCount + 1}`);
-                    document.title = `${successCount}/${tsCount + 1}`;
+                    $("#progress").html(`${successCount++}/${tsLists.length}`);
+                    if (errorTsList.length > 0) {
+                        $("#progress").html($("#progress").html() + " 下载失败: " + errorTsList.length);
+                    }
                     tsThread++;
                 });
             }
@@ -492,6 +495,9 @@ $(function () {
                 }
                 html.remove();
                 $("#progress").html(`${successCount++}/${tsLists.length}`);
+                if (errorTsList.length > 0) {
+                    $("#progress").html($("#progress").html() + " 下载失败: " + errorTsList.length);
+                }
                 isComplete = m3u8Complete(true);
                 if (isComplete) {
                     $("#ForceDownload").hide();
@@ -515,8 +521,7 @@ $(function () {
             url: URL.createObjectURL(fileBlob),
             filename: `${GetFileName(m3u8_url)}.ts`
         });
-        $("#progress").html(`数据已合并，下载中...`);
-        document.title = `数据合已并，下载中...`;
+        $("#progress").html(`数据正在合并，并下载中...`);
     }
 
     // 解密ts文件
@@ -530,12 +535,10 @@ $(function () {
                 return decryptor.decrypt(responseData, 0, iv.buffer || iv, true);
             } catch (e) {
                 stopDownload = "解密出错，无法解密.";
-                document.title = `解密出错，无法解密.`;
                 console.log(e);
             }
         } else {
             stopDownload = "密钥错误，无法解密.";
-            document.title = `解密出错，无法解密.`;
         }
     }
 
@@ -544,7 +547,7 @@ $(function () {
         $("#progress").html(`下载数据校验中...`);
         for (let i = 0; i < tsLists.length; i++) {
             if (tsBuffer[i] == undefined) {
-                isError && $("#progress").html(`数据不完整...`);
+                isError && $("#progress").html(`数据不完整... 下载失败: ${errorTsList.length}`);
                 return false;
             }
         }

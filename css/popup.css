@@ -68,7 +68,7 @@ body {
   left: 0;
   right: 0;
   text-align: center;
-  z-index: 999;
+  z-index: 9999;
   pointer-events: none;
   color: rgb(26, 115, 232);
   font-weight: bold;

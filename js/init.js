@@ -1,5 +1,5 @@
 //全局变量
-var G = new Object();
+var G = {};
 //当前tabID
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     if (tabs[0] && tabs[0].id) {
@@ -7,8 +7,6 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         G.tabIdStr = "tabId" + tabs[0].id;
     }
 });
-//设置参数
-G.Options = new Object();
 //所有设置变量
 G.OptionLists = [
     "Ext",
@@ -24,8 +22,11 @@ G.OptionLists = [
     "m3u8dlArg",
     "injectScript"
 ];
-// 功能tab id列表
-G.TabIdList = { Mobile: [], AutoDown: [], Catch: [] };
+G.TabIdList = [
+    "featMobileTabId",
+    "featAutoDownTabId",
+    "featCatchTabId"
+]
 
 // Init
 InitOptions();
@@ -89,6 +90,9 @@ function GetDefault(Obj) {
         case "m3u8dl": return false;
         case "m3u8dlArg": return '"$url$" --workDir "%USERPROFILE%\\Downloads\\m3u8dl" --saveName "$title$" --enableDelAfterDone --headers "Referer:$referer$"';
         case "injectScript": return "catch.js";
+        case "featMobileTabId": return [];
+        case "featAutoDownTabId": return [];
+        case "featCatchTabId": return [];
     }
 }
 //初始变量
@@ -99,15 +103,24 @@ function InitOptions() {
                 chrome.storage.sync.set({ [list]: GetDefault(list) });
                 continue;
             }
-            G.Options[list] = items[list];
+            G[list] = items[list];
+        }
+    });
+    chrome.storage.local.get(G.TabIdList, function (items) {
+        for (let list of G.TabIdList) {
+            if (items[list] === undefined) {
+                chrome.storage.local.set({ [list]: GetDefault(list) });
+                continue;
+            }
+            G[list] = items[list];
         }
     });
 }
 //监听变化，新值给全局变量
 chrome.storage.onChanged.addListener(function (changes, namespace) {
-    if (namespace != "sync") { return; }
+    if (changes.MediaData) { return; }
     for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
-        G.Options[key] = newValue;
+        G[key] = newValue;
     }
 });
 
@@ -115,7 +128,5 @@ chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason == "update") {
         chrome.storage.local.clear();
         clearRedundant();
-        // chrome.storage.sync.clear();
-        // InitOptions()
     }
 });

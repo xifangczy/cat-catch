@@ -18,7 +18,7 @@ if (typeof (browser) == "object") {
             function (details) {
                 for (var i = 0; i < details.requestHeaders.length; ++i) {
                     if (details.requestHeaders[i].name === 'User-Agent') {
-                        details.requestHeaders[i].value = G.Options.MobileUserAgent;
+                        details.requestHeaders[i].value = G.MobileUserAgent;
                     }
                 }
                 return { requestHeaders: details.requestHeaders };

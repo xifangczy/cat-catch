@@ -54,7 +54,7 @@ function AddMedia(data) {
     }
 
     //添加下载文件名
-    let downFileName = G.Options.TitleName ? data.title + '.' + data.ext : data.name;
+    let downFileName = G.TitleName ? data.title + '.' + data.ext : data.name;
 
 
     // 文件大小单位转换
@@ -98,13 +98,13 @@ function AddMedia(data) {
         <div class="panel">
             <div class="panel-heading">
                 <input type="checkbox" class="DownCheck" checked="true"/>
-                <img src="${data.webInfo?.favIconUrl}" class="icon ${G.Options.ShowWebIco ? "" : "hide"}"/>
+                <img src="${data.webInfo?.favIconUrl}" class="icon ${G.ShowWebIco ? "" : "hide"}"/>
                 <img src="img/regex.png" class="icon ${data.isRegex ? "" : "hide"}" title="正则表达式匹配"/>
                 <span class="name">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
                 <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
                 <img src="img/parsing.png" class="ico ${isM3U8(data) ? "" : "hide"}" id="m3u8" title="解析"/>
-                <img src="img/${G.Options.Potplayer ? "potplayer.png" : "play.png"}" class="ico ${isPlay(data) || isM3U8(data) ? "" : "hide"}" id="play" title="预览"/>
+                <img src="img/${G.Potplayer ? "potplayer.png" : "play.png"}" class="ico ${isPlay(data) || isM3U8(data) ? "" : "hide"}" id="play" title="预览"/>
                 <img src="img/download.png" class="ico" id="download" title="下载"/>
             </div>
             <div class="url hide">
@@ -170,11 +170,15 @@ function AddMedia(data) {
     });
     // 下载
     html.find('#download').click(function () {
-        if (G.Options.m3u8dl && isM3U8(data)) {
-            let m3u8dlArg = G.Options.m3u8dlArg.replace("$referer$", data.initiator);
+        if (G.m3u8dl && isM3U8(data)) {
+            let m3u8dlArg = G.m3u8dlArg.replace("$referer$", data.initiator);
             m3u8dlArg = m3u8dlArg.replace("$url$", data.url);
             m3u8dlArg = m3u8dlArg.replace("$title$", unescape(encodeURIComponent(data.title)));
-            window.open('m3u8dl://' + btoa(m3u8dlArg));
+            let url = 'm3u8dl://' + btoa(m3u8dlArg);
+            if(url.length >= 2046){
+                alert("m3u8dl参数太长,可能导致无法唤醒m3u8DL, 请手动复制到m3u8DL下载");
+            }
+            window.open(url);
             return false;
         }
         chrome.downloads.download({
@@ -200,7 +204,7 @@ function AddMedia(data) {
     });
     //播放
     html.find('#play').click(function () {
-        if (G.Options.Potplayer) {
+        if (G.Potplayer) {
             window.open('potplayer://' + data.url);
             return false;
         }
@@ -394,7 +398,7 @@ $(function () {
 
 //html5播放器允许格式
 function isPlay(data) {
-    if (G.Options.Potplayer) { return true }
+    if (G.Potplayer) { return true }
     let arr = ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'flv', 'm4a', '3gp', 'mpeg', 'mov'];
     return arr.includes(data.ext);
 }
