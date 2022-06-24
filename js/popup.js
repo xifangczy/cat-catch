@@ -1,5 +1,9 @@
 // HeartBeat
 chrome.runtime.sendMessage(chrome.runtime.id, { Message: "HeartBeat" });
+const Port = chrome.runtime.connect(chrome.runtime.id, { name: "HeartBeat" });
+Port.onDisconnect.addListener(function () {
+    if (chrome.runtime.lastError) { chrome.runtime.reload(); }
+});
 
 //填充数据
 chrome.storage.local.get({ "MediaData": {} }, function (items) {

@@ -68,6 +68,7 @@ function GetDefault(Obj) {
         { "type": "application/vnd.apple.mpegurl", "size": 0, "state": true },
         { "type": "application/x-mpegurl", "size": 0, "state": true },
         { "type": "application/mpegurl", "size": 0, "state": true },
+        { "type": "application/octet-stream-m3u8", "size": 0, "state": true },
         { "type": "application/octet-stream", "size": 0, "state": false },
         { "type": "image/*", "size": 0, "state": false }
     );
@@ -113,6 +114,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason == "update") {
         chrome.storage.local.clear();
+        clearRedundant();
         // chrome.storage.sync.clear();
         // InitOptions()
     }

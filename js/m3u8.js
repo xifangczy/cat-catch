@@ -133,6 +133,10 @@ $(function () {
             });
         });
     }
+    // 返回上一页
+    $("#historyBack").click(function () {
+        window.history.back();
+    });
 
     // 下载m3u8内容
     function getM3u8Content() {
@@ -454,7 +458,7 @@ $(function () {
                     if (stopDownload) { return; }
                     tsBuffer[tsIndex] = tsDecrypt(responseData, tsIndex);
                     $("#progress").html(`${successCount++}/${tsCount + 1}`);
-                    document.title = `${successCount}/${tsCount}`;
+                    document.title = `${successCount}/${tsCount + 1}`;
                     tsThread++;
                 });
             }
@@ -469,6 +473,7 @@ $(function () {
         }
         let html = $(`<p>${tsLists[tsIndex]} <button data-id="${tsIndex}">重新下载</button></p>`);
         html.find("button").click(function () {
+            if ($(this).html() == "正在重新下载") { return; }
             $(this).html("正在重新下载");
             let tsIndex = $(this).data("id");
             let url = tsLists[tsIndex];
@@ -487,8 +492,9 @@ $(function () {
                 }
                 html.remove();
                 $("#progress").html(`${successCount++}/${tsLists.length}`);
-                isComplete = m3u8Complete();
+                isComplete = m3u8Complete(true);
                 if (isComplete) {
+                    $("#ForceDownload").hide();
                     $("#progress").html(`数据完整，下载中...`);
                     downloadAllTs();
                 }
@@ -509,8 +515,8 @@ $(function () {
             url: URL.createObjectURL(fileBlob),
             filename: `${GetFileName(m3u8_url)}.ts`
         });
-        $("#progress").html(`数据合并，下载中...`);
-        document.title = `数据合并，下载中...`;
+        $("#progress").html(`数据已合并，下载中...`);
+        document.title = `数据合已并，下载中...`;
     }
 
     // 解密ts文件
@@ -534,11 +540,11 @@ $(function () {
     }
 
     // 验证ts文件是否完整
-    function m3u8Complete() {
+    function m3u8Complete(isError = false) {
         $("#progress").html(`下载数据校验中...`);
         for (let i = 0; i < tsLists.length; i++) {
             if (tsBuffer[i] == undefined) {
-                $("#progress").html(`数据不完整...`);
+                isError && $("#progress").html(`数据不完整...`);
                 return false;
             }
         }

@@ -10,9 +10,10 @@ chrome.webNavigation.onBeforeNavigate.addListener(function () {
 chrome.webNavigation.onHistoryStateUpdated.addListener(function () {
     console.log("HeartBeat onHistoryStateUpdated");
 });
-chrome.alarms.create("heartbeat", { periodInMinutes: 1 });
+chrome.alarms.create("heartbeat1", { periodInMinutes: 1 });
+chrome.alarms.create("heartbeat4.9", { periodInMinutes: 4.9 });
 chrome.alarms.onAlarm.addListener(function (alarm) {
-    console.log("HeartBeat alarm start");
+    console.log(alarm.name);
     chrome.tabs.query({}, function (tabs) {
         for (let item of tabs) {
             if (isSpecialPage(item.url) || item.id == -1 || item.id == 0) { return; }

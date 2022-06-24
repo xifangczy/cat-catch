@@ -74,18 +74,28 @@ function Gethtml(Type, Param = new Object()) {
     html.find(".RemoveButton").click(function () {
         if (confirm("确认删除吗？")) {
             html.remove();
-            Save();
+            Save(Type);
         }
     });
-    html.find("input").blur(function () {
-        Save();
+    html.find("input").keyup(function () {
+        Save(Type);
     });
     html.find("#size, #state").on("click", function () {
-        Save();
+        Save(Type);
     });
+    if (Type == "Type") {
+        html.find("input").blur(function () {
+            $("#typeList tr").each(function () {
+                let GetText = $(this).find("#text").val();
+                if (isEmpty(GetText)) { return true; }
+                if (!/^[^\/]+\/[^\/]+$/ig.test(GetText)) {
+                    alert("抓取类型格式错误，请检查");
+                }
+            });
+        });
+    }
     return html;
 }
-
 // 注入脚本选择
 $("#injectScript").change(function () {
     const Option = $(this).attr("id");
@@ -95,7 +105,7 @@ $("#injectScript").change(function () {
     }
 });
 //失去焦点 保存自动清理数 模拟手机User Agent
-$("#OtherAutoClear, #MobileUserAgent, #m3u8dlArg").blur(function () {
+$("#OtherAutoClear, #MobileUserAgent, #m3u8dlArg").on("input", function () {
     const Option = $(this).attr("id");
     chrome.storage.sync.set({ [Option]: $(this).val() });
 });
@@ -199,44 +209,56 @@ function readerFile(e) {
     location.reload();
 }
 
-function Save() {
-    let Ext = new Array();
-    let Type = new Array();
-    let Regex = new Array();
-    $("#extList tr, #typeList tr").each(function () {
-        let GetText = $(this).find("#text").val();
-        let GetSize = $(this).find("#size").val();
-        let GetState = $(this).find("#state").prop("checked");
-        if (GetText == null || GetText === undefined || GetText == "" || GetText == " ") {
-            return true;
-        }
-        if (GetSize == null || GetSize === undefined || GetSize == "") {
-            GetSize = 0;
-        }
-        if ($(this).data("type") == "Ext") {
+function Save(option) {
+    console.log(option);
+    if (option == "Ext") {
+        let Ext = new Array();
+        $("#extList tr").each(function () {
+            let GetText = $(this).find("#text").val();
+            let GetSize = $(this).find("#size").val();
+            let GetState = $(this).find("#state").prop("checked");
+            if (isEmpty(GetText)) { return true; }
+            if (isEmpty(GetSize)) { GetSize = 0; }
             Ext.push({ ext: GetText.toLowerCase(), size: GetSize, state: GetState });
-        } else if (/^[^\/]+\/[^\/]+$/ig.test(GetText)) {
-            Type.push({ type: GetText.toLowerCase(), size: GetSize, state: GetState });
-        } else {
-            alert("类型输入不正确");
-            location.reload();
-        }
-    });
-    $("#regexList tr").each(function () {
-        let GetType = $(this).find("#type").val();
-        let GetRegex = $(this).find("#regex").val();
-        let GetState = $(this).find("#state").prop("checked");
-        try {
-            new RegExp("", GetType);
-        } catch (e) {
-            GetType = "ig";
-        }
-        if (GetRegex == null || GetRegex === undefined || GetRegex == "" || GetRegex == " ") {
-            return true;
-        }
-        Regex.push({ type: GetType, regex: GetRegex, state: GetState });
-    });
-    chrome.storage.sync.set({ Ext: Ext });
-    chrome.storage.sync.set({ Type: Type });
-    chrome.storage.sync.set({ Regex: Regex });
+        });
+        chrome.storage.sync.set({ Ext: Ext });
+    }
+    if (option == "Type") {
+        let Type = new Array();
+        $("#typeList tr").each(function () {
+            let GetText = $(this).find("#text").val();
+            let GetSize = $(this).find("#size").val();
+            let GetState = $(this).find("#state").prop("checked");
+            if (isEmpty(GetText)) { return true; }
+            if (isEmpty(GetSize)) { GetSize = 0; }
+            if (/^[^\/]+\/[^\/]+$/ig.test(GetText)) {
+                Type.push({ type: GetText.toLowerCase(), size: GetSize, state: GetState });
+            }
+        });
+        chrome.storage.sync.set({ Type: Type });
+    }
+    if (option == "Regex") {
+        let Regex = new Array();
+        $("#regexList tr").each(function () {
+            let GetType = $(this).find("#type").val();
+            let GetRegex = $(this).find("#regex").val();
+            let GetState = $(this).find("#state").prop("checked");
+            try {
+                new RegExp("", GetType);
+            } catch (e) {
+                GetType = "ig";
+            }
+            if (isEmpty(GetRegex)) { return true; }
+            Regex.push({ type: GetType, regex: GetRegex, state: GetState });
+        });
+        chrome.storage.sync.set({ Regex: Regex });
+    }
+}
+
+// 判断是否为空
+function isEmpty(obj) {
+    if (typeof obj == "undefined" || obj == null || obj == "" || obj == " ") {
+        return true;
+    }
+    return false;
 }
