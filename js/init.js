@@ -70,6 +70,7 @@ function GetDefault(Obj) {
         { "type": "application/x-mpegurl", "size": 0, "state": true },
         { "type": "application/mpegurl", "size": 0, "state": true },
         { "type": "application/octet-stream-m3u8", "size": 0, "state": true },
+        { "type": "application/json", "size": 0, "state": false },
         { "type": "application/octet-stream", "size": 0, "state": false },
         { "type": "image/*", "size": 0, "state": false }
     );

@@ -103,7 +103,7 @@ function AddMedia(data) {
                 <span class="name">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
                 <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
-                <img src="img/parsing.png" class="ico ${isM3U8(data) ? "" : "hide"}" id="m3u8" title="解析"/>
+                <img src="img/parsing.png" class="ico ${isM3U8(data) || isJSON(data) ? "" : "hide"}" id="${isM3U8(data) ? "m3u8" : "json"}" title="解析"/>
                 <img src="img/${G.Potplayer ? "potplayer.png" : "play.png"}" class="ico ${isPlay(data) || isM3U8(data) ? "" : "hide"}" id="play" title="预览"/>
                 <img src="img/download.png" class="ico" id="download" title="下载"/>
             </div>
@@ -175,7 +175,7 @@ function AddMedia(data) {
             m3u8dlArg = m3u8dlArg.replace("$url$", data.url);
             m3u8dlArg = m3u8dlArg.replace("$title$", unescape(encodeURIComponent(data.title)));
             let url = 'm3u8dl://' + btoa(m3u8dlArg);
-            if(url.length >= 2046){
+            if (url.length >= 2046) {
                 alert("m3u8dl参数太长,可能导致无法唤醒m3u8DL, 请手动复制到m3u8DL下载");
             }
             window.open(url);
@@ -237,12 +237,18 @@ function AddMedia(data) {
         return false;
     });
     //解析m3u8
-    html.find('#m3u8').click(function () {
+    html.find('#m3u8, #json').click(function () {
+        let id = $(this).attr('id');
         let title = encodeURIComponent(data.title);
         let url = encodeURIComponent(data.url);
         let initiator = encodeURIComponent(data.initiator);
         chrome.tabs.get(G.tabId, function (tab) {
-            chrome.tabs.create({ url: `/m3u8.html?m3u8_url=${url}&referer=${initiator}&title=${title}`, index: tab.index + 1 });
+            if (id == "m3u8") {
+                url = `/m3u8.html?m3u8_url=${url}&referer=${initiator}&filename=${title}`;
+            } else {
+                url = `/json.html?url=${url}&referer=${initiator}&filename=${title}`;
+            }
+            chrome.tabs.create({ url: url, index: tab.index + 1 });
         });
         return false;
     });
@@ -407,6 +413,12 @@ function isM3U8(data) {
         data.type == "application/vnd.apple.mpegurl" ||
         data.type == "application/x-mpegurl" ||
         data.type == "application/mpegurl"
+    ) { return true; }
+    return false;
+}
+function isJSON(data) {
+    if (data.ext == "json" ||
+        data.type == "application/json"
     ) { return true; }
     return false;
 }
