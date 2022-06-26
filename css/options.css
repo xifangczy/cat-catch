@@ -54,8 +54,12 @@ input.regexType {
   width: 20px;
   text-align: center;
 }
+input.regexExt {
+  width: 35px;
+  text-align: center;
+}
 input.regex {
-  width: 440px;
+  width: 395px;
   text-align: center;
 }
 input#OtherAutoClear {

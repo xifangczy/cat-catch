@@ -10,7 +10,7 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
         $("#typeList").append(Gethtml("Type", { type: item.type, size: item.size, state: item.state }));
     }
     for (let item of items.Regex) {
-        $("#regexList").append(Gethtml("Regex", { type: item.type, regex: item.regex, state: item.state }));
+        $("#regexList").append(Gethtml("Regex", { type: item.type, regex: item.regex, ext: item.ext, state: item.state }));
     }
     $("#Debug").attr("checked", items.Debug);
     $("#TitleName").attr("checked", items.TitleName);
@@ -52,6 +52,7 @@ function Gethtml(Type, Param = new Object()) {
         case "Regex":
             html = `<td><input type="text" value="${Param.type ? Param.type : ""}" id="type" class="regexType"></td>`
             html += `<td><input type="text" value="${Param.regex ? Param.regex : ""}" placeholder="正则表达式" id="regex" class="regex"></td>`
+            html += `<td><input type="text" value="${Param.ext ? Param.ext : ""}" id="regexExt" class="regexExt"></td>`
     }
     html = `<tr data-type="${Type}">
             ${html}
@@ -242,6 +243,7 @@ function Save(option) {
         $("#regexList tr").each(function () {
             let GetType = $(this).find("#type").val();
             let GetRegex = $(this).find("#regex").val();
+            let GetExt = $(this).find("#regexExt").val()
             let GetState = $(this).find("#state").prop("checked");
             try {
                 new RegExp("", GetType);
@@ -249,7 +251,8 @@ function Save(option) {
                 GetType = "ig";
             }
             if (isEmpty(GetRegex)) { return true; }
-            Regex.push({ type: GetType, regex: GetRegex, state: GetState });
+            GetExt = GetExt ? GetExt.toLowerCase() : "";
+            Regex.push({ type: GetType, regex: GetRegex, ext: GetExt, state: GetState });
         });
         chrome.storage.sync.set({ Regex: Regex });
     }

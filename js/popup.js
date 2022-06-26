@@ -31,12 +31,17 @@ chrome.runtime.onMessage.addListener(function (MediaData, sender, sendResponse) 
     sendResponse("OK");
 });
 
-
 function AddMedia(data) {
+    // 正则匹配的备注扩展
+    if (data.extraExt) {
+        data.ext = data.extraExt;
+    }
+    // 不存在扩展使用类型
     if (data.ext === undefined && data.type !== undefined) {
         data.ext = data.type.split("/")[1];
     }
 
+    // 修正标题 防止以标题下载文件存在非法字符
     if (data.title) {
         data.title = stringModify(data.title);
     }
@@ -56,7 +61,6 @@ function AddMedia(data) {
     //添加下载文件名
     let downFileName = G.TitleName ? data.title + '.' + data.ext : data.name;
 
-
     // 文件大小单位转换
     if (data.size) {
         if (data.size < 1024) {
@@ -68,6 +72,16 @@ function AddMedia(data) {
         } else {
             data.size = parseFloat((data.size / 1024 / 1024 / 1024).toFixed(1)) + "GB";
         }
+    }
+    // 是否需要解析
+    let parsing = false;
+    let parsingType = "m3u8";
+    if (isM3U8(data)) {
+        parsing = true;
+        parsingType = "m3u8";
+    } else if (isJSON(data)) {
+        parsing = true;
+        parsingType = "json";
     }
     //添加html
     /*
@@ -103,7 +117,7 @@ function AddMedia(data) {
                 <span class="name">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
                 <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
-                <img src="img/parsing.png" class="ico ${isM3U8(data) || isJSON(data) ? "" : "hide"}" id="${isM3U8(data) ? "m3u8" : "json"}" title="解析"/>
+                <img src="img/parsing.png" class="ico ${parsing ? "" : "hide"}" id="${parsingType}" title="解析"/>
                 <img src="img/${G.Potplayer ? "potplayer.png" : "play.png"}" class="ico ${isPlay(data) || isM3U8(data) ? "" : "hide"}" id="play" title="预览"/>
                 <img src="img/download.png" class="ico" id="download" title="下载"/>
             </div>
@@ -410,6 +424,7 @@ function isPlay(data) {
 }
 function isM3U8(data) {
     if (data.ext == "m3u8" ||
+        data.ext == "m3u" ||
         data.type == "application/vnd.apple.mpegurl" ||
         data.type == "application/x-mpegurl" ||
         data.type == "application/mpegurl"

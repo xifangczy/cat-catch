@@ -52,6 +52,7 @@ function GetDefault(Obj) {
         { "ext": "mkv", "size": 0, "state": true },
         { "ext": "m4s", "size": 0, "state": true },
         { "ext": "m3u8", "size": 0, "state": true },
+        { "ext": "m3u", "size": 0, "state": true },
         { "ext": "mpeg", "size": 0, "state": true },
         { "ext": "avi", "size": 0, "state": true },
         { "ext": "wmv", "size": 0, "state": true },
@@ -75,7 +76,8 @@ function GetDefault(Obj) {
         { "type": "image/*", "size": 0, "state": false }
     );
     const defaultRegex = new Array(
-        { "type": "ig", "regex": ".*vurl=([^&]*)", "state": true }
+        { "type": "ig", "regex": ".*vurl=([^&]*)", "ext": "m3u8", "state": true },
+        { "type": "ig", "regex": "/getvinfo\\?", "ext": "json", "state": true }
     );
     switch (Obj) {
         case "Ext": return defaultExt;

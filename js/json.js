@@ -54,7 +54,7 @@ $(function () {
             for (let regex of regexp) {
                 let res = new RegExp(regex, "ig").exec(result);
                 if (res) {
-                    console.log(res);
+                    // console.log(res);
                     result = res[1];
                     break;
                 }

@@ -78,8 +78,24 @@ function findMedia(data, isRegex = false, filter = false) {
 
     //正则匹配
     if (isRegex && !filter) {
-        filter = CheckRegex(data.url);
-        if (filter == "break") { return; }
+        for (let item of G.Regex) {
+            if (!item.state) { continue; }
+            const result = new RegExp(item.regex, item.type).exec(data.url);
+            if (result == null) { continue; }
+            data.extraExt = item.ext ? item.ext : undefined;
+            if (result.length == 1) {
+                findMedia(data, true, true);
+                return;
+            }
+            for (let i = 1; i < result.length; i++) {
+                data.url = decodeURIComponent(result[i]);
+                if (/^[\w]+:\/\/.+/i.test(data.url)) {
+                    findMedia(data, true, true);
+                    return;
+                }
+            }
+        }
+        return;
     }
 
     //检查后缀
@@ -162,6 +178,7 @@ function pushData(items, data, info, webInfo = {}) {
     info.initiator = data.initiator;
     info.title = webInfo.title ? webInfo.title : "NULL";
     info.webInfo = webInfo;
+    info.extraExt = data.extraExt ? data.extraExt : undefined;
 
     items.MediaData[tabId].push(info);
     chrome.storage.local.set({ MediaData: items.MediaData });
@@ -171,11 +188,11 @@ function pushData(items, data, info, webInfo = {}) {
     }
     // 发送到popup 并检查自动下载
     chrome.runtime.sendMessage(info, function () {
-        if (G.featAutoDownTabId.includes(G.tabId)) {
+        if (data.tabId != -1 && G.featAutoDownTabId && G.featAutoDownTabId.includes(data.tabId)) {
             let downFileName = G.TitleName ? info.title + '.' + info.ext : info.name;
             chrome.downloads.download({
                 url: data.url,
-                filename: "CatCatch-" + G.tabId + "/" + downFileName
+                filename: "CatCatch-" + data.tabId + "/" + downFileName
             });
         }
         if (chrome.runtime.lastError) { return; }
@@ -363,24 +380,7 @@ function CheckType(dataType, dataSize) {
     }
     return false;
 }
-//正则匹配
-function CheckRegex(url) {
-    for (let item of G.Regex) {
-        const result = new RegExp(item.regex, item.type).exec(url);
-        if (result == null) { continue; }
-        if (!item.state) { return "break"; }
-        if (result.length == 1) { return true; }
-        for (let i = 1; i < result.length; i++) {
-            let data = new Object();
-            data.url = decodeURIComponent(result[i]);
-            data.tabId = G.tabId;
-            if (/^[\w]+:\/\/.+/i.test(data.url)) {
-                findMedia(data, true, true);
-            }
-        }
-    }
-    return false;
-}
+
 //获取文件名
 function GetFileName(url) {
     let str = url.split("?"); //url按？分开
