@@ -53,8 +53,9 @@ function findMedia(data, isRegex = false, filter = false) {
         G.Debug === undefined ||
         G.OtherAutoClear === undefined ||
         G.Type === undefined ||
-        G.Regex === undefined
-    ) { return; }
+        G.Regex === undefined || 
+        G.featAutoDownTabId === undefined
+    ) { findMedia(data, isRegex, filter); return; }
     // 屏蔽特殊页面发起的资源
     if (data.initiator != "null" &&
         data.initiator != undefined &&
