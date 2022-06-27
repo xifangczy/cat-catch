@@ -10,9 +10,15 @@
 
 [Added] m3u8解析器增强，现在能在线合并下载m3u8文件
 
-[Added] popup页面出现无法下载的视频，会交给m3u8解析器修改Referer下载
+[Added] popup页面无法下载的视频，会交给m3u8解析器修改Referer下载
 
 [Added] popup页面和m3u8页面可以在线预览m3u8
+
+[Added] json查看工具，和m3u8解析器一样在popoup页面显示图标进入
+
+[Fixed] 无数BUG
+
+[Fixed] 该死的Service Worker... 现在后台被杀死能立刻唤醒自己... 继续用肮脏的手段对抗Manifest V3
 
 ### 1.0.26
 [Fixed] 解决关闭网页不能正确删除当前页面储存的数据问题
