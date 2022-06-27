@@ -202,9 +202,7 @@ function readerFile(e) {
         importData = JSON.parse(importData);
     } catch (e) { alert("文件内容错误"); return; }
     for (let item of G.OptionLists) {
-        if (importData[item]) {
-            chrome.storage.sync.set({ [item]: importData[item] });
-        }
+        chrome.storage.sync.set({ [item]: importData[item] });
     }
     alert("导入完成");
     location.reload();
