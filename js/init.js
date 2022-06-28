@@ -1,13 +1,14 @@
-//全局变量
+// 全局变量
 var G = {};
-//当前tabID
+// 缓存数据
+var cacheData = {};
+// 当前tabID
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     if (tabs[0] && tabs[0].id) {
         G.tabId = tabs[0].id;
-        G.tabIdStr = "tabId" + tabs[0].id;
     }
 });
-//所有设置变量
+// 所有设置变量
 G.OptionLists = [
     "Ext",
     "Debug",
@@ -31,7 +32,7 @@ G.TabIdList = [
 // Init
 InitOptions();
 
-//变量初始值
+// 变量初始值
 function GetDefault(Obj) {
     const defaultExt = new Array(
         { "ext": "flv", "size": 0, "state": true },
@@ -98,8 +99,11 @@ function GetDefault(Obj) {
         case "featCatchTabId": return [];
     }
 }
-//初始变量
+// 初始变量
 function InitOptions() {
+    chrome.storage.local.get({ MediaData: {} }, function (items) {
+        cacheData = items.MediaData;
+    });
     chrome.storage.sync.get(G.OptionLists, function (items) {
         for (let list of G.OptionLists) {
             if (items[list] === undefined) {
@@ -119,7 +123,7 @@ function InitOptions() {
         }
     });
 }
-//监听变化，新值给全局变量
+// 监听变化，新值给全局变量
 chrome.storage.onChanged.addListener(function (changes, namespace) {
     if (changes.MediaData) { return; }
     for (let [key, { oldValue, newValue }] of Object.entries(changes)) {

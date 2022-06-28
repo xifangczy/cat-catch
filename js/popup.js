@@ -8,13 +8,13 @@ Port.onDisconnect.addListener(function () {
 //填充数据
 chrome.storage.local.get({ "MediaData": {} }, function (items) {
     if (items.MediaData === undefined) { return; }
-    if (items.MediaData[G.tabIdStr] !== undefined) {
-        for (let item of items.MediaData[G.tabIdStr]) {
+    if (items.MediaData[G.tabId] !== undefined) {
+        for (let item of items.MediaData[G.tabId]) {
             AddMedia(item);
         }
     }
-    if (items.MediaData["tabId-1"] !== undefined) {
-        for (let item of items.MediaData["tabId-1"]) {
+    if (items.MediaData[-1] !== undefined) {
+        for (let item of items.MediaData[-1]) {
             AddMedia(item);
         }
     }
@@ -112,7 +112,7 @@ function AddMedia(data) {
         <div class="panel">
             <div class="panel-heading">
                 <input type="checkbox" class="DownCheck" checked="true"/>
-                <img src="${data.webInfo?.favIconUrl}" class="icon ${G.ShowWebIco ? "" : "hide"}"/>
+                <img src="${data.webInfo?.favIconUrl}" class="icon ${G.ShowWebIco && data.webInfo?.favIconUrl ? "" : "hide"}"/>
                 <img src="img/regex.png" class="icon ${data.isRegex ? "" : "hide"}" title="正则表达式匹配"/>
                 <span class="name">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
@@ -331,14 +331,9 @@ $(function () {
     //清空数据
     $('#Clear').click(function () {
         chrome.runtime.sendMessage({ Message: "clearRedundant" });
-        chrome.storage.local.get({ "MediaData": {} }, function (items) {
-            delete items.MediaData[G.tabIdStr];
-            delete items.MediaData["tabId-1"];
-            chrome.storage.local.set({ MediaData: items.MediaData }, function () {
-                chrome.runtime.sendMessage({ Message: "ClearIcon" });
-                location.reload();
-            });
-        });
+        chrome.runtime.sendMessage({ Message: "clearData", tabId: G.tabId });
+        chrome.runtime.sendMessage({ Message: "ClearIcon" });
+        location.reload();
     });
     //预览播放关闭按钮
     $('#CloseBtn').click(function () {
@@ -427,13 +422,15 @@ function isM3U8(data) {
         data.ext == "m3u" ||
         data.type == "application/vnd.apple.mpegurl" ||
         data.type == "application/x-mpegurl" ||
-        data.type == "application/mpegurl"
+        data.type == "application/mpegurl" ||
+        data.type == "application/octet-stream-m3u8"
     ) { return true; }
     return false;
 }
 function isJSON(data) {
     if (data.ext == "json" ||
-        data.type == "application/json"
+        data.type == "application/json" ||
+        data.type == "text/json"
     ) { return true; }
     return false;
 }
