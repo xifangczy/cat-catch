@@ -147,15 +147,6 @@ function findMedia(data, isRegex = false, filter = false) {
             if (item.url == data.url) { return; }
         }
     }
-    //自动清理幽灵数据
-    if (cacheData[-1] !== undefined) {
-        SetIcon({ tips: true });
-        if (cacheData[-1].length > G.OtherAutoClear) {
-            delete cacheData[-1];
-            chrome.storage.local.set({ MediaData: cacheData });
-            SetIcon({ tips: false });
-        }
-    }
     const info = {
         name: name,
         url: data.url,
@@ -173,7 +164,7 @@ function findMedia(data, isRegex = false, filter = false) {
         }
         // 装载页面信息
         info.initiator = data.initiator;
-        info.title = webInfo.title ? webInfo.title : "NULL";
+        info.title = webInfo?.title ? webInfo.title : "NULL";
         info.webInfo = webInfo;
         info.extraExt = data.extraExt ? data.extraExt : undefined;
         // 发送到popup 并检查自动下载
@@ -192,6 +183,14 @@ function findMedia(data, isRegex = false, filter = false) {
         chrome.storage.local.set({ MediaData: cacheData });
         if (data.tabId != -1) {
             SetIcon({ number: cacheData[data.tabId].length, tabId: data.tabId });
+        } else {
+            SetIcon({ tips: true });
+            //自动清理幽灵数据
+            if (cacheData[-1].length > G.OtherAutoClear) {
+                delete cacheData[-1];
+                chrome.storage.local.set({ MediaData: cacheData });
+                SetIcon({ tips: false });
+            }
         }
     });
 }

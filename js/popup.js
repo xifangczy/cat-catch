@@ -446,9 +446,11 @@ function isPicture(data) {
         data.ext == "jpeg" ||
         data.ext == "bmp" ||
         data.ext == "gif" ||
-        data.ext == "webp" ||
-        data.type.split("/")[0] == "image"
+        data.ext == "webp"
     ) { return true; }
+    if(data.type && data.type.split("/")[0] == "image"){
+        return true;
+    }
     return false;
 }
 
