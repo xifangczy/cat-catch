@@ -164,7 +164,7 @@ function findMedia(data, isRegex = false, filter = false) {
         }
         // 装载页面信息
         info.initiator = data.initiator;
-        info.title = webInfo?.title ? webInfo.title : "NULL";
+        info.title = webInfo?.title ? stringModify(webInfo.title) : "NULL";
         info.webInfo = webInfo;
         info.extraExt = data.extraExt ? data.extraExt : undefined;
         // 发送到popup 并检查自动下载
@@ -504,6 +504,22 @@ function clearRedundant() {
                 }
             }
         });
+    });
+}
+function stringModify(str) {
+    return str.replace(/['\\:\*\?"<\/>\|]/g, function (m) {
+        return {
+            "'": '&#39;',
+            '\\': '&#92;',
+            '/': '&#47;',
+            ':': '&#58;',
+            '*': '&#42;',
+            '?': '&#63;',
+            '"': '&quot;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '|': '&#124;'
+        }[m];
     });
 }
 

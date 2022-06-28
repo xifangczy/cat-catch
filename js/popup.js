@@ -40,11 +40,6 @@ function AddMedia(data) {
         data.ext = data.type.split("/")[1];
     }
 
-    // 修正标题 防止以标题下载文件存在非法字符
-    if (data.title) {
-        data.title = stringModify(data.title);
-    }
-
     //文件名是否为空
     if (data.name === undefined || data.name == '') {
         data.name = data.title + '.' + data.ext;
@@ -467,21 +462,4 @@ function UItoggle() {
 
 function Tips(text, delay = 200) {
     $('#TipsFixed').html(text).fadeIn(500).delay(delay).fadeOut(500);
-}
-
-function stringModify(str) {
-    return str.replace(/['\\:\*\?"<\/>\|]/g, function (m) {
-        return {
-            "'": '&#39;',
-            '\\': '&#92;',
-            '/': '&#47;',
-            ':': '&#58;',
-            '*': '&#42;',
-            '?': '&#63;',
-            '"': '&quot;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '|': '&#124;'
-        }[m];
-    });
 }
