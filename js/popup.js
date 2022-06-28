@@ -4,7 +4,6 @@ const Port = chrome.runtime.connect(chrome.runtime.id, { name: "HeartBeat" });
 Port.onDisconnect.addListener(function () {
     if (chrome.runtime.lastError) { chrome.runtime.reload(); }
 });
-
 //填充数据
 chrome.storage.local.get({ "MediaData": {} }, function (items) {
     if (items.MediaData === undefined) { return; }
@@ -137,8 +136,14 @@ function AddMedia(data) {
     //展开网址
     html.find('.panel-heading').click(function () {
         html.find(".url").toggle();
-        //获取时长
         let screenshots = html.find("#screenshots");
+        // 预览图片
+        if (isPicture(data)) {
+            screenshots.css("display", "block");
+            screenshots.attr("src", data.url);
+            return;
+        }
+        //获取时长
         let getMediaInfo = html.find("#getMediaInfo");
         let durationNode = html.find("#duration");
         if (html.find(".url").is(":visible") && durationNode.html() == "") {
@@ -197,7 +202,7 @@ function AddMedia(data) {
         }
         chrome.downloads.download({
             url: data.url,
-            filename: downFileName
+            filename: "CatCatch-" + data.tabId + "/" + downFileName
         });
         // 监听下载 下载失败 传递referer重试下载
         chrome.downloads.onChanged.addListener(function (DownloadItem) {
@@ -214,6 +219,7 @@ function AddMedia(data) {
     });
     // 点击预览图片
     html.find('#screenshots').click(function () {
+        if (isPicture(data)) { return; }
         html.find('#play').click();
     });
     //播放
@@ -431,6 +437,17 @@ function isJSON(data) {
     if (data.ext == "json" ||
         data.type == "application/json" ||
         data.type == "text/json"
+    ) { return true; }
+    return false;
+}
+function isPicture(data) {
+    if (data.ext == "jpg" ||
+        data.ext == "png" ||
+        data.ext == "jpeg" ||
+        data.ext == "bmp" ||
+        data.ext == "gif" ||
+        data.ext == "webp" ||
+        data.type.split("/")[0] == "image"
     ) { return true; }
     return false;
 }

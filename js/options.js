@@ -73,10 +73,8 @@ function Gethtml(Type, Param = new Object()) {
 
     html = $(html);
     html.find(".RemoveButton").click(function () {
-        if (confirm("确认删除吗？")) {
-            html.remove();
-            Save(Type);
-        }
+        html.remove();
+        Save(Type);
     });
     html.find("input").keyup(function () {
         Save(Type);
@@ -114,6 +112,23 @@ $("#OtherAutoClear, #MobileUserAgent, #m3u8dlArg").on("input", function () {
 $("#Debug, #TitleName, #Potplayer, #ShowWebIco, #m3u8dl").bind("click", function () {
     const Option = $(this).attr("id");
     chrome.storage.sync.set({ [Option]: $(this).prop('checked') });
+});
+// 一键禁用/启用
+$("#allDisable, #allEnable").bind("click", function () {
+    let state = $(this).attr("id") == "allDisable" ? false : true;
+    let obj = $(this).data("switch");
+    let query;
+    if (obj == "Ext") {
+        query = $("#extList #state");
+    } else if (obj == "Type") {
+        query = $("#typeList #state");
+    } else if (obj == "Regex") {
+        query = $("#regexList #state");
+    }
+    query.each(function () {
+        $(this).prop("checked", state);
+    });
+    Save(obj);
 });
 //重置后缀 重置类型 重置正则
 $("#ResetExt, #ResetType, #ResetRegex").bind("click", function () {
@@ -209,7 +224,6 @@ function readerFile(e) {
 }
 
 function Save(option) {
-    console.log(option);
     if (option == "Ext") {
         let Ext = new Array();
         $("#extList tr").each(function () {

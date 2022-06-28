@@ -48,7 +48,6 @@ chrome.webRequest.onBeforeRequest.addListener(
     }, { urls: ["<all_urls>"] }, ["requestBody"]
 );
 
-let cacheInterval = undefined;
 function findMedia(data, isRegex = false, filter = false) {
     if (G.Ext === undefined ||
         G.Debug === undefined ||
@@ -56,7 +55,12 @@ function findMedia(data, isRegex = false, filter = false) {
         G.Type === undefined ||
         G.Regex === undefined ||
         G.featAutoDownTabId === undefined
-    ) { findMedia(data, isRegex, filter); return; }
+    ) {
+        setTimeout(() => {
+            findMedia(data, isRegex, filter);
+        }, 500);
+        return;
+    }
     // 屏蔽特殊页面发起的资源
     if (data.initiator != "null" &&
         data.initiator != undefined &&
@@ -485,7 +489,7 @@ function clearRedundant() {
         }
         // 清理 缓存数据
         for (let key in cacheData) {
-            if (!allTabId.includes(key)) {
+            if (!allTabId.includes(parseInt(key))) {
                 delete cacheData[key];
             }
         }
