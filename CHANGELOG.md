@@ -18,6 +18,8 @@
 
 [Fixed] 无数BUG
 
+[Fixed] 解决1.0.17以来会丢失数据的问题
+
 [Fixed] 该死的Service Worker... 现在后台被杀死能立刻唤醒自己... 继续用肮脏的手段对抗Manifest V3
 
 ### 1.0.26
