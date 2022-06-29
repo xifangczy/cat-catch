@@ -49,16 +49,19 @@ chrome.webRequest.onBeforeRequest.addListener(
 );
 
 function findMedia(data, isRegex = false, filter = false) {
+    // Service Worker被强行杀死之后重新自我唤醒，等待全局变量初始化完成。
     if (G.Ext === undefined ||
         G.Debug === undefined ||
         G.OtherAutoClear === undefined ||
         G.Type === undefined ||
         G.Regex === undefined ||
-        G.featAutoDownTabId === undefined
+        G.featAutoDownTabId === undefined ||
+        G.tabId === undefined ||
+        cacheData.init
     ) {
         setTimeout(() => {
             findMedia(data, isRegex, filter);
-        }, 500);
+        }, 100);
         return;
     }
     // 屏蔽特殊页面发起的资源
@@ -134,7 +137,7 @@ function findMedia(data, isRegex = false, filter = false) {
 
     if (!filter) { return; }
 
-    if (cacheData[data.tabId] === undefined) {
+    if (cacheData[data.tabId] == undefined) {
         cacheData[data.tabId] = [];
     }
     // 查重
@@ -486,13 +489,15 @@ function clearRedundant() {
         for (let item of tabs) {
             allTabId.push(item.id);
         }
-        // 清理 缓存数据
-        for (let key in cacheData) {
-            if (!allTabId.includes(parseInt(key))) {
-                delete cacheData[key];
+        if(!cacheData.init){
+            // 清理 缓存数据
+            for (let key in cacheData) {
+                if (!allTabId.includes(parseInt(key))) {
+                    delete cacheData[key];
+                }
             }
+            chrome.storage.local.set({ MediaData: cacheData });
         }
-        chrome.storage.local.set({ MediaData: cacheData });
 
         // 清理 declarativeNetRequest
         chrome.declarativeNetRequest.getSessionRules(function (rules) {
@@ -524,5 +529,5 @@ function stringModify(str) {
 }
 
 // 测试
-// chrome.storage.local.get(function(data){console.log(data.MediaData)});
+// chrome.storage.local.get(function (data) { console.log(data.MediaData) });
 // chrome.declarativeNetRequest.getSessionRules(function (rules) { console.log(rules); });

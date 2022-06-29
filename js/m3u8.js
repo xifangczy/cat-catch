@@ -44,6 +44,7 @@ $(function () {
     var mediaDuration = 0;  // 视频总时长
     var isLive = true; // 是否是直播
     var hls = {}  // 在线播放工具
+    var fileSize = 0; // 文件大小
 
     // 获取 当前tabId
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -460,6 +461,8 @@ $(function () {
                 }).done(function (responseData) {
                     if (stopDownload) { return; }
                     tsBuffer[tsIndex] = tsDecrypt(responseData, tsIndex);
+                    fileSize += tsBuffer[tsIndex].byteLength;
+                    $("#fileSize").html("已下载:" + byteToSize(fileSize));
                     $("#progress").html(`${successCount++}/${tsLists.length}`);
                     if (errorTsList.length > 0) {
                         $("#progress").html($("#progress").html() + " 下载失败: " + errorTsList.length);
@@ -490,6 +493,8 @@ $(function () {
                 html.find("button").html("下载失败, 继续重新下载");
             }).done(function (responseData) {
                 tsBuffer[tsIndex] = tsDecrypt(responseData, tsIndex);
+                fileSize += tsBuffer[tsIndex].byteLength;
+                $("#fileSize").html("已下载:" + byteToSize(fileSize));
                 for (let i in errorTsList) {
                     if (errorTsList[i] == tsIndex) {
                         errorTsList.splice(i, 1);
@@ -555,25 +560,5 @@ $(function () {
         }
         $("#progress").html(`数据完整`);
         return true
-    }
-
-    // 秒转换成时间
-    function secToTime(sec) {
-        let time = "";
-        let hour = Math.floor(sec / 3600);
-        let min = Math.floor((sec % 3600) / 60);
-        sec = Math.floor(sec % 60);
-        if (hour > 0) {
-            time = hour + ":";
-        }
-        if (min < 10) {
-            time += "0";
-        }
-        time += min + ":";
-        if (sec < 10) {
-            time += "0";
-        }
-        time += sec;
-        return time;
     }
 })

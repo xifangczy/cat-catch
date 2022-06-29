@@ -223,6 +223,9 @@ textarea {
   background-color: rgb(26, 115, 232);
   border-radius: 3px;
 }
+#fileSize{
+  margin-left: 20px;
+}
 
 
 /* JSON格式化 */

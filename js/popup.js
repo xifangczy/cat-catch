@@ -57,15 +57,7 @@ function AddMedia(data) {
 
     // 文件大小单位转换
     if (data.size) {
-        if (data.size < 1024) {
-            data.size = false;
-        } else if (data.size < 1024 * 1024) {
-            data.size = parseFloat((data.size / 1024).toFixed(1)) + "KB";
-        } else if (data.size < 1024 * 1024 * 1024) {
-            data.size = parseFloat((data.size / 1024 / 1024).toFixed(1)) + "MB";
-        } else {
-            data.size = parseFloat((data.size / 1024 / 1024 / 1024).toFixed(1)) + "GB";
-        }
+        data.size = byteToSize(data.size);
     }
     // 是否需要解析
     let parsing = false;
@@ -161,10 +153,7 @@ function AddMedia(data) {
                 }
                 // 获取播放时长
                 if (this.duration && this.duration != Infinity) {
-                    let h = Math.floor(this.duration / 3600 % 24);
-                    let m = Math.floor(this.duration / 60 % 60);
-                    let s = Math.floor((this.duration % 60));
-                    durationNode.html("时长: " + String(h).padStart(2, 0) + ":" + String(m).padStart(2, 0) + ":" + String(s).padStart(2, 0));
+                    durationNode.html("时长: " + secToTime(this.duration));
                 }
                 getMediaInfo.removeAttr('src');
             }
@@ -436,6 +425,9 @@ function isJSON(data) {
     return false;
 }
 function isPicture(data) {
+    if(data.type && data.type.split("/")[0] == "image"){
+        return true;
+    }
     if (data.ext == "jpg" ||
         data.ext == "png" ||
         data.ext == "jpeg" ||
@@ -443,9 +435,6 @@ function isPicture(data) {
         data.ext == "gif" ||
         data.ext == "webp"
     ) { return true; }
-    if(data.type && data.type.split("/")[0] == "image"){
-        return true;
-    }
     return false;
 }
 

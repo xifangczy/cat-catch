@@ -1,7 +1,7 @@
 // 全局变量
 var G = {};
 // 缓存数据
-var cacheData = {};
+var cacheData = { init: true };
 // 当前tabID
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     if (tabs[0] && tabs[0].id) {
@@ -130,10 +130,42 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
         G[key] = newValue;
     }
 });
-
+// 扩展升级，清空本地储存
 chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason == "update") {
         chrome.storage.local.clear();
         clearRedundant();
     }
 });
+
+/*公共函数*/
+// 秒转换成时间
+function secToTime(sec) {
+    let time = "";
+    let hour = Math.floor(sec / 3600);
+    let min = Math.floor((sec % 3600) / 60);
+    sec = Math.floor(sec % 60);
+    if (hour > 0) {
+        time = hour + ":";
+    }
+    if (min < 10) {
+        time += "0";
+    }
+    time += min + ":";
+    if (sec < 10) {
+        time += "0";
+    }
+    time += sec;
+    return time;
+}
+// 字节转换成大小
+function byteToSize(byte) {
+    if (!byte || byte < 1024) { return 0; }
+    if (byte < 1024 * 1024) {
+        return parseFloat((byte / 1024).toFixed(1)) + "KB";
+    } else if (byte < 1024 * 1024 * 1024) {
+        return parseFloat((byte / 1024 / 1024).toFixed(1)) + "MB";
+    } else {
+        return parseFloat((byte / 1024 / 1024 / 1024).toFixed(1)) + "GB";
+    }
+}
