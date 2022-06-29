@@ -35,17 +35,17 @@ if (typeof (browser) == "object") {
     chrome.scripting.executeScript = (obj) => {
         // console.log(obj);
         // if(obj.files[0]){
-            // browser.tabs.executeScript(obj.target.tabId, {
-            //     allFrames: true,
-            //     file: obj.files[0],
-            //     runAt: "document_start",
-            //     matchAboutBlank: true
-            // });
-            // browser.contentScripts.register({
-            //     "js": [{file: obj.files[0]}],
-            //     "runAt": "document_start",
-            //     "allFrames": obj.target.allFrames,
-            // });
+        // browser.tabs.executeScript(obj.target.tabId, {
+        //     allFrames: true,
+        //     file: obj.files[0],
+        //     runAt: "document_start",
+        //     matchAboutBlank: true
+        // });
+        // browser.contentScripts.register({
+        //     "js": [{file: obj.files[0]}],
+        //     "runAt": "document_start",
+        //     "allFrames": obj.target.allFrames,
+        // });
         // }
         return;
     }

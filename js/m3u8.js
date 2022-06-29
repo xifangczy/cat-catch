@@ -84,7 +84,6 @@ $(function () {
             getM3u8Content();
             return;
         }
-        file_name = GetFileName(m3u8_url, true);
         downloadFile();
         return;
     });
@@ -132,7 +131,7 @@ $(function () {
     }
     // 返回上一页
     $("#historyBack").click(function () {
-        if(window.history.length > 1){
+        if (window.history.length > 1) {
             window.history.back();
         }
         window.location.href = "/m3u8.html";

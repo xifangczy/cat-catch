@@ -425,7 +425,7 @@ function isJSON(data) {
     return false;
 }
 function isPicture(data) {
-    if(data.type && data.type.split("/")[0] == "image"){
+    if (data.type && data.type.split("/")[0] == "image") {
         return true;
     }
     if (data.ext == "jpg" ||
