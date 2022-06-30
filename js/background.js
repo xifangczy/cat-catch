@@ -47,6 +47,15 @@ chrome.webRequest.onBeforeRequest.addListener(
         try { findMedia(data, true); } catch (e) { console.log(e); }
     }, { urls: ["<all_urls>"] }, ["requestBody"]
 );
+// 保存Referer
+chrome.webRequest.onSendHeaders.addListener(
+    function (data) {
+        const header = getRequestHeadersValue(data);
+        if(header["referer"]) {
+            refererData[data.requestId] = header["referer"];
+        }
+    }, { urls: ["<all_urls>"] }, ["requestHeaders", "extraHeaders"]
+);
 
 function findMedia(data, isRegex = false, filter = false) {
     // Service Worker被强行杀死之后重新自我唤醒，等待全局变量初始化完成。
@@ -81,7 +90,7 @@ function findMedia(data, isRegex = false, filter = false) {
         console.log({ data, G, isRegex });
     }
 
-    const header = getHeaderValue(data);
+    const header = getResponseHeadersValue(data);
     let name = GetFileName(data.url);
     let ext = GetExt(name);
 
@@ -161,8 +170,11 @@ function findMedia(data, isRegex = false, filter = false) {
     };
     let getTabId = data.tabId == -1 ? G.tabId : data.tabId;
     chrome.tabs.get(getTabId, function (webInfo) {
-        // initiator 不存在 使用当前网页的url
-        if (data.initiator == undefined || data.initiator == "null") {
+        // 有referer替换掉initiator...如果initiator也没有 使用网页url
+        if(refererData[data.requestId]){
+            data.initiator = refererData[data.requestId];
+            delete refererData[data.requestId];
+        } else if(data.initiator == undefined || data.initiator == "null"){
             data.initiator = webInfo?.url;
         }
         // 装载页面信息
@@ -399,7 +411,7 @@ function GetExt(FileName) {
     return ext[0].toLowerCase();
 }
 //获取Header属性的值
-function getHeaderValue(data) {
+function getResponseHeadersValue(data) {
     let header = new Array();
     if (data.responseHeaders == undefined) { return header; }
     for (let item of data.responseHeaders) {
@@ -410,6 +422,19 @@ function getHeaderValue(data) {
             header["type"] = item.value.split(";")[0].toLowerCase();
         } else if (item.name == "content-disposition") {
             header["attachment"] = item.value.toLowerCase();
+        }else if (item.name == "referer") {
+            header["referer"] = item.value.toLowerCase();
+        }
+    }
+    return header;
+}
+function getRequestHeadersValue(data) {
+    let header = new Array();
+    if (data.requestHeaders == undefined) { return header; }
+    for (let item of data.requestHeaders) {
+        item.name = item.name.toLowerCase();
+        if (item.name == "referer") {
+            header["referer"] = item.value.toLowerCase();
         }
     }
     return header;

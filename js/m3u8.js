@@ -60,7 +60,7 @@ $(function () {
                         "requestHeaders": [{
                             "header": "Referer",
                             "operation": "set",
-                            "value": m3u8_referer
+                            "value": m3u8_referer + "/"
                         }]
                     },
                     "condition": {
@@ -220,9 +220,9 @@ $(function () {
             //重要信息
             if (line.includes("#EXT-X-MAP")) {
                 ExistKey = true;
-                MapURI = /URI="(.*)"/.exec(line);
-                if (MapURI && MapURI[1]) {
-                    MapURI = fixUrl(MapURI[1]);
+                let MapUriTemp = /URI="(.*)"/.exec(line);
+                if (MapUriTemp && MapUriTemp[1]) {
+                    MapURI = fixUrl(MapUriTemp[1]);
                     $("#tips").append('#EXT-X-MAP URI: <input type="text" value="' + MapURI + '" spellcheck="false">');
                     line = MapURI;
                 }
@@ -257,16 +257,16 @@ $(function () {
                     });
                 }
                 if (line.includes("IV=")) {
-                    m3u8IV = /IV=([^,\n]*)/.exec(line);
-                    if (m3u8IV && m3u8IV[1]) {
-                        m3u8IV = m3u8IV[1];
+                    let m3u8IvTemp = /IV=([^,\n]*)/.exec(line);
+                    if (m3u8IvTemp && m3u8IvTemp[1]) {
+                        m3u8IV = m3u8IvTemp[1];
                         $("#tips").append('IV= <input type="text" value="' + m3u8IV + '" spellcheck="false">');
                     }
                 }
                 if (line.includes("KEYID=")) {
-                    keyID = /KEYID=([^,\n]*)/.exec(line);
-                    if (keyID && keyID[1]) {
-                        keyID = keyID[1];
+                    let keyIDTemp = /KEYID=([^,\n]*)/.exec(line);
+                    if (keyIDTemp && keyIDTemp[1]) {
+                        keyID = keyIDTemp[1];
                         $("#tips").append('KEYID= <input type="text" value="' + keyID + '" spellcheck="false">');
                     }
                 }

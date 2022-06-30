@@ -2,6 +2,7 @@
 var G = {};
 // 缓存数据
 var cacheData = { init: true };
+var refererData = [];
 // 当前tabID
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     if (tabs[0] && tabs[0].id) {
