@@ -194,6 +194,9 @@ function findMedia(data, isRegex = false, filter = false) {
             if (chrome.runtime.lastError) { return; }
         });
         // 储存数据
+        if (cacheData[data.tabId] == undefined) {
+            cacheData[data.tabId] = [];
+        }
         cacheData[data.tabId].push(info);
         chrome.storage.local.set({ MediaData: cacheData });
         if (data.tabId != -1) {
