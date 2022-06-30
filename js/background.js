@@ -422,8 +422,6 @@ function getResponseHeadersValue(data) {
             header["type"] = item.value.split(";")[0].toLowerCase();
         } else if (item.name == "content-disposition") {
             header["attachment"] = item.value.toLowerCase();
-        }else if (item.name == "referer") {
-            header["referer"] = item.value.toLowerCase();
         }
     }
     return header;

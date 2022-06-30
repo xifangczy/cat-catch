@@ -1,4 +1,9 @@
 ## 更新说明
+### 2.0.1
+[Changed] 新增referer获取 不存在再使用initiator或者直接使用url
+
+[Fixed] 部分m3u8 key文件解析错误问题
+
 ### 2.0.0
 [Changed] 模拟手机端，现在会修改navigator.userAgent变量
 

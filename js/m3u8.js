@@ -60,7 +60,7 @@ $(function () {
                         "requestHeaders": [{
                             "header": "Referer",
                             "operation": "set",
-                            "value": m3u8_referer + "/"
+                            "value": m3u8_referer
                         }]
                     },
                     "condition": {
