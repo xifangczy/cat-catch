@@ -188,7 +188,7 @@ function findMedia(data, isRegex = false, filter = false) {
                 let downFileName = G.TitleName ? info.title + '.' + info.ext : info.name;
                 chrome.downloads.download({
                     url: data.url,
-                    filename: "CatCatch-" + data.tabId + "/" + downFileName
+                    filename: "CatCatch/" + downFileName
                 });
             }
             if (chrome.runtime.lastError) { return; }

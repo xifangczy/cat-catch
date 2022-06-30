@@ -186,7 +186,7 @@ function AddMedia(data) {
         }
         chrome.downloads.download({
             url: data.url,
-            filename: "CatCatch-" + data.tabId + "/" + downFileName
+            filename: "CatCatch/" + downFileName
         });
         // 监听下载 下载失败 传递referer重试下载
         chrome.downloads.onChanged.addListener(function (DownloadItem) {
