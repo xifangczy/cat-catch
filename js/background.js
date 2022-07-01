@@ -52,7 +52,7 @@ chrome.webRequest.onSendHeaders.addListener(
     function (data) {
         refererData[data.requestId] = getReferer(data);
     }, { urls: ["<all_urls>"] }, ['requestHeaders',
-    chrome.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS].filter(Boolean)
+        chrome.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS].filter(Boolean)
 );
 
 function findMedia(data, isRegex = false, filter = false) {

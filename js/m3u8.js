@@ -244,7 +244,7 @@ $(function () {
                         if (!count.includes("(加密HLS)")) {
                             $("#count").html(count + " (加密HLS)");
                         }
-                        if(typeof responseData == "string"){
+                        if (typeof responseData == "string") {
                             responseData = new TextEncoder().encode(responseData).buffer;
                         }
                         try {

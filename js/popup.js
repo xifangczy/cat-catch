@@ -399,8 +399,9 @@ $(function () {
             chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId, action: action });
         }
     });
-    
-    if(G.moreFeat){
+
+    //102以上开启捕获按钮
+    if (G.moreFeat) {
         $("#Catch").show();
     }
 });
