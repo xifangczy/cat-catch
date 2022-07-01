@@ -27,7 +27,7 @@ if (typeof (browser) == "object") {
                     value: obj.addRules[0].action.requestHeaders[0].value
                 });
                 return { requestHeaders: details.requestHeaders };
-                
+
             }, { urls: ["<all_urls>"], tabId: obj.addRules[0].id }, ["blocking", "requestHeaders"]
         );
     };
