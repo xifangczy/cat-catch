@@ -399,6 +399,10 @@ $(function () {
             chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId, action: action });
         }
     });
+    
+    if(G.moreFeat){
+        $("#Catch").show();
+    }
 });
 
 //html5播放器允许格式

@@ -13,7 +13,7 @@ if (typeof (browser) == "object") {
     // webRequest.onBeforeSendHeaders To declarativeNetRequest.updateSessionRules
     chrome.declarativeNetRequest = new Object();
     chrome.declarativeNetRequest.updateSessionRules = (obj) => {
-        if (obj.addRules == undefined) { browser.runtime.reload(); return; }
+        if (obj.addRules == undefined) { browser.runtime.reload(); }
         browser.webRequest.onBeforeSendHeaders.addListener(
             function (details) {
                 for (var i = 0; i < details.requestHeaders.length; ++i) {
@@ -28,7 +28,7 @@ if (typeof (browser) == "object") {
                 });
                 return { requestHeaders: details.requestHeaders };
                 
-            }, { urls: ["<all_urls>"] }, ["blocking", "requestHeaders"]
+            }, { urls: ["<all_urls>"], tabId: obj.addRules[0].id }, ["blocking", "requestHeaders"]
         );
     };
     chrome.declarativeNetRequest.getSessionRules = () => {

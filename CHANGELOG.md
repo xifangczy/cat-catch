@@ -4,6 +4,8 @@
 
 [Fixed] 部分m3u8 key文件解析错误问题
 
+[Fixed] 修复 保存文件名使用网页标题 选项在m3u8解析器里不起作用
+
 ### 2.0.0
 [Changed] 模拟手机端，现在会修改navigator.userAgent变量
 

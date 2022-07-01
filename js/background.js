@@ -310,7 +310,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
     if (changeInfo.status == "loading") {
         // 开启捕获
-        if (G.featCatchTabId && G.featCatchTabId.includes(tabId)) {
+        if (G.moreFeat && G.featCatchTabId && G.featCatchTabId.includes(tabId)) {
             let injectScript = G.injectScript ? "js/" + G.injectScript : "js/catch.js";
             chrome.scripting.executeScript(
                 {
@@ -322,7 +322,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
             );
         }
         // 模拟手机端 修改 navigator 变量
-        if (G.featMobileTabId && G.featMobileTabId.includes(tabId)) {
+        if (G.moreFeat && G.featMobileTabId && G.featMobileTabId.includes(tabId)) {
             chrome.scripting.executeScript(
                 {
                     args: [G.MobileUserAgent.toString()],
@@ -360,11 +360,11 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
     delete cacheData[tabId];
     chrome.storage.local.set({ MediaData: cacheData });
     // 清理 模拟手机
-    mobileUserAgent(tabId, false);
+    G.featMobileTabId.includes(tabId) && mobileUserAgent(tabId, false);
     // 清理 自动下载
     tabIdListRemove("featAutoDownTabId", tabId);
     // 清理 捕获
-    tabIdListRemove("featCatchTabId", tabId);
+    G.moreFeat && tabIdListRemove("featCatchTabId", tabId);
 });
 
 //检查扩展名以及大小限制

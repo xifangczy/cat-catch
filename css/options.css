@@ -226,6 +226,17 @@ textarea {
 #fileSize {
   margin-left: 20px;
 }
+.not-allowed{
+  cursor: not-allowed;
+  background-color: #ccc;
+  color: #fff;
+}
+.not-allowed:hover {
+  background: #ccc;
+}
+.not-allowed:active {
+  background: #ccc;
+}
 
 /* JSON格式化 */
 /* Root element */

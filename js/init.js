@@ -30,6 +30,20 @@ G.TabIdList = [
     "featCatchTabId"
 ]
 
+// 102版本以上 非Firefox 开启更多功能
+G.moreFeat = moreFeatFun();
+function moreFeatFun() {
+    if(navigator.userAgent.includes("Firefox/")){
+        // version = navigator.userAgent.match(/Firefox\/([\d]+)/);
+        return false;
+    }
+    const version = navigator.userAgent.match(/Chrome\/([\d]+)/);
+    if(version && version[1] >= 102){
+        return true;
+    }
+    return false;
+}
+
 // Init
 InitOptions();
 
