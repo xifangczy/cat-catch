@@ -412,6 +412,19 @@ $(function () {
         document.title = e.target.innerHTML;
     });
 
+    // 调用m3u8DL下载
+    $("#m3u8DL").click(function () {
+        let m3u8dlArg = G.m3u8dlArg.replace("$referer$", m3u8_referer);
+        m3u8dlArg = m3u8dlArg.replace("$url$", m3u8_url);
+        m3u8dlArg = m3u8dlArg.replace("$title$", unescape(encodeURIComponent(m3u8_title)));
+        let url = 'm3u8dl://' + btoa(m3u8dlArg);
+        if (url.length >= 2046) {
+            alert("m3u8dl参数太长,可能导致无法唤醒m3u8DL, 请手动复制到m3u8DL下载");
+        }
+        window.open(url);
+    });
+
+
     // 下载m3u8并合并
     var isComplete = false; // 是否下载完成
     var errorTsList = [];   // 下载错误的ts序号

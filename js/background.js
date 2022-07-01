@@ -50,10 +50,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 // 保存Referer
 chrome.webRequest.onSendHeaders.addListener(
     function (data) {
-        const header = getRequestHeadersValue(data);
-        if (header["referer"]) {
-            refererData[data.requestId] = header["referer"];
-        }
+        refererData[data.requestId] = getReferer(data);
     }, { urls: ["<all_urls>"] }, ['requestHeaders',
     chrome.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS].filter(Boolean)
 );
@@ -430,16 +427,14 @@ function getResponseHeadersValue(data) {
     }
     return header;
 }
-function getRequestHeadersValue(data) {
-    let header = new Array();
-    if (data.requestHeaders == undefined) { return header; }
+function getReferer(data) {
+    if (data.requestHeaders == undefined) { return undefined; }
     for (let item of data.requestHeaders) {
-        item.name = item.name.toLowerCase();
-        if (item.name == "referer") {
-            header["referer"] = item.value.toLowerCase();
+        if (item.name.toLowerCase() == "referer") {
+            return item.value.toLowerCase();
         }
     }
-    return header;
+    return undefined;
 }
 //设置扩展图标
 function SetIcon(obj) {

@@ -248,9 +248,9 @@ function AddMedia(data) {
         let initiator = encodeURIComponent(data.initiator);
         chrome.tabs.get(G.tabId, function (tab) {
             if (id == "m3u8") {
-                url = `/m3u8.html?m3u8_url=${url}&referer=${initiator}&filename=${title}`;
+                url = `/m3u8.html?m3u8_url=${url}&referer=${initiator}&title=${title}`;
             } else {
-                url = `/json.html?url=${url}&referer=${initiator}&filename=${title}`;
+                url = `/json.html?url=${url}&referer=${initiator}&title=${title}`;
             }
             chrome.tabs.create({ url: url, index: tab.index + 1 });
         });
