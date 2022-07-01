@@ -35,12 +35,6 @@ chrome.runtime.onConnect.addListener(function (Port) {
     });
 });
 
-// onResponseStarted 浏览器接收到第一个字节触发，保证有更多信息判断资源类型
-chrome.webRequest.onResponseStarted.addListener(
-    function (data) {
-        try { findMedia(data); } catch (e) { console.log(e); }
-    }, { urls: ["<all_urls>"] }, ["responseHeaders"]
-);
 // onBeforeRequest 浏览器发送请求之前使用正则匹配发送请求的URL
 chrome.webRequest.onBeforeRequest.addListener(
     function (data) {
@@ -50,9 +44,30 @@ chrome.webRequest.onBeforeRequest.addListener(
 // 保存Referer
 chrome.webRequest.onSendHeaders.addListener(
     function (data) {
-        refererData[data.requestId] = getReferer(data);
+        let referer = getReferer(data);
+        if (referer) {
+            refererData[data.requestId] = referer;
+        }
     }, { urls: ["<all_urls>"] }, ['requestHeaders',
         chrome.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS].filter(Boolean)
+);
+// onResponseStarted 浏览器接收到第一个字节触发，保证有更多信息判断资源类型
+chrome.webRequest.onResponseStarted.addListener(
+    function (data) {
+        try {
+            if (refererData[data.requestId]) {
+                data.referer = refererData[data.requestId];
+                delete refererData[data.requestId];
+            }
+            findMedia(data);
+        } catch (e) { console.log(e); }
+    }, { urls: ["<all_urls>"] }, ["responseHeaders"]
+);
+// 删除失败的refererData
+chrome.webRequest.onErrorOccurred.addListener(
+    function (data) {
+        delete refererData[data.requestId];
+    }, { urls: ["<all_urls>"] }
 );
 
 function findMedia(data, isRegex = false, filter = false) {
@@ -169,9 +184,8 @@ function findMedia(data, isRegex = false, filter = false) {
     let getTabId = data.tabId == -1 ? G.tabId : data.tabId;
     chrome.tabs.get(getTabId, function (webInfo) {
         // 有referer替换掉initiator...如果initiator也没有 使用网页url
-        if (refererData[data.requestId]) {
-            data.initiator = refererData[data.requestId];
-            delete refererData[data.requestId];
+        if (data.referer) {
+            data.initiator = data.referer;
         } else if (data.initiator == undefined || data.initiator == "null") {
             data.initiator = webInfo?.url;
         }
@@ -359,6 +373,7 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
     // 清理缓存数据
     delete cacheData[tabId];
     chrome.storage.local.set({ MediaData: cacheData });
+    refererData = [];
     // 清理 模拟手机
     G.featMobileTabId.includes(tabId) && mobileUserAgent(tabId, false);
     // 清理 自动下载
@@ -428,13 +443,13 @@ function getResponseHeadersValue(data) {
     return header;
 }
 function getReferer(data) {
-    if (data.requestHeaders == undefined) { return undefined; }
+    if (data.requestHeaders == undefined) { return false; }
     for (let item of data.requestHeaders) {
         if (item.name.toLowerCase() == "referer") {
             return item.value.toLowerCase();
         }
     }
-    return undefined;
+    return false;
 }
 //设置扩展图标
 function SetIcon(obj) {
@@ -532,6 +547,7 @@ function clearRedundant() {
             }
         });
     });
+    refererData = [];
 }
 function stringModify(str) {
     return str.replace(/['\\:\*\?"<\/>\|]/g, function (m) {
