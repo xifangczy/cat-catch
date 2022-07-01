@@ -17,36 +17,27 @@ if (typeof (browser) == "object") {
         browser.webRequest.onBeforeSendHeaders.addListener(
             function (details) {
                 for (var i = 0; i < details.requestHeaders.length; ++i) {
-                    if (details.requestHeaders[i].name === 'User-Agent') {
-                        details.requestHeaders[i].value = G.MobileUserAgent;
+                    if (details.requestHeaders[i].name === obj.addRules[0].action.requestHeaders[0].header) {
+                        details.requestHeaders[i].value = obj.addRules[0].action.requestHeaders[0].value;
+                        return { requestHeaders: details.requestHeaders };
                     }
                 }
+                details.requestHeaders.push({
+                    name: obj.addRules[0].action.requestHeaders[0].header,
+                    value: obj.addRules[0].action.requestHeaders[0].value
+                });
                 return { requestHeaders: details.requestHeaders };
-            }, { urls: ["<all_urls>"], tabId: G.tabId }, ["blocking", "requestHeaders"]
+                
+            }, { urls: ["<all_urls>"] }, ["blocking", "requestHeaders"]
         );
     };
     chrome.declarativeNetRequest.getSessionRules = () => {
         return [];
     }
 
-    // V3 引入scripting 为解决Service Worker休眠问题
-    // V2 不存在此问题 只需要return
-    // chrome.scripting = new Object();
+    // Firefox scripting API 不完善
+    chrome.scripting = new Object();
     chrome.scripting.executeScript = (obj) => {
-        // console.log(obj);
-        // if(obj.files[0]){
-        // browser.tabs.executeScript(obj.target.tabId, {
-        //     allFrames: true,
-        //     file: obj.files[0],
-        //     runAt: "document_start",
-        //     matchAboutBlank: true
-        // });
-        // browser.contentScripts.register({
-        //     "js": [{file: obj.files[0]}],
-        //     "runAt": "document_start",
-        //     "allFrames": obj.target.allFrames,
-        // });
-        // }
         return;
     }
 }

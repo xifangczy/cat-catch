@@ -1,6 +1,6 @@
-var onCatch = new RegExp("&catch=([^\n&]*)").exec(window.location.href);
+const onCatch = new RegExp("&catch=([^\n&]*)").exec(window.location.href);
 if (onCatch) {
-    script = document.createElement('script');
+    const script = document.createElement('script');
     script.src = "js/catch.js"
     document.head.appendChild(script);
 }

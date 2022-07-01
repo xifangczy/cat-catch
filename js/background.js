@@ -51,10 +51,11 @@ chrome.webRequest.onBeforeRequest.addListener(
 chrome.webRequest.onSendHeaders.addListener(
     function (data) {
         const header = getRequestHeadersValue(data);
-        if(header["referer"]) {
+        if (header["referer"]) {
             refererData[data.requestId] = header["referer"];
         }
-    }, { urls: ["<all_urls>"] }, ["requestHeaders", "extraHeaders"]
+    }, { urls: ["<all_urls>"] }, ['requestHeaders',
+    chrome.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS].filter(Boolean)
 );
 
 function findMedia(data, isRegex = false, filter = false) {
@@ -171,10 +172,10 @@ function findMedia(data, isRegex = false, filter = false) {
     let getTabId = data.tabId == -1 ? G.tabId : data.tabId;
     chrome.tabs.get(getTabId, function (webInfo) {
         // 有referer替换掉initiator...如果initiator也没有 使用网页url
-        if(refererData[data.requestId]){
+        if (refererData[data.requestId]) {
             data.initiator = refererData[data.requestId];
             delete refererData[data.requestId];
-        } else if(data.initiator == undefined || data.initiator == "null"){
+        } else if (data.initiator == undefined || data.initiator == "null") {
             data.initiator = webInfo?.url;
         }
         // 装载页面信息
@@ -465,7 +466,7 @@ function mobileUserAgent(tabId, change = false) {
                 "action": {
                     "type": "modifyHeaders",
                     "requestHeaders": [{
-                        "header": "user-agent",
+                        "header": "User-Agent",
                         "operation": "set",
                         "value": G.MobileUserAgent
                     }]
@@ -557,3 +558,4 @@ function stringModify(str) {
 // 测试
 // chrome.storage.local.get(function (data) { console.log(data.MediaData) });
 // chrome.declarativeNetRequest.getSessionRules(function (rules) { console.log(rules); });
+// chrome.tabs.query({}, function (tabs) { for (let item of tabs) { console.log(item.id); } });
