@@ -1,6 +1,10 @@
 ## 更新说明
-### 2.0.1
+### 2.1.0
 [Changed] 新增referer获取 不存在再使用initiator或者直接使用url
+
+[Changed] 重新支持Firefox 需要93版本以上
+
+[Changed] chromium内核的浏览器最低要求降为93 小部分功能需要102版本以上，低版本会隐藏功能按钮
 
 [Fixed] 部分m3u8 key文件解析错误问题
 
