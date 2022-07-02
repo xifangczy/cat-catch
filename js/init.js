@@ -34,7 +34,6 @@ G.TabIdList = [
 G.moreFeat = moreFeatFun();
 function moreFeatFun() {
     if (navigator.userAgent.includes("Firefox/")) {
-        // version = navigator.userAgent.match(/Firefox\/([\d]+)/);
         return false;
     }
     const version = navigator.userAgent.match(/Chrome\/([\d]+)/);

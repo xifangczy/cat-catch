@@ -39,6 +39,7 @@ $(function () {
     var m3u8IV = "";
     var keyID = "";
     var MapURI = "";
+    var method = "";
     var isEncrypted = false;    //是否加密的m3u8
     const decryptor = new AESDecryptor(); //解密工具
     var mediaDuration = 0;  // 视频总时长
@@ -268,6 +269,13 @@ $(function () {
                     if (keyIDTemp && keyIDTemp[1]) {
                         keyID = keyIDTemp[1];
                         $("#tips").append('KEYID= <input type="text" value="' + keyID + '" spellcheck="false">');
+                    }
+                }
+                if (line.includes("METHOD=")) {
+                    let methodTemp = /METHOD=([^,\n]*)/.exec(line);
+                    if (methodTemp && methodTemp[1]) {
+                        method = methodTemp[1];
+                        $("#tips").append('METHOD= <input type="text" value="' + method + '" spellcheck="false">');
                     }
                 }
                 line = KeyURL;

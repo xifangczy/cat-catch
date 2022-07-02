@@ -46,7 +46,7 @@ chrome.webRequest.onSendHeaders.addListener(
     function (data) {
         let referer = getReferer(data);
         if (referer) {
-            refererData[data.requestId] = referer;
+            refererData["requestId" + data.requestId] = referer;
         }
     }, { urls: ["<all_urls>"] }, ['requestHeaders',
         chrome.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS].filter(Boolean)
@@ -55,9 +55,9 @@ chrome.webRequest.onSendHeaders.addListener(
 chrome.webRequest.onResponseStarted.addListener(
     function (data) {
         try {
-            if (refererData[data.requestId]) {
-                data.referer = refererData[data.requestId];
-                delete refererData[data.requestId];
+            if (refererData["requestId" + data.requestId]) {
+                data.referer = refererData["requestId" + data.requestId];
+                delete refererData["requestId" + data.requestId];
             }
             findMedia(data);
         } catch (e) { console.log(e); }
@@ -66,7 +66,7 @@ chrome.webRequest.onResponseStarted.addListener(
 // 删除失败的refererData
 chrome.webRequest.onErrorOccurred.addListener(
     function (data) {
-        delete refererData[data.requestId];
+        delete refererData["requestId" + data.requestId];
     }, { urls: ["<all_urls>"] }
 );
 
@@ -286,16 +286,12 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         sendResponse("HeartBeat OK");
         return;
     }
-    // 清理冗余数据
-    if (Message.Message == "clearRedundant") {
-        clearRedundant();
-        return;
-    }
     // 清理数据
     if (Message.Message == "clearData") {
         delete cacheData[Message.tabId];
         delete cacheData[-1];
         chrome.storage.local.set({ MediaData: cacheData });
+        clearRedundant();
         return;
     }
     sendResponse("Error");
@@ -515,7 +511,8 @@ function isSpecialPage(url) {
     if (urlParsing.protocol == "chrome-extension:" ||
         urlParsing.protocol == "chrome:" ||
         urlParsing.protocol == "about:" ||
-        urlParsing.protocol == "extension:") { return true; }
+        urlParsing.protocol == "extension:" ||
+        urlParsing.protocol == "moz-extension:") { return true; }
     return false;
 }
 

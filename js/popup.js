@@ -320,7 +320,6 @@ $(function () {
     });
     //清空数据
     $('#Clear').click(function () {
-        chrome.runtime.sendMessage({ Message: "clearRedundant" });
         chrome.runtime.sendMessage({ Message: "clearData", tabId: G.tabId });
         chrome.runtime.sendMessage({ Message: "ClearIcon" });
         location.reload();
