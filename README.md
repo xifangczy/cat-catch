@@ -27,7 +27,7 @@ https://o2bmm.gitbook.io/cat-catch/
 2.0~ 需要Chromium内核93及以上, 小部分功能需要102版本以上，低版本会隐藏功能按钮
 
 # 👻幽灵数据？
-1.0.17之前版本经常出现某条资源不属于任何网页（具体原因不详），老版本会丢弃该数据。之后得到修复并称这部分数据称为“幽灵数据”。
+一个Chromium的BUG 不明原因的某资源不会标记来自哪个网页，1.0.17之前版本会直接丢弃该数据。之后得到修复并称这部分数据称为“幽灵数据”。
 
 # 🔍界面
 ![界面](https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/a.png)
