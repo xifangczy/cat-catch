@@ -42,5 +42,6 @@
             "strict_min_version": "93.0"
         }
     },
-    "version": "2.1.0"
+    "content_security_policy": "script-src 'self' blob:; object-src 'self' blob:",
+    "version": "2.1.1"
 }

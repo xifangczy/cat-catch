@@ -120,11 +120,12 @@ function findMedia(data, isRegex = false, filter = false) {
             }
             for (let i = 1; i < result.length; i++) {
                 data.url = decodeURIComponent(result[i]);
-                if (/^[\w]+:\/\/.+/i.test(data.url)) {
-                    findMedia(data, true, true);
-                    return;
+                if (!/^[\w]+:\/\/.+/i.test(data.url)) {
+                    data.url = urlParsing.protocol + "//" + data.url;
                 }
+                findMedia(data, true, true);
             }
+            return;
         }
         return;
     }
