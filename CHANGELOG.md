@@ -1,4 +1,11 @@
 ## 更新说明
+### 2.1.1
+[Changed] 调整正则匹配 现在能提取多个网址
+
+[Fixed] 修复选择脚本在m3u8解析器里不起作用 并提高安全性
+
+[Fixed] m3u8解析器在Firefox中不能正常播放m3u8视频
+
 ### 2.1.0
 [Changed] 新增referer获取 不存在再使用initiator或者直接使用url
 
