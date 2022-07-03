@@ -322,7 +322,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (changeInfo.status == "loading") {
         // 开启捕获
         if (G.moreFeat && G.featCatchTabId && G.featCatchTabId.includes(tabId)) {
-            let injectScript = G.injectScript ? "js/" + G.injectScript : "js/catch.js";
+            const injectScript = G.injectScript == "catch.js" ? "js/catch.js" : "js/recorder.js";     // Security
             chrome.scripting.executeScript(
                 {
                     target: { tabId: tabId, allFrames: true },

@@ -1,7 +1,9 @@
-const onCatch = new RegExp("&catch=([^\n&]*)").exec(window.location.href);
+let onCatch = new RegExp("&catch=([^\n&]*)").exec(window.location.href);
 if (onCatch) {
+    onCatch = decodeURIComponent(onCatch[1]);
+    onCatch = onCatch == "catch.js" ? "js/catch.js" : "js/recorder.js";  // Security
     const script = document.createElement('script');
-    script.src = "js/catch.js"
+    script.src = onCatch;
     document.head.appendChild(script);
 }
 $(function () {
@@ -409,10 +411,12 @@ $(function () {
     // 开启/关闭捕获
     $("#catch").click(function () {
         if ($(this).data("switch") == "on") {
-            window.location.href = window.location.href + "&catch=on";
+            let injectScript = G.injectScript ? G.injectScript : "catch.js";
+            injectScript = encodeURIComponent(injectScript);
+            window.location.href = window.location.href + "&catch=" + injectScript;
             return;
         }
-        window.location.href = window.location.href.replace("&catch=on", "");
+        window.location.href = window.location.href.replace(/&catch=[^&]*/, "");
     });
 
     // 监听提示变化修改网页标题
