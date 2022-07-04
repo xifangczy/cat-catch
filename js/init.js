@@ -119,6 +119,7 @@ function GetDefault(Obj) {
 function InitOptions() {
     chrome.storage.local.get({ MediaData: {} }, function (items) {
         cacheData = items.MediaData;
+        if(items.MediaData.init){ cacheData = {}; }
     });
     chrome.storage.sync.get(G.OptionLists, function (items) {
         for (let list of G.OptionLists) {

@@ -94,8 +94,8 @@ $(function () {
     chrome.downloads.onChanged.addListener(function (DownloadDelta) {
         if (!DownloadDelta.state) { return; }
         if (DownloadDelta.state.current == "complete") {
-            $("#downFilepProgress").html("已保存到硬盘");
-            $("#progress").html("已保存到硬盘");
+            $("#downFilepProgress").html("已保存到硬盘, 请查看浏览器已下载内容");
+            $("#progress").html("已保存到硬盘, 请查看浏览器已下载内容");
         }
     });
 

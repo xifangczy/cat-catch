@@ -72,7 +72,7 @@ chrome.webRequest.onErrorOccurred.addListener(
 
 function findMedia(data, isRegex = false, filter = false) {
     // Service Worker被强行杀死之后重新自我唤醒，等待全局变量初始化完成。
-    if (G.Ext === undefined ||
+    if (!G || G.Ext === undefined ||
         G.Debug === undefined ||
         G.OtherAutoClear === undefined ||
         G.Type === undefined ||
@@ -90,6 +90,9 @@ function findMedia(data, isRegex = false, filter = false) {
     if (data.initiator != "null" &&
         data.initiator != undefined &&
         isSpecialPage(data.initiator)) { return; }
+    if (G.isFirefox &&
+        data.originUrl &&
+        isSpecialPage(data.originUrl)) { return; }
     // 屏蔽特殊页面的资源
     if (isSpecialPage(data.url)) { return; }
     // 屏蔽Youtube
@@ -252,7 +255,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     // 模拟手机
     if (Message.Message == "mobileUserAgent") {
         if (G.featMobileTabId.includes(Message.tabId)) {
-            mobileUserAgent(Message.tabId);
+            mobileUserAgent(Message.tabId, false);
         } else {
             G.featMobileTabId.push(Message.tabId);
             chrome.storage.local.set({ featMobileTabId: G.featMobileTabId });
@@ -372,7 +375,7 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
     chrome.storage.local.set({ MediaData: cacheData });
     refererData = [];
     // 清理 模拟手机
-    !G.isFirefox && mobileUserAgent(tabId, false);
+    G.featMobileTabId.includes(tabId) && mobileUserAgent(tabId, false);
     // 清理 自动下载
     tabIdListRemove("featAutoDownTabId", tabId);
     // 清理 捕获
@@ -486,10 +489,10 @@ function mobileUserAgent(tabId, change = false) {
         });
         return true;
     }
+    tabIdListRemove("featMobileTabId", tabId);
     chrome.declarativeNetRequest.updateSessionRules({
         removeRuleIds: [tabId]
     });
-    return tabIdListRemove("featMobileTabId", tabId);
 }
 function tabIdListRemove(str, tabId) {
     if (!G[str] || G[str].length == 0) { return false; }
@@ -513,7 +516,8 @@ function isSpecialPage(url) {
         urlParsing.protocol == "chrome:" ||
         urlParsing.protocol == "about:" ||
         urlParsing.protocol == "extension:" ||
-        urlParsing.protocol == "moz-extension:") { return true; }
+        urlParsing.protocol == "moz-extension:" ||
+        urlParsing.protocol == "edge:") { return true; }
     return false;
 }
 
