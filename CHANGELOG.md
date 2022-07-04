@@ -6,6 +6,10 @@
 
 [Fixed] m3u8解析器在Firefox中不能正常播放m3u8视频
 
+[Fixed] 修复Firefox中手机端模拟无法还原的问题
+
+[Fixed] 修复初始化错误BUG 导致扩展失效
+
 ### 2.1.0
 [Changed] 新增referer获取 不存在再使用initiator或者直接使用url
 
