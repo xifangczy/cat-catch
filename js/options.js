@@ -1,4 +1,4 @@
-//////////////////////初始化//////////////////////
+////////////////////// 填充数据 //////////////////////
 chrome.storage.sync.get(G.OptionLists, function (items) {
     if (items.Ext === undefined || items.Type === undefined || items.Regex === undefined) {
         location.reload();
@@ -38,6 +38,7 @@ $("#AddRegex").bind("click", function () {
 });
 $("#version").html("猫抓 v" + chrome.runtime.getManifest().version);
 
+// 增加后缀 类型 正则表达式
 function Gethtml(Type, Param = new Object()) {
     let html = "";
     switch (Type) {
@@ -223,6 +224,7 @@ function readerFile(e) {
     location.reload();
 }
 
+// 保存 后缀 类型 正则 配置
 function Save(option) {
     if (option == "Ext") {
         let Ext = new Array();

@@ -84,30 +84,6 @@ function AddMedia(data) {
         parsingType = "json";
     }
     //添加html
-    /*
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <input type="checkbox" class="DownCheck hide" checked="true"/>
-                <img src="${data.webInfo.favIconUrl}" class="leftIco"/>
-                <img src="img/regex.png" class="leftIco" title="正则表达式匹配"/>
-                <span class="name"></span>
-                <span class="size"></span>
-                <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
-                <img src="img/parsing.png" class="ico" id="m3u8" title="解析"/>
-                <img src="img/play.png" class="ico" id="play" title="预览"/>
-                <img src="img/download.png" class="ico" id="download" title="下载"/>
-            </div>
-            <div class="url hide">
-                标题: ...<br>
-                MIME: ...<br>
-                <div id="duration"></div>
-                <a href="" target="_blank" download=""></a>
-                <br>
-                <img id="screenshots" class="hide" width="50%" height="50%" />
-                <video id="getMediaInfo" class="hide" muted autoplay width="100%"></video>
-            </div>
-        </div>
-    */
     let html = `
         <div class="panel">
             <div class="panel-heading">

@@ -1,3 +1,4 @@
+// 解析参数 注入脚本
 let onCatch = new RegExp("&catch=([^\n&]*)").exec(window.location.href);
 if (onCatch) {
     onCatch = decodeURIComponent(onCatch[1]);
@@ -7,7 +8,7 @@ if (onCatch) {
     document.head.appendChild(script);
 }
 $(function () {
-    //获取m3u8_url
+    // url 参数解析
     var m3u8_url = new RegExp("[?]m3u8_url=([^\n&]*)").exec(window.location.href);
     m3u8_url = m3u8_url ? decodeURIComponent(m3u8_url[1]) : undefined;
 
@@ -49,7 +50,7 @@ $(function () {
     var hls = {}  // 在线播放工具
     var fileSize = 0; // 文件大小
 
-    // 获取 当前tabId
+    // 获取当前tabId 如果存在Referer修改当前标签下的所有xhr的Referer
     chrome.tabs.getCurrent(function (tabs) {
         let tabId = tabs.id;
         // 修改Referer
@@ -90,7 +91,7 @@ $(function () {
         downloadFile();
         return;
     });
-
+    // 监听下载事件 修改提示
     chrome.downloads.onChanged.addListener(function (DownloadDelta) {
         if (!DownloadDelta.state) { return; }
         if (DownloadDelta.state.current == "complete") {
@@ -98,7 +99,6 @@ $(function () {
             $("#progress").html("已保存到硬盘, 请查看浏览器已下载内容");
         }
     });
-
     // 辅助下载文件
     function downloadFile() {
         $("#loading").hide();
@@ -132,14 +132,6 @@ $(function () {
             });
         });
     }
-    // 返回上一页
-    $("#historyBack").click(function () {
-        if (window.history.length > 1) {
-            window.history.back();
-        }
-        window.location.href = "/m3u8.html";
-    });
-
     // 下载m3u8内容
     function getM3u8Content() {
         $.ajax({
@@ -157,8 +149,7 @@ $(function () {
             show_list();
         });
     }
-
-    // 获得m3u8文件名
+    // 获得不带扩展的文件名
     function GetFileName(url, ext = false) {
         if (G.TitleName && m3u8_title) {
             return m3u8_title;
@@ -172,8 +163,7 @@ $(function () {
         str.pop();
         return str.join(".");
     }
-
-    //基本文件目录
+    // 基本文件目录
     function getManifestUrlBase(decode = true) {
         let url_decode = decode ? decodeURIComponent(m3u8_url) : m3u8_url;
         url_decode = url_decode.split("?")[0];
@@ -181,14 +171,12 @@ $(function () {
         parts.pop();
         return parts.join("/") + "/";
     }
-
-    //根目录
+    // 根目录
     function getManifestUrlRoot() {
         let Path = m3u8_url.split("/");
         return Path[0] + "//" + Path[2];
     }
-
-    //修复url路劲
+    // 修复url路劲
     function fixUrl(url) {
         if (/^[\w]+:.+/i.test(url)) {
             return url;
@@ -198,6 +186,7 @@ $(function () {
         }
         return BasePath + url;
     }
+    // 获取文件名
     function GetFile(str) {
         str = str.split("?")[0];
         if (str.substr(0, 5) != "data:" && str.substr(0, 4) != "skd:") {
@@ -206,6 +195,7 @@ $(function () {
         return str;
     }
 
+    //////////////////////// 解析器 主函数 ////////////////////////
     function show_list(format = "") {
         let count = 0;
         let ExistKey = false;
@@ -334,6 +324,7 @@ $(function () {
         }
     }
 
+    //////////////////////// 事件绑定 ////////////////////////
     //格式化
     $("#format").click(function () {
         let formatStr = $("#formatStr").val();
@@ -435,9 +426,17 @@ $(function () {
         }
         window.open(url);
     });
+    // 强制下载 按钮
+    $("#ForceDownload").click(function () {
+        downloadAllTs();
+    });
+    // 返回上一页
+    $("#historyBack").click(function () {
+        if (window.history.length > 1) { window.history.back(); }
+        window.location.href = "/m3u8.html";
+    });
 
-
-    // 下载m3u8并合并
+    //////////////////////// 合并下载 ts文件 ////////////////////////
     var isComplete = false; // 是否下载完成
     var errorTsList = [];   // 下载错误的ts序号
     var tsBuffer = [];     // ts缓存
@@ -542,12 +541,7 @@ $(function () {
         });
         $('#errorTsList').append(html);
     }
-
-    // 强制下载 按钮
-    $("#ForceDownload").click(function () {
-        downloadAllTs();
-    });
-    // 合并下载已有的数据
+    // 开始下载
     function downloadAllTs() {
         let fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });
         chrome.downloads.download({
@@ -556,7 +550,6 @@ $(function () {
         });
         $("#progress").html(`数据正在合并，并下载中...`);
     }
-
     // 解密ts文件
     function tsDecrypt(responseData, tsIndex) {
         if (!isEncrypted) {
@@ -574,7 +567,6 @@ $(function () {
             stopDownload = "密钥错误，无法解密.";
         }
     }
-
     // 验证ts文件是否完整
     function m3u8Complete(isError = false) {
         $("#progress").html(`下载数据校验中...`);
