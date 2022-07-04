@@ -187,6 +187,7 @@ function findMedia(data, isRegex = false, filter = false) {
     };
     let getTabId = data.tabId == -1 ? G.tabId : data.tabId;
     chrome.tabs.get(getTabId, function (webInfo) {
+        if (chrome.runtime.lastError) { return; }
         // 有referer替换掉initiator...如果initiator也没有 使用网页url
         if (data.referer) {
             data.initiator = data.referer;
