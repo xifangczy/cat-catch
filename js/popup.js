@@ -30,6 +30,23 @@ chrome.runtime.onMessage.addListener(function (MediaData, sender, sendResponse) 
     sendResponse("OK");
 });
 
+// 监听下载下载失败 传递referer重试下载
+var downData = [];
+chrome.downloads.onChanged.addListener(function (DownloadItem) {
+    // console.log(DownloadItem.error.current);
+    // SERVER_FORBIDDEN
+    if (DownloadItem.error) {
+        chrome.tabs.get(G.tabId, function (tab) {
+            if (!downData[DownloadItem.id]) { return; }
+            let url = downData[DownloadItem.id].url;
+            let initiator = downData[DownloadItem.id].initiator;
+            let downFileName = downData[DownloadItem.id].downFileName;
+            url = `/m3u8.html?m3u8_url=${encodeURIComponent(url)}&referer=${encodeURIComponent(initiator)}&filename=${encodeURIComponent(downFileName)}`;
+            chrome.tabs.create({ url: url, index: tab.index + 1 });
+        });
+    }
+});
+
 function AddMedia(data) {
     // 正则匹配的备注扩展
     if (data.extraExt) {
@@ -54,6 +71,7 @@ function AddMedia(data) {
 
     //添加下载文件名
     let downFileName = G.TitleName ? data.title + '.' + data.ext : data.name;
+    data.downFileName = downFileName;
 
     // 文件大小单位转换
     if (data.size) {
@@ -111,7 +129,7 @@ function AddMedia(data) {
                 ${data.title ? `标题: ${data.title}<br>` : ""}
                 ${data.type ? `MIME:  ${data.type}<br>` : ""}
                 <div id="duration"></div>
-                <a href="${data.url}" target="_blank" download="${downFileName}">${data.url}</a>
+                <a href="${data.url}" target="_blank" download="${downFileName}" data-initiator="${data.initiator}">${data.url}</a>
                 <br>
                 <img id="screenshots" class="hide"/>
                 <video id="getMediaInfo" class="hide" muted autoplay></video>
@@ -186,19 +204,8 @@ function AddMedia(data) {
         }
         chrome.downloads.download({
             url: data.url,
-            filename: "CatCatch/" + downFileName
-        });
-        // 监听下载 下载失败 传递referer重试下载
-        chrome.downloads.onChanged.addListener(function (DownloadItem) {
-            // console.log(DownloadItem.error.current);
-            // SERVER_FORBIDDEN
-            if (DownloadItem.error) {
-                chrome.tabs.get(G.tabId, function (tab) {
-                    let url = `/m3u8.html?m3u8_url=${encodeURIComponent(data.url)}&referer=${encodeURIComponent(data.initiator)}&filename=${encodeURIComponent(downFileName)}`;
-                    chrome.tabs.create({ url: url, index: tab.index + 1 });
-                });
-            }
-        });
+            filename: downFileName
+        }, function (id) { downData[id] = data; });
         return false;
     });
     // 点击预览图片
@@ -292,7 +299,18 @@ $(function () {
             return;
         }
         $('.TabShow :checked').each(function () {
-            $(this).siblings('#download').click();
+            const link = $(this).parents(".panel").find("a");
+            const url = link.attr("href");
+            const filename = "CatCatch/" + link.attr("download");
+            const initiator = link.data("initiator");
+            setTimeout(function () {
+                chrome.downloads.download({
+                    url: url,
+                    filename: filename
+                }, function (id) {
+                    downData[id] = { url: url, downFileName: filename, initiator: initiator };
+                });
+            }, 100);
         });
     });
     //复制选中文件

@@ -50,8 +50,8 @@ $(function () {
     var fileSize = 0; // 文件大小
 
     // 获取 当前tabId
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        let tabId = tabs[0].id;
+    chrome.tabs.getCurrent(function (tabs) {
+        let tabId = tabs.id;
         // 修改Referer
         if (m3u8_referer && m3u8_referer != undefined && m3u8_referer != "" && m3u8_referer != "undefined") {
             chrome.declarativeNetRequest.updateSessionRules({
@@ -547,7 +547,6 @@ $(function () {
     $("#ForceDownload").click(function () {
         downloadAllTs();
     });
-
     // 合并下载已有的数据
     function downloadAllTs() {
         let fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });

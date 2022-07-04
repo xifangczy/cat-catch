@@ -15,7 +15,7 @@ $(function () {
     };
 
     // 修改Referer
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    chrome.tabs.getCurrent(function (tabs) {
         let tabId = tabs[0].id;
         if (referer && referer != undefined && referer != "" && referer != "undefined") {
             chrome.declarativeNetRequest.updateSessionRules({

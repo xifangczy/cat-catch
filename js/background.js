@@ -372,7 +372,7 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
     chrome.storage.local.set({ MediaData: cacheData });
     refererData = [];
     // 清理 模拟手机
-    G.featMobileTabId.includes(tabId) && mobileUserAgent(tabId, false);
+    !G.isFirefox && mobileUserAgent(tabId, false);
     // 清理 自动下载
     tabIdListRemove("featAutoDownTabId", tabId);
     // 清理 捕获

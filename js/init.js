@@ -31,9 +31,11 @@ G.TabIdList = [
 ]
 
 // 102版本以上 非Firefox 开启更多功能
+G.isFirefox = false;
 G.moreFeat = moreFeatFun();
 function moreFeatFun() {
     if (navigator.userAgent.includes("Firefox/")) {
+        G.isFirefox = true;
         return false;
     }
     const version = navigator.userAgent.match(/Chrome\/([\d]+)/);
