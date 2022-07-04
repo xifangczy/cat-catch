@@ -16,7 +16,7 @@ $(function () {
 
     // 修改Referer
     chrome.tabs.getCurrent(function (tabs) {
-        let tabId = tabs[0].id;
+        let tabId = tabs.id;
         if (referer && referer != undefined && referer != "" && referer != "undefined") {
             chrome.declarativeNetRequest.updateSessionRules({
                 removeRuleIds: [tabId],
