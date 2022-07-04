@@ -326,28 +326,24 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
         // 开启捕获
         if (G.moreFeat && G.featCatchTabId && G.featCatchTabId.includes(tabId)) {
             const injectScript = G.injectScript == "catch.js" ? "js/catch.js" : "js/recorder.js";     // Security
-            chrome.scripting.executeScript(
-                {
-                    target: { tabId: tabId, allFrames: true },
-                    files: [injectScript],
-                    injectImmediately: true,
-                    world: "MAIN"
-                }
-            );
+            chrome.scripting.executeScript({
+                target: { tabId: tabId, allFrames: true },
+                files: [injectScript],
+                injectImmediately: true,
+                world: "MAIN"
+            });
         }
         // 模拟手机端 修改 navigator 变量
         if (G.moreFeat && G.featMobileTabId && G.featMobileTabId.includes(tabId)) {
-            chrome.scripting.executeScript(
-                {
-                    args: [G.MobileUserAgent.toString()],
-                    target: { tabId: tabId, allFrames: true },
-                    func: function () {
-                        Object.defineProperty(navigator, 'userAgent', { value: arguments[0], writable: false });
-                    },
-                    injectImmediately: true,
-                    world: "MAIN"
-                }
-            );
+            chrome.scripting.executeScript({
+                args: [G.MobileUserAgent.toString()],
+                target: { tabId: tabId, allFrames: true },
+                func: function () {
+                    Object.defineProperty(navigator, 'userAgent', { value: arguments[0], writable: false });
+                },
+                injectImmediately: true,
+                world: "MAIN"
+            });
         }
     }
     if (changeInfo.status == "complete") {
@@ -375,7 +371,7 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
     chrome.storage.local.set({ MediaData: cacheData });
     refererData = [];
     // 清理 模拟手机
-    G.featMobileTabId.includes(tabId) && mobileUserAgent(tabId, false);
+    mobileUserAgent(tabId, false);
     // 清理 自动下载
     tabIdListRemove("featAutoDownTabId", tabId);
     // 清理 捕获

@@ -32,7 +32,8 @@ if (typeof (browser) == "object") {
             browser.webRequest.onBeforeSendHeaders.removeListener(userAgentListener);
             return;
         }
-        browser.webRequest.onBeforeSendHeaders.addListener(userAgentListener, { urls: ["<all_urls>"], tabId: obj.addRules[0].id }, ["blocking", "requestHeaders"]
+        browser.webRequest.onBeforeSendHeaders.addListener(
+            userAgentListener, { urls: ["<all_urls>"], tabId: obj.addRules[0].id }, ["blocking", "requestHeaders"]
         );
     };
     chrome.declarativeNetRequest.getSessionRules = () => {
