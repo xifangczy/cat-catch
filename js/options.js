@@ -167,7 +167,6 @@ $("#ClearData, #ResetAllOption").bind("click", function () {
 $("#extensionReload").bind("click", function () {
     chrome.runtime.reload();
 });
-
 //正则表达式 测试
 $("#testRegex, #testUrl").keyup(function () {
     const testUrl = $("#testUrl").val();
@@ -190,7 +189,6 @@ $("#testRegex, #testUrl").keyup(function () {
         }
     }
 });
-
 //导出配置
 $("#exportOptions").bind("click", function () {
     chrome.storage.sync.get(function (items) {
@@ -223,6 +221,10 @@ function readerFile(e) {
     alert("导入完成");
     location.reload();
 }
+// 参数说明
+$("#showM3u8Help").bind("click", function () {
+    $("#m3u8Help").slideToggle();
+});
 
 // 保存 后缀 类型 正则 配置
 function Save(option) {

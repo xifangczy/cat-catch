@@ -99,16 +99,43 @@
             </div>
             <div class="item">
               <div>
-                <a
-                  href="https://github.com/nilaoda/N_m3u8DL-CLI"
-                  target="_blank"
-                  >N_m3u8DL-CLI</a
-                >
-                参数
+                <a href="https://github.com/nilaoda/N_m3u8DL-CLI"
+                  target="_blank">N_m3u8DL-CLI</a>参数
               </div>
-              <span class="explain width100"
-                >$url$ m3u8网址. $referer$ 请求头Referer. $title$ 网页标题</span
-              >
+              <button type="button" id="showM3u8Help">参数说明</button>
+              <span class="explain width100 hide" id="m3u8Help">
+                <b>猫抓替换关键词</b><br>
+                $url$ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; m3u8地址<br>
+                $referer$ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 请求头网址<br>
+                $title$ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 网页标题<br>
+                <b>m3u8DL 参数</b><br>
+                --workDir &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设定程序工作目录<br>
+                --saveName &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设定存储文件名(不包括后缀)<br>
+                --baseUrl &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设定Baseurl<br>
+                --headers &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设定请求头，格式 key:value 使用|分割不同的key&value<br>
+                --maxThreads &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Default: 32) 设定程序的最大线程数<br>
+                --minThreads &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Default: 16) 设定程序的最小线程数<br>
+                --retryCount &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Default: 15) 设定程序的重试次数<br>
+                --timeOut &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Default: 10) 设定程序网络请求的超时时间(单位为秒)<br>
+                --muxSetJson &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 使用外部json文件定义混流选项<br>
+                --useKeyFile &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 使用外部16字节文件定义AES-128解密KEY<br>
+                --useKeyBase64 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 使用Base64字符串定义AES-128解密KEY<br>
+                --useKeyIV &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 使用HEX字符串定义AES-128解密IV<br>
+                --downloadRange &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 仅下载视频的一部分分片或长度<br>
+                --liveRecDur &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 直播录制时，达到此长度自动退出软件(HH:MM:SS)<br>
+                --stopSpeed &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 当速度低于此值时，重试(单位为KB/s)<br>
+                --maxSpeed &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设置下载速度上限(单位为KB/s)<br>
+                --proxyAddress &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设置HTTP/SOCKS5代理, 如 http://127.0.0.1:8080<br>
+                --enableDelAfterDone &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 开启下载后删除临时文件夹的功能<br>
+                --enableMuxFastStart &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 开启混流mp4的FastStart特性<br>
+                --enableBinaryMerge &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 开启二进制合并分片<br>
+                --enableParseOnly &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 开启仅解析模式(程序只进行到meta.json)<br>
+                --enableAudioOnly &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 合并时仅封装音频轨道<br>
+                --disableDateInfo &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 关闭混流中的日期写入<br>
+                --disableIntegrityCheck &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 不检测分片数量是否完整<br>
+                --noMerge &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 禁用自动合并<br>
+                --noProxy &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 不自动使用系统代理<br>
+              </span>
               <textarea id="m3u8dlArg" type="text" class="width100"></textarea>
             </div>
 

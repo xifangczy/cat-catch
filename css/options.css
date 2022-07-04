@@ -237,6 +237,12 @@ textarea {
 .not-allowed:active {
   background: #ccc;
 }
+#showM3u8Help{
+  margin-left: 10px;
+  margin-top: 1px;
+  margin-right: 0px;
+  padding: 2px;
+}
 
 /* JSON格式化 */
 /* Root element */

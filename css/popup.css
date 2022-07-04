@@ -19,7 +19,7 @@ body {
 }
 .panel {
   border: 1px solid #ddd;
-  margin-bottom: 2px;
+  margin-bottom: 1px;
 }
 .panel-heading {
   padding: 5px 5px 5px 5px;
