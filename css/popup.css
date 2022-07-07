@@ -111,7 +111,7 @@ body {
   color: rgb(26, 115, 232);
   cursor: pointer;
   padding: 3px 3px 3px 3px;
-  margin: 2px 2px 4px 2px;
+  margin: 0 0 3px 0;
 }
 .button:hover {
   background: #f5f5f5;
@@ -185,7 +185,7 @@ body {
 }
 #down {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-evenly;
   position: fixed;
   bottom: 0;
   width: 100%;

@@ -78,7 +78,7 @@ function GetDefault(Obj) {
         { "ext": "divx", "size": 0, "state": true },
         { "ext": "mpeg4", "size": 0, "state": true },
         { "ext": "vid", "size": 0, "state": true },
-        { "ext": "webp", "size": 5120, "state": false }
+        { "ext": "aac", "size": 0, "state": true }
     );
     const defaultType = new Array(
         { "type": "audio/*", "size": 0, "state": true },
@@ -87,10 +87,7 @@ function GetDefault(Obj) {
         { "type": "application/vnd.apple.mpegurl", "size": 0, "state": true },
         { "type": "application/x-mpegurl", "size": 0, "state": true },
         { "type": "application/mpegurl", "size": 0, "state": true },
-        { "type": "application/octet-stream-m3u8", "size": 0, "state": true },
-        { "type": "application/json", "size": 0, "state": false },
-        { "type": "application/octet-stream", "size": 0, "state": false },
-        { "type": "image/*", "size": 0, "state": false }
+        { "type": "application/octet-stream-m3u8", "size": 0, "state": true }
     );
     const defaultRegex = new Array(
         { "type": "ig", "regex": ".*vurl=([^&]*)", "ext": "m3u8", "state": true },
