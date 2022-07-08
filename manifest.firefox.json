@@ -43,5 +43,5 @@
         }
     },
     "content_security_policy": "script-src 'self' blob:; object-src 'self' blob:",
-    "version": "2.1.2"
+    "version": "2.1.3"
 }

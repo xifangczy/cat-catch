@@ -549,7 +549,7 @@ function clearRedundant() {
     refererData = [];
 }
 function stringModify(str) {
-    return str.replace(/['\\:\*\?"<\/>\|]/g, function (m) {
+    return str.replace(/['\\:\*\?"<\/>\|~]/g, function (m) {
         return {
             "'": '&#39;',
             '\\': '&#92;',
@@ -560,7 +560,8 @@ function stringModify(str) {
             '"': '&quot;',
             '<': '&lt;',
             '>': '&gt;',
-            '|': '&#124;'
+            '|': '&#124;',
+            '~': '_'
         }[m];
     });
 }

@@ -66,8 +66,7 @@ function AddMedia(data) {
     }
 
     //添加下载文件名
-    let downFileName = G.TitleName ? data.title + '.' + data.ext : data.name;
-    data.downFileName = downFileName;
+    data.downFileName = G.TitleName ? data.title + '.' + data.ext : data.name;
 
     // 文件大小单位转换
     if (data.size) {
@@ -101,7 +100,7 @@ function AddMedia(data) {
                 ${data.title ? `标题: ${data.title}<br>` : ""}
                 ${data.type ? `MIME:  ${data.type}<br>` : ""}
                 <div id="duration"></div>
-                <a href="${data.url}" target="_blank" download="${downFileName}" data-initiator="${data.initiator}">${data.url}</a>
+                <a href="${data.url}" target="_blank" download="${data.downFileName}" data-initiator="${data.initiator}">${data.url}</a>
                 <br>
                 <img id="screenshots" class="hide"/>
                 <video id="getMediaInfo" class="hide" muted autoplay></video>
@@ -176,7 +175,7 @@ function AddMedia(data) {
         }
         chrome.downloads.download({
             url: data.url,
-            filename: downFileName
+            filename: data.downFileName
         }, function (id) { downData[id] = data; });
         return false;
     });
