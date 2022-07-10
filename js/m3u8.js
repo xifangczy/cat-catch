@@ -49,6 +49,7 @@ $(function () {
     var isLive = true; // 是否是直播
     var hls = {}  // 在线播放工具
     var fileSize = 0; // 文件大小
+    var downState = false;
 
     // 获取当前tabId 如果存在Referer修改当前标签下的所有xhr的Referer
     chrome.tabs.getCurrent(function (tabs) {
@@ -94,7 +95,7 @@ $(function () {
     // 监听下载事件 修改提示
     chrome.downloads.onChanged.addListener(function (DownloadDelta) {
         if (!DownloadDelta.state) { return; }
-        if (DownloadDelta.state.current == "complete") {
+        if (DownloadDelta.state.current == "complete" && downState) {
             $("#downFilepProgress").html("已保存到硬盘, 请查看浏览器已下载内容");
             $("#progress").html("已保存到硬盘, 请查看浏览器已下载内容");
         }
@@ -125,6 +126,7 @@ $(function () {
         }).fail(function (result) {
             $("#downFilepProgress").html("下载失败... " + JSON.stringify(result));
         }).done(function (result) {
+            downState = true;
             $("#downFilepProgress").html("下载完成，正在保存到硬盘...");
             chrome.downloads.download({
                 url: URL.createObjectURL(result),
@@ -265,7 +267,7 @@ $(function () {
                 }
                 if (line.includes("METHOD=")) {
                     let methodTemp = /METHOD=([^,\n]*)/.exec(line);
-                    if (methodTemp && methodTemp[1]) {
+                    if (methodTemp && methodTemp[1] && methodTemp[1] != "NONE") {
                         method = methodTemp[1];
                         $("#tips").append('METHOD= <input type="text" value="' + method + '" spellcheck="false">');
                     }
@@ -543,6 +545,7 @@ $(function () {
     }
     // 开始下载
     function downloadAllTs() {
+        downState = true;
         let fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });
         chrome.downloads.download({
             url: URL.createObjectURL(fileBlob),

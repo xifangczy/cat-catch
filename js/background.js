@@ -184,6 +184,7 @@ function findMedia(data, isRegex = false, filter = false) {
         type: header["type"],
         tabId: data.tabId,
         isRegex: isRegex,
+        requestId: data.requestId,
     };
     let getTabId = data.tabId == -1 ? G.tabId : data.tabId;
     chrome.tabs.get(getTabId, function (webInfo) {

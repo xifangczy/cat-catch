@@ -34,11 +34,16 @@ chrome.downloads.onChanged.addListener(function (DownloadItem) {
     if (DownloadItem.error) {
         chrome.tabs.get(G.tabId, function (tab) {
             if (!downData[DownloadItem.id]) { return; }
-            let url = downData[DownloadItem.id].url;
-            let initiator = downData[DownloadItem.id].initiator;
-            let downFileName = downData[DownloadItem.id].downFileName;
-            url = `/m3u8.html?m3u8_url=${encodeURIComponent(url)}&referer=${encodeURIComponent(initiator)}&filename=${encodeURIComponent(downFileName)}`;
-            chrome.tabs.create({ url: url, index: tab.index + 1 });
+            chrome.tabs.create({
+                url:`/m3u8.html?m3u8_url=${encodeURIComponent(
+                        downData[DownloadItem.id].url
+                    )}&referer=${encodeURIComponent(
+                        downData[DownloadItem.id].initiator
+                    )}&filename=${encodeURIComponent(
+                        downData[DownloadItem.id].downFileName
+                    )}`,
+                index: tab.index + 1
+            });
         });
     }
 });
@@ -83,7 +88,7 @@ function AddMedia(data) {
         parsingType = "json";
     }
     //添加html
-    let html = `
+    let html = $(`
         <div class="panel">
             <div class="panel-heading">
                 <input type="checkbox" class="DownCheck" checked="true"/>
@@ -105,14 +110,13 @@ function AddMedia(data) {
                 <img id="screenshots" class="hide"/>
                 <video id="getMediaInfo" class="hide" muted autoplay></video>
             </div>
-        </div>`;
+        </div>`);
 
     ////////////////////////绑定事件////////////////////////
-    html = $(html);
     //展开网址
     html.find('.panel-heading').click(function () {
         html.find(".url").toggle();
-        let screenshots = html.find("#screenshots");
+        const screenshots = html.find("#screenshots");
         // 预览图片
         if (isPicture(data)) {
             screenshots.css("display", "block");
@@ -120,8 +124,8 @@ function AddMedia(data) {
             return;
         }
         //获取时长
-        let getMediaInfo = html.find("#getMediaInfo");
-        let durationNode = html.find("#duration");
+        const getMediaInfo = html.find("#getMediaInfo");
+        const durationNode = html.find("#duration");
         if (html.find(".url").is(":visible") && durationNode.html() == "") {
             getMediaInfo.attr('src', data.url);
             getMediaInfo[0].onloadeddata = function () {
@@ -206,7 +210,7 @@ function AddMedia(data) {
         }
         script.onload = function () {
             const hls = new Hls();
-            let video = $('#player video')[0];
+            const video = $('#player video')[0];
             hls.loadSource(data.url);
             hls.attachMedia(video);
             hls.on(Hls.Events.MEDIA_ATTACHED, function () {
@@ -220,27 +224,23 @@ function AddMedia(data) {
     });
     //解析m3u8
     html.find('#m3u8, #json').click(function () {
-        let id = $(this).attr('id');
-        let title = encodeURIComponent(data.title);
-        let url = encodeURIComponent(data.url);
-        let initiator = encodeURIComponent(data.initiator);
+        let url = '';
+        const id = $(this).attr('id');
         chrome.tabs.get(G.tabId, function (tab) {
             if (id == "m3u8") {
-                url = `/m3u8.html?m3u8_url=${url}&referer=${initiator}&title=${title}`;
+                url = `/m3u8.html?m3u8_url=${encodeURIComponent(data.url)}&referer=${encodeURIComponent(data.initiator)}&title=${encodeURIComponent(data.title)}`;
             } else {
-                url = `/json.html?url=${url}&referer=${initiator}&title=${title}`;
+                url = `/json.html?url=${encodeURIComponent(data.url)}&referer=${encodeURIComponent(data.initiator)}&title=${encodeURIComponent(data.title)}`;
             }
             chrome.tabs.create({ url: url, index: tab.index + 1 });
         });
         return false;
     });
     //多选框
-    html.find('input').click(function () {
-        //防止绑定事件重叠
-        html.find(".url").toggle();
-        return true;
+    html.find('input').click(function (event) {
+        event.originalEvent.cancelBubble = true;
     });
-    //添加页面
+    
     data.tabId == -1 ? $('#otherMediaList').append(html) : $('#mediaList').append(html);
 }
 
@@ -252,7 +252,7 @@ $(function () {
     });
     //标签切换
     $(".Tabs .TabButton").click(function () {
-        let index = $(this).index();
+        const index = $(this).index();
         $(".Tabs .TabButton").removeClass('Active');
         $(this).addClass("Active");
         $(".mediaList").removeClass("TabShow");
@@ -265,7 +265,7 @@ $(function () {
     });
     //下载选中文件
     $('#DownFile').click(function () {
-        let FileNum = $('.TabShow :checked').length;
+        const FileNum = $('.TabShow :checked').length;
         if (FileNum >= 10 && !confirm("共 " + FileNum + "个文件，是否确认下载?")) {
             return;
         }
@@ -286,10 +286,10 @@ $(function () {
     });
     //复制选中文件
     $('#AllCopy').click(function () {
-        let count = $('.TabShow :checked').length;
-        if (count == 0) { return false };
+        const checked = $('.TabShow :checked');
+        if (checked.length == 0) { return false };
         let url = '';
-        $('.TabShow :checked').each(function () {
+        checked.each(function () {
             url += $(this).parents('.panel').find('.url a').attr('href') + "\n";
         });
         navigator.clipboard.writeText(url);
@@ -342,21 +342,14 @@ $(function () {
     });
     // 模拟手机端
     $("#MobileUserAgent").click(function () {
-        let action = $(this).data("switch");
-        if (action == "on") {
-            $("#MobileUserAgent").html("关闭模拟");
-            $("#MobileUserAgent").data("switch", "off");
-        } else {
-            $("#MobileUserAgent").html("模拟手机");
-            $("#MobileUserAgent").data("switch", "on");
-        }
+        const action = $(this).data("switch");
         chrome.runtime.sendMessage({ Message: "mobileUserAgent", tabId: G.tabId, action: action }, function () {
             $('#Clear').click();
         });
     });
     // 自动下载
     $("#AutoDown").click(function () {
-        let action = $(this).data("switch");
+        const action = $(this).data("switch");
         if (action == "on") {
             if (confirm("找到资源立刻尝试下载\n点击扩展图标将关闭自动下载\n是否确认开启？")) {
                 $("#AutoDown").html("关闭下载");
@@ -372,7 +365,7 @@ $(function () {
 
     // 捕获
     $("#Catch").click(function () {
-        let action = $(this).data("switch");
+        const action = $(this).data("switch");
         if (action == "on") {
             if (confirm("保存视频缓存数据\n媒体可能会被分成音频和视频,请注意浏览器提示下载多个文件\n是否确认开启？")) {
                 $("#Catch").html("关闭捕获");
@@ -397,7 +390,7 @@ $(function () {
 //html5播放器允许格式
 function isPlay(data) {
     if (G.Potplayer) { return true }
-    let arr = ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'flv', 'm4a', '3gp', 'mpeg', 'mov'];
+    const arr = ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'flv', 'm4a', '3gp', 'mpeg', 'mov'];
     return arr.includes(data.ext);
 }
 function isM3U8(data) {

@@ -172,6 +172,10 @@ $("#testRegex, #testUrl").keyup(function () {
     const testUrl = $("#testUrl").val();
     const testRegex = $("#testRegex").val();
     const testFlag = $("#testFlag").val();
+    if (testUrl == "" || testRegex == "") {
+        $("#testResult").html("不匹配");
+        return;
+    }
     let regex;
     try {
         regex = new RegExp(testRegex, testFlag);
@@ -180,7 +184,11 @@ $("#testRegex, #testUrl").keyup(function () {
         return;
     }
     const result = regex.exec(testUrl);
-    result == null ? $("#testResult").html("不匹配") : $("#testResult").html("匹配");
+    if (result == null) {
+        $("#testResult").html("不匹配");
+        return;
+    }
+    $("#testResult").html("匹配")
     for (let i = 1; i < result.length; i++) {
         if (result[i] != "") {
             $("#testResult").append(
