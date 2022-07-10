@@ -35,13 +35,13 @@ chrome.downloads.onChanged.addListener(function (DownloadItem) {
         chrome.tabs.get(G.tabId, function (tab) {
             if (!downData[DownloadItem.id]) { return; }
             chrome.tabs.create({
-                url:`/m3u8.html?m3u8_url=${encodeURIComponent(
-                        downData[DownloadItem.id].url
-                    )}&referer=${encodeURIComponent(
-                        downData[DownloadItem.id].initiator
-                    )}&filename=${encodeURIComponent(
-                        downData[DownloadItem.id].downFileName
-                    )}`,
+                url: `/m3u8.html?m3u8_url=${encodeURIComponent(
+                    downData[DownloadItem.id].url
+                )}&referer=${encodeURIComponent(
+                    downData[DownloadItem.id].initiator
+                )}&filename=${encodeURIComponent(
+                    downData[DownloadItem.id].downFileName
+                )}`,
                 index: tab.index + 1
             });
         });
@@ -89,7 +89,7 @@ function AddMedia(data) {
     }
     //添加html
     let html = $(`
-        <div class="panel">
+        <div class="panel" id="requestId${data.requestId}">
             <div class="panel-heading">
                 <input type="checkbox" class="DownCheck" checked="true"/>
                 <img src="${data.webInfo?.favIconUrl}" class="icon ${G.ShowWebIco && data.webInfo?.favIconUrl ? "" : "hide"}"/>
@@ -128,7 +128,7 @@ function AddMedia(data) {
         const durationNode = html.find("#duration");
         if (html.find(".url").is(":visible") && durationNode.html() == "") {
             getMediaInfo.attr('src', data.url);
-            getMediaInfo[0].onloadeddata = function () {
+            getMediaInfo.on("loadeddata", function () {
                 this.pause();
                 // 截图
                 if (screenshots.attr("src") == undefined) {
@@ -148,14 +148,14 @@ function AddMedia(data) {
                 if (this.duration && this.duration != Infinity) {
                     durationNode.html("时长: " + secToTime(this.duration));
                 }
-                getMediaInfo.removeAttr('src');
-            }
-            getMediaInfo[0].onplay = function () {
-                getMediaInfo.removeAttr('src');
-            }
-            getMediaInfo[0].onerror = function () {
-                getMediaInfo.removeAttr('src');
-            }
+                getMediaInfo.remove();
+            });
+            getMediaInfo.on("play", function () {
+                getMediaInfo.remove();
+            });
+            getMediaInfo.on("error", function () {
+                getMediaInfo.remove();
+            });
         }
     });
     //点击复制网址
@@ -174,7 +174,11 @@ function AddMedia(data) {
             if (url.length >= 2046) {
                 alert("m3u8dl参数太长,可能导致无法唤醒m3u8DL, 请手动复制到m3u8DL下载");
             }
-            window.open(url);
+            if(G.isFirefox){
+                window.location.href = url;
+                return false;
+            }
+            chrome.tabs.update({ url: url });
             return false;
         }
         chrome.downloads.download({
@@ -191,7 +195,11 @@ function AddMedia(data) {
     //播放
     html.find('#play').click(function () {
         if (G.Potplayer) {
-            window.open('potplayer://' + data.url);
+            if(G.isFirefox){
+                window.location.href = 'potplayer://' + data.url;
+                return false;
+            }
+            chrome.tabs.update({ url: 'potplayer://' + data.url });
             return false;
         }
         html.find("#screenshots").hide();
@@ -240,7 +248,7 @@ function AddMedia(data) {
     html.find('input').click(function (event) {
         event.originalEvent.cancelBubble = true;
     });
-    
+
     data.tabId == -1 ? $('#otherMediaList').append(html) : $('#mediaList').append(html);
 }
 
@@ -270,7 +278,7 @@ $(function () {
             return;
         }
         $('.TabShow :checked').each(function () {
-            const link = $(this).parents(".panel").find("a");
+            const link = $(this).parents(".panel").find(".url a");
             const url = link.attr("href");
             const filename = "CatCatch/" + link.attr("download");
             const initiator = link.data("initiator");
@@ -389,7 +397,7 @@ $(function () {
 
 //html5播放器允许格式
 function isPlay(data) {
-    if (G.Potplayer) { return true }
+    if (G.Potplayer && !isJSON(data) && !isPicture(data)) { return true; }
     const arr = ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'flv', 'm4a', '3gp', 'mpeg', 'mov'];
     return arr.includes(data.ext);
 }

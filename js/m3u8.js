@@ -50,6 +50,7 @@ $(function () {
     var hls = {}  // 在线播放工具
     var fileSize = 0; // 文件大小
     var downState = false;
+    var downId = 0;
 
     // 获取当前tabId 如果存在Referer修改当前标签下的所有xhr的Referer
     chrome.tabs.getCurrent(function (tabs) {
@@ -96,6 +97,7 @@ $(function () {
     chrome.downloads.onChanged.addListener(function (DownloadDelta) {
         if (!DownloadDelta.state) { return; }
         if (DownloadDelta.state.current == "complete" && downState) {
+            downId = DownloadDelta.id;
             $("#downFilepProgress").html("已保存到硬盘, 请查看浏览器已下载内容");
             $("#progress").html("已保存到硬盘, 请查看浏览器已下载内容");
         }
@@ -436,6 +438,14 @@ $(function () {
     $("#historyBack").click(function () {
         if (window.history.length > 1) { window.history.back(); }
         window.location.href = "/m3u8.html";
+    });
+    // 打开目录
+    $(".openDir").click(function () {
+        if(downId){
+            chrome.downloads.show(downId);
+            return;
+        }
+        chrome.downloads.showDefaultFolder();
     });
 
     //////////////////////// 合并下载 ts文件 ////////////////////////

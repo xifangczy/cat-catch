@@ -91,7 +91,8 @@ function GetDefault(Obj) {
     );
     const defaultRegex = new Array(
         { "type": "ig", "regex": ".*vurl=([^&]*)", "ext": "m3u8", "state": true },
-        { "type": "ig", "regex": "/getvinfo\\?", "ext": "json", "state": true }
+        { "type": "ig", "regex": "/getvinfo\\?", "ext": "json", "state": true },
+        { "type": "ig", "regex": "https://cache\\.video\\.[a-z]*\\.com/dash\\?tvid=.*", "ext": "json", "state": true }
     );
     switch (Obj) {
         case "Ext": return defaultExt;
