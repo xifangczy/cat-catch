@@ -2,6 +2,8 @@
 ### 2.1.3
 [Fixed] 修复文件名出现 "~" 符号 导致chrome API无法下载
 
+[Fixed] 修复Firefox中popup页面下载按钮被滚动条遮挡
+
 [Changed] 增加/删除一些默认配置
 
 [Added] 增加视频播放速度控制
