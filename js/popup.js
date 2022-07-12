@@ -98,7 +98,7 @@ function AddMedia(data) {
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
                 <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
                 <img src="img/parsing.png" class="ico ${parsing ? "" : "hide"}" id="${parsingType}" title="解析"/>
-                <img src="img/${G.Potplayer ? "potplayer.png" : "play.png"}" class="ico ${isPlay(data) || isM3U8(data) ? "" : "hide"}" id="play" title="预览"/>
+                <img src="img/${G.Potplayer ? "potplayer.png" : "play.png"}" class="ico ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
                 <img src="img/download.png" class="ico" id="download" title="下载"/>
             </div>
             <div class="url hide">
@@ -389,7 +389,7 @@ $(function () {
         }
     });
 
-    // 倍速播放
+    // 倍速播放 / 画中画
     $("#playbackRate").val(G.playbackRate);
     $("#goSpeedPlay, #reSpeedPlay").click(function () {
         if (this.id == "goSpeedPlay") {
@@ -400,18 +400,27 @@ $(function () {
         }
         chrome.tabs.sendMessage(G.tabId, { Message: "Speed", speed: 1 });
     });
+    $("#requestPictureInPicture").click(function () {
+        chrome.tabs.sendMessage(G.tabId, { Message: "requestPictureInPicture" });
+    });
 
     //102以上开启捕获按钮
     if (G.moreFeat) {
         $("#Catch").show();
+    }
+    // Firefox 关闭画中画 修复右边滚动条遮挡
+    if (G.isFirefox) {
+        $("#requestPictureInPicture").hide();
+        $("body").addClass("fixFirefoxRight");
     }
 });
 
 //html5播放器允许格式
 function isPlay(data) {
     if (G.Potplayer && !isJSON(data) && !isPicture(data)) { return true; }
-    const arr = ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'flv', 'm4a', '3gp', 'mpeg', 'mov'];
-    return arr.includes(data.ext);
+    const extArray = ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'm4a', '3gp', 'mpeg', 'mov'];
+    const typeArray = ['video/ogg', 'video/mp4', 'video/webm', 'audio/ogg', 'audio/mp3', 'audio/wav', 'audio/m4a', 'video/3gp', 'video/mpeg', 'video/mov'];
+    return extArray.includes(data.ext) || typeArray.includes(data.type) || isM3U8(data);
 }
 function isM3U8(data) {
     if (data.ext == "m3u8" ||
@@ -444,7 +453,12 @@ function isPicture(data) {
     return false;
 }
 
-//取消提示 3个以上显示操作按钮
+/*
+* 有资源 隐藏无资源提示
+* 大于30条 显示一键到最底部按钮
+* 更新数量显示
+* 如果标签是其他设置 隐藏底部按钮
+*/
 function UItoggle() {
     let length = $('.TabShow .panel').length;
     length > 0 ? $('#Tips').hide() : $('#Tips').show();

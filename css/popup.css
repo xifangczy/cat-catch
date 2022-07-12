@@ -1,7 +1,3 @@
-* {
-  margin: 0;
-  padding: 0;
-}
 a {
   color: #3079ed;
   text-decoration: none;
@@ -16,6 +12,10 @@ body {
   width: 470px;
   overflow-x: hidden;
   background: #fff;
+  margin: 0;
+}
+.fixFirefoxRight {
+  margin-right: 10px;
 }
 .panel {
   border: 1px solid #ddd;
@@ -207,14 +207,14 @@ body {
 #otherOptions{
   margin: 5px;
 }
-#SpeedPlay {
+#PlayControl {
   display: flex;
   align-items: center;
 }
-#SpeedPlay .button2{
+#PlayControl .button2{
   margin-left: 5px;
 }
-#SpeedPlay #playbackRate{
+#PlayControl #playbackRate{
   width: 3em;
   height: 20px;
 }
