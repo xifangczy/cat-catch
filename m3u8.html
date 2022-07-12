@@ -31,7 +31,7 @@
             <div class="progress"></div>
           </div>
           <button id="historyBack" type="button">返回上一页</button>
-          <button class="openDir">打开下载目录</button>
+          <button class="openDir button2">打开下载目录</button>
         </div>
       </section>
 
@@ -71,7 +71,7 @@
           </div>
 
           <div class="block" id="button">
-            <button id="DownText">下载显示的内容</button>
+            <button id="DownText">下载显示内容</button>
             <button id="UrlDecode">Url解码</button>
             <input type="text" value='wget "$url$"' id="formatStr" spellcheck="false" />
             <button id="format">自定义格式化</button>
@@ -82,15 +82,13 @@
             <button id="catch" data-switch="on">开启捕获</button>
             <br>
             <div style="display: inline;" id="threadDiv">下载线程数 <input type="number" value="32" id="thread" spellcheck="false" style="width: 35px;"/></div>
-            <button id="AllDownload">在线下载合并ts</button> 
-            <button class="openDir">打开下载目录</button>
-            <button id="ForceDownload" class="hide">强制下载已有数据</button>
-            <button id="m3u8DL">调用N_m3u8DL-CLI下载</button>
+            <button id="AllDownload" class="button2">在线下载合并ts</button> 
+            <button class="openDir button2">打开下载目录</button>
+            <button id="ForceDownload" class="hide" class="button2">强制下载已有数据</button>
+            <button id="m3u8DL" class="button2">调用N_m3u8DL-CLI下载</button>
             <div style="display: flex;"><div id="progress"></div> <div id="fileSize"></div></div>
 
             <div class="block hide" id="errorTsList"></div>
-
-            <div class="ffmpeg">ffmpeg合并ts命令: <p>ffmpeg -i xxx.m3u8 -vcodec copy -acodec copy xxx.mp4</p></div>
           </div>
 
         </div>

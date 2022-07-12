@@ -133,7 +133,7 @@ input#OtherAutoClear {
   height: 20px;
   cursor: pointer;
 }
-button {
+button, .button2 {
   background: #fff;
   border: solid 1px #c7c7c7;
   border-radius: 4px;
@@ -153,6 +153,16 @@ button:active {
 .button {
   display: flex;
   justify-content: flex-end;
+}
+.button2 {
+  background: rgb(26 115 232 / 80%);
+  color: rgb(255 255 255);
+}
+.button2:hover {
+  background: rgb(26 115 232);
+}
+.button2:active {
+  background: rgb(26 115 232 / 80%);
 }
 .explain {
   color: rgb(95, 99, 104);
@@ -175,12 +185,12 @@ button:active {
   margin: 0 auto;
   width: 1024px;
 }
+.m3u8_wrapper .block {
+  border-bottom: 0px;
+}
 .wrapper1024 {
   margin: 0 auto;
   width: 1024px;
-}
-.ffmpeg {
-  margin-top: 20px;
 }
 textarea {
   font-size: 12px;
