@@ -204,3 +204,17 @@ body {
 #getMediaInfo {
   width: 100%;
 }
+#otherOptions{
+  margin: 5px;
+}
+#SpeedPlay {
+  display: flex;
+  align-items: center;
+}
+#SpeedPlay .button2{
+  margin-left: 5px;
+}
+#SpeedPlay #playbackRate{
+  width: 3em;
+  height: 20px;
+}

@@ -22,7 +22,8 @@ G.OptionLists = [
     "MobileUserAgent",
     "m3u8dl",
     "m3u8dlArg",
-    "injectScript"
+    "injectScript",
+    "playbackRate"
 ];
 G.TabIdList = [
     "featMobileTabId",
@@ -111,6 +112,7 @@ function GetDefault(Obj) {
         case "featMobileTabId": return [];
         case "featAutoDownTabId": return [];
         case "featCatchTabId": return [];
+        case "playbackRate": return 2;
     }
 }
 // 初始变量

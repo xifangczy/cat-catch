@@ -9,22 +9,17 @@ https://microsoftedge.microsoft.com/addons/detail/oohmdefbjalncfplafanlagojlakmj
 ## 🦊Firefox
 https://addons.mozilla.org/addon/cat-catch/
 
-# 📘Chrome类浏览器 源码加载方法
+# 📘Crhome/Edge等Chromium内核浏览器 源码加载方法
 1. https://github.com/xifangczy/cat-catch/releases 下载 Source code 并解压。
-2. Chrome扩展管理页面 chrome://extensions/ 右上角 打开 "开发者模式"。
-3. 左上角点击 "加载已解压的扩展程序" 然后选中你解压好的猫抓的目录即可。
+2. 扩展管理页面 打开 "开发者模式"。
+3. 点击 "加载已解压的扩展程序" 选中你解压好的目录即可。
 
 # 📒用户文档
 https://o2bmm.gitbook.io/cat-catch/
 
 # 📚兼容性说明
-1.0.16 版本及之前版本所有Chromium内核浏览器可用。
-
-1.0.17 之后版本需要Chromium内核93及以上
-
-1.0.24 开始支持Firefox Gecko内核93及以上
-
-2.0~ 需要Chromium内核93及以上, 小部分功能需要102版本以上，低版本会隐藏功能按钮
+1.0.17版本之后需要Chromium内核版本93以上。
+低于93请使用1.0.16版本。
 
 # 👻幽灵数据？
 一个Chromium的BUG 不明原因的某资源不会标记来自哪个网页，1.0.17之前版本会直接丢弃该数据。之后得到修复并称这部分数据称为“幽灵数据”。

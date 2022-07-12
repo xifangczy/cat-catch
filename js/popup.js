@@ -174,7 +174,7 @@ function AddMedia(data) {
             if (url.length >= 2046) {
                 alert("m3u8dl参数太长,可能导致无法唤醒m3u8DL, 请手动复制到m3u8DL下载");
             }
-            if(G.isFirefox){
+            if (G.isFirefox) {
                 window.location.href = url;
                 return false;
             }
@@ -195,7 +195,7 @@ function AddMedia(data) {
     //播放
     html.find('#play').click(function () {
         if (G.Potplayer) {
-            if(G.isFirefox){
+            if (G.isFirefox) {
                 window.location.href = 'potplayer://' + data.url;
                 return false;
             }
@@ -389,6 +389,18 @@ $(function () {
         }
     });
 
+    // 倍速播放
+    $("#playbackRate").val(G.playbackRate);
+    $("#goSpeedPlay, #reSpeedPlay").click(function () {
+        if (this.id == "goSpeedPlay") {
+            const speed = parseFloat($("#playbackRate").val());
+            chrome.tabs.sendMessage(G.tabId, { Message: "Speed", speed: speed });
+            chrome.storage.sync.set({ playbackRate: speed });
+            return;
+        }
+        chrome.tabs.sendMessage(G.tabId, { Message: "Speed", speed: 1 });
+    });
+
     //102以上开启捕获按钮
     if (G.moreFeat) {
         $("#Catch").show();
@@ -434,13 +446,19 @@ function isPicture(data) {
 
 //取消提示 3个以上显示操作按钮
 function UItoggle() {
-    let length = $('.TabShow #download').length;
+    let length = $('.TabShow .panel').length;
     length > 0 ? $('#Tips').hide() : $('#Tips').show();
     length >= 30 ? $('#ToBottom').show() : $('#ToBottom').hide();
     length = $('#mediaList .panel').length;
     $("#mediaQuantity").text("[" + length + "]");
     length = $('#otherMediaList .panel').length;
     $("#otherQuantity").text("[" + length + "]");
+    if ($('.TabShow').attr("id") == "otherOptions") {
+        $('#Tips').hide();
+        $('#down').hide();
+    } else if ($('#down').is(":hidden")) {
+        $('#down').show();
+    }
 }
 
 function Tips(text, delay = 200) {

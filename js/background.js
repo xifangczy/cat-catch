@@ -9,7 +9,7 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(function () { return; });
 chrome.alarms.create("heartbeat1", { periodInMinutes: 1 });
 chrome.alarms.create("heartbeat4.9", { periodInMinutes: 4.9 });
 chrome.alarms.onAlarm.addListener(function (alarm) {
-    chrome.tabs.query({}, function (tabs) {
+    chrome.tabs.query({ windowType: "normal" }, function (tabs) {
         for (let item of tabs) {
             if (isSpecialPage(item.url) || item.id == -1 || item.id == 0) { return; }
             try {
@@ -18,7 +18,7 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
                     target: { tabId: item.id },
                     func: (cid) => chrome.runtime.sendMessage(cid, { Message: "HeartBeat", type: "alarm" }),
                 });
-            } catch (e) { }
+            } catch (e) { return; }
         }
     });
 });
@@ -203,10 +203,10 @@ function findMedia(data, isRegex = false, filter = false) {
         // 发送到popup 并检查自动下载
         chrome.runtime.sendMessage(info, function () {
             if (data.tabId != -1 && G.featAutoDownTabId && G.featAutoDownTabId.includes(data.tabId)) {
-                let downFileName = G.TitleName ? info.title + '.' + info.ext : info.name;
+                const downDir = info.title == "NULL" ? "CatCatch/" : info.title + "/";
                 chrome.downloads.download({
                     url: data.url,
-                    filename: "CatCatch/" + downFileName
+                    filename: downDir + info.name
                 });
             }
             if (chrome.runtime.lastError) { return; }

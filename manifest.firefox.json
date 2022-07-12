@@ -43,5 +43,10 @@
         }
     },
     "content_security_policy": "script-src 'self' blob:; object-src 'self' blob:",
+    "content_scripts": [{
+        "matches": ["<all_urls>"],
+        "all_frames": true,
+        "js": ["js/content-script.js"]
+    }],
     "version": "2.1.3"
 }
