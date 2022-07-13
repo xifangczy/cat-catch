@@ -408,7 +408,7 @@ $(function () {
     if (G.moreFeat) {
         $("#Catch").show();
     }
-    // Firefox 关闭画中画 修复右边滚动条遮挡
+    // Firefox 关闭画中画功能 修复右边滚动条遮挡
     if (G.isFirefox) {
         $("#requestPictureInPicture").hide();
         $("body").addClass("fixFirefoxRight");

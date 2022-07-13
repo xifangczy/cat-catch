@@ -42,7 +42,6 @@
             "strict_min_version": "93.0"
         }
     },
-    "content_security_policy": "script-src 'self' blob:; object-src 'self' blob:",
     "content_scripts": [{
         "matches": ["<all_urls>"],
         "all_frames": true,

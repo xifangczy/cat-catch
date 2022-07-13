@@ -447,6 +447,11 @@ $(function () {
         }
         chrome.downloads.showDefaultFolder();
     });
+    // Firefox 关闭播放m3u8 和 捕获
+    if (G.isFirefox) {
+        $("#play").hide();
+        $("#catch").hide();
+    }
 
     //////////////////////// 合并下载 ts文件 ////////////////////////
     var isComplete = false; // 是否下载完成

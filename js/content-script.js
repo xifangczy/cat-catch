@@ -7,8 +7,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             video.playbackRate = Message.speed;
         });
         sendResponse("Speed set to " + Message.speed);
-    }
-    if(Message.Message == "requestPictureInPicture"){
+    } else if (Message.Message == "requestPictureInPicture") {
         document.querySelectorAll("video").forEach(function (video) {
             video.requestPictureInPicture();
         });
