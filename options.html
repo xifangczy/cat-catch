@@ -86,6 +86,32 @@
       </section>
 
       <section>
+        <h1 class="optionsTitle">
+          复制选项
+        </h1>
+        <div class="optionBox">
+          <span class="explain">
+            为方便使用第三方应用，自定义复制按钮写入剪贴板的内容。<br/><br/>
+            替换关键词<br/>
+            <b>$url$</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 文件URL<br/>
+            <b>$referer$</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 请求头网址<br/>
+            <b>$title$</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 网页标题<br/>
+          </span><br/>
+          <div class="item">
+            <div>HLS m3u8文件</div>
+            <textarea id="copyM3U8" type="text" class="width100" ></textarea>
+          </div>
+          <div class="item">
+            <div>DASH mpb文件</div>
+            <textarea id="copyMPD" type="text" class="width100" ></textarea>
+          </div>
+          <div class="button">
+            <button type="button" id="ResetCopy">重置复制选项</button>
+          </div>
+        </div>
+      </section>
+
+      <section>
         <h1 class="optionsTitle">其他设置</h1>
         <div class="optionBox" id="OtherOption">
           <div class="list">
@@ -102,7 +128,7 @@
                 <a href="https://github.com/nilaoda/N_m3u8DL-CLI"
                   target="_blank">N_m3u8DL-CLI</a>参数
               </div>
-              <button type="button" id="showM3u8Help">参数说明</button>
+              <button type="button" id="showM3u8Help">查看参数说明</button>
               <span class="explain width100 hide" id="m3u8Help">
                 <b>猫抓替换关键词</b><br>
                 $url$ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; m3u8地址<br>
@@ -145,7 +171,6 @@
               </span>
               <textarea id="m3u8dlArg" type="text" class="width100"></textarea>
             </div>
-
             <div class="item">
               <div>自动清理幽灵数据(默认100条后自动清理)</div>
               <input id="OtherAutoClear" type="number" />

@@ -23,7 +23,9 @@ G.OptionLists = [
     "m3u8dl",
     "m3u8dlArg",
     "injectScript",
-    "playbackRate"
+    "playbackRate",
+    "copyM3U8",
+    "copyMPD",
 ];
 G.TabIdList = [
     "featMobileTabId",
@@ -116,6 +118,8 @@ function GetDefault(Obj) {
         case "featAutoDownTabId": return [];
         case "featCatchTabId": return [];
         case "playbackRate": return 2;
+        case "copyM3U8": return "$url$";
+        case "copyMPD": return "ffmpeg -headers \"referer: $referer$\" -i \"$url$\" -c copy \"$title$.mp4\"";
     }
 }
 // 初始变量

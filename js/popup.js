@@ -160,7 +160,15 @@ function AddMedia(data) {
     });
     //点击复制网址
     html.find('#copy').click(function () {
-        navigator.clipboard.writeText(data.url);
+        let text = data.url;
+        if(isM3U8(data) || isMPD(data)){
+            text = isM3U8(data) ? G.copyM3U8 : G.copyMPD;
+            text = text.includes("$url$") ? text : data.url;    // 防止$url$不存在无法成功复制地址
+            text = text.replace("$url$", data.url);
+            text = text.replace("$referer$", data.initiator);
+            text = text.replace("$title$", data.title);
+        }
+        navigator.clipboard.writeText(text);
         Tips("已复制到剪贴板");
         return false;
     });
@@ -429,6 +437,12 @@ function isM3U8(data) {
         data.type == "application/x-mpegurl" ||
         data.type == "application/mpegurl" ||
         data.type == "application/octet-stream-m3u8"
+    ) { return true; }
+    return false;
+}
+function isMPD(data) {
+    if (data.ext == "mpd" ||
+        data.type == "application/dash+xml"
     ) { return true; }
     return false;
 }
