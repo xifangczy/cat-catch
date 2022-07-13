@@ -397,19 +397,19 @@ $(function () {
         }
     });
 
-    // 倍速播放 / 画中画
+    // 倍速播放
     $("#playbackRate").val(G.playbackRate);
     $("#goSpeedPlay, #reSpeedPlay").click(function () {
         if (this.id == "goSpeedPlay") {
             const speed = parseFloat($("#playbackRate").val());
-            chrome.tabs.sendMessage(G.tabId, { Message: "Speed", speed: speed });
+            chrome.tabs.sendMessage(G.tabId, { Message: "speed", speed: speed });
             chrome.storage.sync.set({ playbackRate: speed });
             return;
         }
-        chrome.tabs.sendMessage(G.tabId, { Message: "Speed", speed: 1 });
+        chrome.tabs.sendMessage(G.tabId, { Message: "speed", speed: 1 });
     });
-    $("#requestPictureInPicture").click(function () {
-        chrome.tabs.sendMessage(G.tabId, { Message: "requestPictureInPicture" });
+    $("#pip, #pause, #play").click(function () {
+        chrome.tabs.sendMessage(G.tabId, { Message: this.id });
     });
 
     //102以上开启捕获按钮
@@ -418,7 +418,7 @@ $(function () {
     }
     // Firefox 关闭画中画功能 修复右边滚动条遮挡
     if (G.isFirefox) {
-        $("#requestPictureInPicture").hide();
+        $("#pip").hide();
         $("body").addClass("fixFirefoxRight");
     }
 });

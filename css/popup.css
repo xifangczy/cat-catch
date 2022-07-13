@@ -151,6 +151,9 @@ body {
   border-bottom-color: transparent;
   font-weight: bold;
 }
+.TabButton.Active div {
+  font-weight: bold;
+}
 #ToBottom {
   text-align: center;
   background: #fff;
@@ -179,10 +182,6 @@ body {
 .TabShow {
   display: block !important;
 }
-#mediaQuantity,
-#otherQuantity {
-  font-weight: bold;
-}
 #down {
   display: flex;
   justify-content: space-evenly;
@@ -204,17 +203,19 @@ body {
 #getMediaInfo {
   width: 100%;
 }
-#otherOptions{
+#otherOptions {
   margin: 5px;
 }
 #PlayControl {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
 }
-#PlayControl .button2{
+#PlayControl .button2,
+#PlayControl .button {
   margin-left: 5px;
 }
-#PlayControl #playbackRate{
+#PlayControl #playbackRate {
   width: 3em;
   height: 20px;
 }
