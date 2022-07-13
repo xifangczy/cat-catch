@@ -428,7 +428,8 @@ $(function () {
         if (url.length >= 2046) {
             alert("m3u8dl参数太长,可能导致无法唤醒m3u8DL, 请手动复制到m3u8DL下载");
         }
-        window.open(url);
+        chrome.tabs.update({ url: url });
+        // window.open(url);
     });
     // 强制下载 按钮
     $("#ForceDownload").click(function () {
