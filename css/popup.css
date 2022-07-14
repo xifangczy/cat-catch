@@ -219,3 +219,7 @@ body {
   width: 3em;
   height: 20px;
 }
+#videoIndex{
+  margin-bottom: 5px;
+  width: 100%;
+}

@@ -26,7 +26,10 @@
     <div id="mediaList" class="mediaList TabShow hide"></div>
     <div id="otherMediaList" class="mediaList hide"></div>
     <div id="otherOptions" class="mediaList hide">
-     <b>视频控制：</b>
+     <b>当前可操控视频：</b>
+     <select id="videoIndex">
+      <option value ="-1" id="videoIndexTips">未找检测到可操控视频</option>
+    </select>
       <div id="PlayControl">
         倍数:<input id="playbackRate" type="number" value="2" min="0" max="16"/>
         <div id="goSpeedPlay" class="button2">倍速播放</div>
@@ -34,6 +37,8 @@
         <div id="pip" class="button2">画中画</div>
         <div id="pause" class="button">暂停</div>
         <div id="play" class="button">播放</div>
+        <input type="range" id="volume" min="0" max="1" value="1" step="0.01"/>
+        <input type="range" id="time" min="0" max="100" value="0" step="1" style="width: 100%;"/>
       </div>
     </div>
     <div id="down">
