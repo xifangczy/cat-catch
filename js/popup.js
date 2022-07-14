@@ -314,13 +314,13 @@ $(function () {
     //全选
     $('#AllSelect').click(function () {
         $('.TabShow input').each(function () {
-            $(this).attr("checked", true);
+            $(this).prop("checked", true);
         });
     });
     //反选
     $('#ReSelect').click(function () {
         $('.TabShow input').each(function () {
-            $(this).attr('checked', !$(this).prop('checked'));
+            $(this).prop('checked', !$(this).prop('checked'));
         });
     });
     //清空数据
@@ -408,17 +408,23 @@ $(function () {
     function getVideoState() {
         chrome.tabs.sendMessage(G.tabId, { Message: "getVideoState", index: _index }, function (state) {
             if (chrome.runtime.lastError || state.count == 0) { return; }
-            _index = _index == -1 ? 0 : _index;
             $("#volume").val(state.volume);
             $("#time").val(state.time);
-            if (!state.update) { return; }
+            if (state.paused) {
+                $("#control").html("播放").data("switch", "play");
+            } else {
+                $("#control").html("暂停").data("switch", "pause");
+            }
+            $("#loop").prop("checked", state.loop);
+            if (!state.update && _index != -1) { return; }
+            _index = _index == -1 ? 0 : _index;
             $("#videoIndex option").remove();
             for (let i = 1; i <= state.count; i++) {
-                let src = state.src[i-1];
+                let src = state.src[i - 1];
                 if (src.length >= 60) {
                     src = src.substr(0, 35) + '...' + src.substr(-35);
                 }
-                $("#videoIndex").append(`<option value='${i-1}'>${src}</option>`);
+                $("#videoIndex").append(`<option value='${i - 1}'>${src}</option>`);
             }
             $("#videoIndex").val(_index);
         });
@@ -445,10 +451,22 @@ $(function () {
         }
         chrome.tabs.sendMessage(G.tabId, { Message: "speed", speed: 1, index: _index });
     });
-    // 画中画 暂停 播放
-    $("#pip, #pause, #play").click(function () {
+    // 画中画
+    $("#pip").click(function () {
         if (_index < 0) { return; }
-        chrome.tabs.sendMessage(G.tabId, { Message: this.id, index: _index });
+        chrome.tabs.sendMessage(G.tabId, { Message: "pip", index: _index });
+    });
+    // 暂停 播放
+    $("#control").click(function () {
+        if (_index < 0) { return; }
+        const action = $(this).data("switch");
+        chrome.tabs.sendMessage(G.tabId, { Message: action, index: _index });
+    });
+    // 循环
+    $("#loop").click(function () {
+        if (_index < 0) { return; }
+        const action = $(this).prop("checked");
+        chrome.tabs.sendMessage(G.tabId, { Message: "loop", loop: action, index: _index });
     });
     // 调节音量
     $("#volume").mousedown(function () {

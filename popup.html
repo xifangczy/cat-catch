@@ -30,13 +30,13 @@
      <select id="videoIndex">
       <option value ="-1" id="videoIndexTips">未找检测到可操控视频</option>
     </select>
-      <div id="PlayControl">
+      <div id="PlayControl" class="blue">
         倍数:<input id="playbackRate" type="number" value="2" min="0" max="16"/>
         <div id="goSpeedPlay" class="button2">倍速播放</div>
         <div id="reSpeedPlay" class="button2">正常播放</div>
         <div id="pip" class="button2">画中画</div>
-        <div id="pause" class="button">暂停</div>
-        <div id="play" class="button">播放</div>
+        <div id="control" class="button" data-switch="play">播放</div>
+        <div class="loop"><div>循环</div><input type="checkbox" id="loop"></div>
         <input type="range" id="volume" min="0" max="1" value="1" step="0.01"/>
         <input type="range" id="time" min="0" max="100" value="0" step="1" style="width: 100%;"/>
       </div>

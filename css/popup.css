@@ -223,3 +223,11 @@ body {
   margin-bottom: 5px;
   width: 100%;
 }
+.loop{
+  margin: 0 5px 0 5px;
+  display: flex;
+  flex-direction: column;
+}
+.blue{
+  color: rgb(26, 115, 232);
+}
