@@ -34,7 +34,16 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             Message.index = Message.index == -1 ? 0 : Message.index;
             const video = videoObj[Message.index];
             const currentTime = video.currentTime / video.duration * 100;
-            sendResponse({ time: currentTime, volume: video.volume, count: _videoObj.length, src: _videoSrc, update: update, paused: video.paused, loop: video.loop });
+            sendResponse({
+                time: currentTime,
+                volume: video.volume,
+                count: _videoObj.length,
+                src: _videoSrc,
+                update: update,
+                paused: video.paused,
+                loop: video.loop,
+                speed: video.playbackRate
+            });
             return;
         }
         sendResponse({ count: 0 });

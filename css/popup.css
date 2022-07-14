@@ -210,6 +210,7 @@ body {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  justify-content: space-evenly;
 }
 #PlayControl .button2,
 #PlayControl .button {
@@ -225,12 +226,15 @@ body {
 }
 .loop {
   margin: 0 5px 0 5px;
-  display: flex;
-  flex-direction: column;
 }
 .blue {
   color: rgb(26, 115, 232);
 }
-#volume {
-  width: 100px;
+.flex {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#time {
+  width: 100%;
 }

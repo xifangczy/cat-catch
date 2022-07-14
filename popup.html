@@ -32,14 +32,13 @@
     </select>
       <div id="PlayControl" class="blue">
         倍数:<input id="playbackRate" type="number" value="2" min="0" max="16"/>
-        <div id="goSpeedPlay" class="button2">倍速播放</div>
-        <div id="reSpeedPlay" class="button2">正常播放</div>
+        <div id="speed" class="button2">倍速播放</div>
         <div id="pip" class="button2">画中画</div>
         <div id="fullScreen" class="button2">全屏</div>
         <div id="control" class="button" data-switch="play">播放</div>
-        <div class="loop"><div>循环</div><input type="checkbox" id="loop"></div>
-        <input type="range" id="volume" min="0" max="1" value="1" step="0.01"/>
-        <input type="range" id="time" min="0" max="100" value="0" step="1" style="width: 100%;"/>
+        <div class="flex loop"><div>循环</div><input type="checkbox" id="loop"></div>
+        <div class="flex"><div>音量</div><input type="range" id="volume" min="0" max="1" value="1" step="0.01"/></div>
+        <input type="range" id="time" min="0" max="100" value="0" step="1"/>
       </div>
     </div>
     <div id="down">

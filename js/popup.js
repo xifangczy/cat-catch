@@ -400,6 +400,8 @@ $(function () {
     /* 网页视频控制 */
     var _setInterval;   //储存定时器
     var _index = -1; // 当前选择的视频
+    var flagPaused = undefined;
+    var flagSpeed = undefined;
     function setLoop() {
         clearInterval(_setInterval);
         _setInterval = setInterval(getVideoState, 500);
@@ -410,7 +412,14 @@ $(function () {
             if (chrome.runtime.lastError || state.count == 0) { return; }
             $("#volume").val(state.volume);
             $("#time").val(state.time);
-            state.paused ? $("#control").html("播放").data("switch", "play") : $("#control").html("暂停").data("switch", "pause");
+            if(flagPaused != state.paused){
+                state.paused ? $("#control").html("播放").data("switch", "play") : $("#control").html("暂停").data("switch", "pause");
+                flagPaused = state.paused;
+            }
+            if(flagSpeed != state.speed){
+                state.speed  == 1 ? $("#speed").html("倍数播放").data("switch", "speed") : $("#speed").html("正常播放").data("switch", "normal");
+                flagSpeed = state.speed;
+            }
             $("#loop").prop("checked", state.loop);
             if (!state.update && _index != -1) { return; }
             _index = _index == -1 ? 0 : _index;
@@ -437,9 +446,9 @@ $(function () {
     });
     // 倍速播放
     $("#playbackRate").val(G.playbackRate); // 上一次设定的倍数
-    $("#goSpeedPlay, #reSpeedPlay").click(function () {
+    $("#speed").click(function () {
         if (_index < 0) { return; }
-        if (this.id == "goSpeedPlay") {
+        if ($(this).data("switch") == "speed") {
             const speed = parseFloat($("#playbackRate").val());
             chrome.tabs.sendMessage(G.tabId, { Message: "speed", speed: speed, index: _index });
             chrome.storage.sync.set({ playbackRate: speed });
