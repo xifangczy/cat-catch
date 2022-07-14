@@ -410,11 +410,7 @@ $(function () {
             if (chrome.runtime.lastError || state.count == 0) { return; }
             $("#volume").val(state.volume);
             $("#time").val(state.time);
-            if (state.paused) {
-                $("#control").html("播放").data("switch", "play");
-            } else {
-                $("#control").html("暂停").data("switch", "pause");
-            }
+            state.paused ? $("#control").html("播放").data("switch", "play") : $("#control").html("暂停").data("switch", "pause");
             $("#loop").prop("checked", state.loop);
             if (!state.update && _index != -1) { return; }
             _index = _index == -1 ? 0 : _index;
@@ -454,7 +450,18 @@ $(function () {
     // 画中画
     $("#pip").click(function () {
         if (_index < 0) { return; }
-        chrome.tabs.sendMessage(G.tabId, { Message: "pip", index: _index });
+        chrome.tabs.sendMessage(G.tabId, { Message: "pip", index: _index }, function (state) {
+            if (chrome.runtime.lastError) { return; }
+            state.state ? $("#pip").html("退出") : $("#pip").html("画中画");
+        });
+    });
+    // 全屏
+    $("#fullScreen").click(function () {
+        if (_index < 0) { return; }
+        chrome.tabs.sendMessage(G.tabId, { Message: "fullScreen", index: _index }, function (state) {
+            if (chrome.runtime.lastError) { return; }
+            state.state ? $("#fullScreen").html("退出") : $("#fullScreen").html("全屏");
+        });
     });
     // 暂停 播放
     $("#control").click(function () {

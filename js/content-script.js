@@ -1,6 +1,7 @@
 var _videoObj = [];
 var _videoSrc = [];
 var pipSwitch = false;
+var fullScreenSwitch = false;
 chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     if (Message.Message == "getVideoState") {   // 获取页面视频对象
         let videoObj = [];
@@ -45,14 +46,29 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     if (Message.Message == "pip") { // 画中画
         try {
-            if(pipSwitch){
+            if (pipSwitch) {
                 document.exitPictureInPicture();
                 pipSwitch = false;
-                return;
+            } else {
+                _videoObj[Message.index].requestPictureInPicture();
+                pipSwitch = true;
             }
-            _videoObj[Message.index].requestPictureInPicture();
-            pipSwitch = true;
+
         } catch (e) { return; }
+        sendResponse({ state: pipSwitch });
+        return;
+    }
+    if (Message.Message == "fullScreen") { // 全屏
+        try {
+            if (fullScreenSwitch) {
+                document.exitFullscreen();
+                fullScreenSwitch = false;
+            } else {
+                _videoObj[Message.index].requestFullscreen();
+                fullScreenSwitch = true;
+            }
+        } catch (e) { return; }
+        sendResponse({ state: fullScreenSwitch });
         return;
     }
     if (Message.Message == "play") { // 播放
