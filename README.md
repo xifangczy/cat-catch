@@ -25,8 +25,7 @@ https://o2bmm.gitbook.io/cat-catch/
 一个Chromium的BUG 不明原因的某资源不会标记来自哪个网页，1.0.17之前版本会直接丢弃该数据。之后得到修复并称这部分数据称为“幽灵数据”。
 
 # 🔍界面
-![界面](https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/a.png)
-![界面](https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/b.png)
+![界面](https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/popup.png)
 
 # 🤚🏻免责
 扩展是通用嗅探工具和浏览器DevTools功能一致，没有针对任何一家网站进行解密操作，用户下载任何内容与扩展无关，请注意下载资源的权限和版权。
