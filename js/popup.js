@@ -177,8 +177,8 @@ function AddMedia(data) {
         if (G.m3u8dl && isM3U8(data)) {
             let m3u8dlArg = G.m3u8dlArg.replace("$referer$", data.initiator);
             m3u8dlArg = m3u8dlArg.replace("$url$", data.url);
-            m3u8dlArg = m3u8dlArg.replace("$title$", unescape(encodeURIComponent(data.title)));
-            let url = 'm3u8dl://' + btoa(m3u8dlArg);
+            m3u8dlArg = m3u8dlArg.replace("$title$", data.title);
+            let url = 'm3u8dl://' + Base64.encode(m3u8dlArg);
             if (url.length >= 2046) {
                 alert("m3u8dl参数太长,可能导致无法唤醒m3u8DL, 请手动复制到m3u8DL下载");
             }
