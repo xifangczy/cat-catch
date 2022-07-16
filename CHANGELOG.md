@@ -4,6 +4,8 @@
 
 [Fixed] 修复Firefox中popup页面下载按钮被滚动条遮挡
 
+[Fixed] 储存路劲有中文时 m3u8dl协议调用错误
+
 [Changed] 增加/删除一些默认配置
 
 [Added] 增加操控当前网页视频功能
