@@ -1,9 +1,8 @@
 var _videoObj = [];
 var _videoSrc = [];
-var pipSwitch = false;
-var fullScreenSwitch = false;
 chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
-    if (Message.Message == "getVideoState") {   // 获取页面视频对象
+    // 获取页面视频对象
+    if (Message.Message == "getVideoState") {
         let videoObj = [];
         let videoSrc = [];
         document.querySelectorAll("video").forEach(function (video) {
@@ -42,65 +41,82 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
                 update: update,
                 paused: video.paused,
                 loop: video.loop,
-                speed: video.playbackRate
+                speed: video.playbackRate,
+                muted: video.muted
             });
             return;
         }
         sendResponse({ count: 0 });
         return;
     }
-    if (Message.Message == "speed") { // 速度控制
+    // 速度控制
+    if (Message.Message == "speed") {
         _videoObj[Message.index].playbackRate = Message.speed;
         return;
     }
-    if (Message.Message == "pip") { // 画中画
-        try {
-            if (pipSwitch) {
-                document.exitPictureInPicture();
-                pipSwitch = false;
-            } else {
-                _videoObj[Message.index].requestPictureInPicture();
-                pipSwitch = true;
-            }
-
-        } catch (e) { return; }
-        sendResponse({ state: pipSwitch });
+    // 画中画
+    if (Message.Message == "pip") {
+        if (document.pictureInPictureElement) {
+            document.exitPictureInPicture();
+            sendResponse({ state: false });
+            return;
+        }
+        _videoObj[Message.index].requestPictureInPicture();
+        sendResponse({ state: true });
         return;
     }
-    if (Message.Message == "fullScreen") { // 全屏
-        try {
-            if (fullScreenSwitch) {
-                document.exitFullscreen();
-                fullScreenSwitch = false;
-            } else {
-                _videoObj[Message.index].requestFullscreen();
-                fullScreenSwitch = true;
-            }
-        } catch (e) { return; }
-        sendResponse({ state: fullScreenSwitch });
+    // 全屏
+    if (Message.Message == "fullScreen") {
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+            sendResponse({ state: false });
+            return;
+        }
+        _videoObj[Message.index].requestFullscreen();
+        sendResponse({ state: true });
         return;
     }
-    if (Message.Message == "play") { // 播放
+    // 播放
+    if (Message.Message == "play") {
         _videoObj[Message.index].play();
         return;
     }
-    if (Message.Message == "pause") { // 暂停
+    // 暂停
+    if (Message.Message == "pause") {
         _videoObj[Message.index].pause();
         return;
     }
-    if (Message.Message == "loop") { // 循环播放
-        _videoObj[Message.index].loop = Message.loop;
+    // 循环播放
+    if (Message.Message == "loop") {
+        _videoObj[Message.index].loop = Message.action;
         return;
     }
-    if (Message.Message == "setVolume") {    // 设置音量
+    // 设置音量
+    if (Message.Message == "setVolume") {
         _videoObj[Message.index].volume = Message.volume;
         sendResponse("ok");
         return;
     }
-    if (Message.Message == "setTime") {  // 设置视频进度
+    // 静音
+    if (Message.Message == "muted") {
+        _videoObj[Message.index].muted = Message.action;
+        return;
+    }
+    // 设置视频进度
+    if (Message.Message == "setTime") {
         const time = Message.time * _videoObj[Message.index].duration / 100;
         _videoObj[Message.index].currentTime = time;
         sendResponse("ok");
         return;
     }
 });
+
+// Heart Beat
+var Port;
+function connect() {
+    Port = chrome.runtime.connect(chrome.runtime.id, { name: "HeartBeat" });
+    Port.postMessage("HeartBeat");
+    Port.onMessage.addListener(function (message, Port) { return; });
+    Port.onDisconnect.addListener(connect);
+}
+connect();

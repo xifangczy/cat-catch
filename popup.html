@@ -26,9 +26,9 @@
     <div id="mediaList" class="mediaList TabShow hide"></div>
     <div id="otherMediaList" class="mediaList hide"></div>
     <div id="otherOptions" class="mediaList hide">
-     <b>当前可操控视频：</b>
+     <b id="number">当前页面可操控视频[0]:</b>
      <select id="videoIndex">
-      <option value ="-1" id="videoIndexTips">未找检测到可操控视频</option>
+      <option value ="-1" id="videoIndexTips">未检测到可操控视频</option>
     </select>
       <div id="PlayControl" class="blue">
         倍数:<input id="playbackRate" type="number" value="2" min="0" max="16"/>
@@ -37,7 +37,8 @@
         <div id="fullScreen" class="button2">全屏</div>
         <div id="control" class="button" data-switch="play">播放</div>
         <div class="flex loop"><div>循环</div><input type="checkbox" id="loop"></div>
-        <div class="flex"><div>音量</div><input type="range" id="volume" min="0" max="1" value="1" step="0.01"/></div>
+        <div class="flex muted"><div>静音</div><input type="checkbox" id="muted"></div>
+        <div class="flex"><div>音 量</div><input type="range" id="volume" min="0" max="1" value="1" step="0.01"/></div>
         <input type="range" id="time" min="0" max="100" value="0" step="1"/>
       </div>
     </div>

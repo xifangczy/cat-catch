@@ -43,7 +43,7 @@
         }
     },
     "content_scripts": [{
-        "matches": ["<all_urls>"],
+        "matches": ["https://*/*", "http://*/*"],
         "js": ["js/content-script.js"]
     }],
     "version": "2.2.0"

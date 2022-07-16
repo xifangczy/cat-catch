@@ -28,19 +28,19 @@ chrome.runtime.onMessage.addListener(function (MediaData, sender, sendResponse) 
 
 // 监听下载下载失败 传递referer重试下载
 var downData = [];
-chrome.downloads.onChanged.addListener(function (DownloadItem) {
-    // console.log(DownloadItem.error.current);
+chrome.downloads.onChanged.addListener(function (item) {
+    // console.log(item.error.current);
     // SERVER_FORBIDDEN
-    if (DownloadItem.error) {
+    if (item.error) {
         chrome.tabs.get(G.tabId, function (tab) {
-            if (!downData[DownloadItem.id]) { return; }
+            if (!downData[item.id]) { return; }
             chrome.tabs.create({
                 url: `/m3u8.html?m3u8_url=${encodeURIComponent(
-                    downData[DownloadItem.id].url
+                    downData[item.id].url
                 )}&referer=${encodeURIComponent(
-                    downData[DownloadItem.id].initiator
+                    downData[item.id].initiator
                 )}&filename=${encodeURIComponent(
-                    downData[DownloadItem.id].downFileName
+                    downData[item.id].downFileName
                 )}`,
                 index: tab.index + 1
             });
@@ -412,16 +412,18 @@ $(function () {
             if (chrome.runtime.lastError || state.count == 0) { return; }
             $("#volume").val(state.volume);
             $("#time").val(state.time);
-            if(flagPaused != state.paused){
+            if (flagPaused != state.paused) {
                 state.paused ? $("#control").html("播放").data("switch", "play") : $("#control").html("暂停").data("switch", "pause");
                 flagPaused = state.paused;
             }
-            if(flagSpeed != state.speed){
-                state.speed  == 1 ? $("#speed").html("倍数播放").data("switch", "speed") : $("#speed").html("正常播放").data("switch", "normal");
+            if (flagSpeed != state.speed) {
+                state.speed == 1 ? $("#speed").html("倍数播放").data("switch", "speed") : $("#speed").html("正常播放").data("switch", "normal");
                 flagSpeed = state.speed;
             }
             $("#loop").prop("checked", state.loop);
+            $("#muted").prop("checked", state.muted);
             if (!state.update && _index != -1) { return; }
+            $("#number").html(`当前可操控视频[${state.count}]:`);
             _index = _index == -1 ? 0 : _index;
             $("#videoIndex option").remove();
             for (let i = 1; i <= state.count; i++) {
@@ -478,17 +480,18 @@ $(function () {
         const action = $(this).data("switch");
         chrome.tabs.sendMessage(G.tabId, { Message: action, index: _index });
     });
-    // 循环
-    $("#loop").click(function () {
+    // 循环 静音
+    $("#loop, #muted").click(function () {
         if (_index < 0) { return; }
         const action = $(this).prop("checked");
-        chrome.tabs.sendMessage(G.tabId, { Message: "loop", loop: action, index: _index });
+        chrome.tabs.sendMessage(G.tabId, { Message: this.id, action: action, index: _index });
     });
-    // 调节音量
-    $("#volume").mousedown(function () {
+    // 调节音量和视频进度时 停止循环任务
+    $("#volume, #time").mousedown(function () {
         if (_index < 0) { return; }
         clearInterval(_setInterval);
     });
+    // 调节音量
     $("#volume").mouseup(function () {
         if (_index < 0) { return; }
         chrome.tabs.sendMessage(G.tabId, { Message: "setVolume", volume: $(this).val(), index: _index }, function () {
@@ -497,10 +500,6 @@ $(function () {
         });
     });
     // 调节视频进度
-    $("#time").mousedown(function () {
-        if (_index < 0) { return; }
-        clearInterval(_setInterval);
-    });
     $("#time").mouseup(function () {
         if (_index < 0) { return; }
         chrome.tabs.sendMessage(G.tabId, { Message: "setTime", time: $(this).val(), index: _index }, function () {
@@ -514,9 +513,10 @@ $(function () {
     if (G.moreFeat) {
         $("#Catch").show();
     }
-    // Firefox 关闭画中画功能 修复右边滚动条遮挡
+    // Firefox 关闭画中画 全屏 修复右边滚动条遮挡
     if (G.isFirefox) {
         $("#pip").hide();
+        $("#fullScreen").hide();
         $("body").addClass("fixFirefoxRight");
     }
 });
