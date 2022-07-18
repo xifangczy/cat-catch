@@ -519,6 +519,12 @@ $(function () {
         $("#fullScreen").hide();
         $("body").addClass("fixFirefoxRight");
     }
+
+    // 解决浏览器字体设置超过16px按钮变高遮挡一条资源
+    if ( $("#down").height() > 30) {
+        const downHeigth = $("#down").height();
+        $(".mediaList").css("margin-bottom", (downHeigth + 2) + "px");
+    }
 });
 
 //html5播放器允许格式
