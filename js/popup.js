@@ -164,9 +164,9 @@ function AddMedia(data) {
         if (isM3U8(data) || isMPD(data)) {
             text = isM3U8(data) ? G.copyM3U8 : G.copyMPD;
             text = text.includes("$url$") ? text : data.url;    // 防止$url$不存在无法成功复制地址
-            text = text.replace("$url$", data.url);
-            text = text.replace("$referer$", data.initiator);
-            text = text.replace("$title$", data.title);
+            text = text.replace(/\$url\$/g, data.url);
+            text = text.replace(/\$referer\$/g, data.initiator);
+            text = text.replace(/\$title\$/g, data.title);
         }
         navigator.clipboard.writeText(text);
         Tips("已复制到剪贴板");
@@ -175,9 +175,9 @@ function AddMedia(data) {
     // 下载
     html.find('#download').click(function () {
         if (G.m3u8dl && isM3U8(data)) {
-            let m3u8dlArg = G.m3u8dlArg.replace("$referer$", data.initiator);
-            m3u8dlArg = m3u8dlArg.replace("$url$", data.url);
-            m3u8dlArg = m3u8dlArg.replace("$title$", data.title);
+            let m3u8dlArg = G.m3u8dlArg.replace(/\$referer\$/g, data.initiator);
+            m3u8dlArg = m3u8dlArg.replace(/\$url\$/g, data.url);
+            m3u8dlArg = m3u8dlArg.replace(/\$title\$/g, data.title);
             let url = 'm3u8dl://' + Base64.encode(m3u8dlArg);
             if (url.length >= 2046) {
                 alert("m3u8dl参数太长,可能导致无法唤醒m3u8DL, 请手动复制到m3u8DL下载");

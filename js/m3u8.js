@@ -39,6 +39,7 @@ $(function () {
     var m3u8_content;
     var tsLists = [];    //储存所有ts链接
     var expandKey = false;
+    var KeyURL = "";
     var m3u8IV = "";
     var keyID = "";
     var MapURI = "";
@@ -227,9 +228,9 @@ $(function () {
             let isKyeUrl = false;
             if (line.includes("#EXT-X-KEY")) {
                 ExistKey = true;
-                let KeyURL = /URI="([^"]*)"/.exec(line);
-                if (KeyURL && KeyURL[1]) {
-                    KeyURL = fixUrl(KeyURL[1]);
+                let KeyURLTemp = /URI="([^"]*)"/.exec(line);
+                if (KeyURLTemp && KeyURLTemp[1] && KeyURL != KeyURLTemp[1]) {
+                    KeyURL = fixUrl(KeyURLTemp[1]);
                     $("#tips").append('#EXT-X-KEY URI: <input type="text" value="' + KeyURL + '" spellcheck="false">');
                     // 下载Key文件
                     $.ajax({
@@ -255,21 +256,21 @@ $(function () {
                 }
                 if (line.includes("IV=")) {
                     let m3u8IvTemp = /IV=([^,\n]*)/.exec(line);
-                    if (m3u8IvTemp && m3u8IvTemp[1]) {
+                    if (m3u8IvTemp && m3u8IvTemp[1] && m3u8IV != m3u8IvTemp[1]) {
                         m3u8IV = m3u8IvTemp[1];
                         $("#tips").append('IV= <input type="text" value="' + m3u8IV + '" spellcheck="false">');
                     }
                 }
                 if (line.includes("KEYID=")) {
                     let keyIDTemp = /KEYID=([^,\n]*)/.exec(line);
-                    if (keyIDTemp && keyIDTemp[1]) {
+                    if (keyIDTemp && keyIDTemp[1] && keyID != keyIDTemp[1]) {
                         keyID = keyIDTemp[1];
                         $("#tips").append('KEYID= <input type="text" value="' + keyID + '" spellcheck="false">');
                     }
                 }
                 if (line.includes("METHOD=")) {
                     let methodTemp = /METHOD=([^,\n]*)/.exec(line);
-                    if (methodTemp && methodTemp[1] && methodTemp[1] != "NONE") {
+                    if (methodTemp && methodTemp[1] && methodTemp[1] != "NONE" && method != methodTemp[1]) {
                         method = methodTemp[1];
                         $("#tips").append('METHOD= <input type="text" value="' + method + '" spellcheck="false">');
                     }
@@ -421,9 +422,9 @@ $(function () {
 
     // 调用m3u8DL下载
     $("#m3u8DL").click(function () {
-        let m3u8dlArg = G.m3u8dlArg.replace("$referer$", m3u8_referer);
-        m3u8dlArg = m3u8dlArg.replace("$url$", m3u8_url);
-        m3u8dlArg = m3u8dlArg.replace("$title$", m3u8_title);
+        let m3u8dlArg = G.m3u8dlArg.replace(/\$referer\$/g, data.initiator);
+        m3u8dlArg = m3u8dlArg.replace(/\$url\$/g, data.url);
+        m3u8dlArg = m3u8dlArg.replace(/\$title\$/g, data.title);
         let url = 'm3u8dl://' + Base64.encode(m3u8dlArg);
         if (url.length >= 2046) {
             alert("m3u8dl参数太长,可能导致无法唤醒m3u8DL, 请手动复制到m3u8DL下载");
