@@ -220,8 +220,9 @@ body {
   width: 3em;
   height: 20px;
 }
-#videoIndex {
-  margin-bottom: 5px;
+#otherOptions select {
+  margin-top: 2px;
+  margin-bottom: 2px;
   width: 100%;
 }
 .loop {
@@ -230,11 +231,19 @@ body {
 .blue {
   color: rgb(26, 115, 232);
 }
-.flex {
+.flexColumn {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+.flexRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
 #time {
   width: 100%;
+}
+.nowrap {
+  word-break: keep-all;
 }

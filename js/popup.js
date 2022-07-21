@@ -398,34 +398,59 @@ $(function () {
     });
 
     /* 网页视频控制 */
-    var _setInterval;   //储存定时器
-    var _index = -1; // 当前选择的视频
-    var flagPaused = undefined;
-    var flagSpeed = undefined;
-    function setLoop() {
-        clearInterval(_setInterval);
-        _setInterval = setInterval(getVideoState, 500);
+    var _tabId = -1;   // 选择的页面ID
+    var _index = -1;    //选择的视频索引
+    var VideoTagTimer;  // 获取所有视频标签的定时器
+    var VideoStateTimer;  // 获取所有视频信息的定时器
+
+    function setVideoTagTimer() {
+        clearInterval(VideoTagTimer);
+        VideoTagTimer = setInterval(getVideoTag, 1000);
     }
-    // 获取视频信息函数
+    function getVideoTag() {
+        chrome.tabs.query({ windowType: "normal" }, function (tabs) {
+            let videoTabList = [];
+            // 列出所有标签
+            for (let tab of tabs) {
+                if ($("#option" + tab.id).length == 1) { continue; }
+                videoTabList.push(tab.id);
+                $("#videoTabIndex").append(`<option value='${tab.id}' id="option${tab.id}">${stringModify(tab.title)}</option>`);
+            }
+            // 删除没有媒体的标签. 异步的原因，使用一个for去处理无法保证标签顺序一致
+            for (let tab of videoTabList) {
+                chrome.tabs.sendMessage(tab, { Message: "getVideoState", index: 0 }, function (state) {
+                    if (chrome.runtime.lastError || state.count == 0) {
+                        $("#option" + tab).remove();
+                        return;
+                    }
+                    $("#videoTabTips").remove();
+                    if (tab == G.tabId && _tabId == -1) {
+                        _tabId = tab;
+                        $("#videoTabIndex").val(tab);
+                    }
+                });
+            }
+        });
+    }
+    function setVideoStateTimer() {
+        clearInterval(VideoStateTimer);
+        VideoStateTimer = setInterval(getVideoState, 500);
+    }
     function getVideoState() {
-        chrome.tabs.sendMessage(G.tabId, { Message: "getVideoState", index: _index }, function (state) {
+        if (_tabId == -1) {
+            let currentTabId = $("#videoTabIndex").val();
+            if (currentTabId == -1) { return; }
+            _tabId = parseInt(currentTabId);
+        }
+        chrome.tabs.sendMessage(_tabId, { Message: "getVideoState", index: _index }, function (state) {
             if (chrome.runtime.lastError || state.count == 0) { return; }
             $("#volume").val(state.volume);
             $("#time").val(state.time);
-            if (flagPaused != state.paused) {
-                state.paused ? $("#control").html("播放").data("switch", "play") : $("#control").html("暂停").data("switch", "pause");
-                flagPaused = state.paused;
-            }
-            if (flagSpeed != state.speed) {
-                state.speed == 1 ? $("#speed").html("倍数播放").data("switch", "speed") : $("#speed").html("正常播放").data("switch", "normal");
-                flagSpeed = state.speed;
-            }
+            state.paused ? $("#control").html("播放").data("switch", "play") : $("#control").html("暂停").data("switch", "pause");
+            state.speed == 1 ? $("#speed").html("倍数播放").data("switch", "speed") : $("#speed").html("正常播放").data("switch", "normal");
             $("#loop").prop("checked", state.loop);
             $("#muted").prop("checked", state.muted);
-            if (!state.update && _index != -1) { return; }
-            $("#number").html(`当前可操控视频[${state.count}]:`);
-            _index = _index == -1 ? 0 : _index;
-            $("#videoIndex option").remove();
+            $("#videoIndex").empty();
             for (let i = 1; i <= state.count; i++) {
                 let src = state.src[i - 1];
                 if (src.length >= 60) {
@@ -433,18 +458,34 @@ $(function () {
                 }
                 $("#videoIndex").append(`<option value='${i - 1}'>${src}</option>`);
             }
+            _index = _index == -1 ? 0 : _index;
             $("#videoIndex").val(_index);
         });
     }
-    // 点击其他设置标签页 开始循环获取网页视频信息
+
+    // 点击其他设置标签页 开始读取tab信息以及视频信息
+    getVideoTag();
     $("#OtherOptions").click(function () {
+        setVideoTagTimer();
+        getVideoState(); setVideoStateTimer();
+    });
+    // 切换标签选择
+    $("#videoTabIndex").change(function () {
+        _tabId = parseInt($("#videoTabIndex").val());
         getVideoState();
-        setLoop();
     });
     // 切换视频选择
     $("#videoIndex").change(function () {
-        _index = $("#videoIndex").val();
+        _index = parseInt($("#videoIndex").val());
         getVideoState();
+    });
+    $("#playbackRate").on("mousewheel", function (event) {
+        let speed = parseFloat($("#playbackRate").val());
+        speed = event.originalEvent.wheelDelta < 0 ? speed - 0.1 : speed + 0.1;
+        speed = parseFloat(speed.toFixed(1));
+        if (speed < 0) { speed = 0; }
+        if (speed > 16) { speed = 16; }
+        $("#playbackRate").val(speed);
     });
     // 倍速播放
     $("#playbackRate").val(G.playbackRate); // 上一次设定的倍数
@@ -452,16 +493,16 @@ $(function () {
         if (_index < 0) { return; }
         if ($(this).data("switch") == "speed") {
             const speed = parseFloat($("#playbackRate").val());
-            chrome.tabs.sendMessage(G.tabId, { Message: "speed", speed: speed, index: _index });
+            chrome.tabs.sendMessage(_tabId, { Message: "speed", speed: speed, index: _index });
             chrome.storage.sync.set({ playbackRate: speed });
             return;
         }
-        chrome.tabs.sendMessage(G.tabId, { Message: "speed", speed: 1, index: _index });
+        chrome.tabs.sendMessage(_tabId, { Message: "speed", speed: 1, index: _index });
     });
     // 画中画
     $("#pip").click(function () {
         if (_index < 0) { return; }
-        chrome.tabs.sendMessage(G.tabId, { Message: "pip", index: _index }, function (state) {
+        chrome.tabs.sendMessage(_tabId, { Message: "pip", index: _index }, function (state) {
             if (chrome.runtime.lastError) { return; }
             state.state ? $("#pip").html("退出") : $("#pip").html("画中画");
         });
@@ -469,7 +510,7 @@ $(function () {
     // 全屏
     $("#fullScreen").click(function () {
         if (_index < 0) { return; }
-        chrome.tabs.sendMessage(G.tabId, { Message: "fullScreen", index: _index }, function (state) {
+        chrome.tabs.sendMessage(_tabId, { Message: "fullScreen", index: _index }, function (state) {
             if (chrome.runtime.lastError) { return; }
             state.state ? $("#fullScreen").html("退出") : $("#fullScreen").html("全屏");
         });
@@ -478,33 +519,33 @@ $(function () {
     $("#control").click(function () {
         if (_index < 0) { return; }
         const action = $(this).data("switch");
-        chrome.tabs.sendMessage(G.tabId, { Message: action, index: _index });
+        chrome.tabs.sendMessage(_tabId, { Message: action, index: _index });
     });
     // 循环 静音
     $("#loop, #muted").click(function () {
         if (_index < 0) { return; }
         const action = $(this).prop("checked");
-        chrome.tabs.sendMessage(G.tabId, { Message: this.id, action: action, index: _index });
+        chrome.tabs.sendMessage(_tabId, { Message: this.id, action: action, index: _index });
     });
     // 调节音量和视频进度时 停止循环任务
     $("#volume, #time").mousedown(function () {
         if (_index < 0) { return; }
-        clearInterval(_setInterval);
+        clearInterval(VideoStateTimer);
     });
     // 调节音量
     $("#volume").mouseup(function () {
         if (_index < 0) { return; }
-        chrome.tabs.sendMessage(G.tabId, { Message: "setVolume", volume: $(this).val(), index: _index }, function () {
+        chrome.tabs.sendMessage(_tabId, { Message: "setVolume", volume: $(this).val(), index: _index }, function () {
             if (chrome.runtime.lastError) { return; }
-            setLoop();
+            setVideoStateTimer();
         });
     });
     // 调节视频进度
     $("#time").mouseup(function () {
         if (_index < 0) { return; }
-        chrome.tabs.sendMessage(G.tabId, { Message: "setTime", time: $(this).val(), index: _index }, function () {
+        chrome.tabs.sendMessage(_tabId, { Message: "setTime", time: $(this).val(), index: _index }, function () {
             if (chrome.runtime.lastError) { return; }
-            setLoop();
+            setVideoStateTimer();
         });
     });
     /* 网页视频控制END */
@@ -521,7 +562,7 @@ $(function () {
     }
 
     // 解决浏览器字体设置超过16px按钮变高遮挡一条资源
-    if ( $("#down").height() > 30) {
+    if ($("#down").height() > 30) {
         const downHeigth = $("#down").height();
         $(".mediaList").css("margin-bottom", (downHeigth + 2) + "px");
     }

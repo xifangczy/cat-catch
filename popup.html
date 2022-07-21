@@ -26,19 +26,27 @@
     <div id="mediaList" class="mediaList TabShow hide"></div>
     <div id="otherMediaList" class="mediaList hide"></div>
     <div id="otherOptions" class="mediaList hide">
-     <b id="number">当前页面可操控视频[0]:</b>
-     <select id="videoIndex">
-      <option value ="-1" id="videoIndexTips">未检测到可操控视频</option>
-    </select>
+    <div class="flexRow">
+      <b class="nowrap">选择标签:</b>
+      <select id="videoTabIndex">
+        <option value ="-1" id="videoTabTips">未检测到有媒体的标签</option>
+      </select>
+    </div>
+    <div class="flexRow">
+      <b class="nowrap">选择视频:</b>
+      <select id="videoIndex">
+        <option value ="-1" id="videoIndexTips">未检测到可操控视频</option>
+      </select>
+    </div>
       <div id="PlayControl" class="blue">
         倍数:<input id="playbackRate" type="number" value="2" min="0" max="16"/>
         <div id="speed" class="button2">倍速播放</div>
         <div id="pip" class="button2">画中画</div>
         <div id="fullScreen" class="button2">全屏</div>
         <div id="control" class="button" data-switch="play">播放</div>
-        <div class="flex loop"><div>循环</div><input type="checkbox" id="loop"></div>
-        <div class="flex muted"><div>静音</div><input type="checkbox" id="muted"></div>
-        <div class="flex"><div>音 量</div><input type="range" id="volume" min="0" max="1" value="1" step="0.01"/></div>
+        <div class="flexColumn loop"><div>循环</div><input type="checkbox" id="loop"></div>
+        <div class="flexColumn muted"><div>静音</div><input type="checkbox" id="muted"></div>
+        <div class="flexColumn"><div>音 量</div><input type="range" id="volume" min="0" max="1" value="1" step="0.01"/></div>
         <input type="range" id="time" min="0" max="100" value="0" step="1"/>
       </div>
     </div>

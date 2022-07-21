@@ -196,3 +196,20 @@ function byteToSize(byte) {
         return parseFloat((byte / 1024 / 1024 / 1024).toFixed(1)) + "GB";
     }
 }
+function stringModify(str) {
+    return str.replace(/['\\:\*\?"<\/>\|~]/g, function (m) {
+        return {
+            "'": '&#39;',
+            '\\': '&#92;',
+            '/': '&#47;',
+            ':': '&#58;',
+            '*': '&#42;',
+            '?': '&#63;',
+            '"': '&quot;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '|': '&#124;',
+            '~': '_'
+        }[m];
+    });
+}

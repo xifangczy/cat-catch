@@ -6,22 +6,6 @@ clearRedundant();
 // https://stackoverflow.com/questions/66618136/persistent-service-worker-in-chrome-extension/70003493#70003493
 chrome.webNavigation.onBeforeNavigate.addListener(function () { return; });
 chrome.webNavigation.onHistoryStateUpdated.addListener(function () { return; });
-// chrome.alarms.create("heartbeat1", { periodInMinutes: 1 });
-// chrome.alarms.create("heartbeat4.9", { periodInMinutes: 4.9 });
-// chrome.alarms.onAlarm.addListener(function (alarm) {
-//     chrome.tabs.query({ windowType: "normal" }, function (tabs) {
-//         for (let item of tabs) {
-//             if (isSpecialPage(item.url) || item.id == -1 || item.id == 0) { return; }
-//             try {
-//                 chrome.scripting.executeScript({
-//                     args: [chrome.runtime.id],
-//                     target: { tabId: item.id },
-//                     func: (cid) => chrome.runtime.sendMessage(cid, { Message: "HeartBeat", type: "alarm" }),
-//                 });
-//             } catch (e) { return; }
-//         }
-//     });
-// });
 chrome.runtime.onConnect.addListener(function (Port) {
     if (Port.name !== "HeartBeat") return;
     Port.postMessage("HeartBeat");
@@ -531,23 +515,6 @@ function clearRedundant() {
         });
     });
     refererData = [];
-}
-function stringModify(str) {
-    return str.replace(/['\\:\*\?"<\/>\|~]/g, function (m) {
-        return {
-            "'": '&#39;',
-            '\\': '&#92;',
-            '/': '&#47;',
-            ':': '&#58;',
-            '*': '&#42;',
-            '?': '&#63;',
-            '"': '&quot;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '|': '&#124;',
-            '~': '_'
-        }[m];
-    });
 }
 
 // 测试
