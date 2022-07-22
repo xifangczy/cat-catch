@@ -5,7 +5,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     if (Message.Message == "getVideoState") {
         let videoObj = [];
         let videoSrc = [];
-        document.querySelectorAll("video").forEach(function (video) {
+        document.querySelectorAll("video, audio").forEach(function (video) {
             if (video.src != "" && video.src != undefined) {
                 videoObj.push(video);
                 videoSrc.push(video.src);
@@ -15,7 +15,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         if (iframe.length > 0) {
             iframe.forEach(function (iframe) {
                 if (iframe.contentDocument == null) { return true; }
-                iframe.contentDocument.querySelectorAll("video").forEach(function (video) {
+                iframe.contentDocument.querySelectorAll("video, audio").forEach(function (video) {
                     if (video.src != "" && video.src != undefined) {
                         videoObj.push(video);
                         videoSrc.push(video.src);
@@ -24,25 +24,25 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             });
         }
         if (videoObj.length > 0) {
-            let update = false;
             if (videoObj.length !== _videoObj.length || videoSrc.toString() !== _videoSrc.toString()) {
-                update = true;
                 _videoSrc = videoSrc;
                 _videoObj = videoObj;
             }
             Message.index = Message.index == -1 ? 0 : Message.index;
             const video = videoObj[Message.index];
-            const currentTime = video.currentTime / video.duration * 100;
+            const timePCT = video.currentTime / video.duration * 100;
             sendResponse({
-                time: currentTime,
+                time: timePCT,
+                currentTime: video.currentTime,
+                duration: video.duration,
                 volume: video.volume,
                 count: _videoObj.length,
                 src: _videoSrc,
-                update: update,
                 paused: video.paused,
                 loop: video.loop,
                 speed: video.playbackRate,
-                muted: video.muted
+                muted: video.muted,
+                type: video.tagName.toLowerCase()
             });
             return;
         }
@@ -57,22 +57,22 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     // 画中画
     if (Message.Message == "pip") {
         if (document.pictureInPictureElement) {
-            document.exitPictureInPicture();
+            try { document.exitPictureInPicture(); } catch (e) { return; }
             sendResponse({ state: false });
             return;
         }
-        _videoObj[Message.index].requestPictureInPicture();
+        try { _videoObj[Message.index].requestPictureInPicture(); } catch (e) { return; }
         sendResponse({ state: true });
         return;
     }
     // 全屏
     if (Message.Message == "fullScreen") {
         if (document.fullscreenElement) {
-            document.exitFullscreen();
+            try { document.exitFullscreen(); } catch (e) { return; }
             sendResponse({ state: false });
             return;
         }
-        _videoObj[Message.index].requestFullscreen();
+        try { _videoObj[Message.index].requestFullscreen(); } catch (e) { return; }
         sendResponse({ state: true });
         return;
     }
@@ -108,6 +108,19 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         _videoObj[Message.index].currentTime = time;
         sendResponse("ok");
         return;
+    }
+    // 截图视频图片
+    if (Message.Message == "screenshot") {
+        try {
+            const video = _videoObj[Message.index];
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+            sendResponse({ img: canvas.toDataURL("image/jpeg"), time: video.currentTime, host: location.host });
+            delete canvas;
+            return;
+        } catch (e) { return; }
     }
 });
 
