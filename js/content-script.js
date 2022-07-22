@@ -119,7 +119,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
             const link = document.createElement("a");
             link.href = canvas.toDataURL("image/jpeg");
-            link.download = `${location.host}-${secToTime(video.currentTime)}.jpg`;
+            link.download = `${location.hostname}-${secToTime(video.currentTime)}.jpg`;
             link.click();
             delete canvas;
             delete link;
