@@ -72,7 +72,9 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             sendResponse({ state: false });
             return;
         }
-        try { _videoObj[Message.index].requestFullscreen(); } catch (e) { return; }
+        setTimeout(function () {
+            try { _videoObj[Message.index].requestFullscreen(); } catch (e) { return; }
+        }, 500);
         sendResponse({ state: true });
         return;
     }

@@ -475,18 +475,15 @@ $(function () {
         setVideoTagTimer();
         getVideoState(); setVideoStateTimer();
     });
-    // 切换标签选择
-    $("#videoTabIndex").change(function () {
+    // 切换标签选择 切换视频选择
+    $("#videoIndex, #videoTabIndex").change(function () {
         if (!G.isFirefox) { $("#pip").show(); }
-        $("#screenshotImg").hide();
-        _tabId = parseInt($("#videoTabIndex").val());
-        getVideoState();
-    });
-    // 切换视频选择
-    $("#videoIndex").change(function () {
-        if (!G.isFirefox) { $("#pip").show(); }
-        $("#screenshotImg").hide();
-        _index = parseInt($("#videoIndex").val());
+        $("#screenshot").show();
+        if (this.id == "videoTabIndex") {
+            _tabId = parseInt($("#videoTabIndex").val());
+        } else {
+            _index = parseInt($("#videoIndex").val());
+        }
         getVideoState();
     });
     $("#playbackRate").on("mousewheel", function (event) {
@@ -520,9 +517,12 @@ $(function () {
     // 全屏
     $("#fullScreen").click(function () {
         if (_index < 0 || _tabId < 0) { return; }
-        chrome.tabs.sendMessage(_tabId, { Message: "fullScreen", index: _index }, function (state) {
-            if (chrome.runtime.lastError) { return; }
-            state.state ? $("#fullScreen").html("退出") : $("#fullScreen").html("全屏");
+        chrome.tabs.get(_tabId, function(tab) {
+            chrome.tabs.highlight({'tabs': tab.index}, function() {
+                chrome.tabs.sendMessage(_tabId, { Message: "fullScreen", index: _index }, function (state) {
+                    close();
+                });
+            });
         });
     });
     // 暂停 播放
