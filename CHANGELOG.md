@@ -1,4 +1,14 @@
 ## 更新说明
+### 2.2.1
+[Fixed] 浏览器字体过大，按钮遮挡
+
+[Fixed] 调整关键词替换
+
+[Fixed] Firefox无法下载data URL 无法导出配置
+
+[Changed] m3u8解析器多个KEY显示问题
+
+[Changed] 视频控制，现在可以控制其他页面的视频
 ### 2.2.0
 [Fixed] 修复文件名出现 "~" 符号 导致chrome API无法下载
 
