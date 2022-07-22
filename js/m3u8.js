@@ -339,7 +339,7 @@ $(function () {
     $("#DownText").click(function () {
         var txt = $("#media_file").val();
         txt = "data:text/plain," + encodeURIComponent(txt);
-        if(G.isFirefox){
+        if (G.isFirefox) {
             downloadDataURL(txt, "media_file.txt");
             return;
         }
@@ -448,7 +448,7 @@ $(function () {
     });
     // 打开目录
     $(".openDir").click(function () {
-        if(downId){
+        if (downId) {
             chrome.downloads.show(downId);
             return;
         }
@@ -466,6 +466,15 @@ $(function () {
     var tsBuffer = [];     // ts缓存
     var successCount = 1; // 已下载数量
     var stopDownload = false; // 停止下载
+    /* 转码成mp4 */
+    var mp4Cache = []; // mp4缓存
+    var transmuxer = new muxjs.mp4.Transmuxer();
+    transmuxer.on('data', function (segment) {
+        let data = new Uint8Array(segment.initSegment.byteLength + segment.data.byteLength);
+        data.set(segment.initSegment, 0);
+        data.set(segment.data, segment.initSegment.byteLength);
+        mp4Cache.push(data);
+    });
     $("#AllDownload").click(function () {
         if (isComplete) {
             downloadAllTs();
@@ -568,12 +577,21 @@ $(function () {
     // 开始下载
     function downloadAllTs() {
         downState = true;
-        let fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });
+        let fileBlob;
+        if ($("#mp4").prop("checked")) {
+            for (let i of tsBuffer) {
+                transmuxer.push(new Uint8Array(i));
+                transmuxer.flush();
+            }
+            fileBlob = new Blob(mp4Cache, { type: "video/mp4" });
+        } else {
+            fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });
+        }
         chrome.downloads.download({
             url: URL.createObjectURL(fileBlob),
             filename: `${GetFileName(m3u8_url)}.ts`
         });
-        $("#progress").html(`数据正在合并，并下载中...`);
+        $("#mp4").prop("checked") ? $("#progress").html(`数据正在转换格式...`) : $("#progress").html(`数据正在合并...`);
     }
     // 解密ts文件
     function tsDecrypt(responseData, tsIndex) {

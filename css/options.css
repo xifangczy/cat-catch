@@ -253,6 +253,10 @@ textarea {
   margin-right: 0px;
   padding: 2px;
 }
+.tomp4 {
+  margin-right: 5px;
+  margin-left: 5px;
+}
 
 /* JSON格式化 */
 /* Root element */
