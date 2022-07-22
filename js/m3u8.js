@@ -578,18 +578,21 @@ $(function () {
     function downloadAllTs() {
         downState = true;
         let fileBlob;
+        let ext;
         if ($("#mp4").prop("checked")) {
             for (let i of tsBuffer) {
                 transmuxer.push(new Uint8Array(i));
                 transmuxer.flush();
             }
             fileBlob = new Blob(mp4Cache, { type: "video/mp4" });
+            ext = "mp4";
         } else {
             fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });
+            ext = "ts";
         }
         chrome.downloads.download({
             url: URL.createObjectURL(fileBlob),
-            filename: `${GetFileName(m3u8_url)}.ts`
+            filename: `${GetFileName(m3u8_url)}.${ext}`
         });
         $("#mp4").prop("checked") ? $("#progress").html(`数据正在转换格式...`) : $("#progress").html(`数据正在合并...`);
     }
