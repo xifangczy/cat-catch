@@ -340,7 +340,8 @@ $(function () {
         var txt = $("#media_file").val();
         txt = encodeURIComponent(txt);
         chrome.downloads.download({
-            url: "data:text/plain," + txt
+            url: "data:text/plain," + txt,
+            filename: "media_file.txt"
         });
     });
     //UrlDecode编码 按钮

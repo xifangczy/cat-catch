@@ -93,7 +93,6 @@ function GetDefault(Obj) {
         { "type": "application/mpegurl", "size": 0, "state": true },
         { "type": "application/octet-stream-m3u8", "size": 0, "state": true },
         { "type": "application/dash+xml", "size": 0, "state": true }
-
     );
     const defaultRegex = new Array(
         { "type": "ig", "regex": ".*vurl=([^&]*)", "ext": "m3u8", "state": true },
@@ -126,7 +125,7 @@ function GetDefault(Obj) {
 function InitOptions() {
     chrome.storage.local.get({ MediaData: {} }, function (items) {
         cacheData = items.MediaData;
-        if(items.MediaData.init){ cacheData = {}; }
+        if (items.MediaData.init) { cacheData = {}; }
     });
     chrome.storage.sync.get(G.OptionLists, function (items) {
         for (let list of G.OptionLists) {
@@ -150,7 +149,7 @@ function InitOptions() {
 // 监听变化，新值给全局变量
 chrome.storage.onChanged.addListener(function (changes, namespace) {
     if (changes.MediaData) {
-        if(changes.MediaData.newValue?.init){ cacheData = {}; }
+        if (changes.MediaData.newValue?.init) { cacheData = {}; }
         return;
     }
     for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
@@ -167,18 +166,18 @@ chrome.runtime.onInstalled.addListener(function (details) {
 
 /*公共函数*/
 // 秒转换成时间
-function secToTime(sec) {
+function secToTime(sec, split = ":") {
     let time = "";
     let hour = Math.floor(sec / 3600);
     let min = Math.floor((sec % 3600) / 60);
     sec = Math.floor(sec % 60);
     if (hour > 0) {
-        time = hour + ":";
+        time = hour + split;
     }
     if (min < 10) {
         time += "0";
     }
-    time += min + ":";
+    time += min + split;
     if (sec < 10) {
         time += "0";
     }

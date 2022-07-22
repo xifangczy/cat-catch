@@ -5,12 +5,13 @@
     <link rel="stylesheet" type="text/css" href="css/popup.css" media="all" />
     <script src="js/jquery.min.js"></script>
     <script src="js/init.js"></script>
+    <script src="js/firefox.js"></script>
   </head>
   <body>
     <div id="ToBottom" class="hide">到最底部↓</div>
     <div class="Tabs">
       <div id="ActiveTab" class="TabButton Active">
-        当前标签
+        当前页面
         <div id="mediaQuantity"></div>
       </div>
       <div id="OtherTab" class="TabButton">
@@ -18,7 +19,7 @@
         <div id="otherQuantity"></div>
       </div>
       <div id="OtherOptions" class="TabButton">
-        其他 功能/设置
+        媒体控制
       </div>
     </div>
     <div id="Tips">还没闻到味儿~</div>
@@ -27,27 +28,29 @@
     <div id="otherMediaList" class="mediaList hide"></div>
     <div id="otherOptions" class="mediaList hide">
     <div class="flexRow">
-      <b class="nowrap">选择标签:</b>
+      <b class="nowrap">选择网页:</b>
       <select id="videoTabIndex">
-        <option value ="-1" id="videoTabTips">未检测到有媒体的标签</option>
+        <option value ="-1" id="videoTabTips">未检测到有媒体的网页</option>
       </select>
     </div>
     <div class="flexRow">
-      <b class="nowrap">选择视频:</b>
+      <b class="nowrap">选择媒体:</b>
       <select id="videoIndex">
-        <option value ="-1" id="videoIndexTips">未检测到可操控视频</option>
+        <option value ="-1" id="videoIndexTips">未检测到可操控媒体</option>
       </select>
     </div>
       <div id="PlayControl" class="blue">
         倍数:<input id="playbackRate" type="number" value="2" min="0" max="16"/>
         <div id="speed" class="button2">倍速播放</div>
-        <div id="pip" class="button2">画中画</div>
-        <div id="fullScreen" class="button2">全屏</div>
         <div id="control" class="button" data-switch="play">播放</div>
+        <div id="pip" class="button">画中画</div>
+        <div id="fullScreen" class="button">全屏</div>
+        <div id="screenshot" class="button" data-switch="play">截图</div>
         <div class="flexColumn loop"><div>循环</div><input type="checkbox" id="loop"></div>
         <div class="flexColumn muted"><div>静音</div><input type="checkbox" id="muted"></div>
         <div class="flexColumn"><div>音 量</div><input type="range" id="volume" min="0" max="1" value="1" step="0.01"/></div>
-        <input type="range" id="time" min="0" max="100" value="0" step="1"/>
+        <div class="flexColumn width100"><div id="timeShow"></div><input type="range" id="time" class="width100" min="0" max="100" value="0" step="1"/></div>
+        <img id="screenshotImg" class="hide width100 height100"/>
       </div>
     </div>
     <div id="down">

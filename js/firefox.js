@@ -12,7 +12,7 @@ if (typeof (browser) == "object") {
 
     // webRequest.onBeforeSendHeaders To declarativeNetRequest.updateSessionRules
     var webRequestData = {};
-    function userAgentListener(details){
+    function userAgentListener(details) {
         for (var i = 0; i < details.requestHeaders.length; ++i) {
             if (details.requestHeaders[i].name === webRequestData.addRules[0].action.requestHeaders[0].header) {
                 details.requestHeaders[i].value = webRequestData.addRules[0].action.requestHeaders[0].value;
@@ -54,5 +54,18 @@ if (typeof (browser) == "object") {
     chrome.scripting = new Object();
     chrome.scripting.executeScript = (obj) => {
         return;
+    }
+
+    // Firefox download API 无法下载 data:url
+    chrome.downloads.download = (obj) => {
+        if(obj.url.substr(0, 5) == "data:"){
+            const link = document.createElement("a");
+            link.href = obj.url;
+            link.download = obj.filename;
+            link.click();
+            delete link;
+            return;
+        }
+        browser.downloads.download(obj);
     }
 }
