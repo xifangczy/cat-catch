@@ -55,17 +55,4 @@ if (typeof (browser) == "object") {
     chrome.scripting.executeScript = (obj) => {
         return;
     }
-
-    // Firefox download API 无法下载 data:url
-    chrome.downloads.download = (obj) => {
-        if(obj.url.substr(0, 5) == "data:"){
-            const link = document.createElement("a");
-            link.href = obj.url;
-            link.download = obj.filename;
-            link.click();
-            delete link;
-            return;
-        }
-        browser.downloads.download(obj);
-    }
 }

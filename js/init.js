@@ -166,18 +166,18 @@ chrome.runtime.onInstalled.addListener(function (details) {
 
 /*公共函数*/
 // 秒转换成时间
-function secToTime(sec, split = ":") {
+function secToTime(sec) {
     let time = "";
     let hour = Math.floor(sec / 3600);
     let min = Math.floor((sec % 3600) / 60);
     sec = Math.floor(sec % 60);
     if (hour > 0) {
-        time = hour + split;
+        time = hour + ":";
     }
     if (min < 10) {
         time += "0";
     }
-    time += min + split;
+    time += min + ":";
     if (sec < 10) {
         time += "0";
     }
@@ -211,4 +211,13 @@ function stringModify(str) {
             '~': '_'
         }[m];
     });
+}
+
+// Firefox download API 无法下载 data URL
+function downloadDataURL(url, filename){
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    link.click();
+    delete link;
 }

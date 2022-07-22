@@ -211,10 +211,16 @@ $("#testRegex, #testUrl").keyup(function () {
 $("#exportOptions").bind("click", function () {
     chrome.storage.sync.get(function (items) {
         let ExportData = JSON.stringify(items);
+        ExportData = "data:application/json;charset=utf-8," + encodeURIComponent(ExportData);
         let date = new Date();
+        const filename = `cat-catch-${chrome.runtime.getManifest().version}-${date.getFullYear()}-${date.getMonth()}-${date.getDay()}-${date.getTime()}.json`;
+        if(G.isFirefox){
+            downloadDataURL(ExportData, filename);
+            return;
+        }
         chrome.downloads.download({
-            url: "data:application/json;charset=utf-8," + encodeURIComponent(ExportData),
-            filename: `cat-catch-${chrome.runtime.getManifest().version}-${date.getFullYear()}-${date.getMonth()}-${date.getDay()}-${date.getTime()}.json`
+            url: ExportData,
+            filename: filename
         });
     });
 });

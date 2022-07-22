@@ -561,13 +561,7 @@ $(function () {
     // 视频截图
     $("#screenshot").click(function () {
         if (_index < 0 || _tabId < 0) { return; }
-        chrome.tabs.sendMessage(_tabId, { Message: "screenshot", index: _index }, function (data) {
-            if (chrome.runtime.lastError) { return; }
-            chrome.downloads.download({
-                url: data.img,
-                filename: `${data.host}-${secToTime(data.time, "'")}.jpg`
-            });
-        });
+        chrome.tabs.sendMessage(_tabId, { Message: "screenshot", index: _index });
     });
     /* 网页视频控制END */
 

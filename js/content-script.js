@@ -117,8 +117,13 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
-            sendResponse({ img: canvas.toDataURL("image/jpeg"), time: video.currentTime, host: location.host });
+            const link = document.createElement("a");
+            link.href = canvas.toDataURL("image/jpeg");
+            link.download = `${location.host}-${secToTime(video.currentTime)}.jpg`;
+            link.click();
             delete canvas;
+            delete link;
+            sendResponse("ok");
             return;
         } catch (e) { return; }
     }
@@ -133,3 +138,16 @@ function connect() {
     Port.onDisconnect.addListener(connect);
 }
 connect();
+
+function secToTime(sec) {
+    let time = "";
+    let hour = Math.floor(sec / 3600);
+    let min = Math.floor((sec % 3600) / 60);
+    sec = Math.floor(sec % 60);
+    if (hour > 0) { time = hour + "'"; }
+    if (min < 10) { time += "0"; }
+    time += min + "'";
+    if (sec < 10) { time += "0"; }
+    time += sec;
+    return time;
+}

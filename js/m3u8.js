@@ -338,9 +338,13 @@ $(function () {
     //下载 文本格式 按钮
     $("#DownText").click(function () {
         var txt = $("#media_file").val();
-        txt = encodeURIComponent(txt);
+        txt = "data:text/plain," + encodeURIComponent(txt);
+        if(G.isFirefox){
+            downloadDataURL(txt, "media_file.txt");
+            return;
+        }
         chrome.downloads.download({
-            url: "data:text/plain," + txt,
+            url: txt,
             filename: "media_file.txt"
         });
     });
