@@ -224,7 +224,6 @@ $(function () {
                     line = MapURI;
                 }
             }
-            let isKyeUrl = false;
             if (line.includes("#EXT-X-KEY")) {
                 ExistKey = true;
                 let KeyURLTemp = /URI="([^"]*)"/.exec(line);
@@ -274,8 +273,6 @@ $(function () {
                         $("#tips").append('METHOD= <input type="text" value="' + method + '" spellcheck="false">');
                     }
                 }
-                // line = KeyURL;
-                isKyeUrl = true;
                 continue;
             }
             // fix https://test-streams.mux.dev/dai-discontinuity-deltatre/manifest.m3u8
@@ -310,7 +307,7 @@ $(function () {
                 if (!results && m3u8_arg) {
                     line = line + "?" + m3u8_arg;
                 }
-                !isKyeUrl && tsLists.push(line);
+                tsLists.push(line);
                 if (format != "") {
                     line = format.replace("$url$", line);
                 }
