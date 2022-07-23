@@ -577,18 +577,17 @@ $(function () {
     // 开始下载
     function downloadAllTs() {
         downState = true;
-        let fileBlob;
-        let ext;
+        let fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });
+        let ext = "ts";
         if ($("#mp4").prop("checked")) {
             for (let i of tsBuffer) {
                 transmuxer.push(new Uint8Array(i));
                 transmuxer.flush();
             }
-            fileBlob = new Blob(mp4Cache, { type: "video/mp4" });
-            ext = "mp4";
-        } else {
-            fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });
-            ext = "ts";
+            if (mp4Cache.length != 0) {
+                fileBlob = new Blob(mp4Cache, { type: "video/mp4" });
+                ext = "mp4";
+            }
         }
         chrome.downloads.download({
             url: URL.createObjectURL(fileBlob),

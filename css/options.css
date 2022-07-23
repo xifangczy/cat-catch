@@ -133,7 +133,8 @@ input#OtherAutoClear {
   height: 20px;
   cursor: pointer;
 }
-button, .button2 {
+button,
+.button2 {
   background: #fff;
   border: solid 1px #c7c7c7;
   border-radius: 4px;
@@ -142,7 +143,7 @@ button, .button2 {
   padding: calc(0.5em - 1px) 1em;
   /* margin-left: 20px; */
   margin-right: 10px;
-  margin-top: 10px;
+  /* margin-top: 10px; */
 }
 button:hover {
   background: #f5f5f5;
@@ -226,6 +227,7 @@ textarea {
   background-color: rgb(189, 193, 198);
   border-radius: 3px;
   margin: 3px;
+  margin-bottom: 10px;
 }
 .progress {
   width: 0px;
@@ -236,7 +238,7 @@ textarea {
 #fileSize {
   margin-left: 20px;
 }
-.not-allowed{
+.not-allowed {
   cursor: not-allowed;
   background-color: #ccc;
   color: #fff;
@@ -247,7 +249,7 @@ textarea {
 .not-allowed:active {
   background: #ccc;
 }
-#showM3u8Help{
+#showM3u8Help {
   margin-left: 10px;
   margin-top: 1px;
   margin-right: 0px;
@@ -256,8 +258,17 @@ textarea {
 .tomp4 {
   margin-right: 5px;
   margin-left: 5px;
+  display: flex;
 }
-
+.merge {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 10px;
+  align-items: center;
+}
+.wrapper .button{
+  margin-top: 5px;
+}
 /* JSON格式化 */
 /* Root element */
 .json-document {
