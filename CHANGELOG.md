@@ -1,10 +1,10 @@
 ## 更新说明
 ### 2.2.1
-[Fixed] 浏览器字体过大，按钮遮挡
+[Fixed] 修复浏览器字体过大，按钮遮挡资源列表的问题。
 
 [Fixed] 调整关键词替换
 
-[Fixed] Firefox无法下载data URL 无法导出配置
+[Fixed] 修复Firefox download API无法下载data URL问题
 
 [Changed] m3u8解析器多个KEY显示问题
 
