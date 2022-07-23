@@ -161,13 +161,17 @@ function AddMedia(data) {
     //点击复制网址
     html.find('#copy').click(function () {
         let text = data.url;
-        if (isM3U8(data) || isMPD(data)) {
-            text = isM3U8(data) ? G.copyM3U8 : G.copyMPD;
-            text = text.includes("$url$") ? text : data.url;    // 防止$url$不存在无法成功复制地址
-            text = text.replace(/\$url\$/g, data.url);
-            text = text.replace(/\$referer\$/g, data.initiator);
-            text = text.replace(/\$title\$/g, data.title);
+        if (isM3U8(data)) {
+            text = G.copyM3U8;
+        } else if (isMPD(data)) {
+            text = G.copyMPD;
+        } else {
+            text = G.copyOther;
         }
+        text = text.includes("$url$") ? text : data.url;
+        text = text.replace(/\$url\$/g, data.url);
+        text = text.replace(/\$referer\$/g, data.initiator);
+        text = text.replace(/\$title\$/g, data.title);
         navigator.clipboard.writeText(text);
         Tips("已复制到剪贴板");
         return false;
@@ -517,8 +521,8 @@ $(function () {
     // 全屏
     $("#fullScreen").click(function () {
         if (_index < 0 || _tabId < 0) { return; }
-        chrome.tabs.get(_tabId, function(tab) {
-            chrome.tabs.highlight({'tabs': tab.index}, function() {
+        chrome.tabs.get(_tabId, function (tab) {
+            chrome.tabs.highlight({ 'tabs': tab.index }, function () {
                 chrome.tabs.sendMessage(_tabId, { Message: "fullScreen", index: _index }, function (state) {
                     close();
                 });
@@ -583,7 +587,7 @@ $(function () {
     }
 });
 
-//html5播放器允许格式
+/* 格式判断 */
 function isPlay(data) {
     if (G.Potplayer && !isJSON(data) && !isPicture(data)) { return true; }
     const extArray = ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'm4a', '3gp', 'mpeg', 'mov'];

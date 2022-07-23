@@ -23,6 +23,7 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
     $("#injectScript").val(items.injectScript);
     $("#copyM3U8").val(items.copyM3U8);
     $("#copyMPD").val(items.copyMPD);
+    $("#copyOther").val(items.copyOther);
 });
 
 //新增格式
@@ -107,7 +108,7 @@ $("#injectScript").change(function () {
     }
 });
 //失去焦点 保存自动清理数 模拟手机User Agent
-$("#OtherAutoClear, #MobileUserAgent, #m3u8dlArg, #copyM3U8, #copyMPD").on("input", function () {
+$("#OtherAutoClear, #MobileUserAgent, #m3u8dlArg, #copyM3U8, #copyMPD, #copyOther").on("input", function () {
     const Option = $(this).attr("id");
     chrome.storage.sync.set({ [Option]: $(this).val() });
 });
@@ -156,6 +157,7 @@ $("#ResetCopy").bind("click", function () {
     if (confirm("确认重置吗？")) {
         chrome.storage.sync.set({ copyM3U8: GetDefault("copyM3U8") });
         chrome.storage.sync.set({ copyMPD: GetDefault("copyMPD") });
+        chrome.storage.sync.set({ copyOther: GetDefault("copyOther") });
         location.reload();
     }
 });
