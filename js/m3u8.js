@@ -274,8 +274,9 @@ $(function () {
                         $("#tips").append('METHOD= <input type="text" value="' + method + '" spellcheck="false">');
                     }
                 }
-                line = KeyURL;
+                // line = KeyURL;
                 isKyeUrl = true;
+                continue;
             }
             // fix https://test-streams.mux.dev/dai-discontinuity-deltatre/manifest.m3u8
             if (line == "\n" || line == "\r" || line == "" || line == " " || line == undefined) {
@@ -358,6 +359,7 @@ $(function () {
         BasePath = getManifestUrlBase();
         $("#formatStr").val('wget "$url$"');
         show_list();
+        buttonState(true);
     });
     // 原始m3u8
     $("#originalM3U8").click(function () {
@@ -483,6 +485,13 @@ $(function () {
         data.set(segment.data, segment.initSegment.byteLength);
         mp4Cache.push(data);
     });
+    function buttonState(state = true){
+        if(state){
+            $("#AllDownload").prop("disabled", false).removeClass("no-drop");
+            return;
+        }
+        $("#AllDownload").prop("disabled", true).addClass("no-drop");
+    }
     $("#AllDownload").click(function () {
         // if (isComplete) {
         //     downloadAllTs();
@@ -492,7 +501,7 @@ $(function () {
         //     return;
         // }
         // 禁止点击按钮
-        $("#AllDownload").prop("disabled", true).css("background-color", "#ccc").css("cursor", "no-drop");
+        buttonState(false);
         isComplete = false;
         tsBuffer = [];
         successCount = 1;
@@ -614,7 +623,7 @@ $(function () {
             filename: `${GetFileName(m3u8_url)}.${ext}`
         });
         $("#mp4").prop("checked") ? $("#progress").html(`数据正在转换格式...`) : $("#progress").html(`数据正在合并...`);
-        $("#AllDownload").prop("disabled", false).css("background-color", "rgb(26 115 232 / 80%)").css("cursor", "pointer");
+        buttonState(true);
     }
     // 解密ts文件
     function tsDecrypt(responseData, tsIndex) {

@@ -165,6 +165,10 @@ button:active {
 .button2:active {
   background: rgb(26 115 232 / 80%);
 }
+.no-drop{
+  background-color: #ccc !important;
+  cursor: no-drop;
+}
 .explain {
   color: rgb(95, 99, 104);
 }
