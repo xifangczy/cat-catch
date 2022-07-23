@@ -33,6 +33,7 @@ https://o2bmm.gitbook.io/cat-catch/
 # 💖鸣谢
 - [hls.js](https://github.com/video-dev/hls.js)
 - [jQuery](https://github.com/jquery/jquery)
+- [mux.js](https://github.com/videojs/mux.js)
 - [Momo707577045](https://github.com/Momo707577045)
 
 # 📜License
