@@ -34,6 +34,8 @@ https://o2bmm.gitbook.io/cat-catch/
 - [hls.js](https://github.com/video-dev/hls.js)
 - [jQuery](https://github.com/jquery/jquery)
 - [mux.js](https://github.com/videojs/mux.js)
+- [js-base64](https://github.com/dankogai/js-base64)
+- [jquery.json-viewer](https://github.com/abodelot/jquery.json-viewer)
 - [Momo707577045](https://github.com/Momo707577045)
 
 # 📜License
