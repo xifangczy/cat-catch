@@ -455,8 +455,12 @@ $(function () {
         chrome.downloads.showDefaultFolder();
     });
     // 切换 转换mp4格式按钮
-    $(".tomp4").click(function () {
+    $("#tomp4Tips").click(function () {
         $("#mp4").prop("checked", !$("#mp4").prop("checked"));
+    });
+    // 不重新提取ts地址
+    $("#extractionTips").click(function () {
+        $("#extraction").prop("checked", !$("#extraction").prop("checked"));
     });
     // Firefox 关闭播放m3u8 和 捕获
     if (G.isFirefox) {
@@ -480,12 +484,24 @@ $(function () {
         mp4Cache.push(data);
     });
     $("#AllDownload").click(function () {
-        if (isComplete) {
-            downloadAllTs();
-            return;
-        }
-        if (tsBuffer.length > 0) {
-            return;
+        // if (isComplete) {
+        //     downloadAllTs();
+        //     return;
+        // }
+        // if (tsBuffer.length > 0) {
+        //     return;
+        // }
+        // 禁止点击按钮
+        $("#AllDownload").prop("disabled", true).css("background-color", "#ccc").css("cursor", "no-drop");
+        isComplete = false;
+        tsBuffer = [];
+        successCount = 1;
+        mp4Cache = [];
+        // 从#media_file 直接读取ts列表
+        if ($("#extraction").prop("checked")) {
+            tsLists = $("#media_file").val().split("\n").filter(function (item) { return item != ""; });
+        } else {
+            show_list();
         }
         $("#progress").html(`等待下载中...`);
         let tsThread = parseInt($("#thread").val());  // 线程数量
@@ -598,6 +614,7 @@ $(function () {
             filename: `${GetFileName(m3u8_url)}.${ext}`
         });
         $("#mp4").prop("checked") ? $("#progress").html(`数据正在转换格式...`) : $("#progress").html(`数据正在合并...`);
+        $("#AllDownload").prop("disabled", false).css("background-color", "rgb(26 115 232 / 80%)").css("cursor", "pointer");
     }
     // 解密ts文件
     function tsDecrypt(responseData, tsIndex) {

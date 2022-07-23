@@ -84,8 +84,11 @@
             <br>
             <div class="merge">
               <div id="threadDiv">下载线程数 <input type="number" value="32" id="thread" spellcheck="false" style="width: 35px;"/></div>
-              <div class="tomp4"><input type="checkbox" id="mp4">尝试转换成mp4格式</div>
-              <button id="AllDownload" class="button2">在线下载合并ts</button> 
+              <div>
+                <div class="checkbox"><input type="checkbox" id="mp4"><div id="tomp4Tips">尝试转换mp4格式</div></div>
+                <div class="checkbox"><input type="checkbox" id="extraction"><div id="extractionTips">不重新提取ts地址</div></div>
+              </div>
+              <button id="AllDownload" class="button2">在线下载合并ts</button>
               <button class="openDir button2">打开下载目录</button>
               <button id="ForceDownload" class="hide" class="button2">强制下载已有数据</button>
               <button id="m3u8DL" class="button2">调用N_m3u8DL-CLI下载</button>
