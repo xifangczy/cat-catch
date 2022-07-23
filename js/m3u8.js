@@ -214,7 +214,6 @@ $(function () {
             if (line == "\n" || line == "\r" || line == "" || line == " " || line == undefined) {
                 continue;
             }
-            if (line == undefined) { continue; }
             //重要信息
             if (line.includes("#EXT-X-MAP")) {
                 ExistKey = true;
@@ -279,7 +278,9 @@ $(function () {
                 isKyeUrl = true;
             }
             // fix https://test-streams.mux.dev/dai-discontinuity-deltatre/manifest.m3u8
-            if (line == undefined) { continue; }
+            if (line == "\n" || line == "\r" || line == "" || line == " " || line == undefined) {
+                continue;
+            }
 
             if (line.includes("#EXTINF:")) {
                 mediaDuration += parseFloat(/#EXTINF:([^,]*)/.exec(line)[1]);
@@ -287,7 +288,6 @@ $(function () {
             if (line.includes("#EXT-X-ENDLIST")) {
                 isLive = false;
             }
-
             //ts文件
             if (!line.includes("#")) {
                 count++;
@@ -453,6 +453,10 @@ $(function () {
             return;
         }
         chrome.downloads.showDefaultFolder();
+    });
+    // 切换 转换mp4格式按钮
+    $(".tomp4").click(function () {
+        $("#mp4").prop("checked", !$("#mp4").prop("checked"));
     });
     // Firefox 关闭播放m3u8 和 捕获
     if (G.isFirefox) {

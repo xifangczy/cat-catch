@@ -259,6 +259,7 @@ textarea {
   margin-right: 5px;
   margin-left: 5px;
   display: flex;
+  cursor: pointer;
 }
 .merge {
   display: flex;
