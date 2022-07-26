@@ -18,7 +18,6 @@ if (onCatch) {
     script.src = onCatch;
     document.head.appendChild(script);
 }
-var debug;
 $(function () {
     // 捕获开关按钮
     if (onCatch) {
@@ -36,14 +35,13 @@ $(function () {
     /* 变量初始化 */
     var _m3u8Content;   // 储存m3u8文件内容
     /* m3u8 解析工具 */
-    var hls = new Hls();  // hls.js 对象
-    var _fragments = []; // 储存切片对象
-    debug = _fragments;
-    var keyContent = new Map();
-    const decryptor = new AESDecryptor(); //解密工具
+    const hls = new Hls();  // hls.js 对象
+    const _fragments = []; // 储存切片对象
+    const keyContent = new Map(); // 储存key的内容
+    const decryptor = new AESDecryptor(); // 解密工具
     /* 转码工具 */
-    var mp4Cache = [];  // mp4格式缓存
-    var transmuxer = new muxjs.mp4.Transmuxer();
+    const mp4Cache = [];  // mp4格式缓存
+    const transmuxer = new muxjs.mp4.Transmuxer();    // mux.js 对象
     transmuxer.on('data', function (segment) {
         let data = new Uint8Array(segment.initSegment.byteLength + segment.data.byteLength);
         data.set(segment.initSegment, 0);
@@ -52,10 +50,10 @@ $(function () {
     });
     /* 下载相关 */
     var downId = 0; // 下载id
-    var stopDownload = false; // 是否停止下载
+    var stopDownload = false; // 停止下载flag
     var fileSize = 0; // 文件大小
-    var tsBuffer = []; // ts缓存
-    var errorTsList = []; // 下载错误ts列表
+    const tsBuffer = []; // ts内容缓存
+    const errorTsList = []; // 下载错误ts序号列表
 
     // 获取当前tabId 如果存在Referer修改当前标签下的所有xhr的Referer
     chrome.tabs.getCurrent(function (tabs) {
@@ -85,6 +83,7 @@ $(function () {
         parseM3U8();
     });
 
+    /* 解析函数 使用hls解析好的数据 进一步处理 */
     function parseM3U8() {
         hls.loadSource(_m3u8Url);    // 载入m3u8 url
         // 等待m3u8解析完成 获得解析的数据
@@ -116,7 +115,7 @@ $(function () {
             console.log(data.error);
         });
     }
-    // 解析Ts
+    /* 提取所有ts链接 判断处理 */
     function parseTs(data) {
         let isEncrypted = false;
         for (let i in data.fragments) {
@@ -172,7 +171,7 @@ $(function () {
                 decryptdata: data.fragments[i].decryptdata
             });
         }
-        writeTsUrl();   // 写入ts链接
+        writeTsUrl();   // 写入ts链接到textarea
         $("#count").html("共 " + _fragments.length + " 个文件" + "，总时长: " + secToTime(data.totalduration));
         data.live && $("#count").html($("#count").html() + " 直播HLS");
         isEncrypted && $("#count").html($("#count").html() + " (加密HLS)");
@@ -289,6 +288,12 @@ $(function () {
         fileSize = 0;
         downloadTs();
     });
+    // Firefox 关闭播放m3u8 和 捕获
+    if (G.isFirefox) {
+        $("#play").hide();
+        $("#catch").hide();
+    }
+    /**************************** 下载TS文件 ****************************/
     // start 开始下载的索引
     // end 结束下载的索引
     function downloadTs(start = 0, end = _fragments.length - 1) {
@@ -297,6 +302,7 @@ $(function () {
         let customKey = $("#customKey").val();
         let customIV = $("#customIV").val();
         if (customKey) {
+            // Base64 转 ArrayBuffer
             let temp = Base64.atob(customKey);
             customKey = new Uint8Array(new ArrayBuffer(temp.length));
             for (i = 0; i < temp.length; i++) {
@@ -307,6 +313,7 @@ $(function () {
             });
             for (let i in _fragments) {
                 if (customIV) {
+                    // 字符串 转 Uint8Array
                     _fragments[i].decryptdata.iv = new TextEncoder().encode(customIV);
                     continue;
                 }
@@ -318,8 +325,8 @@ $(function () {
         let tsThread = _tsThread;  // 线程数量
         let index = start - 1; // 当前下载的索引
         $("#progress").html(`0/${end - start + 1}`);
-
         const tsInterval = setInterval(function () {
+            console.log(tsThread);
             // 停止下载flag
             if (stopDownload) {
                 clearInterval(tsInterval);
@@ -342,7 +349,7 @@ $(function () {
                 tsThread--;
                 let currentIndex = ++index;   // 当前下载的索引
                 $.ajax({
-                    url: _fragments[index].url,
+                    url: _fragments[currentIndex].url,
                     xhrFields: { responseType: "arraybuffer" },
                     timeout: 30000
                 }).fail(function () {
@@ -362,7 +369,7 @@ $(function () {
                     tsThread++;
                 });
             }
-        }, 66);
+        }, 10);
     }
     // 下载ts出现错误
     function downloadTsError(index) {
@@ -383,6 +390,7 @@ $(function () {
         let fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });
         let ext = "ts";
         if ($("#mp4").prop("checked")) {
+            $("#progress").html(`数据正在转换格式...`);
             for (let i of tsBuffer) {
                 transmuxer.push(new Uint8Array(i));
                 transmuxer.flush();
@@ -395,7 +403,7 @@ $(function () {
         chrome.downloads.download({
             url: URL.createObjectURL(fileBlob),
             filename: `${GetFileName(_m3u8Url)}.${ext}`
-        }, function (downloadId) { downId = downloadId; });
+        }, function (downloadId) { downId = downloadId });
         $("#mp4").prop("checked") ? $("#progress").html(`数据正在转换格式...`) : $("#progress").html(`数据正在合并...`);
         buttonState(true);
     }
@@ -427,20 +435,6 @@ $(function () {
         $("#media_file").val(url.join("\n"));
     }
 });
-
-// 基本文件目录
-function getManifestUrlBase(url, decode = true) {
-    let url_decode = decode ? decodeURIComponent(url) : url;
-    url_decode = url_decode.split("?")[0];
-    let parts = url_decode.split("/");
-    parts.pop();
-    return parts.join("/") + "/";
-}
-// 根目录
-function getManifestUrlRoot(url) {
-    let Path = url.split("/");
-    return Path[0] + "//" + Path[2];
-}
 // 获取文件名
 function GetFile(str) {
     str = str.split("?")[0];
