@@ -14,28 +14,6 @@
   <body>
     <div class="m3u8_wrapper">
 
-      <section id="getURL" class="hide">
-        <h1 class="optionsTitle">m3u8解析器</h1>
-        <span class="explain">如果填入非m3u8文件, 解析器会尝试修改referer后下载文件</span>
-        <div  class="optionBox">
-          <input type="text" id="url" placeholder="请输入 URL" style="width: 965px;margin: 5px;"/>
-          <input type="text" id="referer" placeholder="请输入 请求头referer参数" style="width: 965px;margin: 5px;"/>
-          <button id="getURL_btn" type="button">获取</button>
-        </div>
-      </section>
-
-      <section id="downfile" class="hide">
-        <h1 class="optionsTitle">修改Referer 下载</h1>
-        <div class="optionBox">
-          <div id="downFilepProgress"></div>
-          <div class="progress-bar">
-            <div class="progress"></div>
-          </div>
-          <button id="historyBack" type="button">返回上一页</button>
-          <button class="openDir button2">打开下载目录</button>
-        </div>
-      </section>
-
       <section id="loading">
         <div class="optionBox">
           文件载入中...
@@ -59,40 +37,37 @@
             <p><a id="m3u8_url"></a></p>
           </div>
           
-          <div class="block hide" id="tips">
-            该媒体已加密, 请注意加密信息 <br>
-          </div>
+          <div class="block" id="tips"></div>
 
           <div class="block">
             <p id="count"></p>
           </div>
           
           <div class="block" id="textarea">
-            TS文件列表:
             <textarea rows="50" cols="160" id="media_file" spellcheck="false"></textarea>
+            <video id="video" class="hide" width="100%" controls></video>
           </div>
 
           <div class="block" id="button">
-            <button id="DownText">下载显示内容</button>
-            <button id="UrlDecode">Url解码</button>
-            <input type="text" value='wget "$url$"' id="formatStr" spellcheck="false" />
-            <button id="format">自定义格式化</button>
+            <button id="downText">下载显示内容</button>
             <button id="originalM3U8">原始m3u8</button>
-            <button id="DownFixm3u8">本地m3u8</button>
-            <button id="Refresh">提取ts</button>
+            <button id="localFile">本地m3u8</button>
+            <button id="getTs">提取ts</button>
             <button id="play" data-switch="on">播放m3u8</button>
             <button id="catch" data-switch="on">开启捕获</button>
-            <br>
+            <button id="m3u8DL" class="button2">调用N_m3u8DL-CLI下载</button>
+            <div class="merge customKey">
+              <input type="text" id="customKey" spellcheck="false" placeholder="自定义密钥 base64" size="64"/>
+              <input type="text" id="customIV" spellcheck="false" placeholder="自定义iv" size="64"/>
+            </div>
             <div class="merge">
               <div id="threadDiv">下载线程数 <input type="number" value="32" id="thread" spellcheck="false" style="width: 35px;"/></div>
               <div>
                 <div class="checkbox"><input type="checkbox" id="mp4"><div id="tomp4Tips">尝试转换mp4格式</div></div>
-                <div class="checkbox"><input type="checkbox" id="extraction"><div id="extractionTips">使用编辑的ts列表</div></div>
               </div>
-              <button id="AllDownload" class="button2">在线下载合并ts</button>
+              <button id="mergeTs" class="button2">在线下载合并ts</button>
               <button class="openDir button2">打开下载目录</button>
               <button id="ForceDownload" class="hide" class="button2">强制下载已有数据</button>
-              <button id="m3u8DL" class="button2">调用N_m3u8DL-CLI下载</button>
             </div>
             <div style="display: flex; margin-top: 10px;"><div id="progress"></div> <div id="fileSize"></div></div>
             <div class="block hide" id="errorTsList"></div>
@@ -101,7 +76,6 @@
         </div>
       </div>
       </section>
-      <video id="video" class="hide"></video>
     </div>
     <script src="js/m3u8-decrypt.js"></script>
     <script src="js/hls.min.js"></script>

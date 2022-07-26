@@ -271,6 +271,9 @@ textarea {
   margin-top: 10px;
   align-items: center;
 }
+.customKey{
+  justify-content: space-between;
+}
 .wrapper .button{
   margin-top: 5px;
 }
