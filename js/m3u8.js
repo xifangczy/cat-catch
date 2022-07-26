@@ -18,7 +18,6 @@ if (onCatch) {
     script.src = onCatch;
     document.head.appendChild(script);
 }
-var debug;
 $(function () {
     // 捕获开关按钮
     if (onCatch) {
@@ -37,7 +36,6 @@ $(function () {
     var _m3u8Content;   // 储存m3u8文件内容
     /* m3u8 解析工具 */
     const hls = new Hls();  // hls.js 对象
-    debug = hls;
     const _fragments = []; // 储存切片对象
     const keyContent = new Map(); // 储存key的内容
     const decryptor = new AESDecryptor(); // 解密工具
@@ -130,7 +128,7 @@ $(function () {
             if (data.fragments[i].decryptdata) {
                 isEncrypted = true;
                 // 填入key内容
-                Object.defineProperty(data.fragments[0].decryptdata, "keyContent", {
+                Object.defineProperty(data.fragments[i].decryptdata, "keyContent", {
                     get: function () { return keyContent.get(this.uri); },
                     configurable: true
                 });
@@ -149,13 +147,7 @@ $(function () {
                             responseData = new TextEncoder().encode(responseData).buffer;
                         }
                         keyContent.set(data.fragments[i].decryptdata.uri, responseData); // 储存密钥内容 下次同样URL直接使用
-
-                        let bytes = new Uint8Array(responseData);
-                        let binary = "";
-                        for (let i = 0; i < bytes.byteLength; i++) {
-                            binary += String.fromCharCode(bytes[i]);
-                        }
-                        $("#tips").append('密钥(Key)Base64: <input type="text" value="' + Base64.encode(binary) + '" spellcheck="false" readonly="readonly">');
+                        $("#tips").append('密钥(Key)Base64: <input type="text" value="' + ArrayBufferToBase64(responseData) + '" spellcheck="false" readonly="readonly">');
 
                     });
                     $("#tips").append('加密算法(Method): <input type="text" value="' + data.fragments[i].decryptdata.method + '" spellcheck="false" readonly="readonly">');
@@ -474,13 +466,23 @@ function GetFileName(url) {
     url.pop();
     return url.join(".");
 }
-// Uint8Array 转16进制字符串
+// Uint8Array 转 16进制字符串
 function Uint8ArrayToHexString(data) {
     let result = "0x";
     for (let i = 0; i < data.length; i++) {
         result += data[i].toString(16);
     }
     return result;
+}
+// ArrayBuffer 转 Base64
+function ArrayBufferToBase64(buffer) {
+    let binary = "";
+    let bytes = new Uint8Array(buffer);
+    let len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return Base64.encode(binary);
 }
 // 按钮状态
 function buttonState(state = true) {
