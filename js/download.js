@@ -78,13 +78,12 @@ $(function () {
         }).fail(function (result) {
             $("#downFilepProgress").html("下载失败... " + JSON.stringify(result));
         }).done(function (result) {
-            downState = true;
             $("#downFilepProgress").html("下载完成，正在保存到硬盘...");
             try {
                 chrome.downloads.download({
                     url: URL.createObjectURL(result),
                     filename: fileName
-                });
+                }, function (downloadId) { downId = downloadId; });
             } catch (e) {
                 $("#downFilepProgress").html("下载失败... " + e);
             }
@@ -99,8 +98,7 @@ $(function () {
     // 监听下载事件 修改提示
     chrome.downloads.onChanged.addListener(function (DownloadDelta) {
         if (!DownloadDelta.state) { return; }
-        if (DownloadDelta.state.current == "complete" && downState) {
-            downId = DownloadDelta.id;
+        if (DownloadDelta.state.current == "complete" && downId != 0) {
             $("#downFilepProgress").html("已保存到硬盘, 请查看浏览器已下载内容");
             $("#progress").html("已保存到硬盘, 请查看浏览器已下载内容");
         }

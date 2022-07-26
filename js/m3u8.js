@@ -179,10 +179,9 @@ $(function () {
     }
     /**************************** 监听 / 按钮绑定 ****************************/
     // 监听下载事件 修改提示
-    chrome.downloads.onChanged.addListener(function (DownloadDelta) {
-        if (!DownloadDelta.state) { return; }
-        if (DownloadDelta.state.current == "complete" && downId != 0) {
-            downId = DownloadDelta.id;
+    chrome.downloads.onChanged.addListener(function (downloadDelta) {
+        if (!downloadDelta.state) { return; }
+        if (downloadDelta.state.current == "complete" && downId != 0) {
             $("#progress").html("已保存到硬盘, 请查看浏览器已下载内容");
         }
     });
@@ -396,7 +395,7 @@ $(function () {
         chrome.downloads.download({
             url: URL.createObjectURL(fileBlob),
             filename: `${GetFileName(_m3u8Url)}.${ext}`
-        });
+        }, function (downloadId) { downId = downloadId; });
         $("#mp4").prop("checked") ? $("#progress").html(`数据正在转换格式...`) : $("#progress").html(`数据正在合并...`);
         buttonState(true);
     }
