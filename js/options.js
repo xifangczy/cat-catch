@@ -299,11 +299,3 @@ function Save(option) {
         chrome.storage.sync.set({ Regex: Regex });
     }
 }
-
-// 判断是否为空
-function isEmpty(obj) {
-    if (typeof obj == "undefined" || obj == null || obj == "" || obj == " ") {
-        return true;
-    }
-    return false;
-}

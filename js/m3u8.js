@@ -1,13 +1,8 @@
 // url 参数解析
-var _m3u8Url = new RegExp("[?]url=([^\n&]*)").exec(window.location.href);
-if (!_m3u8Url) { window.location.href = "download.html"; }
-_m3u8Url = decodeURIComponent(_m3u8Url[1]);
-
-var _referer = new RegExp("&referer=([^\n&]*)").exec(window.location.href);
-_referer = _referer ? decodeURIComponent(_referer[1]) : undefined;
-
-var _fileName = new RegExp("&title=([^\n&]*)").exec(window.location.href);
-_fileName = _fileName ? decodeURIComponent(_fileName[1]) : undefined;
+const params = new URL(location.href).searchParams;
+const _m3u8Url = params.get("url");
+const _referer = params.get("referer");
+const _title = params.get("title");
 
 // 解析参数 注入脚本
 let onCatch = new RegExp("&catch=([^\n&]*)").exec(window.location.href);
@@ -24,6 +19,11 @@ $(function () {
         $("#catch").html("关闭捕获");
         $("#catch").data("switch", "off");
     }
+    // Firefox 关闭播放m3u8 和 捕获
+    if (G.isFirefox) {
+        $("#play").hide();
+        $("#catch").hide();
+    }
     //获取m3u8参数
     var _m3u8Arg = new RegExp("\\.m3u8\\?([^\n]*)").exec(_m3u8Url);
     if (_m3u8Arg) {
@@ -31,8 +31,6 @@ $(function () {
     }
     // 填充m3u8 url到页面
     $("#m3u8_url").attr("href", _m3u8Url).html(_m3u8Url);
-
-    /* 变量初始化 */
     var _m3u8Content;   // 储存m3u8文件内容
     /* m3u8 解析工具 */
     const hls = new Hls();  // hls.js 对象
@@ -55,15 +53,13 @@ $(function () {
     const tsBuffer = []; // ts内容缓存
     const errorTsList = []; // 下载错误ts序号列表
 
-    // 获取当前tabId 如果存在Referer修改当前标签下的所有xhr的Referer
+    // 如果存在Referer修改当前标签下的所有xhr的Referer
     chrome.tabs.getCurrent(function (tabs) {
-        let tabId = tabs.id;
-        // 修改Referer
-        if (_referer && _referer != undefined && _referer != "" && _referer != "undefined") {
+        if (_referer && !isEmpty(_referer)) {
             chrome.declarativeNetRequest.updateSessionRules({
-                removeRuleIds: [tabId],
+                removeRuleIds: [tabs.id],
                 addRules: [{
-                    "id": tabId,
+                    "id": tabs.id,
                     "action": {
                         "type": "modifyHeaders",
                         "requestHeaders": [{
@@ -73,7 +69,7 @@ $(function () {
                         }]
                     },
                     "condition": {
-                        "tabIds": [tabId],
+                        "tabIds": [tabs.id],
                         "resourceTypes": ["xmlhttprequest"]
                     }
                 }]
@@ -95,9 +91,9 @@ $(function () {
                 for (let item of data.levels) {
                     const url = encodeURIComponent(item.url[0]);
                     const referer = encodeURIComponent(_referer);
-                    const fileName = _fileName ? encodeURIComponent(_fileName) : "";
+                    const title = _title ? encodeURIComponent(_title) : "";
                     const name = GetFile(item.url[0]);
-                    const html = `<p><a href="/m3u8.html?url=${url}&referer=${referer}&title=${fileName}">${name}</a></p>`;
+                    const html = `<p><a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}">${name}</a></p>`;
                     $("#next_m3u8").append(html);
                 }
                 return;
@@ -111,7 +107,7 @@ $(function () {
         // m3u8下载or解析错误
         hls.on(Hls.Events.ERROR, function (event, data) {
             $("#m3u8").show(); $("#loading").hide();
-            $("#loading .optionBox").html(`获取m3u8内容失败, 请尝试手动下载 <a href="${_m3u8Url}">${_m3u8Url}</a>`);
+            $("#loading .optionBox").html(`获取m3u8内容失败, 请尝试手动下载<br><a href="${_m3u8Url}">${_m3u8Url}</a>`);
             console.log(data.error);
         });
     }
@@ -132,7 +128,7 @@ $(function () {
                     get: function () { return keyContent.get(this.uri); },
                     configurable: true
                 });
-                // 密钥地址和之前的一样 则不需要重新下载
+                // 如果不存在key内容 开始下载
                 if (!keyContent.get(data.fragments[i].decryptdata.uri)) {
                     // 占位 等待ajax获取key内容
                     keyContent.set(data.fragments[i].decryptdata.uri, true);
@@ -146,7 +142,7 @@ $(function () {
                         if (typeof responseData == "string") {
                             responseData = new TextEncoder().encode(responseData).buffer;
                         }
-                        keyContent.set(data.fragments[i].decryptdata.uri, responseData); // 储存密钥内容 下次同样URL直接使用
+                        keyContent.set(data.fragments[i].decryptdata.uri, responseData); // 储存密钥内容
                         $("#tips").append('密钥(Key)Base64: <input type="text" value="' + ArrayBufferToBase64(responseData) + '" spellcheck="false" readonly="readonly">');
 
                     });
@@ -269,7 +265,7 @@ $(function () {
     $("#m3u8DL").click(function () {
         let m3u8dlArg = G.m3u8dlArg.replace(/\$referer\$/g, _referer);
         m3u8dlArg = m3u8dlArg.replace(/\$url\$/g, _m3u8Url);
-        m3u8dlArg = m3u8dlArg.replace(/\$title\$/g, _fileName);
+        m3u8dlArg = m3u8dlArg.replace(/\$title\$/g, _title);
         let m3u8dl = 'm3u8dl://' + Base64.encode(m3u8dlArg);
         if (m3u8dl.length >= 2046) {
             alert("m3u8dl参数太长,可能导致无法唤醒m3u8DL, 请手动复制到m3u8DL下载");
@@ -279,10 +275,6 @@ $(function () {
     // 切换 转换mp4格式按钮
     $("#tomp4Tips").click(function () {
         $("#mp4").prop("checked", !$("#mp4").prop("checked"));
-    });
-    // 不重新提取ts地址
-    $("#extractionTips").click(function () {
-        $("#extraction").prop("checked", !$("#extraction").prop("checked"));
     });
     // 在线下载合并ts
     $("#mergeTs").click(function () {
@@ -305,11 +297,6 @@ $(function () {
         }
         downloadTs(start, end);
     });
-    // Firefox 关闭播放m3u8 和 捕获
-    if (G.isFirefox) {
-        $("#play").hide();
-        $("#catch").hide();
-    }
     /**************************** 下载TS文件 ****************************/
     // start 开始下载的索引
     // end 结束下载的索引
@@ -328,13 +315,11 @@ $(function () {
             keyContent.forEach(function (value, key) {
                 keyContent.set(key, customKey.buffer);
             });
+        }
+        if (customIV){
+            let iv = new TextEncoder().encode(customIV);
             for (let i in _fragments) {
-                if (customIV) {
-                    // 字符串 转 Uint8Array
-                    _fragments[i].decryptdata.iv = new TextEncoder().encode(customIV);
-                    continue;
-                }
-                _fragments[i].decryptdata.iv = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i + 1]);
+                _fragments[i].decryptdata.iv = iv;
             }
         }
         $("#progress").html(`等待下载中...`);
@@ -458,8 +443,8 @@ function GetFile(str) {
 }
 // 获得不带扩展的文件名
 function GetFileName(url) {
-    if (G.TitleName && _fileName) {
-        return _fileName;
+    if (G.TitleName && _title) {
+        return _title;
     }
     url = GetFile(url);
     url = url.split(".");

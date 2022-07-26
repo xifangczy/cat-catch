@@ -197,6 +197,7 @@ function byteToSize(byte) {
         return parseFloat((byte / 1024 / 1024 / 1024).toFixed(1)) + "GB";
     }
 }
+// 替换掉不允许的文件名称字符
 function stringModify(str) {
     return str.replace(/['\\:\*\?"<\/>\|~]/g, function (m) {
         return {
@@ -214,7 +215,6 @@ function stringModify(str) {
         }[m];
     });
 }
-
 // Firefox download API 无法下载 data URL
 function downloadDataURL(url, filename){
     const link = document.createElement("a");
@@ -222,4 +222,11 @@ function downloadDataURL(url, filename){
     link.download = filename;
     link.click();
     delete link;
+}
+// 判断是否为空
+function isEmpty(obj) {
+    if (typeof obj == "undefined" || obj == null || obj == "" || obj == " ") {
+        return true;
+    }
+    return false;
 }

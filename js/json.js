@@ -1,10 +1,8 @@
 $(function () {
-    //获取json_url
-    var url = new RegExp("[?]url=([^\n&]*)").exec(window.location.href);
-    url = url ? decodeURIComponent(url[1]) : undefined;
-
-    var referer = new RegExp("&referer=([^\n&]*)").exec(window.location.href);
-    referer = referer ? decodeURIComponent(referer[1]) : undefined;
+    // url 参数解析
+    const params = new URL(location.href).searchParams;
+    const _url = params.get("url");
+    const _referer = params.get("referer");
 
     var jsonContent = "";
     var options = {
@@ -16,22 +14,21 @@ $(function () {
 
     // 修改Referer
     chrome.tabs.getCurrent(function (tabs) {
-        let tabId = tabs.id;
-        if (referer && referer != undefined && referer != "" && referer != "undefined") {
+        if (_referer && !isEmpty(_referer)) {
             chrome.declarativeNetRequest.updateSessionRules({
-                removeRuleIds: [tabId],
+                removeRuleIds: [tabs.id],
                 addRules: [{
-                    "id": tabId,
+                    "id": tabs.id,
                     "action": {
                         "type": "modifyHeaders",
                         "requestHeaders": [{
                             "header": "Referer",
                             "operation": "set",
-                            "value": referer
+                            "value": _referer
                         }]
                     },
                     "condition": {
-                        "tabIds": [tabId],
+                        "tabIds": [tabs.id],
                         "resourceTypes": ["xmlhttprequest"]
                     }
                 }]
@@ -39,7 +36,7 @@ $(function () {
         }
 
         $.ajax({
-            url: url,
+            url: _url,
             dataType: "text",
         }).fail(function (result) {
             console.log(result);
