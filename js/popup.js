@@ -35,7 +35,7 @@ chrome.downloads.onChanged.addListener(function (item) {
         chrome.tabs.get(G.tabId, function (tab) {
             if (!downData[item.id]) { return; }
             chrome.tabs.create({
-                url: `/m3u8.html?m3u8_url=${encodeURIComponent(
+                url: `/download.html?url=${encodeURIComponent(
                     downData[item.id].url
                 )}&referer=${encodeURIComponent(
                     downData[item.id].initiator
@@ -248,7 +248,7 @@ function AddMedia(data) {
         const id = $(this).attr('id');
         chrome.tabs.get(G.tabId, function (tab) {
             if (id == "m3u8") {
-                url = `/m3u8.html?m3u8_url=${encodeURIComponent(data.url)}&referer=${encodeURIComponent(data.initiator)}&title=${encodeURIComponent(data.title)}`;
+                url = `/m3u8.html?url=${encodeURIComponent(data.url)}&referer=${encodeURIComponent(data.initiator)}&title=${encodeURIComponent(data.title)}`;
             } else {
                 url = `/json.html?url=${encodeURIComponent(data.url)}&referer=${encodeURIComponent(data.initiator)}&title=${encodeURIComponent(data.title)}`;
             }
