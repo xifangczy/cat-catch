@@ -34,7 +34,7 @@ $(function () {
     var _m3u8Content;   // 储存m3u8文件内容
     /* m3u8 解析工具 */
     const hls = new Hls();  // hls.js 对象
-    const _fragments = []; // 储存切片对象
+    var _fragments = []; // 储存切片对象
     const keyContent = new Map(); // 储存key的内容
     const decryptor = new AESDecryptor(); // 解密工具
     /* 转码工具 */
@@ -114,6 +114,7 @@ $(function () {
     /* 提取所有ts链接 判断处理 */
     function parseTs(data) {
         let isEncrypted = false;
+        _fragments = [];
         for (let i in data.fragments) {
             // 把本地ts文件地址 转换成远程地址 并添加地址参数
             let flag = new RegExp("[?]([^\n]*)").exec(data.fragments[i].url);
@@ -170,7 +171,7 @@ $(function () {
         }
         writeTsUrl();   // 写入ts链接到textarea
         $("#count").html("共 " + _fragments.length + " 个文件" + "，总时长: " + secToTime(data.totalduration));
-        data.live && $("#count").html($("#count").html() + " 直播HLS");
+        data.live && $("#count").html("直播HLS");
         isEncrypted && $("#count").html($("#count").html() + " (加密HLS)");
     }
     /**************************** 监听 / 按钮绑定 ****************************/
