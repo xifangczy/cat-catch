@@ -259,31 +259,41 @@ textarea {
   margin-right: 0px;
   padding: 2px;
 }
-.checkbox {
-  margin-right: 5px;
-  margin-left: 5px;
+.mp4div {
+  margin: 0 10px 0 10px;
   display: flex;
   cursor: pointer;
+  flex-direction: column;
 }
 .merge {
   display: flex;
   justify-content: flex-start;
-  margin-top: 10px;
+  margin-top: 5px;
   align-items: center;
 }
-.customKey{
-  justify-content: space-between;
+.customKey input{
+  margin-right: 10px;
 }
 .wrapper .button{
   margin-top: 5px;
 }
+.rangeDown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 10px;
+}
+.rangeDown .merge{
+  margin-top: 0;
+}
+#rangeStart, #rangeEnd {
+  width: 70px;
+}
+
 /* JSON格式化 */
-/* Root element */
 .json-document {
-  /* padding: 1em 2em; */
   margin-top: 0px;
 }
-/* Syntax highlighting for JSON objects */
 ul.json-dict,
 ol.json-array {
   list-style-type: none;
@@ -300,7 +310,6 @@ ol.json-array {
   color: #1a01cc;
   font-weight: bold;
 }
-/* Toggle button */
 a.json-toggle {
   position: relative;
   color: inherit;
@@ -312,7 +321,7 @@ a.json-toggle:focus {
 a.json-toggle:before {
   font-size: 1.1em;
   color: #c0c0c0;
-  content: "\25BC"; /* down arrow */
+  content: "\25BC";
   position: absolute;
   display: inline-block;
   width: 1em;
@@ -324,10 +333,8 @@ a.json-toggle:hover:before {
   color: #aaa;
 }
 a.json-toggle.collapsed:before {
-  /* Use rotated down arrow, prevents right arrow appearing smaller than down arrow in some browsers */
   transform: rotate(-90deg);
 }
-/* Collapsable placeholder links */
 a.json-placeholder {
   color: #aaa;
   padding: 0 1em;

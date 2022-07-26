@@ -29,7 +29,7 @@
       </section>
 
       <section id="m3u8" class="hide">
-        <h1 class="optionsTitle">m3u8解析</h1>
+        <h1 class="optionsTitle">猫抓 m3u8解析器</h1>
         <span class="explain" id="key"></span>
         <div class="optionBox">
           <div class="block">
@@ -39,10 +39,7 @@
           
           <div class="block" id="tips"></div>
 
-          <div class="block">
-            <p id="count"></p>
-          </div>
-          
+          <p id="count"></p>
           <div class="block" id="textarea">
             <textarea rows="50" cols="160" id="media_file" spellcheck="false"></textarea>
             <video id="video" class="hide" width="100%" controls></video>
@@ -61,9 +58,14 @@
               <input type="text" id="customIV" spellcheck="false" placeholder="自定义iv" size="64"/>
             </div>
             <div class="merge">
-              <div id="threadDiv">下载线程数 <input type="number" value="32" id="thread" spellcheck="false" style="width: 35px;"/></div>
-              <div>
-                <div class="checkbox"><input type="checkbox" id="mp4"><div id="tomp4Tips">尝试转换mp4格式</div></div>
+              <div id="threadDiv">下载线程数 <input type="number" value="32" id="thread" spellcheck="false" style="width: 35px;" step="1" min="1"/></div>
+              <div class="mp4div"><input type="checkbox" id="mp4"><div id="tomp4Tips">转换mp4格式</div></div>
+              <div class="rangeDown">
+                下载范围
+                <div class="merge">
+                  <input type="number" id="rangeStart" spellcheck="false" placeholder="开始序号" step="1" min="1"/>
+                  <input type="number" id="rangeEnd" spellcheck="false" placeholder="结束序号" step="1" min="0"/>
+                </div>
               </div>
               <button id="mergeTs" class="button2">在线下载合并ts</button>
               <button class="openDir button2">打开下载目录</button>

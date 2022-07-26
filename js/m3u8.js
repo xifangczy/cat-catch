@@ -18,6 +18,7 @@ if (onCatch) {
     script.src = onCatch;
     document.head.appendChild(script);
 }
+var debug;
 $(function () {
     // 捕获开关按钮
     if (onCatch) {
@@ -36,6 +37,7 @@ $(function () {
     var _m3u8Content;   // 储存m3u8文件内容
     /* m3u8 解析工具 */
     const hls = new Hls();  // hls.js 对象
+    debug = hls;
     const _fragments = []; // 储存切片对象
     const keyContent = new Map(); // 储存key的内容
     const decryptor = new AESDecryptor(); // 解密工具
@@ -158,18 +160,25 @@ $(function () {
                     });
                     $("#tips").append('加密算法(Method): <input type="text" value="' + data.fragments[i].decryptdata.method + '" spellcheck="false" readonly="readonly">');
                     $("#tips").append('密钥地址(KeyURL): <input type="text" value="' + data.fragments[i].decryptdata.uri + '" spellcheck="false" readonly="readonly">');
-                    // 如果iv是默认模式 不显示 TODO
-                    // let iv = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i + 1]);
-                    // if (data.fragments[i].decryptdata.iv.toString() != iv.toString()) {
-                    //     iv = Uint8ArrayToHexString(data.fragments[i].decryptdata.iv);
-                    //     $("#tips").append('偏移量(iv): <input type="text" value="' + iv + '" spellcheck="false" readonly="readonly">');
-                    // }
+                    // 如果iv是默认模式 不显示
+                    let iv = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i + 1]).toString();
+                    let iv2 = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i]).toString();
+                    let _iv = data.fragments[i].decryptdata.iv.toString();
+                    if (_iv != iv && _iv != iv2) {
+                        iv = Uint8ArrayToHexString(data.fragments[i].decryptdata.iv);
+                        $("#tips").append('偏移量(iv): <input type="text" value="' + iv + '" spellcheck="false" readonly="readonly">');
+                    }
                 }
             }
             _fragments.push({
                 url: data.fragments[i].url,
                 decryptdata: data.fragments[i].decryptdata
             });
+            // 范围下载所需数据
+            $("#rangeStart").attr("max", _fragments.length);
+            $("#rangeEnd").attr("max", _fragments.length);
+            $("#rangeStart").val(1);
+            $("#rangeEnd").val(_fragments.length);
         }
         writeTsUrl();   // 写入ts链接到textarea
         $("#count").html("共 " + _fragments.length + " 个文件" + "，总时长: " + secToTime(data.totalduration));
@@ -286,7 +295,23 @@ $(function () {
     // 在线下载合并ts
     $("#mergeTs").click(function () {
         fileSize = 0;
-        downloadTs();
+        let start = 0;
+        let end = _fragments.length - 1;
+        if ($("#rangeStart").val()) {
+            start = parseInt($("#rangeStart").val()) - 1;
+        }
+        if ($("#rangeEnd").val()) {
+            end = parseInt($("#rangeEnd").val()) - 1;
+        }
+        if (start > end) {
+            $("#progress").html(`<b>开始序号不能大于结束序号</b>`);
+            return;
+        }
+        if (start > _fragments.length - 1 || end > _fragments.length - 1) {
+            $("#progress").html(`<b>序号最大不能超过${_fragments.length}</b>`);
+            return;
+        }
+        downloadTs(start, end);
     });
     // Firefox 关闭播放m3u8 和 捕获
     if (G.isFirefox) {
@@ -317,7 +342,7 @@ $(function () {
                     _fragments[i].decryptdata.iv = new TextEncoder().encode(customIV);
                     continue;
                 }
-                _fragments[i].decryptdata.iv = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i+1]);
+                _fragments[i].decryptdata.iv = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i + 1]);
             }
         }
         $("#progress").html(`等待下载中...`);
@@ -326,7 +351,6 @@ $(function () {
         let index = start - 1; // 当前下载的索引
         $("#progress").html(`0/${end - start + 1}`);
         const tsInterval = setInterval(function () {
-            console.log(tsThread);
             // 停止下载flag
             if (stopDownload) {
                 clearInterval(tsInterval);
@@ -337,7 +361,6 @@ $(function () {
                 clearInterval(tsInterval);
                 // 错误列表为0 下载完成
                 if (errorTsList.length == 0) {
-                    $("#progress").html(`数据完整，下载中...`);
                     mergeTs();  // 合并下载
                     return;
                 }
@@ -390,7 +413,6 @@ $(function () {
         let fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });
         let ext = "ts";
         if ($("#mp4").prop("checked")) {
-            $("#progress").html(`数据正在转换格式...`);
             for (let i of tsBuffer) {
                 transmuxer.push(new Uint8Array(i));
                 transmuxer.flush();
@@ -404,7 +426,6 @@ $(function () {
             url: URL.createObjectURL(fileBlob),
             filename: `${GetFileName(_m3u8Url)}.${ext}`
         }, function (downloadId) { downId = downloadId });
-        $("#mp4").prop("checked") ? $("#progress").html(`数据正在转换格式...`) : $("#progress").html(`数据正在合并...`);
         buttonState(true);
     }
     // ts解密
@@ -474,5 +495,10 @@ function progressAdd() {
     let progress = $("#progress").html();
     progress = progress.split("/");
     progress[0] = parseInt(progress[0]) + 1;
+
+    if (progress[0] == progress[1]) {
+        $("#progress").html($("#mp4").prop("checked") ? `数据正在转换格式...` : `数据正在合并...`);
+        return;
+    }
     $("#progress").html(`${progress[0]}/${progress[1]}`);
 }
