@@ -276,6 +276,17 @@ $(function () {
     $("#tomp4Tips").click(function () {
         $("#mp4").prop("checked", !$("#mp4").prop("checked"));
     });
+    // 范围 线程数 滚轮调节
+    $("#rangeStart, #rangeEnd, #thread").on("wheel", function (event) {
+        $(this).blur();
+        let number = parseInt($(this).val());
+        number = event.originalEvent.wheelDelta < 0 ? number - 1 : number + 1;
+        if(number < $(this).attr("min") || number > $(this).attr("max")){
+            return false;
+        }
+        $(this).val(number);
+        return false;
+    });
     // 在线下载合并ts
     $("#mergeTs").click(function () {
         fileSize = 0;

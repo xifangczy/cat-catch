@@ -490,13 +490,14 @@ $(function () {
         }
         getVideoState();
     });
-    $("#playbackRate").on("mousewheel", function (event) {
-        let speed = parseFloat($("#playbackRate").val());
+    $("#playbackRate").on("wheel", function (event) {
+        $(this).blur();
+        let speed = parseFloat($(this).val());
         speed = event.originalEvent.wheelDelta < 0 ? speed - 0.1 : speed + 0.1;
         speed = parseFloat(speed.toFixed(1));
-        if (speed < 0) { speed = 0; }
-        if (speed > 16) { speed = 16; }
-        $("#playbackRate").val(speed);
+        if(speed < 0.1 || speed > 16) { return false; }
+        $(this).val(speed);
+        return false;
     });
     // 倍速播放
     $("#playbackRate").val(G.playbackRate); // 上一次设定的倍数
