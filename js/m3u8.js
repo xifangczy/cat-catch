@@ -86,22 +86,57 @@ $(function () {
         hls.loadSource(_m3u8Url);    // 载入m3u8 url
         // 等待m3u8解析完成 获得解析的数据
         hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+            // console.log(data);
             $("#m3u8").show(); $("#loading").hide();
-            // 多级m3u8
+            let more = false;
+            // 多个视频
             if (data.levels.length > 1) {
-                $("#m3u8").hide(); $("button").hide(); $("#more_m3u8").show();
+                $("#more_m3u8").show();
+                more = true;
                 for (let item of data.levels) {
-                    const url = encodeURIComponent(item.url[0]);
+                    const url = encodeURIComponent(item.uri);
                     const referer = encodeURIComponent(_referer);
                     const title = _title ? encodeURIComponent(_title) : "";
-                    const name = GetFile(item.url[0]);
-                    const html = `<p><a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}">${name}</a></p>`;
+                    const name = GetFile(item.uri);
+                    const html = `<div class="block"><div>${item.attrs.RESOLUTION ? "分辨率:" + item.attrs.RESOLUTION : ""}</div><a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}">${name}</a></div>`;
                     $("#next_m3u8").append(html);
                 }
+            }
+            // 多个音频
+            if (data.audioTracks.length > 1) {
+                $("#more_audio").show();
+                more = true;
+                for (let item of data.audioTracks) {
+                    const url = encodeURIComponent(item.url);
+                    const referer = encodeURIComponent(_referer);
+                    const title = _title ? encodeURIComponent(_title) : "";
+                    const name = GetFile(item.url);
+                    const html = `<div class="block"><div>${item.name ? item.name : ""} | ${item.lang ? item.lang : ""}</div><a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}">${name}</a></div>`;
+                    $("#next_audio").append(html);
+                }
+            }
+            // 多个字幕
+            if (data.subtitleTracks.length > 1) {
+                $("#more_subtitle").show();
+                more = true;
+                for (let item of data.subtitleTracks) {
+                    const url = encodeURIComponent(item.url);
+                    const referer = encodeURIComponent(_referer);
+                    const title = _title ? encodeURIComponent(_title) : "";
+                    const name = GetFile(item.url);
+                    const html = `<div class="block"><div>${item.name ? item.name : ""} | ${item.lang ? item.lang : ""}</div><a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}">${name}</a></div>`;
+                    $("#next_subtitle").append(html);
+                }
+            }
+            // 有下一级m3u8 停止解析
+            if (more) {
+                $("#m3u8").hide();
+                $("button").hide();
                 return;
             }
             // 等待ts载入完成 提取Ts链接
             hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
+                // console.log(data);
                 parseTs(data.details);  // 提取Ts链接
             });
         });
@@ -124,7 +159,7 @@ $(function () {
                 data.fragments[i].url = data.fragments[i].url + "?" + _m3u8Arg;
             }
             // 查看是否有加密数据
-            if (data.fragments[i].decryptdata) {
+            if (data.fragments[i].decryptdata && data.fragments[i].decryptdata.iv) {
                 isEncrypted = true;
                 // 填入key内容
                 Object.defineProperty(data.fragments[i].decryptdata, "keyContent", {
@@ -149,7 +184,7 @@ $(function () {
                         $("#tips").append('密钥(Key)Base64: <input type="text" value="' + ArrayBufferToBase64(responseData) + '" spellcheck="false" readonly="readonly">');
 
                     });
-                    $("#tips").append('加密算法(Method): <input type="text" value="' + data.fragments[i].decryptdata.method + '" spellcheck="false" readonly="readonly">');
+                    data.fragments[i].decryptdata.method && $("#tips").append('加密算法(Method): <input type="text" value="' + data.fragments[i].decryptdata.method + '" spellcheck="false" readonly="readonly">');
                     $("#tips").append('密钥地址(KeyURL): <input type="text" value="' + data.fragments[i].decryptdata.uri + '" spellcheck="false" readonly="readonly">');
                     // 如果iv是默认模式 不显示
                     let iv = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i + 1]).toString();

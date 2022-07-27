@@ -202,6 +202,17 @@ textarea {
   font-size: 12px;
   font-family: "Microsoft YaHei", "Helvetica", "Arial", sans-serif;
 }
+#media_file {
+  word-break: break-all;
+}
+/* #media_file {
+  font-size: 12px;
+  font-family: "Microsoft YaHei", "Helvetica", "Arial", sans-serif;
+  height: 700px;
+  overflow-y: auto;
+  border: solid 1.5px rgb(0 0 0 / 50%);
+  word-break: break-all;
+} */
 #formatStr {
   width: 145px;
 }
@@ -288,7 +299,13 @@ textarea {
   margin-top: 0;
 }
 #rangeStart, #rangeEnd {
-  width: 70px;
+  width: 50px;
+  /* text-align:center;
+  vertical-align:middle; */
+  margin-left: 2px;
+  margin-right: 2px;
+  padding-top: 3px;
+  padding-bottom: 3px;
 }
 
 /* JSON格式化 */

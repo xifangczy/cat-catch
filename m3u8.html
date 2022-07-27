@@ -27,6 +27,20 @@
           <div id="next_m3u8"></div>
         </div>
       </section>
+      <section id="more_audio" class="hide">
+        <h1 class="optionsTitle">多个音频</h1>
+        <span class="explain">该m3u8文件中嵌套多个音频</span>
+        <div class="optionBox">
+          <div id="next_audio"></div>
+        </div>
+      </section>
+      <section id="more_subtitle" class="hide">
+        <h1 class="optionsTitle">多个字幕</h1>
+        <span class="explain">该m3u8文件中嵌套多个字幕</span>
+        <div class="optionBox">
+          <div id="next_subtitle"></div>
+        </div>
+      </section>
 
       <section id="m3u8" class="hide">
         <h1 class="optionsTitle">猫抓 m3u8解析器</h1>
@@ -41,6 +55,7 @@
 
           <p id="count"></p>
           <div class="block" id="textarea">
+            <!-- <div id="media_file" contenteditable="true"></div> -->
             <textarea rows="50" cols="160" id="media_file" spellcheck="false"></textarea>
             <video id="video" class="hide" width="100%" controls></video>
           </div>
@@ -63,8 +78,8 @@
               <div class="rangeDown">
                 下载范围
                 <div class="merge">
-                  <input type="number" id="rangeStart" spellcheck="false" placeholder="开始序号" step="1" min="1"/>
-                  <input type="number" id="rangeEnd" spellcheck="false" placeholder="结束序号" step="1" min="1"/>
+                  <input type="number" id="rangeStart" spellcheck="false" placeholder="开始" step="1" min="1"/>
+                  <input type="number" id="rangeEnd" spellcheck="false" placeholder="结束" step="1" min="1"/>
                 </div>
               </div>
               <button id="mergeTs" class="button2">合并下载</button>
