@@ -125,10 +125,15 @@ function GetDefault(Obj) {
 }
 // 初始变量
 function InitOptions() {
+    // 断开重新连接后 立刻把local里MediaData数据交给cacheData
     chrome.storage.local.get({ MediaData: {} }, function (items) {
+        if (items.MediaData.init) {
+            cacheData = {};
+            return;
+        }
         cacheData = items.MediaData;
-        if (items.MediaData.init) { cacheData = {}; }
     });
+    // 读取sync配置数据 交给全局变量G
     chrome.storage.sync.get(G.OptionLists, function (items) {
         for (let list of G.OptionLists) {
             if (items[list] === undefined) {
@@ -138,6 +143,7 @@ function InitOptions() {
             G[list] = items[list];
         }
     });
+    // 读取local配置数据 交给全局变量G
     chrome.storage.local.get(G.TabIdList, function (items) {
         for (let list of G.TabIdList) {
             if (items[list] === undefined) {
