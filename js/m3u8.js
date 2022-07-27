@@ -34,7 +34,7 @@ $(function () {
     var _m3u8Content;   // 储存m3u8文件内容
     /* m3u8 解析工具 */
     const hls = new Hls();  // hls.js 对象
-    var _fragments = []; // 储存切片对象
+    const _fragments = []; // 储存切片对象
     const keyContent = new Map(); // 储存key的内容
     const decryptor = new AESDecryptor(); // 解密工具
     /* 转码工具 */
@@ -50,6 +50,8 @@ $(function () {
     var downId = 0; // 下载id
     var stopDownload = false; // 停止下载flag
     var fileSize = 0; // 文件大小
+    var downCurrentTs = 0;    // 当前进度
+    var downTotalTs = 0;  // 需要下载的文件数量
     const tsBuffer = []; // ts内容缓存
     const errorTsList = []; // 下载错误ts序号列表
 
@@ -100,7 +102,6 @@ $(function () {
             }
             // 等待ts载入完成 提取Ts链接
             hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
-                _m3u8Content = data.details.m3u8;   // m3u8文件内容
                 parseTs(data.details);  // 提取Ts链接
             });
         });
@@ -114,7 +115,8 @@ $(function () {
     /* 提取所有ts链接 判断处理 */
     function parseTs(data) {
         let isEncrypted = false;
-        _fragments = [];
+        _fragments.splice(0);   // 清空 防止直播HLS无限添加
+        _m3u8Content = data.m3u8;   // m3u8文件内容
         for (let i in data.fragments) {
             // 把本地ts文件地址 转换成远程地址 并添加地址参数
             let flag = new RegExp("[?]([^\n]*)").exec(data.fragments[i].url);
@@ -282,7 +284,7 @@ $(function () {
         $(this).blur();
         let number = parseInt($(this).val());
         number = event.originalEvent.wheelDelta < 0 ? number - 1 : number + 1;
-        if(number < $(this).attr("min") || number > $(this).attr("max")){
+        if (number < $(this).attr("min") || number > $(this).attr("max")) {
             return false;
         }
         $(this).val(number);
@@ -307,13 +309,19 @@ $(function () {
             $("#progress").html(`<b>序号最大不能超过${_fragments.length}</b>`);
             return;
         }
+        downCurrentTs = 0;  // 当前进度
+        downTotalTs = end - start + 1;  // 需要下载的文件数量
         downloadTs(start, end);
+    });
+    // 强制下载
+    $("ForceDownload").click(function () {
+        mergeTs();
     });
     /**************************** 下载TS文件 ****************************/
     // start 开始下载的索引
     // end 结束下载的索引
-    function downloadTs(start = 0, end = _fragments.length - 1) {
-        buttonState(false);
+    function downloadTs(start = 0, end = _fragments.length - 1, errorObj = undefined) {
+        buttonState("#mergeTs", false);
         // 查看自定义key和iv 是否存在
         let customKey = $("#customKey").val();
         let customIV = $("#customIV").val();
@@ -328,17 +336,16 @@ $(function () {
                 keyContent.set(key, customKey.buffer);
             });
         }
-        if (customIV){
+        if (customIV) {
             let iv = new TextEncoder().encode(customIV);
             for (let i in _fragments) {
                 _fragments[i].decryptdata.iv = iv;
             }
         }
-        $("#progress").html(`等待下载中...`);
+        $("#progress").html(`${downCurrentTs}/${downTotalTs}`); // 进度显示
         const _tsThread = parseInt($("#thread").val());  // 原始线程数量
         let tsThread = _tsThread;  // 线程数量
         let index = start - 1; // 当前下载的索引
-        $("#progress").html(`0/${end - start + 1}`);
         const tsInterval = setInterval(function () {
             // 停止下载flag
             if (stopDownload) {
@@ -350,10 +357,12 @@ $(function () {
                 clearInterval(tsInterval);
                 // 错误列表为0 下载完成
                 if (errorTsList.length == 0) {
+                    $("ForceDownload").hide();
+                    $("#errorTsList").hide();
                     mergeTs();  // 合并下载
                     return;
                 }
-                $("#progress").html(`数据不完整... 下载失败: ${errorTsList.length}`);
+                $("#progress").html(`数据不完整... 剩余未下载: ${errorTsList.length}`);
                 return;
             }
             // 下载
@@ -366,10 +375,17 @@ $(function () {
                     timeout: 30000
                 }).fail(function () {
                     if (stopDownload) { return; }
-                    downloadTsError(currentIndex);
-                    !errorTsList.includes(currentIndex) && errorTsList.push(currentIndex);
+                    if (errorObj) {
+                        errorObj.find("button").html("下载失败...重试");
+                        buttonState(errorObj.find("button"), true);
+                    }
+                    if (!errorTsList.includes(currentIndex)) {
+                        errorTsList.push(currentIndex);
+                        downloadTsError(currentIndex);
+                    }
                 }).done(function (responseData) {
                     if (stopDownload) { return; }
+                    if (errorObj) { errorObj.remove(); }
                     if (errorTsList.includes(currentIndex)) {
                         errorTsList.splice(errorTsList.indexOf(currentIndex), 1);
                     }
@@ -391,8 +407,9 @@ $(function () {
         }
         let html = $(`<p>${_fragments[index].url} <button data-id="${index}">重新下载</button></p>`);
         html.find("button").click(function () {
-            downloadTs(index, index);
-            html.remove();
+            buttonState(this, false);
+            $(this).html("正在重新下载...");
+            downloadTs(index, index, html);
         });
         $('#errorTsList').append(html);
     }
@@ -415,7 +432,7 @@ $(function () {
             url: URL.createObjectURL(fileBlob),
             filename: `${GetFileName(_m3u8Url)}.${ext}`
         }, function (downloadId) { downId = downloadId });
-        buttonState(true);
+        buttonState("#mergeTs", true);
     }
     // ts解密
     function tsDecrypt(responseData, index) {
@@ -443,6 +460,15 @@ $(function () {
             url.push(ts.url);
         }
         $("#media_file").val(url.join("\n"));
+    }
+    // 进度
+    function progressAdd() {
+        downCurrentTs++;
+        if (downCurrentTs == downTotalTs) {
+            $("#progress").html($("#mp4").prop("checked") ? `数据正在转换格式...` : `数据正在合并...`);
+            return;
+        }
+        $("#progress").html(`${downCurrentTs}/${downTotalTs}`);
     }
 });
 // 获取文件名
@@ -482,22 +508,10 @@ function ArrayBufferToBase64(buffer) {
     return Base64.encode(binary);
 }
 // 按钮状态
-function buttonState(state = true) {
+function buttonState(obj = "#mergeTs", state = true) {
     if (state) {
-        $("#mergeTs").prop("disabled", false).removeClass("no-drop");
+        $(obj).prop("disabled", false).removeClass("no-drop");
         return;
     }
-    $("#mergeTs").prop("disabled", true).addClass("no-drop");
-}
-// 进度
-function progressAdd() {
-    let progress = $("#progress").html();
-    progress = progress.split("/");
-    progress[0] = parseInt(progress[0]) + 1;
-
-    if (progress[0] == progress[1]) {
-        $("#progress").html($("#mp4").prop("checked") ? `数据正在转换格式...` : `数据正在合并...`);
-        return;
-    }
-    $("#progress").html(`${progress[0]}/${progress[1]}`);
+    $(obj).prop("disabled", true).addClass("no-drop");
 }

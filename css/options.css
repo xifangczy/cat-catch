@@ -168,6 +168,7 @@ button:active {
 .no-drop{
   background-color: #ccc !important;
   cursor: no-drop;
+  color: #fff;
 }
 .explain {
   color: rgb(95, 99, 104);
