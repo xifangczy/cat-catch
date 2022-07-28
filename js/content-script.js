@@ -127,7 +127,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             delete link;
             sendResponse("ok");
             return;
-        } catch (e) { return; }
+        } catch (e) { console.log(e); return; }
     }
 });
 

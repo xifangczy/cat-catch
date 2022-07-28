@@ -36,7 +36,7 @@ $(function () {
     const hls = new Hls();  // hls.js 对象
     const _fragments = []; // 储存切片对象
     const keyContent = new Map(); // 储存key的内容
-    const decryptor = new AESDecryptor(); // 解密工具
+    const decryptor = new AESDecryptor(); // 解密工具 来自hls.js 分离出来的
     var skipDecrypt = false; // 是否跳过解密
     /* 转码工具 */
     const mp4Cache = [];  // mp4格式缓存
@@ -168,12 +168,12 @@ $(function () {
                     get: function () { return keyContent.get(this.uri); },
                     configurable: true
                 });
-                // 如果不存在key内容 开始下载
+                // 如果不存在key 开始下载
                 if (!keyContent.get(data.fragments[i].decryptdata.uri)) {
-                    // 占位 等待ajax获取key内容
+                    // 占位 等待ajax获取key
                     keyContent.set(data.fragments[i].decryptdata.uri, true);
                     /* 
-                    * 下载key内容 firefox CSP政策不允许在script-src 使用blob 不能直接调用hls.js下载好的密钥
+                    * 下载key firefox CSP政策不允许在script-src 使用blob 不能直接调用hls.js下载好的密钥
                     */
                     fetch(data.fragments[i].decryptdata.uri)
                         .then(response => response.arrayBuffer())
