@@ -13,7 +13,6 @@ if (onCatch) {
     script.src = onCatch;
     document.head.appendChild(script);
 }
-var debug;
 $(function () {
     // 捕获开关按钮
     if (onCatch) {
@@ -36,7 +35,6 @@ $(function () {
     /* m3u8 解析工具 */
     const hls = new Hls();  // hls.js 对象
     const _fragments = []; // 储存切片对象
-    debug = _fragments;
     const keyContent = new Map(); // 储存key的内容
     const decryptor = new AESDecryptor(); // 解密工具
     var skipDecrypt = false; // 是否跳过解密
@@ -152,6 +150,7 @@ $(function () {
     }
     /* 提取所有ts链接 判断处理 */
     function parseTs(data) {
+        // console.log(data);
         let isEncrypted = false;
         _fragments.splice(0);   // 清空 防止直播HLS无限添加
         _m3u8Content = data.m3u8;   // m3u8文件内容
@@ -161,8 +160,8 @@ $(function () {
             if (!flag && _m3u8Arg) {
                 data.fragments[i].url = data.fragments[i].url + "?" + _m3u8Arg;
             }
-            // 查看是否有加密数据
-            if (data.fragments[i].decryptdata && data.fragments[i].decryptdata.iv) {
+            // 查看是否加密的
+            if (data.fragments[i].encrypted) {
                 isEncrypted = true;
                 // 填入key内容
                 Object.defineProperty(data.fragments[i].decryptdata, "keyContent", {
@@ -173,43 +172,29 @@ $(function () {
                 if (!keyContent.get(data.fragments[i].decryptdata.uri)) {
                     // 占位 等待ajax获取key内容
                     keyContent.set(data.fragments[i].decryptdata.uri, true);
-                    // 下载key内容
-                    $.ajax({
-                        url: data.fragments[i].decryptdata.uri,
-                        xhrFields: { responseType: "arraybuffer" }
-                    }).fail(function () {
-                        keyContent.set(data.fragments[i].decryptdata.uri, undefined);
-                    }).done(function (responseData) {
-                        if (typeof responseData == "string") {
-                            if (responseData == "[object ArrayBuffer]" ||
-                                responseData.includes("404") ||
-                                responseData.toLowerCase.includes("error")
-                            ) {
-                                keyContent.set(data.fragments[i].decryptdata.uri, undefined);
-                                $("#tips").append('密钥(Key)Base64: <input type="text" value="密钥无法下载, 请检查密钥地址是否正确" spellcheck="false" readonly="readonly">');
+                    /* 
+                    * 下载key内容 firefox CSP政策不允许在script-src 使用blob 不能直接调用hls.js下载好的密钥
+                    */
+                    fetch(data.fragments[i].decryptdata.uri)
+                        .then(response => response.arrayBuffer())
+                        .then(function (buffer) {
+                            if (buffer.byteLength == 16) {
+                                keyContent.set(data.fragments[i].decryptdata.uri, buffer); // 储存密钥内容
+                                showKeyInfo(buffer, data.fragments[i].decryptdata, i);
                                 return;
                             }
-                            responseData = new TextEncoder().encode(responseData).buffer;
-                        }
-                        keyContent.set(data.fragments[i].decryptdata.uri, responseData); // 储存密钥内容
-                        $("#tips").append('密钥(Hex): <input type="text" value="' + ArrayBufferToHexString(responseData) + '" spellcheck="false" readonly="readonly">');
-                        $("#tips").append('密钥(Base64): <input type="text" value="' + ArrayBufferToBase64(responseData) + '" spellcheck="false" readonly="readonly">');
-                    });
-                    data.fragments[i].decryptdata.method && $("#tips").append('加密算法(Method): <input type="text" value="' + data.fragments[i].decryptdata.method + '" spellcheck="false" readonly="readonly">');
-                    $("#tips").append('密钥地址(KeyURL): <input type="text" value="' + data.fragments[i].decryptdata.uri + '" spellcheck="false" readonly="readonly">');
-                    // 如果iv是默认模式 不显示
-                    let iv = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i + 1]).toString();
-                    let iv2 = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i]).toString();
-                    let _iv = data.fragments[i].decryptdata.iv.toString();
-                    if (_iv != iv && _iv != iv2) {
-                        iv = Uint8ArrayToHexString(data.fragments[i].decryptdata.iv);
-                        $("#tips").append('偏移量(iv): <input type="text" value="' + iv + '" spellcheck="false" readonly="readonly">');
-                    }
+                            showKeyInfo(false, data.fragments[i].decryptdata, i);
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                            showKeyInfo(false, data.fragments[i].decryptdata, i);
+                        });
                 }
             }
             _fragments.push({
                 url: data.fragments[i].url,
-                decryptdata: data.fragments[i].decryptdata
+                decryptdata: data.fragments[i].decryptdata,
+                encrypted: data.fragments[i].encrypted
             });
             // 范围下载所需数据
             $("#rangeStart").attr("max", _fragments.length);
@@ -221,6 +206,23 @@ $(function () {
         $("#count").html("共 " + _fragments.length + " 个文件" + "，总时长: " + secToTime(data.totalduration));
         data.live && $("#count").html("直播HLS");
         isEncrypted && $("#count").html($("#count").html() + " (加密HLS)");
+    }
+    function showKeyInfo(buffer, decryptdata, i) {
+        decryptdata.method && $("#tips").append('加密算法(Method): <input type="text" value="' + decryptdata.method + '" spellcheck="false" readonly="readonly">');
+        $("#tips").append('密钥地址(KeyURL): <input type="text" value="' + decryptdata.uri + '" spellcheck="false" readonly="readonly">');
+        if (buffer) {
+            $("#tips").append('密钥(Hex): <input type="text" value="' + ArrayBufferToHexString(buffer) + '" spellcheck="false" readonly="readonly">');
+            $("#tips").append('密钥(Base64): <input type="text" value="' + ArrayBufferToBase64(buffer) + '" spellcheck="false" readonly="readonly">');
+        } else {
+            $("#tips").append('密钥(Key): <input type="text" value="密钥下载失败" spellcheck="false" readonly="readonly">');
+        }
+        let iv = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i + 1]).toString();
+        let iv2 = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i]).toString();
+        let _iv = decryptdata.iv.toString();
+        if (_iv != iv && _iv != iv2) {
+            iv = Uint8ArrayToHexString(decryptdata.iv);
+            $("#tips").append('偏移量(iv): <input type="text" value="' + iv + '" spellcheck="false" readonly="readonly">');
+        }
     }
     /**************************** 监听 / 按钮绑定 ****************************/
     // 监听下载事件 修改提示
@@ -284,21 +286,17 @@ $(function () {
         if ($(this).data("switch") == "on") {
             $("#video").show();
             hls.attachMedia($("#video")[0]);
-            $("#textarea textarea").hide();
-            $("#textarea").append(video);
-            $("#play").html("关闭播放");
-            $("#play").data("switch", "off");
+            $("textarea").hide();
+            $(this).html("关闭播放").data("switch", "off");
             hls.on(Hls.Events.MEDIA_ATTACHED, function () {
                 video.play();
             });
             return;
         }
         $("#video").hide();
-        $("#video")[0].pause();
-        $("video").remove();
+        hls.detachMedia($("#video")[0]);
         $("textarea").show();
-        $("#play").html("播放m3u8");
-        $("#play").data("switch", "on");
+        $(this).html("播放m3u8").data("switch", "on");
     });
     // 开启/关闭捕获
     $("#catch").click(function () {
@@ -490,7 +488,7 @@ $(function () {
     }
     // ts解密
     function tsDecrypt(responseData, index) {
-        if (!_fragments[index].decryptdata || skipDecrypt) {
+        if (!_fragments[index].encrypted || skipDecrypt) {
             return responseData;
         }
         try {
