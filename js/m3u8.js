@@ -13,6 +13,7 @@ if (onCatch) {
     script.src = onCatch;
     document.head.appendChild(script);
 }
+var debug;
 $(function () {
     // 捕获开关按钮
     if (onCatch) {
@@ -35,8 +36,10 @@ $(function () {
     /* m3u8 解析工具 */
     const hls = new Hls();  // hls.js 对象
     const _fragments = []; // 储存切片对象
+    debug = _fragments;
     const keyContent = new Map(); // 储存key的内容
     const decryptor = new AESDecryptor(); // 解密工具
+    var skipDecrypt = false; // 是否跳过解密
     /* 转码工具 */
     const mp4Cache = [];  // mp4格式缓存
     const transmuxer = new muxjs.mp4.Transmuxer();    // mux.js 对象
@@ -98,7 +101,7 @@ $(function () {
                     const referer = encodeURIComponent(_referer);
                     const title = _title ? encodeURIComponent(_title) : "";
                     const name = GetFile(item.uri);
-                    const html = `<div class="block"><div>${item.attrs.RESOLUTION ? "分辨率:" + item.attrs.RESOLUTION : ""}</div><a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}">${name}</a></div>`;
+                    const html = `<div class="block"><div>${item.attrs.RESOLUTION ? "分辨率:" + item.attrs.RESOLUTION : ""}${item.attrs.BANDWIDTH ? " | 码率:" + item.attrs.BANDWIDTH : ""}</div><a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}">${name}</a></div>`;
                     $("#next_m3u8").append(html);
                 }
             }
@@ -142,7 +145,7 @@ $(function () {
         });
         // m3u8下载or解析错误
         hls.on(Hls.Events.ERROR, function (event, data) {
-            $("#m3u8").show(); $("#loading").hide();
+            $("#m3u8").hide(); $("#loading").show();
             $("#loading .optionBox").html(`获取m3u8内容失败, 请尝试手动下载<br><a href="${_m3u8Url}">${_m3u8Url}</a>`);
             console.log(data.error);
         });
@@ -178,11 +181,19 @@ $(function () {
                         keyContent.set(data.fragments[i].decryptdata.uri, undefined);
                     }).done(function (responseData) {
                         if (typeof responseData == "string") {
+                            if (responseData == "[object ArrayBuffer]" ||
+                                responseData.includes("404") ||
+                                responseData.toLowerCase.includes("error")
+                            ) {
+                                keyContent.set(data.fragments[i].decryptdata.uri, undefined);
+                                $("#tips").append('密钥(Key)Base64: <input type="text" value="密钥无法下载, 请检查密钥地址是否正确" spellcheck="false" readonly="readonly">');
+                                return;
+                            }
                             responseData = new TextEncoder().encode(responseData).buffer;
                         }
                         keyContent.set(data.fragments[i].decryptdata.uri, responseData); // 储存密钥内容
-                        $("#tips").append('密钥(Key)Base64: <input type="text" value="' + ArrayBufferToBase64(responseData) + '" spellcheck="false" readonly="readonly">');
-
+                        $("#tips").append('密钥(Hex): <input type="text" value="' + ArrayBufferToHexString(responseData) + '" spellcheck="false" readonly="readonly">');
+                        $("#tips").append('密钥(Base64): <input type="text" value="' + ArrayBufferToBase64(responseData) + '" spellcheck="false" readonly="readonly">');
                     });
                     data.fragments[i].decryptdata.method && $("#tips").append('加密算法(Method): <input type="text" value="' + data.fragments[i].decryptdata.method + '" spellcheck="false" readonly="readonly">');
                     $("#tips").append('密钥地址(KeyURL): <input type="text" value="' + data.fragments[i].decryptdata.uri + '" spellcheck="false" readonly="readonly">');
@@ -311,8 +322,15 @@ $(function () {
         chrome.tabs.update({ url: m3u8dl });
     });
     // 切换 转换mp4格式按钮
-    $("#tomp4Tips").click(function () {
+    $(".mp4div").click(function () {
         $("#mp4").prop("checked", !$("#mp4").prop("checked"));
+    });
+    // 切换 跳过解密
+    $(".skipDecryptDiv").click(function () {
+        $("#skipDecrypt").prop("checked", !$("#skipDecrypt").prop("checked"));
+    });
+    $("#skipDecrypt, #mp4").click(function (event) {
+        event.originalEvent.cancelBubble = true;
     });
     // 范围 线程数 滚轮调节
     $("#rangeStart, #rangeEnd, #thread").on("wheel", function (event) {
@@ -346,6 +364,7 @@ $(function () {
         }
         downCurrentTs = 0;  // 当前进度
         downTotalTs = end - start + 1;  // 需要下载的文件数量
+        skipDecrypt = $("#skipDecrypt").prop("checked");    // 是否跳过解密
         downloadTs(start, end);
     });
     // 强制下载
@@ -471,7 +490,7 @@ $(function () {
     }
     // ts解密
     function tsDecrypt(responseData, index) {
-        if (!_fragments[index].decryptdata) {
+        if (!_fragments[index].decryptdata || skipDecrypt) {
             return responseData;
         }
         try {
@@ -531,6 +550,16 @@ function Uint8ArrayToHexString(data) {
         result += data[i].toString(16);
     }
     return result;
+}
+// ArrayBuffer 转 16进制字符串
+function ArrayBufferToHexString(buffer) {
+    let binary = "";
+    let bytes = new Uint8Array(buffer);
+    let len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+        binary += ('00' + bytes[i].toString(16)).slice(-2);
+    }
+    return binary;
 }
 // ArrayBuffer 转 Base64
 function ArrayBufferToBase64(buffer) {

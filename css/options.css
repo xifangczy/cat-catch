@@ -133,6 +133,9 @@ input#OtherAutoClear {
   height: 20px;
   cursor: pointer;
 }
+.themeColor{
+  color: rgb(26, 115, 232);
+}
 button,
 .button2 {
   background: #fff;
@@ -165,7 +168,7 @@ button:active {
 .button2:active {
   background: rgb(26 115 232 / 80%);
 }
-.no-drop{
+.no-drop {
   background-color: #ccc !important;
   cursor: no-drop;
   color: #fff;
@@ -181,6 +184,8 @@ button:active {
   overflow: hidden;
   display: block;
   text-overflow: ellipsis;
+  word-break: break-all;
+  color: rgb(26, 115, 232);
 }
 .block {
   border-bottom: solid 1px rgba(0, 0, 0, 0.06);
@@ -218,10 +223,11 @@ textarea {
 }
 #tips input {
   width: 975px;
+  color: rgb(26, 115, 232)
 }
-#tips {
+/* #tips {
   color: rgb(26, 115, 232);
-}
+} */
 #injectScript {
   margin-left: 360px;
   -webkit-appearance: none;
@@ -271,11 +277,17 @@ textarea {
   margin-right: 0px;
   padding: 2px;
 }
-.mp4div {
-  margin: 0 10px 0 10px;
+.mp4div,
+.skipDecryptDiv {
   display: flex;
   cursor: pointer;
   flex-direction: column;
+}
+.mp4div {
+  margin: 0 5px 0 10px;
+}
+.skipDecryptDiv {
+  margin: 0 12px 0 5px;
 }
 .merge {
   display: flex;
@@ -283,10 +295,10 @@ textarea {
   margin-top: 5px;
   align-items: center;
 }
-.customKey input{
+.customKey input {
   margin-right: 10px;
 }
-.wrapper .button{
+.wrapper .button {
   margin-top: 5px;
 }
 .rangeDown {
@@ -295,10 +307,11 @@ textarea {
   align-items: center;
   margin-right: 10px;
 }
-.rangeDown .merge{
+.rangeDown .merge {
   margin-top: 0;
 }
-#rangeStart, #rangeEnd {
+#rangeStart,
+#rangeEnd {
   width: 50px;
   /* text-align:center;
   vertical-align:middle; */
@@ -306,6 +319,9 @@ textarea {
   margin-right: 2px;
   padding-top: 3px;
   padding-bottom: 3px;
+}
+#loading a {
+  word-break: break-all;
 }
 
 /* JSON格式化 */

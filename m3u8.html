@@ -73,9 +73,10 @@
               <input type="text" id="customIV" spellcheck="false" placeholder="自定义iv" size="64"/>
             </div>
             <div class="merge">
-              <div id="threadDiv">下载线程数 <input type="number" value="32" id="thread" spellcheck="false" style="width: 35px;" step="1" min="1" max="128"/></div>
-              <div class="mp4div"><input type="checkbox" id="mp4"><div id="tomp4Tips">转换mp4格式</div></div>
-              <div class="rangeDown">
+              <div id="threadDiv" class="themeColor">下载线程数 <input type="number" value="32" id="thread" spellcheck="false" style="width: 35px;" step="1" min="1" max="128"/></div>
+              <div class="mp4div themeColor">转换mp4格式<input type="checkbox" id="mp4"></div>
+              <div class="skipDecryptDiv themeColor">跳过解密<input type="checkbox" id="skipDecrypt"></div>
+              <div class="rangeDown themeColor">
                 下载范围
                 <div class="merge">
                   <input type="number" id="rangeStart" spellcheck="false" placeholder="开始" step="1" min="1"/>
