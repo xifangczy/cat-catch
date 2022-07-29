@@ -327,6 +327,9 @@ textarea {
   border-top: solid 1px rgb(0 0 0 / 50%);
   margin: 10px 0 10px 0;
 }
+#next_m3u8 a{
+  word-break: break-all;
+}
 
 /* JSON格式化 */
 .json-document {

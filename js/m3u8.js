@@ -225,7 +225,7 @@ $(function () {
         let iv2 = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i]).toString();
         let _iv = decryptdata.iv.toString();
         if (_iv != iv && _iv != iv2) {
-            iv = Uint8ArrayToHexString(decryptdata.iv);
+            iv = "0x" + ArrayBufferToHexString(decryptdata.iv.buffer);
             $("#tips").append('偏移量(IV): <input type="text" value="' + iv + '" spellcheck="false" readonly="readonly">');
         }
     }
@@ -426,14 +426,14 @@ $(function () {
                 keyContent.set(key, customKeyHex);
             });
         }
+        // 自定义IV
         let customIV = $("#customIV").val();
         if (customIV) {
-            let iv = new TextEncoder().encode(customIV);
+            customIV = StringToUint8Array(customIV);
             for (let i in _fragments) {
-                _fragments[i].decryptdata.iv = iv;
+                _fragments[i].decryptdata.iv = customIV;
             }
         }
-
         skipDecrypt = $("#skipDecrypt").prop("checked");    // 是否跳过解密
         downCurrentTs = 0;  // 当前进度
         downTotalTs = end - start + 1;  // 需要下载的文件数量
@@ -609,20 +609,11 @@ function buttonState(obj = "#mergeTs", state = true) {
     }
     $(obj).prop("disabled", true).addClass("no-drop");
 }
-// Uint8Array 转 16进制字符串
-function Uint8ArrayToHexString(data) {
-    let result = "0x";
-    for (let i = 0; i < data.length; i++) {
-        result += data[i].toString(16);
-    }
-    return result;
-}
 // ArrayBuffer 转 16进制字符串
 function ArrayBufferToHexString(buffer) {
     let binary = "";
     let bytes = new Uint8Array(buffer);
-    let len = bytes.byteLength;
-    for (let i = 0; i < len; i++) {
+    for (let i = 0; i < bytes.byteLength; i++) {
         binary += ('00' + bytes[i].toString(16)).slice(-2);
     }
     return binary;
@@ -631,8 +622,7 @@ function ArrayBufferToHexString(buffer) {
 function ArrayBufferToBase64(buffer) {
     let binary = "";
     let bytes = new Uint8Array(buffer);
-    let len = bytes.byteLength;
-    for (let i = 0; i < len; i++) {
+    for (let i = 0; i < bytes.byteLength; i++) {
         binary += String.fromCharCode(bytes[i]);
     }
     return btoa(binary);
@@ -661,4 +651,18 @@ function HexStringToArrayBuffer(hex) {
         return parseInt(h, 16)
     }));
     return typedArray.buffer
+}
+// 字符串 转 Uint8Array
+function StringToUint8Array(str) {
+    str = str.replace("0x", "");
+    const normal = str.length % 2 ? "0" + str : str; // Make even length
+    const bytes = new Uint8Array(normal.length / 2);
+    for (let index = 0; index < bytes.length; ++index) {
+        const c1 = normal.charCodeAt(index * 2);
+        const c2 = normal.charCodeAt(index * 2 + 1);
+        const n1 = c1 - (c1 < 58 ? 48 : 87);
+        const n2 = c2 - (c2 < 58 ? 48 : 87);
+        bytes[index] = n1 * 16 + n2;
+    }
+    return bytes;
 }
