@@ -321,6 +321,27 @@ $(function () {
         }
         chrome.tabs.update({ url: m3u8dl });
     });
+    // 复制m3u8DL命令
+    $("#copyM3U8dl").click(function () {
+        let m3u8dlArg = G.m3u8dlArg.replace(/\$referer\$/g, _referer);
+        m3u8dlArg = m3u8dlArg.replace(/\$url\$/g, _m3u8Url);
+        m3u8dlArg = m3u8dlArg.replace(/\$title\$/g, _title);
+
+        const tsThread = $("#thread").val();  // 线程数量
+        m3u8dlArg += ` --maxThreads "${tsThread}"`
+
+        const rangeStart = $("#rangeStart").val();  // 开始序列号
+        const rangeEnd = $("#rangeEnd").val();  // 结束序列号
+        m3u8dlArg += ` --downloadRange "${rangeStart}-${rangeEnd}"`
+
+        const customKey = $("#customKey").val();  // 自定义密钥
+        m3u8dlArg += customKey ? ` --useKeyBase64 "${customKey}"` : "";
+
+        const customIV = $("#customIV").val();  // 自定义IV
+        m3u8dlArg += customIV ? ` --useKeyIV "${customIV}"` : "";
+
+        navigator.clipboard.writeText(m3u8dlArg);
+    });
     // 切换 转换mp4格式按钮
     $(".mp4div").click(function () {
         $("#mp4").prop("checked", !$("#mp4").prop("checked"));
@@ -345,15 +366,15 @@ $(function () {
     });
     // 在线下载合并ts
     $("#mergeTs").click(function () {
-        fileSize = 0;
-        let start = 0;
-        let end = _fragments.length - 1;
-        if ($("#rangeStart").val()) {
-            start = parseInt($("#rangeStart").val()) - 1;
-        }
-        if ($("#rangeEnd").val()) {
-            end = parseInt($("#rangeEnd").val()) - 1;
-        }
+        fileSize = 0;   // 初始化已下载大小
+        tsBuffer.splice(0); // 初始化一下载ts缓存
+        // 设定起始序号
+        let start = parseInt($("#rangeStart").val());
+        start = start ? start - 1 : 0;
+        // 设定结束序号
+        let end = parseInt($("#rangeEnd").val());
+        end = end ? end - 1 : _fragments.length - 1;
+        // 检查序号
         if (start > end) {
             $("#progress").html(`<b>开始序号不能大于结束序号</b>`);
             return;
@@ -362,20 +383,6 @@ $(function () {
             $("#progress").html(`<b>序号最大不能超过${_fragments.length}</b>`);
             return;
         }
-        downCurrentTs = 0;  // 当前进度
-        downTotalTs = end - start + 1;  // 需要下载的文件数量
-        skipDecrypt = $("#skipDecrypt").prop("checked");    // 是否跳过解密
-        downloadTs(start, end);
-    });
-    // 强制下载
-    $("ForceDownload").click(function () {
-        mergeTs();
-    });
-    /**************************** 下载TS文件 ****************************/
-    // start 开始下载的索引
-    // end 结束下载的索引
-    function downloadTs(start = 0, end = _fragments.length - 1, errorObj = undefined) {
-        buttonState("#mergeTs", false);
         // 查看自定义key和iv 是否存在
         let customKey = $("#customKey").val();
         let customIV = $("#customIV").val();
@@ -391,7 +398,21 @@ $(function () {
                 _fragments[i].decryptdata.iv = iv;
             }
         }
+        skipDecrypt = $("#skipDecrypt").prop("checked");    // 是否跳过解密
+        downCurrentTs = 0;  // 当前进度
+        downTotalTs = end - start + 1;  // 需要下载的文件数量
         $("#progress").html(`${downCurrentTs}/${downTotalTs}`); // 进度显示
+        downloadTs(start, end);
+    });
+    // 强制下载
+    $("ForceDownload").click(function () {
+        mergeTs();
+    });
+    /**************************** 下载TS文件 ****************************/
+    // start 开始下载的索引
+    // end 结束下载的索引
+    function downloadTs(start = 0, end = _fragments.length - 1, errorObj = undefined) {
+        buttonState("#mergeTs", false);
         const _tsThread = parseInt($("#thread").val());  // 原始线程数量
         let tsThread = _tsThread;  // 线程数量
         let index = start - 1; // 当前下载的索引
@@ -573,15 +594,23 @@ function ArrayBufferToBase64(buffer) {
     for (let i = 0; i < len; i++) {
         binary += String.fromCharCode(bytes[i]);
     }
-    return Base64.encode(binary);
+    return btoa(binary);
 }
 // Base64 转 ArrayBuffer
 function Base64ToArrayBuffer(base64) {
-    let binary_string = Base64.decode(base64);
+    let binary_string = atob(base64);
     let len = binary_string.length;
     let bytes = new Uint8Array(len);
     for (let i = 0; i < len; i++) {
         bytes[i] = binary_string.charCodeAt(i);
+    }
+    return bytes.buffer;
+}
+// 字符串转ArrayBuffer
+function StringToArrayBuffer(str) {
+    let bytes = new Uint8Array(str.length);
+    for (let i = 0; i < str.length; i++) {
+        bytes[i] = str.charCodeAt(i);
     }
     return bytes.buffer;
 }
