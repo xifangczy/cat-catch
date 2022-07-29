@@ -70,8 +70,11 @@
             <button id="m3u8DL" class="button2">调用m3u8DL下载</button>
             <button id="copyM3U8dl" class="button2">复制m3u8DL命令参数</button>
             <div class="merge customKey">
-              <input type="text" id="customKey" spellcheck="false" placeholder="自定义密钥 base64" size="64"/>
-              <input type="text" id="customIV" spellcheck="false" placeholder="自定义iv" size="64"/>
+              <input type="text" id="customKeyBase64" spellcheck="false" placeholder="自定义密钥 base64" size="37"/>
+              <input type="text" id="customKeyHex" spellcheck="false" placeholder="自定义密钥 Hex" size="37"/>
+              <button id="uploadKey" class="button2">上传Key</button>
+              <input id="uploadKeyFile" type="file" class="hide" />
+              <input type="text" id="customIV" spellcheck="false" placeholder="自定义 IV" size="35"/>
             </div>
             <div class="merge">
               <div id="threadDiv" class="themeColor">下载线程数 <input type="number" value="32" id="thread" spellcheck="false" style="width: 35px;" step="1" min="1" max="128"/></div>

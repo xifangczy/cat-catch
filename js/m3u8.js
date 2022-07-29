@@ -13,6 +13,7 @@ if (onCatch) {
     script.src = onCatch;
     document.head.appendChild(script);
 }
+var debug;
 $(function () {
     // 捕获开关按钮
     if (onCatch) {
@@ -35,6 +36,7 @@ $(function () {
     /* m3u8 解析工具 */
     const hls = new Hls();  // hls.js 对象
     const _fragments = []; // 储存切片对象
+    debug = _fragments;
     const keyContent = new Map(); // 储存key的内容
     const decryptor = new AESDecryptor(); // 解密工具 来自hls.js 分离出来的
     var skipDecrypt = false; // 是否跳过解密
@@ -223,7 +225,7 @@ $(function () {
         let _iv = decryptdata.iv.toString();
         if (_iv != iv && _iv != iv2) {
             iv = Uint8ArrayToHexString(decryptdata.iv);
-            $("#tips").append('偏移量(iv): <input type="text" value="' + iv + '" spellcheck="false" readonly="readonly">');
+            $("#tips").append('偏移量(IV): <input type="text" value="' + iv + '" spellcheck="false" readonly="readonly">');
         }
     }
     /**************************** 监听 / 按钮绑定 ****************************/
@@ -364,6 +366,23 @@ $(function () {
         $(this).val(number);
         return false;
     });
+    // 上传key
+    $("#uploadKeyFile").change(function () {
+        let fileReader = new FileReader();
+        fileReader.onload = function(){
+            if(this.result.byteLength != 16){
+                $("#progress").html(`<b>Key文件不正确</b>`);
+                return;
+            }
+            $("#customKeyHex").val(ArrayBufferToHexString(this.result));
+            $("#customKeyBase64").val(ArrayBufferToBase64(this.result));
+        };
+        let file = $("#uploadKeyFile").prop('files')[0];
+        fileReader.readAsArrayBuffer(file);
+    });
+    $("#uploadKey").click(function () {
+        $("#uploadKeyFile").click();
+    });
     // 在线下载合并ts
     $("#mergeTs").click(function () {
         fileSize = 0;   // 初始化已下载大小
@@ -383,21 +402,30 @@ $(function () {
             $("#progress").html(`<b>序号最大不能超过${_fragments.length}</b>`);
             return;
         }
-        // 查看自定义key和iv 是否存在
-        let customKey = $("#customKey").val();
-        let customIV = $("#customIV").val();
-        if (customKey) {
-            customKey = Base64ToArrayBuffer(customKey); // Base64 转 ArrayBuffer
+
+        /* 设定自定义密钥和IV */
+        let customKeyBase64 = $("#customKeyBase64").val();
+        if (customKeyBase64) {
+            customKeyBase64 = Base64ToArrayBuffer(customKeyBase64); // Base64 转 ArrayBuffer
             keyContent.forEach(function (value, key) {
-                keyContent.set(key, customKey);
+                keyContent.set(key, customKeyBase64);
             });
         }
+        let customKeyHex = $("#customKeyHex").val();
+        if (customKeyHex) {
+            customKeyHex = HexStringToArrayBuffer(customKeyHex); // 16进制字符串 转 ArrayBuffer
+            keyContent.forEach(function (value, key) {
+                keyContent.set(key, customKeyHex);
+            });
+        }
+        let customIV = $("#customIV").val();
         if (customIV) {
             let iv = new TextEncoder().encode(customIV);
             for (let i in _fragments) {
                 _fragments[i].decryptdata.iv = iv;
             }
         }
+
         skipDecrypt = $("#skipDecrypt").prop("checked");    // 是否跳过解密
         downCurrentTs = 0;  // 当前进度
         downTotalTs = end - start + 1;  // 需要下载的文件数量
@@ -613,4 +641,11 @@ function StringToArrayBuffer(str) {
         bytes[i] = str.charCodeAt(i);
     }
     return bytes.buffer;
+}
+// 16进制字符串转ArrayBuffer
+function HexStringToArrayBuffer(hex) {
+    let typedArray = new Uint8Array(hex.match(/[\da-f]{2}/gi).map(function (h) {
+        return parseInt(h, 16)
+    }));
+    return typedArray.buffer
 }
