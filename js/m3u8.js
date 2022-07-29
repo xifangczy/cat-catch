@@ -160,7 +160,10 @@ $(function () {
             if (!flag && _m3u8Arg) {
                 data.fragments[i].url = data.fragments[i].url + "?" + _m3u8Arg;
             }
-            // 查看是否加密的
+            /* 
+            * 查看是否加密 下载key
+            * firefox CSP政策不允许在script-src 使用blob 不能直接调用hls.js下载好的密钥
+            */
             if (data.fragments[i].encrypted) {
                 isEncrypted = true;
                 // 填入key内容
@@ -172,14 +175,12 @@ $(function () {
                 if (!keyContent.get(data.fragments[i].decryptdata.uri)) {
                     // 占位 等待ajax获取key
                     keyContent.set(data.fragments[i].decryptdata.uri, true);
-                    /* 
-                    * 下载key firefox CSP政策不允许在script-src 使用blob 不能直接调用hls.js下载好的密钥
-                    */
+                    // 下载key
                     fetch(data.fragments[i].decryptdata.uri)
                         .then(response => response.arrayBuffer())
                         .then(function (buffer) {
                             if (buffer.byteLength == 16) {
-                                keyContent.set(data.fragments[i].decryptdata.uri, buffer); // 储存密钥内容
+                                keyContent.set(data.fragments[i].decryptdata.uri, buffer); // 储存密钥
                                 showKeyInfo(buffer, data.fragments[i].decryptdata, i);
                                 return;
                             }
@@ -216,6 +217,7 @@ $(function () {
         } else {
             $("#tips").append('密钥(Key): <input type="text" value="密钥下载失败" spellcheck="false" readonly="readonly">');
         }
+        // 如果是默认iv 则不显示
         let iv = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i + 1]).toString();
         let iv2 = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i]).toString();
         let _iv = decryptdata.iv.toString();
@@ -378,14 +380,9 @@ $(function () {
         let customKey = $("#customKey").val();
         let customIV = $("#customIV").val();
         if (customKey) {
-            // Base64 转 ArrayBuffer
-            let temp = Base64.atob(customKey);
-            customKey = new Uint8Array(new ArrayBuffer(temp.length));
-            for (i = 0; i < temp.length; i++) {
-                customKey[i] = temp.charCodeAt(i);
-            }
+            customKey = Base64ToArrayBuffer(customKey); // Base64 转 ArrayBuffer
             keyContent.forEach(function (value, key) {
-                keyContent.set(key, customKey.buffer);
+                keyContent.set(key, customKey);
             });
         }
         if (customIV) {
@@ -470,6 +467,7 @@ $(function () {
         downState = true;
         let fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });
         let ext = "ts";
+        // 转码mp4
         if ($("#mp4").prop("checked")) {
             for (let i of tsBuffer) {
                 transmuxer.push(new Uint8Array(i));
@@ -541,6 +539,14 @@ function GetFileName(url) {
     url.pop();
     return url.join(".");
 }
+// 按钮状态
+function buttonState(obj = "#mergeTs", state = true) {
+    if (state) {
+        $(obj).prop("disabled", false).removeClass("no-drop");
+        return;
+    }
+    $(obj).prop("disabled", true).addClass("no-drop");
+}
 // Uint8Array 转 16进制字符串
 function Uint8ArrayToHexString(data) {
     let result = "0x";
@@ -569,11 +575,13 @@ function ArrayBufferToBase64(buffer) {
     }
     return Base64.encode(binary);
 }
-// 按钮状态
-function buttonState(obj = "#mergeTs", state = true) {
-    if (state) {
-        $(obj).prop("disabled", false).removeClass("no-drop");
-        return;
+// Base64 转 ArrayBuffer
+function Base64ToArrayBuffer(base64) {
+    let binary_string = Base64.decode(base64);
+    let len = binary_string.length;
+    let bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+        bytes[i] = binary_string.charCodeAt(i);
     }
-    $(obj).prop("disabled", true).addClass("no-drop");
+    return bytes.buffer;
 }
