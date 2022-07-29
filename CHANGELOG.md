@@ -1,16 +1,8 @@
 ## 更新说明
 ### 2.2.2
-[Changed] m3u8解析器使用hls.js替代
+[Changed] m3u8解析器使用hls.js替代，多项改进，自定义功能添加
 
 [Changed] 分离下载器和m3u8解析器
-
-[Added] m3u8解析器 添加 自定义密钥
-
-[Added] m3u8解析器 添加 自定义下载范围
-
-[Added] m3u8解析器 添加 跳过解密强制二进制合并
-
-[Added] m3u8解析器 添加 解析出多个音频和字幕文件
 
 [Fixed] 修复 m3u8解析器`调用N_m3u8DL-CLI下载`按钮失效
 
