@@ -133,7 +133,7 @@ input#OtherAutoClear {
   height: 20px;
   cursor: pointer;
 }
-.themeColor{
+.themeColor {
   color: rgb(26, 115, 232);
 }
 button,
@@ -223,7 +223,7 @@ textarea {
 }
 #tips input {
   width: 975px;
-  color: rgb(26, 115, 232)
+  color: rgb(26, 115, 232);
 }
 /* #tips {
   color: rgb(26, 115, 232);
@@ -323,7 +323,7 @@ textarea {
 #loading a {
   word-break: break-all;
 }
-.line{
+.line {
   border-top: solid 1px rgb(0 0 0 / 50%);
   margin: 10px 0 10px 0;
 }

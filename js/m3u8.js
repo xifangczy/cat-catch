@@ -13,7 +13,6 @@ if (onCatch) {
     script.src = onCatch;
     document.head.appendChild(script);
 }
-var debug;
 $(function () {
     // 捕获开关按钮
     if (onCatch) {
@@ -36,7 +35,6 @@ $(function () {
     /* m3u8 解析工具 */
     const hls = new Hls();  // hls.js 对象
     const _fragments = []; // 储存切片对象
-    debug = _fragments;
     const keyContent = new Map(); // 储存key的内容
     const decryptor = new AESDecryptor(); // 解密工具 来自hls.js 分离出来的
     var skipDecrypt = false; // 是否跳过解密
@@ -157,7 +155,10 @@ $(function () {
         _fragments.splice(0);   // 清空 防止直播HLS无限添加
         _m3u8Content = data.m3u8;   // m3u8文件内容
         for (let i in data.fragments) {
-            // 把本地ts文件地址 转换成远程地址 并添加地址参数
+            /* 
+            * 少部分网站下载ts必须带有参数才能正常下载
+            * ts地址如果没有参数 添加m3u8地址的参数
+            */
             let flag = new RegExp("[?]([^\n]*)").exec(data.fragments[i].url);
             if (!flag && _m3u8Arg) {
                 data.fragments[i].url = data.fragments[i].url + "?" + _m3u8Arg;
@@ -175,7 +176,7 @@ $(function () {
                 });
                 // 如果不存在key 开始下载
                 if (!keyContent.get(data.fragments[i].decryptdata.uri)) {
-                    // 占位 等待ajax获取key
+                    // 占位 等待fetch获取key
                     keyContent.set(data.fragments[i].decryptdata.uri, true);
                     // 下载key
                     fetch(data.fragments[i].decryptdata.uri)
@@ -199,16 +200,16 @@ $(function () {
                 decryptdata: data.fragments[i].decryptdata,
                 encrypted: data.fragments[i].encrypted
             });
-            // 范围下载所需数据
-            $("#rangeStart").attr("max", _fragments.length);
-            $("#rangeEnd").attr("max", _fragments.length);
-            $("#rangeStart").val(1);
-            $("#rangeEnd").val(_fragments.length);
         }
-        writeTsUrl();   // 写入ts链接到textarea
+        writeText(_fragments);   // 写入ts链接到textarea
         $("#count").html("共 " + _fragments.length + " 个文件" + "，总时长: " + secToTime(data.totalduration));
         data.live && $("#count").html("直播HLS");
         isEncrypted && $("#count").html($("#count").html() + " (加密HLS)");
+        // 范围下载所需数据
+        $("#rangeStart").attr("max", _fragments.length);
+        $("#rangeEnd").attr("max", _fragments.length);
+        $("#rangeStart").val(1);
+        $("#rangeEnd").val(_fragments.length);
     }
     function showKeyInfo(buffer, decryptdata, i) {
         decryptdata.method && $("#tips").append('加密算法(Method): <input type="text" value="' + decryptdata.method + '" spellcheck="false" readonly="readonly">');
@@ -246,28 +247,35 @@ $(function () {
     });
     // 下载显示的内容
     $("#downText").click(function () {
-        var txt = $("#media_file").val();
-        txt = "data:text/plain," + encodeURIComponent(txt);
+        let text = encodeURIComponent($("#media_file").val());
+        let type = $("#media_file").data("type");
+        let downType = "data:text/plain,";
+        let filename = GetFileName(_m3u8Url) + '.txt';
+        if (type == "m3u8") {
+            downType = "data:application/vnd.apple.mpegurl,";
+            filename = GetFile(_m3u8Url);
+        }
+        text = downType + text;
         if (G.isFirefox) {
-            downloadDataURL(txt, "media_file.txt");
+            downloadDataURL(text, filename);
             return;
         }
         chrome.downloads.download({
-            url: txt,
-            filename: "media_file.txt"
+            url: text,
+            filename: filename
         });
     });
     // 原始m3u8
     $("#originalM3U8").click(function () {
-        $("#media_file").val(_m3u8Content);
+        writeText(_m3u8Content);
     });
     // 提取ts
     $("#getTs").click(function () {
-        writeTsUrl();
+        writeText(_fragments);
     });
     //把远程文件替换成本地文件
     $("#localFile").click(function () {
-        $("#media_file").val("");
+        writeText("");
         let textarea = "";
         let m3u8_split = _m3u8Content.split("\n");
         for (let line of m3u8_split) {
@@ -283,7 +291,7 @@ $(function () {
             }
             textarea += line + "\n";
         }
-        $("#media_file").val(textarea);
+        writeText(textarea);
     });
     // 播放m3u8
     $("#play").click(function () {
@@ -369,8 +377,8 @@ $(function () {
     // 上传key
     $("#uploadKeyFile").change(function () {
         let fileReader = new FileReader();
-        fileReader.onload = function(){
-            if(this.result.byteLength != 16){
+        fileReader.onload = function () {
+            if (this.result.byteLength != 16) {
                 $("#progress").html(`<b>Key文件不正确</b>`);
                 return;
             }
@@ -490,7 +498,7 @@ $(function () {
                     tsBuffer[currentIndex] = tsDecrypt(responseData, currentIndex);   //解密m3u8
                     fileSize += tsBuffer[currentIndex].byteLength;
                     $("#fileSize").html("已下载:" + byteToSize(fileSize));
-                    progressAdd();
+                    progressAdd(++downCurrentTs, downTotalTs);
                 }).always(function () {
                     tsThread++;
                 });
@@ -552,24 +560,29 @@ $(function () {
             console.log(e);
         }
     }
-    // 写入ts链接
-    function writeTsUrl() {
+});
+// 进度
+function progressAdd(downCurrentTs, downTotalTs) {
+    if (downCurrentTs == downTotalTs) {
+        $("#progress").html($("#mp4").prop("checked") ? `数据正在转换格式...` : `数据正在合并...`);
+        return;
+    }
+    $("#progress").html(`${downCurrentTs}/${downTotalTs}`);
+}
+// 写入ts链接
+function writeText(text) {
+    if (typeof text == "object") {
         let url = [];
-        for (let ts of _fragments) {
+        for (let ts of text) {
             url.push(ts.url);
         }
         $("#media_file").val(url.join("\n"));
+        $("#media_file").data("type", "link");
+        return;
     }
-    // 进度
-    function progressAdd() {
-        downCurrentTs++;
-        if (downCurrentTs == downTotalTs) {
-            $("#progress").html($("#mp4").prop("checked") ? `数据正在转换格式...` : `数据正在合并...`);
-            return;
-        }
-        $("#progress").html(`${downCurrentTs}/${downTotalTs}`);
-    }
-});
+    $("#media_file").val(text);
+    $("#media_file").data("type", "m3u8");
+}
 // 获取文件名
 function GetFile(str) {
     str = str.split("?")[0];
@@ -634,7 +647,7 @@ function Base64ToArrayBuffer(base64) {
     }
     return bytes.buffer;
 }
-// 字符串转ArrayBuffer
+// 字符串 转 ArrayBuffer
 function StringToArrayBuffer(str) {
     let bytes = new Uint8Array(str.length);
     for (let i = 0; i < str.length; i++) {
@@ -642,7 +655,7 @@ function StringToArrayBuffer(str) {
     }
     return bytes.buffer;
 }
-// 16进制字符串转ArrayBuffer
+// 16进制字符串 转 ArrayBuffer
 function HexStringToArrayBuffer(hex) {
     let typedArray = new Uint8Array(hex.match(/[\da-f]{2}/gi).map(function (h) {
         return parseInt(h, 16)
