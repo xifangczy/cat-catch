@@ -99,7 +99,10 @@ $(function () {
                     const referer = encodeURIComponent(_referer);
                     const title = _title ? encodeURIComponent(_title) : "";
                     const name = GetFile(item.uri);
-                    const html = `<div class="block"><div>${item.attrs.RESOLUTION ? "分辨率:" + item.attrs.RESOLUTION : ""}${item.attrs.BANDWIDTH ? " | 码率:" + item.attrs.BANDWIDTH : ""}</div><a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}">${name}</a></div>`;
+                    const html = `<div class="block">
+                        <div>${item.attrs.RESOLUTION ? "分辨率:" + item.attrs.RESOLUTION : ""}${item.attrs.BANDWIDTH ? " | 码率:" + item.attrs.BANDWIDTH : ""}</div>
+                        <a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}">${name}</a>
+                    </div>`;
                     $("#next_m3u8").append(html);
                 }
             }
@@ -112,7 +115,10 @@ $(function () {
                     const referer = encodeURIComponent(_referer);
                     const title = _title ? encodeURIComponent(_title) : "";
                     const name = GetFile(item.url);
-                    const html = `<div class="block"><div>${item.name ? item.name : ""} | ${item.lang ? item.lang : ""}</div><a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}">${name}</a></div>`;
+                    const html = `<div class="block">
+                        <div>${item.name ? item.name : ""} | ${item.lang ? item.lang : ""}</div>
+                        <a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}">${name}</a>
+                    </div>`;
                     $("#next_audio").append(html);
                 }
             }
@@ -125,7 +131,10 @@ $(function () {
                     const referer = encodeURIComponent(_referer);
                     const title = _title ? encodeURIComponent(_title) : "";
                     const name = GetFile(item.url);
-                    const html = `<div class="block"><div>${item.name ? item.name : ""} | ${item.lang ? item.lang : ""}</div><a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}">${name}</a></div>`;
+                    const html = `<div class="block">
+                        <div>${item.name ? item.name : ""} | ${item.lang ? item.lang : ""}</div>
+                        <a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}">${name}</a>
+                    </div>`;
                     $("#next_subtitle").append(html);
                 }
             }
@@ -655,14 +664,5 @@ function HexStringToArrayBuffer(hex) {
 // 字符串 转 Uint8Array
 function StringToUint8Array(str) {
     str = str.replace("0x", "");
-    const normal = str.length % 2 ? "0" + str : str; // Make even length
-    const bytes = new Uint8Array(normal.length / 2);
-    for (let index = 0; index < bytes.length; ++index) {
-        const c1 = normal.charCodeAt(index * 2);
-        const c2 = normal.charCodeAt(index * 2 + 1);
-        const n1 = c1 - (c1 < 58 ? 48 : 87);
-        const n2 = c2 - (c2 < 58 ? 48 : 87);
-        bytes[index] = n1 * 16 + n2;
-    }
-    return bytes;
+    return new Uint8Array(HexStringToArrayBuffer(str));
 }
