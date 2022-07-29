@@ -323,6 +323,10 @@ textarea {
 #loading a {
   word-break: break-all;
 }
+.line{
+  border-top: solid 1px rgb(0 0 0 / 50%);
+  margin: 10px 0 10px 0;
+}
 
 /* JSON格式化 */
 .json-document {
