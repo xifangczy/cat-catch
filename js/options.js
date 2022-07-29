@@ -229,24 +229,23 @@ $("#exportOptions").bind("click", function () {
 //导入配置
 $("#importOptionsFile").change(function () {
     let fileReader = new FileReader();
-    fileReader.onload = readerFile;
+    fileReader.onload = function(){
+        let importData = this.result;
+        try {
+            importData = JSON.parse(importData);
+        } catch (e) { alert("文件内容错误"); return; }
+        for (let item of G.OptionLists) {
+            chrome.storage.sync.set({ [item]: importData[item] });
+        }
+        alert("导入完成");
+        location.reload();
+    }
     let file = $("#importOptionsFile").prop('files')[0];
     fileReader.readAsText(file);
 });
 $("#importOptions").bind("click", function () {
     $("#importOptionsFile").click();
 });
-function readerFile(e) {
-    let importData = e.target.result;
-    try {
-        importData = JSON.parse(importData);
-    } catch (e) { alert("文件内容错误"); return; }
-    for (let item of G.OptionLists) {
-        chrome.storage.sync.set({ [item]: importData[item] });
-    }
-    alert("导入完成");
-    location.reload();
-}
 // 参数说明
 $("#showM3u8Help").bind("click", function () {
     $("#m3u8Help").slideToggle();
