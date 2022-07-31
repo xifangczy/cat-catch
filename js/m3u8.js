@@ -40,25 +40,12 @@ $(function () {
     var skipDecrypt = false; // 是否跳过解密
     /* 转码工具 */
     const mp4Cache = [];  // mp4格式缓存
-    const transmuxer = new muxjs.mp4.Transmuxer({
-        baseMediaDecodeTime: 10,
-        keepOriginalTimestamps: true
-    });    // mux.js 对象
-    transmuxer.on('data', function (segment) {
-        if (mp4Cache.length == 0) {
-            let data = new Uint8Array(segment.initSegment.byteLength + segment.data.byteLength);
-            data.set(segment.initSegment, 0);
-            data.set(segment.data, segment.initSegment.byteLength);
-            mp4Cache.push(data);
-            return;
-        }
-        mp4Cache.push(segment.data);
-    });
+    const transmuxer = new muxjs.mp4.Transmuxer();    // mux.js 对象
     /* 下载相关 */
     var downId = 0; // 下载id
     var stopDownload = false; // 停止下载flag
     var fileSize = 0; // 文件大小
-    var duration = 0; // 时长 修正mp4转换时 显示时长
+    var downDuration = 0; // 下载媒体得时长
     var downCurrentTs = 0;    // 当前进度
     var downTotalTs = 0;  // 需要下载的文件数量
     const tsBuffer = []; // ts内容缓存
@@ -418,7 +405,7 @@ $(function () {
     // 在线下载合并ts
     $("#mergeTs").click(function () {
         fileSize = 0;   // 初始化已下载大小
-        duration = 0;   // 初始化时长
+        downDuration = 0;   // 初始化时长
         tsBuffer.splice(0); // 初始化一下载ts缓存
         mp4Cache.splice(0); // 清空mp4转换缓存
         // 设定起始序号
@@ -523,7 +510,7 @@ $(function () {
                     }
                     tsBuffer[currentIndex] = tsDecrypt(responseData, currentIndex);   //解密m3u8
                     fileSize += tsBuffer[currentIndex].byteLength;
-                    duration += _fragments[currentIndex].duration;
+                    downDuration += _fragments[currentIndex].duration;
                     $("#fileSize").html("已下载:" + byteToSize(fileSize));
                     progressAdd(++downCurrentTs, downTotalTs);
                 }).always(function () {
@@ -546,16 +533,6 @@ $(function () {
         });
         $('#errorTsList').append(html);
     }
-    function getTimescale(array, duration, index) {
-        let BoxDuration = "";
-        BoxDuration += array[index + 16].toString(16);
-        BoxDuration += array[index + 17].toString(16);
-        BoxDuration += array[index + 18].toString(16);
-        BoxDuration += array[index + 19].toString(16);
-        BoxDuration = parseInt(BoxDuration, 16);
-        BoxDuration *= duration;
-        return BoxDuration;
-    }
     // 合并下载
     function mergeTs() {
         downState = true;
@@ -563,48 +540,24 @@ $(function () {
         let ext = "ts";
         // 转码mp4
         if ($("#mp4").prop("checked")) {
+            // 转码服务监听
+            transmuxer.on('data', function (segment) {
+                // 头部信息
+                if (mp4Cache.length == 0) {
+                    let data = new Uint8Array(segment.initSegment.byteLength + segment.data.byteLength);
+                    data.set(segment.initSegment, 0);
+                    data.set(segment.data, segment.initSegment.byteLength);
+                    // 使用 fixFileDuration 修正媒体时长文件信息
+                    mp4Cache.push(fixFileDuration(data, downDuration));
+                    return;
+                }
+                mp4Cache.push(segment.data);
+            });
             for (let i of tsBuffer) {
                 transmuxer.push(new Uint8Array(i));
                 transmuxer.flush();
             }
             if (mp4Cache.length != 0) {
-                /* 修正文件时长 */
-                let mvhdBoxDuration = duration * 90000;
-                for (let i = 0; i < mp4Cache[0].length; i++) {
-                    // mvhd
-                    if (mp4Cache[0][i] == 0x6D && mp4Cache[0][i + 1] == 0x76 && mp4Cache[0][i + 2] == 0x68 && mp4Cache[0][i + 3] == 0x64) {
-                        mvhdBoxDuration = getTimescale(mp4Cache[0], duration, i);   // 获得 timescale
-                        i += 20;    // mvhd 偏移20 为duration
-                        mp4Cache[0][i] = (mvhdBoxDuration & 0xFF000000) >> 24;
-                        mp4Cache[0][i + 1] = (mvhdBoxDuration & 0xFF0000) >> 16;
-                        mp4Cache[0][i + 2] = (mvhdBoxDuration & 0xFF00) >> 8;
-                        mp4Cache[0][i + 3] = mvhdBoxDuration & 0xFF;
-                        continue;
-                    }
-                    // tkhd
-                    if (mp4Cache[0][i] == 0x74 && mp4Cache[0][i + 1] == 0x6B && mp4Cache[0][i + 2] == 0x68 && mp4Cache[0][i + 3] == 0x64) {
-                        i += 24;    // tkhd 偏移24 为duration
-                        mp4Cache[0][i] = (mvhdBoxDuration & 0xFF000000) >> 24;
-                        mp4Cache[0][i + 1] = (mvhdBoxDuration & 0xFF0000) >> 16;
-                        mp4Cache[0][i + 2] = (mvhdBoxDuration & 0xFF00) >> 8;
-                        mp4Cache[0][i + 3] = mvhdBoxDuration & 0xFF;
-                        continue;
-                    }
-                    // mdhd
-                    if (mp4Cache[0][i] == 0x6D && mp4Cache[0][i + 1] == 0x64 && mp4Cache[0][i + 2] == 0x68 && mp4Cache[0][i + 3] == 0x64) {
-                        let mdhdBoxDuration = getTimescale(mp4Cache[0], duration, i);   // 获得 timescale
-                        i += 20;    // mdhd 偏移20 为duration
-                        mp4Cache[0][i] = (mdhdBoxDuration & 0xFF000000) >> 24;
-                        mp4Cache[0][i + 1] = (mdhdBoxDuration & 0xFF0000) >> 16;
-                        mp4Cache[0][i + 2] = (mdhdBoxDuration & 0xFF00) >> 8;
-                        mp4Cache[0][i + 3] = mdhdBoxDuration & 0xFF;
-                        continue;
-                    }
-                    //  mdat 之后是媒体数据 结束头部修改
-                    if (mp4Cache[0][i] == 0x6D && mp4Cache[0][i + 1] == 0x64 && mp4Cache[0][i + 2] == 0x61 && mp4Cache[0][i + 3] == 0x74) {
-                        break;
-                    }
-                }
                 fileBlob = new Blob(mp4Cache, { type: "video/mp4" });
                 ext = "mp4";
             }
@@ -730,4 +683,54 @@ function HexStringToArrayBuffer(hex) {
 function StringToUint8Array(str) {
     str = str.replace("0x", "");
     return new Uint8Array(HexStringToArrayBuffer(str));
+}
+/* 修正mp4文件显示时长 */
+function fixFileDuration(data, duration) {     
+    let mvhdBoxDuration = duration * 90000;
+    function getBoxDuration(array, duration, index) {
+        let BoxDuration = "";
+        BoxDuration += array[index + 16].toString(16);
+        BoxDuration += array[index + 17].toString(16);
+        BoxDuration += array[index + 18].toString(16);
+        BoxDuration += array[index + 19].toString(16);
+        BoxDuration = parseInt(BoxDuration, 16);
+        BoxDuration *= duration;
+        return BoxDuration;
+    }
+    for (let i = 0; i < data.length; i++) {
+        // mvhd
+        if (data[i] == 0x6D && data[i + 1] == 0x76 && data[i + 2] == 0x68 && data[i + 3] == 0x64) {
+            mvhdBoxDuration = getBoxDuration(data, duration, i);   // 获得 timescale
+            i += 20;    // mvhd 偏移20 为duration
+            data[i] = (mvhdBoxDuration & 0xFF000000) >> 24;
+            data[i + 1] = (mvhdBoxDuration & 0xFF0000) >> 16;
+            data[i + 2] = (mvhdBoxDuration & 0xFF00) >> 8;
+            data[i + 3] = mvhdBoxDuration & 0xFF;
+            continue;
+        }
+        // tkhd
+        if (data[i] == 0x74 && data[i + 1] == 0x6B && data[i + 2] == 0x68 && data[i + 3] == 0x64) {
+            i += 24;    // tkhd 偏移24 为duration
+            data[i] = (mvhdBoxDuration & 0xFF000000) >> 24;
+            data[i + 1] = (mvhdBoxDuration & 0xFF0000) >> 16;
+            data[i + 2] = (mvhdBoxDuration & 0xFF00) >> 8;
+            data[i + 3] = mvhdBoxDuration & 0xFF;
+            continue;
+        }
+        // mdhd
+        if (data[i] == 0x6D && data[i + 1] == 0x64 && data[i + 2] == 0x68 && data[i + 3] == 0x64) {
+            let mdhdBoxDuration = getBoxDuration(data, duration, i);   // 获得 timescale
+            i += 20;    // mdhd 偏移20 为duration
+            data[i] = (mdhdBoxDuration & 0xFF000000) >> 24;
+            data[i + 1] = (mdhdBoxDuration & 0xFF0000) >> 16;
+            data[i + 2] = (mdhdBoxDuration & 0xFF00) >> 8;
+            data[i + 3] = mdhdBoxDuration & 0xFF;
+            continue;
+        }
+        //  mdat 之后是媒体数据 结束头部修改
+        if (data[i] == 0x6D && data[i + 1] == 0x64 && data[i + 2] == 0x61 && data[i + 3] == 0x74) {
+            return data;
+        }
+    }
+    return data;
 }
