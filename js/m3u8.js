@@ -553,6 +553,7 @@ $(function () {
                 }
                 mp4Cache.push(segment.data);
             });
+            // 载入ts数据转码
             for (let i of tsBuffer) {
                 transmuxer.push(new Uint8Array(i));
                 transmuxer.flush();
@@ -686,16 +687,18 @@ function StringToUint8Array(str) {
 }
 /* 修正mp4文件显示时长 */
 function fixFileDuration(data, duration) {     
+    duration = parseInt(duration);
     let mvhdBoxDuration = duration * 90000;
-    function getBoxDuration(array, duration, index) {
-        let BoxDuration = "";
-        BoxDuration += array[index + 16].toString(16);
-        BoxDuration += array[index + 17].toString(16);
-        BoxDuration += array[index + 18].toString(16);
-        BoxDuration += array[index + 19].toString(16);
-        BoxDuration = parseInt(BoxDuration, 16);
-        BoxDuration *= duration;
-        return BoxDuration;
+    function getBoxDuration(data, duration, index) {
+        let boxDuration = "";
+        index += 16;    // 偏移量 16 为timescale
+        boxDuration += data[index].toString(16);
+        boxDuration += data[++index].toString(16);
+        boxDuration += data[++index].toString(16);
+        boxDuration += data[++index].toString(16);
+        boxDuration = parseInt(boxDuration, 16);
+        boxDuration *= duration;
+        return boxDuration;
     }
     for (let i = 0; i < data.length; i++) {
         // mvhd
@@ -703,18 +706,18 @@ function fixFileDuration(data, duration) {
             mvhdBoxDuration = getBoxDuration(data, duration, i);   // 获得 timescale
             i += 20;    // mvhd 偏移20 为duration
             data[i] = (mvhdBoxDuration & 0xFF000000) >> 24;
-            data[i + 1] = (mvhdBoxDuration & 0xFF0000) >> 16;
-            data[i + 2] = (mvhdBoxDuration & 0xFF00) >> 8;
-            data[i + 3] = mvhdBoxDuration & 0xFF;
+            data[++i] = (mvhdBoxDuration & 0xFF0000) >> 16;
+            data[++i] = (mvhdBoxDuration & 0xFF00) >> 8;
+            data[++i] = mvhdBoxDuration & 0xFF;
             continue;
         }
         // tkhd
         if (data[i] == 0x74 && data[i + 1] == 0x6B && data[i + 2] == 0x68 && data[i + 3] == 0x64) {
             i += 24;    // tkhd 偏移24 为duration
             data[i] = (mvhdBoxDuration & 0xFF000000) >> 24;
-            data[i + 1] = (mvhdBoxDuration & 0xFF0000) >> 16;
-            data[i + 2] = (mvhdBoxDuration & 0xFF00) >> 8;
-            data[i + 3] = mvhdBoxDuration & 0xFF;
+            data[++i] = (mvhdBoxDuration & 0xFF0000) >> 16;
+            data[++i] = (mvhdBoxDuration & 0xFF00) >> 8;
+            data[++i] = mvhdBoxDuration & 0xFF;
             continue;
         }
         // mdhd
@@ -722,9 +725,9 @@ function fixFileDuration(data, duration) {
             let mdhdBoxDuration = getBoxDuration(data, duration, i);   // 获得 timescale
             i += 20;    // mdhd 偏移20 为duration
             data[i] = (mdhdBoxDuration & 0xFF000000) >> 24;
-            data[i + 1] = (mdhdBoxDuration & 0xFF0000) >> 16;
-            data[i + 2] = (mdhdBoxDuration & 0xFF00) >> 8;
-            data[i + 3] = mdhdBoxDuration & 0xFF;
+            data[++i] = (mdhdBoxDuration & 0xFF0000) >> 16;
+            data[++i] = (mdhdBoxDuration & 0xFF00) >> 8;
+            data[++i] = mdhdBoxDuration & 0xFF;
             continue;
         }
         //  mdat 之后是媒体数据 结束头部修改
