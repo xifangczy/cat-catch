@@ -40,17 +40,25 @@ $(function () {
     var skipDecrypt = false; // 是否跳过解密
     /* 转码工具 */
     const mp4Cache = [];  // mp4格式缓存
-    const transmuxer = new muxjs.mp4.Transmuxer();    // mux.js 对象
+    const transmuxer = new muxjs.mp4.Transmuxer({
+        baseMediaDecodeTime: 10,
+        keepOriginalTimestamps: true
+    });    // mux.js 对象
     transmuxer.on('data', function (segment) {
-        let data = new Uint8Array(segment.initSegment.byteLength + segment.data.byteLength);
-        data.set(segment.initSegment, 0);
-        data.set(segment.data, segment.initSegment.byteLength);
-        mp4Cache.push(data);
+        if (mp4Cache.length == 0) {
+            let data = new Uint8Array(segment.initSegment.byteLength + segment.data.byteLength);
+            data.set(segment.initSegment, 0);
+            data.set(segment.data, segment.initSegment.byteLength);
+            mp4Cache.push(data);
+            return;
+        }
+        mp4Cache.push(segment.data);
     });
     /* 下载相关 */
     var downId = 0; // 下载id
     var stopDownload = false; // 停止下载flag
     var fileSize = 0; // 文件大小
+    var duration = 0; // 时长 修正mp4转换时 显示时长
     var downCurrentTs = 0;    // 当前进度
     var downTotalTs = 0;  // 需要下载的文件数量
     const tsBuffer = []; // ts内容缓存
@@ -207,12 +215,16 @@ $(function () {
             _fragments.push({
                 url: data.fragments[i].url,
                 decryptdata: data.fragments[i].decryptdata,
-                encrypted: data.fragments[i].encrypted
+                encrypted: data.fragments[i].encrypted,
+                duration: data.fragments[i].duration,
             });
         }
         writeText(_fragments);   // 写入ts链接到textarea
         $("#count").html("共 " + _fragments.length + " 个文件" + "，总时长: " + secToTime(data.totalduration));
-        data.live && $("#count").html("直播HLS");
+        if (data.live) {
+            $("#recorder").show();
+            $("#count").html("直播HLS");
+        }
         isEncrypted && $("#count").html($("#count").html() + " (加密HLS)");
         // 范围下载所需数据
         $("#rangeStart").attr("max", _fragments.length);
@@ -400,10 +412,15 @@ $(function () {
     $("#uploadKey").click(function () {
         $("#uploadKeyFile").click();
     });
+    $("#recorder").click(function () {
+        // TODO: 录制m3u8
+    });
     // 在线下载合并ts
     $("#mergeTs").click(function () {
         fileSize = 0;   // 初始化已下载大小
+        duration = 0;   // 初始化时长
         tsBuffer.splice(0); // 初始化一下载ts缓存
+        mp4Cache.splice(0); // 清空mp4转换缓存
         // 设定起始序号
         let start = parseInt($("#rangeStart").val());
         start = start ? start - 1 : 0;
@@ -506,6 +523,7 @@ $(function () {
                     }
                     tsBuffer[currentIndex] = tsDecrypt(responseData, currentIndex);   //解密m3u8
                     fileSize += tsBuffer[currentIndex].byteLength;
+                    duration += _fragments[currentIndex].duration;
                     $("#fileSize").html("已下载:" + byteToSize(fileSize));
                     progressAdd(++downCurrentTs, downTotalTs);
                 }).always(function () {
@@ -528,6 +546,16 @@ $(function () {
         });
         $('#errorTsList').append(html);
     }
+    function getTimescale(array, duration, index) {
+        let BoxDuration = "";
+        BoxDuration += array[index + 16].toString(16);
+        BoxDuration += array[index + 17].toString(16);
+        BoxDuration += array[index + 18].toString(16);
+        BoxDuration += array[index + 19].toString(16);
+        BoxDuration = parseInt(BoxDuration, 16);
+        BoxDuration *= duration;
+        return BoxDuration;
+    }
     // 合并下载
     function mergeTs() {
         downState = true;
@@ -540,6 +568,46 @@ $(function () {
                 transmuxer.flush();
             }
             if (mp4Cache.length != 0) {
+                /* 修正文件时长 */
+                let mvhdBoxDuration = duration * 90000;
+                for (let i = 0; i < mp4Cache[0].length; i++) {
+                    // mvhd
+                    if (mp4Cache[0][i] == 0x6D && mp4Cache[0][i + 1] == 0x76 && mp4Cache[0][i + 2] == 0x68 && mp4Cache[0][i + 3] == 0x64) {
+                        mvhdBoxDuration = getTimescale(mp4Cache[0], duration, i);   // 获得 timescale
+                        let iv = i + 20;    // mvhd 偏移20 为duration
+                        mp4Cache[0][iv] = (mvhdBoxDuration & 0xFF000000) >> 24;
+                        mp4Cache[0][iv + 1] = (mvhdBoxDuration & 0xFF0000) >> 16;
+                        mp4Cache[0][iv + 2] = (mvhdBoxDuration & 0xFF00) >> 8;
+                        mp4Cache[0][iv + 3] = mvhdBoxDuration & 0xFF;
+                        i += 4; continue;
+                    }
+                    // tkhd
+                    if (mp4Cache[0][i] == 0x74 && mp4Cache[0][i + 1] == 0x6B && mp4Cache[0][i + 2] == 0x68 && mp4Cache[0][i + 3] == 0x64) {
+                        let iv = i + 24;    // tkhd 偏移24 为duration
+                        mp4Cache[0][iv] = (mvhdBoxDuration & 0xFF000000) >> 24;
+                        mp4Cache[0][iv + 1] = (mvhdBoxDuration & 0xFF0000) >> 16;
+                        mp4Cache[0][iv + 2] = (mvhdBoxDuration & 0xFF00) >> 8;
+                        mp4Cache[0][iv + 3] = mvhdBoxDuration & 0xFF;
+                        i += 4;
+                        continue;
+                    }
+                    // mdhd
+                    if (mp4Cache[0][i] == 0x6D && mp4Cache[0][i + 1] == 0x64 && mp4Cache[0][i + 2] == 0x68 && mp4Cache[0][i + 3] == 0x64) {
+                        let mdhdBoxDuration = getTimescale(mp4Cache[0], duration, i);   // 获得 timescale
+                        let iv = i + 20;    // mdhd 偏移20 为duration
+                        mp4Cache[0][iv] = (mdhdBoxDuration & 0xFF000000) >> 24;
+                        mp4Cache[0][iv + 1] = (mdhdBoxDuration & 0xFF0000) >> 16;
+                        mp4Cache[0][iv + 2] = (mdhdBoxDuration & 0xFF00) >> 8;
+                        mp4Cache[0][iv + 3] = mdhdBoxDuration & 0xFF;
+                        i += 4;
+                        continue;
+                    }
+                    //  mdat 之后是媒体数据 结束头部修改
+                    if (mp4Cache[0][i] == 0x6D && mp4Cache[0][i + 1] == 0x64 && mp4Cache[0][i + 2] == 0x61 && mp4Cache[0][i + 3] == 0x74) {
+                        break;
+                    }
+                }
+                console.log(mp4Cache[0]);
                 fileBlob = new Blob(mp4Cache, { type: "video/mp4" });
                 ext = "mp4";
             }
