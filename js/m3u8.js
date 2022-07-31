@@ -207,7 +207,7 @@ $(function () {
                 duration: data.fragments[i].duration,
             });
         }
-        recorder && downloadTs(0, 0);   // 录制直播
+        recorder && downloadTs(_fragments.length - 1, _fragments.length - 1);   // 录制直播
         writeText(_fragments);   // 写入ts链接到textarea
         $("#count").html("共 " + _fragments.length + " 个文件" + "，总时长: " + secToTime(data.totalduration));
         if (data.live) {
@@ -401,8 +401,11 @@ $(function () {
     $("#uploadKey").click(function () {
         $("#uploadKeyFile").click();
     });
+    // 录制直播
     $("#recorder").click(function () {
-        if($(this).data("switch") == "on"){
+        if ($(this).data("switch") == "on") {
+            initDownload(); // 初始化下载变量
+            downloadTs(_fragments.length - 1, _fragments.length - 1);
             recorder = true;
             $(this).html("下载录制").addClass("button2").data("switch", "off");
             return;
@@ -413,10 +416,7 @@ $(function () {
     });
     // 在线下载合并ts
     $("#mergeTs").click(function () {
-        fileSize = 0;   // 初始化已下载大小
-        downDuration = 0;   // 初始化时长
-        tsBuffer.splice(0); // 初始化一下载ts缓存
-        mp4Cache.splice(0); // 清空mp4转换缓存
+        initDownload(); // 初始化下载变量
         // 设定起始序号
         let start = parseInt($("#rangeStart").val());
         start = start ? start - 1 : 0;
@@ -457,7 +457,6 @@ $(function () {
             }
         }
         skipDecrypt = $("#skipDecrypt").prop("checked");    // 是否跳过解密
-        downCurrentTs = 0;  // 当前进度
         downTotalTs = end - start + 1;  // 需要下载的文件数量
         $("#progress").html(`${downCurrentTs}/${downTotalTs}`); // 进度显示
         downloadTs(start, end);
@@ -603,6 +602,14 @@ $(function () {
             console.log(e);
         }
     }
+    // 初始化下载变量
+    function initDownload() {
+        fileSize = 0;   // 初始化已下载大小
+        downDuration = 0;   // 初始化时长
+        tsBuffer.splice(0); // 初始化一下载ts缓存
+        mp4Cache.splice(0); // 清空mp4转换缓存
+        downCurrentTs = 0;  // 当前进度
+    }
 });
 // 进度
 function progressAdd(downCurrentTs, downTotalTs) {
@@ -702,7 +709,7 @@ function StringToUint8Array(str) {
 }
 /* 修正mp4文件显示时长 */
 function fixFileDuration(data, duration) {
-    duration = parseInt(duration);
+    // duration = parseInt(duration);
     let mvhdBoxDuration = duration * 90000;
     function getBoxDuration(data, duration, index) {
         let boxDuration = "";
