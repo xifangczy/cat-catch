@@ -40,7 +40,9 @@ $(function () {
             return;
         }
         // 如果是m3u8跳转到解析器
-        if (_url.includes(".m3u8")) {
+        let url = _url.split("?")[0];
+        url = url.split(".").pop();
+        if (url == "m3u8") {
             window.location.href = `m3u8.html?url=${encodeURIComponent(_url)}&referer=${encodeURIComponent(_referer)}`;
             return;
         }
