@@ -50,6 +50,7 @@ $(function () {
     var downTotalTs = 0;  // 需要下载的文件数量
     const tsBuffer = []; // ts内容缓存
     const errorTsList = []; // 下载错误ts序号列表
+    var recorder = false; // 是否开启录像
 
     // 如果存在Referer修改当前标签下的所有xhr的Referer
     chrome.tabs.getCurrent(function (tabs) {
@@ -206,6 +207,7 @@ $(function () {
                 duration: data.fragments[i].duration,
             });
         }
+        recorder && downloadTs(0, 0);   // 录制直播
         writeText(_fragments);   // 写入ts链接到textarea
         $("#count").html("共 " + _fragments.length + " 个文件" + "，总时长: " + secToTime(data.totalduration));
         if (data.live) {
@@ -400,7 +402,14 @@ $(function () {
         $("#uploadKeyFile").click();
     });
     $("#recorder").click(function () {
-        // TODO: 录制m3u8
+        if($(this).data("switch") == "on"){
+            recorder = true;
+            $(this).html("下载录制").addClass("button2").data("switch", "off");
+            return;
+        }
+        recorder = false;
+        $(this).html("录制直播").removeClass("button2").data("switch", "on");
+        mergeTs();
     });
     // 在线下载合并ts
     $("#mergeTs").click(function () {
@@ -454,7 +463,7 @@ $(function () {
         downloadTs(start, end);
     });
     // 强制下载
-    $("ForceDownload").click(function () {
+    $("#ForceDownload").click(function () {
         mergeTs();
     });
     /**************************** 下载TS文件 ****************************/
@@ -478,7 +487,7 @@ $(function () {
                 if (errorTsList.length == 0) {
                     $("ForceDownload").hide();
                     $("#errorTsList").hide();
-                    mergeTs();  // 合并下载
+                    !recorder && mergeTs();  // 合并下载
                     return;
                 }
                 $("#progress").html(`数据不完整... 剩余未下载: ${errorTsList.length}`);
@@ -493,7 +502,8 @@ $(function () {
                     xhrFields: { responseType: "arraybuffer" },
                     timeout: 30000
                 }).fail(function () {
-                    if (stopDownload) { return; }
+                    // 直播 不处理下载失败
+                    if (stopDownload || recorder) { return; }
                     if (errorObj) {
                         errorObj.find("button").html("下载失败...重试");
                         buttonState(errorObj.find("button"), true);
@@ -508,7 +518,12 @@ $(function () {
                     if (errorTsList.includes(currentIndex)) {
                         errorTsList.splice(errorTsList.indexOf(currentIndex), 1);
                     }
-                    tsBuffer[currentIndex] = tsDecrypt(responseData, currentIndex);   //解密m3u8
+                    responseData = tsDecrypt(responseData, currentIndex); //解密m3u8
+                    if (recorder) {
+                        tsBuffer.push(responseData);
+                    } else {
+                        tsBuffer[currentIndex] = responseData;
+                    }
                     fileSize += tsBuffer[currentIndex].byteLength;
                     downDuration += _fragments[currentIndex].duration;
                     $("#fileSize").html("已下载:" + byteToSize(fileSize));
@@ -686,7 +701,7 @@ function StringToUint8Array(str) {
     return new Uint8Array(HexStringToArrayBuffer(str));
 }
 /* 修正mp4文件显示时长 */
-function fixFileDuration(data, duration) {     
+function fixFileDuration(data, duration) {
     duration = parseInt(duration);
     let mvhdBoxDuration = duration * 90000;
     function getBoxDuration(data, duration, index) {
