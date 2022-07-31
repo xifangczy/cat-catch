@@ -145,7 +145,7 @@ button,
   cursor: pointer;
   padding: calc(0.5em - 1px) 1em;
   /* margin-left: 20px; */
-  margin-right: 10px;
+  margin-right: 5px;
   /* margin-top: 10px; */
 }
 button:hover {
