@@ -574,32 +574,30 @@ $(function () {
                     // mvhd
                     if (mp4Cache[0][i] == 0x6D && mp4Cache[0][i + 1] == 0x76 && mp4Cache[0][i + 2] == 0x68 && mp4Cache[0][i + 3] == 0x64) {
                         mvhdBoxDuration = getTimescale(mp4Cache[0], duration, i);   // 获得 timescale
-                        let iv = i + 20;    // mvhd 偏移20 为duration
-                        mp4Cache[0][iv] = (mvhdBoxDuration & 0xFF000000) >> 24;
-                        mp4Cache[0][iv + 1] = (mvhdBoxDuration & 0xFF0000) >> 16;
-                        mp4Cache[0][iv + 2] = (mvhdBoxDuration & 0xFF00) >> 8;
-                        mp4Cache[0][iv + 3] = mvhdBoxDuration & 0xFF;
-                        i += 4; continue;
+                        i += 20;    // mvhd 偏移20 为duration
+                        mp4Cache[0][i] = (mvhdBoxDuration & 0xFF000000) >> 24;
+                        mp4Cache[0][i + 1] = (mvhdBoxDuration & 0xFF0000) >> 16;
+                        mp4Cache[0][i + 2] = (mvhdBoxDuration & 0xFF00) >> 8;
+                        mp4Cache[0][i + 3] = mvhdBoxDuration & 0xFF;
+                        continue;
                     }
                     // tkhd
                     if (mp4Cache[0][i] == 0x74 && mp4Cache[0][i + 1] == 0x6B && mp4Cache[0][i + 2] == 0x68 && mp4Cache[0][i + 3] == 0x64) {
-                        let iv = i + 24;    // tkhd 偏移24 为duration
-                        mp4Cache[0][iv] = (mvhdBoxDuration & 0xFF000000) >> 24;
-                        mp4Cache[0][iv + 1] = (mvhdBoxDuration & 0xFF0000) >> 16;
-                        mp4Cache[0][iv + 2] = (mvhdBoxDuration & 0xFF00) >> 8;
-                        mp4Cache[0][iv + 3] = mvhdBoxDuration & 0xFF;
-                        i += 4;
+                        i += 24;    // tkhd 偏移24 为duration
+                        mp4Cache[0][i] = (mvhdBoxDuration & 0xFF000000) >> 24;
+                        mp4Cache[0][i + 1] = (mvhdBoxDuration & 0xFF0000) >> 16;
+                        mp4Cache[0][i + 2] = (mvhdBoxDuration & 0xFF00) >> 8;
+                        mp4Cache[0][i + 3] = mvhdBoxDuration & 0xFF;
                         continue;
                     }
                     // mdhd
                     if (mp4Cache[0][i] == 0x6D && mp4Cache[0][i + 1] == 0x64 && mp4Cache[0][i + 2] == 0x68 && mp4Cache[0][i + 3] == 0x64) {
                         let mdhdBoxDuration = getTimescale(mp4Cache[0], duration, i);   // 获得 timescale
-                        let iv = i + 20;    // mdhd 偏移20 为duration
-                        mp4Cache[0][iv] = (mdhdBoxDuration & 0xFF000000) >> 24;
-                        mp4Cache[0][iv + 1] = (mdhdBoxDuration & 0xFF0000) >> 16;
-                        mp4Cache[0][iv + 2] = (mdhdBoxDuration & 0xFF00) >> 8;
-                        mp4Cache[0][iv + 3] = mdhdBoxDuration & 0xFF;
-                        i += 4;
+                        i += 20;    // mdhd 偏移20 为duration
+                        mp4Cache[0][i] = (mdhdBoxDuration & 0xFF000000) >> 24;
+                        mp4Cache[0][i + 1] = (mdhdBoxDuration & 0xFF0000) >> 16;
+                        mp4Cache[0][i + 2] = (mdhdBoxDuration & 0xFF00) >> 8;
+                        mp4Cache[0][i + 3] = mdhdBoxDuration & 0xFF;
                         continue;
                     }
                     //  mdat 之后是媒体数据 结束头部修改
@@ -607,7 +605,6 @@ $(function () {
                         break;
                     }
                 }
-                console.log(mp4Cache[0]);
                 fileBlob = new Blob(mp4Cache, { type: "video/mp4" });
                 ext = "mp4";
             }
