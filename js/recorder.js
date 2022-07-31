@@ -99,6 +99,7 @@ window.onload = function () {
             cat.innerHTML = `${icon}开启录制`;
             cat.setAttribute("data-switch", "on");
         } catch (e) {
+            console.log(e);
             cat.innerHTML = `${icon}无法捕获视频<br>点击重试`;
             cat.setAttribute("data-switch", "error");
         }
