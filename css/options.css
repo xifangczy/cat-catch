@@ -144,7 +144,7 @@ button,
   color: rgb(26, 115, 232);
   cursor: pointer;
   padding: calc(0.5em - 1px) 1em;
-  /* margin-left: 20px; */
+  margin-left: 5px;
   margin-right: 5px;
   /* margin-top: 10px; */
 }

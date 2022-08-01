@@ -420,7 +420,7 @@ $(function () {
     $("#recorder").click(function () {
         if ($(this).data("switch") == "on") {
             initDownload(); // 初始化下载变量
-            downloadTs(_fragments.length - 1, _fragments.length - 1);
+            // downloadTs(_fragments.length - 1, _fragments.length - 1);
             recorder = true;
             $(this).html("下载录制").addClass("button2").data("switch", "off");
             return;
@@ -538,7 +538,7 @@ $(function () {
                     } else {
                         tsBuffer[currentIndex] = responseData;
                     }
-                    fileSize += tsBuffer[currentIndex].byteLength;
+                    fileSize += responseData.byteLength;
                     downDuration += _fragments[currentIndex].duration;
                     $("#fileSize").html("已下载:" + byteToSize(fileSize));
                     progressAdd(++downCurrentTs, downTotalTs);
@@ -567,6 +567,12 @@ $(function () {
         downState = true;
         let fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });
         let ext = "ts";
+        /* 在初始化切片 可能是fMP4 获取初始化切片的后缀 */
+        if(_fragments[0].initSegment) {
+            let name = _fragments[0].initSegment.url.split("/").pop();
+            name = name.split("?")[0];
+            ext = name.split(".").pop();
+        }
         // 转码mp4
         if ($("#mp4").prop("checked")) {
             // 转码服务监听
@@ -600,7 +606,7 @@ $(function () {
     }
     // ts解密
     function tsDecrypt(responseData, index) {
-        // 是否存在初始化MAP
+        // 是否存在初始化切片
         if (_fragments[index].initSegment) {
             let initSegmentData = initData.get(_fragments[index].initSegment.url);
             let initLength = initSegmentData.byteLength;
