@@ -36,6 +36,7 @@ $(function () {
     const hls = new Hls();  // hls.js 对象
     const _fragments = []; // 储存切片对象
     const keyContent = new Map(); // 储存key的内容
+    const initData = new Map(); // 储存map的url
     const decryptor = new AESDecryptor(); // 解密工具 来自hls.js 分离出来的
     var skipDecrypt = false; // 是否跳过解密
     /* 转码工具 */
@@ -150,7 +151,7 @@ $(function () {
         hls.on(Hls.Events.ERROR, function (event, data) {
             $("#m3u8").hide(); $("#loading").show();
             $("#loading .optionBox").html(`获取m3u8内容失败, 请尝试手动下载<br><a href="${_m3u8Url}">${_m3u8Url}</a>`);
-            console.log(data.error);
+            console.log(data);
         });
     }
     /* 提取所有ts链接 判断处理 */
@@ -200,13 +201,27 @@ $(function () {
                         });
                 }
             }
+            // 处理 #EXT-X-MAP 标签
+            let initSegment = null;
+            if (data.fragments[i].initSegment && !initData.get(data.fragments[i].initSegment.url)) {
+                initSegment = data.fragments[i].initSegment;
+                initData.set(data.fragments[i].initSegment.url, true);
+                fetch(data.fragments[i].initSegment.url)
+                    .then(response => response.arrayBuffer())
+                    .then(function (buffer) {
+                        initData.set(data.fragments[i].initSegment.url, buffer);
+                    }).catch(function (error) { console.log(error); });
+                $("#tips").append('初始化片段(EXT-X-MAP): <input type="text" value="' + data.fragments[i].initSegment.url + '" spellcheck="false" readonly="readonly">');
+            }
             _fragments.push({
                 url: data.fragments[i].url,
                 decryptdata: data.fragments[i].decryptdata,
                 encrypted: data.fragments[i].encrypted,
                 duration: data.fragments[i].duration,
+                initSegment: initSegment
             });
         }
+        // console.log(_fragments);
         recorder && downloadTs(_fragments.length - 1, _fragments.length - 1);   // 录制直播
         writeText(_fragments);   // 写入ts链接到textarea
         $("#count").html("共 " + _fragments.length + " 个文件" + "，总时长: " + secToTime(data.totalduration));
@@ -585,6 +600,15 @@ $(function () {
     }
     // ts解密
     function tsDecrypt(responseData, index) {
+        // 是否存在初始化MAP
+        if (_fragments[index].initSegment) {
+            let initSegmentData = initData.get(_fragments[index].initSegment.url);
+            let initLength = initSegmentData.byteLength;
+            let newData = new Uint8Array(initLength + responseData.byteLength);
+            newData.set(new Uint8Array(initSegmentData), 0);
+            newData.set(new Uint8Array(responseData), initLength);
+            responseData = newData.buffer;
+        }
         if (!_fragments[index].encrypted || skipDecrypt) {
             return responseData;
         }
