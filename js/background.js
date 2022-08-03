@@ -319,12 +319,15 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
 
 // 标签更新 清除数据
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-    // 刷新页面 清理数据
     if (changeInfo.status == "loading") {
-        // 清理缓存数据
-        delete cacheData[tabId];
-        chrome.storage.local.set({ MediaData: cacheData });
-        SetIcon({ tabId: tabId });
+        // 刷新页面 清理数据
+        if (G.refreshClear) {
+            delete cacheData[tabId];
+            chrome.storage.local.set({ MediaData: cacheData });
+            SetIcon({ tabId: tabId });
+        } else {
+            SetIcon({ number: cacheData[G.tabId].length, tabId: tabId });
+        }
     }
     // 跳过特殊页面
     if (isSpecialPage(tab.url) || tabId == 0 || tabId == -1) { return; }

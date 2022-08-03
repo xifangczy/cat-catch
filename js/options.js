@@ -28,6 +28,7 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
         $("#injectScript").append(`<option value="${key}">${item.name}</option>`);
     });
     $("#injectScript").val(items.injectScript);
+    $("#refreshClear").attr("checked",items.refreshClear);
 });
 
 //新增格式
@@ -116,8 +117,8 @@ $("#OtherAutoClear, #MobileUserAgent, #m3u8dlArg, #copyM3U8, #copyMPD, #copyOthe
     const Option = $(this).attr("id");
     chrome.storage.sync.set({ [Option]: $(this).val() });
 });
-// 调试模式 使用网页标题做文件名 使用PotPlayer预览 显示网站图标
-$("#Debug, #TitleName, #Potplayer, #ShowWebIco, #m3u8dl").bind("click", function () {
+// 调试模式 使用网页标题做文件名 使用PotPlayer预览 显示网站图标 刷新自动清理
+$("#Debug, #TitleName, #Potplayer, #ShowWebIco, #m3u8dl, #refreshClear").bind("click", function () {
     const Option = $(this).attr("id");
     chrome.storage.sync.set({ [Option]: $(this).prop('checked') });
 });
