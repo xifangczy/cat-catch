@@ -3,29 +3,55 @@
     if (document.getElementById("catCatchRecorder")) {
         return;
     }
+    // 添加style
+    const style = document.createElement("style");
+    style.innerHTML = `
+        @keyframes color-change{
+            0% { outline: 4px solid rgb(26, 115, 232); }
+            50% { outline: 4px solid red; }
+            100% { outline: 4px solid rgb(26, 115, 232); }
+        }
+        #catCatchRecorder{
+            font-weight: bold;
+            position: absolute;
+            cursor: move;
+            z-index: 999999999;
+            outline: 4px solid rgb(26, 115, 232);
+            resize: both;
+            overflow: auto;
+            height: 720px;
+            width: 1024px;
+            top: 30%;
+            left: 30%;
+        }
+        #catCatchRecorderHeader{
+            background: rgb(26, 115, 232);
+            color: white;
+            text-align: center;
+            height: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-evenly;
+        }
+        #catCatchRecorderinnerCropArea{
+            height: calc(100% - 20px);
+            width: 100%;
+        }`;
+    document.getElementsByTagName('html')[0].appendChild(style);
+
+    // 添加div
     let cat = document.createElement("div");
     cat.setAttribute("id", "catCatchRecorder");
-    cat.setAttribute("data-switch", "on");
-    cat.innerHTML = `<div id="catCatchRecorderHeader">猫抓 点击开始录制</div><div id="catCatchRecorderinnerCropArea"></div>`;
-    cat.style = `font-weight: bold;
-        position: absolute;
-        cursor: move;
-        z-index: 999999999;
-        outline: 4px solid rgb(26, 115, 232);
-        resize: both;
-        overflow: auto;
-        height: 720px;
-        width: 1024px;
-        top: 30%;
-        left: 30%;`;
-    const catCatchRecorderHeader = cat.querySelector("#catCatchRecorderHeader");
-    catCatchRecorderHeader.style = `background: rgb(26, 115, 232);
-        color: white;
-        text-transform: uppercase;
-        text-align: center;
-        height: 20px;
-        cursor: pointer;`
-    catCatchRecorderHeader.onclick = function () {
+    cat.innerHTML = `<div id="catCatchRecorderHeader">
+            <div id="catCatchRecorderStart">开始录制</div>
+            <div>猫抓网页录制脚本</div>
+            <div id="catCatchRecorderClose">关闭窗口</div>
+        </div>
+    <div id="catCatchRecorderinnerCropArea"></div>`;
+
+    // 事件绑定
+    const catCatchRecorderStart = cat.querySelector("#catCatchRecorderStart");
+    catCatchRecorderStart.onclick = function () {
         if (recorder) {
             recorder.stop();
             return;
@@ -36,8 +62,13 @@
         }
         try { startRecording(); } catch (e) { console.log(e); return; }
     }
+    cat.querySelector("#catCatchRecorderClose").onclick = function () {
+        recorder && recorder.stop();
+        cat.remove();
+        // chrome.runtime.sendMessage(chrome.runtime.id, { Message: "catch" });
+    }
+    // 拖动div
     const catCatchRecorderinnerCropArea = cat.querySelector("#catCatchRecorderinnerCropArea");
-    catCatchRecorderinnerCropArea.style = `height: calc(100% - 20px); width: 100%;`
     catCatchRecorderinnerCropArea.onpointerdown = (e) => {
         let pos1, pos2, pos3, pos4;
         pos3 = e.clientX;
@@ -61,6 +92,7 @@
     }
     document.getElementsByTagName('html')[0].appendChild(cat);
 
+    // 初始化位置
     const video = document.querySelector("video");
     if (video) {
         if (video.clientHeight > 0 && video.clientWidth > 0) {
@@ -77,11 +109,8 @@
     var recorder;
     async function startRecording() {
         const buffer = [];
-        // const option = { mimeType: 'video/webm;codecs=vp8,opus' };
         const option = { mimeType: 'video/webm;codecs=vp9,opus' };
-        // const option = { mimeType: 'video/webm;codecs=h264,opus' };
-        const innerCropArea = cat.querySelector("#catCatchRecorderinnerCropArea");
-        const cropTarget = await CropTarget.fromElement(innerCropArea);
+        const cropTarget = await CropTarget.fromElement(catCatchRecorderinnerCropArea);
         const stream = await navigator.mediaDevices
             .getDisplayMedia({
                 preferCurrentTab: true,
@@ -100,7 +129,8 @@
         recorder.start();
         recorder.onstart = function (e) {
             buffer.slice(0);
-            catCatchRecorderHeader.innerHTML = "猫抓 停止录制";
+            catCatchRecorderStart.innerHTML = "停止录制";
+            cat.style.animation = "color-change 5s infinite";
         }
         recorder.ondataavailable = function (e) {
             buffer.push(e.data);
@@ -115,7 +145,8 @@
             buffer.slice(0);
             stream.getTracks().forEach(track => track.stop());
             recorder = undefined;
-            catCatchRecorderHeader.innerHTML = "猫抓 点击开始录制";
+            catCatchRecorderStart.innerHTML = "开始录制";
+            cat.removeAttribute("style");
         }
     }
     function getElementOffset(el) {

@@ -269,29 +269,27 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // 捕获
     if (Message.Message == "catch") {
-        // 关闭注入 删除列表 刷新页面
+        /* 不需要刷新的脚本 立即注入 */
+        if (!G.scriptList.get(G.injectScript).refresh) {
+            chrome.scripting.executeScript({
+                target: { tabId: Message.tabId, allFrames: true },
+                files: ["js/" + G.injectScript],
+                injectImmediately: true,
+                world: G.scriptList.get(G.injectScript).world
+            });
+            return;
+        }
+        /* 需要刷新页面的脚本 */
+        // 在列表中 删除 并刷新页面
         if (G.featCatchTabId.includes(Message.tabId)) {
             tabIdListRemove("featCatchTabId", Message.tabId);
             chrome.tabs.reload(Message.tabId, { bypassCache: true });
             return;
         }
-        // 打开注入 载入列表
+        // 不在列表中 加入 并刷新页面
         G.featCatchTabId.push(Message.tabId);
         chrome.storage.local.set({ featCatchTabId: G.featCatchTabId });
-        // 脚本需要刷新页面
-        if (G.scriptList.get(G.injectScript).refresh) {
-            chrome.tabs.reload(Message.tabId, { bypassCache: true });
-            return;
-        }
-        // 不需要刷新 立即注入
-        if (G.scriptList.has(G.injectScript)) {
-            chrome.scripting.executeScript({
-                target: { tabId: Message.tabId, allFrames: true },
-                files: ["js/" + G.injectScript],
-                injectImmediately: true,
-                world: "MAIN"
-            });
-        }
+        chrome.tabs.reload(Message.tabId, { bypassCache: true });
         return;
     }
     // Heart Beat
@@ -334,15 +332,13 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (changeInfo.status == "loading") {
         // 开启捕获
         if (G.version >= 102 && G.featCatchTabId && G.featCatchTabId.includes(tabId)) {
-            if (G.scriptList.has(G.injectScript)) {
-                let injectScript = "js/" + G.injectScript;
-                chrome.scripting.executeScript({
-                    target: { tabId: tabId, allFrames: true },
-                    files: [injectScript],
-                    injectImmediately: true,
-                    world: "MAIN"
-                });
-            }
+            let injectScript = "js/" + G.injectScript;
+            chrome.scripting.executeScript({
+                target: { tabId: tabId, allFrames: true },
+                files: [injectScript],
+                injectImmediately: true,
+                world: G.scriptList.get(G.injectScript).world
+            });
         }
         // 模拟手机端 修改 navigator 变量
         if (G.version >= 102 && G.featMobileTabId && G.featMobileTabId.includes(tabId)) {

@@ -356,7 +356,7 @@ $(function () {
             Tips("已关闭自动下载", 500);
         }
         if (state.catch) {
-            $("#Catch").html("停止捕获");
+            $("#Catch").html("关闭捕获");
             $("#Catch").data("switch", "off");
         }
     });
@@ -385,18 +385,8 @@ $(function () {
 
     // 捕获
     $("#Catch").click(function () {
-        const action = $(this).data("switch");
-        if (action == "on") {
-            $("#Catch").html("关闭捕获");
-            $("#Catch").data("switch", "off");
-            $('#Clear').click();
-            chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId, action: action });
-        } else {
-            $("#Catch").html("停止捕获");
-            $("#Catch").data("switch", "on");
-            $('#Clear').click();
-            chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId, action: action });
-        }
+        chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId });
+        $('#Clear').click();
     });
 
     /* 网页视频控制 */
