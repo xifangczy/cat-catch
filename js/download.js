@@ -87,7 +87,7 @@ $(function () {
     }
 
     // 监听提示变化修改网页标题
-    $("#progress, #downFilepProgress").bind("DOMNodeInserted", function (e) {
+    $("#downFilepProgress").bind("DOMNodeInserted", function (e) {
         document.title = e.target.innerHTML;
     });
 
@@ -96,13 +96,15 @@ $(function () {
         if (!downloadDelta.state) { return; }
         if (downloadDelta.state.current == "complete" && downId != 0) {
             $("#downFilepProgress").html("已保存到硬盘, 请查看浏览器已下载内容");
-            $("#progress").html("已保存到硬盘, 请查看浏览器已下载内容");
         }
     });
 
     // 返回上一页
     $("#historyBack").click(function () {
-        if (window.history.length > 1) { window.history.back(); }
+        if (window.history.length > 1) {
+            window.history.back();
+            return;
+        }
         window.location.href = "/download.html";
     });
 
