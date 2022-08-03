@@ -387,12 +387,10 @@ $(function () {
     $("#Catch").click(function () {
         const action = $(this).data("switch");
         if (action == "on") {
-            if (confirm("保存视频缓存数据\n媒体可能会被分成音频和视频,请注意浏览器提示下载多个文件\n是否确认开启？")) {
-                $("#Catch").html("关闭捕获");
-                $("#Catch").data("switch", "off");
-                $('#Clear').click();
-                chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId, action: action });
-            }
+            $("#Catch").html("关闭捕获");
+            $("#Catch").data("switch", "off");
+            $('#Clear').click();
+            chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId, action: action });
         } else {
             $("#Catch").html("停止捕获");
             $("#Catch").data("switch", "on");

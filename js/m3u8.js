@@ -8,7 +8,7 @@ const _title = params.get("title");
 let onCatch = new RegExp("&catch=([^\n&]*)").exec(window.location.href);
 if (onCatch) {
     onCatch = decodeURIComponent(onCatch[1]);
-    if (G.scriptList.includes(onCatch)) {
+    if (G.scriptList.has(onCatch)) {
         onCatch = "js/" + onCatch;
     }
     const script = document.createElement('script');

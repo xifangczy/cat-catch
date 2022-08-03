@@ -50,13 +50,11 @@ function moreFeatFun() {
 }
 
 // 脚本列表
-G.scriptList = ["catch.js", "recorder.js"];
-G.scriptAttr = new Map();
-G.scriptAttr.set("catch.js", { refresh: true, name: "hook脚本(catch.js)" });
-G.scriptAttr.set("recorder.js", { refresh: false, name: "录制脚本(recorder.js)" });
-if(G.version >= 104){
-    G.scriptList.push("recorder2.js");
-    G.scriptAttr.set("recorder2.js", { refresh: false, name: "录制脚本(recorder2.js)" });
+G.scriptList = new Map();
+G.scriptList.set("catch.js", { refresh: true, name: "hook脚本(catch.js)" });
+G.scriptList.set("recorder.js", { refresh: false, name: "录制脚本(recorder.js)" });
+if (G.version >= 104) {
+    G.scriptList.set("recorder2.js", { refresh: false, name: "录制脚本(recorder2.js)" });
 }
 
 // Init

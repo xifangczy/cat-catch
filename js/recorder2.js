@@ -85,7 +85,9 @@
         const stream = await navigator.mediaDevices
             .getDisplayMedia({
                 preferCurrentTab: true,
-                video: true,
+                video: {
+                    cursor: "never"
+                },
                 audio: {
                     sampleRate: 44100,
                     sampleSize: 16,

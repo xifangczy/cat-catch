@@ -279,12 +279,12 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         G.featCatchTabId.push(Message.tabId);
         chrome.storage.local.set({ featCatchTabId: G.featCatchTabId });
         // 脚本需要刷新页面
-        if (G.scriptAttr.get(G.injectScript).refresh) {
+        if (G.scriptList.get(G.injectScript).refresh) {
             chrome.tabs.reload(Message.tabId, { bypassCache: true });
             return;
         }
         // 不需要刷新 立即注入
-        if (G.scriptList.includes(G.injectScript)) {
+        if (G.scriptList.has(G.injectScript)) {
             chrome.scripting.executeScript({
                 target: { tabId: Message.tabId, allFrames: true },
                 files: ["js/" + G.injectScript],
@@ -334,7 +334,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (changeInfo.status == "loading") {
         // 开启捕获
         if (G.version >= 102 && G.featCatchTabId && G.featCatchTabId.includes(tabId)) {
-            if (G.scriptList.includes(G.injectScript)) {
+            if (G.scriptList.has(G.injectScript)) {
                 let injectScript = "js/" + G.injectScript;
                 chrome.scripting.executeScript({
                     target: { tabId: tabId, allFrames: true },

@@ -24,7 +24,7 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
     $("#copyMPD").val(items.copyMPD);
     $("#copyOther").val(items.copyOther);
     // 注入脚本列表
-    G.scriptAttr.forEach(function (item, key) {
+    G.scriptList.forEach(function (item, key) {
         $("#injectScript").append(`<option value="${key}">${item.name}</option>`);
     });
     $("#injectScript").val(items.injectScript);
@@ -107,7 +107,7 @@ function Gethtml(Type, Param = new Object()) {
 $("#injectScript").change(function () {
     const Option = $(this).attr("id");
     const Value = $(this).val();
-    if (G.scriptList.includes(Value)) {
+    if (G.scriptList.has(Value)) {
         chrome.storage.sync.set({ [Option]: Value });
     }
 });
