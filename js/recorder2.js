@@ -18,11 +18,13 @@
             z-index: 999999999;
             outline: 4px solid rgb(26, 115, 232);
             resize: both;
-            overflow: auto;
+            overflow: hidden;
             height: 720px;
             width: 1024px;
             top: 30%;
             left: 30%;
+            pointer-events: none;
+            font-size: 10px;
         }
         #catCatchRecorderHeader{
             background: rgb(26, 115, 232);
@@ -32,6 +34,13 @@
             cursor: pointer;
             display: flex;
             justify-content: space-evenly;
+            align-items: center;
+            pointer-events: auto;
+        }
+        #catCatchRecorderTitle{
+            cursor: move;
+            user-select: none;
+            width: 66%;
         }
         #catCatchRecorderinnerCropArea{
             height: calc(100% - 20px);
@@ -42,12 +51,12 @@
     // 添加div
     let cat = document.createElement("div");
     cat.setAttribute("id", "catCatchRecorder");
-    cat.innerHTML = `<div id="catCatchRecorderHeader">
+    cat.innerHTML = `<div id="catCatchRecorderinnerCropArea"></div>
+        <div id="catCatchRecorderHeader">
             <div id="catCatchRecorderStart">开始录制</div>
-            <div>猫抓网页录制脚本</div>
+            <div id="catCatchRecorderTitle">拖动窗口</div>
             <div id="catCatchRecorderClose">关闭窗口</div>
-        </div>
-    <div id="catCatchRecorderinnerCropArea"></div>`;
+        </div>`;
 
     // 事件绑定
     const catCatchRecorderStart = cat.querySelector("#catCatchRecorderStart");
@@ -65,11 +74,11 @@
     cat.querySelector("#catCatchRecorderClose").onclick = function () {
         recorder && recorder.stop();
         cat.remove();
-        // chrome.runtime.sendMessage(chrome.runtime.id, { Message: "catch" });
     }
+
     // 拖动div
     const catCatchRecorderinnerCropArea = cat.querySelector("#catCatchRecorderinnerCropArea");
-    catCatchRecorderinnerCropArea.onpointerdown = (e) => {
+    cat.querySelector("#catCatchRecorderTitle").onpointerdown = (e) => {
         let pos1, pos2, pos3, pos4;
         pos3 = e.clientX;
         pos4 = e.clientY;
@@ -101,11 +110,12 @@
         }
         const videoOffset = getElementOffset(video);
         if (videoOffset.top > 0 && videoOffset.left > 0) {
-            cat.style.top = videoOffset.top - 20 + "px";
+            cat.style.top = videoOffset.top + "px";
             cat.style.left = videoOffset.left + "px";
         }
     }
 
+    // 录制
     var recorder;
     async function startRecording() {
         const buffer = [];
