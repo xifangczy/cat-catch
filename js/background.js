@@ -217,6 +217,13 @@ function findMedia(data, isRegex = false, filter = false) {
 
 //监听来自popup 和 options的请求
 chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
+    if (G.featMobileTabId === undefined ||
+        G.featCatchTabId === undefined ||
+        G.featAutoDownTabId === undefined
+    ) {
+        sendResponse("error");
+        return;
+    }
     // 图标设置
     if (Message.Message == "ClearIcon") {
         if (Message.tabId == undefined || Message.tabId == "-1") {
@@ -262,13 +269,29 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // 捕获
     if (Message.Message == "catch") {
+        // 关闭注入 删除列表 刷新页面
         if (G.featCatchTabId.includes(Message.tabId)) {
             tabIdListRemove("featCatchTabId", Message.tabId);
-        } else {
-            G.featCatchTabId.push(Message.tabId);
-            chrome.storage.local.set({ featCatchTabId: G.featCatchTabId });
+            chrome.tabs.reload(Message.tabId, { bypassCache: true });
+            return;
         }
-        chrome.tabs.reload(Message.tabId, { bypassCache: true });
+        // 打开注入 载入列表
+        G.featCatchTabId.push(Message.tabId);
+        chrome.storage.local.set({ featCatchTabId: G.featCatchTabId });
+        // 脚本需要刷新页面
+        if (G.scriptAttr.get(G.injectScript).refresh) {
+            chrome.tabs.reload(Message.tabId, { bypassCache: true });
+            return;
+        }
+        // 不需要刷新 立即注入
+        if (G.scriptList.includes(G.injectScript)) {
+            chrome.scripting.executeScript({
+                target: { tabId: Message.tabId, allFrames: true },
+                files: ["js/" + G.injectScript],
+                injectImmediately: true,
+                world: "MAIN"
+            });
+        }
         return;
     }
     // Heart Beat
@@ -310,17 +333,19 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
     if (changeInfo.status == "loading") {
         // 开启捕获
-        if (G.moreFeat && G.featCatchTabId && G.featCatchTabId.includes(tabId)) {
-            const injectScript = G.injectScript == "catch.js" ? "js/catch.js" : "js/recorder.js";     // Security
-            chrome.scripting.executeScript({
-                target: { tabId: tabId, allFrames: true },
-                files: [injectScript],
-                injectImmediately: true,
-                world: "MAIN"
-            });
+        if (G.version >= 102 && G.featCatchTabId && G.featCatchTabId.includes(tabId)) {
+            if (G.scriptList.includes(G.injectScript)) {
+                let injectScript = "js/" + G.injectScript;
+                chrome.scripting.executeScript({
+                    target: { tabId: tabId, allFrames: true },
+                    files: [injectScript],
+                    injectImmediately: true,
+                    world: "MAIN"
+                });
+            }
         }
         // 模拟手机端 修改 navigator 变量
-        if (G.moreFeat && G.featMobileTabId && G.featMobileTabId.includes(tabId)) {
+        if (G.version >= 102 && G.featMobileTabId && G.featMobileTabId.includes(tabId)) {
             chrome.scripting.executeScript({
                 args: [G.MobileUserAgent.toString()],
                 target: { tabId: tabId, allFrames: true },
@@ -344,7 +369,7 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
     // 清理 自动下载
     tabIdListRemove("featAutoDownTabId", tabId);
     // 清理 捕获
-    G.moreFeat && tabIdListRemove("featCatchTabId", tabId);
+    G.version >= 102 && tabIdListRemove("featCatchTabId", tabId);
 });
 
 //检查扩展名以及大小限制

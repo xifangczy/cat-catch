@@ -36,17 +36,27 @@ G.TabIdList = [
 
 // 102版本以上 非Firefox 开启更多功能
 G.isFirefox = false;
-G.moreFeat = moreFeatFun();
+G.version = moreFeatFun();
 function moreFeatFun() {
     if (navigator.userAgent.includes("Firefox/")) {
         G.isFirefox = true;
         return false;
     }
     const version = navigator.userAgent.match(/Chrome\/([\d]+)/);
-    if (version && version[1] >= 102) {
-        return true;
+    if (version && version[1]) {
+        return parseInt(version[1]);
     }
     return false;
+}
+
+// 脚本列表
+G.scriptList = ["catch.js", "recorder.js"];
+G.scriptAttr = new Map();
+G.scriptAttr.set("catch.js", { refresh: true, name: "hook脚本(catch.js)" });
+G.scriptAttr.set("recorder.js", { refresh: false, name: "录制脚本(recorder.js)" });
+if(G.version >= 104){
+    G.scriptList.push("recorder2.js");
+    G.scriptAttr.set("recorder2.js", { refresh: false, name: "录制脚本(recorder2.js)" });
 }
 
 // Init
@@ -222,7 +232,7 @@ function stringModify(str) {
     });
 }
 // Firefox download API 无法下载 data URL
-function downloadDataURL(url, filename){
+function downloadDataURL(url, filename) {
     const link = document.createElement("a");
     link.href = url;
     link.download = filename;

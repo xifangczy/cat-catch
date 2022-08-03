@@ -1,4 +1,4 @@
-window.onload = function () {
+(function () {
     console.log("recorder.js Start");
     if (document.getElementById("catCatchRecorder")) {
         return;
@@ -132,4 +132,4 @@ window.onload = function () {
         cat.innerHTML = `${icon}录制失败<br>详情看控制台信息`;
         console.log(event);
     };
-}
+})();

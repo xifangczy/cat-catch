@@ -20,10 +20,14 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
     $("#MobileUserAgent").val(items.MobileUserAgent);
     $("#m3u8dl").attr("checked", items.m3u8dl);
     $("#m3u8dlArg").val(items.m3u8dlArg);
-    $("#injectScript").val(items.injectScript);
     $("#copyM3U8").val(items.copyM3U8);
     $("#copyMPD").val(items.copyMPD);
     $("#copyOther").val(items.copyOther);
+    // 注入脚本列表
+    G.scriptAttr.forEach(function (item, key) {
+        $("#injectScript").append(`<option value="${key}">${item.name}</option>`);
+    });
+    $("#injectScript").val(items.injectScript);
 });
 
 //新增格式
@@ -103,7 +107,7 @@ function Gethtml(Type, Param = new Object()) {
 $("#injectScript").change(function () {
     const Option = $(this).attr("id");
     const Value = $(this).val();
-    if (Value == "catch.js" || Value == "recorder.js") {
+    if (G.scriptList.includes(Value)) {
         chrome.storage.sync.set({ [Option]: Value });
     }
 });
@@ -216,7 +220,7 @@ $("#exportOptions").bind("click", function () {
         ExportData = "data:application/json;charset=utf-8," + encodeURIComponent(ExportData);
         let date = new Date();
         const filename = `cat-catch-${chrome.runtime.getManifest().version}-${date.getFullYear()}-${date.getMonth()}-${date.getDay()}-${date.getTime()}.json`;
-        if(G.isFirefox){
+        if (G.isFirefox) {
             downloadDataURL(ExportData, filename);
             return;
         }
@@ -229,7 +233,7 @@ $("#exportOptions").bind("click", function () {
 //导入配置
 $("#importOptionsFile").change(function () {
     let fileReader = new FileReader();
-    fileReader.onload = function(){
+    fileReader.onload = function () {
         let importData = this.result;
         try {
             importData = JSON.parse(importData);

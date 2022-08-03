@@ -495,7 +495,7 @@ $(function () {
         let speed = parseFloat($(this).val());
         speed = event.originalEvent.wheelDelta < 0 ? speed - 0.1 : speed + 0.1;
         speed = parseFloat(speed.toFixed(1));
-        if(speed < 0.1 || speed > 16) { return false; }
+        if (speed < 0.1 || speed > 16) { return false; }
         $(this).val(speed);
         return false;
     });
@@ -571,7 +571,7 @@ $(function () {
     /* 网页视频控制END */
 
     //102以上开启捕获按钮
-    if (G.moreFeat) {
+    if (G.version >= 102) {
         $("#Catch").show();
     }
     // Firefox 关闭画中画 全屏 修复右边滚动条遮挡
