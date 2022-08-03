@@ -330,6 +330,20 @@ textarea {
 #next_m3u8 a{
   word-break: break-all;
 }
+.key{
+  display: flex;
+}
+.key div{
+  display: flex;
+  flex-direction: column;
+  margin-right: 10px;
+}
+.key input{
+  width: 388px !important;
+}
+.method input{
+  width: 140px !important;
+}
 
 /* JSON格式化 */
 .json-document {

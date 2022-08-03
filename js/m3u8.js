@@ -8,7 +8,9 @@ const _title = params.get("title");
 let onCatch = new RegExp("&catch=([^\n&]*)").exec(window.location.href);
 if (onCatch) {
     onCatch = decodeURIComponent(onCatch[1]);
-    onCatch = onCatch == "catch.js" ? "js/catch.js" : "js/recorder.js";  // Security
+    if (G.scriptList.includes(onCatch)) {
+        onCatch = "js/" + onCatch;
+    }
     const script = document.createElement('script');
     script.src = onCatch;
     document.head.appendChild(script);
@@ -108,6 +110,16 @@ $(function () {
                 $("#more_audio").show();
                 more = true;
                 for (let item of data.audioTracks) {
+                    // 音频信息没有m3u8文件 使用groupId去寻找
+                    if(item.url == ""){
+                        let groupId = item.groupId;
+                        for(let item2 of data.levels){
+                            if(item2.audioGroupIds.includes(groupId)){
+                                item.url = item2.uri;
+                                break;
+                            }
+                        }
+                    }
                     const url = encodeURIComponent(item.url);
                     const referer = encodeURIComponent(_referer);
                     const title = _title ? encodeURIComponent(_title) : "";
@@ -230,6 +242,9 @@ $(function () {
             $("#count").html("直播HLS");
         }
         isEncrypted && $("#count").html($("#count").html() + " (加密HLS)");
+        if(_m3u8Content.includes("#EXT-X-KEY:METHOD=SAMPLE-AES-CTR")) {
+            $("#count").html($("#count").html() + ' <b>使用SAMPLE-AES-CTR加密的资源, 目前无法处理.</b>');
+        }
         // 范围下载所需数据
         $("#rangeStart").attr("max", _fragments.length);
         $("#rangeEnd").attr("max", _fragments.length);
@@ -237,11 +252,15 @@ $(function () {
         $("#rangeEnd").val(_fragments.length);
     }
     function showKeyInfo(buffer, decryptdata, i) {
-        decryptdata.method && $("#tips").append('加密算法(Method): <input type="text" value="' + decryptdata.method + '" spellcheck="false" readonly="readonly">');
         $("#tips").append('密钥地址(KeyURL): <input type="text" value="' + decryptdata.uri + '" spellcheck="false" readonly="readonly">');
         if (buffer) {
-            $("#tips").append('密钥(Hex): <input type="text" value="' + ArrayBufferToHexString(buffer) + '" spellcheck="false" readonly="readonly">');
-            $("#tips").append('密钥(Base64): <input type="text" value="' + ArrayBufferToBase64(buffer) + '" spellcheck="false" readonly="readonly">');
+            $("#tips").append(`
+                <div class="key">
+                    <div class="method">加密算法(Method): <input type="text" value="${decryptdata.method ? decryptdata.method : "NONE"}" spellcheck="false" readonly="readonly"></div>
+                    <div>密钥(Hex): <input type="text" value="${ArrayBufferToHexString(buffer)}" spellcheck="false" readonly="readonly"></div>
+                    <div>密钥(Base64): <input type="text" value="${ArrayBufferToBase64(buffer)}" spellcheck="false" readonly="readonly"></div>
+                </div>
+            `);
         } else {
             $("#tips").append('密钥(Key): <input type="text" value="密钥下载失败" spellcheck="false" readonly="readonly">');
         }
@@ -253,6 +272,7 @@ $(function () {
             iv = "0x" + ArrayBufferToHexString(decryptdata.iv.buffer);
             $("#tips").append('偏移量(IV): <input type="text" value="' + iv + '" spellcheck="false" readonly="readonly">');
         }
+        // $("#tips").append("<div class=\"line\"></div>");
     }
     /**************************** 监听 / 按钮绑定 ****************************/
     // 监听下载事件 修改提示
@@ -264,11 +284,7 @@ $(function () {
     });
     // 打开目录
     $(".openDir").click(function () {
-        if (downId) {
-            chrome.downloads.show(downId);
-            return;
-        }
-        chrome.downloads.showDefaultFolder();
+        downId ? chrome.downloads.show(downId) : chrome.downloads.showDefaultFolder();
     });
     // 下载显示的内容
     $("#downText").click(function () {
@@ -369,8 +385,14 @@ $(function () {
         const rangeEnd = $("#rangeEnd").val();  // 结束序列号
         m3u8dlArg += ` --downloadRange "${rangeStart}-${rangeEnd}"`
 
-        const customKey = $("#customKey").val();  // 自定义密钥
-        m3u8dlArg += customKey ? ` --useKeyBase64 "${customKey}"` : "";
+        let customKey = $("#customKey").val().trim();  // 自定义密钥
+        if(customKey){
+            if(isHexKey(customKey)){
+                customKey = HexStringToArrayBuffer(customKey);
+                customKey = ArrayBufferToBase64(customKey);
+            }
+            m3u8dlArg += ` --useKeyBase64 "${customKey}"`;
+        }
 
         const customIV = $("#customIV").val();  // 自定义IV
         m3u8dlArg += customIV ? ` --useKeyIV "${customIV}"` : "";
@@ -407,8 +429,7 @@ $(function () {
                 $("#progress").html(`<b>Key文件不正确</b>`);
                 return;
             }
-            $("#customKeyHex").val(ArrayBufferToHexString(this.result));
-            $("#customKeyBase64").val(ArrayBufferToBase64(this.result));
+            $("#customKey").val(ArrayBufferToBase64(this.result));
         };
         let file = $("#uploadKeyFile").prop('files')[0];
         fileReader.readAsArrayBuffer(file);
@@ -420,7 +441,6 @@ $(function () {
     $("#recorder").click(function () {
         if ($(this).data("switch") == "on") {
             initDownload(); // 初始化下载变量
-            // downloadTs(_fragments.length - 1, _fragments.length - 1);
             recorder = true;
             $(this).html("下载录制").addClass("button2").data("switch", "off");
             return;
@@ -449,22 +469,15 @@ $(function () {
         }
 
         /* 设定自定义密钥和IV */
-        let customKeyBase64 = $("#customKeyBase64").val();
-        if (customKeyBase64) {
-            customKeyBase64 = Base64ToArrayBuffer(customKeyBase64); // Base64 转 ArrayBuffer
+        let customKey = $("#customKey").val().trim();
+        if(customKey){
+            customKey = isHexKey(customKey) ? HexStringToArrayBuffer(customKey) : Base64ToArrayBuffer(customKey);
             keyContent.forEach(function (value, key) {
-                keyContent.set(key, customKeyBase64);
-            });
-        }
-        let customKeyHex = $("#customKeyHex").val();
-        if (customKeyHex) {
-            customKeyHex = HexStringToArrayBuffer(customKeyHex); // 16进制字符串 转 ArrayBuffer
-            keyContent.forEach(function (value, key) {
-                keyContent.set(key, customKeyHex);
+                keyContent.set(key, customKey);
             });
         }
         // 自定义IV
-        let customIV = $("#customIV").val();
+        let customIV = $("#customIV").val().trim();
         if (customIV) {
             customIV = StringToUint8Array(customIV);
             for (let i in _fragments) {
@@ -499,7 +512,7 @@ $(function () {
                 clearInterval(tsInterval);
                 // 错误列表为0 下载完成
                 if (errorTsList.length == 0) {
-                    $("ForceDownload").hide();
+                    $("#ForceDownload").hide();
                     $("#errorTsList").hide();
                     !recorder && mergeTs();  // 合并下载
                     return;
@@ -539,9 +552,14 @@ $(function () {
                         tsBuffer[currentIndex] = responseData;
                     }
                     fileSize += responseData.byteLength;
-                    downDuration += _fragments[currentIndex].duration;
                     $("#fileSize").html("已下载:" + byteToSize(fileSize));
-                    progressAdd(++downCurrentTs, downTotalTs);
+                    downDuration += _fragments[currentIndex].duration;
+                    downCurrentTs++;
+                    if (downCurrentTs == downTotalTs) {
+                        $("#progress").html($("#mp4").prop("checked") ? `数据正在转换格式...` : `数据正在合并...`);
+                        return;
+                    }
+                    $("#progress").html(`${downCurrentTs}/${downTotalTs}`);
                 }).always(function () {
                     tsThread++;
                 });
@@ -567,7 +585,7 @@ $(function () {
         downState = true;
         let fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });
         let ext = "ts";
-        /* 在初始化切片 可能是fMP4 获取初始化切片的后缀 */
+        /* 有初始化切片 可能是fMP4 获取初始化切片的后缀 */
         if(_fragments[0].initSegment) {
             let name = _fragments[0].initSegment.url.split("/").pop();
             name = name.split("?")[0];
@@ -641,14 +659,6 @@ $(function () {
         downCurrentTs = 0;  // 当前进度
     }
 });
-// 进度
-function progressAdd(downCurrentTs, downTotalTs) {
-    if (downCurrentTs == downTotalTs) {
-        $("#progress").html($("#mp4").prop("checked") ? `数据正在转换格式...` : `数据正在合并...`);
-        return;
-    }
-    $("#progress").html(`${downCurrentTs}/${downTotalTs}`);
-}
 // 写入ts链接
 function writeText(text) {
     if (typeof text == "object") {
@@ -788,4 +798,7 @@ function fixFileDuration(data, duration) {
         }
     }
     return data;
+}
+function isHexKey(str) {
+    return /[0-9a-fA-F]{32}/.test(str);
 }

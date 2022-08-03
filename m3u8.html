@@ -71,15 +71,14 @@
             <button id="copyM3U8dl">复制m3u8DL命令参数</button>
             <div class="line"></div>
             <div class="merge customKey">
-              <input type="text" id="customKeyBase64" spellcheck="false" placeholder="自定义密钥 base64" size="37"/>
-              <input type="text" id="customKeyHex" spellcheck="false" placeholder="自定义密钥 Hex" size="37"/>
-              <button id="uploadKey" class="button2">上传Key</button>
+              <input type="text" id="customKey" spellcheck="false" placeholder="自定义 密钥 16进制 或 base64" size="66"/>
+              <input type="text" id="customIV" spellcheck="false" placeholder="自定义 偏移量 IV" size="35"/>
+              <button id="uploadKey">上传Key</button>
               <input id="uploadKeyFile" type="file" class="hide" />
-              <input type="text" id="customIV" spellcheck="false" placeholder="自定义 IV" size="35"/>
             </div>
             <div class="merge">
-              <div id="threadDiv" class="themeColor">下载线程数 <input type="number" value="32" id="thread" spellcheck="false" style="width: 35px;" step="1" min="1" max="128"/></div>
-              <div class="mp4div themeColor">转换mp4格式<input type="checkbox" id="mp4"></div>
+              <div id="threadDiv" class="themeColor">下载线程数 <input type="number" value="32" id="thread" spellcheck="false" style="width: 35px;" step="1" min="1" max="256"/></div>
+              <div class="mp4div themeColor">mp4格式<input type="checkbox" id="mp4"></div>
               <div class="skipDecryptDiv themeColor">跳过解密<input type="checkbox" id="skipDecrypt"></div>
               <div class="rangeDown themeColor">
                 下载范围
