@@ -63,11 +63,15 @@
 
     const video = document.querySelector("video");
     if (video) {
-        cat.style.height = video.clientHeight + 20 + "px";
-        cat.style.width = video.clientWidth + "px";
+        if (video.clientHeight > 0 && video.clientWidth > 0) {
+            cat.style.height = video.clientHeight + 20 + "px";
+            cat.style.width = video.clientWidth + "px";
+        }
         const videoOffset = getElementOffset(video);
-        cat.style.top = videoOffset.top - 20 + "px";
-        cat.style.left = videoOffset.left + "px";
+        if (videoOffset.top > 0 && videoOffset.left > 0) {
+            cat.style.top = videoOffset.top - 20 + "px";
+            cat.style.left = videoOffset.left + "px";
+        }
     }
 
     var recorder;
