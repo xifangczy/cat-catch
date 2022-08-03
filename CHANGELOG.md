@@ -4,7 +4,7 @@
 
 [Added] m3u8解析器增加处理EXT-X-MAP标签
 
-[Added] 增加一个新玩具 recorder2.js 需要Chromium 104以上版本
+[Added] 增加一个新注入脚本 recorder2.js 需要Chromium 104以上版本
 
 [Fixed] 修正 m3u8解析器使用mp4转码生成的文件，媒体时长信息不正确
 ### 2.2.2
