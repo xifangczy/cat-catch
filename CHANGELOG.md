@@ -4,7 +4,7 @@
 
 [Added] m3u8解析器增加处理EXT-X-MAP标签
 
-[Added] 增加一个新注入脚本 recorder2.js 需要Chromium 104以上版本
+[Added] 新增捕获脚本 recorder2.js 需要Chromium 104以上版本
 
 [Added] 增加选项 刷新/载入新页面当前标签的数据是否清空
 
