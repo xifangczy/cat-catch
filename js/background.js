@@ -270,12 +270,13 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     // 捕获
     if (Message.Message == "catch") {
         /* 不需要刷新的脚本 立即注入 */
-        if (!G.scriptList.get(G.injectScript).refresh) {
+        let script = G.scriptList.get(G.injectScript);
+        if (!script.refresh) {
             chrome.scripting.executeScript({
-                target: { tabId: Message.tabId, allFrames: true },
+                target: { tabId: Message.tabId, allFrames: script.allFrames },
                 files: ["js/" + G.injectScript],
                 injectImmediately: true,
-                world: G.scriptList.get(G.injectScript).world
+                world: script.world
             });
             return;
         }
@@ -325,22 +326,22 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
             delete cacheData[tabId];
             chrome.storage.local.set({ MediaData: cacheData });
             SetIcon({ tabId: tabId });
-        } else {
+        } else if (cacheData[G.tabId] !== undefined) {
             SetIcon({ number: cacheData[G.tabId].length, tabId: tabId });
         }
-    }
-    // 跳过特殊页面
-    if (isSpecialPage(tab.url) || tabId == 0 || tabId == -1) { return; }
 
-    if (changeInfo.status == "loading") {
+        // 跳过特殊页面
+        if (isSpecialPage(tab.url) || tabId == 0 || tabId == -1) { return; }
+
         // 开启捕获
         if (G.version >= 102 && G.featCatchTabId && G.featCatchTabId.includes(tabId)) {
+            let script = G.scriptList.get(G.injectScript);
             let injectScript = "js/" + G.injectScript;
             chrome.scripting.executeScript({
-                target: { tabId: tabId, allFrames: true },
+                target: { tabId: tabId, allFrames: script.allFrames },
                 files: [injectScript],
                 injectImmediately: true,
-                world: G.scriptList.get(G.injectScript).world
+                world: script.world
             });
         }
         // 模拟手机端 修改 navigator 变量

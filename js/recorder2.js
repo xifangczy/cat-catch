@@ -3,6 +3,10 @@
     if (document.getElementById("catCatchRecorder")) {
         return;
     }
+    if (!navigator.mediaDevices) {
+        alert("当前网页不支持屏幕分享");
+        return;
+    }
     // 添加style
     const style = document.createElement("style");
     style.innerHTML = `
@@ -45,6 +49,9 @@
         #catCatchRecorderinnerCropArea{
             height: calc(100% - 20px);
             width: 100%;
+        }
+        .animation{
+            animation: color-change 5s infinite;
         }`;
     document.getElementsByTagName('html')[0].appendChild(style);
 
@@ -63,10 +70,6 @@
     catCatchRecorderStart.onclick = function () {
         if (recorder) {
             recorder.stop();
-            return;
-        }
-        if (!navigator.mediaDevices) {
-            alert("当前网页不支持屏幕分享");
             return;
         }
         try { startRecording(); } catch (e) { console.log(e); return; }
@@ -145,7 +148,7 @@
         recorder.onstart = function (e) {
             buffer.slice(0);
             catCatchRecorderStart.innerHTML = "停止录制";
-            cat.style.animation = "color-change 5s infinite";
+            cat.classList.add("animation");
         }
         recorder.ondataavailable = function (e) {
             buffer.push(e.data);
@@ -161,7 +164,7 @@
             stream.getTracks().forEach(track => track.stop());
             recorder = undefined;
             catCatchRecorderStart.innerHTML = "开始录制";
-            cat.removeAttribute("style");
+            cat.classList.remove("animation");
         }
     }
     function getElementOffset(el) {
