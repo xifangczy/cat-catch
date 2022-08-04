@@ -119,13 +119,13 @@
     var recorder;
     async function startRecording() {
         const buffer = [];
-        let option;
-        if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')) {
+        let option = { mimeType: 'video/webm;codecs=vp8,opus' };
+        if (MediaRecorder.isTypeSupported('video/webm;codecs=avc1')) {
+            option = { mimeType: 'video/webm;codecs=av1' };
+        } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')) {
             option = { mimeType: 'video/webm;codecs=vp9,opus' };
-        } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')) {
-            option = { mimeType: 'video/webm;codecs=vp8,opus' };
-        } else if (MediaRecorder.isTypeSupported('video/webm;codecs=h264,opus')) {
-            option = { mimeType: 'video/webm;codecs=h264,opus' };
+        } else if (MediaRecorder.isTypeSupported('video/webm;codecs=h264')) {
+            option = { mimeType: 'video/webm;codecs=h264' };
         }
         const cropTarget = await CropTarget.fromElement(catCatchRecorderinnerCropArea);
         const stream = await navigator.mediaDevices
