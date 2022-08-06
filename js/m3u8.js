@@ -1,6 +1,6 @@
 // url 参数解析
 const params = new URL(location.href).searchParams;
-const _m3u8Url = params.get("url");
+var _m3u8Url = params.get("url");
 const _referer = params.get("referer");
 const _title = params.get("title");
 
@@ -31,8 +31,6 @@ $(function () {
     if (_m3u8Arg) {
         _m3u8Arg = _m3u8Arg[1];
     }
-    // 填充m3u8 url到页面
-    $("#m3u8_url").attr("href", _m3u8Url).html(_m3u8Url);
     var _m3u8Content;   // 储存m3u8文件内容
     /* m3u8 解析工具 */
     const hls = new Hls();  // hls.js 对象
@@ -53,7 +51,7 @@ $(function () {
     var downTotalTs = 0;  // 需要下载的文件数量
     const tsBuffer = []; // ts内容缓存
     const errorTsList = []; // 下载错误ts序号列表
-    var recorder = false; // 是否开启录像
+    var recorder = false; // 录制直播 开关
 
     // 如果存在Referer修改当前标签下的所有xhr的Referer
     chrome.tabs.getCurrent(function (tabs) {
@@ -77,12 +75,41 @@ $(function () {
                 }]
             });
         }
+        if (isEmpty(_m3u8Url)) {
+            $("#loading").hide(); $("#m3u8Custom").show();
+            $("#parse").click(function () {
+                let m3u8Text = $("#m3u8Text").val();
+                let baseUrl = $("#baseUrl").val();
+                // 加入baseUrl
+                if (baseUrl != "") {
+                    let m3u8_split = m3u8Text.split("\n");
+                    m3u8Text = "";
+                    for (let line of m3u8_split) {
+                        if (line.includes("URI=")) {
+                            let KeyURL = /URI="(.*)"/.exec(line);
+                            if (KeyURL && KeyURL[1] && !/^[\w]+:.+/i.test(KeyURL[1])) {
+                                line = line.replace(/URI="(.*)"/, 'URI="' + baseUrl + KeyURL[1] + '"');
+                            }
+                        }
+                        if (!line.includes("#") && !/^[\w]+:.+/i.test(line)) {
+                            line = baseUrl + line;
+                        }
+                        m3u8Text += line + "\n";
+                    }
+                }
+                _m3u8Url = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(m3u8Text)]));
+                parseM3U8();
+                $("#m3u8Custom").hide();
+            });
+            return;
+        }
         // 开始解析
         parseM3U8();
     });
 
     /* 解析函数 使用hls解析好的数据 进一步处理 */
     function parseM3U8() {
+        $("#m3u8_url").attr("href", _m3u8Url).html(_m3u8Url);
         hls.loadSource(_m3u8Url);    // 载入m3u8 url
         // 等待m3u8解析完成 获得解析的数据
         hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
@@ -111,10 +138,10 @@ $(function () {
                 more = true;
                 for (let item of data.audioTracks) {
                     // 音频信息没有m3u8文件 使用groupId去寻找
-                    if(item.url == ""){
+                    if (item.url == "") {
                         let groupId = item.groupId;
-                        for(let item2 of data.levels){
-                            if(item2.audioGroupIds.includes(groupId)){
+                        for (let item2 of data.levels) {
+                            if (item2.audioGroupIds.includes(groupId)) {
                                 item.url = item2.uri;
                                 break;
                             }
@@ -171,7 +198,8 @@ $(function () {
         // console.log(data);
         let isEncrypted = false;
         _fragments.splice(0);   // 清空 防止直播HLS无限添加
-        _m3u8Content = data.m3u8;   // m3u8文件内容
+        /* 获取 m3u8文件原始内容 MANIFEST_PARSED也能获取但偶尔会为空(BUG?) 放在LEVEL_LOADED获取更安全*/
+        _m3u8Content = data.m3u8;
         for (let i in data.fragments) {
             /* 
             * 少部分网站下载ts必须带有参数才能正常下载
@@ -242,7 +270,7 @@ $(function () {
             $("#count").html("直播HLS");
         }
         isEncrypted && $("#count").html($("#count").html() + " (加密HLS)");
-        if(_m3u8Content.includes("#EXT-X-KEY:METHOD=SAMPLE-AES-CTR")) {
+        if (_m3u8Content.includes("#EXT-X-KEY:METHOD=SAMPLE-AES-CTR")) {
             $("#count").html($("#count").html() + ' <b>使用SAMPLE-AES-CTR加密的资源, 目前无法处理.</b>');
         }
         // 范围下载所需数据
@@ -339,7 +367,7 @@ $(function () {
         if ($(this).data("switch") == "on") {
             $("#video").show();
             hls.attachMedia($("#video")[0]);
-            $("textarea").hide();
+            $("#media_file").hide();
             $(this).html("关闭播放").data("switch", "off");
             hls.on(Hls.Events.MEDIA_ATTACHED, function () {
                 video.play();
@@ -348,7 +376,7 @@ $(function () {
         }
         $("#video").hide();
         hls.detachMedia($("#video")[0]);
-        $("textarea").show();
+        $("#media_file").show();
         $(this).html("播放m3u8").data("switch", "on");
     });
     // 开启/关闭捕获
@@ -386,8 +414,8 @@ $(function () {
         m3u8dlArg += ` --downloadRange "${rangeStart}-${rangeEnd}"`
 
         let customKey = $("#customKey").val().trim();  // 自定义密钥
-        if(customKey){
-            if(isHexKey(customKey)){
+        if (customKey) {
+            if (isHexKey(customKey)) {
                 customKey = HexStringToArrayBuffer(customKey);
                 customKey = ArrayBufferToBase64(customKey);
             }
@@ -443,6 +471,7 @@ $(function () {
             initDownload(); // 初始化下载变量
             recorder = true;
             $(this).html("下载录制").addClass("button2").data("switch", "off");
+            $("#progress").html(`等待直播数据中...`);
             return;
         }
         recorder = false;
@@ -470,7 +499,7 @@ $(function () {
 
         /* 设定自定义密钥和IV */
         let customKey = $("#customKey").val().trim();
-        if(customKey){
+        if (customKey) {
             customKey = isHexKey(customKey) ? HexStringToArrayBuffer(customKey) : Base64ToArrayBuffer(customKey);
             keyContent.forEach(function (value, key) {
                 keyContent.set(key, customKey);
@@ -586,7 +615,7 @@ $(function () {
         let fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });
         let ext = "ts";
         /* 有初始化切片 可能是fMP4 获取初始化切片的后缀 */
-        if(_fragments[0].initSegment) {
+        if (_fragments[0].initSegment) {
             let name = _fragments[0].initSegment.url.split("/").pop();
             name = name.split("?")[0];
             ext = name.split(".").pop();

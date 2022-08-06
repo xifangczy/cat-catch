@@ -12,7 +12,19 @@
 
   <body>
     <div class="wrapper1024">
-      <section>
+
+      <section id="jsonCustom" class="hide">
+        <h1 class="optionsTitle">猫抓 JSON格式化</h1>
+        <div class="optionBox">
+          <span class="explain">请输入json内容</span>
+          <textarea rows="50" cols="160" id="jsonText" spellcheck="false" data-type="link"></textarea>
+          <span class="explain">或 输入json的URL</span>
+          <input type="text" id="jsonUrl" placeholder="jsonURL" style="width: 970px; margin: 5px;"/>
+          <button id="format" type="button">格式化</button>
+        </div>
+      </section>
+
+      <section id="main">
         <h1 class="optionsTitle">猫抓 JSON格式化</h1>
         <div class="optionBox">
           <div class="block" id="textarea">

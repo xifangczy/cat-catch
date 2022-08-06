@@ -1,7 +1,7 @@
 $(function () {
     // url 参数解析
     const params = new URL(location.href).searchParams;
-    const _url = params.get("url");
+    var _url = params.get("url");
     const _referer = params.get("referer");
 
     var jsonContent = "";
@@ -34,9 +34,27 @@ $(function () {
                 }]
             });
         }
-
+        if (isEmpty(_url)) {
+            $("#jsonCustom").show(); $("#main").hide();
+            $("#format").click(function () {
+                _url = $("#jsonUrl").val();
+                if (isEmpty(_url)) {
+                    let jsonText = $("#jsonText").val();
+                    jsonContent = JSON.parse(jsonText);
+                    renderJson();
+                    $("#jsonCustom").hide(); $("#main").show();
+                    return;
+                }
+                getJson(_url);
+            });
+            return;
+        }
+        getJson(_url);
+    });
+    function getJson(url) {
+        $("#jsonCustom").hide(); $("#main").show();
         $.ajax({
-            url: _url,
+            url: url,
             dataType: "text",
         }).fail(function (result) {
             console.log(result);
@@ -61,7 +79,7 @@ $(function () {
             jsonContent = JSON.parse(result);
             renderJson();
         });
-    });
+    }
 
     function renderJson() {
         $('#json-renderer').jsonViewer(jsonContent, options);

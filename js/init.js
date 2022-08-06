@@ -52,10 +52,10 @@ function moreFeatFun() {
 
 // 脚本列表
 G.scriptList = new Map();
-G.scriptList.set("catch.js", { refresh: true, allFrames: true, world: "MAIN", name: "hook脚本(catch.js)" });
-G.scriptList.set("recorder.js", { refresh: false, allFrames: true, world: "MAIN", name: "录制脚本(recorder.js)" });
+G.scriptList.set("catch.js", { refresh: true, allFrames: true, world: "MAIN", name: "hook脚本" });
+G.scriptList.set("recorder.js", { refresh: false, allFrames: true, world: "MAIN", name: "录制脚本" });
 if (G.version >= 104) {
-    G.scriptList.set("recorder2.js", { refresh: false, allFrames: false, world: "ISOLATED", name: "录制脚本(recorder2.js)" });
+    G.scriptList.set("recorder2.js", { refresh: false, allFrames: false, world: "ISOLATED", name: "录制脚本2" });
 }
 
 // Init

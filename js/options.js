@@ -25,7 +25,7 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
     $("#copyOther").val(items.copyOther);
     // 注入脚本列表
     G.scriptList.forEach(function (item, key) {
-        $("#injectScript").append(`<option value="${key}">${item.name}</option>`);
+        $("#injectScript").append(`<option value="${key}">${item.name}(${key})</option>`);
     });
     $("#injectScript").val(items.injectScript);
     $("#refreshClear").attr("checked",items.refreshClear);

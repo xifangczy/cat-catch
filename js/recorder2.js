@@ -107,14 +107,21 @@
     // 初始化位置
     const video = document.querySelector("video");
     if (video) {
-        if (video.clientHeight > 0 && video.clientWidth > 0) {
+        // 调整和video一样大小
+        if (video.clientHeight >= 0 && video.clientWidth >= 0) {
             cat.style.height = video.clientHeight + 20 + "px";
             cat.style.width = video.clientWidth + "px";
         }
+        // 调整到video的位置
         const videoOffset = getElementOffset(video);
-        if (videoOffset.top > 0 && videoOffset.left > 0) {
+        if (videoOffset.top >= 0 && videoOffset.left >= 0) {
             cat.style.top = videoOffset.top + "px";
             cat.style.left = videoOffset.left + "px";
+        }
+        // 防止遮挡菜单
+        let catAttr = cat.getBoundingClientRect();
+        if (document.documentElement.scrollTop + catAttr.bottom > document.documentElement.scrollTop + window.innerHeight) {
+            cat.style.top = document.documentElement.scrollTop + window.innerHeight - catAttr.height + "px";
         }
     }
 

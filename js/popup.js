@@ -216,8 +216,7 @@ function AddMedia(data) {
         }
         html.find("#screenshots").hide();
         $('#player video').attr('src', data.url);
-        $('#player').show();
-        $('#player').appendTo(html);
+        $('#player').show().appendTo(html);
         if (!isM3U8(data)) {
             $('#player video').trigger('play');
             return false;
@@ -339,32 +338,29 @@ $(function () {
         if (screenshots.attr("src") != "" && screenshots.attr("src") != undefined) {
             screenshots.css("display", "block");
         }
-        $('#player video').trigger('pause');
-        $('#player video').removeAttr('src');
-        $("#player").hide();
-        $("#player").appendTo('body');
+        $('#player video').trigger('pause').removeAttr('src');
+        $("#player").hide().appendTo('body');
         return false;
     });
 
     // 获取模拟手机 自动下载 捕获 状态
     chrome.runtime.sendMessage({ Message: "getButtonState", tabId: G.tabId }, function (state) {
         if (state.mobile) {
-            $("#MobileUserAgent").html("关闭模拟");
-            $("#MobileUserAgent").data("switch", "off");
+            $("#MobileUserAgent").html("关闭模拟").data("switch", "off");
         }
         if (state.autodown) {
             Tips("已关闭自动下载", 500);
         }
         if (state.catch) {
-            $("#Catch").html("关闭捕获");
-            $("#Catch").data("switch", "off");
+            $("#Catch").html("关闭脚本").data("switch", "off");
         }
     });
     // 模拟手机端
     $("#MobileUserAgent").click(function () {
         const action = $(this).data("switch");
         chrome.runtime.sendMessage({ Message: "mobileUserAgent", tabId: G.tabId, action: action }, function () {
-            $('#Clear').click();
+            G.refreshClear && $('#Clear').click();
+            location.reload();
         });
     });
     // 自动下载
@@ -372,21 +368,21 @@ $(function () {
         const action = $(this).data("switch");
         if (action == "on") {
             if (confirm("找到资源立刻尝试下载\n点击扩展图标将关闭自动下载\n是否确认开启？")) {
-                $("#AutoDown").html("关闭下载");
-                $("#AutoDown").data("switch", "off");
+                $("#AutoDown").html("关闭下载").data("switch", "off");
                 chrome.runtime.sendMessage({ Message: "autoDown", tabId: G.tabId, action: action });
             }
         } else {
-            $("#AutoDown").html("自动下载");
-            $("#AutoDown").data("switch", "on");
+            $("#AutoDown").html("自动下载").data("switch", "on");
             chrome.runtime.sendMessage({ Message: "autoDown", tabId: G.tabId, action: action });
         }
     });
 
     // 捕获
+    $("#Catch").html(G.scriptList.get(G.injectScript).name);
     $("#Catch").click(function () {
         chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId });
-        $('#Clear').click();
+        G.refreshClear && $('#Clear').click();
+        location.reload();
     });
 
     /* 网页视频控制 */
@@ -557,6 +553,12 @@ $(function () {
         chrome.tabs.sendMessage(_tabId, { Message: "screenshot", index: _index });
     });
     /* 网页视频控制END */
+    
+    // 其他功能按钮
+    $(".otherFeat .button2").click(function(){
+        let url = $(this).data("go");
+        chrome.tabs.create({ url: url });
+    });
 
     //102以上开启捕获按钮
     if (G.version >= 102) {

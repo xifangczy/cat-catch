@@ -250,3 +250,12 @@ body {
 .nowrap {
   word-break: keep-all;
 }
+.otherFeat .button2{
+  width: 100%;
+  margin-right: 10px;
+  text-align: center;
+}
+.line {
+  border-top: solid 1px rgb(0 0 0 / 50%);
+  margin: 5px 0 5px 0;
+}
