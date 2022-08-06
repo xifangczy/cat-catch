@@ -722,7 +722,7 @@ function GetFileName(url) {
     }
     url = GetFile(url);
     url = url.split(".");
-    url.pop();
+    url.length > 1 && url.pop();
     return url.join(".");
 }
 // 按钮状态
