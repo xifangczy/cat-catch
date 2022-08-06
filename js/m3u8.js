@@ -80,6 +80,11 @@ $(function () {
             $("#parse").click(function () {
                 let m3u8Text = $("#m3u8Text").val();
                 let baseUrl = $("#baseUrl").val();
+                let m3u8Url = $("#m3u8Url").val();
+                if (m3u8Url != "") {
+                    chrome.tabs.update({ url: "m3u8.html?url=" + encodeURIComponent(m3u8Url) });
+                    return;
+                }
                 // 加入baseUrl
                 if (baseUrl != "") {
                     let m3u8_split = m3u8Text.split("\n");
