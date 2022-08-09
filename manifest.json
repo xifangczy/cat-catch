@@ -39,5 +39,5 @@
         "matches": ["https://*/*", "http://*/*"],
         "js": ["js/content-script.js"]
     }],
-    "version": "2.2.2"
+    "version": "2.2.3"
 }
