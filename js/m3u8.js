@@ -90,6 +90,7 @@ $(function () {
                     let m3u8_split = m3u8Text.split("\n");
                     m3u8Text = "";
                     for (let line of m3u8_split) {
+                        if (isEmpty(line)) { continue; }
                         if (line.includes("URI=")) {
                             let KeyURL = /URI="(.*)"/.exec(line);
                             if (KeyURL && KeyURL[1] && !/^[\w]+:.+/i.test(KeyURL[1])) {
@@ -353,6 +354,7 @@ $(function () {
         let textarea = "";
         let m3u8_split = _m3u8Content.split("\n");
         for (let line of m3u8_split) {
+            if (isEmpty(line)) { continue; }
             if (line.includes("URI=")) {
                 let KeyURL = /URI="(.*)"/.exec(line);
                 if (KeyURL && KeyURL[1]) {
