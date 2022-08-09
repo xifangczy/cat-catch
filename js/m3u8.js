@@ -259,6 +259,9 @@ $(function () {
                     }).catch(function (error) { console.log(error); });
                 $("#tips").append('初始化片段(EXT-X-MAP): <input type="text" value="' + data.fragments[i].initSegment.url + '" spellcheck="false" readonly="readonly">');
             }
+            if (data.live && data.fragments[i].initSegment && tsBuffer.length == 0) {
+                initSegment = data.fragments[i].initSegment;
+            }
             _fragments.push({
                 url: data.fragments[i].url,
                 decryptdata: data.fragments[i].decryptdata,
