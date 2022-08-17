@@ -484,6 +484,7 @@ $(function () {
             $("#progress").html(`等待直播数据中...`);
             return;
         }
+        stopDownload = '停止录制';
         recorder = false;
         $(this).html("录制直播").removeClass("button2").data("switch", "on");
         mergeTs();
@@ -545,6 +546,7 @@ $(function () {
             if (stopDownload) {
                 clearInterval(tsInterval);
                 $("#progress").html(stopDownload);
+                return;
             }
             // 列表为空 等待线程数回归 检查是否下载完成
             if (index == end && tsThread == _tsThread) {
@@ -696,6 +698,7 @@ $(function () {
         tsBuffer.splice(0); // 初始化一下载ts缓存
         mp4Cache.splice(0); // 清空mp4转换缓存
         downCurrentTs = 0;  // 当前进度
+        stopDownload = false; // 停止下载
     }
 });
 // 写入ts链接
