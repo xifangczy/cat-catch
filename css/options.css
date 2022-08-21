@@ -344,7 +344,12 @@ textarea {
 .method input{
   width: 140px !important;
 }
-
+.videoInfo{
+  display: flex;
+}
+.videoInfo div{
+  margin-right: 5px;
+}
 /* JSON格式化 */
 .json-document {
   margin-top: 0px;

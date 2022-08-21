@@ -39,6 +39,7 @@ $(function () {
     const initData = new Map(); // 储存map的url
     const decryptor = new AESDecryptor(); // 解密工具 来自hls.js 分离出来的
     var skipDecrypt = false; // 是否跳过解密
+    var videoInfo = {}; // 视频信息
     /* 转码工具 */
     const mp4Cache = [];  // mp4格式缓存
     const transmuxer = new muxjs.mp4.Transmuxer();    // mux.js 对象
@@ -190,14 +191,36 @@ $(function () {
             hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
                 // console.log(data);
                 parseTs(data.details);  // 提取Ts链接
+                !G.isFirefox && getVideoInfo(); // 获取视频信息
             });
         });
         // m3u8下载or解析错误
         hls.on(Hls.Events.ERROR, function (event, data) {
-            $("#m3u8").hide(); $("#loading").show();
-            $("#loading .optionBox").html(`获取m3u8内容失败, 请尝试手动下载<br><a href="${_m3u8Url}">${_m3u8Url}</a>`);
+            // $("#m3u8").hide(); $("#loading").show();
+            $("#loading").show();
+            $("#loading .optionBox").html(`解析或播放m3u8文件出现错误, 详细错误信息查看控制台`);
             console.log(data);
         });
+        hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
+            if(data.tracks.video && Object.keys(videoInfo).length == 0){
+                videoInfo.width = data.tracks.video.metadata.width;
+                videoInfo.height = data.tracks.video.metadata.height;
+                $(".videoInfo #info").append(" 分辨率:" + videoInfo.width + "x" + videoInfo.height);
+            }
+        });
+    }
+    async function getVideoInfo() {
+        const video = document.createElement("video");
+        video.muted = true;
+        video.autoplay = false;
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+            video.play();
+        });
+        video.oncanplay = function () {
+            hls.detachMedia(video);
+            video.remove();
+        }
     }
     /* 提取所有ts链接 判断处理 */
     function parseTs(data) {
@@ -273,14 +296,14 @@ $(function () {
         // console.log(_fragments);
         recorder && downloadTs(_fragments.length - 1, _fragments.length - 1);   // 录制直播
         writeText(_fragments);   // 写入ts链接到textarea
-        $("#count").html("共 " + _fragments.length + " 个文件" + "，总时长: " + secToTime(data.totalduration));
+        $("#count").append("共 " + _fragments.length + " 个文件" + "，总时长: " + secToTime(data.totalduration));
         if (data.live) {
             $("#recorder").show();
             $("#count").html("直播HLS");
         }
-        isEncrypted && $("#count").html($("#count").html() + " (加密HLS)");
+        isEncrypted && $("#count").append(" (加密HLS)");
         if (_m3u8Content.includes("#EXT-X-KEY:METHOD=SAMPLE-AES-CTR")) {
-            $("#count").html($("#count").html() + ' <b>使用SAMPLE-AES-CTR加密的资源, 目前无法处理.</b>');
+            $("#count").append(' <b>使用SAMPLE-AES-CTR加密的资源, 目前无法处理.</b>');
         }
         // 范围下载所需数据
         $("#rangeStart").attr("max", _fragments.length);
