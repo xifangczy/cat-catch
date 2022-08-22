@@ -228,8 +228,7 @@ textarea {
 /* #tips {
   color: rgb(26, 115, 232);
 } */
-#injectScript {
-  margin-left: 360px;
+.select {
   -webkit-appearance: none;
   background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIxMiIgZmlsbD0iIzVGNjM2OCI+PHBhdGggZD0iTTAgMGgyNEwxMiAxMnoiLz48L3N2Zz4=)
     calc(100% - 8px) center no-repeat;
@@ -239,6 +238,9 @@ textarea {
   border-radius: 4px;
   cursor: pointer;
   padding: 5px 10px;
+}
+#injectScript{
+  margin-left: 360px;
   width: 158px;
 }
 #errorTsList p {
@@ -349,6 +351,11 @@ textarea {
 }
 .videoInfo div{
   margin-right: 5px;
+}
+/* MPD*/
+#mpdLists{
+  width: 100%;
+  margin-bottom: 10px;
 }
 /* JSON格式化 */
 .json-document {

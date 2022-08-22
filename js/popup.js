@@ -78,14 +78,13 @@ function AddMedia(data) {
         data.size = byteToSize(data.size);
     }
     // 是否需要解析
-    let parsing = false;
-    let parsingType = "m3u8";
+    let parsing = { switch: false, type: "null" };
     if (isM3U8(data)) {
-        parsing = true;
-        parsingType = "m3u8";
+        parsing = { switch: true, type: "m3u8" };
+    } else if (isMPD(data)) {
+        parsing = { switch: true, type: "mpd" };
     } else if (isJSON(data)) {
-        parsing = true;
-        parsingType = "json";
+        parsing = { switch: true, type: "json" };
     }
     //添加html
     let html = $(`
@@ -97,7 +96,7 @@ function AddMedia(data) {
                 <span class="name">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
                 <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
-                <img src="img/parsing.png" class="ico ${parsing ? "" : "hide"}" id="${parsingType}" title="解析"/>
+                <img src="img/parsing.png" class="ico ${parsing.switch ? "" : "hide"}" id="${parsing.type}" title="解析"/>
                 <img src="img/${G.Potplayer ? "potplayer.png" : "play.png"}" class="ico ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
                 <img src="img/download.png" class="ico" id="download" title="下载"/>
             </div>
@@ -178,7 +177,7 @@ function AddMedia(data) {
     });
     // 下载
     html.find('#download').click(function () {
-        if (G.m3u8dl && isM3U8(data)) {
+        if (G.m3u8dl && (isM3U8(data) || isMPD(data))) {
             let m3u8dlArg = G.m3u8dlArg.replace(/\$referer\$/g, data.initiator);
             m3u8dlArg = m3u8dlArg.replace(/\$url\$/g, data.url);
             m3u8dlArg = m3u8dlArg.replace(/\$title\$/g, data.title);
@@ -242,15 +241,16 @@ function AddMedia(data) {
         return false;
     });
     //解析m3u8
-    html.find('#m3u8, #json').click(function () {
+    html.find('#m3u8, #json, #mpd').click(function () {
         let url = '';
         const id = $(this).attr('id');
         chrome.tabs.get(G.tabId, function (tab) {
-            if (id == "m3u8") {
-                url = `/m3u8.html?url=${encodeURIComponent(data.url)}&referer=${encodeURIComponent(data.initiator)}&title=${encodeURIComponent(data.title)}`;
-            } else {
-                url = `/json.html?url=${encodeURIComponent(data.url)}&referer=${encodeURIComponent(data.initiator)}&title=${encodeURIComponent(data.title)}`;
+            switch (id) {
+                case "m3u8": url += '/m3u8.html?'; break;
+                case "json": url += '/json.html?'; break;
+                case "mpd": url += '/mpd.html?'; break;
             }
+            url += `url=${encodeURIComponent(data.url)}&referer=${encodeURIComponent(data.initiator)}&title=${encodeURIComponent(data.title)}`;
             chrome.tabs.create({ url: url, index: tab.index + 1 });
         });
         return false;
@@ -378,12 +378,14 @@ $(function () {
     });
 
     // 捕获
-    $("#Catch").html(G.scriptList.get(G.injectScript).name);
-    $("#Catch").click(function () {
-        chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId });
-        G.refreshClear && $('#Clear').click();
-        location.reload();
-    });
+    try {
+        $("#Catch").html(G.scriptList.get(G.injectScript).name);
+        $("#Catch").click(function () {
+            chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId });
+            G.refreshClear && $('#Clear').click();
+            location.reload();
+        });
+    } catch (e) { console.log(e) }
 
     /* 网页视频控制 */
     var _tabId = -1;   // 选择的页面ID
@@ -553,9 +555,9 @@ $(function () {
         chrome.tabs.sendMessage(_tabId, { Message: "screenshot", index: _index });
     });
     /* 网页视频控制END */
-    
+
     // 其他功能按钮
-    $(".otherFeat .button2").click(function(){
+    $(".otherFeat .button2").click(function () {
         let url = $(this).data("go");
         chrome.tabs.create({ url: url });
     });
