@@ -180,6 +180,9 @@ button:active {
 #extList {
   margin-top: 10px;
 }
+.otherOption .item {
+  margin-bottom: 5px;
+}
 #m3u8_url {
   overflow: hidden;
   display: block;
@@ -235,9 +238,9 @@ textarea {
   cursor: pointer;
   padding: 5px 10px;
 }
-#injectScript{
-  margin-left: 360px;
-  width: 158px;
+#injectScript {
+  margin-left: 345px;
+  width: 170px;
 }
 #errorTsList p {
   color: red;
@@ -325,28 +328,28 @@ textarea {
   border-top: solid 1px rgb(0 0 0 / 50%);
   margin: 10px 0 10px 0;
 }
-#next_m3u8 a{
+#next_m3u8 a {
   word-break: break-all;
 }
-.key div{
+.key div {
   display: flex;
   flex-direction: column;
   margin-right: 10px;
 }
-.key input{
+.key input {
   width: 388px !important;
 }
-.method input{
+.method input {
   width: 140px !important;
 }
-.videoInfo div{
+.videoInfo div {
   margin-right: 5px;
 }
-.flex{
+.flex {
   display: flex;
 }
 /* MPD*/
-.dash .select{
+.dash .select {
   width: 300px;
   margin-bottom: 10px;
 }
