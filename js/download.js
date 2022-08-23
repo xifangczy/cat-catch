@@ -39,11 +39,15 @@ $(function () {
             });
             return;
         }
-        // 如果是m3u8跳转到解析器
-        let url = _url.split("?")[0];
-        url = url.split(".").pop();
-        if (url == "m3u8") {
+        // 如果是m3u8 mpd跳转到解析器
+        let ext = _url.split("?")[0];
+        ext = ext.split(".").pop();
+        if (ext == "m3u8") {
             window.location.href = `m3u8.html?url=${encodeURIComponent(_url)}&referer=${encodeURIComponent(_referer)}`;
+            return;
+        }
+        if (ext == "mpd") {
+            window.location.href = `mpd.html?url=${encodeURIComponent(_url)}&referer=${encodeURIComponent(_referer)}`;
             return;
         }
         downloadFile();
