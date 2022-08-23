@@ -41,16 +41,23 @@ $(function () {
                 $("#mpd_url").html(_url).attr("href", _url);
             });
     });
-    $("#mpdLists").change(function () {
-        showSegment("video", $(this).val());
+    $("#mpdLists, #mpdAudioLists").change(function () {
+        let type = this.id == "mpdLists" ? "video" : "audio";
+        showSegment(type, $(this).val());
     });
-    $("#mpdAudioLists").change(function () {
-        showSegment("audio", $(this).val());
+    $("#getVideo, #getAudio").click(function () {
+        let type = "video";
+        let index = $("#mpdLists").val();
+        if (this.id == "getAudio") {
+            type = "audio";
+            index = $("#mpdAudioLists").val();
+        }
+        showSegment(type, index);
     });
     $("#videoToM3u8, #audioToM3u8").click(function () {
         let index = $("#mpdLists").val();
         let items = mpdJson.playlists[index];
-        if(this.id == "audioToM3u8"){
+        if (this.id == "audioToM3u8") {
             index = $("#mpdAudioLists").val();
             items = mpdJson.mediaGroups.AUDIO.audio[index].playlists[0];
         }
@@ -79,7 +86,7 @@ $(function () {
 function parseMPD() {
     $("#loading").hide(); $("#main").show();
     mpdJson = mpdParser.parse(mpdContent, { manifestUri: _url });
-    console.log(mpdJson);
+    // console.log(mpdJson);
     for (let key in mpdJson.playlists) {
         $("#mpdLists").append(`<option value='${key}'>
             ${(mpdJson.playlists[key].attributes.BANDWIDTH / 1024).toFixed(1)} kbps | 

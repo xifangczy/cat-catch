@@ -192,10 +192,6 @@ button:active {
   padding-bottom: 5px;
   margin-bottom: 5px;
 }
-.m3u8_wrapper {
-  margin: 0 auto;
-  width: 1024px;
-}
 .m3u8_wrapper .block {
   border-bottom: 0px;
 }
@@ -332,9 +328,6 @@ textarea {
 #next_m3u8 a{
   word-break: break-all;
 }
-.key{
-  display: flex;
-}
 .key div{
   display: flex;
   flex-direction: column;
@@ -346,18 +339,15 @@ textarea {
 .method input{
   width: 140px !important;
 }
-.videoInfo{
-  display: flex;
-}
 .videoInfo div{
   margin-right: 5px;
 }
-/* MPD*/
 .flex{
   display: flex;
 }
-#mpdLists, #mpdAudioLists{
-  width: 800px;
+/* MPD*/
+.dash .select{
+  width: 300px;
   margin-bottom: 10px;
 }
 /* JSON格式化 */

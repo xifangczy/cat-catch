@@ -109,6 +109,7 @@ $(function () {
                 parseM3U8();
                 $("#m3u8Custom").hide();
             });
+            // 从mpd解析器读取数据
             if(getId){
                 chrome.tabs.sendMessage(getId, "getM3u8", function(text){
                     $("#m3u8Text").html(text);
@@ -322,7 +323,7 @@ $(function () {
         $("#tips").append('密钥地址(KeyURL): <input type="text" value="' + decryptdata.uri + '" spellcheck="false" readonly="readonly">');
         if (buffer) {
             $("#tips").append(`
-                <div class="key">
+                <div class="key flex">
                     <div class="method">加密算法(Method): <input type="text" value="${decryptdata.method ? decryptdata.method : "NONE"}" spellcheck="false" readonly="readonly"></div>
                     <div>密钥(Hex): <input type="text" value="${ArrayBufferToHexString(buffer)}" spellcheck="false" readonly="readonly"></div>
                     <div>密钥(Base64): <input type="text" value="${ArrayBufferToBase64(buffer)}" spellcheck="false" readonly="readonly"></div>
