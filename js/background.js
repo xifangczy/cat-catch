@@ -274,7 +274,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         if (!script.refresh) {
             chrome.scripting.executeScript({
                 target: { tabId: Message.tabId, allFrames: script.allFrames },
-                files: ["js/" + G.injectScript],
+                files: ["catch-script/" + G.injectScript],
                 injectImmediately: true,
                 world: script.world
             });
@@ -336,7 +336,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
         // 开启捕获
         if (G.version >= 102 && G.featCatchTabId && G.featCatchTabId.includes(tabId)) {
             let script = G.scriptList.get(G.injectScript);
-            let injectScript = "js/" + G.injectScript;
+            let injectScript = "catch-script/" + G.injectScript;
             chrome.scripting.executeScript({
                 target: { tabId: tabId, allFrames: script.allFrames },
                 files: [injectScript],

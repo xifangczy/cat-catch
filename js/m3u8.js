@@ -10,7 +10,7 @@ let onCatch = new RegExp("&catch=([^\n&]*)").exec(window.location.href);
 if (onCatch) {
     onCatch = decodeURIComponent(onCatch[1]);
     if (G.scriptList.has(onCatch)) {
-        onCatch = "js/" + onCatch;
+        onCatch = "catch-script/" + onCatch;
     }
     const script = document.createElement('script');
     script.src = onCatch;
@@ -111,9 +111,10 @@ $(function () {
             });
             // 从mpd解析器读取数据
             if(getId){
-                chrome.tabs.sendMessage(getId, "getM3u8", function(text){
-                    $("#m3u8Text").html(text);
+                chrome.tabs.sendMessage(getId, "getM3u8", function(result){
+                    $("#m3u8Text").html(result.m3u8Content);
                     $("#parse").click();
+                    $("#info").html(result.mediaInfo);
                 });
             }
             return;
