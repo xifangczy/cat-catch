@@ -4,15 +4,15 @@ var _url = params.get("url");
 const _referer = params.get("referer");
 const _title = params.get("title");
 
-var _mpdJson = {}; // 解析器json结果
-var currentIndex = 0;   //当前选择的视频
-var _fragments = []; // 储存切片对象
-const initData = new Map(); // 储存map的url
-const saveBuffer = [];
+var mpdJson = {}; // 解析器json结果
+var mpdContent; // mpd文件内容
+var m3u8Content = "";
+var currentTabId;
 
 $(function () {
     // 如果存在Referer修改当前标签下的所有xhr的Referer
     chrome.tabs.getCurrent(function (tabs) {
+        currentTabId = tabs.id;
         if (_referer && !isEmpty(_referer)) {
             chrome.declarativeNetRequest.updateSessionRules({
                 removeRuleIds: [tabs.id],
@@ -36,125 +36,70 @@ $(function () {
         fetch(_url)
             .then(response => response.text())
             .then(function (text) {
-                parseMPD(text);
+                mpdContent = text;
+                parseMPD(mpdContent);
                 $("#mpd_url").html(_url).attr("href", _url);
             });
     });
-
     $("#mpdLists").change(function () {
-        currentIndex = $(this).val();
-        showSegment();
+        showSegment("video", $(this).val());
     });
-
-    $("#mergeDown").click(function () {
-        downSegments();
+    $("#mpdAudioLists").change(function () {
+        showSegment("audio", $(this).val());
+    });
+    $("#videoToM3u8, #audioToM3u8").click(function () {
+        let index = $("#mpdLists").val();
+        let items = mpdJson.playlists[index];
+        if(this.id == "audioToM3u8"){
+            index = $("#mpdAudioLists").val();
+            items = mpdJson.mediaGroups.AUDIO.audio[index].playlists[0];
+        }
+        m3u8Content = "#EXTM3U\n";
+        m3u8Content += "#EXT-X-VERSION:3\n";
+        m3u8Content += "#EXT-X-TARGETDURATION:" + items.targetDuration + "\n";
+        m3u8Content += "#EXT-X-MEDIA-SEQUENCE:0\n";
+        m3u8Content += "#EXT-X-PLAYLIST-TYPE:VOD\n";
+        m3u8Content += '#EXT-X-MAP:URI="' + items.segments[0].map.resolvedUri + '"\n';
+        for (let item of items.segments) {
+            m3u8Content += "#EXTINF:" + item.duration + ",\n"
+            m3u8Content += item.resolvedUri + "\n";
+        }
+        m3u8Content += "#EXT-X-ENDLIST";
+        // $("#media_file").html(m3u8Content); return;
+        chrome.tabs.create({ url: "m3u8.html?getId=" + currentTabId }, function (tab) {
+            chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+                if (message == "getM3u8") {
+                    sendResponse(m3u8Content);
+                }
+            });
+        });
     });
 });
 
-function downinitData() {
-    for (let item of _mpdJson.playlists) {
-        let mapUrl = item.segments[0].map.resolvedUri;
-        $.ajax({
-            url: mapUrl,
-            xhrFields: { responseType: "arraybuffer" },
-            timeout: 30000
-        }).done(function (responseData) {
-            initData.set(mapUrl, responseData);
-        });
-    }
-}
-
-function parseMPD(text) {
+function parseMPD() {
     $("#loading").hide(); $("#main").show();
-    _mpdJson = mpdParser.parse(text, { manifestUri: _url });
-    downinitData();
-    // console.log(_mpdJson);
-    for (let key in _mpdJson.playlists) {
+    mpdJson = mpdParser.parse(mpdContent, { manifestUri: _url });
+    console.log(mpdJson);
+    for (let key in mpdJson.playlists) {
         $("#mpdLists").append(`<option value='${key}'>
-            ${(_mpdJson.playlists[key].attributes.BANDWIDTH / 1024).toFixed(1)} kbps | 
-            ${_mpdJson.playlists[key].attributes["FRAME-RATE"].toFixed(1)} fps | 
-            ${_mpdJson.playlists[key].attributes.RESOLUTION.height} x ${_mpdJson.playlists[key].attributes.RESOLUTION.width}
+            ${(mpdJson.playlists[key].attributes.BANDWIDTH / 1024).toFixed(1)} kbps | 
+            ${mpdJson.playlists[key].attributes["FRAME-RATE"].toFixed(1)} fps | 
+            ${mpdJson.playlists[key].attributes.RESOLUTION.width} x ${mpdJson.playlists[key].attributes.RESOLUTION.height}
         </option>`);
     }
-    showSegment();
+    for (let key in mpdJson.mediaGroups.AUDIO.audio) {
+        $("#mpdAudioLists").append(`<option value='${key}'>${key}</option>`);
+    }
+    showSegment("video", 0);
 }
-function showSegment() {
+
+function showSegment(type, index) {
     let textarea = "";
-    for (let segment of _mpdJson.playlists[currentIndex].segments) {
+    let items = type == "video" ? mpdJson.playlists[index] : mpdJson.mediaGroups.AUDIO.audio[index].playlists[0];
+    for (let segment of items.segments) {
         textarea += segment.resolvedUri + "\n";
     }
     $("#media_file").html(textarea);
-    $("#count").html("共 " + _mpdJson.playlists[currentIndex].segments.length + " 个文件" + "，总时长: " + secToTime(_mpdJson.duration));
-    $("#tips").html('initialization: <input type="text" value="' + _mpdJson.playlists[currentIndex].segments[0].map.resolvedUri + '" spellcheck="false" readonly="readonly">');
-}
-
-function downSegments() {
-    downCurrentTs = 0;  // 当前进度
-    _fragments = _mpdJson.playlists[currentIndex].segments;
-    const _tsThread = parseInt($("#thread").val());  // 原始线程数量
-    let tsThread = _tsThread;  // 线程数量
-    let end = _fragments.length - 1;
-    let index = -1; // 当前下载的索引
-    const tsInterval = setInterval(function () {
-        if (index == end && tsThread == _tsThread) {
-            clearInterval(tsInterval);
-            downVideo();
-            return;
-        }
-        if (tsThread > 0 && index < end) {
-            tsThread--;
-            let curIndex = ++index;   // 当前下载的索引
-            $.ajax({
-                url: _fragments[curIndex].resolvedUri,
-                xhrFields: { responseType: "arraybuffer" },
-                timeout: 30000
-            }).done(function (responseData) {
-                saveBuffer[curIndex] = fixFragments(responseData, curIndex);
-            }).always(function () {
-                $("#progress").html(`${downCurrentTs++}/${_mpdJson.playlists[currentIndex].segments.length}`); // 进度显示
-                tsThread++;
-            });
-        }
-    }, 10);
-}
-
-function downVideo() {
-    $("#progress").html(`下载中...`);
-    let fileBlob = new Blob(saveBuffer, { type: "video/MP4" });
-    chrome.downloads.download({
-        url: URL.createObjectURL(fileBlob),
-        filename: `${GetFileName(_url)}.mp4`
-    });
-}
-
-// 处理切片
-function fixFragments(responseData, index) {
-    if (index == 0) {
-        let initSegmentData = initData.get(_fragments[index].map.resolvedUri);
-        let initLength = initSegmentData.byteLength;
-        let newData = new Uint8Array(initLength + responseData.byteLength);
-        newData.set(new Uint8Array(initSegmentData), 0);
-        newData.set(new Uint8Array(responseData), initLength);
-        responseData = newData.buffer;
-    }
-    return responseData;
-}
-
-// 获取文件名
-function GetFile(str) {
-    str = str.split("?")[0];
-    if (str.substr(0, 5) != "data:" && str.substr(0, 4) != "skd:") {
-        return str.split("/").pop();
-    }
-    return str;
-}
-// 获得不带扩展的文件名
-function GetFileName(url) {
-    if (G.TitleName && _title) {
-        return _title;
-    }
-    url = GetFile(url);
-    url = url.split(".");
-    url.length > 1 && url.pop();
-    return url.join(".");
+    $("#count").html("共 " + items.segments.length + " 个文件" + "，总时长: " + secToTime(mpdJson.duration));
+    $("#tips").html('initialization: <input type="text" value="' + items.segments[0].map.resolvedUri + '" spellcheck="false" readonly="readonly">');
 }

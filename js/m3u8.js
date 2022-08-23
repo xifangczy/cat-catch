@@ -3,6 +3,7 @@ const params = new URL(location.href).searchParams;
 var _m3u8Url = params.get("url");
 const _referer = params.get("referer");
 const _title = params.get("title");
+const getId = parseInt(params.get("getId"));
 
 // 解析参数 注入脚本
 let onCatch = new RegExp("&catch=([^\n&]*)").exec(window.location.href);
@@ -108,6 +109,12 @@ $(function () {
                 parseM3U8();
                 $("#m3u8Custom").hide();
             });
+            if(getId){
+                chrome.tabs.sendMessage(getId, "getM3u8", function(text){
+                    $("#m3u8Text").html(text);
+                    $("#parse").click();
+                });
+            }
             return;
         }
         // 开始解析
@@ -202,7 +209,7 @@ $(function () {
             console.log(data);
         });
         hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
-            if(data.tracks.video && Object.keys(videoInfo).length == 0){
+            if(data.tracks.video && data.tracks.video.metadata && Object.keys(videoInfo).length == 0){
                 videoInfo.width = data.tracks.video.metadata.width;
                 videoInfo.height = data.tracks.video.metadata.height;
                 $(".videoInfo #info").append(" 分辨率:" + videoInfo.width + "x" + videoInfo.height);

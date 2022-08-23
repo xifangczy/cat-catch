@@ -9,6 +9,7 @@
     <script src="js/firefox.js"></script>
     <script src="js/mpd-parser.min.js"></script>
     <script src="js/mpd.js"></script>
+    <script src="js/dash.all.min.js"></script>
   </head>
 
   <body>
@@ -24,7 +25,6 @@
             mpd文件地址
             <p><a id="mpd_url"></a></p>
           </div>
-          选择视频: <select id="mpdLists" class="select"></select>
           <div class="block" id="tips"></div>
           <div class="videoInfo">
             <div id="count"></div>
@@ -34,12 +34,18 @@
             <textarea rows="50" cols="160" id="media_file" spellcheck="false" data-type="link"></textarea>
             <video id="video" class="hide" width="100%" controls></video>
           </div>
-          <div class="block" id="button">
-            <div class="merge">
-              <div id="threadDiv" class="themeColor">下载线程数 <input type="number" value="32" id="thread" spellcheck="false" style="width: 35px;" step="1" min="1" max="256"/></div>
-              <button id="mergeDown" class="button2">合并下载</button>
-            </div>
+          <div class="flex">
+            <div>选择音频: <select id="mpdAudioLists" class="select"></select></div>
+            <div><button id="audioToM3u8">转为m3u8解析</button></div>
           </div>
+          <div class="line"></div>
+          <div class="flex">
+            <div>选择视频: <select id="mpdLists" class="select"></select></div>
+            <div><button id="videoToM3u8">转为m3u8解析</button></div>
+          </div>
+          <!-- <div class="block" id="button">
+            <button id="toM3u8">转换m3u8并打开解析器</button>
+          </div> -->
           <div style="display: flex; margin-top: 10px;"><div id="progress"></div> <div id="fileSize"></div></div>
         </div>
       </section>

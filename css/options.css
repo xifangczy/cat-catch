@@ -353,8 +353,11 @@ textarea {
   margin-right: 5px;
 }
 /* MPD*/
-#mpdLists{
-  width: 100%;
+.flex{
+  display: flex;
+}
+#mpdLists, #mpdAudioLists{
+  width: 800px;
   margin-bottom: 10px;
 }
 /* JSON格式化 */
