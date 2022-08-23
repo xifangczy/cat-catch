@@ -4,6 +4,8 @@
 
 [Changed] m3u8解析器增加分辨率显示以及优化错误提示
 
+[Added] Dash mpd文件解析
+
 ### 2.2.3
 [Added] m3u8解析器增加录制直播
 
