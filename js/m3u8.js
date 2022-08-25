@@ -40,7 +40,6 @@ $(function () {
     const initData = new Map(); // 储存map的url
     const decryptor = new AESDecryptor(); // 解密工具 来自hls.js 分离出来的
     var skipDecrypt = false; // 是否跳过解密
-    var videoInfo = {}; // 视频信息
     /* 转码工具 */
     const mp4Cache = [];  // mp4格式缓存
     const transmuxer = new muxjs.mp4.Transmuxer();    // mux.js 对象
@@ -110,8 +109,8 @@ $(function () {
                 $("#m3u8Custom").hide();
             });
             // 从mpd解析器读取数据
-            if(getId){
-                chrome.tabs.sendMessage(getId, "getM3u8", function(result){
+            if (getId) {
+                chrome.tabs.sendMessage(getId, "getM3u8", function (result) {
                     $("#m3u8Text").html(result.m3u8Content);
                     $("#parse").click();
                     $("#info").html(result.mediaInfo);
@@ -211,10 +210,11 @@ $(function () {
             console.log(data);
         });
         hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
-            if(data.tracks.video && data.tracks.video.metadata && Object.keys(videoInfo).length == 0){
-                videoInfo.width = data.tracks.video.metadata.width;
-                videoInfo.height = data.tracks.video.metadata.height;
-                $(".videoInfo #info").append(" 分辨率:" + videoInfo.width + "x" + videoInfo.height);
+            if (data.tracks && $(".videoInfo #info").html() == "") {
+                if (data.tracks.video?.metadata) {
+                    $(".videoInfo #info").append(" 分辨率:" + data.tracks.video.metadata.width + "x" + data.tracks.video.metadata.height);
+                }
+                $(".videoInfo #info").append(data.tracks.audio?.metadata ? " (有音频)" : " (无音频)");
             }
         });
     }
