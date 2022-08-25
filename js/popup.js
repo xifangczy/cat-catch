@@ -169,7 +169,7 @@ function AddMedia(data) {
                     mediaInfoNode.append("<br><b>时长</b>: " + secToTime(this.duration));
                 }
                 if (this.videoHeight) {
-                    mediaInfoNode.append("<br><b>分辨率</b>: " + this.videoHeight + "x" + this.videoWidth);
+                    mediaInfoNode.append("<br><b>分辨率</b>: " + this.videoWidth + "x" + this.videoHeight);
                 }
                 if (hls) { hls.detachMedia(getMediaInfo[0]); delete hls; }
                 getMediaInfo.remove();
