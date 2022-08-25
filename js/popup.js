@@ -109,8 +109,8 @@ function AddMedia(data) {
             </div>
             <div class="url hide">
                 <div id="mediaInfo">
-                    ${data.title ? `<b>标题</b>: ${data.title}` : ""}
-                    ${data.type ? `<br><b>MIME</b>:  ${data.type}` : ""}
+                    ${data.title ? `<b>标题:</b> ${data.title}` : ""}
+                    ${data.type ? `<br><b>MIME:</b>  ${data.type}` : ""}
                 </div>
                 <a href="${data.url}" target="_blank" download="${data.downFileName}" data-initiator="${data.initiator}">${data.url}</a>
                 <br>
@@ -166,10 +166,10 @@ function AddMedia(data) {
                 }
                 // 获取播放时长
                 if (this.duration && this.duration != Infinity) {
-                    mediaInfoNode.append("<br><b>时长</b>: " + secToTime(this.duration));
+                    mediaInfoNode.append("<br><b>时长:</b> " + secToTime(this.duration));
                 }
                 if (this.videoHeight) {
-                    mediaInfoNode.append("<br><b>分辨率</b>: " + this.videoWidth + "x" + this.videoHeight);
+                    mediaInfoNode.append("<br><b>分辨率:</b> " + this.videoWidth + "x" + this.videoHeight);
                 }
                 if (hls) { hls.detachMedia(getMediaInfo[0]); delete hls; }
                 getMediaInfo.remove();
