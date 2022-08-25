@@ -211,10 +211,11 @@ $(function () {
         });
         hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
             if (data.tracks && $(".videoInfo #info").html() == "") {
+                !data.tracks.audio && $(".videoInfo #info").append(" (无音频) ");
+                !data.tracks.video && $(".videoInfo #info").append(" (无视频) ");
                 if (data.tracks.video?.metadata) {
-                    $(".videoInfo #info").append(" 分辨率:" + data.tracks.video.metadata.width + "x" + data.tracks.video.metadata.height);
+                    $(".videoInfo #info").append("分辨率:" + data.tracks.video.metadata.width + "x" + data.tracks.video.metadata.height);
                 }
-                $(".videoInfo #info").append(data.tracks.audio?.metadata ? " (有音频)" : " (无音频)");
             }
         });
     }

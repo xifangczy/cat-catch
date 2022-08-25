@@ -108,9 +108,10 @@ function AddMedia(data) {
                 <img src="img/download.png" class="ico" id="download" title="下载"/>
             </div>
             <div class="url hide">
-                ${data.title ? `标题: ${data.title}<br>` : ""}
-                ${data.type ? `MIME:  ${data.type}<br>` : ""}
-                <div id="duration"></div>
+                <div id="mediaInfo">
+                    ${data.title ? `<b>标题</b>: ${data.title}` : ""}
+                    ${data.type ? `<br><b>MIME</b>:  ${data.type}` : ""}
+                </div>
                 <a href="${data.url}" target="_blank" download="${data.downFileName}" data-initiator="${data.initiator}">${data.url}</a>
                 <br>
                 <img id="screenshots" class="hide"/>
@@ -131,9 +132,22 @@ function AddMedia(data) {
         }
         //获取时长
         const getMediaInfo = html.find("#getMediaInfo");
-        const durationNode = html.find("#duration");
-        if (html.find(".url").is(":visible") && durationNode.html() == "" && !isM3U8(data)) {
-            getMediaInfo.attr('src', data.url);
+        const mediaInfoNode = html.find("#mediaInfo");
+        if (html.find(".url").is(":visible") && getMediaInfo.length != 0) {
+            let hls = undefined;
+            if (isM3U8(data)) {
+                hls = new Hls();
+                hls.loadSource(data.url);
+                hls.attachMedia(getMediaInfo[0]);
+                hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
+                    if (data.tracks) {
+                        !data.tracks.audio && mediaInfoNode.append("<br><b>无音频</b>");
+                        !data.tracks.video && mediaInfoNode.append("<br><b>无视频</b>");
+                    }
+                });
+            } else {
+                getMediaInfo.attr('src', data.url);
+            }
             getMediaInfo.on("loadeddata", function () {
                 this.pause();
                 // 截图
@@ -152,40 +166,21 @@ function AddMedia(data) {
                 }
                 // 获取播放时长
                 if (this.duration && this.duration != Infinity) {
-                    durationNode.html("时长: " + secToTime(this.duration));
+                    mediaInfoNode.append("<br><b>时长</b>: " + secToTime(this.duration));
                 }
+                if (this.videoHeight) {
+                    mediaInfoNode.append("<br><b>分辨率</b>: " + this.videoHeight + "x" + this.videoWidth);
+                }
+                if (hls) { hls.detachMedia(getMediaInfo[0]); delete hls; }
                 getMediaInfo.remove();
             });
             getMediaInfo.on("play", function () {
+                if (hls) { hls.detachMedia(getMediaInfo[0]); delete hls; }
                 getMediaInfo.remove();
             });
             getMediaInfo.on("error", function () {
+                if (hls) { hls.detachMedia(getMediaInfo[0]); delete hls; }
                 getMediaInfo.remove();
-            });
-            return false;
-        }
-        if (isM3U8(data)) {
-            const getMediaInfo = html.find("#getMediaInfo");
-            const durationNode = html.find("#duration");
-            const hls = new Hls();
-            hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
-                if (data.tracks && durationNode.html() == "") {
-                    if (data.tracks.video?.metadata) {
-                        durationNode.append(" 分辨率:" + data.tracks.video.metadata.width + "x" + data.tracks.video.metadata.height);
-                    }
-                    durationNode.append(data.tracks.audio?.metadata ? " (有音频)" : " (无音频)");
-                }
-            });
-            getMediaInfo.autoplay = false;
-            hls.loadSource(data.url);
-            hls.attachMedia(getMediaInfo[0]);
-            hls.on(Hls.Events.MEDIA_ATTACHED, function () {
-                getMediaInfo.play();
-            });
-            getMediaInfo.on("play", function () {
-                hls.detachMedia(getMediaInfo[0]);
-                getMediaInfo.remove();
-                delete hls;
             });
             return false;
         }
