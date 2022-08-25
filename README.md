@@ -39,6 +39,7 @@ https://o2bmm.gitbook.io/cat-catch/
 - [js-base64](https://github.com/dankogai/js-base64)
 - [jquery.json-viewer](https://github.com/abodelot/jquery.json-viewer)
 - [Momo707577045](https://github.com/Momo707577045)
+- [mpd-parser](https://github.com/videojs/mpd-parser)
 
 # 📜License
 MIT
