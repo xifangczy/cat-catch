@@ -77,10 +77,17 @@ function AddMedia(data) {
     if (data.size) {
         data.size = byteToSize(data.size);
     }
+
     // 是否需要解析
     let parsing = { switch: false, type: "null" };
     if (isM3U8(data)) {
         parsing = { switch: true, type: "m3u8" };
+        // 有m3u8文件 加载hls文件 预览m3u8 和 获取分辨率
+        if (typeof Hls === "undefined") {
+            const script = document.createElement('script');
+            script.src = "js/hls.min.js"
+            document.body.appendChild(script);
+        }
     } else if (isMPD(data)) {
         parsing = { switch: true, type: "mpd" };
     } else if (isJSON(data)) {
@@ -91,7 +98,7 @@ function AddMedia(data) {
         <div class="panel" id="requestId${data.requestId}">
             <div class="panel-heading">
                 <input type="checkbox" class="DownCheck" checked="true"/>
-                <img src="${data.webInfo?.favIconUrl}" class="icon ${G.ShowWebIco && data.webInfo?.favIconUrl ? "" : "hide"}"/>
+                <img src="${data.webInfo?.favIconUrl ? data.webInfo?.favIconUrl : ""}" class="icon ${G.ShowWebIco && data.webInfo?.favIconUrl ? "" : "hide"}"/>
                 <img src="img/regex.png" class="icon ${data.isRegex ? "" : "hide"}" title="正则表达式匹配"/>
                 <span class="name">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
@@ -125,7 +132,7 @@ function AddMedia(data) {
         //获取时长
         const getMediaInfo = html.find("#getMediaInfo");
         const durationNode = html.find("#duration");
-        if (html.find(".url").is(":visible") && durationNode.html() == "") {
+        if (html.find(".url").is(":visible") && durationNode.html() == "" && !isM3U8(data)) {
             getMediaInfo.attr('src', data.url);
             getMediaInfo.on("loadeddata", function () {
                 this.pause();
@@ -155,6 +162,32 @@ function AddMedia(data) {
             getMediaInfo.on("error", function () {
                 getMediaInfo.remove();
             });
+            return false;
+        }
+        if (isM3U8(data)) {
+            const getMediaInfo = html.find("#getMediaInfo");
+            const durationNode = html.find("#duration");
+            const hls = new Hls();
+            hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
+                if (data.tracks && durationNode.html() == "") {
+                    if (data.tracks.video?.metadata) {
+                        durationNode.append(" 分辨率:" + data.tracks.video.metadata.width + "x" + data.tracks.video.metadata.height);
+                    }
+                    durationNode.append(data.tracks.audio?.metadata ? " (有音频)" : " (无音频)");
+                }
+            });
+            getMediaInfo.autoplay = false;
+            hls.loadSource(data.url);
+            hls.attachMedia(getMediaInfo[0]);
+            hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+                getMediaInfo.play();
+            });
+            getMediaInfo.on("play", function () {
+                hls.detachMedia(getMediaInfo[0]);
+                getMediaInfo.remove();
+                delete hls;
+            });
+            return false;
         }
     });
     //点击复制网址
@@ -220,24 +253,13 @@ function AddMedia(data) {
             $('#player video').trigger('play');
             return false;
         }
-        let script = {};
-        if (typeof Hls === "undefined") {
-            script = document.createElement('script');
-            script.src = "js/hls.min.js"
-            document.body.appendChild(script);
-        }
-        script.onload = function () {
-            const hls = new Hls();
-            const video = $('#player video')[0];
-            hls.loadSource(data.url);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MEDIA_ATTACHED, function () {
-                video.play();
-            });
-        }
-        if (typeof Hls === "function") {
-            script.onload();
-        }
+        const hls = new Hls();
+        const video = $('#player video')[0];
+        hls.loadSource(data.url);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+            video.play();
+        });
         return false;
     });
     //解析m3u8
@@ -377,16 +399,6 @@ $(function () {
         }
     });
 
-    // 捕获
-    try {
-        $("#Catch").html(G.scriptList.get(G.injectScript).name);
-        $("#Catch").click(function () {
-            chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId });
-            G.refreshClear && $('#Clear').click();
-            location.reload();
-        });
-    } catch (e) { console.log(e) }
-
     /* 网页视频控制 */
     var _tabId = -1;   // 选择的页面ID
     var _index = -1;    //选择的视频索引
@@ -486,7 +498,6 @@ $(function () {
         return false;
     });
     // 倍速播放
-    $("#playbackRate").val(G.playbackRate); // 上一次设定的倍数
     $("#speed").click(function () {
         if (_index < 0 || _tabId < 0) { return; }
         if ($(this).data("switch") == "speed") {
@@ -578,6 +589,22 @@ $(function () {
         const downHeigth = $("#down").height();
         $(".mediaList").css("margin-bottom", (downHeigth + 2) + "px");
     }
+
+    // 一些需要等待G变量加载完整的操作
+    const interval = setInterval(function () {
+        if (!G.initComplete) { return; }
+        clearInterval(interval);
+        // 捕获按钮
+        $("#Catch").html(G.scriptList.get(G.injectScript).name);
+        $("#Catch").click(function () {
+            chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId });
+            G.refreshClear && $('#Clear').click();
+            location.reload();
+        });
+
+        // 上一次设定的倍数
+        $("#playbackRate").val(G.playbackRate);
+    }, 10);
 });
 
 /* 格式判断 */

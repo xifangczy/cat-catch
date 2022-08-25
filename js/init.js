@@ -27,13 +27,17 @@ G.OptionLists = [
     "copyM3U8",
     "copyMPD",
     "copyOther",
-    "refreshClear"
+    "refreshClear",
+    "initComplete"
 ];
 G.TabIdList = [
     "featMobileTabId",
     "featAutoDownTabId",
     "featCatchTabId"
-]
+];
+
+// Init
+InitOptions();
 
 // 102版本以上 非Firefox 开启更多功能
 G.isFirefox = false;
@@ -57,9 +61,6 @@ G.scriptList.set("recorder.js", { refresh: false, allFrames: true, world: "MAIN"
 if (G.version >= 104) {
     G.scriptList.set("recorder2.js", { refresh: false, allFrames: false, world: "ISOLATED", name: "录制脚本2" });
 }
-
-// Init
-InitOptions();
 
 // 变量初始值
 function GetDefault(Obj) {
@@ -131,6 +132,7 @@ function GetDefault(Obj) {
         case "copyMPD": return "ffmpeg -headers \"referer: $referer$\" -i \"$url$\" -c copy \"$title$.mp4\"";
         case "copyOther": return "$url$";
         case "refreshClear": return true;
+        case "initComplete": return true;
     }
 }
 // 初始变量
