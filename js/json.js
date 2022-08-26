@@ -37,7 +37,7 @@ $(function () {
         if (isEmpty(_url)) {
             $("#jsonCustom").show(); $("#main").hide();
             $("#format").click(function () {
-                _url = $("#jsonUrl").val();
+                _url = $("#jsonUrl").val().trim();
                 if (isEmpty(_url)) {
                     let jsonText = $("#jsonText").val();
                     jsonContent = JSON.parse(jsonText);

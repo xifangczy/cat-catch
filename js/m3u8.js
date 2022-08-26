@@ -79,30 +79,18 @@ $(function () {
         if (isEmpty(_m3u8Url)) {
             $("#loading").hide(); $("#m3u8Custom").show();
             $("#parse").click(function () {
-                let m3u8Text = $("#m3u8Text").val();
-                let baseUrl = $("#baseUrl").val();
-                let m3u8Url = $("#m3u8Url").val();
+                let m3u8Text = $("#m3u8Text").val().trim();
+                let baseUrl = $("#baseUrl").val().trim();
+                let m3u8Url = $("#m3u8Url").val().trim();
                 if (m3u8Url != "") {
                     chrome.tabs.update({ url: "m3u8.html?url=" + encodeURIComponent(m3u8Url) });
                     return;
                 }
-                // 加入baseUrl
                 if (baseUrl != "") {
-                    let m3u8_split = m3u8Text.split("\n");
-                    m3u8Text = "";
-                    for (let line of m3u8_split) {
-                        if (isEmpty(line)) { continue; }
-                        if (line.includes("URI=")) {
-                            let KeyURL = /URI="(.*)"/.exec(line);
-                            if (KeyURL && KeyURL[1] && !/^[\w]+:.+/i.test(KeyURL[1])) {
-                                line = line.replace(/URI="(.*)"/, 'URI="' + baseUrl + KeyURL[1] + '"');
-                            }
-                        }
-                        if (!line.includes("#") && !/^[\w]+:.+/i.test(line)) {
-                            line = baseUrl + line;
-                        }
-                        m3u8Text += line + "\n";
-                    }
+                    m3u8Text = addBashUrl(baseUrl, m3u8Text);
+                }
+                if (!m3u8Text.includes("#EXTM3U")) {
+                    m3u8Text = tsListTom3u8Text(m3u8Text);
                 }
                 _m3u8Url = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(m3u8Text)]));
                 parseM3U8();
@@ -204,17 +192,17 @@ $(function () {
         });
         // m3u8下载or解析错误
         hls.on(Hls.Events.ERROR, function (event, data) {
-            // $("#m3u8").hide(); $("#loading").show();
             $("#loading").show();
-            $("#loading .optionBox").html(`解析或播放m3u8文件出现错误, 详细错误信息查看控制台`);
+            $("#loading .optionBox").html(`解析或播放m3u8文件中有错误, 详细错误信息查看控制台`);
             console.log(data);
         });
         hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
-            if (data.tracks && $(".videoInfo #info").html() == "") {
-                !data.tracks.audio && $(".videoInfo #info").append(" (无音频)");
-                !data.tracks.video && $(".videoInfo #info").append(" (无视频)");
+            const info = $(".videoInfo #info");
+            if (data.tracks && info.html() == "") {
+                !data.tracks.audio && info.append(" (无音频)");
+                !data.tracks.video && info.append(" (无视频)");
                 if (data.tracks.video?.metadata) {
-                    $(".videoInfo #info").append(" 分辨率:" + data.tracks.video.metadata.width + "x" + data.tracks.video.metadata.height);
+                    info.append(" 分辨率:" + data.tracks.video.metadata.width + "x" + data.tracks.video.metadata.height);
                 }
             }
         });
@@ -876,4 +864,35 @@ function fixFileDuration(data, duration) {
 }
 function isHexKey(str) {
     return /[0-9a-fA-F]{32}/.test(str);
+}
+// m3u8文件内容加入bashUrl
+function addBashUrl(baseUrl, m3u8Text) {
+    let m3u8_split = m3u8Text.split("\n");
+    m3u8Text = "";
+    for (let line of m3u8_split) {
+        if (isEmpty(line)) { continue; }
+        if (line.includes("URI=")) {
+            let KeyURL = /URI="(.*)"/.exec(line);
+            if (KeyURL && KeyURL[1] && !/^[\w]+:.+/i.test(KeyURL[1])) {
+                line = line.replace(/URI="(.*)"/, 'URI="' + baseUrl + KeyURL[1] + '"');
+            }
+        }
+        if (!line.includes("#") && !/^[\w]+:.+/i.test(line)) {
+            line = baseUrl + line;
+        }
+        m3u8Text += line + "\n";
+    }
+    return m3u8Text;
+}
+// ts列表转换成m3u8
+function tsListTom3u8Text(tsList) {
+    tsList = tsList.split("\n");
+    let m3u8Text = "#EXTM3U\n";
+    m3u8Text += "#EXT-X-TARGETDURATION:10\n";
+    for (let item of tsList) {
+        m3u8Text += "#EXTINF:1\n";
+        m3u8Text += item + "\n";
+    }
+    m3u8Text += "#EXT-X-ENDLIST";
+    return m3u8Text;
 }

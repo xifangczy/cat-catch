@@ -33,8 +33,8 @@ $(function () {
         if (!_url) {
             $("#getURL").show();
             $("#getURL_btn").click(function () {
-                const url = $("#getURL #url").val();
-                const referer = $("#getURL #referer").val();
+                const url = $("#getURL #url").val().trim();
+                const referer = $("#getURL #referer").val().trim();
                 window.location.href = `?url=${encodeURIComponent(url)}&referer=${encodeURIComponent(referer)}`;
             });
             return;
