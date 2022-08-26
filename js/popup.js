@@ -135,7 +135,7 @@ function AddMedia(data) {
         const mediaInfoNode = html.find("#mediaInfo");
         if (html.find(".url").is(":visible") && getMediaInfo.length != 0) {
             let hls = undefined;
-            if (isM3U8(data)) {
+            if (isM3U8(data) && !G.isFirefox) {
                 hls = new Hls();
                 hls.loadSource(data.url);
                 hls.attachMedia(getMediaInfo[0]);
@@ -144,6 +144,9 @@ function AddMedia(data) {
                         !data.tracks.audio && mediaInfoNode.append("<br><b>无音频</b>");
                         !data.tracks.video && mediaInfoNode.append("<br><b>无视频</b>");
                     }
+                });
+                hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+                    data.levels.length > 1 && mediaInfoNode.append("<br><b>m3u8播放列表</b>");
                 });
             } else {
                 getMediaInfo.attr('src', data.url);
@@ -248,14 +251,15 @@ function AddMedia(data) {
             $('#player video').trigger('play');
             return false;
         }
-        const hls = new Hls();
-        const video = $('#player video')[0];
-        hls.loadSource(data.url);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MEDIA_ATTACHED, function () {
-            video.play();
-        });
-        return false;
+        if (!G.isFirefox) {
+            const hls = new Hls();
+            const video = $('#player video')[0];
+            hls.loadSource(data.url);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+                video.play();
+            });
+        }
     });
     //解析m3u8
     html.find('#m3u8, #json, #mpd').click(function () {
