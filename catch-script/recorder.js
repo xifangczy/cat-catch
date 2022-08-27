@@ -45,6 +45,7 @@
                 default: return;
             }
         }
+        isMove = false;
     });
     let x, y;
     function move(event) {
@@ -56,7 +57,6 @@
         x = event.pageX - CatCatch.offsetLeft;
         y = event.pageY - CatCatch.offsetTop;
         document.addEventListener('mousemove', move);
-        isMove = false;
         document.addEventListener('mouseup', function () {
             document.removeEventListener('mousemove', move);
         });
