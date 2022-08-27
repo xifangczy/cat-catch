@@ -727,7 +727,7 @@ function writeText(text) {
     if (typeof text == "object") {
         let url = [];
         for (let ts of text) {
-            url.push(ts.url);
+            url.push(ts.url + "\n");
         }
         $("#media_file").val(url.join("\n"));
         $("#media_file").data("type", "link");
