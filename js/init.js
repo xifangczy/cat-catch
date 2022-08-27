@@ -56,9 +56,9 @@ function moreFeatFun() {
 
 // 脚本列表
 G.scriptList = new Map();
+G.scriptList.set("search.js", { refresh: true, allFrames: true, world: "MAIN", name: "深度搜索" });
 G.scriptList.set("catch.js", { refresh: true, allFrames: true, world: "MAIN", name: "hook脚本" });
 G.scriptList.set("recorder.js", { refresh: false, allFrames: true, world: "MAIN", name: "录制脚本" });
-G.scriptList.set("search-json.js", { refresh: true, allFrames: true, world: "MAIN", name: "json搜索" });
 if (G.version >= 104) {
     G.scriptList.set("recorder2.js", { refresh: false, allFrames: false, world: "ISOLATED", name: "录制脚本2" });
 }
@@ -125,7 +125,7 @@ function GetDefault(Obj) {
             return "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
         case "m3u8dl": return false;
         case "m3u8dlArg": return '"$url$" --workDir "%USERPROFILE%\\Downloads\\m3u8dl" --saveName "$title$" --enableDelAfterDone --headers "Referer:$referer$"';
-        case "injectScript": return "catch.js";
+        case "injectScript": return "search.js";
         case "featMobileTabId": return [];
         case "featAutoDownTabId": return [];
         case "featCatchTabId": return [];
