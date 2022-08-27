@@ -129,9 +129,6 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             return true;
         } catch (e) { console.log(e); return true; }
     }
-    if (Message.Message == "setTabId") {
-        window.postMessage({ type: "setTabId", tabId: Message.tabId });
-    }
 });
 
 // Heart Beat
