@@ -99,7 +99,7 @@ function AddMedia(data) {
             <div class="panel-heading">
                 <input type="checkbox" class="DownCheck" checked="true"/>
                 <img src="${data.webInfo?.favIconUrl ? data.webInfo?.favIconUrl : ""}" class="icon ${G.ShowWebIco && data.webInfo?.favIconUrl ? "" : "hide"}"/>
-                <img src="img/regex.png" class="icon ${data.isRegex ? "" : "hide"}" title="正则表达式匹配 或 来自强力搜索"/>
+                <img src="img/regex.png" class="icon ${data.isRegex ? "" : "hide"}" title="正则表达式匹配 或 来自深度搜索"/>
                 <span class="name">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
                 <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
@@ -595,7 +595,9 @@ $(function () {
         if (!G.initComplete) { return; }
         clearInterval(interval);
         // 捕获按钮
-        $("#Catch").html(G.scriptList.get(G.injectScript).name);
+        if($("#Catch").data("switch") != "off"){
+            $("#Catch").html(G.scriptList.get(G.injectScript).name);
+        }
         $("#Catch").click(function () {
             chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId });
             G.refreshClear && $('#Clear').click();
