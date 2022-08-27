@@ -49,7 +49,6 @@ chrome.downloads.onChanged.addListener(function (item) {
 });
 
 function AddMedia(data) {
-    console.log(data);
     // 正则匹配的备注扩展
     if (data.extraExt) {
         data.ext = data.extraExt;
@@ -152,6 +151,7 @@ function AddMedia(data) {
             } else {
                 getMediaInfo.attr('src', data.url);
             }
+            getMediaInfo[0].currentTime = 1;
             getMediaInfo.on("loadeddata", function () {
                 this.pause();
                 // 截图
