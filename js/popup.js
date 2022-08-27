@@ -146,12 +146,14 @@ function AddMedia(data) {
                     }
                 });
                 hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
-                    data.levels.length > 1 && mediaInfoNode.append("<br><b>m3u8播放列表</b>");
+                    if(data.levels.length > 1 && !mediaInfoNode.text().includes("m3u8播放列表")){
+                        mediaInfoNode.append("<br><b>m3u8播放列表</b>");
+                    }
                 });
             } else {
                 getMediaInfo.attr('src', data.url);
             }
-            getMediaInfo[0].currentTime = 1;
+            getMediaInfo[0].currentTime = 2;
             getMediaInfo.on("loadeddata", function () {
                 this.pause();
                 // 截图
@@ -164,7 +166,7 @@ function AddMedia(data) {
                     const image = canvas.toDataURL('image/jpeg');
                     if (image != blank) {
                         html.find("#player").length == 0 && screenshots.css("display", "block");
-                        screenshots.attr("src", canvas.toDataURL('image/jpeg'));
+                        screenshots.attr("src", image);
                     }
                     delete canvas;
                 }

@@ -8,6 +8,7 @@ JSON.parse = function () {
 }
 async function findMedia(data, raw) {
     for (let key in data) {
+        // console.log(data[key]);
         if (typeof data[key] == "object") {
             findMedia(data[key], data);
             continue;
@@ -20,6 +21,7 @@ async function findMedia(data, raw) {
                 if (ext.length == 1) { continue; }
                 ext = ext[ext.length - 1];
                 if (ext == "m3u8" || ext == "m3u" || ext == "mpd") {
+                    // console.log(data[key]);
                     window.postMessage({ type: "addMedia", url: data[key], href: location.href, ext: ext });
                 }
                 continue;
@@ -45,3 +47,11 @@ function isFullM3u8(text) {
         return false;
     }
 }
+
+// const _xhrOpen = XMLHttpRequest.prototype.open;
+// XMLHttpRequest.prototype.open = function(event){
+//     this.addEventListener("readystatechange", function (event) {
+//         console.log(this);
+//     });
+//     _xhrOpen.apply(this, arguments);
+// }

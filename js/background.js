@@ -308,8 +308,18 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // 从 content-script 或 catch-script 传来的媒体url
     if (Message.Message == "addMedia") {
-        chrome.tabs.query({ url: Message.href }, function (tabs) {
-            findMedia({ url: Message.url, tabId: tabs[0].id, extraExt: Message.extraExt }, true, true);
+        // chrome.tabs.query({ url: Message.href }, function (tabs) {
+        //     console.log(Message.href, tabs);
+        //     findMedia({ url: Message.url, tabId: tabs[0].id, extraExt: Message.extraExt }, true, true);
+        // });
+        chrome.tabs.query({}, function (tabs) {
+            for (let item of tabs) {
+                if (item.url == Message.href) {
+                    findMedia({ url: Message.url, tabId: item.id, extraExt: Message.extraExt }, true, true);
+                    return true;
+                }
+            }
+            findMedia({ url: Message.url, tabId: -1, extraExt: Message.extraExt }, true, true);
         });
         return true;
     }
