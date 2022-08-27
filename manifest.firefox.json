@@ -1,50 +1,51 @@
 {
-    "background": {
-        "scripts": [
-            "js/firefox.js",
-            "js/background.js"
-        ]
-    },
-    "browser_action": {
-        "default_icon": "img/icon.png",
-        "default_title": "还没闻到味儿~",
-        "default_popup": "popup.html"
-    },
-    "description": "网页媒体嗅探工具",
-    "icons": {
-        "40": "img/icon.png",
-        "48": "img/icon.png",
-        "128": "img/icon128.png"
-    },
-    "manifest_version": 2,
-    "name": "猫抓",
-    "homepage_url": "https://github.com/xifangczy/cat-catch",
-    "options_ui": {
-        "page": "options.html",
-        "open_in_tab": true
-    },
-    "permissions": [
-        "tabs",
-        "webRequest",
-        "webRequestBlocking",
-        "downloads",
-        "storage",
-        "webNavigation",
-        "alarms",
-        "scripting",
-        "activeTab",
-        "*://*/*",
-        "<all_urls>"
-    ],
-    "browser_specific_settings": {
-        "gecko": {
-            "id": "xifangczy@gmail.com",
-            "strict_min_version": "93.0"
-        }
-    },
-    "content_scripts": [{
-        "matches": ["https://*/*", "http://*/*"],
-        "js": ["js/content-script.js"]
-    }],
-    "version": "2.2.3"
+  "background": {
+    "scripts": ["js/firefox.js", "js/background.js"]
+  },
+  "browser_action": {
+    "default_icon": "img/icon.png",
+    "default_title": "还没闻到味儿~",
+    "default_popup": "popup.html"
+  },
+  "description": "网页媒体嗅探工具",
+  "icons": {
+    "40": "img/icon.png",
+    "48": "img/icon.png",
+    "128": "img/icon128.png"
+  },
+  "manifest_version": 2,
+  "name": "猫抓",
+  "homepage_url": "https://github.com/xifangczy/cat-catch",
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "permissions": [
+    "tabs",
+    "webRequest",
+    "webRequestBlocking",
+    "downloads",
+    "storage",
+    "webNavigation",
+    "alarms",
+    "scripting",
+    "activeTab",
+    "*://*/*",
+    "<all_urls>"
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "xifangczy@gmail.com",
+      "strict_min_version": "93.0"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*/*", "http://*/*"],
+      "js": ["js/content-script.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": ["catch-script/*"],
+  "version": "2.2.3"
 }
