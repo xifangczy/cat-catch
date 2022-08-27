@@ -2,9 +2,11 @@
 ### 2.2.4
 [Changed] 更新 hls.js
 
-[Changed] m3u8解析器增加分辨率显示以及优化错误提示
+[Changed] m3u8文件现在能显示更多媒体信息
 
 [Added] 增加 Dash mpd文件解析
+
+[Added] 增加 深度搜索 脚本
 
 [Fixed] 修复 捕获按钮偶尔失效
 
