@@ -58,6 +58,7 @@ function moreFeatFun() {
 G.scriptList = new Map();
 G.scriptList.set("catch.js", { refresh: true, allFrames: true, world: "MAIN", name: "hook脚本" });
 G.scriptList.set("recorder.js", { refresh: false, allFrames: true, world: "MAIN", name: "录制脚本" });
+G.scriptList.set("search-json.js", { refresh: true, allFrames: true, world: "MAIN", name: "json搜索" });
 if (G.version >= 104) {
     G.scriptList.set("recorder2.js", { refresh: false, allFrames: false, world: "ISOLATED", name: "录制脚本2" });
 }
@@ -103,7 +104,8 @@ function GetDefault(Obj) {
         { "type": "application/x-mpegurl", "size": 0, "state": true },
         { "type": "application/mpegurl", "size": 0, "state": true },
         { "type": "application/octet-stream-m3u8", "size": 0, "state": true },
-        { "type": "application/dash+xml", "size": 0, "state": true }
+        { "type": "application/dash+xml", "size": 0, "state": true },
+        { "type": "application/m4s", "size": 0, "state": true }
     );
     const defaultRegex = new Array(
         { "type": "ig", "regex": ".*vurl=([^&]*)", "ext": "m3u8", "state": true },

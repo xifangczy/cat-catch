@@ -44,72 +44,72 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
                 muted: video.muted,
                 type: video.tagName.toLowerCase()
             });
-            return;
+            return true;
         }
         sendResponse({ count: 0 });
-        return;
+        return true;
     }
     // 速度控制
     if (Message.Message == "speed") {
         _videoObj[Message.index].playbackRate = Message.speed;
-        return;
+        return true;
     }
     // 画中画
     if (Message.Message == "pip") {
         if (document.pictureInPictureElement) {
-            try { document.exitPictureInPicture(); } catch (e) { return; }
+            try { document.exitPictureInPicture(); } catch (e) { return true; }
             sendResponse({ state: false });
-            return;
+            return true;
         }
-        try { _videoObj[Message.index].requestPictureInPicture(); } catch (e) { return; }
+        try { _videoObj[Message.index].requestPictureInPicture(); } catch (e) { return true; }
         sendResponse({ state: true });
-        return;
+        return true;
     }
     // 全屏
     if (Message.Message == "fullScreen") {
         if (document.fullscreenElement) {
-            try { document.exitFullscreen(); } catch (e) { return; }
+            try { document.exitFullscreen(); } catch (e) { return true; }
             sendResponse({ state: false });
-            return;
+            return true;
         }
         setTimeout(function () {
-            try { _videoObj[Message.index].requestFullscreen(); } catch (e) { return; }
+            try { _videoObj[Message.index].requestFullscreen(); } catch (e) { return true; }
         }, 500);
         sendResponse({ state: true });
-        return;
+        return true;
     }
     // 播放
     if (Message.Message == "play") {
         _videoObj[Message.index].play();
-        return;
+        return true;
     }
     // 暂停
     if (Message.Message == "pause") {
         _videoObj[Message.index].pause();
-        return;
+        return true;
     }
     // 循环播放
     if (Message.Message == "loop") {
         _videoObj[Message.index].loop = Message.action;
-        return;
+        return true;
     }
     // 设置音量
     if (Message.Message == "setVolume") {
         _videoObj[Message.index].volume = Message.volume;
         sendResponse("ok");
-        return;
+        return true;
     }
     // 静音
     if (Message.Message == "muted") {
         _videoObj[Message.index].muted = Message.action;
-        return;
+        return true;
     }
     // 设置视频进度
     if (Message.Message == "setTime") {
         const time = Message.time * _videoObj[Message.index].duration / 100;
         _videoObj[Message.index].currentTime = time;
         sendResponse("ok");
-        return;
+        return true;
     }
     // 截图视频图片
     if (Message.Message == "screenshot") {
@@ -126,8 +126,11 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             delete canvas;
             delete link;
             sendResponse("ok");
-            return;
-        } catch (e) { console.log(e); return; }
+            return true;
+        } catch (e) { console.log(e); return true; }
+    }
+    if (Message.Message == "setTabId") {
+        window.postMessage({ type: "setTabId", tabId: Message.tabId });
     }
 });
 
@@ -136,7 +139,7 @@ var Port;
 function connect() {
     Port = chrome.runtime.connect(chrome.runtime.id, { name: "HeartBeat" });
     Port.postMessage("HeartBeat");
-    Port.onMessage.addListener(function (message, Port) { return; });
+    Port.onMessage.addListener(function (message, Port) { return true; });
     Port.onDisconnect.addListener(connect);
 }
 connect();
@@ -153,3 +156,9 @@ function secToTime(sec) {
     time += sec;
     return time;
 }
+
+window.addEventListener("message", (event) => {
+    if (event.data.type == "addMedia") {
+        chrome.runtime.sendMessage({ Message: "addMedia", url: event.data.url, href: event.data.href });
+    }
+}, false);

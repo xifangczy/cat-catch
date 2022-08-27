@@ -222,7 +222,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         G.featAutoDownTabId === undefined
     ) {
         sendResponse("error");
-        return;
+        return true;
     }
     // 图标设置
     if (Message.Message == "ClearIcon") {
@@ -234,7 +234,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         } else if (Message.tabId != "-1") {
             SetIcon({ tabId: Message.tabId });
         }
-        return;
+        return true;
     }
     if (Message.Message == "getButtonState") {
         let state = {
@@ -243,7 +243,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             catch: G.featCatchTabId.includes(Message.tabId)
         }
         sendResponse(state);
-        return;
+        return true;
     }
     // 模拟手机
     if (Message.Message == "mobileUserAgent") {
@@ -255,7 +255,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             mobileUserAgent(Message.tabId, true);
         }
         chrome.tabs.reload(Message.tabId, { bypassCache: true });
-        return;
+        return true;
     }
     // 自动下载
     if (Message.Message == "autoDown") {
@@ -265,7 +265,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             G.featAutoDownTabId.push(Message.tabId);
             chrome.storage.local.set({ featAutoDownTabId: G.featAutoDownTabId });
         }
-        return;
+        return true;
     }
     // 捕获
     if (Message.Message == "catch") {
@@ -278,25 +278,25 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
                 injectImmediately: true,
                 world: script.world
             });
-            return;
+            return true;
         }
         /* 需要刷新页面的脚本 */
         // 在列表中 删除 并刷新页面
         if (G.featCatchTabId.includes(Message.tabId)) {
             tabIdListRemove("featCatchTabId", Message.tabId);
             chrome.tabs.reload(Message.tabId, { bypassCache: true });
-            return;
+            return true;
         }
         // 不在列表中 加入 并刷新页面
         G.featCatchTabId.push(Message.tabId);
         chrome.storage.local.set({ featCatchTabId: G.featCatchTabId });
         chrome.tabs.reload(Message.tabId, { bypassCache: true });
-        return;
+        return true;
     }
     // Heart Beat
     if (Message.Message == "HeartBeat") {
         sendResponse("HeartBeat OK");
-        return;
+        return true;
     }
     // 清理数据
     if (Message.Message == "clearData") {
@@ -304,9 +304,17 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         delete cacheData[-1];
         chrome.storage.local.set({ MediaData: cacheData });
         clearRedundant();
-        return;
+        return true;
+    }
+    // 从 content-script 或 catch-script 传来的媒体url
+    if (Message.Message == "addMedia") {
+        chrome.tabs.query({ url: Message.href }, function (tabs) {
+            findMedia({ url: Message.url, tabId: tabs[0].id }, false, false);
+        });
+        return true;
     }
     sendResponse("Error");
+    return true;
 });
 //切换标签，更新全局变量G.tabId 更新图标
 chrome.tabs.onActivated.addListener(function (activeInfo) {
