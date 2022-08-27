@@ -309,7 +309,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     // 从 content-script 或 catch-script 传来的媒体url
     if (Message.Message == "addMedia") {
         chrome.tabs.query({ url: Message.href }, function (tabs) {
-            findMedia({ url: Message.url, tabId: tabs[0].id }, false, false);
+            findMedia({ url: Message.url, tabId: tabs[0].id, extraExt: Message.extraExt }, true, true);
         });
         return true;
     }

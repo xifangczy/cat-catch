@@ -49,6 +49,7 @@ chrome.downloads.onChanged.addListener(function (item) {
 });
 
 function AddMedia(data) {
+    console.log(data);
     // 正则匹配的备注扩展
     if (data.extraExt) {
         data.ext = data.extraExt;
@@ -99,7 +100,7 @@ function AddMedia(data) {
             <div class="panel-heading">
                 <input type="checkbox" class="DownCheck" checked="true"/>
                 <img src="${data.webInfo?.favIconUrl ? data.webInfo?.favIconUrl : ""}" class="icon ${G.ShowWebIco && data.webInfo?.favIconUrl ? "" : "hide"}"/>
-                <img src="img/regex.png" class="icon ${data.isRegex ? "" : "hide"}" title="正则表达式匹配"/>
+                <img src="img/regex.png" class="icon ${data.isRegex ? "" : "hide"}" title="正则表达式匹配 或 来自强力搜索"/>
                 <span class="name">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
                 <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>

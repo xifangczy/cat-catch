@@ -159,6 +159,6 @@ function secToTime(sec) {
 
 window.addEventListener("message", (event) => {
     if (event.data.type == "addMedia") {
-        chrome.runtime.sendMessage({ Message: "addMedia", url: event.data.url, href: event.data.href });
+        chrome.runtime.sendMessage({ Message: "addMedia", url: event.data.url, href: event.data.href, extraExt: event.data.ext });
     }
 }, false);
