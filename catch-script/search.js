@@ -1,16 +1,16 @@
 console.log("start search-json.js");
 
-const _parse = JSON.parse;
+const _JSONparse = JSON.parse;
 JSON.parse = function () {
-    let data = _parse.apply(this, arguments);
-    findMedia(data, undefined);
+    let data = _JSONparse.apply(this, arguments);
+    findMedia(data);
     return data;
 }
-async function findMedia(data, raw) {
+async function findMedia(data, raw = undefined) {
     for (let key in data) {
-        // console.log(data[key]);
         if (typeof data[key] == "object") {
-            findMedia(data[key], data);
+            if (!raw) { raw = data; }
+            findMedia(data[key], raw);
             continue;
         }
         if (typeof data[key] == "string") {
@@ -19,9 +19,8 @@ async function findMedia(data, raw) {
                 try { ext = new URL(data[key]); } catch (e) { continue; }
                 ext = ext.pathname.split(".");
                 if (ext.length == 1) { continue; }
-                ext = ext[ext.length - 1];
+                ext = ext[ext.length - 1].toLowerCase();
                 if (ext == "m3u8" || ext == "m3u" || ext == "mpd") {
-                    // console.log(data[key]);
                     window.postMessage({ type: "addMedia", url: data[key], href: location.href, ext: ext });
                 }
                 continue;
@@ -50,8 +49,18 @@ function isFullM3u8(text) {
 
 // const _xhrOpen = XMLHttpRequest.prototype.open;
 // XMLHttpRequest.prototype.open = function(event){
+//     console.log(this);
 //     this.addEventListener("readystatechange", function (event) {
 //         console.log(this);
 //     });
+//     this.addEventListener("loadend", function (event) {
+//         console.log(this);
+//     });
 //     _xhrOpen.apply(this, arguments);
+// }
+
+// const _fetch = fetch;
+// fetch = function (event) {
+//     console.log(this);
+//     _fetch.apply(this, arguments);
 // }
