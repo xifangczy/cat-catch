@@ -1,4 +1,5 @@
-console.log("start search-json.js");
+console.log("start search.js");
+const DEBUG = false;
 
 // 拦截JSON.parse 分析内容
 const _JSONparse = JSON.parse;
@@ -8,6 +9,7 @@ JSON.parse = function () {
     return data;
 }
 async function findMedia(data, raw = undefined, depth = 0) {
+    DEBUG && console.log(data);
     for (let key in data) {
         if (typeof data[key] == "object") {
             if (depth >= 20) { continue; }  // 防止死循环 最大深度20
@@ -22,9 +24,7 @@ async function findMedia(data, raw = undefined, depth = 0) {
                 continue;
             }
             if (data[key].substr(0, 7) == "#EXTM3U") {
-                if (isFullM3u8(data[key])) {
-                    toUrl(data[key]);
-                }
+                isFullM3u8(data[key]) && toUrl(data[key]);
                 continue;
             }
         }
@@ -37,6 +37,7 @@ XMLHttpRequest.prototype.open = function (method) {
     method = method.toUpperCase();
     this.addEventListener("readystatechange", function (event) {
         if (this.status != 200 || this.response == "" || typeof this.response != "string") { return; }
+        DEBUG && console.log(this);
         if (isUrl(this.response)) {
             let ext = isParsing(this.response);
             ext && window.postMessage({ type: "addMedia", url: this.response, href: location.href, ext: ext });
@@ -48,7 +49,7 @@ XMLHttpRequest.prototype.open = function (method) {
                     window.postMessage({ type: "addMedia", url: this.responseURL, href: location.href, ext: "m3u8" });
                     return;
                 }
-                toUrl(this.response);
+                isFullM3u8(this.response) && toUrl(this.response);
                 return;
             }
             if (isJSON(this.response)) {
@@ -72,6 +73,7 @@ window.fetch = async function (input, init) {
     response.text()
         .then(text => {
             if (text == "") { return; }
+            DEBUG && console.log(text);
             let isJson = isJSON(text);
             if (isJson) {
                 findMedia(isJson);
@@ -82,7 +84,7 @@ window.fetch = async function (input, init) {
                     window.postMessage({ type: "addMedia", url: input, href: location.href, ext: "m3u8" });
                     return;
                 }
-                toUrl(text);
+                isFullM3u8(text) && toUrl(text);
                 return;
             }
         });
@@ -99,15 +101,13 @@ function isFullM3u8(text) {
         if (isUrl(ts)) { return true; }
         return false;
     }
+    return false;
 }
 function isJSON(str) {
     if (typeof str == 'string') {
         try {
             return _JSONparse(str);
-        } catch (e) {
-            console.log(e);
-            return false;
-        }
+        } catch (e) { return false; }
     }
     return false;
 }
