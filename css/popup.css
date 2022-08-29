@@ -82,26 +82,9 @@ body {
   position: fixed;
   display: none;
 }
-#CloseBtn {
-  background: #fff;
-  border: solid 1px #c7c7c7;
-  border-radius: 4px;
-  color: rgb(26, 115, 232);
-  cursor: pointer;
-  padding: 2px 10px 2px 10px;
-  margin-bottom: 5px;
-}
-#CloseBtn:hover {
-  background: #f5f5f5;
-}
-#CloseBtn:active {
-  background: #eee;
-}
-#player {
-  text-align: center;
-}
-#player video {
+#preview {
   max-height: 300px;
+  text-align: center;
 }
 .button,
 .button2 {

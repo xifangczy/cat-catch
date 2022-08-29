@@ -108,88 +108,70 @@ function AddMedia(data) {
                 <img src="img/download.png" class="ico" id="download" title="下载"/>
             </div>
             <div class="url hide">
-                <div id="mediaInfo">
+                <div id="mediaInfo" data-state="false">
                     ${data.title ? `<b>标题:</b> ${data.title}` : ""}
                     ${data.type ? `<br><b>MIME:</b>  ${data.type}` : ""}
                 </div>
                 <a href="${data.url}" target="_blank" download="${data.downFileName}" data-initiator="${data.initiator}">${data.url}</a>
                 <br>
                 <img id="screenshots" class="hide"/>
-                <video id="getMediaInfo" class="hide" muted autoplay></video>
+                <video id="preview" class="hide" controls></video>
             </div>
         </div>`);
 
     ////////////////////////绑定事件////////////////////////
     //展开网址
-    html.find('.panel-heading').click(function () {
-        html.find(".url").toggle();
-        const screenshots = html.find("#screenshots");
-        // 预览图片
-        if (isPicture(data)) {
-            screenshots.css("display", "block");
-            screenshots.attr("src", data.url);
-            return;
+    html.find('.panel-heading').click(function (event) {
+        const urlPanel = html.find(".url");
+        const mediaInfo = html.find("#mediaInfo");
+        const preview = html.find("#preview");
+        if (urlPanel.is(":visible")) {
+            if (event.target.id == "play") {
+                preview.show().trigger("play");
+                return false;
+            }
+            urlPanel.hide();
+            !preview[0].paused && preview.trigger("pause");
+            return false;
         }
-        //获取时长
-        const getMediaInfo = html.find("#getMediaInfo");
-        const mediaInfoNode = html.find("#mediaInfo");
-        if (html.find(".url").is(":visible") && getMediaInfo.length != 0) {
-            let hls = undefined;
+        urlPanel.show();
+        if (!mediaInfo.data("state")) {
+            mediaInfo.data("state", true);
             if (isM3U8(data) && !G.isFirefox) {
-                hls = new Hls();
+                let hls = new Hls();
                 hls.loadSource(data.url);
-                hls.attachMedia(getMediaInfo[0]);
+                hls.attachMedia(preview[0]);
                 hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
                     if (data.tracks) {
-                        !data.tracks.audio && mediaInfoNode.append("<br><b>无音频</b>");
-                        !data.tracks.video && mediaInfoNode.append("<br><b>无视频</b>");
+                        !data.tracks.audio && mediaInfo.append("<br><b>无音频</b>");
+                        !data.tracks.video && mediaInfo.append("<br><b>无视频</b>");
                     }
                 });
                 hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
-                    if(data.levels.length > 1 && !mediaInfoNode.text().includes("m3u8播放列表")){
-                        mediaInfoNode.append("<br><b>m3u8播放列表</b>");
+                    if (data.levels.length > 1 && !mediaInfo.text().includes("m3u8播放列表")) {
+                        mediaInfo.append("<br><b>m3u8播放列表</b>");
                     }
                 });
+            } else if (isPlay(data)) {
+                preview.attr("src", data.url);
+            } else if (isPicture(data)) {
+                html.find("#screenshots").show().attr("src", data.url);
+                return false;
             } else {
-                getMediaInfo.attr('src', data.url);
+                return false;
             }
-            getMediaInfo[0].currentTime = 2;
-            getMediaInfo.on("loadeddata", function () {
-                this.pause();
-                // 截图
-                if (screenshots.attr("src") == undefined) {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = this.videoWidth;
-                    canvas.height = this.videoHeight;
-                    const blank = canvas.toDataURL('image/jpeg');
-                    canvas.getContext('2d').drawImage(this, 0, 0, this.videoWidth, this.videoHeight);
-                    const image = canvas.toDataURL('image/jpeg');
-                    if (image != blank) {
-                        html.find("#player").length == 0 && screenshots.css("display", "block");
-                        screenshots.attr("src", image);
-                    }
-                    delete canvas;
-                }
-                // 获取播放时长
+            preview.on("loadedmetadata", function () {
+                preview.show();
                 if (this.duration && this.duration != Infinity) {
-                    mediaInfoNode.append("<br><b>时长:</b> " + secToTime(this.duration));
+                    mediaInfo.append("<br><b>时长:</b> " + secToTime(this.duration));
                 }
-                if (this.videoHeight) {
-                    mediaInfoNode.append("<br><b>分辨率:</b> " + this.videoWidth + "x" + this.videoHeight);
-                }
-                if (hls) { hls.detachMedia(getMediaInfo[0]); delete hls; }
-                getMediaInfo.remove();
+                this.videoHeight && mediaInfo.append("<br><b>分辨率:</b> " + this.videoWidth + "x" + this.videoHeight);
             });
-            getMediaInfo.on("play", function () {
-                if (hls) { hls.detachMedia(getMediaInfo[0]); delete hls; }
-                getMediaInfo.remove();
-            });
-            getMediaInfo.on("error", function () {
-                if (hls) { hls.detachMedia(getMediaInfo[0]); delete hls; }
-                getMediaInfo.remove();
-            });
-            return false;
         }
+        if (event.target.id == "play") {
+            preview.show().trigger("play");
+        }
+        return false;
     });
     //点击复制网址
     html.find('#copy').click(function () {
@@ -232,11 +214,6 @@ function AddMedia(data) {
         }, function (id) { downData[id] = data; });
         return false;
     });
-    // 点击预览图片
-    html.find('#screenshots').click(function () {
-        if (isPicture(data)) { return; }
-        html.find('#play').click();
-    });
     //播放
     html.find('#play').click(function () {
         if (G.Potplayer) {
@@ -246,22 +223,6 @@ function AddMedia(data) {
             }
             chrome.tabs.update({ url: 'potplayer://' + data.url });
             return false;
-        }
-        html.find("#screenshots").hide();
-        $('#player video').attr('src', data.url);
-        $('#player').show().appendTo(html);
-        if (!isM3U8(data)) {
-            $('#player video').trigger('play');
-            return false;
-        }
-        if (!G.isFirefox) {
-            const hls = new Hls();
-            const video = $('#player video')[0];
-            hls.loadSource(data.url);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MEDIA_ATTACHED, function () {
-                video.play();
-            });
         }
     });
     //解析m3u8
@@ -356,17 +317,6 @@ $(function () {
         chrome.runtime.sendMessage({ Message: "ClearIcon" });
         location.reload();
     });
-    //预览播放关闭按钮
-    $('#CloseBtn').click(function () {
-        const screenshots = $(this).parent().siblings(".url").find("#screenshots");
-        if (screenshots.attr("src") != "" && screenshots.attr("src") != undefined) {
-            screenshots.css("display", "block");
-        }
-        $('#player video').trigger('pause').removeAttr('src');
-        $("#player").hide().appendTo('body');
-        return false;
-    });
-
     // 获取模拟手机 自动下载 捕获 状态
     chrome.runtime.sendMessage({ Message: "getButtonState", tabId: G.tabId }, function (state) {
         if (state.mobile) {
@@ -597,7 +547,7 @@ $(function () {
         if (!G.initComplete) { return; }
         clearInterval(interval);
         // 捕获按钮
-        if($("#Catch").data("switch") != "off"){
+        if ($("#Catch").data("switch") != "off") {
             $("#Catch").html(G.scriptList.get(G.injectScript).name);
         }
         $("#Catch").click(function () {
