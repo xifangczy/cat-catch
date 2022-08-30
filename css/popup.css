@@ -95,22 +95,23 @@ body {
   cursor: pointer;
   padding: 3px 3px 3px 3px;
   margin: 0 0 3px 0;
+  user-select: none;
 }
 .button:hover {
-  background: #f5f5f5;
+  background: rgb(66 133 244 / 4%);
 }
 .button:active {
-  background: #ddd;
+  background: rgb(66 133 244 / 10%);
 }
 .button2 {
-  background: rgb(26 115 232 / 80%);
+  background: rgb(26 115 232);
   color: rgb(255 255 255);
 }
 .button2:hover {
-  background: rgb(26 115 232);
+  background: rgb(26 115 232 / 90%);
 }
 .button2:active {
-  background: rgb(26 115 232 / 80%);
+  background: rgb(26 115 232 / 50%);
 }
 .Tabs {
   display: flex;
@@ -128,6 +129,7 @@ body {
   flex-direction: row;
   align-items: baseline;
   justify-content: center;
+  user-select: none;
 }
 .TabButton.Active {
   background-color: #f5f5f5;
@@ -233,7 +235,7 @@ body {
 .nowrap {
   word-break: keep-all;
 }
-.otherFeat .button2{
+.otherFeat .button2 {
   width: 100%;
   margin-right: 10px;
   text-align: center;

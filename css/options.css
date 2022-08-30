@@ -146,27 +146,28 @@ button,
   padding: calc(0.5em - 1px) 1em;
   margin-left: 5px;
   margin-right: 5px;
+  user-select: none;
   /* margin-top: 10px; */
 }
 button:hover {
-  background: #f5f5f5;
+  background: rgb(66 133 244 / 4%);
 }
 button:active {
-  background: #ddd;
+  background: rgb(66 133 244 / 10%);
 }
 .button {
   display: flex;
   justify-content: flex-end;
 }
 .button2 {
-  background: rgb(26 115 232 / 80%);
+  background: rgb(26 115 232);
   color: rgb(255 255 255);
 }
 .button2:hover {
-  background: rgb(26 115 232);
+  background: rgb(26 115 232 / 90%);
 }
 .button2:active {
-  background: rgb(26 115 232 / 80%);
+  background: rgb(26 115 232 / 50%);
 }
 .no-drop {
   background-color: #ccc !important;
