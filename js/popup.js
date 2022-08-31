@@ -528,6 +528,7 @@ $(function () {
     //102以上开启捕获按钮
     if (G.version >= 102) {
         $("#Catch").show();
+        $("#otherScript").show();
     }
     // Firefox 关闭画中画 全屏 修复右边滚动条遮挡
     if (G.isFirefox) {
@@ -554,6 +555,16 @@ $(function () {
             chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId });
             G.refreshClear && $('#Clear').click();
             location.reload();
+        });
+        G.scriptList.forEach(function (value, key) {
+            let button = $(`<button data-script="${key}" class="button2">${value.name}</button>`);
+            button.click(function () {
+                chrome.storage.sync.set({ injectScript: this.dataset.script }, function () {
+                    chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId });
+                    G.refreshClear && $('#Clear').click();
+                });
+            });
+            $(".otherScript").append(button);
         });
 
         // 上一次设定的倍数

@@ -235,6 +235,7 @@ body {
 .nowrap {
   word-break: keep-all;
 }
+.otherScript .button2,
 .otherFeat .button2 {
   width: 100%;
   margin-right: 10px;
@@ -243,4 +244,9 @@ body {
 .line {
   border-top: solid 1px rgb(0 0 0 / 50%);
   margin: 5px 0 5px 0;
+}
+.otherTips{
+  text-align: center;
+  color: rgb(26, 115, 232);
+  margin-bottom: 5px;
 }
