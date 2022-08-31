@@ -12,7 +12,7 @@ async function findMedia(data, raw = undefined, depth = 0) {
     DEBUG && console.log(data);
     for (let key in data) {
         if (typeof data[key] == "object") {
-            if (depth >= 20) { continue; }  // 防止死循环 最大深度20
+            if (depth > 10) { continue; }  // 防止死循环 最大深度10
             if (!raw) { raw = data; }
             findMedia(data[key], raw, ++depth);
             continue;
