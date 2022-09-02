@@ -104,7 +104,10 @@ function isFullM3u8(text) {
     return false;
 }
 function isJSON(str) {
-    if (typeof str == 'string') {
+    if (typeof str == "object") {
+        return str;
+    }
+    if (typeof str == "string") {
         try {
             return _JSONparse(str);
         } catch (e) { return false; }

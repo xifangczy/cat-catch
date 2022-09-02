@@ -156,7 +156,7 @@ body {
   background: #ddd;
 }
 .DownCheck {
-  margin-right: 2px;
+  margin: 0 2px 0 0;
   width: 15px;
   height: 15px;
   flex: 0 0 auto;
@@ -249,4 +249,5 @@ body {
   text-align: center;
   color: rgb(26, 115, 232);
   margin-bottom: 5px;
+  font-weight: bold;
 }
