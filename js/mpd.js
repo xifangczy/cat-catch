@@ -3,12 +3,13 @@ const params = new URL(location.href).searchParams;
 var _url = params.get("url");
 const _referer = params.get("referer");
 const _title = params.get("title");
+// 修改当前标签下的所有xhr的Referer
+_referer && setReferer(_referer);
 
 var mpdJson = {}; // 解析器json结果
 var mpdContent; // mpd文件内容
 var m3u8Content = "";   //m3u8内容
 var mediaInfo = "" // 媒体文件信息
-var currentTabId = -1;  //当前tabId
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     if (message == "getM3u8") {
@@ -17,37 +18,14 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 });
 
 $(function () {
-    // 如果存在Referer修改当前标签下的所有xhr的Referer
-    chrome.tabs.getCurrent(function (tabs) {
-        currentTabId = tabs.id;
-        if (_referer && !isEmpty(_referer)) {
-            chrome.declarativeNetRequest.updateSessionRules({
-                removeRuleIds: [tabs.id],
-                addRules: [{
-                    "id": tabs.id,
-                    "action": {
-                        "type": "modifyHeaders",
-                        "requestHeaders": [{
-                            "header": "Referer",
-                            "operation": "set",
-                            "value": _referer
-                        }]
-                    },
-                    "condition": {
-                        "tabIds": [tabs.id],
-                        "resourceTypes": ["xmlhttprequest"]
-                    }
-                }]
-            });
-        }
-        fetch(_url)
-            .then(response => response.text())
-            .then(function (text) {
-                mpdContent = text;
-                parseMPD(mpdContent);
-                $("#mpd_url").html(_url).attr("href", _url);
-            });
+    fetch(_url)
+    .then(response => response.text())
+    .then(function (text) {
+        mpdContent = text;
+        parseMPD(mpdContent);
+        $("#mpd_url").html(_url).attr("href", _url);
     });
+
     $("#mpdLists, #mpdAudioLists").change(function () {
         let type = this.id == "mpdLists" ? "video" : "audio";
         showSegment(type, $(this).val());
@@ -83,7 +61,9 @@ $(function () {
         }
         m3u8Content += "#EXT-X-ENDLIST";
         // $("#media_file").html(m3u8Content); return;
-        chrome.tabs.create({ url: "m3u8.html?getId=" + currentTabId });
+        chrome.tabs.getCurrent(function (tabs) {
+            chrome.tabs.create({ url: "m3u8.html?getId=" + tabs.id });
+        });
     });
 });
 

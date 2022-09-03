@@ -250,3 +250,28 @@ function isEmpty(obj) {
     }
     return false;
 }
+
+function setReferer(referer, callback) {
+    chrome.tabs.getCurrent(function (tabs) {
+        chrome.declarativeNetRequest.updateSessionRules({
+            removeRuleIds: [tabs.id],
+            addRules: [{
+                "id": tabs.id,
+                "action": {
+                    "type": "modifyHeaders",
+                    "requestHeaders": [{
+                        "header": "Referer",
+                        "operation": "set",
+                        "value": referer
+                    }]
+                },
+                "condition": {
+                    "tabIds": [tabs.id],
+                    "resourceTypes": ["xmlhttprequest"]
+                }
+            }]
+        }, function () {
+            callback && callback();
+        });
+    });
+}

@@ -29,6 +29,8 @@
           <div class="line"></div>
           <span class="explain">或 输入m3u8的url</span>
           <input type="text" id="m3u8Url" placeholder="m3u8 URL" style="width: 970px; margin: 5px;"/>
+          <div class="line"></div>
+          <input type="text" id="referer" placeholder="请求头 Referer" style="width: 970px; margin: 5px;"/>
           <button id="parse" type="button">解析</button>
         </div>
       </section>
@@ -71,7 +73,6 @@
             <div id="info"></div>
           </div>
           <div class="block" id="textarea">
-            <!-- <div id="media_file" contenteditable="true"></div> -->
             <textarea rows="50" cols="160" id="media_file" spellcheck="false" data-type="link">切片文件载入中....</textarea>
             <video id="video" class="hide" width="100%" controls></video>
           </div>
@@ -82,7 +83,6 @@
             <button id="localFile">本地m3u8</button>
             <button id="getTs">提取ts</button>
             <button id="play" data-switch="on">播放m3u8</button>
-            <!-- <button id="catch" data-switch="on">开启捕获</button> -->
             <button id="m3u8DL" class="button2">调用m3u8DL下载</button>
             <button id="copyM3U8dl">复制m3u8DL命令参数</button>
             <div class="line"></div>

@@ -1,57 +1,36 @@
-$(function () {
-    const params = new URL(location.href).searchParams;
-    const _url = params.get("url");
-    const _referer = params.get("referer");
-    const _fileName = params.get("filename");
+// url 参数解析
+const params = new URL(location.href).searchParams;
+const _url = params.get("url");
+const _referer = params.get("referer");
+const _fileName = params.get("filename");
+// 修改当前标签下的所有xhr的Referer
+_referer && setReferer(_referer);
 
+$(function () {
     // 下载的文件ID
     var downId = 0;
-
-    // 获取当前tabId 如果存在Referer修改当前标签下的所有xhr的Referer
-    chrome.tabs.getCurrent(function (tabs) {
-        if (_referer && !isEmpty(_referer)) {
-            chrome.declarativeNetRequest.updateSessionRules({
-                removeRuleIds: [tabs.id],
-                addRules: [{
-                    "id": tabs.id,
-                    "action": {
-                        "type": "modifyHeaders",
-                        "requestHeaders": [{
-                            "header": "Referer",
-                            "operation": "set",
-                            "value": _referer
-                        }]
-                    },
-                    "condition": {
-                        "tabIds": [tabs.id],
-                        "resourceTypes": ["xmlhttprequest"]
-                    }
-                }]
-            });
-        }
-        // 没有url 打开输入框
-        if (!_url) {
-            $("#getURL").show();
-            $("#getURL_btn").click(function () {
-                const url = $("#getURL #url").val().trim();
-                const referer = $("#getURL #referer").val().trim();
-                window.location.href = `?url=${encodeURIComponent(url)}&referer=${encodeURIComponent(referer)}`;
-            });
-            return;
-        }
-        // 如果是m3u8 mpd跳转到解析器
-        let ext = _url.split("?")[0];
-        ext = ext.split(".").pop();
-        if (ext == "m3u8") {
-            window.location.href = `m3u8.html?url=${encodeURIComponent(_url)}&referer=${encodeURIComponent(_referer)}`;
-            return;
-        }
-        if (ext == "mpd") {
-            window.location.href = `mpd.html?url=${encodeURIComponent(_url)}&referer=${encodeURIComponent(_referer)}`;
-            return;
-        }
-        downloadFile();
-    });
+    // 没有url 打开输入框
+    if (!_url) {
+        $("#getURL").show();
+        $("#getURL_btn").click(function () {
+            const url = $("#getURL #url").val().trim();
+            const referer = $("#getURL #referer").val().trim();
+            window.location.href = `?url=${encodeURIComponent(url)}&referer=${encodeURIComponent(referer)}`;
+        });
+        return;
+    }
+    // 如果是m3u8 mpd跳转到解析器
+    let ext = _url.split("?")[0];
+    ext = ext.split(".").pop();
+    if (ext == "m3u8") {
+        window.location.href = `m3u8.html?url=${encodeURIComponent(_url)}&referer=${encodeURIComponent(_referer)}`;
+        return;
+    }
+    if (ext == "mpd") {
+        window.location.href = `mpd.html?url=${encodeURIComponent(_url)}&referer=${encodeURIComponent(_referer)}`;
+        return;
+    }
+    downloadFile();
 
     // 使用ajax下载文件
     function downloadFile() {

@@ -4,28 +4,13 @@ var _m3u8Url = params.get("url");
 const _referer = params.get("referer");
 const _title = params.get("title");
 const getId = parseInt(params.get("getId"));
+// 修改当前标签下的所有xhr的Referer
+_referer && setReferer(_referer);
 
-// 解析参数 注入脚本
-let onCatch = new RegExp("&catch=([^\n&]*)").exec(window.location.href);
-if (onCatch) {
-    onCatch = decodeURIComponent(onCatch[1]);
-    if (G.scriptList.has(onCatch)) {
-        onCatch = "catch-script/" + onCatch;
-    }
-    const script = document.createElement('script');
-    script.src = onCatch;
-    document.head.appendChild(script);
-}
 $(function () {
-    // 捕获开关按钮
-    if (onCatch) {
-        $("#catch").html("关闭捕获");
-        $("#catch").data("switch", "off");
-    }
-    // Firefox 关闭播放m3u8 和 捕获
+    // Firefox 关闭播放m3u8
     if (G.isFirefox) {
         $("#play").hide();
-        $("#catch").hide();
     }
     //获取m3u8参数
     var _m3u8Arg = new RegExp("\\.m3u8\\?([^\n]*)").exec(_m3u8Url);
@@ -54,61 +39,42 @@ $(function () {
     const errorTsList = []; // 下载错误ts序号列表
     var recorder = false; // 录制直播 开关
 
-    // 如果存在Referer修改当前标签下的所有xhr的Referer
-    chrome.tabs.getCurrent(function (tabs) {
-        if (_referer && !isEmpty(_referer)) {
-            chrome.declarativeNetRequest.updateSessionRules({
-                removeRuleIds: [tabs.id],
-                addRules: [{
-                    "id": tabs.id,
-                    "action": {
-                        "type": "modifyHeaders",
-                        "requestHeaders": [{
-                            "header": "Referer",
-                            "operation": "set",
-                            "value": _referer
-                        }]
-                    },
-                    "condition": {
-                        "tabIds": [tabs.id],
-                        "resourceTypes": ["xmlhttprequest"]
-                    }
-                }]
-            });
-        }
-        if (isEmpty(_m3u8Url)) {
-            $("#loading").hide(); $("#m3u8Custom").show();
-            $("#parse").click(function () {
-                let m3u8Text = $("#m3u8Text").val().trim();
-                let baseUrl = $("#baseUrl").val().trim();
-                let m3u8Url = $("#m3u8Url").val().trim();
-                if (m3u8Url != "") {
-                    chrome.tabs.update({ url: "m3u8.html?url=" + encodeURIComponent(m3u8Url) });
-                    return;
-                }
-                if (baseUrl != "") {
-                    m3u8Text = addBashUrl(baseUrl, m3u8Text);
-                }
-                if (!m3u8Text.includes("#EXTM3U")) {
-                    m3u8Text = tsListTom3u8Text(m3u8Text);
-                }
-                _m3u8Url = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(m3u8Text)]));
-                parseM3U8();
-                $("#m3u8Custom").hide();
-            });
-            // 从mpd解析器读取数据
-            if (getId) {
-                chrome.tabs.sendMessage(getId, "getM3u8", function (result) {
-                    $("#m3u8Text").html(result.m3u8Content);
-                    $("#parse").click();
-                    $("#info").html(result.mediaInfo);
-                });
+    if (isEmpty(_m3u8Url)) {
+        $("#loading").hide(); $("#m3u8Custom").show();
+        $("#parse").click(function () {
+            let m3u8Text = $("#m3u8Text").val().trim();
+            let baseUrl = $("#baseUrl").val().trim();
+            let m3u8Url = $("#m3u8Url").val().trim();
+            let referer = $("#referer").val().trim();
+            if (referer != "") {
+                setReferer(referer);
             }
-            return;
+            if (m3u8Url != "") {
+                chrome.tabs.update({ url: "m3u8.html?url=" + encodeURIComponent(m3u8Url) });
+                return;
+            }
+            if (baseUrl != "") {
+                m3u8Text = addBashUrl(baseUrl, m3u8Text);
+            }
+            if (!m3u8Text.includes("#EXTM3U")) {
+                m3u8Text = tsListTom3u8Text(m3u8Text);
+            }
+            _m3u8Url = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(m3u8Text)]));
+            parseM3U8();
+            $("#m3u8Custom").hide();
+        });
+        // 从mpd解析器读取数据
+        if (getId) {
+            chrome.tabs.sendMessage(getId, "getM3u8", function (result) {
+                $("#m3u8Text").html(result.m3u8Content);
+                $("#parse").click();
+                $("#info").html(result.mediaInfo);
+            });
         }
-        // 开始解析
-        parseM3U8();
-    });
+        return;
+    }
+    // 开始解析
+    parseM3U8();
 
     /* 解析函数 使用hls解析好的数据 进一步处理 */
     function parseM3U8() {
@@ -409,16 +375,6 @@ $(function () {
         hls.detachMedia($("#video")[0]);
         $("#media_file").show();
         $(this).html("播放m3u8").data("switch", "on");
-    });
-    // 开启/关闭捕获
-    $("#catch").click(function () {
-        if ($(this).data("switch") == "on") {
-            let injectScript = G.injectScript ? G.injectScript : "catch.js";
-            injectScript = encodeURIComponent(injectScript);
-            window.location.href = window.location.href + "&catch=" + injectScript;
-            return;
-        }
-        window.location.href = window.location.href.replace(/&catch=[^&]*/, "");
     });
     // 调用m3u8DL下载
     $("#m3u8DL").click(function () {

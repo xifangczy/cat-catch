@@ -1,9 +1,11 @@
-$(function () {
-    // url 参数解析
-    const params = new URL(location.href).searchParams;
-    var _url = params.get("url");
-    const _referer = params.get("referer");
+// url 参数解析
+const params = new URL(location.href).searchParams;
+var _url = params.get("url");
+const _referer = params.get("referer");
+// 修改当前标签下的所有xhr的Referer
+_referer && setReferer(_referer);
 
+$(function () {
     var jsonContent = "";
     var options = {
         collapsed: true,
@@ -12,45 +14,23 @@ $(function () {
         withLinks: true
     };
 
-    // 修改Referer
-    chrome.tabs.getCurrent(function (tabs) {
-        if (_referer && !isEmpty(_referer)) {
-            chrome.declarativeNetRequest.updateSessionRules({
-                removeRuleIds: [tabs.id],
-                addRules: [{
-                    "id": tabs.id,
-                    "action": {
-                        "type": "modifyHeaders",
-                        "requestHeaders": [{
-                            "header": "Referer",
-                            "operation": "set",
-                            "value": _referer
-                        }]
-                    },
-                    "condition": {
-                        "tabIds": [tabs.id],
-                        "resourceTypes": ["xmlhttprequest"]
-                    }
-                }]
-            });
-        }
-        if (isEmpty(_url)) {
-            $("#jsonCustom").show(); $("#main").hide();
-            $("#format").click(function () {
-                _url = $("#jsonUrl").val().trim();
-                if (isEmpty(_url)) {
-                    let jsonText = $("#jsonText").val();
-                    jsonContent = JSON.parse(jsonText);
-                    renderJson();
-                    $("#jsonCustom").hide(); $("#main").show();
-                    return;
-                }
-                getJson(_url);
-            });
-            return;
-        }
-        getJson(_url);
-    });
+    if (isEmpty(_url)) {
+        $("#jsonCustom").show(); $("#main").hide();
+        $("#format").click(function () {
+            _url = $("#jsonUrl").val().trim();
+            if (isEmpty(_url)) {
+                let jsonText = $("#jsonText").val();
+                jsonContent = JSON.parse(jsonText);
+                renderJson();
+                $("#jsonCustom").hide(); $("#main").show();
+                return;
+            }
+            getJson(_url);
+        });
+        return;
+    }
+    getJson(_url);
+
     function getJson(url) {
         $("#jsonCustom").hide(); $("#main").show();
         $.ajax({
