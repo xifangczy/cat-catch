@@ -28,7 +28,7 @@ async function findMedia(data, raw = undefined, depth = 0) {
                 continue;
             }
             if (data[key].substr(0, 34) == "data:application/vnd.apple.mpegurl") {
-                let text = data[key].substr(0, 34);
+                let text = data[key].substr(34);
                 if (text.substr(0, 8) == ";base64,") {
                     text = window.atob(text.substr(8));
                 }
@@ -112,7 +112,7 @@ window.fetch = async function (input, init) {
                 return;
             }
             if (text.substr(0, 34) == "data:application/vnd.apple.mpegurl") {
-                let text = text.substr(0, 34);
+                let text = text.substr(34);
                 if (text.substr(0, 8) == ";base64,") {
                     text = window.atob(text.substr(8));
                 }
