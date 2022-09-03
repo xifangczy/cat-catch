@@ -27,8 +27,12 @@ async function findMedia(data, raw = undefined, depth = 0) {
                 isFullM3u8(data[key]) && toUrl(data[key]);
                 continue;
             }
-            if (data[key].substr(0, 42) == "data:application/vnd.apple.mpegurl;base64,") {
-                toUrl(window.atob(data[key].substr(42)));
+            if (data[key].substr(0, 34) == "data:application/vnd.apple.mpegurl") {
+                let text = data[key].substr(0, 34);
+                if (text.substr(0, 8) == ";base64,") {
+                    text = window.atob(text.substr(8));
+                }
+                toUrl(text);
                 continue;
             }
         }
@@ -42,12 +46,20 @@ XMLHttpRequest.prototype.open = function (method) {
     this.addEventListener("readystatechange", function (event) {
         if (this.status != 200 || this.response == "" || typeof this.response != "string") { return; }
         DEBUG && console.log(this);
-        if (this.response.substr(0, 42) == "data:application/vnd.apple.mpegurl;base64,") {
-            toUrl(window.atob(this.response.substr(42)));
+        if (this.response.substr(0, 34) == "data:application/vnd.apple.mpegurl") {
+            let text = this.response.substr(34);
+            if (text.substr(0, 8) == ";base64,") {
+                text = window.atob(text.substr(8));
+            }
+            toUrl(text);
             return;
         }
-        if (this.responseURL.substr(0, 42) == "data:application/vnd.apple.mpegurl;base64,") {
-            toUrl(window.atob(this.responseURL.substr(42)));
+        if (this.responseURL.substr(0, 34) == "data:application/vnd.apple.mpegurl") {
+            let text = this.responseURL.substr(34);
+            if (text.substr(0, 8) == ";base64,") {
+                text = window.atob(text.substr(8));
+            }
+            toUrl(text);
             return;
         }
         if (isUrl(this.response)) {
@@ -99,8 +111,12 @@ window.fetch = async function (input, init) {
                 isFullM3u8(text) && toUrl(text);
                 return;
             }
-            if (text.substr(0, 42) == "data:application/vnd.apple.mpegurl;base64,") {
-                toUrl(window.atob(text.substr(42)));
+            if (text.substr(0, 34) == "data:application/vnd.apple.mpegurl") {
+                let text = text.substr(0, 34);
+                if (text.substr(0, 8) == ";base64,") {
+                    text = window.atob(text.substr(8));
+                }
+                toUrl(text);
                 return;
             }
         });
