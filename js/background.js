@@ -308,10 +308,6 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // 从 content-script 或 catch-script 传来的媒体url
     if (Message.Message == "addMedia") {
-        // chrome.tabs.query({ url: Message.href }, function (tabs) {
-        //     console.log(Message.href, tabs);
-        //     findMedia({ url: Message.url, tabId: tabs[0].id, extraExt: Message.extraExt }, true, true);
-        // });
         chrome.tabs.query({}, function (tabs) {
             for (let item of tabs) {
                 if (item.url == Message.href) {
@@ -420,9 +416,10 @@ function CheckType(dataType, dataSize) {
 //获取文件名
 function GetFileName(url) {
     let str = url.split("?"); //url按？分开
+    str = str[0].split("&"); //按&分开
     str = str[0].split("/"); //按/分开
     str = str[str.length - 1].split("#"); //按#分开
-    return str[0].toLowerCase(); //得到带后缀的名字
+    return stringModify(str[0].toLowerCase()); //得到带后缀的名字
 }
 //获取后缀名
 function GetExt(FileName) {

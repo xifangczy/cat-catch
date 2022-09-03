@@ -708,7 +708,7 @@ function GetFileName(url) {
     url = GetFile(url);
     url = url.split(".");
     url.length > 1 && url.pop();
-    return url.join(".");
+    return stringModify(url.join("."));
 }
 // 按钮状态
 function buttonState(obj = "#mergeTs", state = true) {
