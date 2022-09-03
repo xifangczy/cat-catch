@@ -27,6 +27,10 @@ async function findMedia(data, raw = undefined, depth = 0) {
                 isFullM3u8(data[key]) && toUrl(data[key]);
                 continue;
             }
+            if (data[key].substr(0, 42) == "data:application/vnd.apple.mpegurl;base64,") {
+                toUrl(window.atob(data[key].substr(42)));
+                continue;
+            }
         }
     }
 }
@@ -38,6 +42,14 @@ XMLHttpRequest.prototype.open = function (method) {
     this.addEventListener("readystatechange", function (event) {
         if (this.status != 200 || this.response == "" || typeof this.response != "string") { return; }
         DEBUG && console.log(this);
+        if (this.response.substr(0, 42) == "data:application/vnd.apple.mpegurl;base64,") {
+            toUrl(window.atob(this.response.substr(42)));
+            return;
+        }
+        if (this.responseURL.substr(0, 42) == "data:application/vnd.apple.mpegurl;base64,") {
+            toUrl(window.atob(this.responseURL.substr(42)));
+            return;
+        }
         if (isUrl(this.response)) {
             let ext = isParsing(this.response);
             ext && window.postMessage({ type: "addMedia", url: this.response, href: location.href, ext: ext });
@@ -85,6 +97,10 @@ window.fetch = async function (input, init) {
                     return;
                 }
                 isFullM3u8(text) && toUrl(text);
+                return;
+            }
+            if (text.substr(0, 42) == "data:application/vnd.apple.mpegurl;base64,") {
+                toUrl(window.atob(text.substr(42)));
                 return;
             }
         });
