@@ -36,10 +36,9 @@ body {
   text-overflow: ellipsis;
   overflow: hidden;
 }
-.url {
+.panel .url {
   padding: 5px;
 }
-.ico,
 .icon {
   padding-left: 2px;
   padding-right: 2px;
@@ -47,19 +46,13 @@ body {
   width: 18px;
   height: 18px;
 }
-.ico:hover {
+.icon:hover {
   transform: scale(1.1);
 }
-.ico:active {
+.icon:active {
   transform: scale(1);
 }
-.leftIco {
-  float: left;
-  width: 18px;
-  height: 18px;
-  padding-right: 2px;
-}
-.size {
+.panel-heading .size {
   float: right;
   font-weight: bold;
 }
@@ -185,9 +178,6 @@ body {
   cursor: pointer;
   margin: auto;
 }
-#getMediaInfo {
-  width: 100%;
-}
 #otherOptions {
   margin: 5px;
 }
@@ -210,7 +200,7 @@ body {
   margin-bottom: 2px;
   width: 100%;
 }
-.loop {
+#PlayControl .loop {
   margin: 0 5px 0 5px;
 }
 .blue {
@@ -248,6 +238,5 @@ body {
 .otherTips{
   text-align: center;
   color: rgb(26, 115, 232);
-  margin-bottom: 5px;
   font-weight: bold;
 }

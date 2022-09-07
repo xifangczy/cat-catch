@@ -65,9 +65,9 @@ function AddMedia(data) {
 
     //截取文件名长度
     let trimName = data.name;
-    if (data.name.length >= 43) {
+    if (data.name.length >= 60) {
         trimName = data.name.replace(/\.[^.\/]+$/, "");
-        trimName = trimName.substr(0, 13) + '...' + trimName.substr(-20) + '.' + data.ext;
+        trimName = trimName.substr(0, 20) + '...' + trimName.substr(-20) + '.' + data.ext;
     }
 
     //添加下载文件名
@@ -102,10 +102,10 @@ function AddMedia(data) {
                 <img src="img/regex.png" class="icon ${data.isRegex ? "" : "hide"}" title="正则表达式匹配 或 来自深度搜索"/>
                 <span class="name">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
-                <img src="img/copy.png" class="ico" id="copy" title="复制地址"/>
-                <img src="img/parsing.png" class="ico ${parsing.switch ? "" : "hide"}" id="${parsing.type}" title="解析"/>
-                <img src="img/${G.Potplayer ? "potplayer.png" : "play.png"}" class="ico ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
-                <img src="img/download.png" class="ico" id="download" title="下载"/>
+                <img src="img/copy.png" class="icon" id="copy" title="复制地址"/>
+                <img src="img/parsing.png" class="icon ${parsing.switch ? "" : "hide"}" id="${parsing.type}" title="解析"/>
+                <img src="img/${G.Potplayer ? "potplayer.png" : "play.png"}" class="icon ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
+                <img src="img/download.png" class="icon" id="download" title="下载"/>
             </div>
             <div class="url hide">
                 <div id="mediaInfo" data-state="false">
@@ -118,7 +118,6 @@ function AddMedia(data) {
                 <video id="preview" class="hide" controls></video>
             </div>
         </div>`);
-
     ////////////////////////绑定事件////////////////////////
     //展开网址
     html.find('.panel-heading').click(function (event) {
@@ -143,6 +142,7 @@ function AddMedia(data) {
                 hls.attachMedia(preview[0]);
                 hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
                     if (data.tracks) {
+                        if (data.tracks.audiovideo) { return; }
                         !data.tracks.audio && mediaInfo.append("<br><b>无音频</b>");
                         !data.tracks.video && mediaInfo.append("<br><b>无视频</b>");
                     }
