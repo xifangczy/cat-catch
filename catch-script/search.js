@@ -23,14 +23,14 @@ async function findMedia(data, raw = undefined, depth = 0) {
                 ext && window.postMessage({ type: "addMedia", url: data[key], href: location.href, ext: ext });
                 continue;
             }
-            if (data[key].substr(0, 7) == "#EXTM3U") {
+            if (data[key].substring(0, 7) == "#EXTM3U") {
                 isFullM3u8(data[key]) && toUrl(data[key]);
                 continue;
             }
-            if (data[key].substr(0, 34) == "data:application/vnd.apple.mpegurl") {
-                let text = data[key].substr(34);
-                if (text.substr(0, 8) == ";base64,") {
-                    text = window.atob(text.substr(8));
+            if (data[key].substring(0, 34) == "data:application/vnd.apple.mpegurl") {
+                let text = data[key].substring(35);
+                if (text.substring(0, 7) == "base64,") {
+                    text = window.atob(text.substring(7));
                 }
                 toUrl(text);
                 continue;
@@ -46,18 +46,18 @@ XMLHttpRequest.prototype.open = function (method) {
     this.addEventListener("readystatechange", function (event) {
         if (this.status != 200 || this.response == "" || typeof this.response != "string") { return; }
         DEBUG && console.log(this);
-        if (this.response.substr(0, 34) == "data:application/vnd.apple.mpegurl") {
-            let text = this.response.substr(34);
-            if (text.substr(0, 8) == ";base64,") {
-                text = window.atob(text.substr(8));
+        if (this.response.substring(0, 34) == "data:application/vnd.apple.mpegurl") {
+            let text = this.response.substring(35);
+            if (text.substring(0, 7) == "base64,") {
+                text = window.atob(text.substring(7));
             }
             toUrl(text);
             return;
         }
-        if (this.responseURL.substr(0, 34) == "data:application/vnd.apple.mpegurl") {
-            let text = this.responseURL.substr(34);
-            if (text.substr(0, 8) == ";base64,") {
-                text = window.atob(text.substr(8));
+        if (this.responseURL.substring(0, 34) == "data:application/vnd.apple.mpegurl") {
+            let text = this.responseURL.substring(35);
+            if (text.substring(0, 7) == "base64,") {
+                text = window.atob(text.substring(7));
             }
             toUrl(text);
             return;
@@ -68,7 +68,7 @@ XMLHttpRequest.prototype.open = function (method) {
             return;
         }
         if (this.response.includes("#EXTM3U")) {
-            if (this.response.substr(0, 7) == "#EXTM3U") {
+            if (this.response.substring(0, 7) == "#EXTM3U") {
                 if (method == "GET") {
                     window.postMessage({ type: "addMedia", url: this.responseURL, href: location.href, ext: "m3u8" });
                     return;
@@ -103,7 +103,7 @@ window.fetch = async function (input, init) {
                 findMedia(isJson);
                 return;
             }
-            if (text.substr(0, 7) == "#EXTM3U") {
+            if (text.substring(0, 7) == "#EXTM3U") {
                 if (init.method == undefined || (init.method && init.method.toUpperCase() == "GET")) {
                     window.postMessage({ type: "addMedia", url: input, href: location.href, ext: "m3u8" });
                     return;
@@ -111,10 +111,10 @@ window.fetch = async function (input, init) {
                 isFullM3u8(text) && toUrl(text);
                 return;
             }
-            if (text.substr(0, 34) == "data:application/vnd.apple.mpegurl") {
-                let text = text.substr(34);
-                if (text.substr(0, 8) == ";base64,") {
-                    text = window.atob(text.substr(8));
+            if (text.substring(0, 34) == "data:application/vnd.apple.mpegurl") {
+                let text = text.substring(35);
+                if (text.substring(0, 7) == "base64,") {
+                    text = window.atob(text.substring(7));
                 }
                 toUrl(text);
                 return;
