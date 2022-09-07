@@ -163,8 +163,15 @@ $(function () {
             console.log(data);
         });
         hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
+            // console.log(data);
             const info = $(".videoInfo #info");
             if (data.tracks && info.html() == "") {
+                if (data.tracks.audiovideo) {
+                    if (data.tracks.audiovideo?.metadata) {
+                        info.append(" 分辨率:" + data.tracks.audiovideo.metadata.width + "x" + data.tracks.audiovideo.metadata.height);
+                    }
+                    return;
+                }
                 !data.tracks.audio && info.append(" (无音频)");
                 !data.tracks.video && info.append(" (无视频)");
                 if (data.tracks.video?.metadata) {
@@ -610,7 +617,7 @@ $(function () {
             ext = name.split(".").pop();
         }
         // 转码mp4
-        if ($("#mp4").prop("checked")) {
+        if ($("#mp4").prop("checked") && ext != "mp4") {
             // 转码服务监听
             transmuxer.on('data', function (segment) {
                 // 头部信息

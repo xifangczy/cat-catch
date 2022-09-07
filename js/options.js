@@ -28,7 +28,7 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
         $("#injectScript").append(`<option value="${key}">${item.name}(${key})</option>`);
     });
     $("#injectScript").val(items.injectScript);
-    $("#refreshClear").attr("checked",items.refreshClear);
+    $("#refreshClear").attr("checked", items.refreshClear);
 });
 
 //新增格式
@@ -63,7 +63,7 @@ function Gethtml(Type, Param = new Object()) {
             html += `<td><input type="text" value="${Param.regex ? Param.regex : ""}" placeholder="正则表达式" id="regex" class="regex"></td>`
             html += `<td><input type="text" value="${Param.ext ? Param.ext : ""}" id="regexExt" class="regexExt"></td>`
     }
-    html = `<tr data-type="${Type}">
+    html = $(`<tr data-type="${Type}">
             ${html}
             <td>
                 <div class="switch">
@@ -78,9 +78,7 @@ function Gethtml(Type, Param = new Object()) {
                     <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                 </g></svg>
             </td>
-        </tr>`;
-
-    html = $(html);
+        </tr>`);
     html.find(".RemoveButton").click(function () {
         html.remove();
         Save(Type);
@@ -88,7 +86,7 @@ function Gethtml(Type, Param = new Object()) {
     html.find("input").keyup(function () {
         Save(Type);
     });
-    html.find("#size, #state").on("click", function () {
+    html.find("#state").on("click", function () {
         Save(Type);
     });
     if (Type == "Type") {
@@ -269,6 +267,7 @@ function Save(option) {
             Ext.push({ ext: GetText.toLowerCase(), size: GetSize, state: GetState });
         });
         chrome.storage.sync.set({ Ext: Ext });
+        return;
     }
     if (option == "Type") {
         let Type = new Array();
@@ -283,6 +282,7 @@ function Save(option) {
             }
         });
         chrome.storage.sync.set({ Type: Type });
+        return;
     }
     if (option == "Regex") {
         let Regex = new Array();
@@ -301,5 +301,6 @@ function Save(option) {
             Regex.push({ type: GetType, regex: GetRegex, ext: GetExt, state: GetState });
         });
         chrome.storage.sync.set({ Regex: Regex });
+        return;
     }
 }
