@@ -199,7 +199,9 @@ function AddMedia(data) {
             m3u8dlArg = m3u8dlArg.replace(/\$title\$/g, data.title);
             let url = 'm3u8dl://' + Base64.encode(m3u8dlArg);
             if (url.length >= 2046) {
-                alert("m3u8dl参数太长,可能导致无法唤醒m3u8DL, 请手动复制到m3u8DL下载");
+                navigator.clipboard.writeText(m3u8dlArg);
+                Tips("m3u8dl参数太长无法唤醒m3u8DL程序, 请手动粘贴下载。", 2000);
+                return false;
             }
             if (G.isFirefox) {
                 window.location.href = url;
