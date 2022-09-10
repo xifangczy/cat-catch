@@ -71,10 +71,9 @@ $(function () {
                 $("#info").html(result.mediaInfo);
             });
         }
-        return;
+    } else {
+        parseM3U8();
     }
-    // 开始解析
-    parseM3U8();
 
     /* 解析函数 使用hls解析好的数据 进一步处理 */
     function parseM3U8() {
@@ -853,8 +852,10 @@ function tsListTom3u8Text(tsList) {
     let m3u8Text = "#EXTM3U\n";
     m3u8Text += "#EXT-X-TARGETDURATION:10\n";
     for (let item of tsList) {
-        m3u8Text += "#EXTINF:1\n";
-        m3u8Text += item + "\n";
+        if (item) {
+            m3u8Text += "#EXTINF:1\n";
+            m3u8Text += item + "\n";
+        }
     }
     m3u8Text += "#EXT-X-ENDLIST";
     return m3u8Text;

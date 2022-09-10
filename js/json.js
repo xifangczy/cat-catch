@@ -27,9 +27,9 @@ $(function () {
             }
             getJson(_url);
         });
-        return;
+    } else {
+        getJson(_url);
     }
-    getJson(_url);
 
     function getJson(url) {
         $("#jsonCustom").hide(); $("#main").show();
