@@ -12,7 +12,7 @@ async function findMedia(data, raw = undefined, depth = 0) {
     DEBUG && console.log(data);
     for (let key in data) {
         if (typeof data[key] == "object") {
-            if (depth > 10) { continue; }  // 防止死循环 最大深度10
+            if (depth > 20) { continue; }  // 防止死循环 最大深度
             if (!raw) { raw = data; }
             findMedia(data[key], raw, ++depth);
             continue;
@@ -34,6 +34,9 @@ async function findMedia(data, raw = undefined, depth = 0) {
                 }
                 toUrl(text);
                 continue;
+            }
+            if(DEBUG && data[key].includes("manifest")){
+                console.log(data);
             }
         }
     }
@@ -152,9 +155,12 @@ function isParsing(str) {
     ext = ext.pathname.split(".");
     if (ext.length == 1) { return undefined; }
     ext = ext[ext.length - 1].toLowerCase();
-    if (ext == "m3u8" || ext == "m3u" || ext == "mpd") {
-        return ext;
-    }
+    if (ext == "m3u8" ||
+        ext == "m3u" ||
+        ext == "mpd" ||
+        ext == "mp4" ||
+        ext == "mp3"
+    ) { return ext; }
     return false;
 }
 function toUrl(text, ext = "m3u8") {
