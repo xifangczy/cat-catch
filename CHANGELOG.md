@@ -1,4 +1,9 @@
 ## 更新说明
+### 2.2.5
+[Fixed] 更新 mpd-parser.min.js 并修复BUG #70
+
+[Changed] 更新 search.js
+
 ### 2.2.4
 [Changed] 更新 hls.js
 
@@ -20,6 +25,7 @@
 [Added] 增加选项 刷新、跳转到新页面 清空当前标签抓取的数据
 
 [Fixed] 修正 m3u8解析器使用mp4转码生成的文件，媒体时长信息不正确
+
 ### 2.2.2
 [Changed] m3u8解析器使用hls.js替代，多项改进，自定义功能添加
 
@@ -47,6 +53,7 @@
 [Changed] 自定义复制选项增加 其他文件 选项
 
 [Added] m3u8解析器现在可以转换成mp4格式
+
 ### 2.2.0
 [Fixed] 修复文件名出现 "~" 符号 导致chrome API无法下载
 
@@ -59,8 +66,10 @@
 [Added] 增加操控当前网页视频功能
 
 [Added] 增加自定义复制选项
+
 ### 2.1.2
 [Changed] 细节调整
+
 ### 2.1.1
 [Changed] 调整正则匹配 现在能提取多个网址
 
@@ -117,28 +126,36 @@
 [Added] 手机端模拟，手机环境下有更多资源可以被下载。
 
 [Added] 自动下载
+
 ### 1.0.24
 [Added] 导入/导出配置
 
 [Added] Heart Beat 解决Service Worker休眠问题
 
 [Added] firefox.js兼容层 并上架Firefox
+
 ### 1.0.23
 [Added] 正则匹配
+
 ### 1.0.22
 [Fixed] 一个严重BUG，导致Service Worker无法使用 *
+
 ### 1.0.21
 [Added] 自定义抓取类型
 
 [Refactor] 设置页面新界面
+
 ### 1.0.20
 [Added] 抓取image/*类型文件选项
+
 ### 1.0.19
 [Fixed] 重构导致的许多BUG *
+
 ### 1.0.18
 [Added] 抓取application/octet-stream选项
 
 [Refactor] 重构剩余代码
+
 ### 1.0.17
 [Refactor] Manifest 更新到 V3 部分代码
 
