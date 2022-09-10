@@ -184,7 +184,7 @@ button:active {
 .otherOption .item {
   margin-bottom: 5px;
 }
-#m3u8_url {
+#m3u8_url, #mpd_url {
   overflow: hidden;
   display: block;
   text-overflow: ellipsis;

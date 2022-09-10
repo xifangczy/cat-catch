@@ -19,20 +19,20 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
 $(function () {
     fetch(_url)
-    .then(response => response.text())
-    .then(function (text) {
-        mpdContent = text;
-        parseMPD(mpdContent);
-        $("#mpd_url").html(_url).attr("href", _url);
-    });
+        .then(response => response.text())
+        .then(function (text) {
+            mpdContent = text;
+            parseMPD(mpdContent);
+            $("#mpd_url").html(_url).attr("href", _url);
+        });
 
-    $("#mpdLists, #mpdAudioLists").change(function () {
-        let type = this.id == "mpdLists" ? "video" : "audio";
+    $("#mpdVideoLists, #mpdAudioLists").change(function () {
+        let type = this.id == "mpdVideoLists" ? "video" : "audio";
         showSegment(type, $(this).val());
     });
     $("#getVideo, #getAudio").click(function () {
         let type = "video";
-        let index = $("#mpdLists").val();
+        let index = $("#mpdVideoLists").val();
         if (this.id == "getAudio") {
             type = "audio";
             index = $("#mpdAudioLists").val();
@@ -40,12 +40,15 @@ $(function () {
         showSegment(type, index);
     });
     $("#videoToM3u8, #audioToM3u8").click(function () {
-        let index = $("#mpdLists").val();
+        let index = $("#mpdVideoLists").val();
         let items = mpdJson.playlists[index];
         let type = "video";
         if (this.id == "audioToM3u8") {
             index = $("#mpdAudioLists").val();
-            items = mpdJson.mediaGroups.AUDIO.audio[index].playlists[0];
+            let temp = index.split("$-bmmmd-$");
+            index = temp[0];
+            let index2 = temp[1];
+            items = mpdJson.mediaGroups.AUDIO.audio[index].playlists[index2];
             type = "audio";
         }
         mediaInfo = getInfo(type);
@@ -70,15 +73,20 @@ $(function () {
 function parseMPD() {
     $("#loading").hide(); $("#main").show();
     mpdJson = mpdParser.parse(mpdContent, { manifestUri: _url });
+    console.log(mpdJson);
     for (let key in mpdJson.playlists) {
-        $("#mpdLists").append(`<option value='${key}'>${(mpdJson.playlists[key].attributes.BANDWIDTH / 1024).toFixed(1)
+        $("#mpdVideoLists").append(`<option value='${key}'>${(mpdJson.playlists[key].attributes.BANDWIDTH / 1024).toFixed(1)
             } kbps |  ${mpdJson.playlists[key].attributes["FRAME-RATE"].toFixed(1)
             } fps |  ${mpdJson.playlists[key].attributes.RESOLUTION.width
             } x ${mpdJson.playlists[key].attributes.RESOLUTION.height
             }</option>`);
     }
     for (let key in mpdJson.mediaGroups.AUDIO.audio) {
-        $("#mpdAudioLists").append(`<option value='${key}'>${key}</option>`);
+        for (let index in mpdJson.mediaGroups.AUDIO.audio[key].playlists) {
+            let item = mpdJson.mediaGroups.AUDIO.audio[key].playlists[index];
+            // console.log(item);
+            $("#mpdAudioLists").append(`<option value='${key}$-bmmmd-$${index}'>${key} | ${item.attributes.NAME} | ${item.attributes.BANDWIDTH/1000}Kbps</option>`);
+        }
     }
     $("#info").html(getInfo("video"));
     showSegment("video", 0);
@@ -86,9 +94,17 @@ function parseMPD() {
 
 function showSegment(type, index) {
     let textarea = "";
-    let items = type == "video" ? mpdJson.playlists[index] : mpdJson.mediaGroups.AUDIO.audio[index].playlists[0];
+    let items;
+    if (type == "video") {
+        items = mpdJson.playlists[index];
+    } else {
+        let temp = index.split("$-bmmmd-$");
+        index = temp[0];
+        let index2 = temp[1];
+        items = mpdJson.mediaGroups.AUDIO.audio[index].playlists[index2];
+    }
     for (let segment of items.segments) {
-        textarea += segment.resolvedUri + "\n";
+        textarea += segment.resolvedUri + "\n\n";
     }
     $("#media_file").html(textarea);
     $("#count").html("共 " + items.segments.length + " 个文件" + "，总时长: " + secToTime(mpdJson.duration));
@@ -100,6 +116,6 @@ function getInfo(type = "audio") {
     if (type == "audio") {
         return "音频: " + $("#mpdAudioLists").find("option:selected").text();
     } else {
-        return "视频: " + $("#mpdLists").find("option:selected").text();
+        return "视频: " + $("#mpdVideoLists").find("option:selected").text();
     }
 }
