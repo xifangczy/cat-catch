@@ -245,6 +245,7 @@ textarea {
 }
 #errorTsList p {
   color: red;
+  word-break: break-all;
 }
 .progress-bar {
   height: 15px;

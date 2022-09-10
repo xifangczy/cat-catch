@@ -516,6 +516,15 @@ $(function () {
     $("#ForceDownload").click(function () {
         mergeTs();
     });
+    // 重新下载
+    $("#errorDownload").click(function () {
+        $("#errorTsList button").each(function (index) {
+            let button = this;
+            setTimeout(() => {
+                button.click();
+            }, index * 233);
+        });
+    });
     /**************************** 下载TS文件 ****************************/
     // start 开始下载的索引
     // end 结束下载的索引
@@ -537,6 +546,7 @@ $(function () {
                 // 错误列表为0 下载完成
                 if (errorTsList.length == 0) {
                     $("#ForceDownload").hide();
+                    $("#errorDownload").hide();
                     $("#errorTsList").hide();
                     !recorder && mergeTs();  // 合并下载
                     return;
@@ -594,9 +604,10 @@ $(function () {
     function downloadTsError(index) {
         if ($("#errorTsList").is(':hidden')) {
             $("#ForceDownload").show();
+            $("#errorDownload").show();
             $("#errorTsList").show();
         }
-        let html = $(`<p>${_fragments[index].url} <button data-id="${index}">重新下载</button></p>`);
+        let html = $(`<p id="errorId${index}">${_fragments[index].url} <button data-id="${index}">重新下载</button></p>`);
         html.find("button").click(function () {
             buttonState(this, false);
             $(this).html("正在重新下载...");
