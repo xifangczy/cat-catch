@@ -1,6 +1,6 @@
 ## 更新说明
 ### 2.2.5
-[Fixed] 更新 mpd-parser.min.js 并修复BUG #70
+[Fixed] 更新 mpd-parser.min.js 并修复BUG [#70](https://github.com/xifangczy/cat-catch/issues/70)
 
 [Changed] 更新 search.js
 
