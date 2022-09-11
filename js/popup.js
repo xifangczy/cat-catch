@@ -442,6 +442,7 @@ $(function () {
         }
         getVideoState();
     });
+    let wheelPlaybackRateTimeout;
     $("#playbackRate").on("wheel", function (event) {
         $(this).blur();
         let speed = parseFloat($(this).val());
@@ -449,6 +450,11 @@ $(function () {
         speed = parseFloat(speed.toFixed(1));
         if (speed < 0.1 || speed > 16) { return false; }
         $(this).val(speed);
+        clearTimeout(wheelPlaybackRateTimeout);
+        wheelPlaybackRateTimeout = setTimeout(() => {
+            chrome.storage.sync.set({ playbackRate: speed });
+            chrome.tabs.sendMessage(_tabId, { Message: "speed", speed: speed, index: _index });
+        }, 200);
         return false;
     });
     // 倍速播放
