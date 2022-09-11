@@ -37,7 +37,10 @@ $(function () {
     var downTotalTs = 0;  // 需要下载的文件数量
     const tsBuffer = []; // ts内容缓存
     const errorTsList = []; // 下载错误ts序号列表
-    var recorder = false; // 录制直播 开关
+    /* 录制相关 */
+    var recorder = false; // 开关
+    var recorderArray = []; // 储存临时碎片
+    var recorderIndex = 0;  // 下载索引
 
     if (isEmpty(_m3u8Url)) {
         $("#loading").hide(); $("#m3u8Custom").show();
@@ -94,7 +97,7 @@ $(function () {
                     const title = _title ? encodeURIComponent(_title) : "";
                     const name = GetFile(item.uri);
                     const html = `<div class="block">
-                        <div>${item.attrs.RESOLUTION ? "分辨率:" + item.attrs.RESOLUTION : ""}${item.attrs.BANDWIDTH ? " | 码率:" + item.attrs.BANDWIDTH : ""}</div>
+                        <div>${item.attrs.RESOLUTION ? "分辨率:" + item.attrs.RESOLUTION : ""}${item.attrs.BANDWIDTH ? " | 码率:" + (parseInt(item.attrs.BANDWIDTH / 1000) + " Kbps") : ""}</div>
                         <a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}">${name}</a>
                     </div>`;
                     $("#next_m3u8").append(html);
@@ -263,8 +266,15 @@ $(function () {
                 initSegment: initSegment
             });
         }
-        // console.log(_fragments);
-        recorder && downloadTs(_fragments.length - 1, _fragments.length - 1);   // 录制直播
+        // 录制直播
+        if (recorder) {
+            let _recorderArray = recorderArray;
+            recorderArray = [];
+            for (let index in _fragments) {
+                recorderArray.push(_fragments[index].url);
+                !_recorderArray.includes(_fragments[index].url) && downloadTs(index, index);
+            }
+        }
         writeText(_fragments);   // 写入ts链接到textarea
         $("#count").append("共 " + _fragments.length + " 个文件" + "，总时长: " + secToTime(data.totalduration));
         if (data.live) {
@@ -558,8 +568,10 @@ $(function () {
             if (tsThread > 0 && index < end) {
                 tsThread--;
                 let currentIndex = ++index;   // 当前下载的索引
+                const fragment = _fragments[currentIndex];
+                if (recorder) { currentIndex = recorderIndex++; }
                 $.ajax({
-                    url: _fragments[currentIndex].url,
+                    url: fragment.url,
                     xhrFields: { responseType: "arraybuffer" },
                     timeout: 30000
                 }).fail(function () {
@@ -576,18 +588,15 @@ $(function () {
                 }).done(function (responseData) {
                     if (stopDownload) { return; }
                     if (errorObj) { errorObj.remove(); }
-                    if (errorTsList.includes(currentIndex)) {
+                    if (errorTsList.length && errorTsList.includes(currentIndex)) {
                         errorTsList.splice(errorTsList.indexOf(currentIndex), 1);
                     }
+                    // console.log(fragment.url, currentIndex, tsBuffer);
                     responseData = tsDecrypt(responseData, currentIndex); //解密m3u8
-                    if (recorder) {
-                        tsBuffer.push(responseData);
-                    } else {
-                        tsBuffer[currentIndex] = responseData;
-                    }
+                    tsBuffer[currentIndex] = responseData;
                     fileSize += responseData.byteLength;
                     $("#fileSize").html("已下载:" + byteToSize(fileSize));
-                    downDuration += _fragments[currentIndex].duration;
+                    downDuration += fragment.duration;
                     downCurrentTs++;
                     if (downCurrentTs == downTotalTs) {
                         $("#progress").html($("#mp4").prop("checked") ? `数据正在转换格式...` : `数据正在合并...`);
@@ -660,7 +669,7 @@ $(function () {
     // ts解密
     function tsDecrypt(responseData, index) {
         // 是否存在初始化切片
-        if (_fragments[index].initSegment) {
+        if (_fragments[index] && _fragments[index].initSegment) {
             let initSegmentData = initData.get(_fragments[index].initSegment.url);
             let initLength = initSegmentData.byteLength;
             let newData = new Uint8Array(initLength + responseData.byteLength);
@@ -668,7 +677,7 @@ $(function () {
             newData.set(new Uint8Array(responseData), initLength);
             responseData = newData.buffer;
         }
-        if (!_fragments[index].encrypted || skipDecrypt) {
+        if (skipDecrypt || recorder || !_fragments[index].encrypted) {
             return responseData;
         }
         try {
@@ -693,6 +702,8 @@ $(function () {
         mp4Cache.splice(0); // 清空mp4转换缓存
         downCurrentTs = 0;  // 当前进度
         stopDownload = false; // 停止下载
+        recorderIndex = 0;  // 录制直播索引
+        recorderArray = []; // 录制直播储存临时切片地址
     }
 });
 // 写入ts链接
