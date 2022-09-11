@@ -73,9 +73,10 @@ $(function () {
 function parseMPD() {
     $("#loading").hide(); $("#main").show();
     mpdJson = mpdParser.parse(mpdContent, { manifestUri: _url });
-    console.log(mpdJson);
+    // console.log(mpdJson);
     for (let key in mpdJson.playlists) {
-        $("#mpdVideoLists").append(`<option value='${key}'>${(mpdJson.playlists[key].attributes.BANDWIDTH / 1024).toFixed(1)
+        $("#mpdVideoLists").append(`<option value='${key}'>${mpdJson.playlists[key].attributes.NAME
+            } | ${(mpdJson.playlists[key].attributes.BANDWIDTH / 1024).toFixed(1)
             } kbps |  ${mpdJson.playlists[key].attributes["FRAME-RATE"].toFixed(1)
             } fps |  ${mpdJson.playlists[key].attributes.RESOLUTION.width
             } x ${mpdJson.playlists[key].attributes.RESOLUTION.height
