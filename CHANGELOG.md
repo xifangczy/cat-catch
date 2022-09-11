@@ -1,6 +1,6 @@
 ## 更新说明
 ### 2.2.5
-[Fixed] 更新 mpd-parser.min.js 并修复BUG [#70](https://github.com/xifangczy/cat-catch/issues/70)
+[Fixed] 修复mpd解析器丢失音轨 [#70](https://github.com/xifangczy/cat-catch/issues/70)
 
 [Changed] 优化在网络状况不佳下的直播m3u8录制
 
