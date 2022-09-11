@@ -2,7 +2,9 @@
 ### 2.2.5
 [Fixed] 更新 mpd-parser.min.js 并修复BUG [#70](https://github.com/xifangczy/cat-catch/issues/70)
 
-[Changed] 更新 search.js
+[Changed] 优化在网络状况不佳下的直播m3u8录制
+
+[Changed] 更新 深度搜索 search.js 进一步增加分析能力
 
 ### 2.2.4
 [Changed] 更新 hls.js
