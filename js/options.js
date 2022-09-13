@@ -3,14 +3,14 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
     if (items.Ext === undefined || items.Type === undefined || items.Regex === undefined) {
         location.reload();
     }
-    for (let item of items.Ext) {
-        $("#extList").append(Gethtml("Ext", { ext: item.ext, size: item.size, state: item.state }));
+    for (let key in items.Ext) {
+        $("#extList").append(Gethtml("Ext", { ext: items.Ext[key].ext, size: items.Ext[key].size, state: items.Ext[key].state }));
     }
-    for (let item of items.Type) {
-        $("#typeList").append(Gethtml("Type", { type: item.type, size: item.size, state: item.state }));
+    for (let key in items.Type) {
+        $("#typeList").append(Gethtml("Type", { type: items.Type[key].type, size: items.Type[key].size, state: items.Type[key].state }));
     }
-    for (let item of items.Regex) {
-        $("#regexList").append(Gethtml("Regex", { type: item.type, regex: item.regex, ext: item.ext, state: item.state }));
+    for (let key in items.Regex) {
+        $("#regexList").append(Gethtml("Regex", { type: items.Regex[key].type, regex: items.Regex[key].regex, ext: items.Regex[key].ext, state: items.Regex[key].state }));
     }
     $("#Debug").attr("checked", items.Debug);
     $("#TitleName").attr("checked", items.TitleName);

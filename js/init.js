@@ -245,10 +245,11 @@ function downloadDataURL(url, filename) {
 }
 // 判断是否为空
 function isEmpty(obj) {
-    if (typeof obj == "undefined" || obj == null || obj == "" || obj == " ") {
-        return true;
-    }
-    return false;
+    return (typeof obj == "undefined" ||
+        obj == null ||
+        obj == "" ||
+        obj == " "
+    )
 }
 
 function setReferer(referer, callback) {

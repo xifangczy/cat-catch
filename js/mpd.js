@@ -58,9 +58,9 @@ $(function () {
         m3u8Content += "#EXT-X-MEDIA-SEQUENCE:0\n";
         m3u8Content += "#EXT-X-PLAYLIST-TYPE:VOD\n";
         m3u8Content += '#EXT-X-MAP:URI="' + items.segments[0].map.resolvedUri + '"\n';
-        for (let item of items.segments) {
-            m3u8Content += "#EXTINF:" + item.duration + ",\n"
-            m3u8Content += item.resolvedUri + "\n";
+        for (let key in items.segments) {
+            m3u8Content += "#EXTINF:" + items.segments[key].duration + ",\n"
+            m3u8Content += items.segments[key].resolvedUri + "\n";
         }
         m3u8Content += "#EXT-X-ENDLIST";
         // $("#media_file").html(m3u8Content); return;
@@ -104,8 +104,8 @@ function showSegment(type, index) {
         let index2 = temp[1];
         items = mpdJson.mediaGroups.AUDIO.audio[index].playlists[index2];
     }
-    for (let segment of items.segments) {
-        textarea += segment.resolvedUri + "\n\n";
+    for (let key in items.segments) {
+        textarea += items.segments[key].resolvedUri + "\n\n";
     }
     $("#media_file").html(textarea);
     $("#count").html("共 " + items.segments.length + " 个文件" + "，总时长: " + secToTime(mpdJson.duration));

@@ -96,11 +96,11 @@ function findMedia(data, isRegex = false, filter = false) {
 
     //正则匹配
     if (isRegex && !filter) {
-        for (let item of G.Regex) {
-            if (!item.state) { continue; }
-            const result = new RegExp(item.regex, item.type).exec(data.url);
+        for (let key in G.Regex) {
+            if (!G.Regex[key].state) { continue; }
+            const result = new RegExp(G.Regex[key].regex, G.Regex[key].type).exec(data.url);
             if (result == null) { continue; }
-            data.extraExt = item.ext ? item.ext : undefined;
+            data.extraExt = G.Regex[key].ext ? G.Regex[key].ext : undefined;
             if (result.length == 1) {
                 findMedia(data, true, true);
                 return;
@@ -151,13 +151,13 @@ function findMedia(data, isRegex = false, filter = false) {
         cacheData[data.tabId] = [];
     }
     // 查重
-    for (let item of cacheData[data.tabId]) {
-        if (item.url == data.url) { return; }
+    for (let key in cacheData[data.tabId]) {
+        if (cacheData[data.tabId][key].url == data.url) { return; }
     }
     //幽灵数据与当前标签资源查重
     if (data.tabId == -1 && cacheData[G.tabId] !== undefined) {
-        for (let item of cacheData[G.tabId]) {
-            if (item.url == data.url) { return; }
+        for (let key in cacheData[G.tabId]) {
+            if (cacheData[G.tabId][key].url == data.url) { return; }
         }
     }
     const info = {
@@ -255,6 +255,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             mobileUserAgent(Message.tabId, true);
         }
         chrome.tabs.reload(Message.tabId, { bypassCache: true });
+        sendResponse("ok");
         return true;
     }
     // 自动下载
@@ -388,26 +389,26 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
 
 //检查扩展名以及大小限制
 function CheckExtension(ext, size) {
-    for (let item of G.Ext) {
-        if (item.ext == ext) {
-            if (item.size != 0 && size != undefined && size <= item.size * 1024) {
+    for (let key in G.Ext) {
+        if (G.Ext[key].ext == ext) {
+            if (G.Ext[key].size != 0 && size != undefined && size <= G.Ext[key].size * 1024) {
                 return "break";
             }
-            return item.state ? true : "break";
+            return G.Ext[key].state ? true : "break";
         }
     }
     return false;
 }
 //检查类型以及大小限制
 function CheckType(dataType, dataSize) {
-    for (let item of G.Type) {
+    for (let key in G.Type) {
         let TypeSplit = dataType.split("/");
-        let OptionSplit = item.type.split("/");
+        let OptionSplit = G.Type[key].type.split("/");
         if (OptionSplit[0] == TypeSplit[0] && (OptionSplit[1] == TypeSplit[1] || OptionSplit[1] == "*")) {
-            if (item.size != 0 && dataSize != undefined && dataSize <= item.size * 1024) {
+            if (G.Type[key].size != 0 && dataSize != undefined && dataSize <= G.Type[key].size * 1024) {
                 return "break";
             }
-            return item.state ? true : "break";
+            return G.Type[key].state ? true : "break";
         }
     }
     return false;
@@ -517,13 +518,12 @@ function isSpecialPage(url) {
     try {
         urlParsing = new URL(url);
     } catch (e) { return true; }
-    if (urlParsing.protocol == "chrome-extension:" ||
+    return (urlParsing.protocol == "chrome-extension:" ||
         urlParsing.protocol == "chrome:" ||
         urlParsing.protocol == "about:" ||
         urlParsing.protocol == "extension:" ||
         urlParsing.protocol == "moz-extension:" ||
-        urlParsing.protocol == "edge:") { return true; }
-    return false;
+        urlParsing.protocol == "edge:")
 }
 
 // 清理冗余数据

@@ -359,19 +359,19 @@ $(function () {
         writeText("");
         let textarea = "";
         let m3u8_split = _m3u8Content.split("\n");
-        for (let line of m3u8_split) {
-            if (isEmpty(line)) { continue; }
-            if (line.includes("URI=")) {
-                let KeyURL = /URI="(.*)"/.exec(line);
+        for (let key in m3u8_split) {
+            if (isEmpty(m3u8_split[key])) { continue; }
+            if (m3u8_split[key].includes("URI=")) {
+                let KeyURL = /URI="(.*)"/.exec(m3u8_split[key]);
                 if (KeyURL && KeyURL[1]) {
                     KeyURL = GetFile(KeyURL[1]);
-                    line = line.replace(/URI="(.*)"/, 'URI="' + KeyURL + '"');
+                    m3u8_split[key] = m3u8_split[key].replace(/URI="(.*)"/, 'URI="' + KeyURL + '"');
                 }
             }
-            if (!line.includes("#")) {
-                line = GetFile(line);
+            if (!m3u8_split[key].includes("#")) {
+                m3u8_split[key] = GetFile(m3u8_split[key]);
             }
-            textarea += line + "\n";
+            textarea += m3u8_split[key] + "\n";
         }
         writeText(textarea);
     });
@@ -597,6 +597,7 @@ $(function () {
                     fileSize += responseData.byteLength;
                     $("#fileSize").html("已下载:" + byteToSize(fileSize));
                     downDuration += fragment.duration;
+                    recorder && $("#fileDuration").html("录制时长:" + secToTime(downDuration));
                     downCurrentTs++;
                     if (downCurrentTs == downTotalTs) {
                         $("#progress").html($("#mp4").prop("checked") ? `数据正在转换格式...` : `数据正在合并...`);
@@ -636,7 +637,7 @@ $(function () {
             ext = name.split(".").pop();
         }
         // 转码mp4
-        if ($("#mp4").prop("checked") && ext != "mp4") {
+        if ($("#mp4").prop("checked") && ext.toLowerCase() != "mp4") {
             // 转码服务监听
             transmuxer.on('data', function (segment) {
                 // 头部信息
@@ -651,8 +652,8 @@ $(function () {
                 mp4Cache.push(segment.data);
             });
             // 载入ts数据转码
-            for (let i of tsBuffer) {
-                transmuxer.push(new Uint8Array(i));
+            for (let i in tsBuffer) {
+                transmuxer.push(new Uint8Array(tsBuffer[i]));
                 transmuxer.flush();
             }
             if (mp4Cache.length != 0) {
@@ -697,7 +698,9 @@ $(function () {
     // 初始化下载变量
     function initDownload() {
         fileSize = 0;   // 初始化已下载大小
+        $("#fileSize").html("");
         downDuration = 0;   // 初始化时长
+        $("#fileDuration").html("");
         tsBuffer.splice(0); // 初始化一下载ts缓存
         mp4Cache.splice(0); // 清空mp4转换缓存
         downCurrentTs = 0;  // 当前进度
@@ -710,8 +713,8 @@ $(function () {
 function writeText(text) {
     if (typeof text == "object") {
         let url = [];
-        for (let ts of text) {
-            url.push(ts.url + "\n");
+        for (let key in text) {
+            url.push(text[key].url + "\n");
         }
         $("#media_file").val(url.join("\n"));
         $("#media_file").data("type", "link");
@@ -853,18 +856,18 @@ function isHexKey(str) {
 function addBashUrl(baseUrl, m3u8Text) {
     let m3u8_split = m3u8Text.split("\n");
     m3u8Text = "";
-    for (let line of m3u8_split) {
-        if (isEmpty(line)) { continue; }
-        if (line.includes("URI=")) {
-            let KeyURL = /URI="(.*)"/.exec(line);
+    for (let key in m3u8_split) {
+        if (isEmpty(m3u8_split[key])) { continue; }
+        if (m3u8_split[key].includes("URI=")) {
+            let KeyURL = /URI="(.*)"/.exec(m3u8_split[key]);
             if (KeyURL && KeyURL[1] && !/^[\w]+:.+/i.test(KeyURL[1])) {
-                line = line.replace(/URI="(.*)"/, 'URI="' + baseUrl + KeyURL[1] + '"');
+                m3u8_split[key] = m3u8_split[key].replace(/URI="(.*)"/, 'URI="' + baseUrl + KeyURL[1] + '"');
             }
         }
-        if (!line.includes("#") && !/^[\w]+:.+/i.test(line)) {
-            line = baseUrl + line;
+        if (!m3u8_split[key].includes("#") && !/^[\w]+:.+/i.test(m3u8_split[key])) {
+            m3u8_split[key] = baseUrl + m3u8_split[key];
         }
-        m3u8Text += line + "\n";
+        m3u8Text += m3u8_split[key] + "\n";
     }
     return m3u8Text;
 }
@@ -873,10 +876,10 @@ function tsListTom3u8Text(tsList) {
     tsList = tsList.split("\n");
     let m3u8Text = "#EXTM3U\n";
     m3u8Text += "#EXT-X-TARGETDURATION:10\n";
-    for (let item of tsList) {
-        if (item) {
+    for (let key in tsList) {
+        if (tsList[key]) {
             m3u8Text += "#EXTINF:1\n";
-            m3u8Text += item + "\n";
+            m3u8Text += tsList[key] + "\n";
         }
     }
     m3u8Text += "#EXT-X-ENDLIST";

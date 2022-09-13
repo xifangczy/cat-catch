@@ -4,13 +4,13 @@ chrome.runtime.sendMessage(chrome.runtime.id, { Message: "HeartBeat" });
 chrome.storage.local.get({ "MediaData": {} }, function (items) {
     if (items.MediaData === undefined) { return; }
     if (items.MediaData[G.tabId] !== undefined) {
-        for (let item of items.MediaData[G.tabId]) {
-            AddMedia(item);
+        for (let key in items.MediaData[G.tabId]) {
+            AddMedia(items.MediaData[G.tabId][key]);
         }
     }
     if (items.MediaData[-1] !== undefined) {
-        for (let item of items.MediaData[-1]) {
-            AddMedia(item);
+        for (let key in items.MediaData[-1]) {
+            AddMedia(items.MediaData[-1][key]);
         }
     }
     UItoggle();
@@ -229,15 +229,9 @@ function AddMedia(data) {
     });
     //解析m3u8
     html.find('#m3u8, #json, #mpd').click(function () {
-        let url = '';
         const id = $(this).attr('id');
         chrome.tabs.get(G.tabId, function (tab) {
-            switch (id) {
-                case "m3u8": url += '/m3u8.html?'; break;
-                case "json": url += '/json.html?'; break;
-                case "mpd": url += '/mpd.html?'; break;
-            }
-            url += `url=${encodeURIComponent(data.url)}&referer=${encodeURIComponent(data.initiator)}&title=${encodeURIComponent(data.title)}`;
+            let url = `/${id}.html?url=${encodeURIComponent(data.url)}&referer=${encodeURIComponent(data.initiator)}&title=${encodeURIComponent(data.title)}`;
             chrome.tabs.create({ url: url, index: tab.index + 1 });
         });
         return false;
@@ -335,8 +329,7 @@ $(function () {
     $("#MobileUserAgent").click(function () {
         const action = $(this).data("switch");
         chrome.runtime.sendMessage({ Message: "mobileUserAgent", tabId: G.tabId, action: action }, function () {
-            G.refreshClear && $('#Clear').click();
-            location.reload();
+            G.refreshClear ? $('#Clear').click() : location.reload();
         });
     });
     // 自动下载
@@ -588,40 +581,36 @@ function isPlay(data) {
     return extArray.includes(data.ext) || typeArray.includes(data.type) || isM3U8(data);
 }
 function isM3U8(data) {
-    if (data.ext == "m3u8" ||
+    return (data.ext == "m3u8" ||
         data.ext == "m3u" ||
         data.type == "application/vnd.apple.mpegurl" ||
         data.type == "application/x-mpegurl" ||
         data.type == "application/mpegurl" ||
         data.type == "application/octet-stream-m3u8"
-    ) { return true; }
-    return false;
+    )
 }
 function isMPD(data) {
-    if (data.ext == "mpd" ||
+    return (data.ext == "mpd" ||
         data.type == "application/dash+xml"
-    ) { return true; }
-    return false;
+    )
 }
 function isJSON(data) {
-    if (data.ext == "json" ||
+    return (data.ext == "json" ||
         data.type == "application/json" ||
         data.type == "text/json"
-    ) { return true; }
-    return false;
+    )
 }
 function isPicture(data) {
     if (data.type && data.type.split("/")[0] == "image") {
         return true;
     }
-    if (data.ext == "jpg" ||
+    return (data.ext == "jpg" ||
         data.ext == "png" ||
         data.ext == "jpeg" ||
         data.ext == "bmp" ||
         data.ext == "gif" ||
         data.ext == "webp"
-    ) { return true; }
-    return false;
+    )
 }
 
 /*

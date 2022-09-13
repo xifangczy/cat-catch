@@ -184,7 +184,8 @@ button:active {
 .otherOption .item {
   margin-bottom: 5px;
 }
-#m3u8_url, #mpd_url {
+#m3u8_url,
+#mpd_url {
   overflow: hidden;
   display: block;
   text-overflow: ellipsis;
@@ -260,7 +261,8 @@ textarea {
   background-color: rgb(26, 115, 232);
   border-radius: 3px;
 }
-#fileSize {
+#fileSize,
+#fileDuration {
   margin-left: 20px;
 }
 .not-allowed {
