@@ -67,7 +67,7 @@ function findMedia(data, isRegex = false, filter = false) {
     ) {
         setTimeout(() => {
             findMedia(data, isRegex, filter);
-        }, 100);
+        }, 50);
         return;
     }
     // 屏蔽特殊页面发起的资源
@@ -515,9 +515,7 @@ function tabIdListRemove(str, tabId) {
 function isSpecialPage(url) {
     if (url == "" || url == undefined || url == "null") { return true; }
     let urlParsing = {};
-    try {
-        urlParsing = new URL(url);
-    } catch (e) { return true; }
+    try { urlParsing = new URL(url); } catch (e) { return true; }
     return (urlParsing.protocol == "chrome-extension:" ||
         urlParsing.protocol == "chrome:" ||
         urlParsing.protocol == "about:" ||
@@ -536,7 +534,7 @@ function clearRedundant() {
         if (!cacheData.init) {
             // 清理 缓存数据
             for (let key in cacheData) {
-                if (!allTabId.includes(parseInt(key))) {
+                if (!allTabId.includes(parseInt(cacheData[key]))) {
                     delete cacheData[key];
                 }
             }
