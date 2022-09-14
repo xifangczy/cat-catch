@@ -26,7 +26,6 @@ $(function () {
     const decryptor = new AESDecryptor(); // 解密工具 来自hls.js 分离出来的
     var skipDecrypt = false; // 是否跳过解密
     /* 转码工具 */
-    const mp4Cache = [];  // mp4格式缓存
     const transmuxer = new muxjs.mp4.Transmuxer();    // mux.js 对象
     /* 下载相关 */
     var downId = 0; // 下载id
@@ -155,7 +154,10 @@ $(function () {
             hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
                 // console.log(data);
                 parseTs(data.details);  // 提取Ts链接
-                !G.isFirefox && getVideoInfo(); // 获取视频信息
+                // 获取视频信息
+                if (!G.isFirefox && $(".videoInfo #info").html() == "") {
+                    getVideoInfo();
+                }
             });
         });
         // m3u8下载or解析错误
@@ -194,6 +196,7 @@ $(function () {
             hls.detachMedia(video);
             video.remove();
         }
+        delete video;
     }
     /* 提取所有ts链接 判断处理 */
     function parseTs(data) {
@@ -328,7 +331,8 @@ $(function () {
     });
     // 下载显示的内容
     $("#downText").click(function () {
-        let text = encodeURIComponent($("#media_file").val());
+        let text = $("#media_file").val().replace(/\n\n/g, "\n");
+        text = encodeURIComponent(text);
         let type = $("#media_file").data("type");
         let downType = "data:text/plain,";
         let filename = GetFileName(_m3u8Url) + '.txt';
@@ -627,9 +631,20 @@ $(function () {
     }
     // 合并下载
     function mergeTs() {
-        downState = true;
-        let fileBlob = new Blob(tsBuffer, { type: "video/MP2T" });
+        // 修正数组，清理空白数据
+        const _tsBuffer = [];
+        for (let i = 0, j = 0; i < tsBuffer.length; i++) {
+            if (tsBuffer[i]) {
+                _tsBuffer[j++] = tsBuffer[i];
+            }
+            delete tsBuffer[i];
+        }
+        tsBuffer.splice(0); delete tsBuffer;
+
+        // 默认下载格式
+        let fileBlob = new Blob(_tsBuffer, { type: "video/MP2T" });
         let ext = "ts";
+
         /* 有初始化切片 可能是fMP4 获取初始化切片的后缀 */
         if (_fragments[0].initSegment) {
             let name = _fragments[0].initSegment.url.split("/").pop();
@@ -638,26 +653,31 @@ $(function () {
         }
         // 转码mp4
         if ($("#mp4").prop("checked") && ext.toLowerCase() != "mp4") {
+            let index;
+            let headEncoding = true;
             // 转码服务监听
             transmuxer.on('data', function (segment) {
                 // 头部信息
-                if (mp4Cache.length == 0) {
+                if (headEncoding) {
+                    headEncoding = false;
                     let data = new Uint8Array(segment.initSegment.byteLength + segment.data.byteLength);
                     data.set(segment.initSegment, 0);
                     data.set(segment.data, segment.initSegment.byteLength);
-                    // 使用 fixFileDuration 修正媒体时长文件信息
-                    mp4Cache.push(fixFileDuration(data, downDuration));
+                    _tsBuffer[index] = fixFileDuration(data, downDuration);
                     return;
                 }
-                mp4Cache.push(segment.data);
+                _tsBuffer[index] = segment.data;
             });
             // 载入ts数据转码
-            for (let i in tsBuffer) {
-                transmuxer.push(new Uint8Array(tsBuffer[i]));
+            for (index in _tsBuffer) {
+                transmuxer.push(new Uint8Array(_tsBuffer[index]));
                 transmuxer.flush();
             }
-            if (mp4Cache.length != 0) {
-                fileBlob = new Blob(mp4Cache, { type: "video/mp4" });
+            // 关闭监听
+            transmuxer.off('data');
+            // 正确转换 下载格式改为 mp4
+            if (!headEncoding) {
+                fileBlob = new Blob(_tsBuffer, { type: "video/mp4" });
                 ext = "mp4";
             }
         }
@@ -666,6 +686,7 @@ $(function () {
             filename: `${GetFileName(_m3u8Url)}.${ext}`
         }, function (downloadId) { downId = downloadId });
         buttonState("#mergeTs", true);
+        _tsBuffer.splice(0); delete _tsBuffer;
     }
     // ts解密
     function tsDecrypt(responseData, index) {
@@ -702,7 +723,6 @@ $(function () {
         downDuration = 0;   // 初始化时长
         $("#fileDuration").html("");
         tsBuffer.splice(0); // 初始化一下载ts缓存
-        mp4Cache.splice(0); // 清空mp4转换缓存
         downCurrentTs = 0;  // 当前进度
         stopDownload = false; // 停止下载
         recorderIndex = 0;  // 录制直播索引

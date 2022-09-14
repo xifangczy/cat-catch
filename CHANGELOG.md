@@ -6,6 +6,8 @@
 
 [Changed] 更新 深度搜索 search.js 进一步增加分析能力
 
+[Changed] 减少mp4转码时内存占用
+
 ### 2.2.4
 [Changed] 更新 hls.js
 
