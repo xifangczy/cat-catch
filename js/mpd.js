@@ -7,6 +7,7 @@ const _title = params.get("title");
 _referer && setReferer(_referer);
 
 var mpdJson = {}; // 解析器json结果
+var mpdXml = {}; // 解析器xml结果
 var mpdContent; // mpd文件内容
 var m3u8Content = "";   //m3u8内容
 var mediaInfo = "" // 媒体文件信息
@@ -73,7 +74,11 @@ $(function () {
 function parseMPD() {
     $("#loading").hide(); $("#main").show();
     mpdJson = mpdParser.parse(mpdContent, { manifestUri: _url });
-    // console.log(mpdJson);
+    mpdXml = $(mpdContent);
+    if(mpdXml.find("contentprotection").length > 0){
+        $("#loading").show();
+        $("#loading .optionBox").html("媒体有DRM保护, 可能无法下载和播放. 暂无加密分析以及解密功能, 请复制mpd文件地址, 使用第三方工具下载.");
+    }
     for (let key in mpdJson.playlists) {
         $("#mpdVideoLists").append(`<option value='${key}'>${mpdJson.playlists[key].attributes.NAME
             } | ${(mpdJson.playlists[key].attributes.BANDWIDTH / 1024).toFixed(1)
