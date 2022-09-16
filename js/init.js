@@ -157,7 +157,7 @@ function InitOptions() {
             if (list == "Ext") {
                 G.Ext = new Map();
                 for (let key in items[list]) {
-                    G.Ext.set(items[list][key].ext, items[list]);
+                    G.Ext.set(items[list][key].ext, items[list][key]);
                 }
                 continue;
             }
