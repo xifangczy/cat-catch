@@ -35,7 +35,7 @@ async function findMedia(data, raw = undefined, depth = 0) {
                 toUrl(text);
                 continue;
             }
-            if(DEBUG && data[key].includes("manifest")){
+            if (DEBUG && data[key].includes("manifest")) {
                 console.log(data);
             }
         }
@@ -100,7 +100,8 @@ window.fetch = async function (input, init) {
     response.text()
         .then(text => {
             if (text == "") { return; }
-            DEBUG && console.log(text);
+            DEBUG && console.log({ text, input });
+            if (typeof input == "object") { input = input.url; }
             let isJson = isJSON(text);
             if (isJson) {
                 findMedia(isJson);
@@ -122,6 +123,11 @@ window.fetch = async function (input, init) {
                 toUrl(text);
                 return;
             }
+            // if(/googlevideo\.com\/videoplayback.*&range=/i.test(input)){
+            //     input = input.replace(/&range=[^&]*/, "");
+            //     window.postMessage({ type: "addMedia", url: input, href: location.href, ext: "mp4" });
+            //     return;
+            // }
         });
     return clone;
 }

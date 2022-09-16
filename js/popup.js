@@ -229,7 +229,7 @@ function AddMedia(data) {
     });
     //解析m3u8
     html.find('#m3u8, #json, #mpd').click(function () {
-        const id = $(this).attr('id');
+        const id = this.id;
         chrome.tabs.get(G.tabId, function (tab) {
             let url = `/${id}.html?url=${encodeURIComponent(data.url)}&referer=${encodeURIComponent(data.initiator)}&title=${encodeURIComponent(data.title)}`;
             chrome.tabs.create({ url: url, index: tab.index + 1 });

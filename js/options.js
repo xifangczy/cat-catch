@@ -104,7 +104,7 @@ function Gethtml(Type, Param = new Object()) {
 }
 // 注入脚本选择
 $("#injectScript").change(function () {
-    const Option = $(this).attr("id");
+    const Option = this.id;
     const Value = $(this).val();
     if (G.scriptList.has(Value)) {
         chrome.storage.sync.set({ [Option]: Value });
@@ -112,17 +112,17 @@ $("#injectScript").change(function () {
 });
 //失去焦点 保存自动清理数 模拟手机User Agent
 $("#OtherAutoClear, #MobileUserAgent, #m3u8dlArg, #copyM3U8, #copyMPD, #copyOther").on("input", function () {
-    const Option = $(this).attr("id");
+    const Option = this.id;
     chrome.storage.sync.set({ [Option]: $(this).val() });
 });
 // 调试模式 使用网页标题做文件名 使用PotPlayer预览 显示网站图标 刷新自动清理
 $("#Debug, #TitleName, #Potplayer, #ShowWebIco, #m3u8dl, #refreshClear").bind("click", function () {
-    const Option = $(this).attr("id");
+    const Option = this.id;
     chrome.storage.sync.set({ [Option]: $(this).prop('checked') });
 });
 // 一键禁用/启用
 $("#allDisable, #allEnable").bind("click", function () {
-    let state = $(this).attr("id") == "allDisable" ? false : true;
+    let state = this.id == "allDisable" ? false : true;
     let obj = $(this).data("switch");
     let query;
     if (obj == "Ext") {
@@ -149,7 +149,7 @@ $("#ResetExt, #ResetType, #ResetRegex").bind("click", function () {
 $("#ResetOption").bind("click", function () {
     if (confirm("确认重置吗？")) {
         $("#OtherOption input, #OtherOption textarea").each(function () {
-            const Option = $(this).attr("id");
+            const Option = this.id;
             chrome.storage.sync.set({ [Option]: GetDefault(Option) });
         });
         location.reload();
@@ -166,7 +166,7 @@ $("#ResetCopy").bind("click", function () {
 });
 //清空数据 重置所有设置
 $("#ClearData, #ResetAllOption").bind("click", function () {
-    if ($(this).attr("id") == "ResetAllOption") {
+    if (this.id == "ResetAllOption") {
         if (confirm("确认重置所有设置吗？")) {
             chrome.storage.sync.clear();
             InitOptions();
