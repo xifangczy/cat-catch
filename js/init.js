@@ -154,6 +154,13 @@ function InitOptions() {
                 chrome.storage.sync.set({ [list]: GetDefault(list) });
                 continue;
             }
+            if (list == "Ext") {
+                G.Ext = new Map();
+                for (let key in items[list]) {
+                    G.Ext.set(items[list][key].ext, items[list]);
+                }
+                continue;
+            }
             G[list] = items[list];
         }
     });
@@ -175,6 +182,13 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
         return;
     }
     for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
+        if (key == "Ext") {
+            G.Ext = new Map();
+            for (let key in newValue) {
+                G.Ext.set(newValue[key].ext, newValue[key]);
+            }
+            continue;
+        }
         G[key] = newValue;
     }
 });

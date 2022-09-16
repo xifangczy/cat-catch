@@ -67,7 +67,7 @@ function findMedia(data, isRegex = false, filter = false) {
     ) {
         setTimeout(() => {
             findMedia(data, isRegex, filter);
-        }, 50);
+        }, 100);
         return;
     }
     // 屏蔽特殊页面发起的资源
@@ -389,15 +389,21 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
 
 //检查扩展名以及大小限制
 function CheckExtension(ext, size) {
-    for (let key in G.Ext) {
-        if (G.Ext[key].ext == ext) {
-            if (G.Ext[key].size != 0 && size != undefined && size <= G.Ext[key].size * 1024) {
-                return "break";
-            }
-            return G.Ext[key].state ? true : "break";
-        }
-    }
-    return false;
+    // for (let key in G.Ext) {
+    //     if (G.Ext[key].ext == ext) {
+    //         if (G.Ext[key].size != 0 && size != undefined && size <= G.Ext[key].size * 1024) {
+    //             return "break";
+    //         }
+    //         return G.Ext[key].state ? true : "break";
+    //     }
+    // }
+    // return false;
+    
+    const Ext = G.Ext.get(ext);
+    if (!Ext) { return false; }
+    if (!Ext.state) { return "break"; }
+    if (Ext.size != 0 && size != undefined && size <= Ext.size * 1024) { return "break"; }
+    return true;
 }
 //检查类型以及大小限制
 function CheckType(dataType, dataSize) {
