@@ -596,9 +596,8 @@ $(function () {
                         errorTsList.splice(errorTsList.indexOf(currentIndex), 1);
                     }
                     // console.log(fragment.url, currentIndex, tsBuffer);
-                    responseData = tsDecrypt(responseData, currentIndex); //解密m3u8
-                    tsBuffer[currentIndex] = responseData;
-                    fileSize += responseData.byteLength;
+                    tsBuffer[currentIndex] = tsDecrypt(responseData, currentIndex); //解密m3u8
+                    fileSize += tsBuffer[currentIndex].byteLength;
                     $("#fileSize").html("已下载:" + byteToSize(fileSize));
                     downDuration += fragment.duration;
                     recorder && $("#fileDuration").html("录制时长:" + secToTime(downDuration));
@@ -643,13 +642,17 @@ $(function () {
 
         // 默认下载格式
         let fileBlob = new Blob(_tsBuffer, { type: "video/MP2T" });
-        let ext = "ts";
+        let ext = _fragments[0].url.split("/").pop();
+        ext = ext.split("?")[0];
+        ext = ext.split(".").pop();
+        ext = ext ? ext : "ts";
 
         /* 有初始化切片 可能是fMP4 获取初始化切片的后缀 */
         if (_fragments[0].initSegment) {
             let name = _fragments[0].initSegment.url.split("/").pop();
             name = name.split("?")[0];
             ext = name.split(".").pop();
+            ext = ext ? ext : "ts";
         }
         // 转码mp4
         if ($("#mp4").prop("checked") && ext.toLowerCase() != "mp4") {
@@ -760,6 +763,16 @@ function GetFileName(url) {
     url = url.split(".");
     url.length > 1 && url.pop();
     return stringModify(url.join("."));
+}
+// 获取扩展名
+function GetExt(url) {
+    let str = url.split(".");
+    if (str.length == 1) {
+        return undefined;
+    }
+    let ext = str[str.length - 1];
+    ext = ext.match(/[0-9a-zA-Z]*/);
+    return ext[0].toLowerCase();
 }
 // 按钮状态
 function buttonState(obj = "#mergeTs", state = true) {

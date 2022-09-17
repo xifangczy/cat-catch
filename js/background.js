@@ -389,16 +389,6 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
 
 //检查扩展名以及大小限制
 function CheckExtension(ext, size) {
-    // for (let key in G.Ext) {
-    //     if (G.Ext[key].ext == ext) {
-    //         if (G.Ext[key].size != 0 && size != undefined && size <= G.Ext[key].size * 1024) {
-    //             return "break";
-    //         }
-    //         return G.Ext[key].state ? true : "break";
-    //     }
-    // }
-    // return false;
-    
     const Ext = G.Ext.get(ext);
     if (!Ext) { return false; }
     if (!Ext.state) { return "break"; }
@@ -540,7 +530,7 @@ function clearRedundant() {
         if (!cacheData.init) {
             // 清理 缓存数据
             for (let key in cacheData) {
-                if (!allTabId.includes(parseInt(cacheData[key]))) {
+                if (!allTabId.includes(parseInt(key))) {
                     delete cacheData[key];
                 }
             }
