@@ -175,25 +175,23 @@
               </span>
               <textarea id="m3u8dlArg" type="text" class="width100"></textarea>
             </div>
+            
             <div class="item">
-              <div>自动清理幽灵数据(默认100条后自动清理)</div>
-              <input id="OtherAutoClear" type="number" />
+              <div>
+                使用本地播放器调用协议打开视频预览 <select id="PlayerTemplate" class="select">
+                  <option value="default">调用协议模板</option>
+                  <option value="potplayer">PotPlayer</option>
+                  <option value="mxPlayerAd">MX Player 免费版</option>
+                  <option value="mxPlayerPro">MX Player Pro</option>
+                  <option value="vlc">自定义VLC协议 vlc://</option>
+                </select>
+              </div>
+              <input id="Player" type="text" class="width100" placeholder="留空为不启用 默认使用popup页面预览视频"/>
             </div>
 
             <div class="item">
-              <div>
-                调用本地<a href="https://potplayer.daum.net/" target="_blank"
-                  >PotPlayer</a
-                >播放器预览资源
-              </div>
-              <div class="switch">
-                <label class="switchLabel switchRadius">
-                  <input type="checkbox" id="Potplayer" class="switchInput" />
-                  <span class="switchRound switchRadius"
-                    ><em class="switchRoundBtn switchRadius"></em
-                  ></span>
-                </label>
-              </div>
+              <div>自动清理幽灵数据(默认100条后自动清理)</div>
+              <input id="OtherAutoClear" type="number" />
             </div>
 
             <div class="item">
@@ -209,7 +207,7 @@
             </div>
 
             <div class="item">
-              <div>捕获脚本选择</div>
+              <div>默认捕获脚本</div>
               <select id="injectScript" class="select"></select>
             </div>
 

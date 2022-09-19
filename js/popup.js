@@ -104,7 +104,7 @@ function AddMedia(data) {
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
                 <img src="img/copy.png" class="icon" id="copy" title="复制地址"/>
                 <img src="img/parsing.png" class="icon ${parsing.switch ? "" : "hide"}" id="${parsing.type}" title="解析"/>
-                <img src="img/${G.Potplayer ? "potplayer.png" : "play.png"}" class="icon ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
+                <img src="img/${G.Player ? "player.png" : "play.png"}" class="icon ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
                 <img src="img/download.png" class="icon" id="download" title="下载"/>
             </div>
             <div class="url hide">
@@ -218,14 +218,16 @@ function AddMedia(data) {
     });
     //播放
     html.find('#play').click(function () {
-        if (G.Potplayer) {
-            if (G.isFirefox) {
-                window.location.href = 'potplayer://' + data.url;
-                return false;
-            }
-            chrome.tabs.update({ url: 'potplayer://' + data.url });
+        if (isEmpty(G.Player)) { return true; }
+        let url = G.Player.replace(/\$url\$/g, data.url);
+        url = url.replace(/\$referer\$/g, data.initiator);
+        url = url.replace(/\$title\$/g, encodeURIComponent(data.title));
+        if (G.isFirefox) {
+            window.location.href = url;
             return false;
         }
+        chrome.tabs.update({ url: url });
+        return false;
     });
     //解析m3u8
     html.find('#m3u8, #json, #mpd').click(function () {
@@ -575,7 +577,7 @@ $(function () {
 
 /* 格式判断 */
 function isPlay(data) {
-    if (G.Potplayer && !isJSON(data) && !isPicture(data)) { return true; }
+    if (G.Player && !isJSON(data) && !isPicture(data)) { return true; }
     const extArray = ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'm4a', '3gp', 'mpeg', 'mov'];
     const typeArray = ['video/ogg', 'video/mp4', 'video/webm', 'audio/ogg', 'audio/mp3', 'audio/wav', 'audio/m4a', 'video/3gp', 'video/mpeg', 'video/mov'];
     return extArray.includes(data.ext) || typeArray.includes(data.type) || isM3U8(data);

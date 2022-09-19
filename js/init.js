@@ -15,7 +15,7 @@ G.OptionLists = [
     "Debug",
     "TitleName",
     "OtherAutoClear",
-    "Potplayer",
+    "Player",
     "Type",
     "Regex",
     "ShowWebIco",
@@ -118,7 +118,7 @@ function GetDefault(Obj) {
         case "Debug": return false;
         case "TitleName": return false;
         case "OtherAutoClear": return 100;
-        case "Potplayer": return false;
+        case "Player": return "";
         case "Regex": return defaultRegex;
         case "ShowWebIco": return false;
         case "MobileUserAgent":
@@ -195,6 +195,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 // 扩展升级，清空本地储存
 chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason == "update") {
+        InitOptions();
         chrome.storage.local.clear();
         clearRedundant();
     }
