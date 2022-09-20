@@ -48,11 +48,16 @@ $("#version").html("猫抓 v" + chrome.runtime.getManifest().version);
 
 // 自定义播放调用模板
 playerList = new Map();
-playerList.set("default", "");
-playerList.set("potplayer", "potplayer://$url$");
-playerList.set("mxPlayerAd", `intent:$url$#Intent;package=com.mxtech.videoplayer.ad;S.title=$title$;end`);
-playerList.set("mxPlayerPro", `intent:$url$#Intent;package=com.mxtech.videoplayer.pro;S.title=$title$;end`);
-playerList.set("vlc", "vlc://$url$");
+playerList.set("default", {name: "调用协议模板", template: ""});
+playerList.set("potplayer", {name: "PotPlayer", template: "potplayer://$url$"});
+playerList.set("mxPlayerAd", {name: "安卓 MX Player 免费版", template: `intent:$url$#Intent;package=com.mxtech.videoplayer.ad;end`});
+playerList.set("mxPlayerPro", {name: "安卓 MX Player Pro", template: `intent:$url$#Intent;package=com.mxtech.videoplayer.pro;end`});
+playerList.set("vlc", {name: "安卓 vlc", template: `intent:$url$#Intent;package=org.videolan.vlc;end`});
+playerList.set("vlcCustom", {name: "自定义VLC协议 vlc://", template: "vlc://$url$"});
+playerList.set("shareApi", {name: "系统分享", template: "$shareApi$"});
+playerList.forEach(function (item, key) {
+    $("#PlayerTemplate").append(`<option value="${key}">${item.name}</option>`);
+});
 
 // 增加后缀 类型 正则表达式
 function Gethtml(Type, Param = new Object()) {
@@ -118,7 +123,7 @@ $("#injectScript, #PlayerTemplate").change(function () {
         chrome.storage.sync.set({ [Option]: Value });
     }
     if (Option == "PlayerTemplate" && playerList.has(Value)) {
-        const template = playerList.get(Value);
+        const template = playerList.get(Value).template;
         $("#Player").val(template);
         chrome.storage.sync.set({ Player: template });
     }

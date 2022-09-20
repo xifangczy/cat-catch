@@ -244,6 +244,9 @@ textarea {
   margin-left: 345px;
   width: 170px;
 }
+#PlayerTemplate{
+  width: 200px;
+}
 #errorTsList p {
   color: red;
   word-break: break-all;

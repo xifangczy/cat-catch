@@ -219,6 +219,10 @@ function AddMedia(data) {
     //播放
     html.find('#play').click(function () {
         if (isEmpty(G.Player)) { return true; }
+        if (G.Player == "$shareApi$") {
+            navigator.share({ url: data.url });
+            return false;
+        }
         let url = G.Player.replace(/\$url\$/g, data.url);
         url = url.replace(/\$referer\$/g, data.initiator);
         url = url.replace(/\$title\$/g, encodeURIComponent(data.title));

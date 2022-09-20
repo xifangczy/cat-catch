@@ -40,18 +40,14 @@ G.TabIdList = [
 InitOptions();
 
 // 102版本以上 非Firefox 开启更多功能
-G.isFirefox = false;
-G.version = moreFeatFun();
-function moreFeatFun() {
-    if (navigator.userAgent.includes("Firefox/")) {
-        G.isFirefox = true;
-        return false;
-    }
+G.isFirefox = navigator.userAgent.includes("Firefox/");
+G.isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
+G.version = 93;
+if (navigator.userAgent.includes("Chrome/")) {
     const version = navigator.userAgent.match(/Chrome\/([\d]+)/);
     if (version && version[1]) {
-        return parseInt(version[1]);
+        G.version = parseInt(version[1]);
     }
-    return false;
 }
 
 // 脚本列表
