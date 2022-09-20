@@ -229,9 +229,9 @@ $("#testRegex, #testUrl").keyup(function () {
 $("#exportOptions").bind("click", function () {
     chrome.storage.sync.get(function (items) {
         let ExportData = JSON.stringify(items);
-        ExportData = "data:application/json;charset=utf-8," + encodeURIComponent(ExportData);
+        ExportData = "data:text/plain," + Base64.encode(ExportData);
         let date = new Date();
-        const filename = `cat-catch-${chrome.runtime.getManifest().version}-${date.getFullYear()}-${date.getMonth()}-${date.getDay()}-${date.getTime()}.json`;
+        const filename = `cat-catch-${chrome.runtime.getManifest().version}-${date.getFullYear()}-${date.getMonth()}-${date.getDay()}-${date.getTime()}.txt`;
         if (G.isFirefox) {
             downloadDataURL(ExportData, filename);
             return;
@@ -249,7 +249,10 @@ $("#importOptionsFile").change(function () {
         let importData = this.result;
         try {
             importData = JSON.parse(importData);
-        } catch (e) { alert("文件内容错误"); return; }
+        } catch (e) {
+            importData = Base64.decode(importData);
+            importData = JSON.parse(importData);
+        }
         for (let item of G.OptionLists) {
             chrome.storage.sync.set({ [item]: importData[item] });
         }

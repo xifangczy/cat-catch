@@ -198,6 +198,10 @@ chrome.runtime.onInstalled.addListener(function (details) {
         InitOptions();
         chrome.storage.local.clear();
         clearRedundant();
+        if (G.Potplayer) {
+            chrome.storage.sync.set({ Player: "potplayer://$url$" });
+            delete G.Potplayer;
+        }
     }
 });
 
