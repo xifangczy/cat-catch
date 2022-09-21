@@ -48,7 +48,8 @@ $("#version").html("猫抓 v" + chrome.runtime.getManifest().version);
 
 // 自定义播放调用模板
 playerList = new Map();
-playerList.set("default", {name: "调用协议模板", template: ""});
+playerList.set("tips", {name: "调用协议模板", template: ""});
+playerList.set("default", {name: "默认 / 不启用", template: ""});
 playerList.set("potplayer", {name: "PotPlayer", template: "potplayer://$url$"});
 playerList.set("mxPlayerAd", {name: "安卓 MX Player 免费版", template: `intent:$url$#Intent;package=com.mxtech.videoplayer.ad;end`});
 playerList.set("mxPlayerPro", {name: "安卓 MX Player Pro", template: `intent:$url$#Intent;package=com.mxtech.videoplayer.pro;end`});
@@ -122,7 +123,7 @@ $("#injectScript, #PlayerTemplate").change(function () {
     if (Option == "injectScript" && G.scriptList.has(Value)) {
         chrome.storage.sync.set({ [Option]: Value });
     }
-    if (Option == "PlayerTemplate" && playerList.has(Value)) {
+    if (Option == "PlayerTemplate" && playerList.has(Value) && Value != "tips") {
         const template = playerList.get(Value).template;
         $("#Player").val(template);
         chrome.storage.sync.set({ Player: template });
