@@ -8,6 +8,8 @@
 
 [Changed] 减少mp4转码时内存占用
 
+[Changed] 自定义调用本地播放器的协议
+
 ### 2.2.4
 [Changed] 更新 hls.js
 
