@@ -66,8 +66,7 @@ function AddMedia(data) {
     //截取文件名长度
     let trimName = data.name;
     if (data.name.length >= 60) {
-        trimName = data.name.replace(/\.[^.\/]+$/, "");
-        trimName = trimName.substr(0, 20) + '...' + trimName.substr(-20) + '.' + data.ext;
+        trimName = trimName.substr(0, 20) + '...' + trimName.substr(-23);
     }
 
     //添加下载文件名

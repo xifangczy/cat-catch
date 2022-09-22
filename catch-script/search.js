@@ -1,5 +1,5 @@
 console.log("start search.js");
-const DEBUG = false;
+const CATCH_SEARCH_DEBUG = false;
 
 // 拦截JSON.parse 分析内容
 const _JSONparse = JSON.parse;
@@ -9,7 +9,7 @@ JSON.parse = function () {
     return data;
 }
 async function findMedia(data, raw = undefined, depth = 0) {
-    DEBUG && console.log(data);
+    CATCH_SEARCH_DEBUG && console.log(data);
     for (let key in data) {
         if (typeof data[key] == "object") {
             if (depth > 20) { continue; }  // 防止死循环 最大深度
@@ -35,7 +35,7 @@ async function findMedia(data, raw = undefined, depth = 0) {
                 toUrl(text);
                 continue;
             }
-            if (DEBUG && data[key].includes("manifest")) {
+            if (CATCH_SEARCH_DEBUG && data[key].includes("manifest")) {
                 console.log(data);
             }
         }
@@ -48,7 +48,7 @@ XMLHttpRequest.prototype.open = function (method) {
     method = method.toUpperCase();
     this.addEventListener("readystatechange", function (event) {
         if (this.status != 200 || this.response == "" || typeof this.response != "string") { return; }
-        DEBUG && console.log(this);
+        CATCH_SEARCH_DEBUG && console.log(this);
         if (this.response.substring(0, 34) == "data:application/vnd.apple.mpegurl") {
             let text = this.response.substring(35);
             if (text.substring(0, 7) == "base64,") {
@@ -100,7 +100,7 @@ window.fetch = async function (input, init) {
     response.text()
         .then(text => {
             if (text == "") { return; }
-            DEBUG && console.log({ text, input });
+            CATCH_SEARCH_DEBUG && console.log({ text, input });
             if (typeof input == "object") { input = input.url; }
             let isJson = isJSON(text);
             if (isJson) {

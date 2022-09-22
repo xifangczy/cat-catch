@@ -638,7 +638,7 @@ $(function () {
             }
             delete tsBuffer[i];
         }
-        tsBuffer.splice(0); delete tsBuffer;
+        tsBuffer.splice(0);
 
         // 默认下载格式
         let fileBlob = new Blob(_tsBuffer, { type: "video/MP2T" });
