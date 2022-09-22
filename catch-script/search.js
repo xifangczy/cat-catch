@@ -9,7 +9,7 @@ JSON.parse = function () {
     return data;
 }
 async function findMedia(data, raw = undefined, depth = 0) {
-    CATCH_SEARCH_DEBUG && console.log(data);
+    CATCH_SEARCH_DEBUG && console.log(raw ? raw : data);
     for (let key in data) {
         if (typeof data[key] == "object") {
             if (depth > 20) { continue; }  // 防止死循环 最大深度
