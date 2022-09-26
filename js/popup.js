@@ -111,6 +111,7 @@ function AddMedia(data) {
                     ${data.title ? `<b>标题:</b> ${data.title}` : ""}
                     ${data.type ? `<br><b>MIME:</b>  ${data.type}` : ""}
                 </div>
+                <div id="qrcode"><img src="img/qrcode.png" class="icon"/></div>
                 <a href="${data.url}" target="_blank" download="${data.downFileName}" data-initiator="${data.initiator}">${data.url}</a>
                 <br>
                 <img id="screenshots" class="hide"/>
@@ -171,6 +172,11 @@ function AddMedia(data) {
             preview.show().trigger("play");
         }
         return false;
+    });
+    // 二维码
+    html.find("#qrcode").click(function () {
+        const size = data.url.length >= 300 ? 400 : 256;
+        $(this).html("").qrcode({ width: size, height: size, text: data.url });
     });
     //点击复制网址
     html.find('#copy').click(function () {

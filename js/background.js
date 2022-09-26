@@ -44,7 +44,7 @@ chrome.webRequest.onResponseStarted.addListener(
                 delete refererData["requestId" + data.requestId];
             }
             findMedia(data);
-        } catch (e) { console.log(e); }
+        } catch (e) { console.log(e, data); }
     }, { urls: ["<all_urls>"] }, ["responseHeaders"]
 );
 // 删除失败的refererData

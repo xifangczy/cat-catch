@@ -40,8 +40,6 @@ body {
   padding: 5px;
 }
 .icon {
-  padding-left: 2px;
-  padding-right: 2px;
   transition: all 0.1s;
   width: 18px;
   height: 18px;
@@ -51,6 +49,10 @@ body {
 }
 .icon:active {
   transform: scale(1);
+}
+.panel-heading .icon{
+  padding-left: 2px;
+  padding-right: 2px;
 }
 .panel-heading .size {
   float: right;
