@@ -1,4 +1,9 @@
 ## 更新说明
+### 2.2.6
+[Added] 深度搜索 增加搜索key
+
+[Added] popup 增加二维码按钮
+
 ### 2.2.5
 [Fixed] 修复mpd解析器丢失音轨 [#70](https://github.com/xifangczy/cat-catch/issues/70)
 
