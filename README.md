@@ -11,13 +11,13 @@ https://addons.mozilla.org/addon/cat-catch/
 
 💔猫抓是开源的，任何人都可以下载修改上架到应用商店，已经有不少加上广告代码后上架的伪猫抓，请注意自己的数据安全。所有安装地址以github和用户文档为准。
 
+# 📒用户文档
+https://o2bmm.gitbook.io/cat-catch/
+
 # 📘Crhome/Edge等Chromium内核浏览器 源码加载方法
 1. https://github.com/xifangczy/cat-catch/releases 下载 Source code 并解压。
 2. 扩展管理页面 打开 "开发者模式"。
 3. 点击 "加载已解压的扩展程序" 选中你解压好的目录即可。
-
-# 📒用户文档
-https://o2bmm.gitbook.io/cat-catch/
 
 # 📚兼容性说明
 1.0.17版本之后需要Chromium内核版本93以上。
