@@ -7,8 +7,8 @@
     <script src="js/jquery.min.js"></script>
     <script src="js/init.js"></script>
     <script src="js/firefox.js"></script>
-    <script src="js/m3u8.js"></script>
     <script src="js/mux.min.js"></script>
+    <script src="js/m3u8.js"></script>
   </head>
 
   <body>
@@ -87,8 +87,11 @@
             <button id="copyM3U8dl">复制m3u8DL命令参数</button>
             <div class="line"></div>
             <div class="merge customKey">
-              <input type="text" id="customKey" spellcheck="false" placeholder="自定义 密钥 16进制 或 base64" size="66"/>
+              <input type="text" id="customKey" spellcheck="false" placeholder="自定义 密钥 16进制 或 base64" size="60"/>
               <input type="text" id="customIV" spellcheck="false" placeholder="自定义 偏移量 IV" size="35"/>
+              <!-- <select id="maybeKey" class="m3u8Key select hide">
+                <option value="tips">寻找到疑似Key</option>
+              </select> -->
               <button id="uploadKey">上传Key</button>
               <input id="uploadKeyFile" type="file" class="hide" />
             </div>

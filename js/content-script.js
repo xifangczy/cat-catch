@@ -1,5 +1,6 @@
 var _videoObj = [];
 var _videoSrc = [];
+var _key = [];
 chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     // 获取页面视频对象
     if (Message.Message == "getVideoState") {
@@ -129,6 +130,10 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             return true;
         } catch (e) { console.log(e); return true; }
     }
+    if (Message.Message == "getKey") {
+        sendResponse(_key);
+        return true;
+    }
 });
 
 // Heart Beat
@@ -158,4 +163,18 @@ window.addEventListener("message", (event) => {
     if (event.data.type == "addMedia") {
         chrome.runtime.sendMessage({ Message: "addMedia", url: event.data.url, href: event.data.href, extraExt: event.data.ext });
     }
+    if (event.data.type == "addKey") {
+        let key = ArrayToBase64(event.data.key);
+        if (_key.includes(key)) { return; }
+        _key.push(key);
+    }
 }, false);
+
+function ArrayToBase64(data) {
+    let bytes = new Uint8Array(data);
+    let binary = "";
+    for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
+}

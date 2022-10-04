@@ -240,11 +240,14 @@ textarea {
   cursor: pointer;
   padding: 5px 10px;
 }
+.m3u8Key {
+  width: 233px;
+}
 #injectScript {
   margin-left: 345px;
   width: 170px;
 }
-#PlayerTemplate{
+#PlayerTemplate {
   width: 200px;
 }
 #errorTsList p {
@@ -337,6 +340,9 @@ textarea {
 }
 #next_m3u8 a {
   word-break: break-all;
+}
+.key {
+  align-items: flex-end;
 }
 .key div {
   display: flex;

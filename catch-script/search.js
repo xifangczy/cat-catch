@@ -9,10 +9,22 @@ JSON.parse = function () {
     return data;
 }
 async function findMedia(data, raw = undefined, depth = 0) {
-    CATCH_SEARCH_DEBUG && console.log(raw ? raw : data);
+    CATCH_SEARCH_DEBUG && console.log(data);
     for (let key in data) {
         if (typeof data[key] == "object") {
-            if (depth > 20) { continue; }  // 防止死循环 最大深度
+            // 查找疑似key
+            if (data[key] instanceof Array && data[key].length == 16) {
+                let flag = true;
+                for (let item of data[key]) {
+                    if (typeof item != "number" || item > 255) { flag = false; break; }
+                }
+                if (flag) {
+                    window.postMessage({ type: "addKey", key: data[key], href: location.href, ext: "key" });
+                    continue;
+                }
+                continue;
+            }
+            if (depth > 25) { continue; }  // 防止死循环 最大深度
             if (!raw) { raw = data; }
             findMedia(data[key], raw, ++depth);
             continue;
@@ -46,9 +58,15 @@ async function findMedia(data, raw = undefined, depth = 0) {
 const _xhrOpen = XMLHttpRequest.prototype.open;
 XMLHttpRequest.prototype.open = function (method) {
     method = method.toUpperCase();
+    CATCH_SEARCH_DEBUG && console.log(this);
     this.addEventListener("readystatechange", function (event) {
-        if (this.status != 200 || this.response == "" || typeof this.response != "string") { return; }
         CATCH_SEARCH_DEBUG && console.log(this);
+        if (this.status != 200) { return; }
+        // 查找疑似key
+        if (this.responseType == "arraybuffer" && this.response?.byteLength && this.response.byteLength == 16) {
+            window.postMessage({ type: "addKey", key: this.response, href: location.href, ext: "key" });
+        }
+        if (this.response == "" || typeof this.response != "string") { return; }
         if (this.response.substring(0, 34) == "data:application/vnd.apple.mpegurl") {
             let text = this.response.substring(35);
             if (text.substring(0, 7) == "base64,") {
@@ -97,10 +115,16 @@ const _fetch = window.fetch;
 window.fetch = async function (input, init) {
     const response = await _fetch.apply(this, arguments);
     const clone = response.clone();
-    response.text()
-        .then(text => {
+    CATCH_SEARCH_DEBUG && console.log(response);
+    response.arrayBuffer()
+        .then(arrayBuffer => {
+            CATCH_SEARCH_DEBUG && console.log({ arrayBuffer, input });
+            if (arrayBuffer.byteLength == 16) {
+                window.postMessage({ type: "addKey", key: arrayBuffer, href: location.href, ext: "key" });
+                return;
+            }
+            let text = new TextDecoder().decode(arrayBuffer);
             if (text == "") { return; }
-            CATCH_SEARCH_DEBUG && console.log({ text, input });
             if (typeof input == "object") { input = input.url; }
             let isJson = isJSON(text);
             if (isJson) {
@@ -130,6 +154,19 @@ window.fetch = async function (input, init) {
             // }
         });
     return clone;
+}
+
+// 拦截 Array.prototype.slice
+const _slice = Array.prototype.slice;
+Array.prototype.slice = function (start, end) {
+    let data = _slice.apply(this, arguments);
+    if (end == 16 && this.length == 32) {
+        for (let item of data) {
+            if (typeof item != "number" || item > 255) { return data; }
+        }
+        window.postMessage({ type: "addKey", key: data, href: location.href, ext: "key" });
+    }
+    return data;
 }
 
 function isUrl(str) {
@@ -165,7 +202,8 @@ function isParsing(str) {
         ext == "m3u" ||
         ext == "mpd" ||
         ext == "mp4" ||
-        ext == "mp3"
+        ext == "mp3" ||
+        ext == "key"
     ) { return ext; }
     return false;
 }

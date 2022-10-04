@@ -4,6 +4,7 @@ var _m3u8Url = params.get("url");
 const _referer = params.get("referer");
 const _title = params.get("title");
 const getId = parseInt(params.get("getId"));
+const tabId = parseInt(params.get("tabid"));
 // 修改当前标签下的所有xhr的Referer
 _referer && setReferer(_referer);
 
@@ -97,7 +98,7 @@ $(function () {
                     const name = GetFile(item.uri);
                     const html = `<div class="block">
                         <div>${item.attrs.RESOLUTION ? "分辨率:" + item.attrs.RESOLUTION : ""}${item.attrs.BANDWIDTH ? " | 码率:" + (parseInt(item.attrs.BANDWIDTH / 1000) + " Kbps") : ""}</div>
-                        <a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}">${name}</a>
+                        <a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}&tabid=${tabId}">${name}</a>
                     </div>`;
                     $("#next_m3u8").append(html);
                 }
@@ -123,7 +124,7 @@ $(function () {
                     const name = GetFile(item.url);
                     const html = `<div class="block">
                         <div>${item.name ? item.name : ""} | ${item.lang ? item.lang : ""}</div>
-                        <a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}">${name}</a>
+                        <a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}&tabid=${tabId}">${name}</a>
                     </div>`;
                     $("#next_audio").append(html);
                 }
@@ -139,7 +140,7 @@ $(function () {
                     const name = GetFile(item.url);
                     const html = `<div class="block">
                         <div>${item.name ? item.name : ""} | ${item.lang ? item.lang : ""}</div>
-                        <a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}">${name}</a>
+                        <a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}&tabid=${tabId}">${name}</a>
                     </div>`;
                     $("#next_subtitle").append(html);
                 }
@@ -305,7 +306,25 @@ $(function () {
                 </div>
             `);
         } else {
-            $("#tips").append('密钥(Key): <input type="text" value="密钥下载失败" spellcheck="false" readonly="readonly">');
+            $("#tips").append(`
+                <div class="key flex">
+                    <div class="method">加密算法(Method): <input type="text" value="${decryptdata.method ? decryptdata.method : "NONE"}" spellcheck="false" readonly="readonly"></div>
+                    <div>密钥(Hex): <input type="text" value="密钥下载失败" spellcheck="false" readonly="readonly"></div>
+                    <select id="maybeKey" class="m3u8Key select hide"><option value="tips">寻找到疑似Key</option></select>
+                </div>
+            `);
+            if (tabId) {
+                chrome.tabs.sendMessage(tabId, { Message: "getKey" }, function (result) {
+                    if (result.length == 0) { return; }
+                    for (let item of result) {
+                        $("#maybeKey").append(`<option value="${item}">${item}</option>`);
+                    }
+                    $("#maybeKey").show();
+                    $("#maybeKey").change(function () {
+                        this.value != "tips" && $("#customKey").val(this.value);
+                    });
+                });
+            }
         }
         // 如果是默认iv 则不显示
         let iv = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i + 1]).toString();
@@ -632,9 +651,9 @@ $(function () {
     function mergeTs() {
         // 修正数组，清理空白数据
         const _tsBuffer = [];
-        for (let i = 0, j = 0; i < tsBuffer.length; i++) {
+        for (let i = 0; i < tsBuffer.length; i++) {
             if (tsBuffer[i]) {
-                _tsBuffer[j++] = tsBuffer[i];
+                _tsBuffer.push(tsBuffer[i]);
             }
             delete tsBuffer[i];
         }
@@ -666,6 +685,7 @@ $(function () {
                     let data = new Uint8Array(segment.initSegment.byteLength + segment.data.byteLength);
                     data.set(segment.initSegment, 0);
                     data.set(segment.data, segment.initSegment.byteLength);
+                    // console.log(muxjs.mp4.tools.inspect(data));
                     _tsBuffer[index] = fixFileDuration(data, downDuration);
                     return;
                 }

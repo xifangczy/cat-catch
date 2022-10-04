@@ -176,7 +176,7 @@ function AddMedia(data) {
     // 二维码
     html.find("#qrcode").click(function () {
         const size = data.url.length >= 300 ? 400 : 256;
-        $(this).html("").qrcode({ width: size, height: size, text: data.url });
+        $(this).html("").qrcode({ width: size, height: size, text: data.url }).off("click");
     });
     //点击复制网址
     html.find('#copy').click(function () {
@@ -242,7 +242,7 @@ function AddMedia(data) {
     html.find('#m3u8, #json, #mpd').click(function () {
         const id = this.id;
         chrome.tabs.get(G.tabId, function (tab) {
-            let url = `/${id}.html?url=${encodeURIComponent(data.url)}&referer=${encodeURIComponent(data.initiator)}&title=${encodeURIComponent(data.title)}`;
+            let url = `/${id}.html?url=${encodeURIComponent(data.url)}&referer=${encodeURIComponent(data.initiator)}&title=${encodeURIComponent(data.title)}&tabid=${data.tabId}`;
             chrome.tabs.create({ url: url, index: tab.index + 1 });
         });
         return false;
