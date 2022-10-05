@@ -164,7 +164,7 @@ window.addEventListener("message", (event) => {
         chrome.runtime.sendMessage({ Message: "addMedia", url: event.data.url, href: event.data.href, extraExt: event.data.ext });
     }
     if (event.data.type == "addKey") {
-        let key = ArrayToBase64(event.data.key);
+        let key = event.data.ext == "key" ? ArrayToBase64(event.data.key) : event.data.key;
         if (_key.includes(key)) { return; }
         _key.push(key);
     }
@@ -175,6 +175,9 @@ function ArrayToBase64(data) {
     let binary = "";
     for (let i = 0; i < bytes.byteLength; i++) {
         binary += String.fromCharCode(bytes[i]);
+    }
+    if (typeof _btoa == "function") {
+        return _btoa(binary);
     }
     return btoa(binary);
 }

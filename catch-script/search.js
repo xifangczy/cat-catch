@@ -169,6 +169,26 @@ Array.prototype.slice = function (start, end) {
     return data;
 }
 
+// 拦截 window.btoa / window.atob
+const _btoa = window.btoa;
+window.btoa = function (data) {
+    let base64 = _btoa.apply(this, arguments);
+    CATCH_SEARCH_DEBUG && console.log(base64, data);
+    if (base64.length == 24) {
+        window.postMessage({ type: "addKey", key: base64, href: location.href, ext: "base64Key" });
+    }
+    return base64;
+}
+const _atob = window.atob;
+window.atob = function (base64) {
+    let data = _atob.apply(this, arguments);
+    CATCH_SEARCH_DEBUG && console.log(base64, data);
+    if (base64.length == 24) {
+        window.postMessage({ type: "addKey", key: base64, href: location.href, ext: "base64Key" });
+    }
+    return data;
+}
+
 function isUrl(str) {
     return /^http[s]*:\/\/.+/i.test(str);
 }
