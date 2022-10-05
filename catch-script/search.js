@@ -31,7 +31,7 @@ async function findMedia(data, raw = undefined, depth = 0) {
         }
         if (typeof data[key] == "string") {
             if (isUrl(data[key])) {
-                let ext = isParsing(data[key]);
+                let ext = getExtension(data[key]);
                 ext && window.postMessage({ type: "addMedia", url: data[key], href: location.href, ext: ext });
                 continue;
             }
@@ -84,7 +84,7 @@ XMLHttpRequest.prototype.open = function (method) {
             return;
         }
         if (isUrl(this.response)) {
-            let ext = isParsing(this.response);
+            let ext = getExtension(this.response);
             ext && window.postMessage({ type: "addMedia", url: this.response, href: location.href, ext: ext });
             return;
         }
@@ -174,7 +174,7 @@ const _btoa = window.btoa;
 window.btoa = function (data) {
     let base64 = _btoa.apply(this, arguments);
     CATCH_SEARCH_DEBUG && console.log(base64, data);
-    if (base64.length == 24) {
+    if (base64.length == 24 && base64.substring(22, 24) == "==") {
         window.postMessage({ type: "addKey", key: base64, href: location.href, ext: "base64Key" });
     }
     return base64;
@@ -183,7 +183,7 @@ const _atob = window.atob;
 window.atob = function (base64) {
     let data = _atob.apply(this, arguments);
     CATCH_SEARCH_DEBUG && console.log(base64, data);
-    if (base64.length == 24) {
+    if (base64.length == 24 && base64.substring(22, 24) == "==") {
         window.postMessage({ type: "addKey", key: base64, href: location.href, ext: "base64Key" });
     }
     return data;
@@ -212,7 +212,7 @@ function isJSON(str) {
     }
     return false;
 }
-function isParsing(str) {
+function getExtension(str) {
     let ext;
     try { ext = new URL(str); } catch (e) { return undefined; }
     ext = ext.pathname.split(".");
