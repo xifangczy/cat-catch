@@ -42,4 +42,7 @@ https://o2bmm.gitbook.io/cat-catch/
 - [mpd-parser](https://github.com/videojs/mpd-parser)
 
 # 📜License
-MIT
+GPL-3.0 license
+1.0版 使用 MIT许可
+2.0版 更改为GPL v3许可
+为了资源嗅探扩展有良好发展，希望使用猫抓源码的扩展仍然保持开源。
