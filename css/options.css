@@ -223,14 +223,16 @@ textarea {
   width: 145px;
 }
 #tips input {
-  width: 975px;
   color: rgb(26, 115, 232);
+}
+.keyUrl{
+  width: 975px;
 }
 /* #tips {
   color: rgb(26, 115, 232);
 } */
 .select {
-  -webkit-appearance: none;
+  appearance: none;
   background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIxMiIgZmlsbD0iIzVGNjM2OCI+PHBhdGggZD0iTTAgMGgyNEwxMiAxMnoiLz48L3N2Zz4=)
     calc(100% - 8px) center no-repeat;
   background-color: rgb(241, 243, 244);
@@ -353,10 +355,13 @@ textarea {
   margin-right: 10px;
 }
 .key input {
-  width: 388px !important;
+  width: 265px;
 }
 .method input {
-  width: 140px !important;
+  width: 100px;
+}
+.offset {
+  width: 256px;
 }
 .videoInfo div {
   margin-right: 5px;

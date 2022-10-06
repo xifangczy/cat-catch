@@ -173,7 +173,7 @@ Array.prototype.slice = function (start, end) {
 const _btoa = window.btoa;
 window.btoa = function (data) {
     let base64 = _btoa.apply(this, arguments);
-    CATCH_SEARCH_DEBUG && console.log(base64, data);
+    CATCH_SEARCH_DEBUG && console.log(base64, data, base64.length);
     if (base64.length == 24 && base64.substring(22, 24) == "==") {
         window.postMessage({ type: "addKey", key: base64, href: location.href, ext: "base64Key" });
     }
@@ -182,7 +182,7 @@ window.btoa = function (data) {
 const _atob = window.atob;
 window.atob = function (base64) {
     let data = _atob.apply(this, arguments);
-    CATCH_SEARCH_DEBUG && console.log(base64, data);
+    CATCH_SEARCH_DEBUG && console.log(base64, data, base64.length);
     if (base64.length == 24 && base64.substring(22, 24) == "==") {
         window.postMessage({ type: "addKey", key: base64, href: location.href, ext: "base64Key" });
     }

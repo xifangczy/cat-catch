@@ -79,6 +79,7 @@ body {
 }
 #preview {
   max-height: 300px;
+  max-width: 488px;
   text-align: center;
 }
 .button,

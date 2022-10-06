@@ -1,6 +1,6 @@
 // url 参数解析
 const params = new URL(location.href).searchParams;
-var _m3u8Url = params.get("url");
+let _m3u8Url = params.get("url");
 const _referer = params.get("referer");
 let _title = params.get("title");
 const getId = parseInt(params.get("getId"));
@@ -10,31 +10,31 @@ _referer && setReferer(_referer);
 
 $(function () {
     //获取m3u8参数
-    var _m3u8Arg = new RegExp("\\.m3u8\\?([^\n]*)").exec(_m3u8Url);
+    let _m3u8Arg = new RegExp("\\.m3u8\\?([^\n]*)").exec(_m3u8Url);
     if (_m3u8Arg) {
         _m3u8Arg = _m3u8Arg[1];
     }
-    var _m3u8Content;   // 储存m3u8文件内容
+    let _m3u8Content;   // 储存m3u8文件内容
     /* m3u8 解析工具 */
     const hls = new Hls({ enableWorker: false });  // hls.js 对象
     const _fragments = []; // 储存切片对象
     const keyContent = new Map(); // 储存key的内容
     const initData = new Map(); // 储存map的url
     const decryptor = new AESDecryptor(); // 解密工具 来自hls.js 分离出来的
-    var skipDecrypt = false; // 是否跳过解密
+    let skipDecrypt = false; // 是否跳过解密
     /* 下载相关 */
-    var downId = 0; // 下载id
-    var stopDownload = false; // 停止下载flag
-    var fileSize = 0; // 文件大小
-    var downDuration = 0; // 下载媒体得时长
-    var downCurrentTs = 0;    // 当前进度
-    var downTotalTs = 0;  // 需要下载的文件数量
+    let downId = 0; // 下载id
+    let stopDownload = false; // 停止下载flag
+    let fileSize = 0; // 文件大小
+    let downDuration = 0; // 下载媒体得时长
+    let downCurrentTs = 0;    // 当前进度
+    let downTotalTs = 0;  // 需要下载的文件数量
     const tsBuffer = []; // ts内容缓存
     const errorTsList = []; // 下载错误ts序号列表
     /* 录制相关 */
-    var recorder = false; // 开关
-    var recorderArray = []; // 储存临时碎片
-    var recorderIndex = 0;  // 下载索引
+    let recorder = false; // 开关
+    let recorderArray = []; // 储存临时碎片
+    let recorderIndex = 0;  // 下载索引
 
     if (isEmpty(_m3u8Url)) {
         $("#loading").hide(); $("#m3u8Custom").show();
@@ -290,13 +290,14 @@ $(function () {
         $("#rangeEnd").val(_fragments.length);
     }
     function showKeyInfo(buffer, decryptdata, i) {
-        $("#tips").append('密钥地址(KeyURL): <input type="text" value="' + decryptdata.uri + '" spellcheck="false" readonly="readonly">');
+        $("#tips").append('密钥地址(KeyURL): <input type="text" value="' + decryptdata.uri + '" spellcheck="false" readonly="readonly" class="keyUrl">');
         if (buffer) {
             $("#tips").append(`
                 <div class="key flex">
                     <div class="method">加密算法(Method): <input type="text" value="${decryptdata.method ? decryptdata.method : "NONE"}" spellcheck="false" readonly="readonly"></div>
                     <div>密钥(Hex): <input type="text" value="${ArrayBufferToHexString(buffer)}" spellcheck="false" readonly="readonly"></div>
                     <div>密钥(Base64): <input type="text" value="${ArrayBufferToBase64(buffer)}" spellcheck="false" readonly="readonly"></div>
+                    <select id="maybeKey" class="m3u8Key select hide"><option value="tips">寻找到疑似Key</option></select>
                 </div>
             `);
         } else {
@@ -307,18 +308,19 @@ $(function () {
                     <select id="maybeKey" class="m3u8Key select hide"><option value="tips">寻找到疑似Key</option></select>
                 </div>
             `);
-            if (tabId) {
-                chrome.tabs.sendMessage(tabId, { Message: "getKey" }, function (result) {
-                    if (result.length == 0) { return; }
-                    for (let item of result) {
-                        $("#maybeKey").append(`<option value="${item}">${item}</option>`);
-                    }
-                    $("#maybeKey").show();
-                    $("#maybeKey").change(function () {
-                        this.value != "tips" && $("#customKey").val(this.value);
-                    });
+        }
+        if (tabId) {
+            chrome.tabs.sendMessage(tabId, { Message: "getKey" }, function (result) {
+                if (!result || result.length == 0) { return; }
+                const maybeKey = $("#maybeKey");
+                for (let item of result) {
+                    maybeKey.append(`<option value="${item}">${item}</option>`);
+                }
+                maybeKey.show();
+                maybeKey.change(function () {
+                    this.value != "tips" && $("#customKey").val(this.value);
                 });
-            }
+            });
         }
         // 如果是默认iv 则不显示
         let iv = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i + 1]).toString();
@@ -326,7 +328,7 @@ $(function () {
         let _iv = decryptdata.iv.toString();
         if (_iv != iv && _iv != iv2) {
             iv = "0x" + ArrayBufferToHexString(decryptdata.iv.buffer);
-            $("#tips").append('偏移量(IV): <input type="text" value="' + iv + '" spellcheck="false" readonly="readonly">');
+            $("#tips").append('<div class="key flex"><div>偏移量(IV): <input type="text" value="' + iv + '" spellcheck="false" readonly="readonly" class="offset"></div></div>');
         }
         // $("#tips").append("<div class=\"line\"></div>");
     }
@@ -682,11 +684,10 @@ $(function () {
             }
             delete transmuxer;
         }
-        const saveAs = $("#saveAs").prop("checked");
         chrome.downloads.download({
             url: URL.createObjectURL(fileBlob),
             filename: `${GetFileName(_m3u8Url)}.${ext}`,
-            saveAs: saveAs
+            saveAs: $("#saveAs").prop("checked")
         }, function (downloadId) { downId = downloadId });
         buttonState("#mergeTs", true);
         _tsBuffer.splice(0); delete _tsBuffer;
