@@ -2,7 +2,7 @@
 const params = new URL(location.href).searchParams;
 var _m3u8Url = params.get("url");
 const _referer = params.get("referer");
-const _title = params.get("title");
+let _title = params.get("title");
 const getId = parseInt(params.get("getId"));
 const tabId = parseInt(params.get("tabid"));
 // 修改当前标签下的所有xhr的Referer
@@ -305,6 +305,8 @@ $(function () {
                     <div>密钥(Base64): <input type="text" value="${ArrayBufferToBase64(buffer)}" spellcheck="false" readonly="readonly"></div>
                 </div>
             `);
+			//hiaming 填到自定义处
+			$("#customKey").val(ArrayBufferToBase64(buffer));
         } else {
             $("#tips").append(`
                 <div class="key flex">
@@ -333,6 +335,8 @@ $(function () {
         if (_iv != iv && _iv != iv2) {
             iv = "0x" + ArrayBufferToHexString(decryptdata.iv.buffer);
             $("#tips").append('偏移量(IV): <input type="text" value="' + iv + '" spellcheck="false" readonly="readonly">');
+			//hiaming 填到自定义处
+			$("#customIV").val(iv);
         }
         // $("#tips").append("<div class=\"line\"></div>");
     }
@@ -419,7 +423,30 @@ $(function () {
     $("#m3u8DL").click(function () {
         let m3u8dlArg = G.m3u8dlArg.replace(/\$referer\$/g, _referer);
         m3u8dlArg = m3u8dlArg.replace(/\$url\$/g, _m3u8Url);
+        //hiamng 输入文件名
+        let customFilename = $("#customFilename").val();  // 自定义IV
+        _title = customFilename ? customFilename : _title;
         m3u8dlArg = m3u8dlArg.replace(/\$title\$/g, _title);
+        //hiaming 加上iv和key
+        let customKey = $("#customKey").val().trim();  // 自定义密钥
+        if (customKey) {
+            if (isHexKey(customKey)) {
+                customKey = HexStringToArrayBuffer(customKey);
+                customKey = ArrayBufferToBase64(customKey);
+            }
+            m3u8dlArg += ` --useKeyBase64 "${customKey}"`;
+        }
+        
+        const customIV = $("#customIV").val();  // 自定义IV
+        m3u8dlArg += customIV ? ` --useKeyIV "${customIV}"` : "";
+        
+        //hiamng 只存音频
+        const onlyMp3 = $("#onlyMp3").val();  // 自定义IV
+        m3u8dlArg += onlyMp3 ? ` --enableAudioOnly` : "";
+        
+        navigator.clipboard.writeText(m3u8dlArg);
+        console.log("m3u8dl://的原始参数是："+ m3u8dlArg)
+        // hiaming end
         let m3u8dl = 'm3u8dl://' + Base64.encode(m3u8dlArg);
         if (m3u8dl.length >= 2046) {
             alert("m3u8dl参数太长,可能导致无法唤醒m3u8DL, 请手动复制到m3u8DL下载");
@@ -430,6 +457,9 @@ $(function () {
     $("#copyM3U8dl").click(function () {
         let m3u8dlArg = G.m3u8dlArg.replace(/\$referer\$/g, _referer);
         m3u8dlArg = m3u8dlArg.replace(/\$url\$/g, _m3u8Url);
+		//hiamng 输入文件名
+		const customFilename = $("#customFilename").val();  // 自定义IV
+        _title = customFilename ? customFilename : _title;
         m3u8dlArg = m3u8dlArg.replace(/\$title\$/g, _title);
 
         const tsThread = $("#thread").val();  // 线程数量
@@ -451,7 +481,15 @@ $(function () {
         const customIV = $("#customIV").val();  // 自定义IV
         m3u8dlArg += customIV ? ` --useKeyIV "${customIV}"` : "";
 
+        //hiamng 只存音频
+        const onlyMp3 = $("#onlyMp3").val();  // 自定义IV
+        m3u8dlArg += onlyMp3 ? ` --enableAudioOnly` : "";
+
         navigator.clipboard.writeText(m3u8dlArg);
+    });
+    // 切换
+    $(".customFilename").on('change',function() {
+        _title = $(".customFilename").val();
     });
     // 切换 转换mp4格式按钮
     $(".mp4div").click(function () {
@@ -776,13 +814,25 @@ function GetFile(str) {
 }
 // 获得不带扩展的文件名
 function GetFileName(url) {
+	//hiaming 增加自定义名字功能
+	if ($('customFilename')&&$('customFilename').val()) {
+	    return $('customFilename').val();
+	}
     if (G.TitleName && _title) {
         return _title;
     }
     url = GetFile(url);
     url = url.split(".");
     url.length > 1 && url.pop();
-    return stringModify(url.join("."));
+    //return stringModify(url.join("."));
+	// hiaming 修复超长名字
+    url = url.join(".");
+	url=url.replace('~','');
+	if(url.length>=150){
+		url=url.substring(url.length-150).replace('~','');
+		console.log(url.length+"==="+url);
+	}
+	return stringModify(url);
 }
 // 获取扩展名
 function GetExt(url) {
