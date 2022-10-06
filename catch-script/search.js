@@ -132,7 +132,7 @@ window.fetch = async function (input, init) {
                 return;
             }
             if (text.substring(0, 7) == "#EXTM3U") {
-                if (init.method == undefined || (init.method && init.method.toUpperCase() == "GET")) {
+                if (init?.method == undefined || (init.method && init.method.toUpperCase() == "GET")) {
                     window.postMessage({ type: "addMedia", url: input, href: location.href, ext: "m3u8" });
                     return;
                 }
