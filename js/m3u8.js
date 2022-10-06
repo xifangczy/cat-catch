@@ -9,10 +9,6 @@ const tabId = parseInt(params.get("tabid"));
 _referer && setReferer(_referer);
 
 $(function () {
-    // Firefox 关闭播放m3u8
-    if (G.isFirefox) {
-        $("#play").hide();
-    }
     //获取m3u8参数
     var _m3u8Arg = new RegExp("\\.m3u8\\?([^\n]*)").exec(_m3u8Url);
     if (_m3u8Arg) {
@@ -20,7 +16,7 @@ $(function () {
     }
     var _m3u8Content;   // 储存m3u8文件内容
     /* m3u8 解析工具 */
-    const hls = new Hls();  // hls.js 对象
+    const hls = new Hls({ enableWorker: false });  // hls.js 对象
     const _fragments = []; // 储存切片对象
     const keyContent = new Map(); // 储存key的内容
     const initData = new Map(); // 储存map的url
