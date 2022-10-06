@@ -36,6 +36,7 @@
     {
       "matches": ["https://*/*", "http://*/*"],
       "js": ["js/content-script.js"],
+      "all_frames": true,
       "run_at": "document_start"
     }
   ],
