@@ -1,8 +1,12 @@
 ## 更新说明
 ### 2.2.6
-[Added] 深度搜索 增加搜索key
+[Added] 深度搜索 尝试收集m3u8文件的密钥 具体使用查看[用户文档](https://o2bmm.gitbook.io/cat-catch/docs/m3u8parse#maybekey)
 
-[Added] popup 增加二维码按钮
+[Added] popup 资源详情增加二维码按钮
+
+[Added] m3u8解析器 自定义文件名 只要音频 另存为 m3u8DL命令完善 部分代码来自 [#80](https://github.com/xifangczy/cat-catch/pull/80)
+
+[Fixed] m3u8解析器 超长名字无法保存文件 [#80](https://github.com/xifangczy/cat-catch/pull/80)
 
 ### 2.2.5
 [Fixed] 修复mpd解析器丢失音轨 [#70](https://github.com/xifangczy/cat-catch/issues/70)
