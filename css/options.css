@@ -288,16 +288,19 @@ textarea {
   margin-right: 0px;
   padding: 2px;
 }
-.mp4div,
-.skipDecryptDiv {
+.m3u8checkbox {
   display: flex;
   cursor: pointer;
   flex-direction: column;
 }
-.mp4div {
+.mp4div,
+.onlyAudio,
+.saveAs
+ {
   margin: 0 5px 0 10px;
 }
-.skipDecryptDiv {
+.skipDecryptDiv
+{
   margin: 0 12px 0 5px;
 }
 .merge {
@@ -307,7 +310,7 @@ textarea {
   align-items: center;
 }
 .customKey input {
-  margin-right: 10px;
+  margin-right: 5px;
 }
 .wrapper .button {
   margin-top: 5px;

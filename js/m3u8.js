@@ -22,8 +22,6 @@ $(function () {
     const initData = new Map(); // 储存map的url
     const decryptor = new AESDecryptor(); // 解密工具 来自hls.js 分离出来的
     var skipDecrypt = false; // 是否跳过解密
-    /* 转码工具 */
-    const transmuxer = new muxjs.mp4.Transmuxer();    // mux.js 对象
     /* 下载相关 */
     var downId = 0; // 下载id
     var stopDownload = false; // 停止下载flag
@@ -301,8 +299,6 @@ $(function () {
                     <div>密钥(Base64): <input type="text" value="${ArrayBufferToBase64(buffer)}" spellcheck="false" readonly="readonly"></div>
                 </div>
             `);
-			//hiaming 填到自定义处
-			$("#customKey").val(ArrayBufferToBase64(buffer));
         } else {
             $("#tips").append(`
                 <div class="key flex">
@@ -331,8 +327,6 @@ $(function () {
         if (_iv != iv && _iv != iv2) {
             iv = "0x" + ArrayBufferToHexString(decryptdata.iv.buffer);
             $("#tips").append('偏移量(IV): <input type="text" value="' + iv + '" spellcheck="false" readonly="readonly">');
-			//hiaming 填到自定义处
-			$("#customIV").val(iv);
         }
         // $("#tips").append("<div class=\"line\"></div>");
     }
@@ -417,33 +411,9 @@ $(function () {
     });
     // 调用m3u8DL下载
     $("#m3u8DL").click(function () {
-        let m3u8dlArg = G.m3u8dlArg.replace(/\$referer\$/g, _referer);
-        m3u8dlArg = m3u8dlArg.replace(/\$url\$/g, _m3u8Url);
-        //hiamng 输入文件名
-        let customFilename = $("#customFilename").val();  // 自定义IV
-        _title = customFilename ? customFilename : _title;
-        m3u8dlArg = m3u8dlArg.replace(/\$title\$/g, _title);
-        //hiaming 加上iv和key
-        let customKey = $("#customKey").val().trim();  // 自定义密钥
-        if (customKey) {
-            if (isHexKey(customKey)) {
-                customKey = HexStringToArrayBuffer(customKey);
-                customKey = ArrayBufferToBase64(customKey);
-            }
-            m3u8dlArg += ` --useKeyBase64 "${customKey}"`;
-        }
-        
-        const customIV = $("#customIV").val();  // 自定义IV
-        m3u8dlArg += customIV ? ` --useKeyIV "${customIV}"` : "";
-        
-        //hiamng 只存音频
-        const onlyMp3 = $("#onlyMp3").val();  // 自定义IV
-        m3u8dlArg += onlyMp3 ? ` --enableAudioOnly` : "";
-        
+        const m3u8dlArg = getM3u8DlArg();
         navigator.clipboard.writeText(m3u8dlArg);
-        console.log("m3u8dl://的原始参数是："+ m3u8dlArg)
-        // hiaming end
-        let m3u8dl = 'm3u8dl://' + Base64.encode(m3u8dlArg);
+        const m3u8dl = 'm3u8dl://' + Base64.encode(m3u8dlArg);
         if (m3u8dl.length >= 2046) {
             alert("m3u8dl参数太长,可能导致无法唤醒m3u8DL, 请手动复制到m3u8DL下载");
         }
@@ -451,52 +421,21 @@ $(function () {
     });
     // 复制m3u8DL命令
     $("#copyM3U8dl").click(function () {
-        let m3u8dlArg = G.m3u8dlArg.replace(/\$referer\$/g, _referer);
-        m3u8dlArg = m3u8dlArg.replace(/\$url\$/g, _m3u8Url);
-		//hiamng 输入文件名
-		const customFilename = $("#customFilename").val();  // 自定义IV
-        _title = customFilename ? customFilename : _title;
-        m3u8dlArg = m3u8dlArg.replace(/\$title\$/g, _title);
-
-        const tsThread = $("#thread").val();  // 线程数量
-        m3u8dlArg += ` --maxThreads "${tsThread}"`
-
-        const rangeStart = $("#rangeStart").val();  // 开始序列号
-        const rangeEnd = $("#rangeEnd").val();  // 结束序列号
-        m3u8dlArg += ` --downloadRange "${rangeStart}-${rangeEnd}"`
-
-        let customKey = $("#customKey").val().trim();  // 自定义密钥
-        if (customKey) {
-            if (isHexKey(customKey)) {
-                customKey = HexStringToArrayBuffer(customKey);
-                customKey = ArrayBufferToBase64(customKey);
-            }
-            m3u8dlArg += ` --useKeyBase64 "${customKey}"`;
-        }
-
-        const customIV = $("#customIV").val();  // 自定义IV
-        m3u8dlArg += customIV ? ` --useKeyIV "${customIV}"` : "";
-
-        //hiamng 只存音频
-        const onlyMp3 = $("#onlyMp3").val();  // 自定义IV
-        m3u8dlArg += onlyMp3 ? ` --enableAudioOnly` : "";
-
+        console.log(_fragments);
+        const m3u8dlArg = getM3u8DlArg();
         navigator.clipboard.writeText(m3u8dlArg);
     });
     // 切换
-    $(".customFilename").on('change',function() {
-        _title = $(".customFilename").val();
+    $(".m3u8checkbox").click(function (event) {
+        if (event.target.nodeName == "DIV") {
+            $(this).find("input").click();
+        }
     });
-    // 切换 转换mp4格式按钮
-    $(".mp4div").click(function () {
-        $("#mp4").prop("checked", !$("#mp4").prop("checked"));
-    });
-    // 切换 跳过解密
-    $(".skipDecryptDiv").click(function () {
-        $("#skipDecrypt").prop("checked", !$("#skipDecrypt").prop("checked"));
-    });
-    $("#skipDecrypt, #mp4").click(function (event) {
-        event.originalEvent.cancelBubble = true;
+    // 只要音频
+    $("#onlyAudio").on("change", function () {
+        if ($("#onlyAudio").prop("checked") && !$("#mp4").prop("checked")) {
+            $("#mp4").prop("checked", true);
+        }
     });
     // 范围 线程数 滚轮调节
     $("#rangeStart, #rangeEnd, #thread").on("wheel", function (event) {
@@ -711,8 +650,12 @@ $(function () {
         if ($("#mp4").prop("checked") && ext.toLowerCase() != "mp4") {
             let index;
             let headEncoding = true;
+            /* 转码工具 */
+            const onlyAudio = $("#onlyAudio").prop("checked");
+            const transmuxer = new muxjs.mp4.Transmuxer({ remux: !onlyAudio });    // mux.js 对象
             // 转码服务监听
             transmuxer.on('data', function (segment) {
+                if (onlyAudio && segment.type != "audio") { return; }
                 // 头部信息
                 if (headEncoding) {
                     headEncoding = false;
@@ -737,10 +680,13 @@ $(function () {
                 fileBlob = new Blob(_tsBuffer, { type: "video/mp4" });
                 ext = "mp4";
             }
+            delete transmuxer;
         }
+        const saveAs = $("#saveAs").prop("checked");
         chrome.downloads.download({
             url: URL.createObjectURL(fileBlob),
-            filename: `${GetFileName(_m3u8Url)}.${ext}`
+            filename: `${GetFileName(_m3u8Url)}.${ext}`,
+            saveAs: saveAs
         }, function (downloadId) { downId = downloadId });
         buttonState("#mergeTs", true);
         _tsBuffer.splice(0); delete _tsBuffer;
@@ -786,6 +732,36 @@ $(function () {
         recorderArray = []; // 录制直播储存临时切片地址
     }
 });
+function getM3u8DlArg() {
+    let m3u8dlArg = G.m3u8dlArg.replace(/\$referer\$/g, _referer);
+    m3u8dlArg = m3u8dlArg.replace(/\$url\$/g, _m3u8Url);
+    // 自定义文件名
+    const customFilename = $("#customFilename").val().trim();
+    _title = customFilename ? customFilename : _title;
+    m3u8dlArg = m3u8dlArg.replace(/\$title\$/g, _title);
+
+    const tsThread = $("#thread").val();  // 线程数量
+    m3u8dlArg += ` --maxThreads "${tsThread}"`
+
+    const rangeStart = $("#rangeStart").val();  // 开始序列号
+    const rangeEnd = $("#rangeEnd").val();  // 结束序列号
+    m3u8dlArg += ` --downloadRange "${rangeStart}-${rangeEnd}"`
+
+    let customKey = $("#customKey").val().trim();  // 自定义密钥
+    if (customKey) {
+        if (isHexKey(customKey)) {
+            customKey = HexStringToArrayBuffer(customKey);
+            customKey = ArrayBufferToBase64(customKey);
+        }
+        m3u8dlArg += ` --useKeyBase64 "${customKey}"`;
+    }
+    const customIV = $("#customIV").val();  // 自定义IV
+    m3u8dlArg += customIV ? ` --useKeyIV "${customIV}"` : "";
+    // 只要音频
+    const onlyAudio = $("#onlyAudio").prop("checked");
+    m3u8dlArg += onlyAudio ? ` --enableAudioOnly` : "";
+    return m3u8dlArg;
+}
 // 写入ts链接
 function writeText(text) {
     if (typeof text == "object") {
@@ -810,25 +786,22 @@ function GetFile(str) {
 }
 // 获得不带扩展的文件名
 function GetFileName(url) {
-	//hiaming 增加自定义名字功能
-	if ($('customFilename')&&$('customFilename').val()) {
-	    return $('customFilename').val();
-	}
+    //hiaming 增加自定义名字功能
+    if ($('#customFilename').val()) {
+        return $('#customFilename').val().trim();
+    }
     if (G.TitleName && _title) {
         return _title;
     }
     url = GetFile(url);
     url = url.split(".");
     url.length > 1 && url.pop();
-    //return stringModify(url.join("."));
-	// hiaming 修复超长名字
     url = url.join(".");
-	url=url.replace('~','');
-	if(url.length>=150){
-		url=url.substring(url.length-150).replace('~','');
-		console.log(url.length+"==="+url);
-	}
-	return stringModify(url);
+    if (url.length >= 150) {
+        url = url.substring(url.length - 150);
+        console.log(url.length + "===" + url);
+    }
+    return stringModify(url);
 }
 // 获取扩展名
 function GetExt(url) {

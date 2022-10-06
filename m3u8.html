@@ -78,31 +78,29 @@
           </div>
 
           <div class="block" id="button">
-            <button id="downText">下载显示内容</button>
-            <button id="originalM3U8">原始m3u8</button>
-            <button id="localFile">本地m3u8</button>
-            <button id="getTs">提取ts</button>
-            <button id="play" data-switch="on">播放m3u8</button>
-            <button id="m3u8DL" class="button2">调用m3u8DL下载</button>
-            <button id="copyM3U8dl">复制m3u8DL命令参数</button>
+            <div class="merge">
+              <button id="downText">下载显示内容</button>
+              <button id="originalM3U8">原始m3u8</button>
+              <button id="localFile">本地m3u8</button>
+              <button id="getTs">提取ts</button>
+              <button id="play" data-switch="on">播放m3u8</button>
+              <button id="m3u8DL" class="button2">调用m3u8DL下载</button>
+              <button id="copyM3U8dl">复制m3u8DL命令参数</button>
+            </div>
             <div class="line"></div>
             <div class="merge customKey">
-              <input type="text" id="customKey" spellcheck="false" placeholder="自定义 密钥 16进制 或 base64" size="60"/>
+              <input type="text" id="customFilename" spellcheck="false" placeholder="自定义保存文件名" size="35"/>
+              <input type="text" id="customKey" spellcheck="false" placeholder="自定义 密钥 16进制 或 base64" size="35"/>
               <input type="text" id="customIV" spellcheck="false" placeholder="自定义 偏移量 IV" size="35"/>
-              <!-- <select id="maybeKey" class="m3u8Key select hide">
-                <option value="tips">寻找到疑似Key</option>
-              </select> -->
               <button id="uploadKey">上传Key</button>
               <input id="uploadKeyFile" type="file" class="hide" />
             </div>
-			<div class="merge customKey">
-			  <input type="text" id="customFilename" spellcheck="false" placeholder="自定义文件名" size="66"/>
-			  <div class="mp4div themeColor"><input type="checkbox" id="onlyMp3">只要音频（协议下载才有效）</div>
-			</div>
             <div class="merge">
               <div id="threadDiv" class="themeColor">下载线程数 <input type="number" value="32" id="thread" spellcheck="false" style="width: 35px;" step="1" min="1" max="256"/></div>
-              <div class="mp4div themeColor">mp4格式<input type="checkbox" id="mp4" checked="checked"></div>
-              <div class="skipDecryptDiv themeColor">跳过解密<input type="checkbox" id="skipDecrypt"></div>
+              <div class="mp4div m3u8checkbox themeColor">mp4格式<input type="checkbox" id="mp4" checked="checked"/></div>
+              <div class="onlyAudio m3u8checkbox themeColor">只要音频<input type="checkbox" id="onlyAudio"/></div>
+              <div class="saveAs m3u8checkbox themeColor">另存为<input type="checkbox" id="saveAs"></div>
+              <div class="skipDecryptDiv m3u8checkbox themeColor">跳过解密<input type="checkbox" id="skipDecrypt"></div>
               <div class="rangeDown themeColor">
                 下载范围
                 <div class="merge">
