@@ -15,7 +15,7 @@
   },
   "manifest_version": 3,
   "minimum_chrome_version": "93",
-  "name": "猫抓-明教主加强版key",
+  "name": "猫抓",
   "homepage_url": "https://github.com/xifangczy/cat-catch",
   "options_ui": {
     "page": "options.html",
