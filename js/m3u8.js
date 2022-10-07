@@ -311,7 +311,7 @@ $(function () {
         }
         if (tabId) {
             chrome.tabs.sendMessage(tabId, { Message: "getKey" }, function (result) {
-                if (!result || result.length == 0) { return; }
+                if (chrome.runtime.lastError || !result || result.length == 0) { return; }
                 const maybeKey = $("#maybeKey");
                 for (let item of result) {
                     maybeKey.append(`<option value="${item}">${item}</option>`);
@@ -420,6 +420,10 @@ $(function () {
             alert("m3u8dl参数太长,可能导致无法唤醒m3u8DL, 请手动复制到m3u8DL下载");
         }
         chrome.tabs.update({ url: m3u8dl });
+    });
+    // 解析器说明文档
+    $("#help").click(function () {
+        chrome.tabs.create({ url: "https://o2bmm.gitbook.io/cat-catch/docs/m3u8parse" });
     });
     // 复制m3u8DL命令
     $("#copyM3U8dl").click(function () {

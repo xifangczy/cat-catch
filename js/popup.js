@@ -432,8 +432,24 @@ $(function () {
     // 点击其他设置标签页 开始读取tab信息以及视频信息
     getVideoTag();
     $("#OtherOptions").click(function () {
-        setVideoTagTimer();
-        getVideoState(); setVideoStateTimer();
+        chrome.tabs.get(G.mediaControl.tabid, function (tab) {
+            if (chrome.runtime.lastError) {
+                _tabId = -1;
+                _index = -1;
+                setVideoTagTimer(); getVideoState(); setVideoStateTimer();
+                return;
+            }
+            chrome.tabs.sendMessage(G.mediaControl.tabid, { Message: "getVideoState", index: 0 }, function (state) {
+                _tabId = G.mediaControl.tabid;
+                if (state.count > G.mediaControl.index) {
+                    _index = G.mediaControl.index;
+                }
+                $("#videoTabIndex").val(_tabId);
+                setVideoTagTimer(); getVideoState(); setVideoStateTimer();
+                chrome.storage.local.set({ mediaControl: { tabid: _tabId, index: _index } });
+            });
+        });
+        // setVideoTagTimer(); getVideoState(); setVideoStateTimer();
     });
     // 切换标签选择 切换视频选择
     $("#videoIndex, #videoTabIndex").change(function () {
@@ -444,6 +460,7 @@ $(function () {
         } else {
             _index = parseInt($("#videoIndex").val());
         }
+        chrome.storage.local.set({ mediaControl: { tabid: _tabId, index: _index } });
         getVideoState();
     });
     let wheelPlaybackRateTimeout;
