@@ -251,7 +251,7 @@ $(function () {
                     .then(function (buffer) {
                         initData.set(data.fragments[i].initSegment.url, buffer);
                     }).catch(function (error) { console.log(error); });
-                $("#tips").append('初始化片段(EXT-X-MAP): <input type="text" value="' + data.fragments[i].initSegment.url + '" spellcheck="false" readonly="readonly">');
+                $("#tips").append('初始化片段(EXT-X-MAP): <input type="text" class="keyUrl" value="' + data.fragments[i].initSegment.url + '" spellcheck="false" readonly="readonly">');
             }
             if (data.live && data.fragments[i].initSegment && tsBuffer.length == 0) {
                 initSegment = data.fragments[i].initSegment;
@@ -333,6 +333,7 @@ $(function () {
         // $("#tips").append("<div class=\"line\"></div>");
     }
     /**************************** 监听 / 按钮绑定 ****************************/
+    $("#version").html("猫抓-m3u8解析器 v" + chrome.runtime.getManifest().version);
     // 监听下载事件 修改提示
     chrome.downloads.onChanged.addListener(function (downloadDelta) {
         if (!downloadDelta.state) { return; }
@@ -420,10 +421,6 @@ $(function () {
             alert("m3u8dl参数太长,可能导致无法唤醒m3u8DL, 请手动复制到m3u8DL下载");
         }
         chrome.tabs.update({ url: m3u8dl });
-    });
-    // 解析器说明文档
-    $("#help").click(function () {
-        chrome.tabs.create({ url: "https://o2bmm.gitbook.io/cat-catch/docs/m3u8parse" });
     });
     // 复制m3u8DL命令
     $("#copyM3U8dl").click(function () {
@@ -661,6 +658,7 @@ $(function () {
             const transmuxer = new muxjs.mp4.Transmuxer({ remux: !onlyAudio });    // mux.js 对象
             // 转码服务监听
             transmuxer.on('data', function (segment) {
+                // console.log(segment);
                 if (onlyAudio && segment.type != "audio") { return; }
                 // 头部信息
                 if (headEncoding) {
