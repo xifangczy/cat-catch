@@ -7,9 +7,9 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         let videoObj = [];
         let videoSrc = [];
         document.querySelectorAll("video, audio").forEach(function (video) {
-            if (video.src != "" && video.src != undefined) {
+            if (video.currentSrc != "" && video.currentSrc != undefined) {
                 videoObj.push(video);
-                videoSrc.push(video.src);
+                videoSrc.push(video.currentSrc);
             }
         });
         const iframe = document.querySelectorAll("iframe");
@@ -17,9 +17,9 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             iframe.forEach(function (iframe) {
                 if (iframe.contentDocument == null) { return true; }
                 iframe.contentDocument.querySelectorAll("video, audio").forEach(function (video) {
-                    if (video.src != "" && video.src != undefined) {
+                    if (video.currentSrc != "" && video.currentSrc != undefined) {
                         videoObj.push(video);
-                        videoSrc.push(video.src);
+                        videoSrc.push(video.currentSrc);
                     }
                 });
             });
