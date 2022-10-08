@@ -178,25 +178,24 @@ $(function () {
                 if (!data.tracks.video) {
                     info.append(" (无视频)");
                     // 下载第一个切片 判断是否H256编码
-                    let url = _fragments[0].url;
-                    if (GetExt(url) == "ts") {
-                        fetch(url).then(response => response.arrayBuffer())
-                            .then(function (data) {
-                                data = new Uint8Array(data);
-                                for (let i = 0; i < data.length; i++) {
-                                    if (data[i] == 0x47 && data[i + 1] != 0x40) {
-                                        // 0x24 H.256
-                                        if (data[i + 17] == 0x24) {
-                                            info.html(info.html().replace("无视频", "H.256编码 暂不支持在线mp4转码"))
-                                            $("#mp4").prop("checked", false);
-                                        }
-                                        return;
-                                    }
+                    fetch(_fragments[0].url).then(response => response.arrayBuffer())
+                    .then(function (data) {
+                        data = new Uint8Array(data);
+                        // 非ts文件 或 已加密
+                        if (data[0] != 0x47 || data[1] != 0x40) { return; }
+                        for (let i = 0; i < data.length; i++) {
+                            if (data[i] == 0x47 && data[i + 1] != 0x40) {
+                                // 0x24 H.256
+                                if (data[i + 17] == 0x24) {
+                                    info.html(info.html().replace("无视频", "H.256编码 暂不支持在线mp4转码"))
+                                    $("#mp4").prop("checked", false);
                                 }
-                            }).catch(function (error) {
-                                console.log(error);
-                            });
-                    }
+                                return;
+                            }
+                        }
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
                 }
                 if (data.tracks.video?.metadata) {
                     info.append(" 分辨率:" + data.tracks.video.metadata.width + "x" + data.tracks.video.metadata.height);
