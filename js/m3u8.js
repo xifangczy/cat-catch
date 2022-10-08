@@ -16,7 +16,10 @@ $(function () {
     }
     let _m3u8Content;   // 储存m3u8文件内容
     /* m3u8 解析工具 */
-    const hls = new Hls({ enableWorker: false });  // hls.js 对象
+    const hls = new Hls({
+        enableWorker: false,
+        debug: false
+    });  // hls.js 对象
     const _fragments = []; // 储存切片对象
     const keyContent = new Map(); // 储存key的内容
     const initData = new Map(); // 储存map的url
@@ -172,7 +175,11 @@ $(function () {
                     return;
                 }
                 !data.tracks.audio && info.append(" (无音频)");
-                !data.tracks.video && info.append(" (无视频)");
+                // !data.tracks.video && info.append(" (H.256编码 或 无视频)");
+                if(!data.tracks.video){
+                    info.append(" (H.256编码 或 无视频)");
+                    $("#mp4").prop("checked", false);
+                }
                 if (data.tracks.video?.metadata) {
                     info.append(" 分辨率:" + data.tracks.video.metadata.width + "x" + data.tracks.video.metadata.height);
                 }
