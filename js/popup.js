@@ -143,8 +143,8 @@ function AddMedia(data) {
                 hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
                     if (data.tracks) {
                         if (data.tracks.audiovideo) { return; }
-                        !data.tracks.audio && mediaInfo.append("<br><b>H.256编码 或 无音频</b>");
-                        !data.tracks.video && mediaInfo.append("<br><b>无视频</b>");
+                        !data.tracks.audio && mediaInfo.append("<br><b>无音频</b>");
+                        !data.tracks.video && mediaInfo.append("<br><b>无视频 或 H.265编码</b>");
                     }
                 });
                 hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
