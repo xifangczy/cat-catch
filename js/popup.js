@@ -136,8 +136,8 @@ function AddMedia(data) {
         urlPanel.show();
         if (!mediaInfo.data("state")) {
             mediaInfo.data("state", true);
-            if (isM3U8(data) && !G.isFirefox) {
-                let hls = new Hls();
+            if (isM3U8(data)) {
+                let hls = new Hls({enableWorker: false});
                 hls.loadSource(data.url);
                 hls.attachMedia(preview[0]);
                 hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {

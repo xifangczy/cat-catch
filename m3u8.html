@@ -86,6 +86,7 @@
               <button id="play" data-switch="on">播放m3u8</button>
               <button id="m3u8DL" class="button2">调用m3u8DL下载</button>
               <button id="copyM3U8dl">复制m3u8DL命令参数</button>
+              <button id="help">使用说明</button>
             </div>
             <div class="line"></div>
             <div class="merge customKey">
@@ -110,8 +111,8 @@
               </div>
               <button id="mergeTs" class="button2">合并下载</button>
               <button class="openDir">打开下载目录</button>
-              <button id="errorDownload" class="hide button2">重新下载所有失败项</button>
-              <button id="ForceDownload" class="hide button2">强制下载已有数据</button>
+              <button id="errorDownload" class="hide button2">重试所有失败项</button>
+              <button id="ForceDownload" class="hide button2">下载已有数据</button>
               <button id="recorder" data-switch="on" class="hide" data-switch="on">录制直播</button>
             </div>
             <div style="display: flex; margin-top: 10px;"><div id="progress"></div> <div id="fileSize"></div><div id="fileDuration"></div></div>
@@ -120,24 +121,6 @@
 
         </div>
       </section>
-
-      <section>
-        <h1 class="optionsTitle">关于</h1>
-        <div class="optionBox">
-          <div class="item">
-            <div id="version"></div>
-          </div>
-          <div class="item">
-            文档说明:
-            <a href="https://o2bmm.gitbook.io/cat-catch/docs/m3u8parse" target="_blank">https://o2bmm.gitbook.io/cat-catch/docs/m3u8parse</a>
-          </div>
-          <div class="item">
-            Github:
-            <a href="https://github.com/xifangczy/cat-catch" target="_blank">https://github.com/xifangczy/cat-catch</a>
-          </div>
-        </div>
-      </section>
-
     </div>
     <script src="js/m3u8-decrypt.js"></script>
     <script src="js/hls.min.js"></script>

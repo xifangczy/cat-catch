@@ -358,13 +358,16 @@ $(function () {
         // $("#tips").append("<div class=\"line\"></div>");
     }
     /**************************** 监听 / 按钮绑定 ****************************/
-    $("#version").html("猫抓-m3u8解析器 v" + chrome.runtime.getManifest().version);
     // 监听下载事件 修改提示
     chrome.downloads.onChanged.addListener(function (downloadDelta) {
         if (!downloadDelta.state) { return; }
         if (downloadDelta.state.current == "complete" && downId != 0) {
             $("#progress").html("已保存到硬盘, 请查看浏览器已下载内容");
         }
+    });
+    // help
+    $("#help").click(function () {
+        chrome.tabs.create({ url: "https://o2bmm.gitbook.io/cat-catch/docs/m3u8parse" })
     });
     // 打开目录
     $(".openDir").click(function () {
