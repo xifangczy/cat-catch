@@ -594,10 +594,11 @@ $(function () {
                 let currentIndex = ++index;   // 当前下载的索引
                 const fragment = _fragments[currentIndex];
                 if (recorder) { currentIndex = recorderIndex++; }
+                const timeout = errorObj ? 0 : 30000;
                 $.ajax({
                     url: fragment.url,
                     xhrFields: { responseType: "arraybuffer" },
-                    timeout: 30000
+                    timeout: timeout
                 }).fail(function () {
                     // 直播 不处理下载失败
                     if (stopDownload || recorder) { return; }
