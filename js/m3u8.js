@@ -153,7 +153,7 @@ $(function () {
                 // console.log(data);
                 parseTs(data.details);  // 提取Ts链接
                 // 获取视频信息
-                if (!G.isFirefox && $(".videoInfo #info").html() == "") {
+                if ($(".videoInfo #info").html() == "") {
                     getVideoInfo();
                 }
             });
@@ -175,10 +175,28 @@ $(function () {
                     return;
                 }
                 !data.tracks.audio && info.append(" (无音频)");
-                // !data.tracks.video && info.append(" (H.256编码 或 无视频)");
-                if(!data.tracks.video){
-                    info.append(" (H.256编码 或 无视频)");
-                    $("#mp4").prop("checked", false);
+                if (!data.tracks.video) {
+                    info.append(" (无视频)");
+                    // 下载第一个切片 判断是否H256编码
+                    let url = _fragments[0].url;
+                    if (GetExt(url) == "ts") {
+                        fetch(url).then(response => response.arrayBuffer())
+                            .then(function (data) {
+                                data = new Uint8Array(data);
+                                for (let i = 0; i < data.length; i++) {
+                                    if (data[i] == 0x47 && data[i + 1] == 0x50 && data[i + 2] == 0x00) {
+                                        // 0xE1 H.256
+                                        if (data[i + 18] == 0xE1) {
+                                            info.html(info.html().replace("无视频", "H.256编码 暂不支持在线mp4转码"))
+                                            $("#mp4").prop("checked", false);
+                                        }
+                                        return;
+                                    }
+                                }
+                            }).catch(function (error) {
+                                console.log(error);
+                            });
+                    }
                 }
                 if (data.tracks.video?.metadata) {
                     info.append(" 分辨率:" + data.tracks.video.metadata.width + "x" + data.tracks.video.metadata.height);
