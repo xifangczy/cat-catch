@@ -371,7 +371,7 @@ textarea {
 }
 /* MPD*/
 .dash .select {
-  width: 366px;
+  padding-right: 20px;
   margin-bottom: 10px;
 }
 /* JSON格式化 */
