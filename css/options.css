@@ -228,6 +228,10 @@ textarea {
 .keyUrl{
   width: 975px;
 }
+.fullInput{
+  width: 975px;
+  margin: 5px 0 5px 0;
+}
 /* #tips {
   color: rgb(26, 115, 232);
 } */

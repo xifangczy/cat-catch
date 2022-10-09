@@ -144,7 +144,7 @@ function AddMedia(data) {
                     if (data.tracks) {
                         if (data.tracks.audiovideo) { return; }
                         !data.tracks.audio && mediaInfo.append("<br><b>无音频</b>");
-                        !data.tracks.video && mediaInfo.append("<br><b>无视频 或 H.265编码</b>");
+                        !data.tracks.video && mediaInfo.append("<br><b>无视频 或 HEVC/H.265编码ts文件</b>");
                     }
                 });
                 hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {

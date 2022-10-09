@@ -187,7 +187,7 @@ $(function () {
                             if (data[i] == 0x47 && data[i + 1] != 0x40) {
                                 // 0x24 H.256
                                 if (data[i + 17] == 0x24) {
-                                    info.html(info.html().replace("无视频", "H.256编码 暂不支持在线mp4转码"))
+                                    info.html(info.html().replace("无视频", "HEVC/H.265编码ts文件 暂不支持在线mp4转码"))
                                     $("#mp4").prop("checked", false);
                                 }
                                 return;
