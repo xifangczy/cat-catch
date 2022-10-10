@@ -81,12 +81,6 @@ function AddMedia(data) {
     let parsing = { switch: false, type: "null" };
     if (isM3U8(data)) {
         parsing = { switch: true, type: "m3u8" };
-        // 有m3u8文件 加载hls文件 预览m3u8 和 获取分辨率
-        if (typeof Hls === "undefined") {
-            const script = document.createElement('script');
-            script.src = "js/hls.min.js"
-            document.body.appendChild(script);
-        }
     } else if (isMPD(data)) {
         parsing = { switch: true, type: "mpd" };
     } else if (isJSON(data)) {

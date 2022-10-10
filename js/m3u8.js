@@ -170,14 +170,14 @@ $(function () {
             if (data.tracks && info.html() == "") {
                 if (data.tracks.audiovideo) {
                     if (data.tracks.audiovideo?.metadata) {
-                        info.append(" 分辨率:" + data.tracks.audiovideo.metadata.width + "x" + data.tracks.audiovideo.metadata.height);
+                        info.append(" 分辨率: " + data.tracks.audiovideo.metadata.width + "x" + data.tracks.audiovideo.metadata.height);
                     }
                     return;
                 }
                 !data.tracks.audio && info.append(" (无音频)");
                 if (!data.tracks.video) {
                     info.append(" (无视频)");
-                    // 下载第一个切片 判断是否H256编码
+                    // 下载第一个切片 判断是否H265编码
                     fetch(_fragments[0].url).then(response => response.arrayBuffer())
                     .then(function (data) {
                         data = new Uint8Array(data);
@@ -185,7 +185,7 @@ $(function () {
                         if (data[0] != 0x47 || data[1] != 0x40) { return; }
                         for (let i = 0; i < data.length; i++) {
                             if (data[i] == 0x47 && data[i + 1] != 0x40) {
-                                // 0x24 H.256
+                                // 0x24 H.265
                                 if (data[i + 17] == 0x24) {
                                     info.html(info.html().replace("无视频", "HEVC/H.265编码ts文件 暂不支持在线mp4转码"))
                                     $("#mp4").prop("checked", false);
@@ -198,7 +198,7 @@ $(function () {
                     });
                 }
                 if (data.tracks.video?.metadata) {
-                    info.append(" 分辨率:" + data.tracks.video.metadata.width + "x" + data.tracks.video.metadata.height);
+                    info.append(" 分辨率: " + data.tracks.video.metadata.width + "x" + data.tracks.video.metadata.height);
                 }
             }
         });
