@@ -2,7 +2,7 @@
 const params = new URL(location.href).searchParams;
 let _m3u8Url = params.get("url");
 const _referer = params.get("referer");
-let _title = params.get("title");
+const _title = params.get("title");
 const getId = parseInt(params.get("getId"));
 const tabId = parseInt(params.get("tabid"));
 // 修改当前标签下的所有xhr的Referer
@@ -777,8 +777,11 @@ function getM3u8DlArg() {
     m3u8dlArg = m3u8dlArg.replace(/\$url\$/g, _m3u8Url);
     // 自定义文件名
     const customFilename = $("#customFilename").val().trim();
-    _title = customFilename ? customFilename : _title;
-    m3u8dlArg = m3u8dlArg.replace(/\$title\$/g, _title);
+    let title = customFilename ? customFilename : _title;
+    if (title.length >= 150) {
+        title = title.substring(title.length - 150);
+    }
+    m3u8dlArg = m3u8dlArg.replace(/\$title\$/g, title);
 
     if (m3u8dlArg.includes("--maxThreads")) {
         m3u8dlArg = m3u8dlArg.replace(/--maxThreads "?[0-9]+"?/g, "");
