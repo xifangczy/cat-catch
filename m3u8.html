@@ -85,9 +85,10 @@
               <button id="getTs">提取ts</button>
               <button id="play" data-switch="on">播放m3u8</button>
               <button id="m3u8DL" class="button2">调用m3u8DL下载</button>
-              <button id="copyM3U8dl">复制m3u8DL命令参数</button>
-              <button id="help">使用说明</button>
+              <button id="copyM3U8dl">复制m3u8DL命令</button>
+              <button id="setM3u8dl">显示m3u8DL命令</button>
             </div>
+            <textarea id="m3u8dlArg" type="text" class="m3u8dlArg hide"></textarea>
             <div class="line"></div>
             <div class="merge customKey">
               <input type="text" id="customFilename" spellcheck="false" placeholder="自定义 保存文件名" size="35"/>
@@ -96,7 +97,7 @@
               <button id="uploadKey">上传Key</button>
               <input id="uploadKeyFile" type="file" class="hide" />
             </div>
-            <div class="merge">
+            <div class="merge" id="mergeDown">
               <div id="threadDiv" class="themeColor">下载线程数 <input type="number" value="32" id="thread" spellcheck="false" style="width: 35px;" step="1" min="1" max="256"/></div>
               <div class="mp4div m3u8checkbox themeColor">mp4格式<input type="checkbox" id="mp4" checked="checked"/></div>
               <div class="onlyAudio m3u8checkbox themeColor">只要音频<input type="checkbox" id="onlyAudio"/></div>

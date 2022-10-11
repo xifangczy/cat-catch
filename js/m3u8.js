@@ -179,23 +179,23 @@ $(function () {
                     info.append(" (无视频)");
                     // 下载第一个切片 判断是否H265编码
                     fetch(_fragments[0].url).then(response => response.arrayBuffer())
-                    .then(function (data) {
-                        data = new Uint8Array(data);
-                        // 非ts文件 或 已加密
-                        if (data[0] != 0x47 || data[1] != 0x40) { return; }
-                        for (let i = 0; i < data.length; i++) {
-                            if (data[i] == 0x47 && data[i + 1] != 0x40) {
-                                // 0x24 H.265
-                                if (data[i + 17] == 0x24) {
-                                    info.html(info.html().replace("无视频", "HEVC/H.265编码ts文件 暂不支持在线mp4转码"))
-                                    $("#mp4").prop("checked", false);
+                        .then(function (data) {
+                            data = new Uint8Array(data);
+                            // 非ts文件 或 已加密
+                            if (data[0] != 0x47 || data[1] != 0x40) { return; }
+                            for (let i = 0; i < data.length; i++) {
+                                if (data[i] == 0x47 && data[i + 1] != 0x40) {
+                                    // 0x24 H.265
+                                    if (data[i + 17] == 0x24) {
+                                        info.html(info.html().replace("无视频", "HEVC/H.265编码ts文件 暂不支持在线mp4转码"))
+                                        $("#mp4").prop("checked", false);
+                                    }
+                                    return;
                                 }
-                                return;
                             }
-                        }
-                    }).catch(function (error) {
-                        console.log(error);
-                    });
+                        }).catch(function (error) {
+                            console.log(error);
+                        });
                 }
                 if (data.tracks.video?.metadata) {
                     info.append(" 分辨率: " + data.tracks.video.metadata.width + "x" + data.tracks.video.metadata.height);
@@ -312,6 +312,7 @@ $(function () {
         $("#rangeEnd").attr("max", _fragments.length);
         $("#rangeStart").val(1);
         $("#rangeEnd").val(_fragments.length);
+        $("#m3u8dlArg").val(getM3u8DlArg());
     }
     function showKeyInfo(buffer, decryptdata, i) {
         $("#tips").append('密钥地址(KeyURL): <input type="text" value="' + decryptdata.uri + '" spellcheck="false" readonly="readonly" class="keyUrl">');
@@ -343,6 +344,7 @@ $(function () {
                 maybeKey.show();
                 maybeKey.change(function () {
                     this.value != "tips" && $("#customKey").val(this.value);
+                    $("#m3u8dlArg").val(getM3u8DlArg());
                 });
             });
         }
@@ -363,10 +365,6 @@ $(function () {
         if (downloadDelta.state.current == "complete" && downId != 0) {
             $("#progress").html("已保存到硬盘, 请查看浏览器已下载内容");
         }
-    });
-    // help
-    $("#help").click(function () {
-        chrome.tabs.create({ url: "https://o2bmm.gitbook.io/cat-catch/docs/m3u8parse" })
     });
     // 打开目录
     $(".openDir").click(function () {
@@ -441,7 +439,7 @@ $(function () {
     });
     // 调用m3u8DL下载
     $("#m3u8DL").click(function () {
-        const m3u8dlArg = getM3u8DlArg();
+        const m3u8dlArg = $("#m3u8dlArg").val();
         navigator.clipboard.writeText(m3u8dlArg);
         const m3u8dl = 'm3u8dl://' + Base64.encode(m3u8dlArg);
         if (m3u8dl.length >= 2046) {
@@ -451,9 +449,18 @@ $(function () {
     });
     // 复制m3u8DL命令
     $("#copyM3U8dl").click(function () {
-        console.log(_fragments);
-        const m3u8dlArg = getM3u8DlArg();
+        const m3u8dlArg = $("#m3u8dlArg").val();
         navigator.clipboard.writeText(m3u8dlArg);
+    });
+    // m3u8DL参数设置
+    $("#setM3u8dl").click(function () {
+        $("#m3u8dlArg").slideToggle();
+    });
+    $("input").click(function () {
+        $("#m3u8dlArg").val(getM3u8DlArg());
+    });
+    $("input").keyup(function () {
+        $("#m3u8dlArg").val(getM3u8DlArg());
     });
     // 切换
     $(".m3u8checkbox").click(function (event) {
@@ -476,6 +483,7 @@ $(function () {
             return false;
         }
         $(this).val(number);
+        $("#m3u8dlArg").val(getM3u8DlArg());
         return false;
     });
     // 上传key
@@ -487,6 +495,7 @@ $(function () {
                 return;
             }
             $("#customKey").val(ArrayBufferToBase64(this.result));
+            $("#m3u8dlArg").val(getM3u8DlArg());
         };
         let file = $("#uploadKeyFile").prop('files')[0];
         fileReader.readAsArrayBuffer(file);
@@ -771,6 +780,9 @@ function getM3u8DlArg() {
     _title = customFilename ? customFilename : _title;
     m3u8dlArg = m3u8dlArg.replace(/\$title\$/g, _title);
 
+    if (m3u8dlArg.includes("--maxThreads")) {
+        m3u8dlArg = m3u8dlArg.replace(/--maxThreads "?[0-9]+"?/g, "");
+    }
     const tsThread = $("#thread").val();  // 线程数量
     m3u8dlArg += ` --maxThreads "${tsThread}"`
 
@@ -791,6 +803,7 @@ function getM3u8DlArg() {
     // 只要音频
     const onlyAudio = $("#onlyAudio").prop("checked");
     m3u8dlArg += onlyAudio ? ` --enableAudioOnly` : "";
+    // m3u8dlArg = m3u8dlArg.replace(/  /g, " ");
     return m3u8dlArg;
 }
 // 写入ts链接

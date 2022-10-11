@@ -373,6 +373,12 @@ textarea {
 .flex {
   display: flex;
 }
+.m3u8dlArg{
+  margin-top: 10px;
+  height: 100px;
+  word-break: break-all;
+  width: 100%;
+}
 /* MPD*/
 .dash .select {
   padding-right: 20px;
