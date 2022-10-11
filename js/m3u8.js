@@ -187,7 +187,7 @@ $(function () {
                                 if (data[i] == 0x47 && data[i + 1] != 0x40) {
                                     // 0x24 H.265
                                     if (data[i + 17] == 0x24) {
-                                        info.html(info.html().replace("无视频", "HEVC/H.265编码ts文件 暂不支持在线mp4转码"))
+                                        info.html(info.html().replace("无视频", "<b>HEVC/H.265编码ts文件 暂不支持在线mp4转码</b>"));
                                         $("#mp4").prop("checked", false);
                                     }
                                     return;
@@ -835,6 +835,9 @@ function GetFileName(url) {
         return $('#customFilename').val().trim();
     }
     if (G.TitleName && _title) {
+        if (_title.length >= 150) {
+            return _title.substring(_title.length - 150);
+        }
         return _title;
     }
     url = GetFile(url);
