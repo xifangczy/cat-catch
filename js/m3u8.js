@@ -474,6 +474,11 @@ $(function () {
             $("#mp4").prop("checked", true);
         }
     });
+    $("#mp4").on("change", function () {
+        if (!$("#mp4").prop("checked") && $("#onlyAudio").prop("checked")) {
+            $("#onlyAudio").prop("checked", false);
+        }
+    });
     // 范围 线程数 滚轮调节
     $("#rangeStart, #rangeEnd, #thread").on("wheel", function (event) {
         $(this).blur();
@@ -749,6 +754,7 @@ $(function () {
             decryptor.expandKey(_fragments[index].decryptdata.keyContent);
         } catch (e) {
             stopDownload = "密钥类型错误";
+            buttonState("#mergeTs", true);
             console.log(e);
             return;
         }
@@ -756,6 +762,7 @@ $(function () {
             return decryptor.decrypt(responseData, 0, _fragments[index].decryptdata.iv.buffer, true);
         } catch (e) {
             stopDownload = "解密失败，无法解密.";
+            buttonState("#mergeTs", true);
             console.log(e);
         }
     }
