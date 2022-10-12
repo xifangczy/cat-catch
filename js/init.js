@@ -28,7 +28,8 @@ G.OptionLists = [
     "copyMPD",
     "copyOther",
     "refreshClear",
-    "initComplete"
+    "initComplete",
+    "youtube"
 ];
 G.TabIdList = [
     "featMobileTabId",
@@ -133,6 +134,7 @@ function GetDefault(Obj) {
         case "copyOther": return "$url$";
         case "refreshClear": return true;
         case "initComplete": return true;
+        case "youtube": return false;
     }
 }
 // 初始变量

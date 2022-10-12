@@ -65,7 +65,8 @@ function AddMedia(data) {
 
     // Youtube
     if (data.url.includes("googlevideo.com") && data.name == "videoplayback") {
-        data.name = data.title.substring(0, data.title.length - 10) + '.' + data.ext;
+        data.name = data.title.replace(" - YouTube", "") + '.' + data.ext;
+        data.size = 0;
     }
 
     //截取文件名长度

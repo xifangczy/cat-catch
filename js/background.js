@@ -81,9 +81,10 @@ function findMedia(data, isRegex = false, filter = false) {
     if (isSpecialPage(data.url)) { return; }
     const urlParsing = new URL(data.url);
     // 屏蔽Youtube
+    if (urlParsing.host.includes("youtube.com")) { return; }
     if (urlParsing.host.includes("googlevideo.com")) {
         // Chrome商店版本 跳过youtube
-        if (chrome.runtime.id == "jfedfbgedapdagkghmgibemcoggfppbb") { return; }
+        if (chrome.runtime.id == "jfedfbgedapdagkghmgibemcoggfppbb" && !G.youtube) { return; }
         // 完整视频/音频 &range=[^&]*
         // 去掉不必要的参数 防止重复
         data.url = data.url.replace(/&range=[^&]*|&rbuf=[^&]*|&rn=[^&]*|&cver=[^&]*|&altitags=[^&]*|&pot=[^&]*|&fallback_count=[^&]*/g, "");
