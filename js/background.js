@@ -79,12 +79,14 @@ function findMedia(data, isRegex = false, filter = false) {
         isSpecialPage(data.originUrl)) { return; }
     // 屏蔽特殊页面的资源
     if (isSpecialPage(data.url)) { return; }
-    // 屏蔽Youtube
-    let urlParsing = new URL(data.url);
-    if (
-        urlParsing.host.includes("youtube.com") ||
-        urlParsing.host.includes("googlevideo.com")
-    ) { return; }
+    const urlParsing = new URL(data.url);
+    if (urlParsing.host.includes("googlevideo.com")) {
+        // Chrome商店版本 跳过youtube
+        if (chrome.runtime.id == "jfedfbgedapdagkghmgibemcoggfppbb") { return; }
+        // 完整视频/音频 &range=[^&]*
+        // 去掉不必要的参数 防止重复
+        data.url = data.url.replace(/&range=[^&]*|&rbuf=[^&]*|&rn=[^&]*|&cver=[^&]*|&altitags=[^&]*|&pot=[^&]*|&fallback_count=[^&]*/g, "");
+    }
     // 调试模式
     if (G.Debug) {
         console.log({ data, G, isRegex });
