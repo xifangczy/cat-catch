@@ -63,6 +63,11 @@ function AddMedia(data) {
         data.name = data.title + '.' + data.ext;
     }
 
+    // Youtube
+    if (data.url.includes("googlevideo.com") && data.name == "videoplayback") {
+        data.name = data.title.replace(" - YouTube", "") + '.' + data.ext;
+    }
+
     //截取文件名长度
     let trimName = data.name;
     if (data.name.length >= 60) {
@@ -131,7 +136,7 @@ function AddMedia(data) {
         if (!mediaInfo.data("state")) {
             mediaInfo.data("state", true);
             if (isM3U8(data)) {
-                let hls = new Hls({enableWorker: false});
+                let hls = new Hls({ enableWorker: false });
                 hls.loadSource(data.url);
                 hls.attachMedia(preview[0]);
                 hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
