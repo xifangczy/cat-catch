@@ -126,7 +126,7 @@ function GetDefault(Obj) {
         case "featMobileTabId": return [];
         case "featAutoDownTabId": return [];
         case "featCatchTabId": return [];
-        case "mediaControl": return {tabid: 0, index: -1};
+        case "mediaControl": return { tabid: 0, index: -1 };
         case "playbackRate": return 2;
         case "copyM3U8": return "$url$";
         case "copyMPD": return "ffmpeg -headers \"referer: $referer$\" -i \"$url$\" -c copy \"$title$.mp4\"";

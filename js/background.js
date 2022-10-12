@@ -80,6 +80,7 @@ function findMedia(data, isRegex = false, filter = false) {
     // 屏蔽特殊页面的资源
     if (isSpecialPage(data.url)) { return; }
     const urlParsing = new URL(data.url);
+    // 屏蔽Youtube
     if (urlParsing.host.includes("googlevideo.com")) {
         // Chrome商店版本 跳过youtube
         if (chrome.runtime.id == "jfedfbgedapdagkghmgibemcoggfppbb") { return; }
@@ -167,7 +168,7 @@ function findMedia(data, isRegex = false, filter = false) {
         url: data.url,
         size: header["size"],
         ext: ext,
-        type: header["type"],
+        type: data.mime ? data.mime : header["type"],
         tabId: data.tabId,
         isRegex: isRegex,
         requestId: data.requestId,
@@ -314,11 +315,11 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         chrome.tabs.query({}, function (tabs) {
             for (let item of tabs) {
                 if (item.url == Message.href) {
-                    findMedia({ url: Message.url, tabId: item.id, extraExt: Message.extraExt }, true, true);
+                    findMedia({ url: Message.url, tabId: item.id, extraExt: Message.extraExt, mime: Message.mime }, true, true);
                     return true;
                 }
             }
-            findMedia({ url: Message.url, tabId: -1, extraExt: Message.extraExt }, true, true);
+            findMedia({ url: Message.url, tabId: -1, extraExt: Message.extraExt, mime: Message.mime }, true, true);
         });
         return true;
     }

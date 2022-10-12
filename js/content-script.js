@@ -160,10 +160,10 @@ function secToTime(sec) {
 }
 
 window.addEventListener("message", (event) => {
-    if (event.data.type == "addMedia") {
-        chrome.runtime.sendMessage({ Message: "addMedia", url: event.data.url, href: event.data.href, extraExt: event.data.ext });
+    if (event.data.action == "addMedia") {
+        chrome.runtime.sendMessage({ Message: "addMedia", url: event.data.url, href: event.data.href, extraExt: event.data.ext, mime: event.data.mime });
     }
-    if (event.data.type == "addKey") {
+    if (event.data.action == "addKey") {
         let key = event.data.ext == "key" ? ArrayToBase64(event.data.key) : event.data.key;
         if (_key.includes(key)) { return; }
         _key.push(key);

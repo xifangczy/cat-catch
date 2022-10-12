@@ -19,7 +19,7 @@ async function findMedia(data, raw = undefined, depth = 0) {
                     if (typeof item != "number" || item > 255) { flag = false; break; }
                 }
                 if (flag) {
-                    window.postMessage({ type: "addKey", key: data[key], href: location.href, ext: "key" });
+                    window.postMessage({ action: "addKey", key: data[key], href: location.href, ext: "key" });
                     continue;
                 }
                 continue;
@@ -32,7 +32,7 @@ async function findMedia(data, raw = undefined, depth = 0) {
         if (typeof data[key] == "string") {
             if (isUrl(data[key])) {
                 let ext = getExtension(data[key]);
-                ext && window.postMessage({ type: "addMedia", url: data[key], href: location.href, ext: ext });
+                ext && window.postMessage({ action: "addMedia", url: data[key], href: location.href, ext: ext });
                 continue;
             }
             if (data[key].substring(0, 7) == "#EXTM3U") {
@@ -64,7 +64,7 @@ XMLHttpRequest.prototype.open = function (method) {
         if (this.status != 200) { return; }
         // 查找疑似key
         if (this.responseType == "arraybuffer" && this.response?.byteLength && this.response.byteLength == 16) {
-            window.postMessage({ type: "addKey", key: this.response, href: location.href, ext: "key" });
+            window.postMessage({ action: "addKey", key: this.response, href: location.href, ext: "key" });
         }
         if (this.response == "" || typeof this.response != "string") { return; }
         if (this.response.substring(0, 34) == "data:application/vnd.apple.mpegurl") {
@@ -85,13 +85,13 @@ XMLHttpRequest.prototype.open = function (method) {
         }
         if (isUrl(this.response)) {
             let ext = getExtension(this.response);
-            ext && window.postMessage({ type: "addMedia", url: this.response, href: location.href, ext: ext });
+            ext && window.postMessage({ action: "addMedia", url: this.response, href: location.href, ext: ext });
             return;
         }
         if (this.response.includes("#EXTM3U")) {
             if (this.response.substring(0, 7) == "#EXTM3U") {
                 if (method == "GET") {
-                    window.postMessage({ type: "addMedia", url: this.responseURL, href: location.href, ext: "m3u8" });
+                    window.postMessage({ action: "addMedia", url: this.responseURL, href: location.href, ext: "m3u8" });
                     return;
                 }
                 isFullM3u8(this.response) && toUrl(this.response);
@@ -99,7 +99,7 @@ XMLHttpRequest.prototype.open = function (method) {
             }
             if (isJSON(this.response)) {
                 if (method == "GET") {
-                    window.postMessage({ type: "addMedia", url: this.responseURL, href: location.href, ext: "json" });
+                    window.postMessage({ action: "addMedia", url: this.responseURL, href: location.href, ext: "json" });
                     return;
                 }
                 toUrl(this.response, "json");
@@ -120,7 +120,7 @@ window.fetch = async function (input, init) {
         .then(arrayBuffer => {
             CATCH_SEARCH_DEBUG && console.log({ arrayBuffer, input });
             if (arrayBuffer.byteLength == 16) {
-                window.postMessage({ type: "addKey", key: arrayBuffer, href: location.href, ext: "key" });
+                window.postMessage({ action: "addKey", key: arrayBuffer, href: location.href, ext: "key" });
                 return;
             }
             let text = new TextDecoder().decode(arrayBuffer);
@@ -133,7 +133,7 @@ window.fetch = async function (input, init) {
             }
             if (text.substring(0, 7) == "#EXTM3U") {
                 if (init?.method == undefined || (init.method && init.method.toUpperCase() == "GET")) {
-                    window.postMessage({ type: "addMedia", url: input, href: location.href, ext: "m3u8" });
+                    window.postMessage({ action: "addMedia", url: input, href: location.href, ext: "m3u8" });
                     return;
                 }
                 isFullM3u8(text) && toUrl(text);
@@ -147,11 +147,6 @@ window.fetch = async function (input, init) {
                 toUrl(text);
                 return;
             }
-            // if(/googlevideo\.com\/videoplayback.*&range=/i.test(input)){
-            //     input = input.replace(/&range=[^&]*/, "");
-            //     window.postMessage({ type: "addMedia", url: input, href: location.href, ext: "mp4" });
-            //     return;
-            // }
         });
     return clone;
 }
@@ -164,7 +159,7 @@ Array.prototype.slice = function (start, end) {
         for (let item of data) {
             if (typeof item != "number" || item > 255) { return data; }
         }
-        window.postMessage({ type: "addKey", key: data, href: location.href, ext: "key" });
+        window.postMessage({ action: "addKey", key: data, href: location.href, ext: "key" });
     }
     return data;
 }
@@ -175,7 +170,7 @@ window.btoa = function (data) {
     let base64 = _btoa.apply(this, arguments);
     CATCH_SEARCH_DEBUG && console.log(base64, data, base64.length);
     if (base64.length == 24 && base64.substring(22, 24) == "==") {
-        window.postMessage({ type: "addKey", key: base64, href: location.href, ext: "base64Key" });
+        window.postMessage({ action: "addKey", key: base64, href: location.href, ext: "base64Key" });
     }
     return base64;
 }
@@ -184,7 +179,7 @@ window.atob = function (base64) {
     let data = _atob.apply(this, arguments);
     CATCH_SEARCH_DEBUG && console.log(base64, data, base64.length);
     if (base64.length == 24 && base64.substring(22, 24) == "==") {
-        window.postMessage({ type: "addKey", key: base64, href: location.href, ext: "base64Key" });
+        window.postMessage({ action: "addKey", key: base64, href: location.href, ext: "base64Key" });
     }
     return data;
 }
@@ -229,5 +224,5 @@ function getExtension(str) {
 }
 function toUrl(text, ext = "m3u8") {
     let url = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(text)]));
-    window.postMessage({ type: "addMedia", url: url, href: location.href, ext: ext });
+    window.postMessage({ action: "addMedia", url: url, href: location.href, ext: ext });
 }
