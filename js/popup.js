@@ -578,6 +578,7 @@ $(function () {
         clearInterval(interval);
         // 捕获按钮
         if ($("#Catch").data("switch") != "off") {
+            G.injectScript = G.scriptList.has(G.injectScript) ? G.injectScript : GetDefault("injectScript");
             $("#Catch").html(G.scriptList.get(G.injectScript).name);
         }
         $("#Catch").click(function () {

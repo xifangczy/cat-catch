@@ -275,6 +275,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     // 捕获
     if (Message.Message == "catch") {
         /* 不需要刷新的脚本 立即注入 */
+        G.injectScript = G.scriptList.has(G.injectScript) ? G.injectScript : GetDefault("injectScript");
         let script = G.scriptList.get(G.injectScript);
         if (!script.refresh) {
             chrome.scripting.executeScript({
@@ -354,6 +355,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
         // 开启捕获
         if (G.version >= 102 && G.featCatchTabId && G.featCatchTabId.includes(tabId)) {
+            G.injectScript = G.scriptList.has(G.injectScript) ? G.injectScript : GetDefault("injectScript");
             let script = G.scriptList.get(G.injectScript);
             let injectScript = "catch-script/" + G.injectScript;
             chrome.scripting.executeScript({
