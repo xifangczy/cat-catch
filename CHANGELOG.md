@@ -10,6 +10,8 @@
 
 [Fixed] 修正 媒体控制 某些情况检测不到视频
 
+[Added] 非Chrome扩展商店版本 现在支持Youtube
+
 ### 2.2.5
 [Fixed] 修复mpd解析器丢失音轨 [#70](https://github.com/xifangczy/cat-catch/issues/70)
 
