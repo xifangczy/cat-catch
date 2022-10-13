@@ -43,6 +43,7 @@ body {
   transition: all 0.1s;
   width: 18px;
   height: 18px;
+  cursor: pointer;
 }
 .icon:hover {
   transform: scale(1.1);
