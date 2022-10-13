@@ -6,11 +6,13 @@
 
 [Added] m3u8解析器 自定义文件名 只要音频 另存为 m3u8DL命令完善 部分代码来自 [#80](https://github.com/xifangczy/cat-catch/pull/80)
 
+[Added] 非Chrome扩展商店版本 现在支持Youtube
+
+[Added] Firefox版 现在支持m3u8视频预览
+
 [Fixed] m3u8解析器 超长名字无法保存文件 [#80](https://github.com/xifangczy/cat-catch/pull/80)
 
 [Fixed] 修正 媒体控制 某些情况检测不到视频
-
-[Added] 非Chrome扩展商店版本 现在支持Youtube
 
 ### 2.2.5
 [Fixed] 修复mpd解析器丢失音轨 [#70](https://github.com/xifangczy/cat-catch/issues/70)
