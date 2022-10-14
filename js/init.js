@@ -68,6 +68,11 @@ const reRange = /([\d]+)-([\d]+)\/([\d]+)/;
 const reGetExt = /[0-9a-zA-Z]*/;
 const reYoutube = /&range=[^&]*|&rbuf=[^&]*|&rn=[^&]*|&cver=[^&]*|&altitags=[^&]*|&pot=[^&]*|&fallback_count=[^&]*/g;
 const reStringModify = /['\\:\*\?"<\/>\|~]/g;
+const reOptionsType = /^[^\/]+\/[^\/]+$/ig;
+
+// 防抖
+let debounce = undefined;
+let debounceCount = 0;
 
 // 变量初始值
 function GetDefault(Obj) {
@@ -277,8 +282,7 @@ function isEmpty(obj) {
     return (typeof obj == "undefined" ||
         obj == null ||
         obj == "" ||
-        obj == " "
-    )
+        obj == " ")
 }
 
 function setReferer(referer, callback) {

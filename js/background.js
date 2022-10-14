@@ -192,7 +192,7 @@ function findMedia(data, isRegex = false, filter = false) {
         }
         // 装载页面信息
         info.initiator = data.initiator;
-        info.title = webInfo?.title ? stringModify(webInfo.title) : "NULL";
+        info.title = webInfo?.title ? webInfo.title : "NULL";
         info.webInfo = webInfo;
         info.extraExt = data.extraExt ? data.extraExt : undefined;
         // 发送到popup 并检查自动下载
@@ -211,7 +211,20 @@ function findMedia(data, isRegex = false, filter = false) {
             cacheData[data.tabId] = [];
         }
         cacheData[data.tabId].push(info);
-        chrome.storage.local.set({ MediaData: cacheData });
+        // 视频切片太多 频繁储存 严重影响性能
+        // 当前标签媒体数量大于1000 开启防抖 等待5秒储存 或 积累10个资源储存一次。
+        if (cacheData[data.tabId].length >= 1000 && debounceCount <= 10) {
+            debounceCount++;
+            clearTimeout(debounce);
+            debounce = setTimeout(() => {
+                chrome.storage.local.set({ MediaData: cacheData });
+            }, 5000);
+        } else {
+            clearTimeout(debounce);
+            debounceCount = 0;
+            chrome.storage.local.set({ MediaData: cacheData });
+        }
+
         if (data.tabId != -1) {
             SetIcon({ number: cacheData[data.tabId].length, tabId: data.tabId });
         } else {
@@ -233,6 +246,15 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         G.featAutoDownTabId === undefined
     ) {
         sendResponse("error");
+        return true;
+    }
+    if (Message.Message == "pushData") {
+        chrome.storage.local.set({ MediaData: cacheData });
+        sendResponse(cacheData);
+        return true;
+    }
+    if (Message.Message == "getData") {
+        sendResponse(cacheData);
         return true;
     }
     // 图标设置
@@ -523,12 +545,9 @@ function isSpecialPage(url) {
     if (url == "" || url == undefined || url == "null") { return true; }
     let urlParsing = {};
     try { urlParsing = new URL(url); } catch (e) { return true; }
-    return (urlParsing.protocol == "chrome-extension:" ||
-        urlParsing.protocol == "chrome:" ||
-        urlParsing.protocol == "about:" ||
-        urlParsing.protocol == "extension:" ||
-        urlParsing.protocol == "moz-extension:" ||
-        urlParsing.protocol == "edge:")
+    return !(urlParsing.protocol == "https:" ||
+        urlParsing.protocol == "http:" ||
+        urlParsing.protocol == "blob:")
 }
 
 // 清理冗余数据

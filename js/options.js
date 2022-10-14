@@ -48,14 +48,14 @@ $("#version").html("猫抓 v" + chrome.runtime.getManifest().version);
 
 // 自定义播放调用模板
 playerList = new Map();
-playerList.set("tips", {name: "调用协议模板", template: ""});
-playerList.set("default", {name: "默认 / 不启用", template: ""});
-playerList.set("potplayer", {name: "PotPlayer", template: "potplayer://$url$"});
-playerList.set("mxPlayerAd", {name: "安卓 MX Player 免费版", template: `intent:$url$#Intent;package=com.mxtech.videoplayer.ad;end`});
-playerList.set("mxPlayerPro", {name: "安卓 MX Player Pro", template: `intent:$url$#Intent;package=com.mxtech.videoplayer.pro;end`});
-playerList.set("vlc", {name: "安卓 vlc", template: `intent:$url$#Intent;package=org.videolan.vlc;end`});
-playerList.set("vlcCustom", {name: "自定义VLC协议 vlc://", template: "vlc://$url$"});
-playerList.set("shareApi", {name: "系统分享", template: "$shareApi$"});
+playerList.set("tips", { name: "调用协议模板", template: "" });
+playerList.set("default", { name: "默认 / 不启用", template: "" });
+playerList.set("potplayer", { name: "PotPlayer", template: "potplayer://$url$" });
+playerList.set("mxPlayerAd", { name: "安卓 MX Player 免费版", template: `intent:$url$#Intent;package=com.mxtech.videoplayer.ad;end` });
+playerList.set("mxPlayerPro", { name: "安卓 MX Player Pro", template: `intent:$url$#Intent;package=com.mxtech.videoplayer.pro;end` });
+playerList.set("vlc", { name: "安卓 vlc", template: `intent:$url$#Intent;package=org.videolan.vlc;end` });
+playerList.set("vlcCustom", { name: "自定义VLC协议 vlc://", template: "vlc://$url$" });
+playerList.set("shareApi", { name: "系统分享", template: "$shareApi$" });
 playerList.forEach(function (item, key) {
     $("#PlayerTemplate").append(`<option value="${key}">${item.name}</option>`);
 });
@@ -108,7 +108,7 @@ function Gethtml(Type, Param = new Object()) {
             $("#typeList tr").each(function () {
                 let GetText = $(this).find("#text").val();
                 if (isEmpty(GetText)) { return true; }
-                if (!/^[^\/]+\/[^\/]+$/ig.test(GetText)) {
+                if (!reOptionsType.test(GetText)) {
                     alert("抓取类型格式错误，请检查");
                 }
             });
@@ -299,7 +299,7 @@ function Save(option) {
             let GetState = $(this).find("#state").prop("checked");
             if (isEmpty(GetText)) { return true; }
             if (isEmpty(GetSize)) { GetSize = 0; }
-            if (/^[^\/]+\/[^\/]+$/ig.test(GetText)) {
+            if (reOptionsType.test(GetText)) {
                 Type.push({ type: GetText.toLowerCase(), size: GetSize, state: GetState });
             }
         });

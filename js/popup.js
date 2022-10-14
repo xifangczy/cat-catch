@@ -16,7 +16,6 @@ chrome.storage.local.get({ "MediaData": {} }, function (items) {
     UItoggle();
     // $(document).scrollTop($(document).height());
 });
-
 //监听数据
 chrome.runtime.onMessage.addListener(function (MediaData, sender, sendResponse) {
     if (MediaData.tabId == G.tabId || MediaData.tabId == -1) {
@@ -50,6 +49,9 @@ chrome.downloads.onChanged.addListener(function (item) {
 
 function AddMedia(data) {
     // console.log(data);
+
+    data.title = stringModify(data.title);
+
     // 正则匹配的备注扩展
     if (data.extraExt) {
         data.ext = data.extraExt;
