@@ -164,6 +164,13 @@ function findMedia(data, isRegex = false, filter = false) {
             if (cacheData[G.tabId][key].url == data.url) { return; }
         }
     }
+    // 通过视频范围计算完整视频大小
+    if (header["range"]) {
+        const size = header["range"].match(/([\d]*)-([\d]*)\/([\d]*)/);
+        if (size) {
+            header["size"] = parseInt(header["size"] * (size[3] / (size[2] - size[1])));
+        }
+    }
     const info = {
         name: name,
         url: data.url,
@@ -439,13 +446,11 @@ function getResponseHeadersValue(data) {
     let header = new Array();
     if (data.responseHeaders == undefined) { return header; }
     for (let item of data.responseHeaders) {
-        item.name = item.name.toLowerCase();
-        if (item.name == "content-length") {
-            header["size"] = item.value;
-        } else if (item.name == "content-type") {
-            header["type"] = item.value.split(";")[0].toLowerCase();
-        } else if (item.name == "content-disposition") {
-            header["attachment"] = item.value.toLowerCase();
+        switch (item.name.toLowerCase()) {
+            case "content-length": header["size"] = item.value; break;
+            case "content-type": header["type"] = item.value.split(";")[0].toLowerCase(); break;
+            case "content-disposition": header["attachment"] = item.value.toLowerCase(); break;
+            case "content-range": header["range"] = item.value.toLowerCase(); break;
         }
     }
     return header;
