@@ -61,6 +61,14 @@ if (G.version >= 104) {
     G.scriptList.set("recorder2.js", { refresh: false, allFrames: false, world: "ISOLATED", name: "录制脚本2" });
 }
 
+// 正则预编译
+const reProtocol = /^[\w]+:\/\/.+/i;
+const reFilename = /filename="(.*?)"/;
+const reRange = /([\d]+)-([\d]+)\/([\d]+)/;
+const reGetExt = /[0-9a-zA-Z]*/;
+const reYoutube = /&range=[^&]*|&rbuf=[^&]*|&rn=[^&]*|&cver=[^&]*|&altitags=[^&]*|&pot=[^&]*|&fallback_count=[^&]*/g;
+const reStringModify = /['\\:\*\?"<\/>\|~]/g;
+
 // 变量初始值
 function GetDefault(Obj) {
     const defaultExt = new Array(
@@ -240,7 +248,7 @@ function byteToSize(byte) {
 }
 // 替换掉不允许的文件名称字符
 function stringModify(str) {
-    return str.replace(/['\\:\*\?"<\/>\|~]/g, function (m) {
+    return str.replace(reStringModify, function (m) {
         return {
             "'": '&#39;',
             '\\': '&#92;',

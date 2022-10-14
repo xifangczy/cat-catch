@@ -190,7 +190,7 @@ function isUrl(str) {
 function isFullM3u8(text) {
     let tsLists = text.split("\n");
     for (let ts of tsLists) {
-        if (ts.includes("#")) { continue; }
+        if (ts[0] == "#") { continue; }
         if (isUrl(ts)) { return true; }
         return false;
     }

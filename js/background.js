@@ -87,7 +87,7 @@ function findMedia(data, isRegex = false, filter = false) {
         if (chrome.runtime.id == "jfedfbgedapdagkghmgibemcoggfppbb" && !G.youtube) { return; }
         // 完整视频/音频 &range=[^&]*
         // 去掉不必要的参数 防止重复
-        data.url = data.url.replace(/&range=[^&]*|&rbuf=[^&]*|&rn=[^&]*|&cver=[^&]*|&altitags=[^&]*|&pot=[^&]*|&fallback_count=[^&]*/g, "");
+        data.url = data.url.replace(reYoutube, "");
     }
     // 调试模式
     if (G.Debug) {
@@ -111,7 +111,7 @@ function findMedia(data, isRegex = false, filter = false) {
             }
             for (let i = 1; i < result.length; i++) {
                 data.url = decodeURIComponent(result[i]);
-                if (!/^[\w]+:\/\/.+/i.test(data.url)) {
+                if (!reProtocol.test(data.url)) {
                     data.url = urlParsing.protocol + "//" + data.url;
                 }
                 findMedia(data, true, true);
@@ -135,7 +135,7 @@ function findMedia(data, isRegex = false, filter = false) {
 
     //查找附件
     if (!isRegex && !filter && header["attachment"] != undefined) {
-        const res = header["attachment"].match(/filename="(.*?)"/);
+        const res = header["attachment"].match(reFilename);
         if (res && res[1]) {
             name = GetFileName(decodeURIComponent(res[1]));
             ext = GetExt(name);
@@ -166,7 +166,7 @@ function findMedia(data, isRegex = false, filter = false) {
     }
     // 通过视频范围计算完整视频大小
     if (header["range"]) {
-        const size = header["range"].match(/([\d]*)-([\d]*)\/([\d]*)/);
+        const size = header["range"].match(reRange);
         if (size) {
             header["size"] = parseInt(header["size"] * (size[3] / (size[2] - size[1])));
         }
@@ -438,7 +438,7 @@ function GetExt(FileName) {
         return undefined;
     }
     let ext = str[str.length - 1];
-    ext = ext.match(/[0-9a-zA-Z]*/);
+    ext = ext.match(reGetExt);
     return ext[0].toLowerCase();
 }
 //获取Header属性的值
