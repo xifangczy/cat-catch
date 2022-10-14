@@ -49,6 +49,7 @@ chrome.downloads.onChanged.addListener(function (item) {
 });
 
 function AddMedia(data) {
+    // console.log(data);
     // 正则匹配的备注扩展
     if (data.extraExt) {
         data.ext = data.extraExt;
@@ -66,7 +67,8 @@ function AddMedia(data) {
     // Youtube
     if (data.url.includes("googlevideo.com") && data.name == "videoplayback") {
         data.name = data.title.replace(" - YouTube", "") + '.' + data.ext;
-        data.size = 0;
+        const size =  data.url.match(/&clen=([\d]*)/);
+        data.size = size ? size[1] : 0;
     }
 
     //截取文件名长度
