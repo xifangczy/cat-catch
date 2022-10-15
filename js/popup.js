@@ -1,5 +1,7 @@
 // HeartBeat
 chrome.runtime.sendMessage(chrome.runtime.id, { Message: "HeartBeat" });
+// clearData
+chrome.runtime.sendMessage(chrome.runtime.id, { Message: "clearData" });
 //填充数据
 chrome.storage.local.get({ "MediaData": {} }, function (items) {
     if (items.MediaData === undefined) { return; }

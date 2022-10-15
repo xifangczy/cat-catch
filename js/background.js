@@ -1,5 +1,4 @@
 importScripts("/js/init.js");
-clearRedundant();
 
 // Service Worker 5分钟后会强制终止扩展
 // https://bugs.chromium.org/p/chromium/issues/detail?id=1271154
@@ -17,6 +16,12 @@ chrome.runtime.onConnect.addListener(function (Port) {
     Port.onDisconnect.addListener(function () {
         if (interval) { clearInterval(interval); }
     });
+});
+
+// 10分钟清理一次数据
+chrome.alarms.create("clear", { periodInMinutes: 10 });
+chrome.alarms.onAlarm.addListener(function (alarm) {
+    alarm.name == "clear" && clearRedundant();
 });
 
 // onBeforeRequest 浏览器发送请求之前使用正则匹配发送请求的URL
@@ -567,6 +572,7 @@ function clearRedundant() {
     });
     refererData = [];
 }
+clearRedundant();
 
 // 测试
 // chrome.storage.local.get(function (data) { console.log(data.MediaData) });
