@@ -1,6 +1,8 @@
 ## 更新说明
 ### 2.2.7
-[Fixed] 修正 文件大小不正确
+[Fixed] 修正 文件大小显示不正确
+
+[Changed] 性能优化
 
 ### 2.2.6
 [Added] 深度搜索 尝试收集m3u8文件的密钥 具体使用查看 [用户文档](https://o2bmm.gitbook.io/cat-catch/docs/m3u8parse#maybekey)
