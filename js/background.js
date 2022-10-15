@@ -81,7 +81,6 @@ function findMedia(data, isRegex = false, filter = false) {
     if (isSpecialPage(data.url)) { return; }
     const urlParsing = new URL(data.url);
     // 屏蔽Youtube
-    if (urlParsing.host.includes("youtube.com")) { return; }
     if (urlParsing.host.includes("googlevideo.com")) {
         // Chrome商店版本 跳过youtube
         if (chrome.runtime.id == "jfedfbgedapdagkghmgibemcoggfppbb" && !G.youtube) { return; }
@@ -95,8 +94,7 @@ function findMedia(data, isRegex = false, filter = false) {
     }
 
     const header = getResponseHeadersValue(data);
-    let name = GetFileName(data.url);
-    let ext = GetExt(name);
+    let { name, ext } = fileNameParse(urlParsing.pathname);
 
     //正则匹配
     if (isRegex && !filter) {
@@ -137,8 +135,7 @@ function findMedia(data, isRegex = false, filter = false) {
     if (!isRegex && !filter && header["attachment"] != undefined) {
         const res = header["attachment"].match(reFilename);
         if (res && res[1]) {
-            name = GetFileName(decodeURIComponent(res[1]));
-            ext = GetExt(name);
+            let { name, ext } = fileNameParse(decodeURIComponent(res[1]));
             filter = CheckExtension(ext, 0);
             if (filter == "break") { return; }
         }
@@ -193,7 +190,8 @@ function findMedia(data, isRegex = false, filter = false) {
         // 装载页面信息
         info.initiator = data.initiator;
         info.title = webInfo?.title ? webInfo.title : "NULL";
-        info.webInfo = webInfo;
+        // info.webInfo = webInfo;
+        info.favIconUrl = webInfo?.favIconUrl ? webInfo.favIconUrl : undefined;
         info.extraExt = data.extraExt ? data.extraExt : undefined;
         // 发送到popup 并检查自动下载
         chrome.runtime.sendMessage(info, function () {
@@ -250,7 +248,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     if (Message.Message == "pushData") {
         chrome.storage.local.set({ MediaData: cacheData });
-        sendResponse(cacheData);
+        sendResponse("ok");
         return true;
     }
     if (Message.Message == "getData") {
@@ -445,23 +443,12 @@ function CheckType(dataType, dataSize) {
     return false;
 }
 
-//获取文件名
-function GetFileName(url) {
-    let str = url.split("?"); //url按？分开
-    str = str[0].split("&"); //按&分开
-    str = str[0].split("/"); //按/分开
-    str = str[str.length - 1].split("#"); //按#分开
-    return stringModify(str[0].toLowerCase()); //得到带后缀的名字
-}
-//获取后缀名
-function GetExt(FileName) {
-    let str = FileName.split(".");
-    if (str.length == 1) {
-        return undefined;
-    }
-    let ext = str[str.length - 1];
-    ext = ext.match(reGetExt);
-    return ext[0].toLowerCase();
+// 获取文件名 后缀
+function fileNameParse(pathname) {
+    let fileName = pathname.split("/").pop();
+    let ext = fileName.split(".");
+    ext = ext.length == 1 ? undefined : ext.pop().toLowerCase();
+    return { name: fileName, ext: ext ? ext : undefined }
 }
 //获取Header属性的值
 function getResponseHeadersValue(data) {
@@ -471,8 +458,8 @@ function getResponseHeadersValue(data) {
         switch (item.name.toLowerCase()) {
             case "content-length": header["size"] = item.value; break;
             case "content-type": header["type"] = item.value.split(";")[0].toLowerCase(); break;
-            case "content-disposition": header["attachment"] = item.value.toLowerCase(); break;
-            case "content-range": header["range"] = item.value.toLowerCase(); break;
+            case "content-disposition": header["attachment"] = item.value; break;
+            case "content-range": header["range"] = item.value; break;
         }
     }
     return header;

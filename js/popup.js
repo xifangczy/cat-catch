@@ -49,8 +49,8 @@ chrome.downloads.onChanged.addListener(function (item) {
 
 function AddMedia(data) {
     // console.log(data);
-
     data.title = stringModify(data.title);
+    data.name = stringModify(data.name);
 
     // 正则匹配的备注扩展
     if (data.extraExt) {
@@ -69,7 +69,7 @@ function AddMedia(data) {
     // Youtube
     if (data.url.includes("googlevideo.com") && data.name == "videoplayback") {
         data.name = data.title.replace(" - YouTube", "") + '.' + data.ext;
-        const size =  data.url.match(/&clen=([\d]*)/);
+        const size = data.url.match(/&clen=([\d]*)/);
         data.size = size ? size[1] : 0;
     }
 
@@ -101,7 +101,7 @@ function AddMedia(data) {
         <div class="panel" id="requestId${data.requestId}">
             <div class="panel-heading">
                 <input type="checkbox" class="DownCheck" checked="true"/>
-                <img src="${data.webInfo?.favIconUrl ? data.webInfo?.favIconUrl : ""}" class="icon ${G.ShowWebIco && data.webInfo?.favIconUrl ? "" : "hide"}"/>
+                <img src="${data.favIconUrl ? data.favIconUrl : ""}" class="icon ${G.ShowWebIco && data.favIconUrl ? "" : "hide"}"/>
                 <img src="img/regex.png" class="icon ${data.isRegex ? "" : "hide"}" title="正则表达式匹配 或 来自深度搜索"/>
                 <span class="name">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>

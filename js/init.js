@@ -65,7 +65,6 @@ if (G.version >= 104) {
 const reProtocol = /^[\w]+:\/\/.+/i;
 const reFilename = /filename="(.*?)"/;
 const reRange = /([\d]+)-([\d]+)\/([\d]+)/;
-const reGetExt = /[0-9a-zA-Z]*/;
 const reYoutube = /&range=[^&]*|&rbuf=[^&]*|&rn=[^&]*|&cver=[^&]*|&altitags=[^&]*|&pot=[^&]*|&fallback_count=[^&]*/g;
 const reStringModify = /['\\:\*\?"<\/>\|~]/g;
 const reOptionsType = /^[^\/]+\/[^\/]+$/ig;
