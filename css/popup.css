@@ -244,3 +244,9 @@ body {
   color: rgb(26, 115, 232);
   font-weight: bold;
 }
+.moreButton{
+  display: flex;
+}
+.moreButton div{
+  margin-right: 3px;
+}

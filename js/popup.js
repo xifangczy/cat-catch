@@ -32,20 +32,8 @@ var downData = [];
 chrome.downloads.onChanged.addListener(function (item) {
     // console.log(item.error.current);
     // SERVER_FORBIDDEN
-    if (item.error) {
-        chrome.tabs.get(G.tabId, function (tab) {
-            if (!downData[item.id]) { return; }
-            chrome.tabs.create({
-                url: `/download.html?url=${encodeURIComponent(
-                    downData[item.id].url
-                )}&referer=${encodeURIComponent(
-                    downData[item.id].initiator
-                )}&filename=${encodeURIComponent(
-                    downData[item.id].downFileName
-                )}`,
-                index: tab.index + 1
-            });
-        });
+    if (item.error && downData[item.id]) {
+        catDownload(downData[item.id]);
     }
 });
 
@@ -117,7 +105,10 @@ function AddMedia(data) {
                     ${data.title ? `<b>标题:</b> ${data.title}` : ""}
                     ${data.type ? `<br><b>MIME:</b>  ${data.type}` : ""}
                 </div>
-                <div id="qrcode"><img src="img/qrcode.png" class="icon"/></div>
+                <div class="moreButton">
+                    <div id="qrcode"><img src="img/qrcode.png" class="icon"/></div>
+                    <div id="catDown"><img src="img/cat-down.png" class="icon"/></div>
+                </div>
                 <a href="${data.url}" target="_blank" download="${data.downFileName}" data-initiator="${data.initiator}">${data.url}</a>
                 <br>
                 <img id="screenshots" class="hide"/>
@@ -183,6 +174,10 @@ function AddMedia(data) {
     html.find("#qrcode").click(function () {
         const size = data.url.length >= 300 ? 400 : 256;
         $(this).html("").qrcode({ width: size, height: size, text: data.url }).off("click");
+    });
+    // 猫抓下载器 下载
+    html.find("#catDown").click(function () {
+        catDownload(data);
     });
     //点击复制网址
     html.find('#copy').click(function () {
@@ -353,7 +348,7 @@ $(function () {
     $("#AutoDown").click(function () {
         const action = $(this).data("switch");
         if (action == "on") {
-            if (confirm("找到资源立刻尝试下载\n点击扩展图标将关闭自动下载\n是否确认开启？")) {
+            if (confirm("找到资源立刻尝试下载\n开启后再点击扩展图标将结束自动下载\n是否确认开启?")) {
                 $("#AutoDown").html("关闭下载").data("switch", "off");
                 chrome.runtime.sendMessage({ Message: "autoDown", tabId: G.tabId, action: action });
             }
@@ -607,6 +602,22 @@ $(function () {
         $("#playbackRate").val(G.playbackRate);
     }, 10);
 });
+
+// 猫抓下载器 下载
+function catDownload(obj) {
+    chrome.tabs.get(G.tabId, function (tab) {
+        chrome.tabs.create({
+            url: `/download.html?url=${encodeURIComponent(
+                obj.url
+            )}&referer=${encodeURIComponent(
+                obj.initiator
+            )}&filename=${encodeURIComponent(
+                obj.downFileName
+            )}`,
+            index: tab.index + 1
+        });
+    });
+}
 
 /* 格式判断 */
 function isPlay(data) {
