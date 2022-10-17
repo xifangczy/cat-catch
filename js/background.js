@@ -18,8 +18,8 @@ chrome.runtime.onConnect.addListener(function (Port) {
     });
 });
 
-// 10分钟清理一次数据
-chrome.alarms.create("clear", { periodInMinutes: 10 });
+// 30分钟清理一次数据
+chrome.alarms.create("clear", { periodInMinutes: 30 });
 chrome.alarms.onAlarm.addListener(function (alarm) {
     alarm.name == "clear" && clearRedundant();
 });
