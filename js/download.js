@@ -19,20 +19,9 @@ $(function () {
         });
         return;
     }
-    // 如果是m3u8 mpd跳转到解析器
-    let ext = _url.split("?")[0];
-    ext = ext.split(".").pop().toLowerCase();
-    if (ext == "m3u8") {
-        window.location.href = `m3u8.html?url=${encodeURIComponent(_url)}&referer=${encodeURIComponent(_referer)}`;
-        return;
-    }
-    if (ext == "mpd") {
-        window.location.href = `mpd.html?url=${encodeURIComponent(_url)}&referer=${encodeURIComponent(_referer)}`;
-        return;
-    }
-    downloadFile();
 
     // 使用ajax下载文件
+    downloadFile();
     function downloadFile() {
         $("#downfile").show();
         $("#downFilepProgress").html("后台下载中...");

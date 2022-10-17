@@ -1,6 +1,6 @@
 // url 参数解析
 const params = new URL(location.href).searchParams;
-var _url = params.get("url");
+const _url = params.get("url");
 const _referer = params.get("referer");
 const _title = params.get("title");
 // 修改当前标签下的所有xhr的Referer
@@ -19,13 +19,25 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 });
 
 $(function () {
-    fetch(_url)
-        .then(response => response.text())
-        .then(function (text) {
-            mpdContent = text;
-            parseMPD(mpdContent);
-            $("#mpd_url").html(_url).attr("href", _url);
+    if (_url) {
+        fetch(_url)
+            .then(response => response.text())
+            .then(function (text) {
+                mpdContent = text;
+                parseMPD(mpdContent);
+                $("#mpd_url").html(_url).attr("href", _url);
+            });
+    } else {
+        $("#loading").hide();
+        $("#mpdCustom").show();
+        $("#parse").click(function () {
+            let url = $("#mpdUrl").val().trim();;
+            url = "mpd.html?url=" + encodeURIComponent(url);
+            let referer = $("#referer").val().trim();;
+            if (referer) { url += "&referer=" + referer; }
+            chrome.tabs.update({ url: url });
         });
+    }
 
     $("#mpdVideoLists, #mpdAudioLists").change(function () {
         let type = this.id == "mpdVideoLists" ? "video" : "audio";
@@ -75,7 +87,7 @@ function parseMPD() {
     $("#loading").hide(); $("#main").show();
     mpdJson = mpdParser.parse(mpdContent, { manifestUri: _url });
     mpdXml = $(mpdContent);
-    if(mpdXml.find("contentprotection").length > 0){
+    if (mpdXml.find("contentprotection").length > 0) {
         $("#loading").show();
         $("#loading .optionBox").html("媒体有DRM保护, 可能无法下载和播放. 暂无加密分析以及解密功能, 请复制mpd文件地址, 使用第三方工具下载.");
     }
@@ -91,7 +103,7 @@ function parseMPD() {
         for (let index in mpdJson.mediaGroups.AUDIO.audio[key].playlists) {
             let item = mpdJson.mediaGroups.AUDIO.audio[key].playlists[index];
             // console.log(item);
-            $("#mpdAudioLists").append(`<option value='${key}$-bmmmd-$${index}'>${key} | ${item.attributes.NAME} | ${item.attributes.BANDWIDTH/1000}Kbps</option>`);
+            $("#mpdAudioLists").append(`<option value='${key}$-bmmmd-$${index}'>${key} | ${item.attributes.NAME} | ${item.attributes.BANDWIDTH / 1000}Kbps</option>`);
         }
     }
     $("#info").html(getInfo("video"));

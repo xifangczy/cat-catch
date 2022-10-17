@@ -17,8 +17,17 @@
         <div class="optionBox">文件载入中...</div>
       </section>
 
+      <section id="mpdCustom" class="hide">
+        <h1 class="optionsTitle">猫抓 Dash mpd解析器</h1>
+        <div class="optionBox">
+          <input type="text" id="mpdUrl" placeholder="mpd URL" class="fullInput"/>
+          <input type="text" id="referer" placeholder="请求头 Referer" class="fullInput"/>
+          <button id="parse" type="button">解析</button>
+        </div>
+      </section>
+
       <section id="main" class="hide">
-        <h1 class="optionsTitle">猫抓 Dash解析</h1>
+        <h1 class="optionsTitle">猫抓 Dash mpd解析器</h1>
         <div class="optionBox">
           <div class="block">
             mpd文件地址
@@ -31,7 +40,6 @@
           </div>
           <div class="block" id="textarea">
             <textarea rows="50" cols="160" id="media_file" spellcheck="false" data-type="link"></textarea>
-            <!-- <video class="hide" width="100%" controls></video> -->
           </div>
           <div class="flex">
             <div>选择视频: <select id="mpdVideoLists" class="select"></select></div>

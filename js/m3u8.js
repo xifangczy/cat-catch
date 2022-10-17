@@ -46,12 +46,12 @@ $(function () {
             let baseUrl = $("#baseUrl").val().trim();
             let m3u8Url = $("#m3u8Url").val().trim();
             let referer = $("#referer").val().trim();
+            if (m3u8Url != "") {
+                chrome.tabs.update({ url: "m3u8.html?url=" + encodeURIComponent(m3u8Url) + "&referer=" + referer });
+                return;
+            }
             if (referer != "") {
                 setReferer(referer);
-            }
-            if (m3u8Url != "") {
-                chrome.tabs.update({ url: "m3u8.html?url=" + encodeURIComponent(m3u8Url) });
-                return;
             }
             if (baseUrl != "") {
                 m3u8Text = addBashUrl(baseUrl, m3u8Text);
@@ -785,7 +785,7 @@ function getM3u8DlArg() {
     // 自定义文件名
     const customFilename = $("#customFilename").val().trim();
     let title = customFilename ? customFilename : _title;
-    if (title.length >= 150) {
+    if (title && title.length >= 150) {
         title = title.substring(title.length - 150);
     }
     m3u8dlArg = m3u8dlArg.replace(/\$title\$/g, title);

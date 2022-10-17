@@ -106,8 +106,8 @@ function AddMedia(data) {
                     ${data.type ? `<br><b>MIME:</b>  ${data.type}` : ""}
                 </div>
                 <div class="moreButton">
-                    <div id="qrcode"><img src="img/qrcode.png" class="icon"/></div>
-                    <div id="catDown"><img src="img/cat-down.png" class="icon"/></div>
+                    <div id="qrcode"><img src="img/qrcode.png" class="icon" title="显示资源地址二维码"/></div>
+                    <div id="catDown"><img src="img/cat-down.png" class="icon" title="携带referer参数下载"/></div>
                 </div>
                 <a href="${data.url}" target="_blank" download="${data.downFileName}" data-initiator="${data.initiator}">${data.url}</a>
                 <br>
