@@ -174,6 +174,16 @@ $("#ResetOption").bind("click", function () {
         location.reload();
     }
 });
+//m3u8DL 参数设置
+$("#ResetM3u8dl").bind("click", function () {
+    if (confirm("确认重置吗？")) {
+        $("#m3u8dlOption textarea").each(function () {
+            const Option = this.id;
+            chrome.storage.sync.set({ [Option]: GetDefault(Option) });
+        });
+        location.reload();
+    }
+});
 //重置复制选项
 $("#ResetCopy").bind("click", function () {
     if (confirm("确认重置吗？")) {
