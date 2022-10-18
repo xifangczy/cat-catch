@@ -4,6 +4,8 @@
 
 [Changed] 性能优化
 
+[Fixed] 修复 CPU占用问题
+
 ### 2.2.6
 [Added] 深度搜索 尝试收集m3u8文件的密钥 具体使用查看 [用户文档](https://o2bmm.gitbook.io/cat-catch/docs/m3u8parse#maybekey)
 
