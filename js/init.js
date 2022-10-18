@@ -204,43 +204,13 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
         G[key] = newValue;
     }
 });
-// 清理冗余数据
-function clearRedundant() {
-    chrome.tabs.query({}, function (tabs) {
-        let allTabId = [-1];    // 初始化一个-1 防止断开sw重连后 幽灵数据丢失
-        for (let item of tabs) {
-            allTabId.push(item.id);
-        }
-        if (!cacheData.init) {
-            // 清理 缓存数据
-            for (let key in cacheData) {
-                if (!allTabId.includes(parseInt(key))) {
-                    delete cacheData[key];
-                }
-            }
-            chrome.storage.local.set({ MediaData: cacheData });
-        }
-
-        // 清理 declarativeNetRequest
-        chrome.declarativeNetRequest.getSessionRules(function (rules) {
-            for (let item of rules) {
-                if (!allTabId.includes(item.id)) {
-                    chrome.declarativeNetRequest.updateSessionRules({
-                        removeRuleIds: [item.id]
-                    });
-                }
-            }
-        });
-    });
-    refererData = [];
-}
 // 扩展升级，清空本地储存
 chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason == "update") {
         InitOptions();
         chrome.storage.local.clear();
         clearRedundant();
-
+        
         // 兼容之前版本 PotPlayer打开预览视频选项
         if (G.Potplayer) {
             chrome.storage.sync.set({ Player: "potplayer://$url$" });
@@ -314,6 +284,7 @@ function isEmpty(obj) {
         obj == " ")
 }
 
+// 修改请求头Referer
 function setReferer(referer, callback) {
     chrome.tabs.getCurrent(function (tabs) {
         chrome.declarativeNetRequest.updateSessionRules({
@@ -337,4 +308,36 @@ function setReferer(referer, callback) {
             callback && callback();
         });
     });
+}
+
+// 清理冗余数据
+function clearRedundant() {
+    // console.log("clearRedundant");
+    chrome.tabs.query({}, function (tabs) {
+        let allTabId = [-1];    // 初始化一个-1 防止断开sw重连后 幽灵数据丢失
+        for (let item of tabs) {
+            allTabId.push(item.id);
+        }
+        if (!cacheData.init) {
+            // 清理 缓存数据
+            for (let key in cacheData) {
+                if (!allTabId.includes(parseInt(key))) {
+                    delete cacheData[key];
+                }
+            }
+            chrome.storage.local.set({ MediaData: cacheData });
+        }
+
+        // 清理 declarativeNetRequest
+        chrome.declarativeNetRequest.getSessionRules(function (rules) {
+            for (let item of rules) {
+                if (!allTabId.includes(item.id)) {
+                    chrome.declarativeNetRequest.updateSessionRules({
+                        removeRuleIds: [item.id]
+                    });
+                }
+            }
+        });
+    });
+    refererData = [];
 }
