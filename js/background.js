@@ -425,6 +425,7 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
     tabIdListRemove("featAutoDownTabId", tabId);
     // 清理 捕获
     G.version >= 102 && tabIdListRemove("featCatchTabId", tabId);
+    chrome.alarms.create("nowClear", { when: Date.now() + 3000 });
 });
 
 //检查扩展名以及大小限制
