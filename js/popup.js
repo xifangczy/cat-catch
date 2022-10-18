@@ -420,7 +420,7 @@ $(function () {
             $("#muted").prop("checked", state.muted);
             $("#videoIndex").empty();
             for (let i = 0; i < state.count; i++) {
-                let src = state.src[i];
+                let src = state.src[i].split("/").pop();
                 if (src.length >= 60) {
                     src = src.substr(0, 35) + '...' + src.substr(-35);
                 }
