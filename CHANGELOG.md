@@ -1,10 +1,10 @@
 ## 更新说明
 ### 2.2.7
-[Fixed] 修正 文件大小
+[Fixed] 修正 文件大小显示不正确
 
 [Changed] 性能优化
 
-[Fixed] 修复 CPU占用问题
+[Fixed] 修复 没有正确清理冗余数据 导致CPU占用问题
 
 ### 2.2.6
 [Added] 深度搜索 尝试收集m3u8文件的密钥 具体使用查看 [用户文档](https://o2bmm.gitbook.io/cat-catch/docs/m3u8parse#maybekey)
