@@ -18,11 +18,12 @@ chrome.runtime.onConnect.addListener(function (Port) {
     });
 });
 
-clearRedundant();   //清理冗余数据
-// 30分钟清理一次冗余数据
-chrome.alarms.create("clear", { periodInMinutes: 30 });
+
+chrome.alarms.create("nowClear", { when: Date.now() + 3000 });  // 3秒后清理立即清理一次
+chrome.alarms.create("clear", { periodInMinutes: 30 }); // 30分钟清理一次冗余数据
 chrome.alarms.onAlarm.addListener(function (alarm) {
     alarm.name == "clear" && clearRedundant();
+    alarm.name == "nowClear" && clearRedundant();
 });
 
 // onBeforeRequest 浏览器发送请求之前使用正则匹配发送请求的URL
