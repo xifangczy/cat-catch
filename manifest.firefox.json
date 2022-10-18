@@ -48,5 +48,5 @@
     }
   ],
   "web_accessible_resources": ["catch-script/*"],
-  "version": "2.2.6"
+  "version": "2.2.7"
 }
