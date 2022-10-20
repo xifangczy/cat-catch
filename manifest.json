@@ -36,12 +36,13 @@
     {
       "matches": ["https://*/*", "http://*/*"],
       "js": ["js/content-script.js"],
+      "css": ["css/float.css"],
       "run_at": "document_start"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["catch-script/*"],
+      "resources": ["catch-script/*", "float.html"],
       "matches": ["<all_urls>"]
     }
   ],

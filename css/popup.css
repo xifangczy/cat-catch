@@ -193,7 +193,7 @@ body {
 }
 #PlayControl .button2,
 #PlayControl .button {
-  margin-left: 5px;
+  margin-left: 2px;
 }
 #PlayControl #playbackRate {
   width: 3em;
@@ -206,6 +206,9 @@ body {
 }
 #PlayControl .loop {
   margin: 0 5px 0 5px;
+}
+#PlayControl .volume{
+  width: 100px;
 }
 .blue {
   color: rgb(26, 115, 232);

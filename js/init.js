@@ -58,7 +58,7 @@ G.scriptList.set("search.js", { refresh: true, allFrames: true, world: "MAIN", n
 G.scriptList.set("catch.js", { refresh: true, allFrames: true, world: "MAIN", name: "hook脚本" });
 G.scriptList.set("recorder.js", { refresh: false, allFrames: true, world: "MAIN", name: "录制脚本" });
 if (G.version >= 104) {
-    G.scriptList.set("recorder2.js", { refresh: false, allFrames: false, world: "ISOLATED", name: "录制脚本2" });
+    G.scriptList.set("recorder2.js", { refresh: false, allFrames: false, world: "ISOLATED", name: "屏幕捕捉" });
 }
 
 // 正则预编译
