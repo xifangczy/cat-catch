@@ -9,6 +9,8 @@ chrome.storage.local.get({ "MediaData": {} }, function (items) {
         for (let key in items.MediaData[G.tabId]) {
             AddMedia(items.MediaData[G.tabId][key]);
         }
+    } else {
+        $("#Tips").html("还没闻到味儿~");
     }
     if (items.MediaData[-1] !== undefined) {
         for (let key in items.MediaData[-1]) {

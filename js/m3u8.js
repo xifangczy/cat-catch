@@ -9,6 +9,15 @@ const tabId = parseInt(params.get("tabid"));
 _referer && setReferer(_referer);
 
 $(function () {
+    // 默认设置
+    chrome.storage.local.get({ thread: 32, mp4: true, onlyAudio: false, saveAs: false, skipDecrypt: false }, function (items) {
+        $("#thread").val(items.thread);
+        $("#mp4").prop("checked", items.mp4);
+        $("#onlyAudio").prop("checked", items.onlyAudio);
+        $("#saveAs").prop("checked", items.saveAs);
+        $("#skipDecrypt").prop("checked", items.skipDecrypt);
+    });
+
     //获取m3u8参数
     let _m3u8Arg = new RegExp("\\.m3u8\\?([^\n]*)").exec(_m3u8Url);
     if (_m3u8Arg) {
@@ -489,7 +498,16 @@ $(function () {
         }
         $(this).val(number);
         $("#m3u8dlArg").val(getM3u8DlArg());
+        this.id == "thread" && chrome.storage.local.set({ thread: number });
         return false;
+    });
+    // 储存设置
+    $("#thread, #mp4, #onlyAudio, #saveAs, #skipDecrypt").on("change", function () {
+        let val = $(this).prop("checked");
+        if (this.id == "thread") {
+            val = $(this).val();
+        }
+        chrome.storage.local.set({ [this.id]: val });
     });
     // 上传key
     $("#uploadKeyFile").change(function () {
