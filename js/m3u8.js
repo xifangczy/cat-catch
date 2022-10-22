@@ -505,7 +505,7 @@ $(function () {
     $("#thread, #mp4, #onlyAudio, #saveAs, #skipDecrypt").on("change", function () {
         let val = $(this).prop("checked");
         if (this.id == "thread") {
-            val = $(this).val();
+            val = parseInt($(this).val());
         }
         chrome.storage.local.set({ [this.id]: val });
     });

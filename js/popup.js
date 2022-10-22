@@ -5,7 +5,7 @@ let allTabFlag = true;
 // HeartBeat
 chrome.runtime.sendMessage(chrome.runtime.id, { Message: "HeartBeat" });
 // 清理冗余数据
-chrome.runtime.sendMessage(chrome.runtime.id, { Message: "clearData" });
+chrome.runtime.sendMessage(chrome.runtime.id, { Message: "clearRedundant" });
 // 填充数据
 chrome.storage.local.get({ "MediaData": {} }, function (items) {
     if (items.MediaData === undefined) { return; }

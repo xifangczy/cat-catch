@@ -132,7 +132,11 @@ $("#injectScript, #PlayerTemplate").change(function () {
 //失去焦点 保存自动清理数 模拟手机User Agent 自定义播放调用模板
 $("#OtherAutoClear, #MobileUserAgent, #m3u8dlArg, #copyM3U8, #copyMPD, #copyOther, #Player").on("input", function () {
     const Option = this.id;
-    chrome.storage.sync.set({ [Option]: $(this).val() });
+    let val = $(this).val();
+    if(Option == "OtherAutoClear"){
+        val = parseInt(val);
+    }
+    chrome.storage.sync.set({ [Option]: val });
 });
 // 调试模式 使用网页标题做文件名 使用PotPlayer预览 显示网站图标 刷新自动清理
 $("#Debug, #TitleName, #ShowWebIco, #m3u8dl, #refreshClear").bind("click", function () {
@@ -292,7 +296,7 @@ function Save(option) {
         let Ext = new Array();
         $("#extList tr").each(function () {
             let GetText = $(this).find("#text").val();
-            let GetSize = $(this).find("#size").val();
+            let GetSize = parseInt($(this).find("#size").val());
             let GetState = $(this).find("#state").prop("checked");
             if (isEmpty(GetText)) { return true; }
             if (isEmpty(GetSize)) { GetSize = 0; }
@@ -305,7 +309,7 @@ function Save(option) {
         let Type = new Array();
         $("#typeList tr").each(function () {
             let GetText = $(this).find("#text").val();
-            let GetSize = $(this).find("#size").val();
+            let GetSize = parseInt($(this).find("#size").val());
             let GetState = $(this).find("#state").prop("checked");
             if (isEmpty(GetText)) { return true; }
             if (isEmpty(GetSize)) { GetSize = 0; }
