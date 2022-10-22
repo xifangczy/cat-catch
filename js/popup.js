@@ -22,7 +22,7 @@ chrome.storage.local.get({ "MediaData": {} }, function (items) {
 chrome.runtime.onMessage.addListener(function (MediaData, sender, sendResponse) {
     const html = AddMedia(MediaData);
     MediaData.tabId == G.tabId && mediaList.append(html);
-    !allTabFlag && allMediaList.append(html);
+    !allTabFlag && allMediaList.append(html.clone(true, true));
     UItoggle();
     sendResponse("OK");
 });
@@ -271,18 +271,16 @@ $(".Tabs .TabButton").click(function () {
 });
 // 所有数据标签 遍历所有数据
 $("#allTab").click(function () {
-    if (allTabFlag) {
+    allTabFlag && chrome.storage.local.get({ "MediaData": {} }, function (items) {
         allTabFlag = false;
-        chrome.storage.local.get({ "MediaData": {} }, function (items) {
-            if (items.MediaData === undefined) { return; }
-            for (let key in items.MediaData) {
-                for (let item of items.MediaData[key]) {
-                    allMediaList.append(AddMedia(item));
-                }
+        if (items.MediaData === undefined) { return; }
+        for (let key in items.MediaData) {
+            for (let item of items.MediaData[key]) {
+                allMediaList.append(AddMedia(item));
             }
-            UItoggle();
-        });
-    }
+        }
+        UItoggle();
+    });
 });
 //设置
 $("#Options").click(function () {
