@@ -267,11 +267,14 @@ $(".Tabs .TabButton").click(function () {
     $(this).addClass("Active");
     $(".mediaList").removeClass("TabShow");
     $(".mediaList").eq(index).addClass("TabShow");
-    // 点击所有数据标签 遍历所有数据
-    if (this.id == "allTab" && allTabFlag) {
+    UItoggle();
+});
+// 所有数据标签 遍历所有数据
+$("#allTab").click(function () {
+    if (allTabFlag) {
         allTabFlag = false;
         chrome.storage.local.get({ "MediaData": {} }, function (items) {
-            if (items.MediaData === undefined) { UItoggle(); return; }
+            if (items.MediaData === undefined) { return; }
             for (let key in items.MediaData) {
                 for (let item of items.MediaData[key]) {
                     allMediaList.append(AddMedia(item));
@@ -279,9 +282,7 @@ $(".Tabs .TabButton").click(function () {
             }
             UItoggle();
         });
-        return true;
     }
-    UItoggle();
 });
 //设置
 $("#Options").click(function () {
@@ -499,7 +500,6 @@ function UItoggle() {
     } else if ($('#down').is(":hidden")) {
         $('#down').show();
     }
-    // $(document).scrollTop($(document).height());
 }
 
 function Tips(text, delay = 200) {
