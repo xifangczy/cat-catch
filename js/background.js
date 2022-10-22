@@ -346,6 +346,11 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         clearRedundant();
         return true;
     }
+    // 清理冗余数据
+    if (Message.Message == "clearRedundant") {
+        clearRedundant();
+        return true;
+    }
     // 从 content-script 或 catch-script 传来的媒体url
     if (Message.Message == "addMedia") {
         chrome.tabs.query({}, function (tabs) {
