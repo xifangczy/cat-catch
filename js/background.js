@@ -340,15 +340,20 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // 清理数据
     if (Message.Message == "clearData") {
-        delete cacheData[Message.tabId];
-        delete cacheData[-1];
+        if (Message.type) {
+            delete cacheData[Message.tabId];
+        } else {
+            cacheData = {};
+        }
         chrome.storage.local.set({ MediaData: cacheData });
         clearRedundant();
+        sendResponse("OK");
         return true;
     }
     // 清理冗余数据
     if (Message.Message == "clearRedundant") {
         clearRedundant();
+        sendResponse("OK");
         return true;
     }
     // 从 content-script 或 catch-script 传来的媒体url

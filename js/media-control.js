@@ -43,6 +43,7 @@
            _tabId = parseInt(currentTabId);
        }
        chrome.tabs.sendMessage(_tabId, { Message: "getVideoState", index: _index }, function (state) {
+        // console.log(state);
            if (chrome.runtime.lastError || state.count == 0) { return; }
            if (state.type == "audio") {
                $("#pip").hide();
@@ -71,7 +72,7 @@
    }
    // 点击其他设置标签页 开始读取tab信息以及视频信息
    getVideoTag();
-   $("#OtherOptions").click(function () {
+   $("#otherTab").click(function () {
        chrome.tabs.get(G.mediaControl.tabid, function (tab) {
            if (chrome.runtime.lastError) {
                _tabId = -1;

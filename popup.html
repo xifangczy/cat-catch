@@ -7,25 +7,23 @@
     <script src="lib/jquery.min.js"></script>
   </head>
   <body>
-    <div id="ToBottom" class="hide">到最底部↓</div>
     <div class="Tabs">
-      <div id="ActiveTab" class="TabButton Active">
+      <div id="currentTab" class="TabButton Active">
         当前页面
-        <div id="mediaQuantity"></div>
+        <div id="quantity"></div>
       </div>
       <div id="allTab" class="TabButton">
         全部数据
-        <div id="allQuantity"></div>
+        <div id="quantity"></div>
       </div>
-      <div id="OtherOptions" class="TabButton">
+      <div id="otherTab" class="TabButton">
         媒体控制 / 其他功能
       </div>
     </div>
     <div id="Tips">数据载入中...</div>
     <div id="TipsFixed">~</div>
-    <div id="mediaList" class="mediaList TabShow hide"></div>
-    <div id="allMediaList" class="mediaList hide"></div>
-    <div id="otherOptions" class="mediaList hide">
+    <div id="mediaList" class="container hide TabShow"></div>
+    <div id="otherOptions" class="container hide">
     <div class="otherTips">媒体控制</div>
     <div class="flexRow">
       <b class="nowrap">选择网页:</b>
