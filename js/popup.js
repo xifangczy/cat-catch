@@ -1,11 +1,13 @@
-// 当前页面 资源DOM 虚拟DOM 计数DOM 计数
+// 当前页面 资源DOM 计数DOM 计数
 const $mediaList = $('#mediaList');
-const $current = $("<div>");
+// const $current = $("<div>");
+const $current = [];
 const $currentCount = $("#currentTab #quantity");
 let currentCount = 0;
-// 其他页面 资源DOM 虚拟DOM 计数DOM 计数
+// 其他页面 资源DOM 计数DOM 计数
 const $allMediaList = $('#allMediaList');
-const $all = $("<div>");
+// const $all = $("<div>");
+const $all = [];
 const $allCount = $("#allTab #quantity");
 let allCount = 0;
 // 提示 操作按钮 DOM
@@ -25,9 +27,11 @@ chrome.storage.local.get("MediaData", function (items) {
     }
     for (let key in items.MediaData[G.tabId]) {
         currentCount++;
-        $current.append(AddMedia(items.MediaData[G.tabId][key]));
+        // $current.append(AddMedia(items.MediaData[G.tabId][key]));
+        $current.push(AddMedia(items.MediaData[G.tabId][key]));
     }
     $mediaList.append($current);
+    delete $current;
     UItoggle();
 });
 // 监听资源数据
@@ -35,11 +39,13 @@ chrome.runtime.onMessage.addListener(function (MediaData, sender, sendResponse) 
     const html = AddMedia(MediaData);
     if (MediaData.tabId == G.tabId) {
         currentCount++;
-        $current.append(html);
+        // $current.append(html);
+        $mediaList.append(html);
         UItoggle();
     } else if (allCount) {
         allCount++;
-        $all.append(html);
+        // $all.append(html);
+        $allMediaList.append(html);
         UItoggle();
     }
     sendResponse("OK");
@@ -297,10 +303,12 @@ $('#allTab').click(function () {
             if (key == G.tabId) { continue; }
             for (let item of items.MediaData[key]) {
                 allCount++;
-                $all.append(AddMedia(item));
+                // $all.append(AddMedia(item));
+                $all.push(AddMedia(item));
             }
         }
         $allMediaList.append($all);
+        delete $all;
         UItoggle();
     });
 });
@@ -401,7 +409,6 @@ const interval = setInterval(function () {
     clearInterval(interval);
     // 获取模拟手机 自动下载 捕获 状态
     chrome.runtime.sendMessage({ Message: "getButtonState", tabId: G.tabId }, function (state) {
-        console.log(state);
         if (state.mobile) {
             $("#MobileUserAgent").html("关闭模拟").data("switch", "off");
         }
