@@ -25,6 +25,7 @@ https://o2bmm.gitbook.io/cat-catch/
 
 # 👻幽灵数据？
 一个Chromium的BUG 不明原因的某资源不会标记来自哪个网页，1.0.17之前版本会直接丢弃该数据。之后得到修复并称这部分数据称为“幽灵数据”。
+2.2.8版之后 幽灵数据标签改为其他页面，幽灵数据都归类其他页面内。
 
 # 🔍界面
 ![界面](https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/popup.png)
