@@ -1,210 +1,49 @@
-const mediaList = $('#mediaList');
-const currentCount = $("#currentTab #quantity");
-const allCount = $("#allTab #quantity");
-const $current = $("<div id='current' class='hide TabShow'>");
-const $all = $("<div id='all' class='hide'>");
+// 当前页面 资源DOM 虚拟DOM 计数DOM 计数
+const $mediaList = $('#mediaList');
+const $current = $("<div>");
+const $currentCount = $("#currentTab #quantity");
+let currentCount = 0;
+// 其他页面 资源DOM 虚拟DOM 计数DOM 计数
+const $allMediaList = $('#allMediaList');
+const $all = $("<div>");
+const $allCount = $("#allTab #quantity");
+let allCount = 0;
+// 提示 操作按钮 DOM
+const $tips = $("#Tips");
+const $down = $("#down");
 // HeartBeat
 chrome.runtime.sendMessage(chrome.runtime.id, { Message: "HeartBeat" });
 // 清理冗余数据
 chrome.runtime.sendMessage(chrome.runtime.id, { Message: "clearRedundant" });
-// 监听下载下载失败 传递referer重试下载
-const downData = [];
-chrome.downloads.onChanged.addListener(function (item) {
-    if (item.error && downData[item.id]) {
-        catDownload(downData[item.id]);
-    }
-});
 // 填充数据
 chrome.storage.local.get("MediaData", function (items) {
-    if (items.MediaData === undefined || items.MediaData[G.tabId] === undefined) {
-        $("#Tips").html("还没闻到味儿~");
+    if (items.MediaData === undefined || items.MediaData[G.tabId] == undefined) {
+        $tips.html("还没闻到味儿~");
         return;
     }
-    $("#Tips").hide();
     for (let key in items.MediaData[G.tabId]) {
+        currentCount++;
         $current.append(AddMedia(items.MediaData[G.tabId][key]));
     }
-    currentCount.text("[" + ($current.children(".panel").length) + "]");
-    mediaList.append($current);
+    $mediaList.append($current);
+    UItoggle();
 });
 // 监听数据
 chrome.runtime.onMessage.addListener(function (MediaData, sender, sendResponse) {
+    const html = AddMedia(MediaData);
     if (MediaData.tabId == G.tabId) {
-        $current.append(AddMedia(MediaData));
-        if (!currentCount.text()) { mediaList.append($current); }
-        currentCount.text("[" + $current.children(".panel").length + "]");
-    }else if(allCount.text()){
-        $all.append(AddMedia(MediaData));
+        currentCount++;
+        $current.append(html);
+        UItoggle();
+    } else if (allCount) {
+        allCount++;
+        $all.append(html);
+        UItoggle();
     }
-    allCount.text() && allCount.text("[" + $(".panel").length + "]");
     sendResponse("OK");
 });
 
-/********************绑定事件********************/
-// 标签切换
-$(".Tabs .TabButton").click(function () {
-    $(".Tabs .TabButton").removeClass('Active');
-    $(this).addClass("Active");
-    $(".container").removeClass("TabShow");
-    $('#down').show();
-    $("#Tips").show();
-    if (this.id == "otherTab") {
-        $("#Tips").hide();
-        $('#down').hide();
-        $("#otherOptions").addClass("TabShow");
-        return;
-    }
-    mediaList.addClass("TabShow");
-    if (this.id == "currentTab") {
-        $all.removeClass("TabShow");
-        $current.children(".panel").length && $("#Tips").hide();
-    }
-    if (this.id == "allTab") {
-        $all.addClass("TabShow");
-        $all.children(".panel").length ? $("#Tips").hide() : getAllData();
-    }
-});
-// 设置
-$("#Options").click(function () {
-    chrome.tabs.create({ url: '/options.html' });
-});
-// 下载选中文件
-$('#DownFile').click(function () {
-    const checked = $('#mediaList .TabShow :checked');
-    if (checked.length >= 10 && !confirm("共 " + checked.length + "个文件，是否确认下载?")) {
-        return;
-    }
-    checked.each(function () {
-        const link = $(this).parents(".panel").find(".url a");
-        const url = link.attr("href");
-        const filename = "CatCatch/" + link.attr("download");
-        const initiator = link.data("initiator");
-        setTimeout(function () {
-            chrome.downloads.download({
-                url: url,
-                filename: filename
-            }, function (id) {
-                downData[id] = { url: url, downFileName: filename, initiator: initiator };
-            });
-        }, 500);
-    });
-});
-// 复制选中文件
-$('#AllCopy').click(function () {
-    const checked = $('#mediaList .TabShow :checked');
-    if (checked.length == 0) { return false };
-    let url = '';
-    checked.each(function () {
-        url += $(this).parents('.panel').find('.url a').attr('href') + "\n";
-    });
-    navigator.clipboard.writeText(url);
-    Tips("已复制到剪贴板");
-});
-// 全选
-$('#AllSelect').click(function () {
-    $('#mediaList .TabShow input').each(function () {
-        $(this).prop("checked", true);
-    });
-});
-// 反选
-$('#ReSelect').click(function () {
-    $('#mediaList .TabShow input').each(function () {
-        $(this).prop('checked', !$(this).prop('checked'));
-    });
-});
-//清空数据
-$('#Clear').click(function () {
-    chrome.runtime.sendMessage({ Message: "clearData", tabId: G.tabId, type: $('.Active').attr("id") == "currentTab" });
-    chrome.runtime.sendMessage({ Message: "ClearIcon" });
-    location.reload();
-});
-// 获取模拟手机 自动下载 捕获 状态
-chrome.runtime.sendMessage({ Message: "getButtonState", tabId: G.tabId }, function (state) {
-    if (state.mobile) {
-        $("#MobileUserAgent").html("关闭模拟").data("switch", "off");
-    }
-    if (state.autodown) {
-        Tips("已关闭自动下载", 500);
-    }
-    if (state.catch) {
-        $("#Catch").html("关闭脚本").data("switch", "off");
-    }
-});
-// 模拟手机端
-$("#MobileUserAgent").click(function () {
-    const action = $(this).data("switch");
-    chrome.runtime.sendMessage({ Message: "mobileUserAgent", tabId: G.tabId, action: action }, function () {
-        G.refreshClear ? $('#Clear').click() : location.reload();
-    });
-});
-// 自动下载
-$("#AutoDown").click(function () {
-    const action = $(this).data("switch");
-    if (action == "on") {
-        if (confirm("找到资源立刻尝试下载\n开启后再点击扩展图标将结束自动下载\n是否确认开启?")) {
-            $("#AutoDown").html("关闭下载").data("switch", "off");
-            chrome.runtime.sendMessage({ Message: "autoDown", tabId: G.tabId, action: action });
-        }
-    } else {
-        $("#AutoDown").html("自动下载").data("switch", "on");
-        chrome.runtime.sendMessage({ Message: "autoDown", tabId: G.tabId, action: action });
-    }
-});
-
-// 其他功能按钮
-$(".otherFeat .button2").click(function () {
-    let url = $(this).data("go");
-    chrome.tabs.create({ url: url });
-});
-
-//102以上开启捕获按钮
-if (G.version >= 102) {
-    $("#Catch").show();
-    $("#otherScript").show();
-}
-// Firefox 关闭画中画 全屏 修复右边滚动条遮挡
-if (G.isFirefox) {
-    $("#pip").hide();
-    $("#fullScreen").hide();
-    $("body").addClass("fixFirefoxRight");
-}
-
-// 解决浏览器字体设置超过16px按钮变高遮挡一条资源
-if ($("#down").height() > 30) {
-    const downHeigth = $("#down").height();
-    $(".mediaList").css("margin-bottom", (downHeigth + 2) + "px");
-}
-
-// 一些需要等待G变量加载完整的操作
-const interval = setInterval(function () {
-    if (!G.initComplete) { return; }
-    clearInterval(interval);
-    // 捕获按钮
-    if ($("#Catch").data("switch") != "off") {
-        G.injectScript = G.scriptList.has(G.injectScript) ? G.injectScript : GetDefault("injectScript");
-        $("#Catch").html(G.scriptList.get(G.injectScript).name);
-    }
-    $("#Catch").click(function () {
-        chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId });
-        G.refreshClear && $('#Clear').click();
-        location.reload();
-    });
-    G.scriptList.forEach(function (value, key) {
-        let button = $(`<button data-script="${key}" class="button2">${value.name}</button>`);
-        button.click(function () {
-            chrome.storage.sync.set({ injectScript: this.dataset.script }, function () {
-                chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId });
-                G.refreshClear && $('#Clear').click();
-            });
-        });
-        $(".otherScript").append(button);
-    });
-
-    // 上一次设定的倍数
-    $("#playbackRate").val(G.playbackRate);
-}, 10);
-/********************绑定事件 END********************/
-
+// 生成资源DOM
 function AddMedia(data) {
     // console.log(data);
     data.title = stringModify(data.title);
@@ -430,23 +269,163 @@ function AddMedia(data) {
     return html;
 }
 
-function getAllData() {
-    chrome.storage.local.get("MediaData", function (items) {
+/********************绑定事件********************/
+//标签切换
+$(".Tabs .TabButton").click(function () {
+    const index = $(this).index();
+    $(".Tabs .TabButton").removeClass('Active');
+    $(this).addClass("Active");
+    $(".container").removeClass("TabShow");
+    $(".container").eq(index).addClass("TabShow");
+    UItoggle();
+});
+// 其他页面
+$('#allTab').click(function () {
+    !allCount && chrome.storage.local.get("MediaData", function (items) {
         if (items.MediaData === undefined) { return; }
         for (let key in items.MediaData) {
             if (key == G.tabId) { continue; }
             for (let item of items.MediaData[key]) {
+                allCount++;
                 $all.append(AddMedia(item));
             }
         }
-        mediaList.append($all);
-        const length = $('.panel').length;
-        if (length) {
-            $("#Tips").hide();
-            allCount.text("[" + length + "]");
-        }
+        $allMediaList.append($all);
+        UItoggle();
     });
+});
+// 下载选中文件
+$('#DownFile').click(function () {
+    const checked = $('.TabShow :checked');
+    if (checked.length >= 10 && !confirm("共 " + checked.length + "个文件，是否确认下载?")) {
+        return;
+    }
+    checked.each(function () {
+        const link = $(this).parents(".panel").find(".url a");
+        const url = link.attr("href");
+        const filename = "CatCatch/" + link.attr("download");
+        const initiator = link.data("initiator");
+        setTimeout(function () {
+            chrome.downloads.download({
+                url: url,
+                filename: filename
+            }, function (id) {
+                downData[id] = { url: url, downFileName: filename, initiator: initiator };
+            });
+        }, 500);
+    });
+});
+// 复制选中文件
+$('#AllCopy').click(function () {
+    const checked = $('.TabShow :checked');
+    if (checked.length == 0) { return false };
+    let url = '';
+    checked.each(function () {
+        url += $(this).parents('.panel').find('.url a').attr('href') + "\n";
+    });
+    navigator.clipboard.writeText(url);
+    Tips("已复制到剪贴板");
+});
+// 全选
+$('#AllSelect').click(function () {
+    $('.TabShow input').each(function () {
+        $(this).prop("checked", true);
+    });
+});
+// 反选
+$('#ReSelect').click(function () {
+    $('.TabShow input').each(function () {
+        $(this).prop('checked', !$(this).prop('checked'));
+    });
+});
+// 清空数据
+$('#Clear').click(function () {
+    chrome.runtime.sendMessage({ Message: "clearData", tabId: G.tabId, type: $('.Active').attr("id") == "currentTab" });
+    chrome.runtime.sendMessage({ Message: "ClearIcon" });
+    location.reload();
+});
+// 获取模拟手机 自动下载 捕获 状态
+chrome.runtime.sendMessage({ Message: "getButtonState", tabId: G.tabId }, function (state) {
+    if (state.mobile) {
+        $("#MobileUserAgent").html("关闭模拟").data("switch", "off");
+    }
+    if (state.autodown) {
+        Tips("已关闭自动下载", 500);
+    }
+    if (state.catch) {
+        $("#Catch").html("关闭脚本").data("switch", "off");
+    }
+});
+// 模拟手机端
+$("#MobileUserAgent").click(function () {
+    const action = $(this).data("switch");
+    chrome.runtime.sendMessage({ Message: "mobileUserAgent", tabId: G.tabId, action: action }, function () {
+        G.refreshClear ? $('#Clear').click() : location.reload();
+    });
+});
+// 自动下载
+$("#AutoDown").click(function () {
+    const action = $(this).data("switch");
+    if (action == "on") {
+        if (confirm("找到资源立刻尝试下载\n开启后再点击扩展图标将结束自动下载\n是否确认开启?")) {
+            $("#AutoDown").html("关闭下载").data("switch", "off");
+            chrome.runtime.sendMessage({ Message: "autoDown", tabId: G.tabId, action: action });
+        }
+    } else {
+        $("#AutoDown").html("自动下载").data("switch", "on");
+        chrome.runtime.sendMessage({ Message: "autoDown", tabId: G.tabId, action: action });
+    }
+});
+// 102以上开启 捕获按钮/注入脚本
+if (G.version >= 102) {
+    $("#Catch").show();
+    $("#otherScript").show();
 }
+// Firefox 关闭画中画 全屏 修复右边滚动条遮挡
+if (G.isFirefox) {
+    $("#pip").hide();
+    $("#fullScreen").hide();
+    $("body").addClass("fixFirefoxRight");
+}
+// 解决浏览器字体设置超过16px按钮变高遮挡一条资源
+if ($down.height() > 30) {
+    const downHeigth = $down.height();
+    $(".mediaList").css("margin-bottom", (downHeigth + 2) + "px");
+}
+// 功能入口
+$(".otherFeat .button2").click(function () {
+    let url = $(this).data("go");
+    chrome.tabs.create({ url: url });
+});
+// 一些需要等待G变量加载完整的操作
+const interval = setInterval(function () {
+    if (!G.initComplete) { return; }
+    clearInterval(interval);
+    // 捕获按钮
+    if ($("#Catch").data("switch") != "off") {
+        G.injectScript = G.scriptList.has(G.injectScript) ? G.injectScript : GetDefault("injectScript");
+        $("#Catch").html(G.scriptList.get(G.injectScript).name);
+    }
+    $("#Catch").click(function () {
+        chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId });
+        G.refreshClear && $('#Clear').click();
+        location.reload();
+    });
+    G.scriptList.forEach(function (value, key) {
+        let button = $(`<button data-script="${key}" class="button2">${value.name}</button>`);
+        button.click(function () {
+            chrome.storage.sync.set({ injectScript: this.dataset.script }, function () {
+                chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId });
+                G.refreshClear && $('#Clear').click();
+            });
+        });
+        $(".otherScript").append(button);
+    });
+
+    // 上一次设定的倍数
+    $("#playbackRate").val(G.playbackRate);
+}, 10);
+/********************绑定事件END********************/
 /* 格式判断 */
 function isPlay(data) {
     if (G.Player && !isJSON(data) && !isPicture(data)) { return true; }
@@ -486,7 +465,7 @@ function isPicture(data) {
         data.ext == "webp"
     )
 }
-// 携带referer 下载
+// 猫抓下载器 下载
 function catDownload(obj) {
     chrome.tabs.get(G.tabId, function (tab) {
         chrome.tabs.create({
@@ -501,8 +480,25 @@ function catDownload(obj) {
         });
     });
 }
-
 // 提示
 function Tips(text, delay = 200) {
     $('#TipsFixed').html(text).fadeIn(500).delay(delay).fadeOut(500);
+}
+
+/*
+* 有资源 隐藏无资源提示
+* 更新数量显示
+* 如果标签是其他设置 隐藏底部按钮
+*/
+function UItoggle() {
+    let length = $('.TabShow .panel').length;
+    length > 0 ? $tips.hide() : $tips.show().html("还没闻到味儿~");
+    currentCount && $currentCount.text("[" + currentCount + "]");
+    allCount && $allCount.text("[" + allCount + "]");
+    if ($('.TabShow').attr("id") == "otherOptions") {
+        $tips.hide();
+        $down.hide();
+    } else if ($down.is(":hidden")) {
+        $down.show();
+    }
 }
