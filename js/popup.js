@@ -30,7 +30,7 @@ chrome.storage.local.get("MediaData", function (items) {
     $mediaList.append($current);
     UItoggle();
 });
-// 监听数据
+// 监听资源数据
 chrome.runtime.onMessage.addListener(function (MediaData, sender, sendResponse) {
     const html = AddMedia(MediaData);
     if (MediaData.tabId == G.tabId) {
@@ -44,6 +44,7 @@ chrome.runtime.onMessage.addListener(function (MediaData, sender, sendResponse) 
     }
     sendResponse("OK");
 });
+// 监听下载 出现服务器拒绝错误 调用下载器
 chrome.downloads.onChanged.addListener(function (item) {
     const errorList = ["SERVER_BAD_CONTENT", "SERVER_UNAUTHORIZED", "SERVER_UNAUTHORIZED", "SERVER_FORBIDDEN", "SERVER_UNREACHABLE", "SERVER_CROSS_ORIGIN_REDIRECT"];
     if (item.error && errorList.includes(item.error.current) && downData[item.id]) {
@@ -349,21 +350,9 @@ $('#ReSelect').click(function () {
 });
 // 清空数据
 $('#Clear').click(function () {
-    chrome.runtime.sendMessage({ Message: "clearData", tabId: G.tabId, type: $('.Active').attr("id") == "currentTab" });
+    chrome.runtime.sendMessage({ Message: "clearData", tabId: G.tabId, type: $('.Active').attr("id") != "allTab" });
     chrome.runtime.sendMessage({ Message: "ClearIcon" });
     location.reload();
-});
-// 获取模拟手机 自动下载 捕获 状态
-chrome.runtime.sendMessage({ Message: "getButtonState", tabId: G.tabId }, function (state) {
-    if (state.mobile) {
-        $("#MobileUserAgent").html("关闭模拟").data("switch", "off");
-    }
-    if (state.autodown) {
-        Tips("已关闭自动下载", 500);
-    }
-    if (state.catch) {
-        $("#Catch").html("关闭脚本").data("switch", "off");
-    }
 });
 // 模拟手机端
 $("#MobileUserAgent").click(function () {
@@ -376,8 +365,8 @@ $("#MobileUserAgent").click(function () {
 $("#AutoDown").click(function () {
     const action = $(this).data("switch");
     if (action == "on") {
-        if (confirm("找到资源立刻尝试下载\n开启后再点击扩展图标将结束自动下载\n是否确认开启?")) {
-            $("#AutoDown").html("关闭下载").data("switch", "off");
+        if (confirm("当前页面找到资源立刻尝试下载\n是否确认开启?")) {
+            $("#AutoDown").html("关闭自动下载").data("switch", "off");
             chrome.runtime.sendMessage({ Message: "autoDown", tabId: G.tabId, action: action });
         }
     } else {
@@ -408,8 +397,22 @@ $(".otherFeat .button2").click(function () {
 });
 // 一些需要等待G变量加载完整的操作
 const interval = setInterval(function () {
-    if (!G.initComplete) { return; }
+    if (!G.initComplete || !G.tabId) { return; }
     clearInterval(interval);
+    // 获取模拟手机 自动下载 捕获 状态
+    chrome.runtime.sendMessage({ Message: "getButtonState", tabId: G.tabId }, function (state) {
+        console.log(state);
+        if (state.mobile) {
+            $("#MobileUserAgent").html("关闭模拟").data("switch", "off");
+        }
+        if (state.autodown) {
+            // Tips("已关闭自动下载", 500);
+            $("#AutoDown").html("关闭自动下载").data("switch", "off");
+        }
+        if (state.catch) {
+            $("#Catch").html("关闭脚本").data("switch", "off");
+        }
+    });
     // 捕获按钮
     if ($("#Catch").data("switch") != "off") {
         G.injectScript = G.scriptList.has(G.injectScript) ? G.injectScript : GetDefault("injectScript");
@@ -494,7 +497,6 @@ function catDownload(obj) {
 function Tips(text, delay = 200) {
     $('#TipsFixed').html(text).fadeIn(500).delay(delay).fadeOut(500);
 }
-
 /*
 * 有资源 隐藏无资源提示
 * 更新数量显示

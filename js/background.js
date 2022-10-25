@@ -253,6 +253,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         sendResponse("error");
         return true;
     }
+    Message.tabId = Message.tabId ?? G.tabId;
     if (Message.Message == "pushData") {
         chrome.storage.local.set({ MediaData: cacheData });
         sendResponse("ok");
@@ -277,7 +278,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     if (Message.Message == "getButtonState") {
         let state = {
             mobile: G.featMobileTabId.includes(Message.tabId),
-            autodown: tabIdListRemove("featAutoDownTabId", Message.tabId), // 点击图标 立刻停止下载
+            autodown: G.featAutoDownTabId.includes(Message.tabId), // 点击图标 立刻停止下载
             catch: G.featCatchTabId.includes(Message.tabId)
         }
         sendResponse(state);
