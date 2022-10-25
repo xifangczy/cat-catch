@@ -11,6 +11,8 @@ let allCount = 0;
 // 提示 操作按钮 DOM
 const $tips = $("#Tips");
 const $down = $("#down");
+// 储存下载id
+const downData = [];
 // HeartBeat
 chrome.runtime.sendMessage(chrome.runtime.id, { Message: "HeartBeat" });
 // 清理冗余数据
@@ -41,6 +43,12 @@ chrome.runtime.onMessage.addListener(function (MediaData, sender, sendResponse) 
         UItoggle();
     }
     sendResponse("OK");
+});
+chrome.downloads.onChanged.addListener(function (item) {
+    const errorList = ["SERVER_BAD_CONTENT", "SERVER_UNAUTHORIZED", "SERVER_UNAUTHORIZED", "SERVER_FORBIDDEN", "SERVER_UNREACHABLE", "SERVER_CROSS_ORIGIN_REDIRECT"];
+    if (item.error && errorList.includes(item.error.current) && downData[item.id]) {
+        catDownload(downData[item.id]);
+    }
 });
 
 // 生成资源DOM
@@ -426,6 +434,7 @@ const interval = setInterval(function () {
     $("#playbackRate").val(G.playbackRate);
 }, 10);
 /********************绑定事件END********************/
+
 /* 格式判断 */
 function isPlay(data) {
     if (G.Player && !isJSON(data) && !isPicture(data)) { return true; }
@@ -465,7 +474,7 @@ function isPicture(data) {
         data.ext == "webp"
     )
 }
-// 猫抓下载器 下载
+// 携带referer 下载
 function catDownload(obj) {
     chrome.tabs.get(G.tabId, function (tab) {
         chrome.tabs.create({
