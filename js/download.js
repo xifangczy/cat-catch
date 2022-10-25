@@ -31,10 +31,11 @@ $(function () {
             xhr: function () {
                 let xhr = new XMLHttpRequest();
                 xhr.addEventListener("progress", function (evt) {
+                    // console.log(byteToSize(evt.total));
                     let progress = Math.round(evt.loaded / evt.total * 10000) / 100.00;
                     if (progress != Infinity) {
                         progress = progress + "%";
-                        $("#downFilepProgress").html(progress);
+                        $("#downFilepProgress").html(byteToSize(evt.loaded) + " " + progress);
                         $(".progress").css("width", progress);
                     } else {
                         $("#downFilepProgress").html("未知大小...");
@@ -58,10 +59,10 @@ $(function () {
         });
     }
 
-    // 监听提示变化修改网页标题
-    $("#downFilepProgress").bind("DOMNodeInserted", function (e) {
-        document.title = e.target.innerHTML;
-    });
+    // 监听提示变化修改网页标题 非常影响效率 取消
+    // $("#downFilepProgress").bind("DOMNodeInserted", function (e) {
+    //     document.title = e.target.innerHTML;
+    // });
 
     // 监听下载事件 修改提示
     chrome.downloads.onChanged.addListener(function (downloadDelta) {

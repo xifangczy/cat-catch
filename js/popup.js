@@ -48,6 +48,7 @@ chrome.downloads.onChanged.addListener(function (item) {
     const errorList = ["SERVER_BAD_CONTENT", "SERVER_UNAUTHORIZED", "SERVER_UNAUTHORIZED", "SERVER_FORBIDDEN", "SERVER_UNREACHABLE", "SERVER_CROSS_ORIGIN_REDIRECT"];
     if (item.error && errorList.includes(item.error.current) && downData[item.id]) {
         catDownload(downData[item.id]);
+        delete downData[item.id];
     }
 });
 
