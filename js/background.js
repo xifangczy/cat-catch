@@ -473,14 +473,14 @@ function fileNameParse(pathname) {
 function getResponseHeadersValue(data) {
     let header = new Array();
     if (data.responseHeaders == undefined) { return header; }
-    for (let item of data.responseHeaders) {
+    data.responseHeaders.forEach(item => {
         switch (item.name.toLowerCase()) {
             case "content-length": header["size"] = item.value; break;
             case "content-type": header["type"] = item.value.split(";")[0].toLowerCase(); break;
             case "content-disposition": header["attachment"] = item.value; break;
             case "content-range": header["range"] = item.value; break;
         }
-    }
+    });
     return header;
 }
 function getReferer(data) {
