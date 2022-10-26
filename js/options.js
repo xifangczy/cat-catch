@@ -29,6 +29,7 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
     $("#Player").val(items.Player);
     $("#injectScript").val(items.injectScript);
     $("#refreshClear").prop("checked", items.refreshClear);
+    $("#catDownload").prop("checked", items.catDownload);
 });
 
 //新增格式
@@ -133,13 +134,13 @@ $("#injectScript, #PlayerTemplate").change(function () {
 $("#OtherAutoClear, #MobileUserAgent, #m3u8dlArg, #copyM3U8, #copyMPD, #copyOther, #Player").on("input", function () {
     const Option = this.id;
     let val = $(this).val();
-    if(Option == "OtherAutoClear"){
+    if (Option == "OtherAutoClear") {
         val = parseInt(val);
     }
     chrome.storage.sync.set({ [Option]: val });
 });
 // 调试模式 使用网页标题做文件名 使用PotPlayer预览 显示网站图标 刷新自动清理
-$("#Debug, #TitleName, #ShowWebIco, #m3u8dl, #refreshClear").bind("click", function () {
+$("#Debug, #TitleName, #ShowWebIco, #m3u8dl, #refreshClear, #catDownload").bind("click", function () {
     const Option = this.id;
     chrome.storage.sync.set({ [Option]: $(this).prop('checked') });
 });

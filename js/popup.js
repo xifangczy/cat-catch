@@ -1,13 +1,11 @@
-// 当前页面 资源DOM 计数DOM 计数
+// 当前页面 资源DOM 新建DOM 计数DOM 计数
 const $mediaList = $('#mediaList');
-// const $current = $("<div>");
-const $current = [];
+const $current = $("<div>");
 const $currentCount = $("#currentTab #quantity");
 let currentCount = 0;
-// 其他页面 资源DOM 计数DOM 计数
+// 其他页面 资源DOM 新建DOM 计数DOM 计数
 const $allMediaList = $('#allMediaList');
-// const $all = $("<div>");
-const $all = [];
+const $all = $("<div>");
 const $allCount = $("#allTab #quantity");
 let allCount = 0;
 // 提示 操作按钮 DOM
@@ -25,13 +23,11 @@ chrome.storage.local.get("MediaData", function (items) {
         $tips.html("还没闻到味儿~");
         return;
     }
-    for (let key in items.MediaData[G.tabId]) {
-        currentCount++;
-        // $current.append(AddMedia(items.MediaData[G.tabId][key]));
-        $current.push(AddMedia(items.MediaData[G.tabId][key]));
+    currentCount = items.MediaData[G.tabId].length;
+    for (let key = 0; key < currentCount; key++) {
+        $current.append(AddMedia(items.MediaData[G.tabId][key]));
     }
     $mediaList.append($current);
-    delete $current;
     UItoggle();
 });
 // 监听资源数据
@@ -39,19 +35,18 @@ chrome.runtime.onMessage.addListener(function (MediaData, sender, sendResponse) 
     const html = AddMedia(MediaData);
     if (MediaData.tabId == G.tabId) {
         currentCount++;
-        // $current.append(html);
-        $mediaList.append(html);
+        $current.append(html);
         UItoggle();
     } else if (allCount) {
         allCount++;
-        // $all.append(html);
-        $allMediaList.append(html);
+        $all.append(html);
         UItoggle();
     }
     sendResponse("OK");
 });
 // 监听下载 出现服务器拒绝错误 调用下载器
 chrome.downloads.onChanged.addListener(function (item) {
+    if (G.catDownload) { delete downData[item.id]; return; }
     const errorList = ["SERVER_BAD_CONTENT", "SERVER_UNAUTHORIZED", "SERVER_UNAUTHORIZED", "SERVER_FORBIDDEN", "SERVER_UNREACHABLE", "SERVER_CROSS_ORIGIN_REDIRECT"];
     if (item.error && errorList.includes(item.error.current) && downData[item.id]) {
         catDownload(downData[item.id]);
@@ -301,14 +296,12 @@ $('#allTab').click(function () {
         if (items.MediaData === undefined) { return; }
         for (let key in items.MediaData) {
             if (key == G.tabId) { continue; }
-            for (let item of items.MediaData[key]) {
-                allCount++;
-                // $all.append(AddMedia(item));
-                $all.push(AddMedia(item));
+            allCount = items.MediaData[key].length;
+            for (let i = 0; i < allCount; i++) {
+                $all.append(AddMedia(items.MediaData[key][i]));
             }
         }
         $allMediaList.append($all);
-        delete $all;
         UItoggle();
     });
 });
@@ -394,14 +387,12 @@ if (G.isFirefox) {
     $("body").addClass("fixFirefoxRight");
 }
 // 解决浏览器字体设置超过16px按钮变高遮挡一条资源
-if ($down.height() > 30) {
-    const downHeigth = $down.height();
-    $(".mediaList").css("margin-bottom", (downHeigth + 2) + "px");
+if ($down[0].offsetHeight > 30) {
+    $(".container").css("margin-bottom", ($down[0].offsetHeight + 2) + "px");
 }
-// 功能入口
-$(".otherFeat .button2").click(function () {
-    let url = $(this).data("go");
-    chrome.tabs.create({ url: url });
+// 跳转页面
+$(".otherFeat .button2, #Options").click(function () {
+    chrome.tabs.create({ url: $(this).data("go") });
 });
 // 一些需要等待G变量加载完整的操作
 const interval = setInterval(function () {
