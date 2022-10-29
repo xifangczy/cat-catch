@@ -9,8 +9,7 @@
   },
   "description": "网页媒体嗅探工具",
   "icons": {
-    "40": "img/icon.png",
-    "48": "img/icon.png",
+    "64": "img/icon.png",
     "128": "img/icon128.png"
   },
   "manifest_version": 3,

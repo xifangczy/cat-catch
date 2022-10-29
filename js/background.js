@@ -126,6 +126,14 @@ function findMedia(data, isRegex = false, filter = false) {
         return;
     }
 
+    // 通过视频范围计算完整视频大小
+    if (header["range"]) {
+        const size = header["range"].match(reRange);
+        if (size) {
+            header["size"] = parseInt(header["size"] * (size[3] / (size[2] - size[1])));
+        }
+    }
+    
     //检查后缀
     if (!isRegex && !filter && ext != undefined) {
         filter = CheckExtension(ext, header["size"]);
@@ -166,13 +174,6 @@ function findMedia(data, isRegex = false, filter = false) {
     if (data.tabId == -1 && cacheData[G.tabId] !== undefined) {
         for (let key in cacheData[G.tabId]) {
             if (cacheData[G.tabId][key].url == data.url) { return; }
-        }
-    }
-    // 通过视频范围计算完整视频大小
-    if (header["range"]) {
-        const size = header["range"].match(reRange);
-        if (size) {
-            header["size"] = parseInt(header["size"] * (size[3] / (size[2] - size[1])));
         }
     }
     const info = {
@@ -253,7 +254,6 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         sendResponse("error");
         return true;
     }
-    Message.tabId = Message.tabId ?? G.tabId;
     if (Message.Message == "pushData") {
         chrome.storage.local.set({ MediaData: cacheData });
         sendResponse("ok");
@@ -275,6 +275,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         }
         return true;
     }
+    Message.tabId = Message.tabId ?? G.tabId;
     if (Message.Message == "getButtonState") {
         let state = {
             mobile: G.featMobileTabId.includes(Message.tabId),

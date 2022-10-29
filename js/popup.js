@@ -114,7 +114,7 @@ function AddMedia(data) {
         <div class="panel" id="requestId${data.requestId}">
             <div class="panel-heading">
                 <input type="checkbox" class="DownCheck" checked="true"/>
-                <img src="${data.favIconUrl ? data.favIconUrl : ""}" class="icon ${G.ShowWebIco && data.favIconUrl ? "" : "hide"}"/>
+                ${G.ShowWebIco && data.favIconUrl ? `<img src="${data.favIconUrl}" class="favicon"/>` : ""}
                 <img src="img/regex.png" class="icon ${data.isRegex ? "" : "hide"}" title="正则表达式匹配 或 来自深度搜索"/>
                 <span class="name">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
@@ -296,8 +296,8 @@ $('#allTab').click(function () {
         if (items.MediaData === undefined) { return; }
         for (let key in items.MediaData) {
             if (key == G.tabId) { continue; }
-            allCount = items.MediaData[key].length;
-            for (let i = 0; i < allCount; i++) {
+            allCount += items.MediaData[key].length;
+            for (let i = 0; i < items.MediaData[key].length; i++) {
                 $all.append(AddMedia(items.MediaData[key][i]));
             }
         }
@@ -330,11 +330,11 @@ $('#DownFile').click(function () {
 $('#AllCopy').click(function () {
     const checked = $('.TabShow :checked');
     if (checked.length == 0) { return false };
-    let url = '';
+    const url = [];
     checked.each(function () {
-        url += $(this).parents('.panel').find('.url a').attr('href') + "\n";
+        url.push($(this).parents('.panel').find('.url a').attr('href'));
     });
-    navigator.clipboard.writeText(url);
+    navigator.clipboard.writeText(url.join("\n"));
     Tips("已复制到剪贴板");
 });
 // 全选

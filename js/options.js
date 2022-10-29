@@ -99,7 +99,7 @@ function Gethtml(Type, Param = new Object()) {
         Save(Type);
     });
     html.find("input").keyup(function () {
-        Save(Type);
+        Save(Type, 500);
     });
     html.find("#state").on("click", function () {
         Save(Type);
@@ -292,52 +292,55 @@ $("#showM3u8Help").bind("click", function () {
 });
 
 // 保存 后缀 类型 正则 配置
-function Save(option) {
-    if (option == "Ext") {
-        let Ext = new Array();
-        $("#extList tr").each(function () {
-            let GetText = $(this).find("#text").val();
-            let GetSize = parseInt($(this).find("#size").val());
-            let GetState = $(this).find("#state").prop("checked");
-            if (isEmpty(GetText)) { return true; }
-            if (isEmpty(GetSize)) { GetSize = 0; }
-            Ext.push({ ext: GetText.toLowerCase(), size: GetSize, state: GetState });
-        });
-        chrome.storage.sync.set({ Ext: Ext });
-        return;
-    }
-    if (option == "Type") {
-        let Type = new Array();
-        $("#typeList tr").each(function () {
-            let GetText = $(this).find("#text").val();
-            let GetSize = parseInt($(this).find("#size").val());
-            let GetState = $(this).find("#state").prop("checked");
-            if (isEmpty(GetText)) { return true; }
-            if (isEmpty(GetSize)) { GetSize = 0; }
-            if (reOptionsType.test(GetText)) {
-                Type.push({ type: GetText.toLowerCase(), size: GetSize, state: GetState });
-            }
-        });
-        chrome.storage.sync.set({ Type: Type });
-        return;
-    }
-    if (option == "Regex") {
-        let Regex = new Array();
-        $("#regexList tr").each(function () {
-            let GetType = $(this).find("#type").val();
-            let GetRegex = $(this).find("#regex").val();
-            let GetExt = $(this).find("#regexExt").val()
-            let GetState = $(this).find("#state").prop("checked");
-            try {
-                new RegExp("", GetType);
-            } catch (e) {
-                GetType = "ig";
-            }
-            if (isEmpty(GetRegex)) { return true; }
-            GetExt = GetExt ? GetExt.toLowerCase() : "";
-            Regex.push({ type: GetType, regex: GetRegex, ext: GetExt, state: GetState });
-        });
-        chrome.storage.sync.set({ Regex: Regex });
-        return;
-    }
+function Save(option, sec = 0) {
+    clearTimeout(debounce);
+    debounce = setTimeout(() => {
+        if (option == "Ext") {
+            let Ext = new Array();
+            $("#extList tr").each(function () {
+                let GetText = $(this).find("#text").val();
+                let GetSize = parseInt($(this).find("#size").val());
+                let GetState = $(this).find("#state").prop("checked");
+                if (isEmpty(GetText)) { return true; }
+                if (isEmpty(GetSize)) { GetSize = 0; }
+                Ext.push({ ext: GetText.toLowerCase(), size: GetSize, state: GetState });
+            });
+            chrome.storage.sync.set({ Ext: Ext });
+            return;
+        }
+        if (option == "Type") {
+            let Type = new Array();
+            $("#typeList tr").each(function () {
+                let GetText = $(this).find("#text").val();
+                let GetSize = parseInt($(this).find("#size").val());
+                let GetState = $(this).find("#state").prop("checked");
+                if (isEmpty(GetText)) { return true; }
+                if (isEmpty(GetSize)) { GetSize = 0; }
+                if (reOptionsType.test(GetText)) {
+                    Type.push({ type: GetText.toLowerCase(), size: GetSize, state: GetState });
+                }
+            });
+            chrome.storage.sync.set({ Type: Type });
+            return;
+        }
+        if (option == "Regex") {
+            let Regex = new Array();
+            $("#regexList tr").each(function () {
+                let GetType = $(this).find("#type").val();
+                let GetRegex = $(this).find("#regex").val();
+                let GetExt = $(this).find("#regexExt").val()
+                let GetState = $(this).find("#state").prop("checked");
+                try {
+                    new RegExp("", GetType);
+                } catch (e) {
+                    GetType = "ig";
+                }
+                if (isEmpty(GetRegex)) { return true; }
+                GetExt = GetExt ? GetExt.toLowerCase() : "";
+                Regex.push({ type: GetType, regex: GetRegex, ext: GetExt, state: GetState });
+            });
+            chrome.storage.sync.set({ Regex: Regex });
+            return;
+        }
+    }, sec);
 }

@@ -39,7 +39,7 @@ body {
 .panel .url {
   padding: 5px;
 }
-.icon {
+.icon, .favicon {
   transition: all 0.1s;
   width: 18px;
   height: 18px;
@@ -49,9 +49,9 @@ body {
   transform: scale(1.1);
 }
 .icon:active {
-  transform: scale(1);
+  transform: scale(0.9);
 }
-.panel-heading .icon{
+.panel-heading .icon, .favicon{
   padding-left: 2px;
   padding-right: 2px;
 }
