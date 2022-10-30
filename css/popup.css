@@ -51,8 +51,11 @@ body {
 .icon:active {
   transform: scale(0.9);
 }
-.panel-heading .icon, .favicon{
+.panel-heading .icon{
   padding-left: 2px;
+  padding-right: 2px;
+}
+.favicon{
   padding-right: 2px;
 }
 .panel-heading .size {

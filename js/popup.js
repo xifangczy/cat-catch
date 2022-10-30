@@ -1,10 +1,10 @@
 // 当前页面 资源DOM 新建DOM 计数DOM 计数
-const $mediaList = $('#mediaList');
+// const $mediaList = $('#mediaList');
 const $current = $("<div>");
 const $currentCount = $("#currentTab #quantity");
 let currentCount = 0;
 // 其他页面 资源DOM 新建DOM 计数DOM 计数
-const $allMediaList = $('#allMediaList');
+// const $allMediaList = $('#allMediaList');
 const $all = $("<div>");
 const $allCount = $("#allTab #quantity");
 let allCount = 0;
@@ -27,7 +27,7 @@ chrome.storage.local.get("MediaData", function (items) {
     for (let key = 0; key < currentCount; key++) {
         $current.append(AddMedia(items.MediaData[G.tabId][key]));
     }
-    $mediaList.append($current);
+    $('#mediaList').append($current);
     UItoggle();
 });
 // 监听资源数据
@@ -107,14 +107,15 @@ function AddMedia(data) {
 
     // 网站图标 不存在 使用duckduckgo图标服务
     if (!data.favIconUrl) {
-        data.favIconUrl = "https://icons.duckduckgo.com/ip3/" + new URL(data.initiator).hostname + ".ico";
+        // data.favIconUrl = "https://icons.duckduckgo.com/ip3/" + new URL(data.initiator).hostname + ".ico";
+        data.favIconUrl = "img/web-favicon.png";
     }
     //添加html
     let html = $(`
         <div class="panel" id="requestId${data.requestId}">
             <div class="panel-heading">
                 <input type="checkbox" class="DownCheck" checked="true"/>
-                ${G.ShowWebIco && data.favIconUrl ? `<img src="${data.favIconUrl}" class="favicon"/>` : ""}
+                ${G.ShowWebIco ? `<img src="${data.favIconUrl}" class="favicon"/>` : ""}
                 <img src="img/regex.png" class="icon ${data.isRegex ? "" : "hide"}" title="正则表达式匹配 或 来自深度搜索"/>
                 <span class="name">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
@@ -301,7 +302,7 @@ $('#allTab').click(function () {
                 $all.append(AddMedia(items.MediaData[key][i]));
             }
         }
-        $allMediaList.append($all);
+        $('#allMediaList').append($all);
         UItoggle();
     });
 });
