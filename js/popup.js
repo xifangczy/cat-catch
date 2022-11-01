@@ -115,7 +115,7 @@ function AddMedia(data) {
                 <input type="checkbox" class="DownCheck" checked="true"/>
                 ${G.ShowWebIco ? `<img src="${data.favIconUrl}" class="favicon"/>` : ""}
                 <img src="img/regex.png" class="icon ${data.isRegex ? "" : "hide"}" title="正则表达式匹配 或 来自深度搜索"/>
-                <span class="name">${trimName}</span>
+                <span class="name ${parsing.switch ? "bold" : ""}">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
                 <img src="img/copy.png" class="icon" id="copy" title="复制地址"/>
                 <img src="img/parsing.png" class="icon ${parsing.switch ? "" : "hide"}" id="${parsing.type}" title="解析"/>
