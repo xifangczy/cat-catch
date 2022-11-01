@@ -1,11 +1,9 @@
 // 当前页面 资源DOM 新建DOM 计数DOM 计数
-// const $mediaList = $('#mediaList');
-const $current = $("<div>");
+const $current = $("<div></div>");
 const $currentCount = $("#currentTab #quantity");
 let currentCount = 0;
 // 其他页面 资源DOM 新建DOM 计数DOM 计数
-// const $allMediaList = $('#allMediaList');
-const $all = $("<div>");
+const $all = $("<div></div>");
 const $allCount = $("#allTab #quantity");
 let allCount = 0;
 // 提示 操作按钮 DOM
