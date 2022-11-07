@@ -1,8 +1,10 @@
-// 当前页面 资源DOM 新建DOM 计数DOM 计数
+// 当前页面
+const $mediaList = $('#mediaList');
 const $current = $("<div></div>");
 const $currentCount = $("#currentTab #quantity");
 let currentCount = 0;
-// 其他页面 资源DOM 新建DOM 计数DOM 计数
+// 其他页面
+const $allMediaList = $('#allMediaList');
 const $all = $("<div></div>");
 const $allCount = $("#allTab #quantity");
 let allCount = 0;
@@ -25,13 +27,14 @@ chrome.storage.local.get("MediaData", function (items) {
     for (let key = 0; key < currentCount; key++) {
         $current.append(AddMedia(items.MediaData[G.tabId][key]));
     }
-    $('#mediaList').append($current);
+    $mediaList.append($current);
     UItoggle();
 });
 // 监听资源数据
 chrome.runtime.onMessage.addListener(function (MediaData, sender, sendResponse) {
     const html = AddMedia(MediaData);
     if (MediaData.tabId == G.tabId) {
+        !currentCount && $mediaList.append($current);
         currentCount++;
         $current.append(html);
         UItoggle();
@@ -300,7 +303,7 @@ $('#allTab').click(function () {
                 $all.append(AddMedia(items.MediaData[key][i]));
             }
         }
-        $('#allMediaList').append($all);
+        allCount && $allMediaList.append($all);
         UItoggle();
     });
 });
