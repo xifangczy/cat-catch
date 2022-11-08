@@ -814,8 +814,8 @@ function getM3u8DlArg() {
     const tsThread = $("#thread").val();  // 线程数量
     m3u8dlArg += ` --maxThreads "${tsThread}"`
 
-    const rangeStart = $("#rangeStart").val();  // 开始序列号
-    const rangeEnd = $("#rangeEnd").val();  // 结束序列号
+    const rangeStart = $("#rangeStart").val() - 1;  // 开始序列号
+    const rangeEnd = $("#rangeEnd").val() - 1;  // 结束序列号
     m3u8dlArg += ` --downloadRange "${rangeStart}-${rangeEnd}"`
 
     let customKey = $("#customKey").val().trim();  // 自定义密钥
