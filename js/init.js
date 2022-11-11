@@ -253,6 +253,7 @@ function byteToSize(byte) {
 }
 // 替换掉不允许的文件名称字符
 function stringModify(str) {
+    if (!str) { return str; }
     return str.replace(reStringModify, function (m) {
         return {
             "'": '&#39;',
