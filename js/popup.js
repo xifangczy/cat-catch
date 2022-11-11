@@ -117,7 +117,7 @@ function AddMedia(data) {
             <div class="panel-heading">
                 <input type="checkbox" class="DownCheck" checked="true"/>
                 ${G.ShowWebIco ? `<img src="${data.favIconUrl}" class="favicon"/>` : ""}
-                <img src="img/regex.png" class="icon ${data.isRegex ? "" : "hide"}" title="正则表达式匹配 或 来自深度搜索"/>
+                <img src="img/regex.png" class="favicon ${data.isRegex ? "" : "hide"}" title="正则表达式匹配 或 来自深度搜索"/>
                 <span class="name ${parsing.switch ? "bold" : ""}">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
                 <img src="img/copy.png" class="icon" id="copy" title="复制地址"/>
