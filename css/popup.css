@@ -213,6 +213,9 @@ body {
 #PlayControl .loop {
   margin: 0 5px 0 5px;
 }
+.label, .label input{
+  cursor: pointer;
+}
 #PlayControl .volume{
   width: 100px;
 }

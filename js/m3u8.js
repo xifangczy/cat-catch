@@ -471,12 +471,6 @@ $(function () {
     $("input").keyup(function () {
         $("#m3u8dlArg").val(getM3u8DlArg());
     });
-    // 切换
-    $(".m3u8checkbox").click(function (event) {
-        if (event.target.nodeName == "DIV") {
-            $(this).find("input").click();
-        }
-    });
     // 只要音频
     $("#onlyAudio").on("change", function () {
         if ($("#onlyAudio").prop("checked") && !$("#mp4").prop("checked")) {
@@ -489,6 +483,7 @@ $(function () {
         }
     });
     // 范围 线程数 滚轮调节
+    let debounce2 = undefined;
     $("#rangeStart, #rangeEnd, #thread").on("wheel", function (event) {
         $(this).blur();
         let number = parseInt($(this).val());
@@ -498,16 +493,28 @@ $(function () {
         }
         $(this).val(number);
         $("#m3u8dlArg").val(getM3u8DlArg());
-        this.id == "thread" && chrome.storage.local.set({ thread: number });
+        if(this.id == "thread"){
+            clearTimeout(debounce2);
+            debounce2 = setTimeout(() => {
+                chrome.storage.local.set({ thread: number });
+            }, 500);
+        }
         return false;
     });
     // 储存设置
     $("#thread, #mp4, #onlyAudio, #saveAs, #skipDecrypt").on("change", function () {
-        let val = $(this).prop("checked");
-        if (this.id == "thread") {
-            val = parseInt($(this).val());
-        }
-        chrome.storage.local.set({ [this.id]: val });
+        const thread = parseInt($("#thread").val());
+        const mp4 = $("#mp4").prop("checked");
+        const onlyAudio = $("#onlyAudio").prop("checked");
+        const saveAs = $("#saveAs").prop("checked");
+        const skipDecrypt = $("#skipDecrypt").prop("checked");
+        chrome.storage.local.set({
+            thread: thread,
+            mp4: mp4,
+            onlyAudio: onlyAudio,
+            saveAs: saveAs,
+            skipDecrypt: skipDecrypt
+        });
     });
     // 上传key
     $("#uploadKeyFile").change(function () {

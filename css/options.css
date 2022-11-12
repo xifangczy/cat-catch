@@ -232,9 +232,6 @@ textarea {
   width: 975px;
   margin: 5px 0 5px 0;
 }
-/* #tips {
-  color: rgb(26, 115, 232);
-} */
 .select {
   appearance: none;
   background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIxMiIgZmlsbD0iIzVGNjM2OCI+PHBhdGggZD0iTTAgMGgyNEwxMiAxMnoiLz48L3N2Zz4=)
@@ -298,16 +295,8 @@ textarea {
   display: flex;
   cursor: pointer;
   flex-direction: column;
-}
-.mp4div,
-.onlyAudio,
-.saveAs
- {
+  user-select: none;
   margin: 0 5px 0 5px;
-}
-.skipDecryptDiv
-{
-  margin: 0 12px 0 5px;
 }
 .merge {
   display: flex;
