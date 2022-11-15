@@ -59,7 +59,6 @@ chrome.downloads.onChanged.addListener(function (item) {
 function AddMedia(data) {
     // console.log(data);
     data.title = stringModify(data.title);
-    data.name = stringModify(data.name);
 
     // 正则匹配的备注扩展
     if (data.extraExt) {
@@ -70,10 +69,8 @@ function AddMedia(data) {
         data.ext = data.type.split("/")[1];
     }
 
-    //文件名是否为空
-    if (data.name === undefined || data.name == '') {
-        data.name = data.title + '.' + data.ext;
-    }
+    //文件名
+    data.name = isEmpty(data.name) ? data.title + '.' + data.ext : stringModify(data.name);
 
     // Youtube
     if (data.name == "videoplayback" && data.url.includes("googlevideo.com")) {
