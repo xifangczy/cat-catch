@@ -36,7 +36,7 @@ table {
 }
 input {
   border: solid 1px rgb(218, 220, 224);
-  padding: 0.5em 0.625em;
+  padding: 5px 5px;
 }
 input.ext {
   width: 100px;
@@ -67,7 +67,7 @@ input#OtherAutoClear {
   width: 45px;
 }
 input#trimTitleRE {
-  margin-left: 295px;
+  margin-left: 200px;
   width: 200px;
 }
 .width100 {
@@ -187,6 +187,7 @@ button:active {
 }
 .otherOption .item {
   margin-bottom: 5px;
+  min-height: 35px;
 }
 #m3u8_url,
 #mpd_url {
