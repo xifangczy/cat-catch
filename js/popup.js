@@ -58,7 +58,8 @@ chrome.downloads.onChanged.addListener(function (item) {
 // 生成资源DOM
 function AddMedia(data) {
     // console.log(data);
-    data.title = stringModify(data.title);
+    data._title = stringModify(data.title);
+    data.title = trimTitle(data._title);
 
     // 正则匹配的备注扩展
     if (data.extraExt) {
@@ -74,7 +75,7 @@ function AddMedia(data) {
 
     // Youtube
     if (data.name == "videoplayback" && data.url.includes("googlevideo.com")) {
-        data.name = data.title.replace(" - YouTube", "") + '.' + data.ext;
+        data.name = data.title + '.' + data.ext;
         const size = data.url.match(/&clen=([\d]*)/);
         data.size = size ? size[1] : 0;
     }
@@ -124,7 +125,7 @@ function AddMedia(data) {
             </div>
             <div class="url hide">
                 <div id="mediaInfo" data-state="false">
-                    ${data.title ? `<b>标题:</b> ${data.title}` : ""}
+                    ${data._title ? `<b>标题:</b> ${data._title}` : ""}
                     ${data.type ? `<br><b>MIME:</b>  ${data.type}` : ""}
                 </div>
                 <div class="moreButton">
@@ -474,6 +475,12 @@ function isPicture(data) {
         data.ext == "gif" ||
         data.ext == "webp"
     )
+}
+// 修剪标题
+function trimTitle(title) {
+    const result = title.match(G.trimTitleRE);
+    title = result ? result[1] : title;
+    return title.trim();
 }
 // 携带referer 下载
 function catDownload(obj) {

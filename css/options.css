@@ -66,6 +66,10 @@ input#OtherAutoClear {
   margin-left: 250px;
   width: 45px;
 }
+input#trimTitleRE {
+  margin-left: 295px;
+  width: 200px;
+}
 .width100 {
   width: 100%;
 }
