@@ -150,7 +150,7 @@ function GetDefault(Obj) {
         case "initComplete": return true;
         case "youtube": return false;
         case "catDownload": return false;
-        case "trimTitleRE": return "([^-]*)[-|–]?";
+        case "trimTitleRE": return "([^-|–]*)";
     }
 }
 // 初始变量
