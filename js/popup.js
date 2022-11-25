@@ -478,9 +478,17 @@ function isPicture(data) {
 }
 // 修剪标题
 function trimTitle(title) {
-    const result = title.match(G.trimTitleRE);
-    title = result ? result[1] : title;
-    return title.trim();
+    if (!G.trimTitleRE) { return title; }
+    try {
+        const result = title.match(G.trimTitleRE);
+        if (result && result.length >= 2) {
+            title = "";
+            for (let i = 1; i < result.length; i++) {
+                title += result[i].trim();
+            }
+        }
+    } catch (e) { console.log(e); return title; }
+    return title;
 }
 // 携带referer 下载
 function catDownload(obj) {

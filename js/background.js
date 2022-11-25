@@ -201,6 +201,7 @@ function findMedia(data, isRegex = false, filter = false) {
         // info.webInfo = webInfo;
         info.favIconUrl = webInfo?.favIconUrl ? webInfo.favIconUrl : undefined;
         info.extraExt = data.extraExt ? data.extraExt : undefined;
+        info.currentUrl = webInfo?.url;
         // 发送到popup 并检查自动下载
         chrome.runtime.sendMessage(info, function () {
             if (data.tabId != -1 && G.featAutoDownTabId && G.featAutoDownTabId.includes(data.tabId)) {
