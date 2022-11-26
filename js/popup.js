@@ -95,13 +95,13 @@ function AddMedia(data) {
     }
 
     // 是否需要解析
-    let parsing = { switch: false, type: "null" };
+    let parsing = false;
     if (isM3U8(data)) {
-        parsing = { switch: true, type: "m3u8" };
+        parsing = "m3u8";
     } else if (isMPD(data)) {
-        parsing = { switch: true, type: "mpd" };
+        parsing = "mpd";
     } else if (isJSON(data)) {
-        parsing = { switch: true, type: "json" };
+        parsing = "json";
     }
 
     // 网站图标 不存在 使用duckduckgo图标服务
@@ -110,16 +110,16 @@ function AddMedia(data) {
         data.favIconUrl = "img/web-favicon.png";
     }
     //添加html
-    let html = $(`
+    const html = $(`
         <div class="panel" id="requestId${data.requestId}">
             <div class="panel-heading">
                 <input type="checkbox" class="DownCheck" checked="true"/>
                 ${G.ShowWebIco ? `<img src="${data.favIconUrl}" class="favicon"/>` : ""}
                 <img src="img/regex.png" class="favicon ${data.isRegex ? "" : "hide"}" title="正则表达式匹配 或 来自深度搜索"/>
-                <span class="name ${parsing.switch ? "bold" : ""}">${trimName}</span>
+                <span class="name ${parsing ? "bold" : ""}">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
                 <img src="img/copy.png" class="icon" id="copy" title="复制地址"/>
-                <img src="img/parsing.png" class="icon ${parsing.switch ? "" : "hide"}" id="${parsing.type}" title="解析"/>
+                <img src="img/parsing.png" class="icon ${parsing ? "" : "hide"}" id="${parsing}" title="解析"/>
                 <img src="img/${G.Player ? "player.png" : "play.png"}" class="icon ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
                 <img src="img/download.png" class="icon" id="download" title="下载"/>
             </div>
@@ -478,7 +478,8 @@ function isPicture(data) {
 }
 // 修剪标题
 function trimTitle(title) {
-    if (!G.trimTitleRE) { return title; }
+    const _title = title;
+    if (!G.trimTitleRE) { return _title; }
     try {
         const result = title.match(G.trimTitleRE);
         if (result && result.length >= 2) {
@@ -487,8 +488,8 @@ function trimTitle(title) {
                 title += result[i].trim();
             }
         }
-    } catch (e) { console.log(e); return title; }
-    return title;
+        return title;
+    } catch (e) { console.log(e); return _title; }
 }
 // 携带referer 下载
 function catDownload(obj) {
