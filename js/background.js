@@ -181,10 +181,11 @@ function findMedia(data, isRegex = false, filter = false) {
         url: data.url,
         size: header["size"],
         ext: ext,
-        type: data.mime ? data.mime : header["type"],
+        type: data.mime ?? header["type"],
         tabId: data.tabId,
         isRegex: isRegex,
         requestId: data.requestId,
+        extraExt: data.extraExt
     };
     const getTabId = data.tabId == -1 ? G.tabId : data.tabId;
     chrome.tabs.get(getTabId, function (webInfo) {
@@ -197,11 +198,8 @@ function findMedia(data, isRegex = false, filter = false) {
         }
         // 装载页面信息
         info.initiator = data.initiator;
-        info.title = webInfo?.title ? webInfo.title : "NULL";
-        // info.webInfo = webInfo;
-        info.favIconUrl = webInfo?.favIconUrl ? webInfo.favIconUrl : undefined;
-        info.extraExt = data.extraExt ? data.extraExt : undefined;
-        info.currentUrl = webInfo?.url;
+        info.title = webInfo?.title ?? "NULL";
+        info.favIconUrl = webInfo?.favIconUrl;
         // 发送到popup 并检查自动下载
         chrome.runtime.sendMessage(info, function () {
             if (data.tabId != -1 && G.featAutoDownTabId && G.featAutoDownTabId.includes(data.tabId)) {
