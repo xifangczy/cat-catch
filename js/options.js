@@ -22,6 +22,7 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
     $("#copyM3U8").val(items.copyM3U8);
     $("#copyMPD").val(items.copyMPD);
     $("#copyOther").val(items.copyOther);
+    $("#saveAs").prop("checked", items.saveAs);
     // 注入脚本列表
     G.scriptList.forEach(function (item, key) {
         $("#injectScript").append(`<option value="${key}">${item.name}(${key})</option>`);
@@ -145,7 +146,7 @@ $("#OtherAutoClear, #MobileUserAgent, #m3u8dlArg, #copyM3U8, #copyMPD, #copyOthe
     }, 300);
 });
 // 调试模式 使用网页标题做文件名 使用PotPlayer预览 显示网站图标 刷新自动清理
-$("#Debug, #TitleName, #ShowWebIco, #m3u8dl, #refreshClear, #catDownload").bind("click", function () {
+$("#Debug, #TitleName, #ShowWebIco, #m3u8dl, #refreshClear, #catDownload, #saveAs").bind("click", function () {
     const Option = this.id;
     chrome.storage.sync.set({ [Option]: $(this).prop('checked') });
 });

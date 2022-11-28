@@ -51,7 +51,8 @@ $(function () {
             try {
                 chrome.downloads.download({
                     url: URL.createObjectURL(result),
-                    filename: _fileName
+                    filename: _fileName,
+                    saveAs: G.saveAs
                 }, function (downloadId) { downId = downloadId });
             } catch (e) {
                 $("#downFilepProgress").html("下载失败... " + e);

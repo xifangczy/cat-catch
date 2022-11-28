@@ -242,7 +242,8 @@ function AddMedia(data) {
         }
         chrome.downloads.download({
             url: data.url,
-            filename: data.downFileName
+            filename: data.downFileName,
+            saveAs: G.saveAs
         }, function (id) { downData[id] = data; });
         return false;
     });
