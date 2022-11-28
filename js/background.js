@@ -185,19 +185,19 @@ function findMedia(data, isRegex = false, filter = false) {
         tabId: data.tabId,
         isRegex: isRegex,
         requestId: data.requestId,
-        extraExt: data.extraExt
+        extraExt: data.extraExt,
+        initiator: data.initiator
     };
     const getTabId = data.tabId == -1 ? G.tabId : data.tabId;
     chrome.tabs.get(getTabId, function (webInfo) {
         if (chrome.runtime.lastError) { return; }
         // 有referer替换掉initiator...如果initiator也没有 使用网页url
         if (data.referer) {
-            data.initiator = data.referer;
-        } else if (data.initiator == undefined || data.initiator == "null") {
-            data.initiator = webInfo?.url;
+            info.initiator = data.referer;
+        } else if (info.initiator == undefined || info.initiator == "null") {
+            info.initiator = webInfo?.url;
         }
         // 装载页面信息
-        info.initiator = data.initiator;
         info.title = webInfo?.title ?? "NULL";
         info.favIconUrl = webInfo?.favIconUrl;
         // 发送到popup 并检查自动下载
