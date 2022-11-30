@@ -4,9 +4,9 @@ const _url = params.get("url");
 const _referer = params.get("referer");
 const _fileName = params.get("filename");
 // 修改当前标签下的所有xhr的Referer
-_referer && setReferer(_referer);
+_referer ? setReferer(_referer, startDownload) : startDownload();
 
-$(function () {
+function startDownload() {
     // 下载的文件ID
     var downId = 0;
     // 没有url 打开输入框
@@ -21,44 +21,41 @@ $(function () {
     }
 
     // 使用ajax下载文件
-    downloadFile();
-    function downloadFile() {
-        $("#downfile").show();
-        $("#downFilepProgress").html("后台下载中...");
-        $.ajax({
-            url: _url,
-            xhrFields: { responseType: "blob" },
-            xhr: function () {
-                let xhr = new XMLHttpRequest();
-                xhr.addEventListener("progress", function (evt) {
-                    // console.log(byteToSize(evt.total));
-                    let progress = Math.round(evt.loaded / evt.total * 10000) / 100.00;
-                    if (progress != Infinity) {
-                        progress = progress + "%";
-                        $("#downFilepProgress").html(byteToSize(evt.loaded) + " " + progress);
-                        $(".progress").css("width", progress);
-                    } else {
-                        $("#downFilepProgress").html("未知大小...");
-                        $(".progress").css("width", "100%");
-                    }
-                });
-                return xhr;
-            }
-        }).fail(function (result) {
-            $("#downFilepProgress").html("下载失败... " + JSON.stringify(result));
-        }).done(function (result) {
-            $("#downFilepProgress").html("下载完成，正在保存到硬盘...");
-            try {
-                chrome.downloads.download({
-                    url: URL.createObjectURL(result),
-                    filename: _fileName,
-                    saveAs: G.saveAs
-                }, function (downloadId) { downId = downloadId });
-            } catch (e) {
-                $("#downFilepProgress").html("下载失败... " + e);
-            }
-        });
-    }
+    $("#downfile").show();
+    $("#downFilepProgress").html("后台下载中...");
+    $.ajax({
+        url: _url,
+        xhrFields: { responseType: "blob" },
+        xhr: function () {
+            let xhr = new XMLHttpRequest();
+            xhr.addEventListener("progress", function (evt) {
+                // console.log(byteToSize(evt.total));
+                let progress = Math.round(evt.loaded / evt.total * 10000) / 100.00;
+                if (progress != Infinity) {
+                    progress = progress + "%";
+                    $("#downFilepProgress").html(byteToSize(evt.loaded) + " " + progress);
+                    $(".progress").css("width", progress);
+                } else {
+                    $("#downFilepProgress").html("未知大小...");
+                    $(".progress").css("width", "100%");
+                }
+            });
+            return xhr;
+        }
+    }).fail(function (result) {
+        $("#downFilepProgress").html("下载失败... " + JSON.stringify(result));
+    }).done(function (result) {
+        $("#downFilepProgress").html("下载完成，正在保存到硬盘...");
+        try {
+            chrome.downloads.download({
+                url: URL.createObjectURL(result),
+                filename: _fileName,
+                saveAs: G.saveAs
+            }, function (downloadId) { downId = downloadId });
+        } catch (e) {
+            $("#downFilepProgress").html("下载失败... " + e);
+        }
+    });
 
     // 监听提示变化修改网页标题 非常影响效率 取消
     // $("#downFilepProgress").bind("DOMNodeInserted", function (e) {
@@ -90,4 +87,4 @@ $(function () {
         }
         chrome.downloads.showDefaultFolder();
     });
-});
+}
