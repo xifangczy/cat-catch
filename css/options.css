@@ -209,6 +209,10 @@ button:active {
   margin: 0 auto;
   width: 1024px;
 }
+.wrapper1080 {
+  margin: 0 auto;
+  width: 1080px;
+}
 textarea {
   font-size: 12px;
   font-family: "Microsoft YaHei", "Helvetica", "Arial", sans-serif;
@@ -231,7 +235,7 @@ textarea {
   color: rgb(26, 115, 232);
 }
 .keyUrl{
-  width: 975px;
+  width: 1034px;
 }
 .fullInput{
   width: 975px;

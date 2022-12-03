@@ -3,6 +3,7 @@ const params = new URL(location.href).searchParams;
 let _m3u8Url = params.get("url");
 const _referer = params.get("referer");
 const _title = params.get("title");
+const tsAddArg = params.get("tsAddArg");
 const getId = parseInt(params.get("getId"));
 const tabId = parseInt(params.get("tabid"));
 // 修改当前标签下的所有xhr的Referer
@@ -241,10 +242,12 @@ $(function () {
             * 少部分网站下载ts必须带有参数才能正常下载
             * ts地址如果没有参数 添加m3u8地址的参数
             */
-            let flag = new RegExp("[?]([^\n]*)").exec(data.fragments[i].url);
-            if (!flag && _m3u8Arg) {
-                data.fragments[i].url = data.fragments[i].url + "?" + _m3u8Arg;
-            }
+           if(tsAddArg && _m3u8Arg){
+                const flag = new RegExp("[?]([^\n]*)").exec(data.fragments[i].url);
+                if (!flag) {
+                    data.fragments[i].url = data.fragments[i].url + "?" + _m3u8Arg;
+                }
+           }
             /* 
             * 查看是否加密 下载key
             * firefox CSP政策不允许在script-src 使用blob 不能直接调用hls.js下载好的密钥
@@ -602,6 +605,15 @@ $(function () {
                 button.click();
             }, index * 233);
         });
+    });
+    // 添加ts 参数
+    _m3u8Arg && $("#tsAddArg").show();
+    $("#tsAddArg").click(function () {
+        if(tsAddArg){
+            window.location.href = window.location.href.replace(/&tsAddArg=[^&]*/g, "");
+            return;
+        }
+        window.location.href = window.location.href + "&tsAddArg=1";
     });
     /**************************** 下载TS文件 ****************************/
     // start 开始下载的索引
