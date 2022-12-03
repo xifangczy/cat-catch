@@ -119,7 +119,7 @@ function AddMedia(data) {
                 <span class="name ${parsing ? "bold" : ""}">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
                 <img src="img/copy.png" class="icon" id="copy" title="复制地址"/>
-                <img src="img/parsing.png" class="icon ${parsing ? "" : "hide"}" id="${parsing}" title="解析"/>
+                <img src="img/parsing.png" class="icon ${parsing ? "" : "hide"}" id="parsing" data-type="${parsing}" title="解析"/>
                 <img src="img/${G.Player ? "player.png" : "play.png"}" class="icon ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
                 <img src="img/download.png" class="icon" id="download" title="下载"/>
             </div>
@@ -132,7 +132,7 @@ function AddMedia(data) {
                     <div id="qrcode"><img src="img/qrcode.png" class="icon" title="显示资源地址二维码"/></div>
                     <div id="catDown"><img src="img/cat-down.png" class="icon" title="携带referer参数下载"/></div>
                 </div>
-                <a href="${data.url}" target="_blank" download="${data.downFileName}" data-initiator="${data.initiator}">${data.url}</a>
+                <a href="${data.url}" target="_blank" download="${data.downFileName}" data-initiator="${data.initiator}" data-title="${data.title}">${data.url}</a>
                 <br>
                 <img id="screenshots" class="hide"/>
                 <video id="preview" class="hide" controls></video>
@@ -205,18 +205,7 @@ function AddMedia(data) {
     });
     //点击复制网址
     html.find('#copy').click(function () {
-        let text = data.url;
-        if (isM3U8(data)) {
-            text = G.copyM3U8;
-        } else if (isMPD(data)) {
-            text = G.copyMPD;
-        } else {
-            text = G.copyOther;
-        }
-        text = text.includes("$url$") ? text : data.url;
-        text = text.replace(/\$url\$/g, data.url);
-        text = text.replace(/\$referer\$/g, data.initiator);
-        text = text.replace(/\$title\$/g, data.title);
+        const text = copyLink(parsing, data);
         navigator.clipboard.writeText(text);
         Tips("已复制到剪贴板");
         return false;
@@ -265,10 +254,10 @@ function AddMedia(data) {
         return false;
     });
     //解析m3u8
-    html.find('#m3u8, #json, #mpd').click(function () {
-        const id = this.id;
+    html.find('#parsing').click(function () {
+        const type = $(this).data("type");
         chrome.tabs.get(G.tabId, function (tab) {
-            let url = `/${id}.html?url=${encodeURIComponent(data.url)}&referer=${encodeURIComponent(data.initiator)}&title=${encodeURIComponent(data.title)}&tabid=${data.tabId}`;
+            let url = `/${type}.html?url=${encodeURIComponent(data.url)}&referer=${encodeURIComponent(data.initiator)}&title=${encodeURIComponent(data.title)}&tabid=${data.tabId}`;
             chrome.tabs.create({ url: url, index: tab.index + 1 });
         });
         return false;
@@ -333,7 +322,15 @@ $('#AllCopy').click(function () {
     if (checked.length == 0) { return false };
     const url = [];
     checked.each(function () {
-        url.push($(this).parents('.panel').find('.url a').attr('href'));
+        const type = $(this).siblings("#parsing").data("type");
+        const link = $(this).parents('.panel').find('.url a');
+        let href = link.attr('href');
+        if (type) {
+            const initiator = link.data('initiator');
+            const title = link.data('title');
+            href = copyLink(type, { url: href, initiator: initiator, title: title });
+        }
+        url.push(href);
     });
     navigator.clipboard.writeText(url.join("\n"));
     Tips("已复制到剪贴板");
@@ -476,6 +473,21 @@ function isPicture(data) {
         data.ext == "gif" ||
         data.ext == "webp"
     )
+}
+// 复制选项
+function copyLink(type, data) {
+    let text = data.url;
+    if (type == "m3u8") {
+        text = G.copyM3U8;
+    } else if (type == "mpd") {
+        text = G.copyMPD;
+    } else {
+        text = G.copyOther;
+    }
+    text = text.includes("$url$") ? text : data.url;
+    text = text.replace(/\$url\$/g, data.url);
+    text = text.replace(/\$referer\$/g, data.initiator);
+    return text.replace(/\$title\$/g, data.title);
 }
 // 修剪标题
 function trimTitle(title) {
