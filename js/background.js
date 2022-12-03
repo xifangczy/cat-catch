@@ -18,9 +18,8 @@ chrome.runtime.onConnect.addListener(function (Port) {
     });
 });
 
-
 chrome.alarms.create("nowClear", { when: Date.now() + 3000 });  // 3秒后清理立即清理一次
-chrome.alarms.create("clear", { periodInMinutes: 30 }); // 30分钟清理一次冗余数据
+chrome.alarms.create("clear", { periodInMinutes: 30 }); // 60分钟清理一次冗余数据
 chrome.alarms.onAlarm.addListener(function (alarm) {
     alarm.name == "clear" && clearRedundant();
     alarm.name == "nowClear" && clearRedundant();

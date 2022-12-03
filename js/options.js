@@ -12,26 +12,28 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
     for (let key in items.Regex) {
         $("#regexList").append(Gethtml("Regex", { type: items.Regex[key].type, regex: items.Regex[key].regex, ext: items.Regex[key].ext, state: items.Regex[key].state }));
     }
-    $("#Debug").prop("checked", items.Debug);
-    $("#TitleName").prop("checked", items.TitleName);
     $("#OtherAutoClear").val(items.OtherAutoClear);
-    $("#ShowWebIco").prop("checked", items.ShowWebIco);
     $("#MobileUserAgent").val(items.MobileUserAgent);
-    $("#m3u8dl").prop("checked", items.m3u8dl);
     $("#m3u8dlArg").val(items.m3u8dlArg);
     $("#copyM3U8").val(items.copyM3U8);
     $("#copyMPD").val(items.copyMPD);
     $("#copyOther").val(items.copyOther);
-    $("#saveAs").prop("checked", items.saveAs);
     // 注入脚本列表
     G.scriptList.forEach(function (item, key) {
         $("#injectScript").append(`<option value="${key}">${item.name}(${key})</option>`);
     });
     $("#Player").val(items.Player);
-    $("#injectScript").val(items.injectScript);
-    $("#refreshClear").prop("checked", items.refreshClear);
-    $("#catDownload").prop("checked", items.catDownload);
     $("#trimTitleRE").val(items.trimTitleRE);
+    setTimeout(() => {
+        $("#Debug").prop("checked", items.Debug);
+        $("#TitleName").prop("checked", items.TitleName);
+        $("#ShowWebIco").prop("checked", items.ShowWebIco);
+        $("#m3u8dl").prop("checked", items.m3u8dl);
+        $("#saveAs").prop("checked", items.saveAs);
+        $("#refreshClear").prop("checked", items.refreshClear);
+        $("#catDownload").prop("checked", items.catDownload);
+        $("#injectScript").val(items.injectScript);
+    }, 100);
 });
 
 //新增格式
