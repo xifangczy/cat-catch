@@ -20,9 +20,12 @@ function startDownload() {
         return;
     }
 
+    const $downFilepProgress = $("#downFilepProgress");
+    const $progress = $("#progress");
+
     // 使用ajax下载文件
     $("#downfile").show();
-    $("#downFilepProgress").html("后台下载中...");
+    $downFilepProgress.html("后台下载中...");
     $.ajax({
         url: _url,
         xhrFields: { responseType: "blob" },
@@ -33,19 +36,19 @@ function startDownload() {
                 let progress = Math.round(evt.loaded / evt.total * 10000) / 100.00;
                 if (progress != Infinity) {
                     progress = progress + "%";
-                    $("#downFilepProgress").html(byteToSize(evt.loaded) + " " + progress);
-                    $(".progress").css("width", progress);
+                    $downFilepProgress.html(byteToSize(evt.loaded) + " " + progress);
+                    $progress.css("width", progress);
                 } else {
-                    $("#downFilepProgress").html("未知大小...");
-                    $(".progress").css("width", "100%");
+                    $downFilepProgress.html("未知大小...");
+                    $progress.css("width", "100%");
                 }
             });
             return xhr;
         }
     }).fail(function (result) {
-        $("#downFilepProgress").html("下载失败... " + JSON.stringify(result));
+        $downFilepProgress.html("下载失败... " + JSON.stringify(result));
     }).done(function (result) {
-        $("#downFilepProgress").html("下载完成，正在保存到硬盘...");
+        $downFilepProgress.html("下载完成，正在保存到硬盘...");
         try {
             chrome.downloads.download({
                 url: URL.createObjectURL(result),
@@ -53,7 +56,7 @@ function startDownload() {
                 saveAs: G.saveAs
             }, function (downloadId) { downId = downloadId });
         } catch (e) {
-            $("#downFilepProgress").html("下载失败... " + e);
+            $downFilepProgress.html("下载失败... " + e);
         }
     });
 
@@ -66,7 +69,7 @@ function startDownload() {
     chrome.downloads.onChanged.addListener(function (downloadDelta) {
         if (!downloadDelta.state) { return; }
         if (downloadDelta.state.current == "complete" && downId != 0) {
-            $("#downFilepProgress").html("已保存到硬盘, 请查看浏览器已下载内容");
+            $downFilepProgress.html("已保存到硬盘, 请查看浏览器已下载内容");
         }
     });
 
