@@ -1,6 +1,12 @@
 ## 更新说明
 ### 2.2.9
-[Fixed] 修复 m3u8DL调用命令范围不正确
+[Fixed] 修复 m3u8DL调用命令范围参数 --downloadRange 不正确
+
+[Added] 正则修剪标题 [#90](https://github.com/xifangczy/cat-catch/issues/94)
+
+[Added] 下载前选择保存目录 选项
+
+[Fixed] m3u8解析器 部分情况无法下载ts文件
 ### 2.2.8
 [Changed] m3u8解析器现在会记忆你设定的参数
 
