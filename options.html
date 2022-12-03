@@ -1,326 +1,322 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>猫抓 设置</title>
-    <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
-    <script src="lib/jquery.min.js"></script>
-    <script src="js/init.js"></script>
-  </head>
 
-  <body>
-    <div class="wrapper">
-      <section>
-        <h1 class="optionsTitle">抓取后缀</h1>
-        <div class="optionBox">
-          <span class="explain">填写不含"."的后缀, 不过滤大小填0</span>
-          <table id="extList">
-            <tr>
-              <th>扩展名</th>
-              <th>过滤大小</th>
-              <th>启用</th>
-              <th>删除</th>
-            </tr>
-          </table>
-          <div class="button">
-            <button type="button" id="AddExt" class="button2">添加后缀</button>
-            <button type="button" id="ResetExt" data-reset="Ext">重置后缀</button>
-            <button type="button" id="allDisable" data-switch="Ext">全部禁用</button>
-            <button type="button" id="allEnable" data-switch="Ext">全部启用</button>
-          </div>
+<head>
+  <meta charset="UTF-8" />
+  <title>猫抓 设置</title>
+  <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
+  <script src="lib/jquery.min.js"></script>
+  <script src="js/init.js"></script>
+</head>
+
+<body>
+  <div class="wrapper">
+    <section>
+      <h1 class="optionsTitle">抓取后缀</h1>
+      <div class="optionBox">
+        <span class="explain">填写不含"."的后缀, 不过滤大小填0</span>
+        <table id="extList">
+          <tr>
+            <th>扩展名</th>
+            <th>过滤大小</th>
+            <th>启用</th>
+            <th>删除</th>
+          </tr>
+        </table>
+        <div class="button">
+          <button type="button" id="AddExt" class="button2">添加后缀</button>
+          <button type="button" id="ResetExt" data-reset="Ext">重置后缀</button>
+          <button type="button" id="allDisable" data-switch="Ext">全部禁用</button>
+          <button type="button" id="allEnable" data-switch="Ext">全部启用</button>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section>
-        <h1 class="optionsTitle">抓取类型</h1>
-        <div class="optionBox">
-          <span class="explain">填入正确的content-type类型, 不过滤大小填0</span>
-          <table id="typeList">
-            <tr>
-              <th>类型</th>
-              <th>过滤大小</th>
-              <th>启用</th>
-              <th>删除</th>
-            </tr>
-          </table>
-          <div class="button">
-            <button type="button" id="AddType" class="button2">添加类型</button>
-            <button type="button" id="ResetType" data-reset="Type">重置类型</button>
-            <button type="button" id="allDisable" data-switch="Type">全部禁用</button>
-            <button type="button" id="allEnable" data-switch="Type">全部启用</button>
-          </div>
+    <section>
+      <h1 class="optionsTitle">抓取类型</h1>
+      <div class="optionBox">
+        <span class="explain">填入正确的content-type类型, 不过滤大小填0</span>
+        <table id="typeList">
+          <tr>
+            <th>类型</th>
+            <th>过滤大小</th>
+            <th>启用</th>
+            <th>删除</th>
+          </tr>
+        </table>
+        <div class="button">
+          <button type="button" id="AddType" class="button2">添加类型</button>
+          <button type="button" id="ResetType" data-reset="Type">重置类型</button>
+          <button type="button" id="allDisable" data-switch="Type">全部禁用</button>
+          <button type="button" id="allEnable" data-switch="Type">全部启用</button>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section>
-        <h1 class="optionsTitle">
-          <img src="img/regex.png" style="width: 18px" />正则匹配
-        </h1>
-        <div class="optionBox">
-          <span class="explain"><b>标志</b> i: 忽略大小写, g: 全局搜索。也可为空。</span><br />
-          <span class="explain"><b>扩展</b> 为获取到的URL指定一个扩展名, 可留空，会自动截取扩展名(很多文件并不存在扩展名)</span><br />
-          <table id="regexList">
-            <tr>
-              <th>标志</th>
-              <th>正则表达式</th>
-              <th>扩展</th>
-              <th>启用</th>
-              <th>删除</th>
-            </tr>
-          </table>
-          <div class="button">
-            <button type="button" id="AddRegex" class="button2">添加正则</button>
-            <button type="button" id="ResetRegex" data-reset="Regex">重置正则</button>
-            <button type="button" id="allDisable" data-switch="Regex">全部禁用</button>
-            <button type="button" id="allEnable" data-switch="Regex">全部启用</button>
-          </div>
-          <span style="font-weight: bold; font-size: 15px">正则测试</span><br />
-          <span>要匹配的URL:</span><br />
-          <input type="text" id="testUrl" style="width: 590px" /><br />
-          <span>正则表达式:</span><br />
-          <input type="text" id="testRegex" style="width: 590px" /><br />
-          <span>标识符:</span><br />
-          <input type="text" id="testFlag" style="width: 20px" value="ig" />
-          结果: <span style="color: #ff0000" id="testResult">不匹配</span>
+    <section>
+      <h1 class="optionsTitle">
+        <img src="img/regex.png" style="width: 18px" />正则匹配
+      </h1>
+      <div class="optionBox">
+        <span class="explain"><b>标志</b> i: 忽略大小写, g: 全局搜索。也可为空。</span><br />
+        <span class="explain"><b>扩展</b> 为获取到的URL指定一个扩展名, 可留空，会自动截取扩展名(很多文件并不存在扩展名)</span><br />
+        <table id="regexList">
+          <tr>
+            <th>标志</th>
+            <th>正则表达式</th>
+            <th>扩展</th>
+            <th>启用</th>
+            <th>删除</th>
+          </tr>
+        </table>
+        <div class="button">
+          <button type="button" id="AddRegex" class="button2">添加正则</button>
+          <button type="button" id="ResetRegex" data-reset="Regex">重置正则</button>
+          <button type="button" id="allDisable" data-switch="Regex">全部禁用</button>
+          <button type="button" id="allEnable" data-switch="Regex">全部启用</button>
         </div>
-      </section>
+        <span style="font-weight: bold; font-size: 15px">正则测试</span><br />
+        <span>要匹配的URL:</span><br />
+        <input type="text" id="testUrl" style="width: 590px" /><br />
+        <span>正则表达式:</span><br />
+        <input type="text" id="testRegex" style="width: 590px" /><br />
+        <span>标识符:</span><br />
+        <input type="text" id="testFlag" style="width: 20px" value="ig" />
+        结果: <span style="color: #ff0000" id="testResult">不匹配</span>
+      </div>
+    </section>
 
-      <section>
-        <h1 class="optionsTitle">
-          复制选项
-        </h1>
-        <div class="optionBox">
-          <span class="explain">
-            为方便使用第三方应用，自定义复制按钮写入剪贴板的内容。<br/><br/>
-            替换关键词<br/>
-            <b>$url$</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 文件URL<br/>
-            <b>$referer$</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 请求头网址<br/>
-            <b>$title$</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 网页标题<br/>
-          </span><br/>
+    <section>
+      <h1 class="optionsTitle">
+        复制选项
+      </h1>
+      <div class="optionBox">
+        <span class="explain">
+          为方便使用第三方应用，自定义复制按钮写入剪贴板的内容。<br /><br />
+          替换关键词<br />
+          <b>$url$</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 文件URL<br />
+          <b>$referer$</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 请求头网址<br />
+          <b>$title$</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 网页标题<br />
+        </span><br />
+        <div class="item">
+          <div>HLS m3u8文件</div>
+          <textarea id="copyM3U8" type="text" class="width100"></textarea>
+        </div>
+        <div class="item" style="margin-top: 10px;">
+          <div>DASH mpb文件</div>
+          <textarea id="copyMPD" type="text" class="width100"></textarea>
+        </div>
+        <div class="item" style="margin-top: 10px;">
+          <div>其他文件</div>
+          <textarea id="copyOther" type="text" class="width100"></textarea>
+        </div>
+        <div class="button">
+          <button type="button" id="ResetCopy">重置复制选项</button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h1 class="optionsTitle"><a href="https://github.com/nilaoda/N_m3u8DL-CLI" target="_blank">N_m3u8DL-CLI</a></h1>
+      <div class="optionBox" id="m3u8dlOption">
+        <span class="explain">非常优秀的m3u8 mpd第三方下载工具 使用方法查看
+          <a href="https://o2bmm.gitbook.io/cat-catch/docs/m3u8dl" target="_blank">用户文档</a>
+        </span>
+        <div class="list">
           <div class="item">
-            <div>HLS m3u8文件</div>
-            <textarea id="copyM3U8" type="text" class="width100" ></textarea>
-          </div>
-          <div class="item" style="margin-top: 10px;">
-            <div>DASH mpb文件</div>
-            <textarea id="copyMPD" type="text" class="width100" ></textarea>
-          </div>
-          <div class="item" style="margin-top: 10px;">
-            <div>其他文件</div>
-            <textarea id="copyOther" type="text" class="width100" ></textarea>
-          </div>
-          <div class="button">
-            <button type="button" id="ResetCopy">重置复制选项</button>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <h1 class="optionsTitle"><a href="https://github.com/nilaoda/N_m3u8DL-CLI" target="_blank">N_m3u8DL-CLI</a></h1>
-        <div class="optionBox" id="m3u8dlOption">
-          <span class="explain">非常优秀的m3u8 mpd第三方下载工具 使用方法查看
-            <a href="https://o2bmm.gitbook.io/cat-catch/docs/m3u8dl" target="_blank">用户文档</a>
-          </span>
-          <div class="list">
-            <div class="item">
-              <div>调用<a href="https://github.com/nilaoda/N_m3u8DL-CLI" target="_blank">N_m3u8DL-CLI</a>的m3u8dl://协议下载m3u8 和 mpd</div>
-              <div class="switch">
-                <label class="switchLabel switchRadius">
-                  <input type="checkbox" id="m3u8dl" class="switchInput" />
-                  <span class="switchRound switchRadius"
-                    ><em class="switchRoundBtn switchRadius"></em
-                  ></span>
-                </label>
-              </div>
+            <div>调用<a href="https://github.com/nilaoda/N_m3u8DL-CLI" target="_blank">N_m3u8DL-CLI</a>的m3u8dl://协议下载m3u8
+              和 mpd</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="m3u8dl" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
             </div>
-            <div class="item">
-              <div>参数设置</div>
-              <button type="button" id="showM3u8Help">查看参数说明</button>
-              <span class="explain width100 hide" id="m3u8Help">
-                <b>猫抓替换关键词</b><br>
-                $url$ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; m3u8地址<br>
-                $referer$ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 请求头网址<br>
-                $title$ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 网页标题<br>
-                <b>m3u8DL 参数</b><br>
-                --workDir &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设定程序工作目录<br>
-                --saveName &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设定存储文件名(不包括后缀)<br>
-                --baseUrl &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设定Baseurl<br>
-                --headers &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设定请求头，格式 key:value 使用|分割不同的key&value<br>
-                --maxThreads &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Default: 32) 设定程序的最大线程数<br>
-                --minThreads &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Default: 16) 设定程序的最小线程数<br>
-                --retryCount &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Default: 15) 设定程序的重试次数<br>
-                --timeOut &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Default: 10) 设定程序网络请求的超时时间(单位为秒)<br>
-                --muxSetJson &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 使用外部json文件定义混流选项<br>
-                --useKeyFile &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 使用外部16字节文件定义AES-128解密KEY<br>
-                --useKeyBase64 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 使用Base64字符串定义AES-128解密KEY<br>
-                --useKeyIV &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 使用HEX字符串定义AES-128解密IV<br>
-                --downloadRange &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 仅下载视频的一部分分片或长度<br>
-                --liveRecDur &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 直播录制时，达到此长度自动退出软件(HH:MM:SS)<br>
-                --stopSpeed &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 当速度低于此值时，重试(单位为KB/s)<br>
-                --maxSpeed &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设置下载速度上限(单位为KB/s)<br>
-                --proxyAddress &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设置HTTP/SOCKS5代理, 如 http://127.0.0.1:8080<br>
-                --enableDelAfterDone &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 开启下载后删除临时文件夹的功能<br>
-                --enableMuxFastStart &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 开启混流mp4的FastStart特性<br>
-                --enableBinaryMerge &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 开启二进制合并分片<br>
-                --enableParseOnly &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 开启仅解析模式(程序只进行到meta.json)<br>
-                --enableAudioOnly &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 合并时仅封装音频轨道<br>
-                --disableDateInfo &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 关闭混流中的日期写入<br>
-                --disableIntegrityCheck &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 不检测分片数量是否完整<br>
-                --noMerge &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 禁用自动合并<br>
-                --noProxy &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 不自动使用系统代理<br>
-                --registerUrlProtocol &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 注册m3u8dl链接协议<br>
-                --unregisterUrlProtocol &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 取消注册m3u8dl链接协议<br>
-                --enableChaCha20 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; enableChaCha20<br>
-                --chaCha20KeyBase64 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ChaCha20KeyBase64<br>
-                --chaCha20NonceBase64 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ChaCha20NonceBase64<br>
-                --help &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Display this help screen.<br>
-                --version &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Display version information.
-              </span>
-              <textarea id="m3u8dlArg" type="text" class="width100" rows="3"></textarea>
-            </div>
-            <div class="button">
-              <button type="button" id="ResetM3u8dl">重置参数设置</button>
-            </div>
-        </div>
-      </section>
-
-      <section>
-        <h1 class="optionsTitle">其他设置</h1>
-        <div class="optionBox" id="OtherOption">
-          <div class="list otherOption">
-            <div class="item">
-              <div>模拟手机User Agent</div>
-              <textarea
-                id="MobileUserAgent"
-                type="text"
-                class="width100"
-              ></textarea>
-            </div>
-            <div class="item">
-              <div>
-                使用本地播放器调用协议打开视频预览 <select id="PlayerTemplate" class="select"></select>
-              </div>
-              <input id="Player" type="text" class="width100" placeholder="留空为不启用 默认使用popup页面预览视频"/>
-            </div>
-
-            <div class="item">
-              <div>自动清理幽灵数据(默认100条后自动清理)</div>
-              <input id="OtherAutoClear" type="number" />
-            </div>
-
-            <div class="item">
-              <div>默认捕获脚本</div>
-              <select id="injectScript" class="select"></select>
-            </div>
-
-            <div class="item">
-              <div>保存文件名使用网页标题</div>
-              <div class="switch">
-                <label class="switchLabel switchRadius">
-                  <input type="checkbox" id="TitleName" class="switchInput" />
-                  <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
-                </label>
-              </div>
-            </div>
-
-            <div class="item">
-              <div>下载时选择保存目录</div>
-              <div class="switch">
-                <label class="switchLabel switchRadius">
-                  <input type="checkbox" id="saveAs" class="switchInput" />
-                  <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
-                </label>
-              </div>
-            </div>
-
-            <div class="item">
-              <div>修剪标题 (正则表达式提取标题 留空为不启用)</div>
-              <input id="trimTitleRE" type="text" />
-            </div>
-
-            <div class="item">
-              <div>显示网站图标</div>
-              <div class="switch">
-                <label class="switchLabel switchRadius">
-                  <input type="checkbox" id="ShowWebIco" class="switchInput" />
-                  <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
-                </label>
-              </div>
-            </div>
-
-            <div class="item">
-              <div>刷新、跳转到新页面 清空当前标签抓取的数据</div>
-              <div class="switch">
-                <label class="switchLabel switchRadius">
-                  <input type="checkbox" id="refreshClear" class="switchInput" />
-                  <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
-                </label>
-              </div>
-            </div>
-
-            <div class="item">
-              <div>始终不启用猫抓下载器</div>
-              <div class="switch">
-                <label class="switchLabel switchRadius">
-                  <input type="checkbox" id="catDownload" class="switchInput" />
-                  <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
-                </label>
-              </div>
-            </div>
-
-            <div class="item">
-              <div>调试模式</div>
-              <div class="switch">
-                <label class="switchLabel switchRadius">
-                  <input type="checkbox" id="Debug" class="switchInput" />
-                  <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
-                </label>
-              </div>
-            </div>
-          </div>
-          <div class="button">
-            <button type="button" id="ResetOption">重置其他设置</button>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <h1 class="optionsTitle">操作</h1>
-        <div class="optionBox">
-          <div class="button" style="justify-content: center">
-            <input id="importOptionsFile" type="file" class="hide" />
-            <button type="button" id="exportOptions">导出设置</button>
-            <button type="button" id="importOptions">导入配置</button>
-            <button type="button" id="ClearData">清空抓取的数据</button>
-            <button type="button" id="ResetAllOption">重置所有设置</button>
-            <button type="button" id="extensionReload">重启扩展</button>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <h1 class="optionsTitle">关于</h1>
-        <div class="optionBox">
-          <div class="item">
-            <div id="version"></div>
           </div>
           <div class="item">
-            文档说明:
-            <a href="https://o2bmm.gitbook.io/cat-catch/" target="_blank">
-              https://o2bmm.gitbook.io/cat-catch/</a
-            >
+            <div>参数设置</div>
+            <button type="button" id="showM3u8Help">查看参数说明</button>
+            <span class="explain width100 hide" id="m3u8Help">
+              <b>猫抓替换关键词</b><br>
+              $url$ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; m3u8地址<br>
+              $referer$ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 请求头网址<br>
+              $title$ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 网页标题<br>
+              <b>m3u8DL 参数</b><br>
+              --workDir &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设定程序工作目录<br>
+              --saveName &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设定存储文件名(不包括后缀)<br>
+              --baseUrl &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设定Baseurl<br>
+              --headers &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设定请求头，格式 key:value 使用|分割不同的key&value<br>
+              --maxThreads &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Default: 32) 设定程序的最大线程数<br>
+              --minThreads &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Default: 16) 设定程序的最小线程数<br>
+              --retryCount &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Default: 15) 设定程序的重试次数<br>
+              --timeOut &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Default: 10) 设定程序网络请求的超时时间(单位为秒)<br>
+              --muxSetJson &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 使用外部json文件定义混流选项<br>
+              --useKeyFile &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 使用外部16字节文件定义AES-128解密KEY<br>
+              --useKeyBase64 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 使用Base64字符串定义AES-128解密KEY<br>
+              --useKeyIV &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 使用HEX字符串定义AES-128解密IV<br>
+              --downloadRange &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 仅下载视频的一部分分片或长度<br>
+              --liveRecDur &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 直播录制时，达到此长度自动退出软件(HH:MM:SS)<br>
+              --stopSpeed &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 当速度低于此值时，重试(单位为KB/s)<br>
+              --maxSpeed &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设置下载速度上限(单位为KB/s)<br>
+              --proxyAddress &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设置HTTP/SOCKS5代理, 如 http://127.0.0.1:8080<br>
+              --enableDelAfterDone &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 开启下载后删除临时文件夹的功能<br>
+              --enableMuxFastStart &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 开启混流mp4的FastStart特性<br>
+              --enableBinaryMerge &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 开启二进制合并分片<br>
+              --enableParseOnly &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 开启仅解析模式(程序只进行到meta.json)<br>
+              --enableAudioOnly &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 合并时仅封装音频轨道<br>
+              --disableDateInfo &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 关闭混流中的日期写入<br>
+              --disableIntegrityCheck &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 不检测分片数量是否完整<br>
+              --noMerge &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 禁用自动合并<br>
+              --noProxy &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 不自动使用系统代理<br>
+              --registerUrlProtocol &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 注册m3u8dl链接协议<br>
+              --unregisterUrlProtocol &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 取消注册m3u8dl链接协议<br>
+              --enableChaCha20 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; enableChaCha20<br>
+              --chaCha20KeyBase64 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ChaCha20KeyBase64<br>
+              --chaCha20NonceBase64 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ChaCha20NonceBase64<br>
+              --help &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Display this help screen.<br>
+              --version &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Display version information.
+            </span>
+            <textarea id="m3u8dlArg" type="text" class="width100" rows="3"></textarea>
           </div>
-          <div class="item">
-            Github:
-            <a href="https://github.com/xifangczy/cat-catch" target="_blank">
-              https://github.com/xifangczy/cat-catch</a
-            >
+          <div class="button">
+            <button type="button" id="ResetM3u8dl">重置参数设置</button>
           </div>
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
 
-    <script src="lib/base64.js"></script>
-    <script src="js/options.js"></script>
-  </body>
+    <section>
+      <h1 class="optionsTitle">其他设置</h1>
+      <div class="optionBox" id="OtherOption">
+        <div class="list otherOption">
+          <div class="item">
+            <div>模拟手机User Agent</div>
+            <textarea id="MobileUserAgent" type="text" class="width100"></textarea>
+          </div>
+          <div class="item">
+            <div>
+              使用本地播放器调用协议打开视频预览 <select id="PlayerTemplate" class="select"></select>
+            </div>
+            <input id="Player" type="text" class="width100" placeholder="留空为不启用 默认使用popup页面预览视频" />
+          </div>
+
+          <div class="item">
+            <div>自动清理幽灵数据(默认100条后自动清理)</div>
+            <input id="OtherAutoClear" type="number" />
+          </div>
+
+          <div class="item">
+            <div>默认捕获脚本</div>
+            <select id="injectScript" class="select"></select>
+          </div>
+
+          <div class="item">
+            <div>保存文件名使用网页标题</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="TitleName" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div>下载时选择保存目录</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="saveAs" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div>修剪标题 (正则表达式提取标题 留空为不启用)</div>
+            <input id="trimTitleRE" type="text" />
+          </div>
+
+          <div class="item">
+            <div>显示网站图标</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="ShowWebIco" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div>刷新、跳转到新页面 清空当前标签抓取的数据</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="refreshClear" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div>始终不启用猫抓下载器</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="catDownload" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div>调试模式</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="Debug" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="button">
+          <button type="button" id="ResetOption">重置其他设置</button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h1 class="optionsTitle">操作</h1>
+      <div class="optionBox">
+        <div class="button" style="justify-content: center">
+          <input id="importOptionsFile" type="file" class="hide" />
+          <button type="button" id="exportOptions">导出设置</button>
+          <button type="button" id="importOptions">导入配置</button>
+          <button type="button" id="ClearData">清空抓取的数据</button>
+          <button type="button" id="ResetAllOption">重置所有设置</button>
+          <button type="button" id="extensionReload">重启扩展</button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h1 class="optionsTitle">关于</h1>
+      <div class="optionBox">
+        <div class="item">
+          <div id="version"></div>
+        </div>
+        <div class="item">
+          文档说明:
+          <a href="https://o2bmm.gitbook.io/cat-catch/" target="_blank">
+            https://o2bmm.gitbook.io/cat-catch/</a>
+        </div>
+        <div class="item">
+          Github:
+          <a href="https://github.com/xifangczy/cat-catch" target="_blank">
+            https://github.com/xifangczy/cat-catch</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="lib/base64.js"></script>
+  <script src="js/options.js"></script>
+</body>
+
 </html>
