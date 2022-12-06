@@ -22,9 +22,11 @@ https://o2bmm.gitbook.io/cat-catch/
 # 📚兼容性说明
 1.0.17版本之后需要Chromium内核版本93以上。
 低于93请使用1.0.16版本。
+要体验完整功能，请使用104版本以上。
 
 # 🔍界面
-![界面](https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/popup.png)
+![popup界面](https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/popup.png)
+![m3u8解析器界面](https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/m3u8.png)
 
 # 🤚🏻免责
 扩展是通用嗅探工具和浏览器DevTools功能一致，没有针对任何一家网站进行解密操作，用户下载任何内容与扩展无关，请注意下载资源的权限和版权。
