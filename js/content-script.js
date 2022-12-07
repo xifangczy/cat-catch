@@ -162,23 +162,41 @@ function secToTime(sec) {
 window.addEventListener("message", (event) => {
     if (!event.data.action) { return; }
     if (event.data.action == "catCatchAddMedia") {
-        chrome.runtime.sendMessage({ Message: "addMedia", url: event.data.url, href: event.data.href, extraExt: event.data.ext, mime: event.data.mime, referer: event.data.referer });
+        chrome.runtime.sendMessage({
+            Message: "addMedia",
+            url: event.data.url,
+            href: event.data.href,
+            extraExt: event.data.ext,
+            mime: event.data.mime,
+            referer: event.data.referer
+        });
     }
     if (event.data.action == "catCatchAddKey") {
-        let key = event.data.ext == "key" ? ArrayToBase64(event.data.key) : event.data.key;
-        if (_key.includes(key)) { return; }
+        let key = event.data.key;
+        // if(event.data.ext == "key" || event.data.ext == "arrayBuffer"){
+        //     key = ArrayToBase64(key);
+        //     if(!key){ return; }
+        // }
+        if(key instanceof ArrayBuffer || key instanceof Array){
+            key = ArrayToBase64(key);
+        }
+        if (!key || _key.includes(key)) { return; }
         _key.push(key);
     }
 }, false);
 
 function ArrayToBase64(data) {
-    let bytes = new Uint8Array(data);
-    let binary = "";
-    for (let i = 0; i < bytes.byteLength; i++) {
-        binary += String.fromCharCode(bytes[i]);
+    try {
+        let bytes = new Uint8Array(data);
+        let binary = "";
+        for (let i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        if (typeof _btoa == "function") {
+            return _btoa(binary);
+        }
+        return btoa(binary);
+    } catch (e) {
+        return false;
     }
-    if (typeof _btoa == "function") {
-        return _btoa(binary);
-    }
-    return btoa(binary);
 }
