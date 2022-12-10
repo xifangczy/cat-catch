@@ -21,7 +21,7 @@ function startDownload() {
     }
 
     const $downFilepProgress = $("#downFilepProgress");
-    const $progress = $("#progress");
+    const $progress = $(".progress");
 
     // 使用ajax下载文件
     $("#downfile").show();
