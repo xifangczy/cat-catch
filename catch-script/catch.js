@@ -63,7 +63,7 @@
         return sourceBuffer;
     }
     window.MediaSource.prototype.addSourceBuffer.toString = function () {
-        return 'function addSourceBuffer() { [native code] }'
+        return 'ƒ addSourceBuffer() { [native code] }';
     }
 
     let _endOfStream = window.MediaSource.prototype.endOfStream;
