@@ -376,6 +376,16 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             ffmpegTab.id = tab.id;
             ffmpegTab.media = Message.media;
             ffmpegTab.title = Message.title;
+            ffmpegTab.action = "FFmpegMergeAddMedia";
+        });
+        return true;
+    }
+    if (Message.Message == "openFFmpegTranscode") {
+        chrome.tabs.create({ url: "https://ffmpeg.bmmmd.com/transcode.html" }, function (tab) {
+            ffmpegTab.id = tab.id;
+            ffmpegTab.media = Message.media;
+            ffmpegTab.title = Message.title;
+            ffmpegTab.action = "FFmpegTranscodeAddMedia";
         });
         return true;
     }
@@ -434,14 +444,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     }
     if (changeInfo.status == "complete") {
         if (ffmpegTab.id && tabId == ffmpegTab.id) {
-            // chrome.scripting.executeScript({
-            //     target: { tabId: tabId, allFrames: true },
-            //     files: ["js/ffmpeg-merge.js"],
-            //     injectImmediately: true
-            // }, function () {
-            //     chrome.tabs.sendMessage(tabId, { Message: "FFmpegMergeAddMedia", media: ffmpegTab.media });
-            // });
-            chrome.tabs.sendMessage(tabId, { Message: "FFmpegMergeAddMedia", media: ffmpegTab.media, title: ffmpegTab.title });
+            chrome.tabs.sendMessage(tabId, { Message: ffmpegTab.action, media: ffmpegTab.media, title: ffmpegTab.title });
             ffmpegTab.id = 0;
         }
     }

@@ -724,6 +724,13 @@ $(function () {
         ext = ext.split(".").pop();
         ext = ext ? ext : "ts";
 
+        if($("#ffmpegMp4").prop("checked")){
+            const BLOBURL = URL.createObjectURL(fileBlob);
+            window.postMessage({ action: "catCatchOpenFFmpegTranscode", media: {video: BLOBURL} });
+            buttonState("#mergeTs", true);
+            return;
+        }
+
         /* 有初始化切片 可能是fMP4 获取初始化切片的后缀 */
         if (_fragments[0].initSegment) {
             let name = _fragments[0].initSegment.url.split("/").pop();

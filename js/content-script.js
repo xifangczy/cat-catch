@@ -136,7 +136,13 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     if (Message.Message == "FFmpegMergeAddMedia") {
         for (let type in Message.media) {
-            loadBlob(Message.media[type], type, Message.title);
+            loadBlob(Message.media[type], type, Message.title, "Merge");
+        }
+        return true;
+    }
+    if (Message.Message == "FFmpegTranscodeAddMedia") {
+        for (let type in Message.media) {
+            loadBlob(Message.media[type], type, Message.title, "Transcode");
         }
         return true;
     }
@@ -189,9 +195,16 @@ window.addEventListener("message", (event) => {
         if (!key || _key.includes(key)) { return; }
         _key.push(key);
     }
-    if (event.data.action == "catCatchOpenFFmegMerge") {
+    if (event.data.action == "catCatchOpenFFmpegMerge") {
         chrome.runtime.sendMessage({
             Message: "openFFmpegMerge",
+            media: event.data.media,
+            title: document.title
+        });
+    }
+    if (event.data.action == "catCatchOpenFFmpegTranscode") {
+        chrome.runtime.sendMessage({
+            Message: "openFFmpegTranscode",
             media: event.data.media,
             title: document.title
         });
@@ -214,10 +227,10 @@ function ArrayToBase64(data) {
     }
 }
 
-async function loadBlob(url, type, title) {
+async function loadBlob(url, type, title, action) {
     const reader = new FileReader;
     reader.onload = function (e) {
-        window.postMessage({ type: type, data: reader.result, title: title }, "*", [reader.result]);
+        window.postMessage({ action: action, type: type, data: reader.result, title: title }, "*", [reader.result]);
     };
 
     const xhr = new XMLHttpRequest;
