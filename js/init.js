@@ -58,11 +58,18 @@ if (navigator.userAgent.includes("Chrome/")) {
 // 脚本列表
 G.scriptList = new Map();
 G.scriptList.set("search.js", { refresh: true, allFrames: true, world: "MAIN", name: "深度搜索" });
-G.scriptList.set("catch.js", { refresh: true, allFrames: true, world: "MAIN", name: "hook脚本" });
-G.scriptList.set("recorder.js", { refresh: false, allFrames: true, world: "MAIN", name: "录制脚本" });
+G.scriptList.set("catch.js", { refresh: true, allFrames: true, world: "MAIN", name: "缓存捕捉" });
+G.scriptList.set("recorder.js", { refresh: false, allFrames: true, world: "MAIN", name: "视频录制" });
 if (G.version >= 104) {
     G.scriptList.set("recorder2.js", { refresh: false, allFrames: false, world: "ISOLATED", name: "屏幕捕捉" });
 }
+
+// ffmpeg
+const ffmpegTab = { id: 0 };
+const ffmpegData = new Map();
+const ffmpegOpen = ["openFFmpegMerge", "openFFmpegTranscode"];
+ffmpegData.set("openFFmpegMerge", {url: "https://ffmpeg.bmmmd.com/merge.html", action: "FFmpegMergeAddMedia"});
+ffmpegData.set("openFFmpegTranscode", {url: "https://ffmpeg.bmmmd.com/transcode.html", action: "FFmpegTranscodeAddMedia"});
 
 // 正则预编译
 const reProtocol = /^[\w]+:\/\/.+/i;

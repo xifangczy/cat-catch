@@ -25,8 +25,6 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
     alarm.name == "nowClear" && clearRedundant();
 });
 
-const ffmpegTab = { id: 0 };
-
 // onBeforeRequest 浏览器发送请求之前使用正则匹配发送请求的URL
 chrome.webRequest.onBeforeRequest.addListener(
     function (data) {
@@ -371,21 +369,20 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         });
         return true;
     }
-    if (Message.Message == "openFFmpegMerge") {
-        chrome.tabs.create({ url: "https://ffmpeg.bmmmd.com/merge.html" }, function (tab) {
-            ffmpegTab.id = tab.id;
-            ffmpegTab.media = Message.media;
-            ffmpegTab.title = Message.title;
-            ffmpegTab.action = "FFmpegMergeAddMedia";
-        });
-        return true;
-    }
-    if (Message.Message == "openFFmpegTranscode") {
-        chrome.tabs.create({ url: "https://ffmpeg.bmmmd.com/transcode.html" }, function (tab) {
-            ffmpegTab.id = tab.id;
-            ffmpegTab.media = Message.media;
-            ffmpegTab.title = Message.title;
-            ffmpegTab.action = "FFmpegTranscodeAddMedia";
+    // ffmpeg在线转码
+    if (ffmpegOpen.includes(Message.Message)) {
+        const ffmpegObj = ffmpegData.get(Message.Message);
+        const URL = ffmpegObj.url;
+        const data = { Message: ffmpegObj.action, media: Message.media, title: Message.title };
+        chrome.tabs.query({ url: URL }, function (tabs) {
+            if (chrome.runtime.lastError || !tabs.length) {
+                chrome.tabs.create({ url: URL }, function (tab) {
+                    ffmpegTab.id = tab.id;
+                    ffmpegTab.data = data;
+                });
+                return true;
+            }
+            chrome.tabs.sendMessage(tabs[0].id, data);
         });
         return true;
     }
@@ -444,7 +441,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     }
     if (changeInfo.status == "complete") {
         if (ffmpegTab.id && tabId == ffmpegTab.id) {
-            chrome.tabs.sendMessage(tabId, { Message: ffmpegTab.action, media: ffmpegTab.media, title: ffmpegTab.title });
+            chrome.tabs.sendMessage(tabId, ffmpegTab.data);
             ffmpegTab.id = 0;
         }
     }

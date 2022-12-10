@@ -199,14 +199,14 @@ window.addEventListener("message", (event) => {
         chrome.runtime.sendMessage({
             Message: "openFFmpegMerge",
             media: event.data.media,
-            title: document.title
+            title: event.data.title ?? document.title
         });
     }
     if (event.data.action == "catCatchOpenFFmpegTranscode") {
         chrome.runtime.sendMessage({
             Message: "openFFmpegTranscode",
             media: event.data.media,
-            title: document.title
+            title: event.data.title ?? document.title
         });
     }
 }, false);

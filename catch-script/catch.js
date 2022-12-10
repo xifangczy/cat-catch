@@ -93,7 +93,7 @@
                 const type = mime.split('/')[0];
                 media[type] = URL.createObjectURL(fileBlob);
             }
-            window.postMessage({ action: "catCatchOpenFFmpegMerge", media: media });
+            window.postMessage({ action: "catCatchOpenFFmpegMerge", media: media, title: document.title });
             if (isComplete) {
                 catchMedia = [];
                 isComplete = false;

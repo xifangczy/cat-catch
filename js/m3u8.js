@@ -726,7 +726,7 @@ $(function () {
 
         if($("#ffmpegMp4").prop("checked")){
             const BLOBURL = URL.createObjectURL(fileBlob);
-            window.postMessage({ action: "catCatchOpenFFmpegTranscode", media: {video: BLOBURL} });
+            window.postMessage({ action: "catCatchOpenFFmpegTranscode", media: {video: BLOBURL}, title: `${GetFileName(_m3u8Url)}`});
             buttonState("#mergeTs", true);
             return;
         }
