@@ -44,6 +44,8 @@ $(function () {
     let downTotalTs = 0;  // 需要下载的文件数量
     const tsBuffer = []; // ts内容缓存
     const errorTsList = []; // 下载错误ts序号列表
+    let StreamSaver = false; // 流式下载
+    let fileStream = undefined; // 流式下载文件输出流
     /* 录制相关 */
     let recorder = false; // 开关
     let recorderArray = []; // 储存临时碎片
@@ -492,6 +494,15 @@ $(function () {
             $("#onlyAudio").prop("checked", false);
         }
     });
+    $("#StreamSaver").on("change", function () {
+        if ($(this).prop("checked")) {
+            alert("开启流式，不支持转码");
+            $("#mp4").prop("checked", false);
+            $("#ffmpegMp4").prop("checked", false);
+            $("#onlyAudio").prop("checked", false);
+            $("#saveAs").prop("checked", false);
+        }
+    });
     // 范围 线程数 滚轮调节
     let debounce2 = undefined;
     $("#rangeStart, #rangeEnd, #thread").on("wheel", function (event) {
@@ -548,13 +559,24 @@ $(function () {
         if ($(this).data("switch") == "on") {
             initDownload(); // 初始化下载变量
             recorder = true;
-            $(this).html("下载录制").addClass("button2").data("switch", "off");
+
+            // 流式下载
+            StreamSaver = $("#StreamSaver").prop("checked");
+            fileStream = StreamSaver ? createStreamSaver(_fragments[0].url) : undefined;
+
+            $(this).html(fileStream ? "停止下载" : "下载录制").addClass("button2").data("switch", "off");
             $progress.html(`等待直播数据中...`);
             return;
         }
         stopDownload = '停止录制';
         recorder = false;
         $(this).html("录制直播").removeClass("button2").data("switch", "on");
+        if (fileStream) {
+            fileStream.close();
+            buttonState("#mergeTs", true);
+            initDownload();
+            return true;
+        }
         mergeTs();
     });
     // 在线下载合并ts
@@ -595,6 +617,11 @@ $(function () {
         skipDecrypt = $("#skipDecrypt").prop("checked");    // 是否跳过解密
         downTotalTs = end - start + 1;  // 需要下载的文件数量
         $progress.html(`${downCurrentTs}/${downTotalTs}`); // 进度显示
+
+        // 流式下载
+        StreamSaver = $("#StreamSaver").prop("checked");
+        fileStream = StreamSaver ? createStreamSaver(_fragments[0].url) : undefined;
+
         downloadTs(start, end);
     });
     // 强制下载
@@ -632,11 +659,20 @@ $(function () {
             if (stopDownload) {
                 clearInterval(tsInterval);
                 $progress.html(stopDownload);
+                fileStream && fileStream.close();
                 return;
             }
             // 列表为空 等待线程数回归 检查是否下载完成
             if (index == end && tsThread == _tsThread) {
                 clearInterval(tsInterval);
+                if (stopDownload) { return; }
+                // 流式下载完成
+                if (!recorder && fileStream) {
+                    fileStream.close();
+                    initDownload();
+                    buttonState("#mergeTs", true);
+                    return;
+                }
                 // 错误列表为0 下载完成
                 if (errorTsList.length == 0) {
                     $("#ForceDownload").hide();
@@ -685,9 +721,15 @@ $(function () {
                     downCurrentTs++;
                     if (downCurrentTs == downTotalTs) {
                         $progress.html($("#mp4").prop("checked") ? `数据正在转换格式...` : `数据正在合并...`);
+                        fileStream && $progress.html("下载完成");
                         return;
                     }
                     $progress.html(`${downCurrentTs}/${downTotalTs}`);
+                    // 流式下载
+                    if (fileStream) {
+                        fileStream.write(new Uint8Array(tsBuffer[currentIndex]));
+                        tsBuffer[currentIndex] = undefined;
+                    }
                 }).always(function () {
                     tsThread++;
                 });
@@ -716,6 +758,7 @@ $(function () {
         for (let i = 0; i < tsBuffer.length; i++) {
             if (tsBuffer[i]) {
                 _tsBuffer.push(tsBuffer[i]);
+                tsBuffer[i] = undefined;
             }
             delete tsBuffer[i];
         }
@@ -728,6 +771,7 @@ $(function () {
         ext = ext.split(".").pop();
         ext = ext ? ext : "ts";
 
+        // ffmpeg 转码
         if ($("#ffmpegMp4").prop("checked")) {
             const BLOBURL = URL.createObjectURL(fileBlob);
             chrome.runtime.sendMessage({
@@ -832,6 +876,12 @@ $(function () {
         stopDownload = false; // 停止下载
         recorderIndex = 0;  // 录制直播索引
         recorderArray = []; // 录制直播储存临时切片地址
+        fileStream = undefined; // 流式下载 文件流
+    }
+
+    // 流式下载
+    function createStreamSaver(url) {
+        return streamSaver.createWriteStream(`${GetFileName(url)}.${GetExt(url)}`).getWriter();
     }
 });
 function getM3u8DlArg() {

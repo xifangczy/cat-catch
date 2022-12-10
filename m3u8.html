@@ -101,7 +101,8 @@
             <div class="merge" id="mergeDown">
               <div id="threadDiv" class="themeColor">下载线程数 <input type="number" value="32" id="thread" spellcheck="false" style="width: 35px;" step="1" min="1" max="256"/></div>
               <label class="m3u8checkbox themeColor">mp4格式<input type="checkbox" id="mp4" checked="checked"/></label>
-              <label class="m3u8checkbox themeColor">在线ffmpeg转码(beta)<input type="checkbox" id="ffmpegMp4"/></label>
+              <label class="m3u8checkbox themeColor">ffmpeg转码(beta)<input type="checkbox" id="ffmpegMp4"/></label>
+              <label class="m3u8checkbox themeColor">流式下载(beta)<input type="checkbox" id="StreamSaver"/></label>
               <label class="m3u8checkbox themeColor">只要音频<input type="checkbox" id="onlyAudio"/></label>
               <label class="m3u8checkbox themeColor">另存为<input type="checkbox" id="saveAs"></label>
               <label class="m3u8checkbox themeColor">跳过解密<input type="checkbox" id="skipDecrypt"></label>
@@ -128,5 +129,6 @@
     <script src="lib/m3u8-decrypt.js"></script>
     <script src="lib/hls.min.js"></script>
     <script src="lib/base64.js"></script>
+    <script src="lib/StreamSaver.js"></script>
   </body>
 </html>
