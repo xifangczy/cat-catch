@@ -8,6 +8,11 @@ JSON.parse = function () {
     findMedia(data);
     return data;
 }
+// 反检测
+JSON.parse.toString = function () {
+    return _JSONparse.toString();
+}
+
 async function findMedia(data, raw = undefined, depth = 0) {
     CATCH_SEARCH_DEBUG && console.log(data);
     for (let key in data) {
@@ -114,6 +119,10 @@ XMLHttpRequest.prototype.open = function (method) {
     });
     _xhrOpen.apply(this, arguments);
 }
+// 反检测
+XMLHttpRequest.prototype.open.toString = function () {
+    return _xhrOpen.toString();
+}
 
 // 拦截 fetch 分析内容
 const _fetch = window.fetch;
@@ -155,6 +164,10 @@ window.fetch = async function (input, init) {
         });
     return clone;
 }
+// 反检测
+window.fetch.toString = function () {
+    return _fetch.toString();
+}
 
 // 拦截 Array.prototype.slice
 const _slice = Array.prototype.slice;
@@ -168,6 +181,10 @@ Array.prototype.slice = function (start, end) {
     }
     return data;
 }
+// 反检测
+Array.prototype.slice.toString = function () {
+    return _slice.toString();
+}
 
 // 拦截 window.btoa / window.atob
 const _btoa = window.btoa;
@@ -179,6 +196,10 @@ window.btoa = function (data) {
     }
     return base64;
 }
+// 反检测
+window.btoa.toString = function () {
+    return _btoa.toString();
+}
 const _atob = window.atob;
 window.atob = function (base64) {
     let data = _atob.apply(this, arguments);
@@ -187,6 +208,10 @@ window.atob = function (base64) {
         window.postMessage({ action: "catCatchAddKey", key: base64, href: location.href, ext: "base64Key" });
     }
     return data;
+}
+// 反检测
+window.atob.toString = function () {
+    return _atob.toString();
 }
 
 function isUrl(str) {

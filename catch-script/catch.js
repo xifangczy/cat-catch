@@ -62,8 +62,9 @@
         }
         return sourceBuffer;
     }
+    // 反检测
     window.MediaSource.prototype.addSourceBuffer.toString = function () {
-        return 'ƒ addSourceBuffer() { [native code] }';
+        return _AddSourceBuffer.toString();
     }
 
     let _endOfStream = window.MediaSource.prototype.endOfStream;
