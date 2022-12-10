@@ -7,7 +7,7 @@ const tsAddArg = params.get("tsAddArg");
 const getId = parseInt(params.get("getId"));
 const tabId = parseInt(params.get("tabid"));
 // 修改当前标签下的所有xhr的Referer
-_referer && setReferer(_referer);
+_referer ? setReferer(_referer) : deleteReferer();
 
 $(function () {
     // 默认设置
@@ -242,12 +242,12 @@ $(function () {
             * 少部分网站下载ts必须带有参数才能正常下载
             * ts地址如果没有参数 添加m3u8地址的参数
             */
-           if(tsAddArg && _m3u8Arg){
+            if (tsAddArg && _m3u8Arg) {
                 const flag = new RegExp("[?]([^\n]*)").exec(data.fragments[i].url);
                 if (!flag) {
                     data.fragments[i].url = data.fragments[i].url + "?" + _m3u8Arg;
                 }
-           }
+            }
             /* 
             * 查看是否加密 下载key
             * firefox CSP政策不允许在script-src 使用blob 不能直接调用hls.js下载好的密钥
@@ -499,7 +499,7 @@ $(function () {
         }
         $(this).val(number);
         $("#m3u8dlArg").val(getM3u8DlArg());
-        if(this.id == "thread"){
+        if (this.id == "thread") {
             clearTimeout(debounce2);
             debounce2 = setTimeout(() => {
                 chrome.storage.local.set({ thread: number });
@@ -609,7 +609,7 @@ $(function () {
     // 添加ts 参数
     _m3u8Arg && $("#tsAddArg").show();
     $("#tsAddArg").click(function () {
-        if(tsAddArg){
+        if (tsAddArg) {
             window.location.href = window.location.href.replace(/&tsAddArg=[^&]*/g, "");
             return;
         }
@@ -724,9 +724,13 @@ $(function () {
         ext = ext.split(".").pop();
         ext = ext ? ext : "ts";
 
-        if($("#ffmpegMp4").prop("checked")){
+        if ($("#ffmpegMp4").prop("checked")) {
             const BLOBURL = URL.createObjectURL(fileBlob);
-            window.postMessage({ action: "catCatchOpenFFmpegTranscode", media: {video: BLOBURL}, title: `${GetFileName(_m3u8Url)}`});
+            chrome.runtime.sendMessage({
+                Message: "openFFmpegTranscode",
+                media: { video: BLOBURL },
+                title: `${GetFileName(_m3u8Url)}`
+            });
             buttonState("#mergeTs", true);
             return;
         }
