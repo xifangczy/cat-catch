@@ -73,6 +73,7 @@ input#trimTitleRE {
 .width100 {
   width: 100%;
 }
+/* 滑动开关 组件 */
 .switch {
   height: 22px;
   width: 50px;
@@ -109,6 +110,7 @@ input#trimTitleRE {
 .switch .switchRadius {
   border-radius: 50px;
 }
+/* 滑动开关 组件 END */
 .icon {
   cursor: pointer;
   margin-left: 5px;
