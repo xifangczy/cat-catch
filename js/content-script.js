@@ -134,6 +134,12 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         sendResponse(_key);
         return true;
     }
+    if (Message.Message == "FFmpegMergeAddMedia") {
+        for (let type in Message.media) {
+            loadBlob(Message.media[type], type, Message.title);
+        }
+        return true;
+    }
 });
 
 // Heart Beat
@@ -165,7 +171,7 @@ window.addEventListener("message", (event) => {
         chrome.runtime.sendMessage({
             Message: "addMedia",
             url: event.data.url,
-            href: event.data.href,
+            href: event.data.href ?? event.source.location.href,
             extraExt: event.data.ext,
             mime: event.data.mime,
             referer: event.data.referer
@@ -177,11 +183,18 @@ window.addEventListener("message", (event) => {
         //     key = ArrayToBase64(key);
         //     if(!key){ return; }
         // }
-        if(key instanceof ArrayBuffer || key instanceof Array){
+        if (key instanceof ArrayBuffer || key instanceof Array) {
             key = ArrayToBase64(key);
         }
         if (!key || _key.includes(key)) { return; }
         _key.push(key);
+    }
+    if (event.data.action == "catCatchOpenFFmegMerge") {
+        chrome.runtime.sendMessage({
+            Message: "openFFmpegMerge",
+            media: event.data.media,
+            title: document.title
+        });
     }
 }, false);
 
@@ -200,3 +213,20 @@ function ArrayToBase64(data) {
         return false;
     }
 }
+
+async function loadBlob(url, type, title) {
+    const reader = new FileReader;
+    reader.onload = function (e) {
+        window.postMessage({ type: type, data: reader.result, title: title }, "*", [reader.result]);
+    };
+
+    const xhr = new XMLHttpRequest;
+    xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            reader.readAsArrayBuffer(xhr.response);
+        }
+    };
+    xhr.open("GET", url);
+    xhr.responseType = "blob";
+    xhr.send();
+};

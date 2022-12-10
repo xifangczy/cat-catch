@@ -19,11 +19,13 @@ chrome.runtime.onConnect.addListener(function (Port) {
 });
 
 chrome.alarms.create("nowClear", { when: Date.now() + 3000 });  // 3秒后清理立即清理一次
-chrome.alarms.create("clear", { periodInMinutes: 30 }); // 60分钟清理一次冗余数据
+chrome.alarms.create("clear", { periodInMinutes: 60 }); // 60分钟清理一次冗余数据
 chrome.alarms.onAlarm.addListener(function (alarm) {
     alarm.name == "clear" && clearRedundant();
     alarm.name == "nowClear" && clearRedundant();
 });
+
+const ffmpegTab = { id: 0 };
 
 // onBeforeRequest 浏览器发送请求之前使用正则匹配发送请求的URL
 chrome.webRequest.onBeforeRequest.addListener(
@@ -132,7 +134,7 @@ function findMedia(data, isRegex = false, filter = false) {
             header["size"] = parseInt(header["size"] * (size[3] / (size[2] - size[1])));
         }
     }
-    
+
     //检查后缀
     if (!isRegex && !filter && ext != undefined) {
         filter = CheckExtension(ext, header["size"]);
@@ -369,6 +371,14 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         });
         return true;
     }
+    if (Message.Message == "openFFmpegMerge") {
+        chrome.tabs.create({ url: "https://ffmpeg.bmmmd.com/merge.html" }, function (tab) {
+            ffmpegTab.id = tab.id;
+            ffmpegTab.media = Message.media;
+            ffmpegTab.title = Message.title;
+        });
+        return true;
+    }
     sendResponse("Error");
     return true;
 });
@@ -420,6 +430,19 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
                 injectImmediately: true,
                 world: "MAIN"
             });
+        }
+    }
+    if (changeInfo.status == "complete") {
+        if (ffmpegTab.id && tabId == ffmpegTab.id) {
+            // chrome.scripting.executeScript({
+            //     target: { tabId: tabId, allFrames: true },
+            //     files: ["js/ffmpeg-merge.js"],
+            //     injectImmediately: true
+            // }, function () {
+            //     chrome.tabs.sendMessage(tabId, { Message: "FFmpegMergeAddMedia", media: ffmpegTab.media });
+            // });
+            chrome.tabs.sendMessage(tabId, { Message: "FFmpegMergeAddMedia", media: ffmpegTab.media, title: ffmpegTab.title });
+            ffmpegTab.id = 0;
         }
     }
 });

@@ -77,16 +77,23 @@
             return;
         }
         if (isComplete || confirm("提前下载可能会导致视频无法播放，确定下载吗？")) {
+            const media = {};
             for (let item of catchMedia) {
+                // const mime = item.mimeType.split(';')[0];
+                // const type = mime.split('/')[0] == "video" ? "mp4" : "mp3";
+                // const fileBlob = new Blob(item.bufferList, { type: mime });
+                // const a = document.createElement('a');
+                // a.href = URL.createObjectURL(fileBlob);
+                // a.download = `${document.title}.${type}`;
+                // a.click();
+                // a.remove();
+
                 const mime = item.mimeType.split(';')[0];
-                const type = mime.split('/')[1];
                 const fileBlob = new Blob(item.bufferList, { type: mime });
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(fileBlob);
-                a.download = `${document.title}.${type}`;
-                a.click();
-                a.remove();
+                const type = mime.split('/')[0];
+                media[type] = URL.createObjectURL(fileBlob);
             }
+            window.postMessage({ action: "catCatchOpenFFmegMerge", media: media });
             if (isComplete) {
                 catchMedia = [];
                 isComplete = false;
