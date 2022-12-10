@@ -176,6 +176,10 @@ $(function () {
             $("#loading").show();
             $("#loading .optionBox").html(`解析或播放m3u8文件中有错误, 详细错误信息查看控制台`);
             console.log(data);
+            // 如果存在 referer 删掉再重新打开解析器
+            if (_referer && data.type == "networkError") {
+                $("#loading .optionBox").append(`<p><a href="${window.location.href.replace(/&referer=[^&]*/g, "")}">删除Referer重新尝试</a></p>`);
+            }
         });
         hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
             // console.log(data);
