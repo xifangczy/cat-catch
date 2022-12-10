@@ -322,6 +322,15 @@ function setReferer(referer, callback) {
         });
     });
 }
+function deleteReferer(callback){
+    chrome.tabs.getCurrent(function (tabs) {
+        chrome.declarativeNetRequest.updateSessionRules({
+            removeRuleIds: [tabs.id]
+        }, function () {
+            callback && callback();
+        });
+    });
+}
 
 // 清理冗余数据
 function clearRedundant() {
