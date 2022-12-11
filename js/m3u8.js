@@ -503,6 +503,14 @@ $(function () {
             $("#saveAs").prop("checked", false);
         }
     });
+    $("#ffmpegMp4").on("change", function () {
+        if ($(this).prop("checked")) {
+            $("#mp4").prop("checked", false);
+            $("#StreamSaver").prop("checked", false);
+            $("#onlyAudio").prop("checked", false);
+            $("#saveAs").prop("checked", false);
+        }
+    });
     // 范围 线程数 滚轮调节
     let debounce2 = undefined;
     $("#rangeStart, #rangeEnd, #thread").on("wheel", function (event) {

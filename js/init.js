@@ -69,7 +69,8 @@ const ffmpegTab = { id: 0 };
 const ffmpegData = new Map();
 const ffmpegOpen = ["openFFmpegMerge", "openFFmpegTranscode"];
 ffmpegData.set("openFFmpegMerge", {url: "https://ffmpeg.bmmmd.com/merge.html", action: "FFmpegMergeAddMedia"});
-ffmpegData.set("openFFmpegTranscode", {url: "https://ffmpeg.bmmmd.com/transcode.html", action: "FFmpegTranscodeAddMedia"});
+// ffmpegData.set("openFFmpegTranscode", {url: "https://ffmpeg.bmmmd.com/transcode.html", action: "FFmpegTranscodeAddMedia"});
+ffmpegData.set("openFFmpegTranscode", {url: "https://ffmpeg.bmmmd.com/", action: "FFmpegTranscodeAddMedia"});
 
 // 正则预编译
 const reProtocol = /^[\w]+:\/\/.+/i;
