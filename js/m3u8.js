@@ -206,7 +206,7 @@ $(function () {
                                 if (data[i] == 0x47 && data[i + 1] != 0x40) {
                                     // 0x24 H.265
                                     if (data[i + 17] == 0x24) {
-                                        info.html(info.html().replace("无视频", "<b>HEVC/H.265编码ts文件 暂不支持在线mp4转码</b>"));
+                                        info.html(info.html().replace("无视频", "<b>HEVC/H.265编码ts文件 只支持在线ffmpeg转码</b>"));
                                         $("#mp4").prop("checked", false);
                                     }
                                     return;
@@ -781,10 +781,9 @@ $(function () {
 
         // ffmpeg 转码
         if ($("#ffmpegMp4").prop("checked")) {
-            const BLOBURL = URL.createObjectURL(fileBlob);
             chrome.runtime.sendMessage({
                 Message: "openFFmpegTranscode",
-                media: { video: BLOBURL },
+                media: [{ media: URL.createObjectURL(fileBlob) }],
                 title: `${GetFileName(_m3u8Url)}`
             });
             buttonState("#mergeTs", true);

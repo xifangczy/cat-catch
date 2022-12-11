@@ -373,7 +373,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     if (ffmpegOpen.includes(Message.Message)) {
         const ffmpegObj = ffmpegData.get(Message.Message);
         const URL = ffmpegObj.url;
-        const data = { Message: ffmpegObj.action, media: Message.media, title: Message.title };
+        const data = { Message: "ffmpeg", action: ffmpegObj.action, media: Message.media, title: Message.title };
         chrome.tabs.query({ url: URL }, function (tabs) {
             if (chrome.runtime.lastError || !tabs.length) {
                 chrome.tabs.create({ url: URL }, function (tab) {

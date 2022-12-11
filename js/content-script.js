@@ -134,15 +134,9 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         sendResponse(_key);
         return true;
     }
-    if (Message.Message == "FFmpegMergeAddMedia") {
-        for (let type in Message.media) {
-            loadBlob(Message.media[type], type, Message.title, "Merge");
-        }
-        return true;
-    }
-    if (Message.Message == "FFmpegTranscodeAddMedia") {
-        for (let type in Message.media) {
-            loadBlob(Message.media[type], type, Message.title, "Transcode");
+    if (Message.Message == "ffmpeg") {
+        for (let item of Message.media) {
+            loadBlob(item.media, item.type ?? "video", Message.title, Message.action);
         }
         return true;
     }
@@ -232,7 +226,6 @@ async function loadBlob(url, type, title, action) {
     reader.onload = function (e) {
         window.postMessage({ action: action, type: type, data: reader.result, title: title }, "*", [reader.result]);
     };
-
     const xhr = new XMLHttpRequest;
     xhr.onreadystatechange = () => {
         if (xhr.readyState === 4 && xhr.status === 200) {

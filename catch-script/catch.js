@@ -81,7 +81,7 @@
             return;
         }
         if (isComplete || confirm("提前下载可能会导致视频无法播放，确定下载吗？")) {
-            const media = {};
+            const media = [];
             for (let item of catchMedia) {
                 // const mime = item.mimeType.split(';')[0];
                 // const type = mime.split('/')[0] == "video" ? "mp4" : "mp3";
@@ -95,7 +95,8 @@
                 const mime = item.mimeType.split(';')[0];
                 const fileBlob = new Blob(item.bufferList, { type: mime });
                 const type = mime.split('/')[0];
-                media[type] = URL.createObjectURL(fileBlob);
+                // media[type] = URL.createObjectURL(fileBlob);
+                media.push({ media: URL.createObjectURL(fileBlob), type: type });
             }
             window.postMessage({ action: "catCatchOpenFFmpegMerge", media: media, title: document.title });
             if (isComplete) {
