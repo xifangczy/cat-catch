@@ -136,8 +136,14 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     if (Message.Message == "ffmpeg") {
         for (let item of Message.media) {
-            loadBlob(item.media, item.type ?? "video", Message.title, Message.action);
+            const data = { action: Message.action, type: item.type ?? "video", data: item.data, title: Message.title };
+            if (typeof item.data == "string") {
+                loadBlob(data);
+            } else if (item.data instanceof ArrayBuffer) {
+                window.postMessage(data, "*", [item.data]);
+            }
         }
+        sendResponse("ok");
         return true;
     }
 });
@@ -189,18 +195,13 @@ window.addEventListener("message", (event) => {
         if (!key || _key.includes(key)) { return; }
         _key.push(key);
     }
-    if (event.data.action == "catCatchOpenFFmpegMerge") {
+    if (event.data.action == "catCatchFFmpeg") {
         chrome.runtime.sendMessage({
-            Message: "openFFmpegMerge",
+            Message: event.data.action,
+            action: event.data.use,
             media: event.data.media,
-            title: event.data.title ?? document.title
-        });
-    }
-    if (event.data.action == "catCatchOpenFFmpegTranscode") {
-        chrome.runtime.sendMessage({
-            Message: "openFFmpegTranscode",
-            media: event.data.media,
-            title: event.data.title ?? document.title
+            title: event.data.title ?? document.title,
+            url: event.data.href ?? event.source.location.href,
         });
     }
 }, false);
@@ -221,10 +222,11 @@ function ArrayToBase64(data) {
     }
 }
 
-async function loadBlob(url, type, title, action) {
+function loadBlob(data) {
     const reader = new FileReader;
     reader.onload = function (e) {
-        window.postMessage({ action: action, type: type, data: reader.result, title: title }, "*", [reader.result]);
+        data.data = reader.result;
+        window.postMessage(data, "*", [reader.result]);
     };
     const xhr = new XMLHttpRequest;
     xhr.onreadystatechange = () => {
@@ -232,7 +234,7 @@ async function loadBlob(url, type, title, action) {
             reader.readAsArrayBuffer(xhr.response);
         }
     };
-    xhr.open("GET", url);
+    xhr.open("GET", data.data);
     xhr.responseType = "blob";
     xhr.send();
 };

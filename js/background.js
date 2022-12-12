@@ -271,6 +271,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         } else if (Message.tabId != "-1") {
             SetIcon({ tabId: Message.tabId });
         }
+        sendResponse("ok");
         return true;
     }
     Message.tabId = Message.tabId ?? G.tabId;
@@ -304,6 +305,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             G.featAutoDownTabId.push(Message.tabId);
             chrome.storage.local.set({ featAutoDownTabId: G.featAutoDownTabId });
         }
+        sendResponse("ok");
         return true;
     }
     // 捕获
@@ -318,6 +320,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
                 injectImmediately: true,
                 world: script.world
             });
+            sendResponse("ok");
             return true;
         }
         /* 需要刷新页面的脚本 */
@@ -325,12 +328,14 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         if (G.featCatchTabId.includes(Message.tabId)) {
             tabIdListRemove("featCatchTabId", Message.tabId);
             chrome.tabs.reload(Message.tabId, { bypassCache: true });
+            sendResponse("ok");
             return true;
         }
         // 不在列表中 加入 并刷新页面
         G.featCatchTabId.push(Message.tabId);
         chrome.storage.local.set({ featCatchTabId: G.featCatchTabId });
         chrome.tabs.reload(Message.tabId, { bypassCache: true });
+        sendResponse("ok");
         return true;
     }
     // Heart Beat
@@ -362,28 +367,32 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             for (let item of tabs) {
                 if (item.url == Message.href) {
                     findMedia({ url: Message.url, tabId: item.id, extraExt: Message.extraExt, mime: Message.mime }, true, true);
+                    sendResponse("ok");
                     return true;
                 }
             }
             findMedia({ url: Message.url, tabId: -1, extraExt: Message.extraExt, mime: Message.mime }, true, true);
         });
+        sendResponse("ok");
         return true;
     }
     // ffmpeg在线转码
-    if (ffmpegOpen.includes(Message.Message)) {
-        const ffmpegObj = ffmpegData.get(Message.Message);
-        const URL = ffmpegObj.url;
+    if (Message.Message == "catCatchFFmpeg") {
+        const ffmpegObj = ffmpegData.get(Message.action);
+        if (!ffmpegObj) { sendResponse("error"); return true; }
         const data = { Message: "ffmpeg", action: ffmpegObj.action, media: Message.media, title: Message.title };
-        chrome.tabs.query({ url: URL }, function (tabs) {
+        chrome.tabs.query({ url: ffmpegObj.url }, function (tabs) {
             if (chrome.runtime.lastError || !tabs.length) {
-                chrome.tabs.create({ url: URL }, function (tab) {
+                chrome.tabs.create({ url: ffmpegObj.url }, function (tab) {
                     ffmpegTab.id = tab.id;
                     ffmpegTab.data = data;
                 });
+                sendResponse("ok");
                 return true;
             }
             chrome.tabs.sendMessage(tabs[0].id, data);
         });
+        sendResponse("ok");
         return true;
     }
     sendResponse("Error");
@@ -441,8 +450,10 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     }
     if (changeInfo.status == "complete") {
         if (ffmpegTab.id && tabId == ffmpegTab.id) {
-            chrome.tabs.sendMessage(tabId, ffmpegTab.data);
-            ffmpegTab.id = 0;
+            setTimeout(() => {
+                chrome.tabs.sendMessage(tabId, ffmpegTab.data);
+                ffmpegTab.id = 0;
+            }, 500);
         }
     }
 });

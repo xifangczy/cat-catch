@@ -782,8 +782,9 @@ $(function () {
         // ffmpeg 转码
         if ($("#ffmpegMp4").prop("checked")) {
             chrome.runtime.sendMessage({
-                Message: "openFFmpegTranscode",
-                media: [{ media: URL.createObjectURL(fileBlob) }],
+                Message: "catCatchFFmpeg",
+                action: "transcode",
+                media: [{ data: URL.createObjectURL(fileBlob) }],
                 title: `${GetFileName(_m3u8Url)}`
             });
             buttonState("#mergeTs", true);

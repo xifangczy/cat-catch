@@ -96,9 +96,9 @@
                 const fileBlob = new Blob(item.bufferList, { type: mime });
                 const type = mime.split('/')[0];
                 // media[type] = URL.createObjectURL(fileBlob);
-                media.push({ media: URL.createObjectURL(fileBlob), type: type });
+                media.push({ data: URL.createObjectURL(fileBlob), type: type });
             }
-            window.postMessage({ action: "catCatchOpenFFmpegMerge", media: media, title: document.title });
+            window.postMessage({ action: "catCatchFFmpeg", use: "merge", media: media, title: document.title });
             if (isComplete) {
                 catchMedia = [];
                 isComplete = false;
