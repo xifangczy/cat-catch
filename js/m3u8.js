@@ -496,11 +496,12 @@ $(function () {
     });
     $("#StreamSaver").on("change", function () {
         if ($(this).prop("checked")) {
-            alert("开启流式，不支持转码");
+            alert("开启边下边存\n不支持转换格式 暂不支持多线程下载");
             $("#mp4").prop("checked", false);
             $("#ffmpegMp4").prop("checked", false);
             $("#onlyAudio").prop("checked", false);
             $("#saveAs").prop("checked", false);
+            $("#thread").val(1);    // 线程强制 1
         }
     });
     $("#ffmpegMp4").on("change", function () {
@@ -628,7 +629,14 @@ $(function () {
 
         // 流式下载
         StreamSaver = $("#StreamSaver").prop("checked");
-        fileStream = StreamSaver ? createStreamSaver(_fragments[0].url) : undefined;
+        if(StreamSaver){
+            fileStream = createStreamSaver(_fragments[0].url);
+            $("#mp4").prop("checked", false);
+            $("#ffmpegMp4").prop("checked", false);
+            $("#onlyAudio").prop("checked", false);
+            $("#saveAs").prop("checked", false);
+            $("#thread").val(1);    // 线程强制 1
+        }
 
         downloadTs(start, end);
     });
