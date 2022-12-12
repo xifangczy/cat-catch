@@ -309,7 +309,7 @@ $('#DownFile').click(function () {
         setTimeout(function () {
             chrome.downloads.download({
                 url: url,
-                filename: filename
+                filename: stringModify(filename)
             }, function (id) {
                 downData[id] = { url: url, downFileName: filename, initiator: initiator };
             });
