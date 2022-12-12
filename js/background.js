@@ -378,14 +378,14 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // ffmpeg在线转码
     if (Message.Message == "catCatchFFmpeg") {
-        const ffmpegObj = ffmpegData.get(Message.action);
-        if (!ffmpegObj) { sendResponse("error"); return true; }
-        const data = { Message: "ffmpeg", action: ffmpegObj.action, media: Message.media, title: Message.title };
-        chrome.tabs.query({ url: ffmpegObj.url }, function (tabs) {
+        // const ffmpegObj = ffmpegData.get(Message.action);
+        if (!ffmpeg.action.includes(Message.action)) { sendResponse("error"); return true; }
+        const data = { Message: "ffmpeg", action: Message.action, media: Message.media, title: Message.title };
+        chrome.tabs.query({ url: ffmpeg.url }, function (tabs) {
             if (chrome.runtime.lastError || !tabs.length) {
-                chrome.tabs.create({ url: ffmpegObj.url }, function (tab) {
-                    ffmpegTab.id = tab.id;
-                    ffmpegTab.data = data;
+                chrome.tabs.create({ url: ffmpeg.url }, function (tab) {
+                    ffmpeg.tab = tab.id;
+                    ffmpeg.data = data;
                 });
                 sendResponse("ok");
                 return true;
@@ -449,10 +449,10 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
         }
     }
     if (changeInfo.status == "complete") {
-        if (ffmpegTab.id && tabId == ffmpegTab.id) {
+        if (ffmpeg.tab && tabId == ffmpeg.tab) {
             setTimeout(() => {
-                chrome.tabs.sendMessage(tabId, ffmpegTab.data);
-                ffmpegTab.id = 0;
+                chrome.tabs.sendMessage(tabId, ffmpeg.data);
+                ffmpeg.tab = 0;
             }, 500);
         }
     }
