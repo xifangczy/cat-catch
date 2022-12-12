@@ -136,12 +136,8 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     if (Message.Message == "ffmpeg") {
         for (let item of Message.media) {
-            const data = { action: Message.action, type: item.type ?? "video", data: item.data, title: Message.title };
-            if (typeof item.data == "string") {
-                loadBlob(data);
-            } else if (item.data instanceof ArrayBuffer) {
-                window.postMessage(data, "*", [item.data]);
-            }
+            // const data = { action: Message.action, type: item.type ?? "video", data: item.data, title: Message.title };
+            loadBlob({ action: Message.action, type: item.type ?? "video", data: item.data, title: Message.title });
         }
         sendResponse("ok");
         return true;

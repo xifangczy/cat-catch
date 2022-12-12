@@ -67,7 +67,7 @@ if (G.version >= 104) {
 // ffmpeg
 const ffmpegTab = { id: 0 };
 const ffmpegData = new Map();
-ffmpegData.set("merge", {url: "https://ffmpeg.bmmmd.com/merge.html", action: "FFmpegMerge"});
+ffmpegData.set("merge", {url: "https://ffmpeg.bmmmd.com/", action: "FFmpegMerge"});
 ffmpegData.set("transcode", {url: "https://ffmpeg.bmmmd.com/", action: "FFmpegTranscode"});
 
 // 正则预编译
