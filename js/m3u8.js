@@ -499,7 +499,7 @@ $(function () {
     });
     $("#StreamSaver").on("change", function () {
         if ($(this).prop("checked")) {
-            alert("开启边下边存\n不支持转换格式 暂不支持多线程下载");
+            alert("开启边下边存\n不支持转换格式 不支持另存为 不支持下载错误切片重下");
             $("#mp4").prop("checked", false);
             $("#ffmpegMp4").prop("checked", false);
             $("#onlyAudio").prop("checked", false);
@@ -864,7 +864,6 @@ $(function () {
         for (let index = start; index <= end; index++) {
             downList.push({ url: _fragments[index].url, index: index, duration: _fragments[index].duration });
         }
-        const downTotal = downList.length - 1;   // 需要下载的总量
         let index = 0;  // 下载指针
         let downP = 0;  // 推流指针 帮助按照顺序下载
         const tsInterval = setInterval(function () {
@@ -876,26 +875,27 @@ $(function () {
                 buttonState("#mergeTs", true);
                 return;
             }
-            // 检查当前推流指针是否有数据
-            if (downList[downP].data) {
-                if (!fileStream) { return; }
-                fileStream.write(new Uint8Array(downList[downP].data));
-                downList[downP].data = null;
-                downP++;
-            }
             // 推流指针位置大于总下载量 已完成下载
+            // downTotalTs 从1开始 所以 判断相等
             // 录播不停止
-            if (downP > downTotal) {
+            if (downP == downTotalTs) {
                 clearInterval(tsInterval);
                 if(!recorder){
                     fileStream.close();
-                    $progress.html("下载完成");
+                    $progress.html("合并已完成, 等待浏览器下载完成...");
                     buttonState("#mergeTs", true);
                 }
                 return;
             }
+            // 检查当前推流指针是否有数据
+            if (downList[downP].data) {
+                if (!fileStream) { clearInterval(tsInterval); return; }
+                fileStream.write(new Uint8Array(downList[downP].data));
+                downList[downP].data = null;
+                downP++;
+            }
             // 还有线程数 并且下载指针小于总下载量 开启下载
-            if (tsThread > 0 && index <= downTotal) {
+            if (tsThread > 0 && index < downTotalTs) {
                 tsThread--;
                 let currentIndex = index++; // 记录当前下载指针
                 fetch(downList[currentIndex].url)
