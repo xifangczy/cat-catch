@@ -44,15 +44,17 @@ $(function () {
     let downTotalTs = 0;  // 需要下载的文件数量
     const tsBuffer = []; // ts内容缓存
     const errorTsList = []; // 下载错误ts序号列表
-    let StreamSaver = false; // 流式下载
+    // let StreamSaver = false; // 流式下载
     let fileStream = undefined; // 流式下载文件输出流
     /* 录制相关 */
     let recorder = false; // 开关
-    let recorderArray = []; // 储存临时碎片
+    // let recorderArray = []; // 储存临时碎片
     let recorderIndex = 0;  // 下载索引
+    let recorderLast = "";  // 最后下载的url
     /* DOM */
     const $fileSize = $("#fileSize");
     const $progress = $("#progress");
+    const $fileDuration = $("#fileDuration");
 
     if (isEmpty(_m3u8Url)) {
         $("#loading").hide(); $("#m3u8Custom").show();
@@ -311,11 +313,12 @@ $(function () {
         }
         // 录制直播
         if (recorder) {
-            let _recorderArray = recorderArray;
-            recorderArray = [];
             for (let index in _fragments) {
-                recorderArray.push(_fragments[index].url);
-                !_recorderArray.includes(_fragments[index].url) && downloadTs(index, index);
+                if (_fragments[index].url != recorderLast) {
+                    fileStream ? streamDownload(index) : downloadTs(index);
+                    recorderLast = _fragments[_fragments.length - 1].url;
+                    break;
+                }
             }
         }
         writeText(_fragments);   // 写入ts链接到textarea
@@ -501,7 +504,7 @@ $(function () {
             $("#ffmpegMp4").prop("checked", false);
             $("#onlyAudio").prop("checked", false);
             $("#saveAs").prop("checked", false);
-            $("#thread").val(1);    // 线程强制 1
+            // $("#thread").val(1);    // 线程强制 1
         }
     });
     $("#ffmpegMp4").on("change", function () {
@@ -570,8 +573,9 @@ $(function () {
             recorder = true;
 
             // 流式下载
-            StreamSaver = $("#StreamSaver").prop("checked");
-            fileStream = StreamSaver ? createStreamSaver(_fragments[0].url) : undefined;
+            if ($("#StreamSaver").prop("checked")) {
+                fileStream = createStreamSaver(_fragments[0].url);
+            }
 
             $(this).html(fileStream ? "停止下载" : "下载录制").addClass("button2").data("switch", "off");
             $progress.html(`等待直播数据中...`);
@@ -628,14 +632,15 @@ $(function () {
         $progress.html(`${downCurrentTs}/${downTotalTs}`); // 进度显示
 
         // 流式下载
-        StreamSaver = $("#StreamSaver").prop("checked");
-        if(StreamSaver){
+        if ($("#StreamSaver").prop("checked")) {
             fileStream = createStreamSaver(_fragments[0].url);
+            streamDownload(start, end);
             $("#mp4").prop("checked", false);
             $("#ffmpegMp4").prop("checked", false);
             $("#onlyAudio").prop("checked", false);
             $("#saveAs").prop("checked", false);
-            $("#thread").val(1);    // 线程强制 1
+            $("#stopStream").show();
+            return;
         }
 
         downloadTs(start, end);
@@ -643,6 +648,15 @@ $(function () {
     // 强制下载
     $("#ForceDownload").click(function () {
         mergeTs();
+    });
+    // 停止下载流
+    $("#stopStream").click(function () {
+        if (fileStream) {
+            stopDownload = "停止下载流";
+            fileStream.close();
+            $("#stopStream").hide();
+            buttonState("#mergeTs", true);
+        }
     });
     // 重新下载
     $("#errorDownload").click(function () {
@@ -675,20 +689,12 @@ $(function () {
             if (stopDownload) {
                 clearInterval(tsInterval);
                 $progress.html(stopDownload);
-                fileStream && fileStream.close();
                 return;
             }
             // 列表为空 等待线程数回归 检查是否下载完成
             if (index == end && tsThread == _tsThread) {
                 clearInterval(tsInterval);
                 if (stopDownload) { return; }
-                // 流式下载完成
-                if (!recorder && fileStream) {
-                    fileStream.close();
-                    initDownload();
-                    buttonState("#mergeTs", true);
-                    return;
-                }
                 // 错误列表为0 下载完成
                 if (errorTsList.length == 0) {
                     $("#ForceDownload").hide();
@@ -732,20 +738,16 @@ $(function () {
                     tsBuffer[currentIndex] = tsDecrypt(responseData, currentIndex); //解密m3u8
                     fileSize += tsBuffer[currentIndex].byteLength;
                     $fileSize.html("已下载:" + byteToSize(fileSize));
-                    downDuration += fragment.duration;
-                    recorder && $("#fileDuration").html("录制时长:" + secToTime(downDuration));
+                    if(recorder){
+                        downDuration += fragment.duration;
+                        $fileDuration.html("录制时长:" + secToTime(downDuration));
+                    }
                     downCurrentTs++;
                     if (downCurrentTs == downTotalTs) {
                         $progress.html($("#mp4").prop("checked") ? `数据正在转换格式...` : `数据正在合并...`);
-                        fileStream && $progress.html("下载完成");
                         return;
                     }
                     $progress.html(`${downCurrentTs}/${downTotalTs}`);
-                    // 流式下载
-                    if (fileStream) {
-                        fileStream.write(new Uint8Array(tsBuffer[currentIndex]));
-                        tsBuffer[currentIndex] = undefined;
-                    }
                 }).always(function () {
                     tsThread++;
                 });
@@ -851,6 +853,71 @@ $(function () {
         buttonState("#mergeTs", true);
         _tsBuffer.splice(0); delete _tsBuffer;
     }
+
+    // 流式下载
+    function streamDownload(start = 0, end = _fragments.length - 1) {
+        buttonState("#mergeTs", false); // 禁止下载按钮
+        const _tsThread = parseInt($("#thread").val());  // 原始线程数量
+        let tsThread = _tsThread;  // 线程数量
+        // 下载范围
+        const downList = [];
+        for (let index = start; index <= end; index++) {
+            downList.push({ url: _fragments[index].url, index: index, duration: _fragments[index].duration });
+        }
+        const downTotal = downList.length - 1;   // 需要下载的总量
+        let index = 0;  // 下载指针
+        let downP = 0;  // 推流指针 帮助按照顺序下载
+        const tsInterval = setInterval(function () {
+            // 停止下载flag
+            if (stopDownload) {
+                fileStream && fileStream.close();
+                clearInterval(tsInterval);
+                $progress.html(stopDownload);
+                buttonState("#mergeTs", true);
+                return;
+            }
+            // 检查当前推流指针是否有数据
+            if (downList[downP].data) {
+                if (!fileStream) { return; }
+                fileStream.write(new Uint8Array(downList[downP].data));
+                downList[downP].data = null;
+                downP++;
+            }
+            // 推流指针位置大于总下载量 已完成下载
+            // 录播不停止
+            if (downP > downTotal) {
+                clearInterval(tsInterval);
+                if(!recorder){
+                    fileStream.close();
+                    $progress.html("下载完成");
+                    buttonState("#mergeTs", true);
+                }
+                return;
+            }
+            // 还有线程数 并且下载指针小于总下载量 开启下载
+            if (tsThread > 0 && index <= downTotal) {
+                tsThread--;
+                let currentIndex = index++; // 记录当前下载指针
+                fetch(downList[currentIndex].url)
+                    .then(response => response.arrayBuffer())
+                    .then(buffer => {
+                        if (stopDownload) { return; }
+                        // 解密需要当前资源的总索引 downList[currentIndex].index
+                        downList[currentIndex].data = tsDecrypt(buffer, downList[currentIndex].index);
+                        $progress.html(`${++downCurrentTs}/${downTotalTs}`);
+                        if(recorder){
+                            downDuration += downList[currentIndex].duration;
+                            $fileDuration.html("录制时长:" + secToTime(downDuration));
+                        }
+                        tsThread++;
+                    }).catch(error => {
+                        tsThread++;
+                        console.error('Error:', error);
+                    });
+            }
+        }, 10);
+    }
+
     // ts解密
     function tsDecrypt(responseData, index) {
         // 是否存在初始化切片
@@ -886,7 +953,7 @@ $(function () {
         fileSize = 0;   // 初始化已下载大小
         $fileSize.html("");
         downDuration = 0;   // 初始化时长
-        $("#fileDuration").html("");
+        $fileDuration.html("");
         tsBuffer.splice(0); // 初始化一下载ts缓存
         downCurrentTs = 0;  // 当前进度
         stopDownload = false; // 停止下载
