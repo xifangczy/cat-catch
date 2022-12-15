@@ -136,7 +136,6 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     if (Message.Message == "ffmpeg") {
         for (let item of Message.media) {
-            // const data = { action: Message.action, type: item.type ?? "video", data: item.data, title: Message.title };
             loadBlob({ action: Message.action, type: item.type ?? "video", data: item.data, title: Message.title });
         }
         sendResponse("ok");
@@ -170,6 +169,7 @@ function secToTime(sec) {
 window.addEventListener("message", (event) => {
     if (!event.data.action) { return; }
     if (event.data.action == "catCatchAddMedia") {
+        if (!event.data.url) { return; }
         chrome.runtime.sendMessage({
             Message: "addMedia",
             url: event.data.url,
@@ -192,12 +192,17 @@ window.addEventListener("message", (event) => {
         _key.push(key);
     }
     if (event.data.action == "catCatchFFmpeg") {
+        if (!event.data.use ||
+            !event.data.media ||
+            !event.data.media instanceof Array ||
+            event.data.media.length == 0
+        ) { return; }
         chrome.runtime.sendMessage({
             Message: event.data.action,
             action: event.data.use,
             media: event.data.media,
             title: event.data.title ?? document.title,
-            url: event.data.href ?? event.source.location.href,
+            url: event.data.href ?? event.source.location.href
         });
     }
 }, false);
@@ -219,15 +224,14 @@ function ArrayToBase64(data) {
 }
 
 function loadBlob(data) {
-    const reader = new FileReader;
-    reader.onload = function (e) {
-        data.data = reader.result;
-        window.postMessage(data, "*", [reader.result]);
-    };
     const xhr = new XMLHttpRequest;
     xhr.onreadystatechange = () => {
         if (xhr.readyState === 4 && xhr.status === 200) {
-            reader.readAsArrayBuffer(xhr.response);
+            xhr.response.arrayBuffer()
+            .then(function(buffer){
+                data.data = buffer;
+                window.postMessage(data, "*", [buffer]);
+            });
         }
     };
     xhr.open("GET", data.data);

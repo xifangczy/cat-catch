@@ -870,23 +870,32 @@ $(function () {
         }
         let index = 0;  // 下载指针
         let downP = 0;  // 推流指针 帮助按照顺序下载
-        let downTotalTs = end - start + 1;  // 需要下载的文件数量
+        const errorList = [];
+        const downTotalTs = end - start + 1;  // 需要下载的文件数量
         const tsInterval = setInterval(function () {
             // 停止下载flag
             if (stopDownload) {
-                fileStream && fileStream.close();
+                // fileStream && fileStream.abort();
+                if(fileStream){
+                    fileStream.abort();
+                    fileStream = undefined;
+                }
                 clearInterval(tsInterval);
                 $progress.html(stopDownload);
                 buttonState("#mergeTs", true);
                 return;
             }
+            errorList.includes(downP) && downP++;
             // 推流指针位置大于总下载量 已完成下载
             // downTotalTs 从1开始 所以 判断相等
             // 录播不停止
             if (downP == downTotalTs) {
                 clearInterval(tsInterval);
                 if (!recorder) {
-                    fileStream.close();
+                    setTimeout(() => {
+                        fileStream.close();
+                        fileStream = undefined;
+                    }, 1000);
                     $progress.html("合并已完成, 等待浏览器下载完成...");
                     $("#stopStream").hide();
                     buttonState("#mergeTs", true);
@@ -903,7 +912,7 @@ $(function () {
             // 还有线程数 并且下载指针小于总下载量 开启下载
             if (tsThread > 0 && index < downTotalTs) {
                 tsThread--;
-                let currentIndex = index++; // 记录当前下载指针
+                const currentIndex = index++; // 记录当前下载指针
                 fetch(downList[currentIndex].url)
                     .then(response => response.arrayBuffer())
                     .then(buffer => {
@@ -918,6 +927,7 @@ $(function () {
                         }
                         tsThread++;
                     }).catch(error => {
+                        errorList.push(currentIndex);
                         tsThread++;
                         console.error('Error:', error);
                     });
@@ -971,7 +981,16 @@ $(function () {
 
     // 流式下载
     function createStreamSaver(url) {
-        return streamSaver.createWriteStream(`${GetFileName(url)}.${GetExt(url)}`).getWriter();
+        streamSaver.mitm = "https://stream.bmmmd.com/mitm.html";
+        return streamSaver.createWriteStream(`${GetFileName(url)}.${GetExt(url)}`,).getWriter();
+    }
+    window.onunload = function () {
+        fileStream.abort();
+    }
+    window.onbeforeunload = function (event) {
+        if (fileStream) {
+            event.returnValue = `正在推流, 关闭后停止下载...`;
+        }
     }
 });
 function getM3u8DlArg() {

@@ -70,7 +70,6 @@ const ffmpeg = {
     url: "https://ffmpeg.bmmmd.com/",
     action: ["merge", "transcode"]
 }
-const streamSaverUrl = "https://stream.bmmmd.com/mitm.html?v20221212";
 
 // 正则预编译
 const reProtocol = /^[\w]+:\/\/.+/i;
@@ -323,7 +322,7 @@ function setReferer(referer, callback) {
         });
     });
 }
-function deleteReferer(callback){
+function deleteReferer(callback) {
     chrome.tabs.getCurrent(function (tabs) {
         chrome.declarativeNetRequest.updateSessionRules({
             removeRuleIds: [tabs.id]

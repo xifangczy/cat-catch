@@ -377,9 +377,8 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         return true;
     }
     // ffmpeg在线转码
+    // if (Message.Message == "catCatchFFmpeg" && ffmpeg.action.includes(Message.action)) {
     if (Message.Message == "catCatchFFmpeg") {
-        // const ffmpegObj = ffmpegData.get(Message.action);
-        if (!ffmpeg.action.includes(Message.action)) { sendResponse("error"); return true; }
         const data = { Message: "ffmpeg", action: Message.action, media: Message.media, title: Message.title };
         chrome.tabs.query({ url: ffmpeg.url }, function (tabs) {
             if (chrome.runtime.lastError || !tabs.length) {
