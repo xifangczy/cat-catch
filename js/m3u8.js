@@ -310,6 +310,7 @@ $(function () {
                 initSegment: initSegment
             });
         }
+        
         // 录制直播
         if (recorder) {
             let indexLast = -1;
@@ -322,6 +323,7 @@ $(function () {
             recorderLast = _fragments[_fragments.length - 1].url;
             streamDownload(indexLast + 1);
         }
+
         writeText(_fragments);   // 写入ts链接到textarea
         $("#count").append("共 " + _fragments.length + " 个文件" + "，总时长: " + secToTime(data.totalduration));
         if (data.live) {
@@ -876,7 +878,7 @@ $(function () {
             // 停止下载flag
             if (stopDownload) {
                 // fileStream && fileStream.abort();
-                if(fileStream){
+                if (fileStream) {
                     fileStream.abort();
                     fileStream = undefined;
                 }
@@ -909,28 +911,35 @@ $(function () {
                 downList[downP].data = null;
                 downP++;
             }
+            // 下载指针超过推流指针太多(目前为线程数) 暂停下载
+            if (index - downP > tsThread) {
+                return;
+            }
             // 还有线程数 并且下载指针小于总下载量 开启下载
             if (tsThread > 0 && index < downTotalTs) {
                 tsThread--;
                 const currentIndex = index++; // 记录当前下载指针
-                fetch(downList[currentIndex].url)
-                    .then(response => response.arrayBuffer())
-                    .then(buffer => {
-                        if (stopDownload) { return; }
-                        // 解密需要当前资源的总索引 downList[currentIndex].index
-                        downList[currentIndex].data = tsDecrypt(buffer, downList[currentIndex].index);
-                        if (recorder) {
-                            downDuration += downList[currentIndex].duration;
-                            $fileDuration.html("录制时长:" + secToTime(downDuration));
-                        } else {
-                            $progress.html(`${++downCurrentTs}/${downTotalTs}`);
-                        }
-                        tsThread++;
-                    }).catch(error => {
-                        errorList.push(currentIndex);
-                        tsThread++;
-                        console.error('Error:', error);
-                    });
+                $.ajax({
+                    url: downList[currentIndex].url,
+                    xhrFields: { responseType: "arraybuffer" },
+                    timeout: 60000
+                }).fail(function (error) {
+                    if (stopDownload) { return; }
+                    errorList.push(currentIndex);
+                    console.error('Error:', error);
+                }).done(function (buffer) {
+                    if (stopDownload) { return; }
+                    // 解密需要当前资源的总索引 downList[currentIndex].index
+                    downList[currentIndex].data = tsDecrypt(buffer, downList[currentIndex].index);
+                    if (recorder) {
+                        downDuration += downList[currentIndex].duration;
+                        $fileDuration.html("录制时长:" + secToTime(downDuration));
+                        return;
+                    }
+                    $progress.html(`${++downCurrentTs}/${downTotalTs}`);
+                }).always(function () {
+                    tsThread++;
+                });
             }
         }, 10);
     }
