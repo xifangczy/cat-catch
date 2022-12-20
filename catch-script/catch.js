@@ -80,7 +80,7 @@
             alert("没抓到有效数据");
             return;
         }
-        if (confirm("是否使用在线ffmpeg合并文件?")) {
+        if (catchMedia.length >= 2 && confirm("是否使用在线ffmpeg合并文件?")) {
             const media = [];
             for (let item of catchMedia) {
                 const mime = item.mimeType.split(';')[0];
