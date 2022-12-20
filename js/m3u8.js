@@ -991,7 +991,7 @@ $(function () {
     // 流式下载
     function createStreamSaver(url) {
         streamSaver.mitm = "https://stream.bmmmd.com/mitm.html";
-        return streamSaver.createWriteStream(`${GetFileName(url)}.${GetExt(url)}`,).getWriter();
+        return streamSaver.createWriteStream(`${GetFileName(url)}.${GetExt(url)}`).getWriter();
     }
     window.onunload = function () {
         fileStream.abort();
