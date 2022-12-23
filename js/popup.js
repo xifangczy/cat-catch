@@ -213,7 +213,7 @@ function AddMedia(data) {
     // 下载
     html.find('#download').click(function () {
         if (G.m3u8dl && (isM3U8(data) || isMPD(data))) {
-            let m3u8dlArg = G.m3u8dlArg.replace(/\$referer\$/g, data.initiator);
+            let m3u8dlArg = G.m3u8dlArg.replace(/\$referer\$/g, data.referer ?? data.initiator);
             m3u8dlArg = m3u8dlArg.replace(/\$url\$/g, data.url);
             m3u8dlArg = m3u8dlArg.replace(/\$title\$/g, data.title);
             let url = 'm3u8dl://' + Base64.encode(m3u8dlArg);
@@ -244,7 +244,7 @@ function AddMedia(data) {
             return false;
         }
         let url = G.Player.replace(/\$url\$/g, data.url);
-        url = url.replace(/\$referer\$/g, data.initiator);
+        url = url.replace(/\$referer\$/g, data.referer ?? data.initiator);
         url = url.replace(/\$title\$/g, encodeURIComponent(data.title));
         if (G.isFirefox) {
             window.location.href = url;
@@ -257,7 +257,10 @@ function AddMedia(data) {
     html.find('#parsing').click(function () {
         const type = $(this).data("type");
         chrome.tabs.get(G.tabId, function (tab) {
-            let url = `/${type}.html?url=${encodeURIComponent(data.url)}&referer=${encodeURIComponent(data.initiator)}&title=${encodeURIComponent(data.title)}&tabid=${data.tabId}`;
+            let url = `/${type}.html?url=${encodeURIComponent(data.url)}&title=${encodeURIComponent(data.title)}&tabid=${data.tabId}`;
+            if (data.referer) {
+                url += `&referer=${encodeURIComponent(data.referer)}`;
+            }
             chrome.tabs.create({ url: url, index: tab.index + 1 });
         });
         return false;
@@ -486,7 +489,7 @@ function copyLink(type, data) {
     }
     text = text.includes("$url$") ? text : data.url;
     text = text.replace(/\$url\$/g, data.url);
-    text = text.replace(/\$referer\$/g, data.initiator);
+    text = text.replace(/\$referer\$/g, data.referer ?? data.initiator);
     return text.replace(/\$title\$/g, data.title);
 }
 // 修剪标题
@@ -511,7 +514,7 @@ function catDownload(obj) {
             url: `/download.html?url=${encodeURIComponent(
                 obj.url
             )}&referer=${encodeURIComponent(
-                obj.initiator
+                obj.referer ?? obj.initiator
             )}&filename=${encodeURIComponent(
                 obj.downFileName
             )}`,

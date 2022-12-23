@@ -188,16 +188,15 @@ function findMedia(data, isRegex = false, filter = false) {
         isRegex: isRegex,
         requestId: data.requestId,
         extraExt: data.extraExt,
-        initiator: data.initiator
+        initiator: data.initiator,
+        referer: data.referer
     };
     const getTabId = data.tabId == -1 ? G.tabId : data.tabId;
     chrome.tabs.get(getTabId, function (webInfo) {
         if (chrome.runtime.lastError) { return; }
-        // 有referer替换掉initiator...如果initiator也没有 使用网页url
-        if (data.referer) {
-            info.initiator = data.referer;
-        } else if (info.initiator == undefined || info.initiator == "null") {
-            info.initiator = webInfo?.url;
+        // 不存在 initiator 和 referer 使用web url代替initiator
+        if (info.initiator == undefined || info.initiator == "null") {
+            info.initiator = data.referer ?? webInfo?.url;
         }
         // 装载页面信息
         info.title = webInfo?.title ?? "NULL";
