@@ -993,7 +993,7 @@ $(function () {
         return streamSaver.createWriteStream(`${GetFileName(url)}.${GetExt(url)}`).getWriter();
     }
     window.onunload = function () {
-        fileStream.abort();
+        fileStream && fileStream.abort();
     }
     window.onbeforeunload = function (event) {
         if (fileStream) {
