@@ -100,7 +100,10 @@ function findMedia(data, isRegex = false, filter = false) {
     }
 
     const header = getResponseHeadersValue(data);
-    let { name, ext } = fileNameParse(urlParsing.pathname);
+    let [name, ext] = fileNameParse(urlParsing.pathname);
+    if (!name || !ext) {
+        [name, ext] = fileNameParse(data.url);
+    }
 
     //正则匹配
     if (isRegex && !filter) {
@@ -149,7 +152,7 @@ function findMedia(data, isRegex = false, filter = false) {
     if (!isRegex && !filter && header["attachment"] != undefined) {
         const res = header["attachment"].match(reFilename);
         if (res && res[1]) {
-            let { name, ext } = fileNameParse(decodeURIComponent(res[1]));
+            [name, ext] = fileNameParse(decodeURIComponent(res[1]));
             filter = CheckExtension(ext, 0);
             if (filter == "break") { return; }
         }
@@ -499,7 +502,8 @@ function fileNameParse(pathname) {
     let fileName = pathname.split("/").pop();
     let ext = fileName.split(".");
     ext = ext.length == 1 ? undefined : ext.pop().toLowerCase();
-    return { name: fileName, ext: ext ? ext : undefined }
+    // return { name: fileName, ext: ext ? ext : undefined }
+    return [fileName, ext ? ext : undefined];
 }
 //获取Header属性的值
 function getResponseHeadersValue(data) {
