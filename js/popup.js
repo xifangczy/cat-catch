@@ -260,6 +260,8 @@ function AddMedia(data) {
             let url = `/${type}.html?url=${encodeURIComponent(data.url)}&title=${encodeURIComponent(data.title)}&tabid=${data.tabId}`;
             if (data.referer) {
                 url += `&referer=${encodeURIComponent(data.referer)}`;
+            } else {
+                url += `&initiator=${encodeURIComponent(data.initiator)}`;
             }
             chrome.tabs.create({ url: url, index: tab.index + 1 });
         });

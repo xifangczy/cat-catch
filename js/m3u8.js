@@ -2,6 +2,7 @@
 const params = new URL(location.href).searchParams;
 let _m3u8Url = params.get("url");
 const _referer = params.get("referer");
+const _initiator = params.get("initiator");
 const _title = params.get("title");
 const tsAddArg = params.get("tsAddArg");
 const getId = parseInt(params.get("getId"));
@@ -179,9 +180,13 @@ $(function () {
             $("#loading").show();
             $("#loading .optionBox").html(`解析或播放m3u8文件中有错误, 详细错误信息查看控制台`);
             console.log(data);
-            // 如果存在 referer 删掉再重新打开解析器
-            if (_referer && data.type == "networkError") {
-                $("#loading .optionBox").append(`<p><a href="${window.location.href.replace(/&referer=[^&]*/g, "")}">删除Referer重新尝试</a></p>`);
+            // 尝试添加删除referer
+            if(data.type == "networkError"){
+                if(_referer){
+                    $("#loading .optionBox").append(`<p><a href="${window.location.href.replace("&referer=", "&initiator=")}">删除Referer重新尝试</a></p>`);
+                    return;
+                }
+                _initiator && $("#loading .optionBox").append(`<p><a href="${window.location.href.replace("&initiator=", "&referer=")}">添加Referer重新尝试</a></p>`);
             }
         });
         hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
