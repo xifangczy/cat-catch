@@ -502,7 +502,8 @@ $(function () {
     });
     $("#StreamSaver").on("change", function () {
         if ($(this).prop("checked")) {
-            alert("开启边下边存\n不支持转换格式 不支持另存为 不支持下载错误切片重下");
+            // alert("开启边下边存\n不支持转换格式 不支持另存为 不支持下载错误切片重下");
+            $progress.html("开启边下边存功能<br><b>不支持转换格式</b> <b>不支持错误切片重下</b> <b>不支持另存为</b>");
             $("#mp4").prop("checked", false);
             $("#ffmpegMp4").prop("checked", false);
             $("#onlyAudio").prop("checked", false);
@@ -908,13 +909,11 @@ $(function () {
             if (downList[downP].data) {
                 if (!fileStream) { clearInterval(tsInterval); return; }
                 fileStream.write(new Uint8Array(downList[downP].data));
-                downList[downP].data = null;
+                downList[downP].data = undefined;
                 downP++;
             }
-            // 下载指针超过推流指针太多(目前为线程数) 暂停下载
-            if (index - downP > tsThread) {
-                return;
-            }
+            // 下载指针超过推流指针太多(超过线程数) 暂停下载
+            if (index - downP > _tsThread) { return; }
             // 还有线程数 并且下载指针小于总下载量 开启下载
             if (tsThread > 0 && index < downTotalTs) {
                 tsThread--;
@@ -1079,7 +1078,9 @@ function GetFileName(url) {
     url = url.join(".");
     if (url.length >= 150) {
         url = url.substring(url.length - 150);
-        console.log(url.length + "===" + url);
+    }
+    if (url.length == 0) {
+        url = "NULL";
     }
     return stringModify(url);
 }
