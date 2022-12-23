@@ -181,8 +181,8 @@ $(function () {
             $("#loading .optionBox").html(`解析或播放m3u8文件中有错误, 详细错误信息查看控制台`);
             console.log(data);
             // 尝试添加删除referer
-            if(data.type == "networkError"){
-                if(_referer){
+            if (data.type == "networkError") {
+                if (_referer) {
                     $("#loading .optionBox").append(`<p><a href="${window.location.href.replace("&referer=", "&initiator=")}">删除Referer重新尝试</a></p>`);
                     return;
                 }
@@ -315,7 +315,7 @@ $(function () {
                 initSegment: initSegment
             });
         }
-        
+
         // 录制直播
         if (recorder) {
             let indexLast = -1;
@@ -326,7 +326,7 @@ $(function () {
                 }
             }
             recorderLast = _fragments[_fragments.length - 1].url;
-            streamDownload(indexLast + 1);
+            fileStream ? streamDownload(indexLast + 1) : downloadTs(indexLast + 1);
         }
 
         writeText(_fragments);   // 写入ts链接到textarea
@@ -507,13 +507,11 @@ $(function () {
     });
     $("#StreamSaver").on("change", function () {
         if ($(this).prop("checked")) {
-            // alert("开启边下边存\n不支持转换格式 不支持另存为 不支持下载错误切片重下");
             $progress.html("开启边下边存功能<br><b>不支持转换格式</b> <b>不支持错误切片重下</b> <b>不支持另存为</b>");
             $("#mp4").prop("checked", false);
             $("#ffmpegMp4").prop("checked", false);
             $("#onlyAudio").prop("checked", false);
             $("#saveAs").prop("checked", false);
-            // $("#thread").val(1);    // 线程强制 1
         }
     });
     $("#ffmpegMp4").on("change", function () {
@@ -582,11 +580,9 @@ $(function () {
             recorder = true;
 
             // 流式下载
-            // if ($("#StreamSaver").prop("checked")) {
-            //     fileStream = createStreamSaver(_fragments[0].url);
-            // }
-            $("#StreamSaver").prop("checked", true);
-            fileStream = createStreamSaver(_fragments[0].url);
+            if ($("#StreamSaver").prop("checked")) {
+                fileStream = createStreamSaver(_fragments[0].url);
+            }
 
             $(this).html(fileStream ? "停止下载" : "下载录制").addClass("button2").data("switch", "off");
             $progress.html(`等待直播数据中...`);
@@ -597,6 +593,7 @@ $(function () {
         $(this).html("录制直播").removeClass("button2").data("switch", "on");
         if (fileStream) {
             fileStream.close();
+            fileStream = undefined;
             buttonState("#mergeTs", true);
             initDownload();
             return true;
@@ -753,6 +750,7 @@ $(function () {
                     if (recorder) {
                         downDuration += fragment.duration;
                         $fileDuration.html("录制时长:" + secToTime(downDuration));
+                        return;
                     }
                     downCurrentTs++;
                     if (downCurrentTs == downTotalTs) {
