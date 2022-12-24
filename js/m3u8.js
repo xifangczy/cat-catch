@@ -596,6 +596,7 @@ $(function () {
             fileStream = undefined;
             buttonState("#mergeTs", true);
             initDownload();
+            $progress.html(stopDownload);
             return true;
         }
         mergeTs();
