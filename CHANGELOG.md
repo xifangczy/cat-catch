@@ -1,10 +1,15 @@
 ## 更新说明
 ### 2.3.0
 [Added] m3u8解析器 边下边存
+
 [Added] m3u8解析器 在线ffmpeg转码
+
 [Fixed] 特殊文件名 下载所选无法下载
+
 [Fixed] m3u8解析器 某些情况无法下载文件
+
 [Fixed] Header属性提取失败
+
 [Changed] 修改 标题修剪 默认配置
 ### 2.2.9
 [Fixed] 修复 m3u8DL调用命令范围参数 --downloadRange 不正确
