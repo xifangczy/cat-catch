@@ -73,7 +73,7 @@ const ffmpeg = {
 
 // 正则预编译
 const reProtocol = /^[\w]+:\/\/.+/i;
-const reFilename = /filename="(.*?)"/;
+const reFilename = /filename="?(.*)"?/;
 const reRange = /([\d]+)-([\d]+)\/([\d]+)/;
 const reYoutube = /&range=[^&]*|&rbuf=[^&]*|&rn=[^&]*|&cver=[^&]*|&altitags=[^&]*|&pot=[^&]*|&fallback_count=[^&]*/g;
 const reStringModify = /['\\:\*\?"<\/>\|~]/g;
