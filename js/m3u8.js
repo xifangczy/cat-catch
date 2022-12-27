@@ -882,7 +882,6 @@ $(function () {
         const tsInterval = setInterval(function () {
             // 停止下载flag
             if (stopDownload) {
-                // fileStream && fileStream.abort();
                 if (fileStream) {
                     fileStream.abort();
                     fileStream = undefined;
