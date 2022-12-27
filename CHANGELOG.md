@@ -10,6 +10,8 @@
 
 [Fixed] Header属性提取失败
 
+[Fixed] 添加抓取类型出错 #109
+
 [Changed] 修改 标题修剪 默认配置
 ### 2.2.9
 [Fixed] 修复 m3u8DL调用命令范围参数 --downloadRange 不正确
