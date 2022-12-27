@@ -113,8 +113,11 @@ function Gethtml(Type, Param = new Object()) {
             $("#typeList tr").each(function () {
                 let GetText = $(this).find("#text").val();
                 if (isEmpty(GetText)) { return true; }
-                if (!reOptionsType.test(GetText)) {
+                GetText = GetText.trim();
+                const test = GetText.split("/");
+                if(test.length != 2 || isEmpty(test[0]) || isEmpty(test[1])){
                     alert("抓取类型格式错误，请检查");
+                    return true;
                 }
             });
         });
@@ -324,7 +327,9 @@ function Save(option, sec = 0) {
                 let GetState = $(this).find("#state").prop("checked");
                 if (isEmpty(GetText)) { return true; }
                 if (isEmpty(GetSize)) { GetSize = 0; }
-                if (reOptionsType.test(GetText)) {
+                GetText = GetText.trim();
+                const test = GetText.split("/");
+                if(test.length == 2 && !isEmpty(test[0]) && !isEmpty(test[1])){
                     Type.push({ type: GetText.toLowerCase(), size: GetSize, state: GetState });
                 }
             });
