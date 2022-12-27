@@ -77,7 +77,6 @@ const reFilename = /filename="?(.*)"?/;
 const reRange = /([\d]+)-([\d]+)\/([\d]+)/;
 const reYoutube = /&range=[^&]*|&rbuf=[^&]*|&rn=[^&]*|&cver=[^&]*|&altitags=[^&]*|&pot=[^&]*|&fallback_count=[^&]*/g;
 const reStringModify = /['\\:\*\?"<\/>\|~]/g;
-// const reOptionsType = /^[^\/]+\/[^\/]+$/ig;
 
 // 防抖
 let debounce = undefined;
