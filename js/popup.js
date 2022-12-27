@@ -385,10 +385,10 @@ if (G.version >= 102) {
 }
 // Firefox 关闭画中画 全屏 修复右边滚动条遮挡
 if (G.isFirefox) {
-    $("#pip").hide();
-    $("#fullScreen").hide();
     $("body").addClass("fixFirefoxRight");
+    $(".firefoxHide").each(function(){ $(this).hide(); });
 }
+
 // 解决浏览器字体设置超过16px按钮变高遮挡一条资源
 if ($down[0].offsetHeight > 30) {
     $(".container").css("margin-bottom", ($down[0].offsetHeight + 2) + "px");

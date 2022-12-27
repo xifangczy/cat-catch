@@ -19,6 +19,9 @@ $(function () {
         $("#saveAs").prop("checked", items.saveAs);
         $("#skipDecrypt").prop("checked", items.skipDecrypt);
     });
+    if(G.isFirefox){
+        $(".firefoxHide").each(function(){ $(this).hide(); });
+    }
 
     //获取m3u8参数
     let _m3u8Arg = new RegExp("\\.m3u8\\?([^\n]*)").exec(_m3u8Url);
