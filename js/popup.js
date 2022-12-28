@@ -132,7 +132,7 @@ function AddMedia(data) {
                     <div id="qrcode"><img src="img/qrcode.png" class="icon" title="显示资源地址二维码"/></div>
                     <div id="catDown"><img src="img/cat-down.png" class="icon" title="携带referer参数下载"/></div>
                 </div>
-                <a href="${data.url}" target="_blank" download="${data.downFileName}" data-initiator="${data.initiator}" data-title="${data.title}">${data.url}</a>
+                <a href="${data.url}" target="_blank" download="${data.downFileName}" data-referer="${data.referer ?? data.initiator}" data-title="${data.title}">${data.url}</a>
                 <br>
                 <img id="screenshots" class="hide"/>
                 <video id="preview" class="hide" controls></video>
@@ -213,9 +213,7 @@ function AddMedia(data) {
     // 下载
     html.find('#download').click(function () {
         if (G.m3u8dl && (isM3U8(data) || isMPD(data))) {
-            let m3u8dlArg = G.m3u8dlArg.replace(/\$referer\$/g, data.referer ?? data.initiator);
-            m3u8dlArg = m3u8dlArg.replace(/\$url\$/g, data.url);
-            m3u8dlArg = m3u8dlArg.replace(/\$title\$/g, data.title);
+            let m3u8dlArg = templates(G.m3u8dlArg, data);
             let url = 'm3u8dl://' + Base64.encode(m3u8dlArg);
             if (url.length >= 2046) {
                 navigator.clipboard.writeText(m3u8dlArg);
@@ -239,13 +237,11 @@ function AddMedia(data) {
     //播放
     html.find('#play').click(function () {
         if (isEmpty(G.Player)) { return true; }
-        if (G.Player == "$shareApi$") {
+        if (G.Player == "$shareApi$" || G.Player == "${shareApi}") {
             navigator.share({ url: data.url });
             return false;
         }
-        let url = G.Player.replace(/\$url\$/g, data.url);
-        url = url.replace(/\$referer\$/g, data.referer ?? data.initiator);
-        url = url.replace(/\$title\$/g, encodeURIComponent(data.title));
+        let url = templates(G.Player, data);
         if (G.isFirefox) {
             window.location.href = url;
             return false;
@@ -310,13 +306,13 @@ $('#DownFile').click(function () {
         const link = $(this).parents(".panel").find(".url a");
         const url = link.attr("href");
         const filename = "CatCatch/" + link.attr("download");
-        const initiator = link.data("initiator");
+        const referer = link.data("referer");
         setTimeout(function () {
             chrome.downloads.download({
                 url: url,
                 filename: stringModify(filename)
             }, function (id) {
-                downData[id] = { url: url, downFileName: filename, initiator: initiator };
+                downData[id] = { url: url, downFileName: filename, referer: referer };
             });
         }, 500);
     });
@@ -331,9 +327,9 @@ $('#AllCopy').click(function () {
         const link = $(this).parents('.panel').find('.url a');
         let href = link.attr('href');
         if (type) {
-            const initiator = link.data('initiator');
+            const referer = link.data('referer');
             const title = link.data('title');
-            href = copyLink(type, { url: href, initiator: initiator, title: title });
+            href = copyLink(type, { url: href, referer: referer, title: title });
         }
         url.push(href);
     });
@@ -490,9 +486,7 @@ function copyLink(type, data) {
         text = G.copyOther;
     }
     text = text.includes("$url$") ? text : data.url;
-    text = text.replace(/\$url\$/g, data.url);
-    text = text.replace(/\$referer\$/g, data.referer ?? data.initiator);
-    return text.replace(/\$title\$/g, data.title);
+    return templates(text, data);
 }
 // 修剪标题
 function trimTitle(title) {
