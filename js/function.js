@@ -120,6 +120,9 @@ function templatesFunction(text, action, arg) {
     if (action == "replace") {
         return text.replace(...arg);
     }
+    if (action == "replaceAll") {
+        return text.replaceAll(...arg);
+    }
     if (action == "regexp") {
         arg = new RegExp(...arg);
         const result = text.match(arg);
@@ -133,7 +136,7 @@ function templatesFunction(text, action, arg) {
     }
     if (action == "exists") {
         if(text){
-            return arg[0].replace("*", text);
+            return arg[0].replaceAll("*", text);
         }
         return "";
     }
