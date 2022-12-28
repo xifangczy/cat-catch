@@ -87,7 +87,7 @@
       </div>
     </section>
 
-    <section>
+    <section class="hide">
       <h1 class="optionsTitle">
         替换关键词
       </h1>
@@ -96,7 +96,7 @@
           用于 复制选项 和 N_m3u8DL-CLI 使用的关键词替换<br />
           <br />
           <b>${url}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 文件URL<b>*</b><br />
-          <b>${referer}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 请求头网址<br />
+          <b>${referer}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 请求头网址<b>*</b><br />
           <b>${title}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 网页标题<b>*</b><br />
           <b>${fullfilename}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 完整文件名(包含扩展)<b>*</b><br />
           <b>${filename}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 文件名(不包含扩展)<b>*</b><br />
@@ -111,7 +111,11 @@
           <b>${filename|slice:-10}</b> 截取末尾10个字符<br />
           <b>${fullfilename|replace:"m3u8","mp4"}</b> m3u8 替换为 mp4<br />
           <b>${title|replace:"网站",""}</b> 删除"网站"一词<br />
-          <b>${url|regexp:"(https?://[^?]*)"}</b>提取不要参数的网址<br />
+          <b>${url|regexp:"(https?://[^?]*)"}</b> 提取不要参数的网址<br />
+          <b>${referer|exists:'--headers "Referer:*"'}</b>
+          <br />如果存在referer 则输出对应字符 反之不输出(*号会被替换成referer本身)<br />
+          <br />
+          <a href="https://o2bmm.gitbook.io/cat-catch/" target="_blank">关键词替换 说明文档</a>
         </span>
       </div>
     </section>
@@ -122,7 +126,8 @@
       </h1>
       <div class="optionBox">
         <span class="explain">
-          为方便使用第三方应用，自定义复制按钮写入剪贴板的内容。<br /><br />
+          为方便使用第三方应用，自定义复制按钮写入剪贴板的内容。<br />
+          <a href="https://o2bmm.gitbook.io/cat-catch/docs/settings#keywords" target="_blank">猫抓替换关键词列表</a><br /><br />
         <div class="item">
           <div>HLS m3u8文件</div>
           <textarea id="copyM3U8" type="text" class="width100"></textarea>
@@ -162,6 +167,7 @@
             <div>参数设置</div>
             <button type="button" id="showM3u8Help">查看参数说明</button>
             <span class="explain width100 hide" id="m3u8Help">
+              <br /><a href="https://o2bmm.gitbook.io/cat-catch/docs/settings#keywords" target="_blank">猫抓替换关键词列表</a><br /><br />
               <b>m3u8DL 参数</b><br>
               --workDir &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设定程序工作目录<br>
               --saveName &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设定存储文件名(不包括后缀)<br>
@@ -252,7 +258,7 @@
           </div>
 
           <div class="item">
-            <div>修剪标题 (正则表达式提取标题 留空为不启用)</div>
+            <div>正则提取标题 留空为不启用 设置影响替换标签${title}</div>
             <input id="trimTitleRE" type="text" />
           </div>
 

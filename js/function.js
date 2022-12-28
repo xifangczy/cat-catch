@@ -99,14 +99,19 @@ function deleteReferer(callback) {
     });
 }
 
-// 模板 slice replace 实现
+// 模板 函数 实现
 function templatesFunction(text, action, arg) {
     action = action.trim();
     arg = arg.split(",");
     arg = arg.map(item => {
         item = item.trim();
-        item = item.replace(/"/g, "");
-        item = item.replace(/'/g, "");
+        if(item[0] == "'" || item[0] == '"'){
+            item = item.slice(1);
+        }
+        const length = item.length - 1;
+        if(item[length] == "'" || item[length] == '"'){
+            item = item.slice(0, length);
+        }
         return item;
     });
     if (action == "slice") {
@@ -126,36 +131,45 @@ function templatesFunction(text, action, arg) {
         }
         return text;
     }
+    if (action == "exists") {
+        if(text){
+            return arg[0].replace("*", text);
+        }
+        return "";
+    }
     return text;
 }
 function templates(text, data) {
     // 旧标签
-    text = text.replace(/\$url\$/g, data.url);
-    text = text.replace(/\$referer\$/g, data.referer ?? data.initiator);
-    text = text.replace(/\$title\$/g, data.title);
+    text = text.replaceAll("$url$", data.url);
+    text = text.replaceAll("$referer$", data.referer ?? data.initiator);
+    text = text.replaceAll("$title$", data.title);
     // 新标签
-    text = text.replace(/\${url\}/g, data.url);
+    text = text.replaceAll("${url}", data.url);
     text = text.replace(/\${url ?\| ?([^:]+):([^}]+)}/g, function (text, action, arg) {
         return templatesFunction(data.url, action, arg);
     });
-    text = text.replace(/\${referer\}/g, data.referer ?? data.initiator);
-    text = text.replace(/\${title\}/g, data.title);
+    text = text.replaceAll("${referer}", data.referer ?? data.initiator);
+    text = text.replace(/\${referer ?\| ?([^:]+):([^}]+)}/g, function (text, action, arg) {
+        return templatesFunction(data.referer, action, arg);
+    });
+    text = text.replaceAll("${title}", data.title);
     text = text.replace(/\${title ?\| ?([^:]+):([^}]+)}/g, function (text, action, arg) {
         return templatesFunction(data.title, action, arg);
     });
     // 日期
     const date = new Date();
-    text = text.replace(/\${year\}/g, date.getFullYear());
-    text = text.replace(/\${month\}/g, date.getMonth() + 1);
-    text = text.replace(/\${day\}/g, date.getDate());
-    text = text.replace(/\${hours\}/g, date.getHours());
-    text = text.replace(/\${minutes\}/g, date.getMinutes());
-    text = text.replace(/\${seconds\}/g, date.getSeconds());
-    text = text.replace(/\${date\}/g, `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`);
-    text = text.replace(/\${time\}/g, `${date.getHours()}'${date.getMinutes()}'${date.getSeconds()}`);
+    text = text.replaceAll("${year}", date.getFullYear());
+    text = text.replaceAll("${month}", date.getMonth() + 1);
+    text = text.replaceAll("${day}", date.getDate());
+    text = text.replaceAll("${hours}", date.getHours());
+    text = text.replaceAll("${minutes}", date.getMinutes());
+    text = text.replaceAll("${seconds}", date.getSeconds());
+    text = text.replaceAll("${date}", `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`);
+    text = text.replaceAll("${time}", `${date.getHours()}'${date.getMinutes()}'${date.getSeconds()}`);
     // fullfilename
     const fullfilename = new URL(data.url).pathname.split("/").pop();
-    text = text.replace(/\${fullfilename\}/g, fullfilename);
+    text = text.replaceAll("${fullfilename}", fullfilename);
     text = text.replace(/\${fullfilename ?\| ?([^:]+):([^}]+)}/g, function (text, action, arg) {
         return templatesFunction(fullfilename, action, arg);
     });
@@ -164,7 +178,7 @@ function templates(text, data) {
     filename.length > 1 && filename.pop();
     filename = filename.join(".");
     filename = isEmpty(filename) ? "NULL" : filename;
-    text = text.replace(/\${filename\}/g, filename);
+    text = text.replaceAll("${filename}", filename);
     text = text.replace(/\${filename ?\| ?([^:]+):([^}]+)}/g, function (text, action, arg) {
         return templatesFunction(filename, action, arg);
     });
@@ -172,7 +186,7 @@ function templates(text, data) {
     let ext = fullfilename.split(".");
     ext = ext.length == 1 ? "NULL" : ext[ext.length - 1];
     ext = isEmpty(ext) ? "NULL" : ext;
-    text = text.replace(/\${ext\}/g, ext);
+    text = text.replaceAll("${ext}", ext);
     text = text.replace(/\${ext ?\| ?([^:]+):([^}]+)}/g, function (text, action, arg) {
         return templatesFunction(ext, action, arg);
     });
