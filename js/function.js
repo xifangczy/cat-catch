@@ -102,19 +102,29 @@ function deleteReferer(callback) {
 // 模板 slice replace 实现
 function templatesFunction(text, action, arg) {
     action = action.trim();
+    arg = arg.split(",");
+    arg = arg.map(item => {
+        item = item.trim();
+        item = item.replace(/"/g, "");
+        item = item.replace(/'/g, "");
+        return item;
+    });
     if (action == "slice") {
-        arg = arg.split(",");
         return text.slice(...arg);
     }
     if (action == "replace") {
-        arg = arg.split(",");
-        arg = arg.map(item => {
-            item = item.trim();
-            item = item.replace(/"/g, "");
-            item = item.replace(/'/g, "");
-            return item;
-        });
         return text.replace(...arg);
+    }
+    if (action == "regexp") {
+        arg = new RegExp(...arg);
+        const result = text.match(arg);
+        if (result && result.length >= 2) {
+            text = "";
+            for (let i = 1; i < result.length; i++) {
+                text += result[i].trim();
+            }
+        }
+        return text;
     }
     return text;
 }
@@ -125,9 +135,11 @@ function templates(text, data) {
     text = text.replace(/\$title\$/g, data.title);
     // 新标签
     text = text.replace(/\${url\}/g, data.url);
+    text = text.replace(/\${url ?\| ?([^:]+):([^}]+)}/g, function (text, action, arg) {
+        return templatesFunction(data.url, action, arg);
+    });
     text = text.replace(/\${referer\}/g, data.referer ?? data.initiator);
     text = text.replace(/\${title\}/g, data.title);
-    // title 支持 split replace
     text = text.replace(/\${title ?\| ?([^:]+):([^}]+)}/g, function (text, action, arg) {
         return templatesFunction(data.title, action, arg);
     });
@@ -140,7 +152,7 @@ function templates(text, data) {
     text = text.replace(/\${minutes\}/g, date.getMinutes());
     text = text.replace(/\${seconds\}/g, date.getSeconds());
     text = text.replace(/\${date\}/g, `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`);
-    text = text.replace(/\${time\}/g, `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`);
+    text = text.replace(/\${time\}/g, `${date.getHours()}'${date.getMinutes()}'${date.getSeconds()}`);
     // fullfilename
     const fullfilename = new URL(data.url).pathname.split("/").pop();
     text = text.replace(/\${fullfilename\}/g, fullfilename);

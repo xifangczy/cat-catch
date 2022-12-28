@@ -95,7 +95,7 @@
         <span class="explain">
           用于 复制选项 和 N_m3u8DL-CLI 使用的关键词替换<br />
           <br />
-          <b>${url}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 文件URL<br />
+          <b>${url}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 文件URL<b>*</b><br />
           <b>${referer}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 请求头网址<br />
           <b>${title}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 网页标题<b>*</b><br />
           <b>${fullfilename}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 完整文件名(包含扩展)<b>*</b><br />
@@ -103,14 +103,15 @@
           <b>${ext}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 扩展名(不含".")<b>*</b><br />
           <b>${year}</b> 年 / <b>${month}</b> 月 / <b>${day}</b> 日 / <b>${hours}</b> 时 / <b>${minutes}</b> 分 / <b>${seconds}</b> 秒<br />
           <b>${date}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 日期 示例(2020-12-28)<br />
-          <b>${time}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 时间 示例(21:30:55)<br />
+          <b>${time}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 时间 示例(21'30'55)<br />
           <br />
-          <b>带"*"号 支持 slice replace函数</b><br />
+          <b>带"*"号 支持 slice replace regexp函数</b><br />
           <b>示例:</b><br />
           <b>${title|slice:0,5}</b> 截取前5个字符<br />
           <b>${filename|slice:-10}</b> 截取末尾10个字符<br />
           <b>${fullfilename|replace:"m3u8","mp4"}</b> m3u8 替换为 mp4<br />
           <b>${title|replace:"网站",""}</b> 删除"网站"一词<br />
+          <b>${url|regexp:"(https?://[^?]*)"}</b>提取不要参数的网址<br />
         </span>
       </div>
     </section>

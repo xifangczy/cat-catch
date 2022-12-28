@@ -485,7 +485,6 @@ function copyLink(type, data) {
     } else {
         text = G.copyOther;
     }
-    text = text.includes("$url$") ? text : data.url;
     return templates(text, data);
 }
 // 修剪标题
