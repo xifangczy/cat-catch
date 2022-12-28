@@ -143,16 +143,16 @@ function GetDefault(Obj) {
         case "MobileUserAgent":
             return "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
         case "m3u8dl": return false;
-        case "m3u8dlArg": return '"$url$" --workDir "%USERPROFILE%\\Downloads\\m3u8dl" --saveName "$title$" --enableDelAfterDone --headers "Referer:$referer$"';
+        case "m3u8dlArg": return '"${url}" --workDir "%USERPROFILE%\\Downloads\\m3u8dl" --saveName "${title}" --enableDelAfterDone --headers "Referer:${referer}"';
         case "injectScript": return "search.js";
         case "featMobileTabId": return [];
         case "featAutoDownTabId": return [];
         case "featCatchTabId": return [];
         case "mediaControl": return { tabid: 0, index: -1 };
         case "playbackRate": return 2;
-        case "copyM3U8": return "$url$";
-        case "copyMPD": return "ffmpeg -headers \"referer: $referer$\" -i \"$url$\" -c copy \"$title$.mp4\"";
-        case "copyOther": return "$url$";
+        case "copyM3U8": return "${url}";
+        case "copyMPD": return "ffmpeg -headers \"referer: ${referer}\" -i \"${url}\" -c copy \"${title}.mp4\"";
+        case "copyOther": return "${url}";
         case "refreshClear": return true;
         case "initComplete": return true;
         case "youtube": return false;
@@ -231,107 +231,6 @@ chrome.runtime.onInstalled.addListener(function (details) {
         }
     }
 });
-
-/*公共函数*/
-// 秒转换成时间
-function secToTime(sec) {
-    let time = "";
-    let hour = Math.floor(sec / 3600);
-    let min = Math.floor((sec % 3600) / 60);
-    sec = Math.floor(sec % 60);
-    if (hour > 0) {
-        time = hour + ":";
-    }
-    if (min < 10) {
-        time += "0";
-    }
-    time += min + ":";
-    if (sec < 10) {
-        time += "0";
-    }
-    time += sec;
-    return time;
-}
-// 字节转换成大小
-function byteToSize(byte) {
-    if (!byte || byte < 1024) { return 0; }
-    if (byte < 1024 * 1024) {
-        return parseFloat((byte / 1024).toFixed(1)) + "KB";
-    } else if (byte < 1024 * 1024 * 1024) {
-        return parseFloat((byte / 1024 / 1024).toFixed(1)) + "MB";
-    } else {
-        return parseFloat((byte / 1024 / 1024 / 1024).toFixed(1)) + "GB";
-    }
-}
-// 替换掉不允许的文件名称字符
-function stringModify(str) {
-    if (!str) { return str; }
-    return str.replace(reStringModify, function (m) {
-        return {
-            "'": '&#39;',
-            '\\': '&#92;',
-            '/': '&#47;',
-            ':': '&#58;',
-            '*': '&#42;',
-            '?': '&#63;',
-            '"': '&quot;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '|': '&#124;',
-            '~': '_'
-        }[m];
-    });
-}
-// Firefox download API 无法下载 data URL
-function downloadDataURL(url, filename) {
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    link.click();
-    delete link;
-}
-// 判断是否为空
-function isEmpty(obj) {
-    return (typeof obj == "undefined" ||
-        obj == null ||
-        obj == "" ||
-        obj == " ")
-}
-
-// 修改请求头Referer
-function setReferer(referer, callback) {
-    chrome.tabs.getCurrent(function (tabs) {
-        chrome.declarativeNetRequest.updateSessionRules({
-            removeRuleIds: [tabs.id],
-            addRules: [{
-                "id": tabs.id,
-                "action": {
-                    "type": "modifyHeaders",
-                    "requestHeaders": [{
-                        "header": "Referer",
-                        "operation": "set",
-                        "value": referer
-                    }]
-                },
-                "condition": {
-                    "tabIds": [tabs.id],
-                    "resourceTypes": ["xmlhttprequest"]
-                }
-            }]
-        }, function () {
-            callback && callback();
-        });
-    });
-}
-function deleteReferer(callback) {
-    chrome.tabs.getCurrent(function (tabs) {
-        chrome.declarativeNetRequest.updateSessionRules({
-            removeRuleIds: [tabs.id]
-        }, function () {
-            callback && callback();
-        });
-    });
-}
 
 // 清理冗余数据
 function clearRedundant() {
