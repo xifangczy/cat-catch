@@ -19,8 +19,8 @@ $(function () {
         $("#saveAs").prop("checked", items.saveAs);
         $("#skipDecrypt").prop("checked", items.skipDecrypt);
     });
-    if(G.isFirefox){
-        $(".firefoxHide").each(function(){ $(this).hide(); });
+    if (G.isFirefox) {
+        $(".firefoxHide").each(function () { $(this).hide(); });
     }
 
     //获取m3u8参数
@@ -110,12 +110,12 @@ $(function () {
                 more = true;
                 for (let item of data.levels) {
                     const url = encodeURIComponent(item.uri);
-                    const referer = encodeURIComponent(_referer);
+                    const referer = _referer ? "&referer=" + encodeURIComponent(_referer) : "&initiator=" + encodeURIComponent(_initiator);
                     const title = _title ? encodeURIComponent(_title) : "";
                     const name = GetFile(item.uri);
                     const html = `<div class="block">
                         <div>${item.attrs.RESOLUTION ? "分辨率:" + item.attrs.RESOLUTION : ""}${item.attrs.BANDWIDTH ? " | 码率:" + (parseInt(item.attrs.BANDWIDTH / 1000) + " Kbps") : ""}</div>
-                        <a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}&tabid=${tabId}">${name}</a>
+                        <a href="/m3u8.html?url=${url}${referer}&title=${title}&tabid=${tabId}">${name}</a>
                     </div>`;
                     $("#next_m3u8").append(html);
                 }
@@ -136,12 +136,12 @@ $(function () {
                         }
                     }
                     const url = encodeURIComponent(item.url);
-                    const referer = encodeURIComponent(_referer);
+                    const referer = _referer ? "&referer=" + encodeURIComponent(_referer) : "&initiator=" + encodeURIComponent(_initiator);
                     const title = _title ? encodeURIComponent(_title) : "";
                     const name = GetFile(item.url);
                     const html = `<div class="block">
                         <div>${item.name ? item.name : ""} | ${item.lang ? item.lang : ""}</div>
-                        <a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}&tabid=${tabId}">${name}</a>
+                        <a href="/m3u8.html?url=${url}${referer}&title=${title}&tabid=${tabId}">${name}</a>
                     </div>`;
                     $("#next_audio").append(html);
                 }
@@ -152,12 +152,12 @@ $(function () {
                 more = true;
                 for (let item of data.subtitleTracks) {
                     const url = encodeURIComponent(item.url);
-                    const referer = encodeURIComponent(_referer);
+                    const referer = _referer ? "&referer=" + encodeURIComponent(_referer) : "&initiator=" + encodeURIComponent(_initiator);
                     const title = _title ? encodeURIComponent(_title) : "";
                     const name = GetFile(item.url);
                     const html = `<div class="block">
                         <div>${item.name ? item.name : ""} | ${item.lang ? item.lang : ""}</div>
-                        <a href="/m3u8.html?url=${url}&referer=${referer}&title=${title}&tabid=${tabId}">${name}</a>
+                        <a href="/m3u8.html?url=${url}${referer}&title=${title}&tabid=${tabId}">${name}</a>
                     </div>`;
                     $("#next_subtitle").append(html);
                 }
@@ -1008,15 +1008,14 @@ $(function () {
     }
 });
 function getM3u8DlArg() {
-    let m3u8dlArg = G.m3u8dlArg.replace(/\$referer\$/g, _referer);
-    m3u8dlArg = m3u8dlArg.replace(/\$url\$/g, _m3u8Url);
     // 自定义文件名
     const customFilename = $("#customFilename").val().trim();
-    let title = customFilename ? customFilename : _title;
-    if (title && title.length >= 150) {
-        title = title.substring(title.length - 150);
+    const data = {
+        url: _m3u8Url,
+        title: customFilename ? customFilename : _title,
+        referer: _referer ? _referer : _initiator
     }
-    m3u8dlArg = m3u8dlArg.replace(/\$title\$/g, title);
+    let m3u8dlArg = templates(G.m3u8dlArg, data);
 
     if (m3u8dlArg.includes("--maxThreads")) {
         m3u8dlArg = m3u8dlArg.replace(/--maxThreads "?[0-9]+"?/g, "");
