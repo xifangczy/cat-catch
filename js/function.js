@@ -152,17 +152,8 @@ function templates(text, data) {
     text = text.replaceAll("$title$", data.title);
     // 新标签
     text = text.replaceAll("${url}", data.url);
-    text = text.replace(/\$\{url ?\| ?([^:]+):([^\}]+)\}/g, function (text, action, arg) {
-        return templatesFunction(data.url, action, arg);
-    });
     text = text.replaceAll("${referer}", data.referer ?? data.initiator);
-    text = text.replace(/\$\{referer ?\| ?([^:]+):([^\}]+)\}/g, function (text, action, arg) {
-        return templatesFunction(data.referer, action, arg);
-    });
     text = text.replaceAll("${title}", data.title);
-    text = text.replace(/\$\{title ?\| ?([^:]+):([^\}]+)\}/g, function (text, action, arg) {
-        return templatesFunction(data.title, action, arg);
-    });
     // 日期
     const date = new Date();
     text = text.replaceAll("${year}", date.getFullYear());
@@ -177,25 +168,35 @@ function templates(text, data) {
     let fullfilename = new URL(data.url).pathname.split("/").pop();
     fullfilename = isEmpty(fullfilename) ? "NULL" : fullfilename;
     text = text.replaceAll("${fullfilename}", fullfilename);
-    text = text.replace(/\$\{fullfilename ?\| ?([^:]+):([^\}]+)\}/g, function (text, action, arg) {
-        return templatesFunction(fullfilename, action, arg);
-    });
     // filename
     let filename = fullfilename.split(".");
     filename.length > 1 && filename.pop();
     filename = filename.join(".");
     filename = isEmpty(filename) ? "NULL" : filename;
     text = text.replaceAll("${filename}", filename);
-    text = text.replace(/\$\{filename ?\| ?([^:]+):([^\}]+)\}/g, function (text, action, arg) {
-        return templatesFunction(filename, action, arg);
-    });
     // ext
     let ext = fullfilename.split(".");
     ext = ext.length == 1 ? "NULL" : ext[ext.length - 1];
     ext = isEmpty(ext) ? "NULL" : ext;
     text = text.replaceAll("${ext}", ext);
+    //函数支持
+    text = text.replace(/\$\{fullfilename ?\| ?([^:]+):([^\}]+)\}/g, function (text, action, arg) {
+        return templatesFunction(fullfilename, action, arg);
+    });
+    text = text.replace(/\$\{filename ?\| ?([^:]+):([^\}]+)\}/g, function (text, action, arg) {
+        return templatesFunction(filename, action, arg);
+    });
     text = text.replace(/\$\{ext ?\| ?([^:]+):([^\}]+)\}/g, function (text, action, arg) {
         return templatesFunction(ext, action, arg);
+    });
+    text = text.replace(/\$\{title ?\| ?([^:]+):([^\}]+)\}/g, function (text, action, arg) {
+        return templatesFunction(data.title, action, arg);
+    });
+    text = text.replace(/\$\{referer ?\| ?([^:]+):([^\}]+)\}/g, function (text, action, arg) {
+        return templatesFunction(data.referer, action, arg);
+    });
+    text = text.replace(/\$\{url ?\| ?([^:]+):([^\}]+)\}/g, function (text, action, arg) {
+        return templatesFunction(data.url, action, arg);
     });
     return text;
 }
