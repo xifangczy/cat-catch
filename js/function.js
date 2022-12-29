@@ -102,6 +102,7 @@ function deleteReferer(callback) {
 // 模板 函数 实现
 function templatesFunction(text, action, arg) {
     if (isEmpty(text)) { return "" };
+    text = text.toString();
     action = action.trim();
     arg = arg.split(",");
     arg = arg.map(item => {
@@ -153,26 +154,30 @@ function templates(text, data) {
     text = text.replaceAll("$title$", data.title);
     // 新标签
     text = text.replaceAll("${url}", data.url);
-    if(data.referer){
+    if (data.referer) {
         text = text.replaceAll("${referer}", data.referer);
     }
-    text = text.replaceAll("${initiator}", data.referer ?? data.initiator);
+    text = text.replaceAll("${initiator}", data.referer ? data.referer : data.initiator);
     text = text.replaceAll("${webUrl}", data.webUrl);
     text = text.replaceAll("${title}", data.title);
     // 日期
     const date = new Date();
     data.days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][date.getDay()];
-    text = text.replaceAll("${now}", date);
+    data.now = Date.now();
+    function appendZero(date) {
+        return parseInt(date) < 10 ? `0${date}` : date;
+    }
+    text = text.replaceAll("${now}", data.now);
     text = text.replaceAll("${year}", date.getFullYear());
-    text = text.replaceAll("${month}", date.getMonth() + 1);
-    text = text.replaceAll("${date}", date.getDate());
+    text = text.replaceAll("${month}", appendZero(date.getMonth() + 1));
+    text = text.replaceAll("${date}", appendZero(date.getDate()));
     text = text.replaceAll("${day}", data.days);
-    text = text.replaceAll("${hours}", date.getHours());
-    text = text.replaceAll("${minutes}", date.getMinutes());
-    text = text.replaceAll("${seconds}", date.getSeconds());
-    data.fullDate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+    text = text.replaceAll("${hours}", appendZero(date.getHours()));
+    text = text.replaceAll("${minutes}", appendZero(date.getMinutes()));
+    text = text.replaceAll("${seconds}", appendZero(date.getSeconds()));
+    data.fullDate = `${date.getFullYear()}-${appendZero(date.getMonth() + 1)}-${appendZero(date.getDate())}`;
     text = text.replaceAll("${fullDate}", data.fullDate);
-    data.time = `${date.getHours()}'${date.getMinutes()}'${date.getSeconds()}`;
+    data.time = `${appendZero(date.getHours())}'${appendZero(date.getMinutes())}'${appendZero(date.getSeconds())}`;
     text = text.replaceAll("${time}", data.time);
     // fullFileName
     data.fullFileName = new URL(data.url).pathname.split("/").pop();
