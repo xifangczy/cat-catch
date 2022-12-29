@@ -145,11 +145,19 @@ function templatesFunction(text, action, arg = "") {
         }
         return "";
     }
-    if (action == "base64") {
-        if (window.Base64) {
-            return arg[0] == "decode" ? Base64.decode(text) : Base64.encode(text);
+    if (action == "to") {
+        if(arg[0] == "base64"){
+            return window.Base64 ? Base64.encode(text) : btoa(unescape(encodeURIComponent(text)));
         }
-        return arg[0] == "decode" ?  atob(decodeURIComponent(text)) : btoa(encodeURIComponent(text));
+        if(arg[0] == "urlEncode"){
+            return encodeURIComponent(text);
+        }
+        if(arg[0] == "lowerCase"){
+            return text.toLowerCase();
+        }
+        if(arg[0] == "upperCase"){
+            return text.toUpperCase();
+        }
     }
     return text;
 }
@@ -203,7 +211,7 @@ function templates(text, data) {
     }
     text = text.replaceAll("${ext}", data.ext);
     //函数支持
-    text = text.replace(/\$\{(fullFileName|fileName|ext|title|referer|url|now|fullDate|time|initiator|webUrl) ?\| ?(slice|replace|replaceAll|regexp|exists|base64) ?:([^\}]+)\}/g, function (original, tag, action, arg) {
+    text = text.replace(/\$\{(fullFileName|fileName|ext|title|referer|url|now|fullDate|time|initiator|webUrl) ?\| ?(slice|replace|replaceAll|regexp|exists|to) ?:([^\}]+)\}/g, function (original, tag, action, arg) {
         return templatesFunction(data[tag], action, arg);
     });
     return text;
