@@ -101,6 +101,7 @@ function deleteReferer(callback) {
 
 // 模板 函数 实现
 function templatesFunction(text, action, arg) {
+    if (isEmpty(text)) { return "" };
     action = action.trim();
     arg = arg.split(",");
     arg = arg.map(item => {
@@ -165,41 +166,30 @@ function templates(text, data) {
     text = text.replaceAll("${hours}", date.getHours());
     text = text.replaceAll("${minutes}", date.getMinutes());
     text = text.replaceAll("${seconds}", date.getSeconds());
-    text = text.replaceAll("${fulldate}", `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`);
-    text = text.replaceAll("${time}", `${date.getHours()}'${date.getMinutes()}'${date.getSeconds()}`);
+    data.fulldate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+    text = text.replaceAll("${fulldate}", data.fulldate);
+    data.time = `${date.getHours()}'${date.getMinutes()}'${date.getSeconds()}`;
+    text = text.replaceAll("${time}", data.time);
     // fullfilename
-    let fullfilename = new URL(data.url).pathname.split("/").pop();
-    fullfilename = isEmpty(fullfilename) ? "NULL" : fullfilename;
-    text = text.replaceAll("${fullfilename}", fullfilename);
+    data.fullfilename = new URL(data.url).pathname.split("/").pop();
+    data.fullfilename = isEmpty(data.fullfilename) ? "NULL" : data.fullfilename;
+    text = text.replaceAll("${fullfilename}", data.fullfilename);
     // filename
-    let filename = fullfilename.split(".");
-    filename.length > 1 && filename.pop();
-    filename = filename.join(".");
-    filename = isEmpty(filename) ? "NULL" : filename;
-    text = text.replaceAll("${filename}", filename);
+    data.filename = data.fullfilename.split(".");
+    data.filename.length > 1 && data.filename.pop();
+    data.filename = data.filename.join(".");
+    data.filename = isEmpty(data.filename) ? "NULL" : data.filename;
+    text = text.replaceAll("${filename}", data.filename);
     // ext
-    let ext = fullfilename.split(".");
-    ext = ext.length == 1 ? "NULL" : ext[ext.length - 1];
-    ext = isEmpty(ext) ? "NULL" : ext;
-    text = text.replaceAll("${ext}", ext);
+    if (!data.ext) {
+        data.ext = data.fullfilename.split(".");
+        data.ext = data.ext.length == 1 ? "NULL" : data.ext[data.ext.length - 1];
+        data.ext = isEmpty(data.ext) ? "NULL" : data.ext;
+    }
+    text = text.replaceAll("${ext}", data.ext);
     //函数支持
-    text = text.replace(/\$\{fullfilename ?\| ?([^:]+):([^\}]+)\}/g, function (text, action, arg) {
-        return templatesFunction(fullfilename, action, arg);
-    });
-    text = text.replace(/\$\{filename ?\| ?([^:]+):([^\}]+)\}/g, function (text, action, arg) {
-        return templatesFunction(filename, action, arg);
-    });
-    text = text.replace(/\$\{ext ?\| ?([^:]+):([^\}]+)\}/g, function (text, action, arg) {
-        return templatesFunction(ext, action, arg);
-    });
-    text = text.replace(/\$\{title ?\| ?([^:]+):([^\}]+)\}/g, function (text, action, arg) {
-        return templatesFunction(data.title, action, arg);
-    });
-    text = text.replace(/\$\{referer ?\| ?([^:]+):([^\}]+)\}/g, function (text, action, arg) {
-        return templatesFunction(data.referer, action, arg);
-    });
-    text = text.replace(/\$\{url ?\| ?([^:]+):([^\}]+)\}/g, function (text, action, arg) {
-        return templatesFunction(data.url, action, arg);
+    text = text.replace(/\$\{(fullfilename|filename|ext|title|referer|url|now|fulldate|time) ?\| ?([^:]+):([^\}]+)\}/g, function (original, tag, action, arg) {
+        return templatesFunction(data[tag], action, arg);
     });
     return text;
 }
