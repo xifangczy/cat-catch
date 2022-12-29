@@ -381,6 +381,9 @@ textarea {
   word-break: break-all;
   width: 100%;
 }
+.break-all{
+  word-break: break-all;
+}
 /* MPD*/
 .dash .select {
   padding-right: 20px;
