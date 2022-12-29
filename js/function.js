@@ -157,12 +157,12 @@ function templates(text, data) {
     text = text.replaceAll("${title}", data.title);
     // 日期
     const date = new Date();
-    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    data.days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][date.getDay()];
     text = text.replaceAll("${now}", date);
     text = text.replaceAll("${year}", date.getFullYear());
     text = text.replaceAll("${month}", date.getMonth() + 1);
     text = text.replaceAll("${date}", date.getDate());
-    text = text.replaceAll("${day}", days[date.getDay()]);
+    text = text.replaceAll("${day}", data.days);
     text = text.replaceAll("${hours}", date.getHours());
     text = text.replaceAll("${minutes}", date.getMinutes());
     text = text.replaceAll("${seconds}", date.getSeconds());
