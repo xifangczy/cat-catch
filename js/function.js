@@ -156,13 +156,16 @@ function templates(text, data) {
     text = text.replaceAll("${title}", data.title);
     // 日期
     const date = new Date();
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    text = text.replaceAll("${now}", date);
     text = text.replaceAll("${year}", date.getFullYear());
     text = text.replaceAll("${month}", date.getMonth() + 1);
-    text = text.replaceAll("${day}", date.getDate());
+    text = text.replaceAll("${date}", date.getDate());
+    text = text.replaceAll("${day}", days[date.getDay()]);
     text = text.replaceAll("${hours}", date.getHours());
     text = text.replaceAll("${minutes}", date.getMinutes());
     text = text.replaceAll("${seconds}", date.getSeconds());
-    text = text.replaceAll("${date}", `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`);
+    text = text.replaceAll("${fulldate}", `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`);
     text = text.replaceAll("${time}", `${date.getHours()}'${date.getMinutes()}'${date.getSeconds()}`);
     // fullfilename
     let fullfilename = new URL(data.url).pathname.split("/").pop();
