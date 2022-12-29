@@ -100,7 +100,7 @@ function deleteReferer(callback) {
 }
 
 // 模板 函数 实现
-function templatesFunction(text, action, arg) {
+function templatesFunction(text, action, arg = "") {
     if (isEmpty(text)) { return "" };
     text = text.toString();
     action = action.trim();
@@ -144,6 +144,12 @@ function templatesFunction(text, action, arg) {
             return arg[1].replaceAll("*", text);
         }
         return "";
+    }
+    if (action == "base64") {
+        if (window.Base64) {
+            return arg[0] == "decode" ? Base64.decode(text) : Base64.encode(text);
+        }
+        return arg[0] == "decode" ?  atob(decodeURIComponent(text)) : btoa(encodeURIComponent(text));
     }
     return text;
 }
@@ -197,7 +203,7 @@ function templates(text, data) {
     }
     text = text.replaceAll("${ext}", data.ext);
     //函数支持
-    text = text.replace(/\$\{(fullFileName|fileName|ext|title|referer|url|now|fullDate|time|initiator|webUrl) ?\| ?([^:]+):([^\}]+)\}/g, function (original, tag, action, arg) {
+    text = text.replace(/\$\{(fullFileName|fileName|ext|title|referer|url|now|fullDate|time|initiator|webUrl) ?\| ?(slice|replace|replaceAll|regexp|exists|base64) ?:([^\}]+)\}/g, function (original, tag, action, arg) {
         return templatesFunction(data[tag], action, arg);
     });
     return text;
