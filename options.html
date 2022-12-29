@@ -205,7 +205,16 @@
             </span>
             <textarea id="m3u8dlArg" type="text" class="width100" rows="3"></textarea>
           </div>
+          <div id="testTag" class="hide">
+            ${url}<input type="text" class="width100" value="https://bmmmd.com/test.m3u8" id="url">
+            ${referer}<input type="text" class="width100" value="https://bmmmd.com/" id="referer">
+            ${initiator}<input type="text" class="width100" value="https://bmmmd.com" id="initiator">
+            ${webUrl}<input type="text" class="width100" value="https://bmmmd.com/test.html" id="webUrl">
+            ${title}<input type="text" class="width100" value="测试视频" id="title">
+            替换后:<br><span id="m3u8dlArgResult"></span>
+          </div>
           <div class="button">
+            <button type="button" id="showTestTag">测试</button>
             <button type="button" id="ResetM3u8dl">重置参数设置</button>
           </div>
         </div>

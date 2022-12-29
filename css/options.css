@@ -192,7 +192,9 @@ button:active {
   min-height: 35px;
 }
 #m3u8_url,
-#mpd_url {
+#mpd_url,
+.test_url
+{
   overflow: hidden;
   display: block;
   text-overflow: ellipsis;

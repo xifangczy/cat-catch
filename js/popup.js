@@ -132,7 +132,7 @@ function AddMedia(data) {
                     <div id="qrcode"><img src="img/qrcode.png" class="icon" title="显示资源地址二维码"/></div>
                     <div id="catDown"><img src="img/cat-down.png" class="icon" title="携带referer参数下载"/></div>
                 </div>
-                <a href="${data.url}" target="_blank" download="${data.downFileName}" data-referer="${data.referer ?? ""}" data-initiator="${data.initiator}" data-title="${data.title}">${data.url}</a>
+                <a href="${data.url}" target="_blank" download="${data.downFileName}" data-referer="${data.referer ?? ""}" data-initiator="${data.initiator}" data-title="${data.title}" data-weburl="${data.webUrl}">${data.url}</a>
                 <br>
                 <img id="screenshots" class="hide"/>
                 <video id="preview" class="hide" controls></video>
@@ -314,6 +314,8 @@ $('#DownFile').click(function () {
             }, function (id) {
                 downData[id] = { url: url, downFileName: filename };
                 if (referer) { downData[id].referer = referer; }
+                downData[id].initiator = referer ? referer : link.data('initiator');
+                downData[id].webUrl = link.data("weburl");
             });
         }, 500);
     });
@@ -332,6 +334,8 @@ $('#AllCopy').click(function () {
             const title = link.data('title');
             const data = { url: href, title: title };
             if (referer) { data.referer = referer; }
+            data.initiator = referer ? referer : link.data('initiator');
+            data.webUrl = link.data("weburl");
             href = copyLink(type, data);
         }
         url.push(href);

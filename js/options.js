@@ -33,6 +33,7 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
         $("#refreshClear").prop("checked", items.refreshClear);
         $("#catDownload").prop("checked", items.catDownload);
         $("#injectScript").val(items.injectScript);
+        m3u8dlArgTest();
     }, 100);
 });
 
@@ -115,7 +116,7 @@ function Gethtml(Type, Param = new Object()) {
                 if (isEmpty(GetText)) { return true; }
                 GetText = GetText.trim();
                 const test = GetText.split("/");
-                if(test.length != 2 || isEmpty(test[0]) || isEmpty(test[1])){
+                if (test.length != 2 || isEmpty(test[0]) || isEmpty(test[1])) {
                     alert("抓取类型格式错误，请检查");
                     return true;
                 }
@@ -171,6 +172,25 @@ $("#allDisable, #allEnable").bind("click", function () {
         $(this).prop("checked", state);
     });
     Save(obj);
+});
+// m3u8dlArg 输出测试
+function m3u8dlArgTest() {
+    const data = {
+        url: $("#url").val(),
+        referer: $("#referer").val(),
+        initiator: $("#initiator").val(),
+        webUrl: $("#webUrl").val(),
+        title: $("#title").val(),
+    }
+    const result = templates($("#m3u8dlArg").val(), data);
+    const m3u8dl = 'm3u8dl://' + Base64.encode(result);
+    $("#m3u8dlArgResult").html(`${result}<br><br><a href="${m3u8dl}" class="test_url">${m3u8dl}</a>`);
+}
+$("#showTestTag").bind("click", function () {
+    $("#testTag").slideToggle();
+});
+$("#testTag input, #m3u8dlArg").on("input", function () {
+    m3u8dlArgTest();
 });
 //重置后缀 重置类型 重置正则
 $("#ResetExt, #ResetType, #ResetRegex").bind("click", function () {
@@ -329,7 +349,7 @@ function Save(option, sec = 0) {
                 if (isEmpty(GetSize)) { GetSize = 0; }
                 GetText = GetText.trim();
                 const test = GetText.split("/");
-                if(test.length == 2 && !isEmpty(test[0]) && !isEmpty(test[1])){
+                if (test.length == 2 && !isEmpty(test[0]) && !isEmpty(test[1])) {
                     Type.push({ type: GetText.toLowerCase(), size: GetSize, state: GetState });
                 }
             });

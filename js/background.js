@@ -198,6 +198,7 @@ function findMedia(data, isRegex = false, filter = false) {
         // 装载页面信息
         info.title = webInfo?.title ?? "NULL";
         info.favIconUrl = webInfo?.favIconUrl;
+        info.webUrl = webInfo?.url;
         // 发送到popup 并检查自动下载
         chrome.runtime.sendMessage(info, function () {
             if (data.tabId != -1 && G.featAutoDownTabId && G.featAutoDownTabId.includes(data.tabId)) {

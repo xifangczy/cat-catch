@@ -49,10 +49,10 @@ function stringModify(str) {
     });
 }
 // Firefox download API 无法下载 data URL
-function downloadDataURL(url, filename) {
+function downloadDataURL(url, fileName) {
     const link = document.createElement("a");
     link.href = url;
-    link.download = filename;
+    link.download = fileName;
     link.click();
     delete link;
 }
@@ -153,7 +153,11 @@ function templates(text, data) {
     text = text.replaceAll("$title$", data.title);
     // 新标签
     text = text.replaceAll("${url}", data.url);
-    text = text.replaceAll("${referer}", data.referer ?? data.initiator);
+    if(data.referer){
+        text = text.replaceAll("${referer}", data.referer);
+    }
+    text = text.replaceAll("${initiator}", data.referer ?? data.initiator);
+    text = text.replaceAll("${webUrl}", data.webUrl);
     text = text.replaceAll("${title}", data.title);
     // 日期
     const date = new Date();
@@ -166,29 +170,29 @@ function templates(text, data) {
     text = text.replaceAll("${hours}", date.getHours());
     text = text.replaceAll("${minutes}", date.getMinutes());
     text = text.replaceAll("${seconds}", date.getSeconds());
-    data.fulldate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-    text = text.replaceAll("${fulldate}", data.fulldate);
+    data.fullDate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+    text = text.replaceAll("${fullDate}", data.fullDate);
     data.time = `${date.getHours()}'${date.getMinutes()}'${date.getSeconds()}`;
     text = text.replaceAll("${time}", data.time);
-    // fullfilename
-    data.fullfilename = new URL(data.url).pathname.split("/").pop();
-    data.fullfilename = isEmpty(data.fullfilename) ? "NULL" : data.fullfilename;
-    text = text.replaceAll("${fullfilename}", data.fullfilename);
-    // filename
-    data.filename = data.fullfilename.split(".");
-    data.filename.length > 1 && data.filename.pop();
-    data.filename = data.filename.join(".");
-    data.filename = isEmpty(data.filename) ? "NULL" : data.filename;
-    text = text.replaceAll("${filename}", data.filename);
+    // fullFileName
+    data.fullFileName = new URL(data.url).pathname.split("/").pop();
+    data.fullFileName = isEmpty(data.fullFileName) ? "NULL" : data.fullFileName;
+    text = text.replaceAll("${fullFileName}", data.fullFileName);
+    // fileName
+    data.fileName = data.fullFileName.split(".");
+    data.fileName.length > 1 && data.fileName.pop();
+    data.fileName = data.fileName.join(".");
+    data.fileName = isEmpty(data.fileName) ? "NULL" : data.fileName;
+    text = text.replaceAll("${fileName}", data.fileName);
     // ext
     if (!data.ext) {
-        data.ext = data.fullfilename.split(".");
+        data.ext = data.fullFileName.split(".");
         data.ext = data.ext.length == 1 ? "NULL" : data.ext[data.ext.length - 1];
         data.ext = isEmpty(data.ext) ? "NULL" : data.ext;
     }
     text = text.replaceAll("${ext}", data.ext);
     //函数支持
-    text = text.replace(/\$\{(fullfilename|filename|ext|title|referer|url|now|fulldate|time) ?\| ?([^:]+):([^\}]+)\}/g, function (original, tag, action, arg) {
+    text = text.replace(/\$\{(fullFileName|fileName|ext|title|referer|url|now|fullDate|time|initiator|webUrl) ?\| ?([^:]+):([^\}]+)\}/g, function (original, tag, action, arg) {
         return templatesFunction(data[tag], action, arg);
     });
     return text;

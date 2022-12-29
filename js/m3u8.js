@@ -1013,7 +1013,8 @@ function getM3u8DlArg() {
     const data = {
         url: _m3u8Url,
         title: customFilename ? customFilename : _title,
-        referer: _referer ? _referer : _initiator
+        referer: _referer,
+        initiator: _referer ?? _initiator
     }
     let m3u8dlArg = templates(G.m3u8dlArg, data);
 
