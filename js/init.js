@@ -226,7 +226,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
         chrome.alarms.create("nowClear", { when: Date.now() + 3000 });
         // 兼容之前版本 PotPlayer打开预览视频选项
         if (G.Potplayer) {
-            chrome.storage.sync.set({ Player: "potplayer://$url$" });
+            chrome.storage.sync.set({ Player: "potplayer://${url}" });
             delete G.Potplayer;
         }
     }
