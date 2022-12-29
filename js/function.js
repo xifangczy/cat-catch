@@ -105,11 +105,11 @@ function templatesFunction(text, action, arg) {
     arg = arg.split(",");
     arg = arg.map(item => {
         item = item.trim();
-        if(item[0] == "'" || item[0] == '"'){
+        if (item[0] == "'" || item[0] == '"') {
             item = item.slice(1);
         }
         const length = item.length - 1;
-        if(item[length] == "'" || item[length] == '"'){
+        if (item[length] == "'" || item[length] == '"') {
             item = item.slice(0, length);
         }
         return item;
@@ -135,8 +135,11 @@ function templatesFunction(text, action, arg) {
         return text;
     }
     if (action == "exists") {
-        if(text){
+        if (text) {
             return arg[0].replaceAll("*", text);
+        }
+        if (arg[1]) {
+            return arg[1].replaceAll("*", text);
         }
         return "";
     }
