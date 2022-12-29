@@ -181,10 +181,6 @@ window.addEventListener("message", (event) => {
     }
     if (event.data.action == "catCatchAddKey") {
         let key = event.data.key;
-        // if(event.data.ext == "key" || event.data.ext == "arrayBuffer"){
-        //     key = ArrayToBase64(key);
-        //     if(!key){ return; }
-        // }
         if (key instanceof ArrayBuffer || key instanceof Array) {
             key = ArrayToBase64(key);
         }
