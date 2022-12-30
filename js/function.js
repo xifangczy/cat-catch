@@ -1,4 +1,7 @@
-/*公共函数*/
+// 追加0
+function appendZero(date) {
+    return parseInt(date) < 10 ? `0${date}` : date;
+}
 // 秒转换成时间
 function secToTime(sec) {
     let time = "";
@@ -8,14 +11,8 @@ function secToTime(sec) {
     if (hour > 0) {
         time = hour + ":";
     }
-    if (min < 10) {
-        time += "0";
-    }
-    time += min + ":";
-    if (sec < 10) {
-        time += "0";
-    }
-    time += sec;
+    time += appendZero(min) + ":";
+    time += appendZero(sec);
     return time;
 }
 // 字节转换成大小
@@ -146,65 +143,66 @@ function templatesFunction(text, action, arg = "") {
         return "";
     }
     if (action == "to") {
-        if(arg[0] == "base64"){
+        if (arg[0] == "base64") {
             return window.Base64 ? Base64.encode(text) : btoa(unescape(encodeURIComponent(text)));
         }
-        if(arg[0] == "urlEncode"){
+        if (arg[0] == "urlEncode") {
             return encodeURIComponent(text);
         }
-        if(arg[0] == "lowerCase"){
+        if (arg[0] == "lowerCase") {
             return text.toLowerCase();
         }
-        if(arg[0] == "upperCase"){
+        if (arg[0] == "upperCase") {
             return text.toUpperCase();
         }
     }
     return text;
 }
 function templates(text, data) {
-    // 旧标签
-    text = text.replaceAll("$url$", data.url);
-    text = text.replaceAll("$referer$", data.referer ?? data.initiator);
-    text = text.replaceAll("$title$", data.title);
-    // 新标签
-    text = text.replaceAll("${url}", data.url ?? "");
-    text = text.replaceAll("${referer}", data.referer ?? "");
-    text = text.replaceAll("${initiator}", data.referer ? data.referer : data.initiator);
-    text = text.replaceAll("${webUrl}", data.webUrl ?? "");
-    text = text.replaceAll("${title}", data.title ?? "");
     // 日期
     const date = new Date();
     data.days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][date.getDay()];
     data.now = Date.now();
-    function appendZero(date) {
-        return parseInt(date) < 10 ? `0${date}` : date;
-    }
-    text = text.replaceAll("${now}", data.now);
-    text = text.replaceAll("${year}", date.getFullYear());
-    text = text.replaceAll("${month}", appendZero(date.getMonth() + 1));
-    text = text.replaceAll("${date}", appendZero(date.getDate()));
-    text = text.replaceAll("${day}", data.days);
-    text = text.replaceAll("${hours}", appendZero(date.getHours()));
-    text = text.replaceAll("${minutes}", appendZero(date.getMinutes()));
-    text = text.replaceAll("${seconds}", appendZero(date.getSeconds()));
     data.fullDate = `${date.getFullYear()}-${appendZero(date.getMonth() + 1)}-${appendZero(date.getDate())}`;
-    text = text.replaceAll("${fullDate}", data.fullDate);
     data.time = `${appendZero(date.getHours())}'${appendZero(date.getMinutes())}'${appendZero(date.getSeconds())}`;
-    text = text.replaceAll("${time}", data.time);
     // fullFileName
     data.fullFileName = new URL(data.url).pathname.split("/").pop();
-    text = text.replaceAll("${fullFileName}", data.fullFileName ?? "");
     // fileName
     data.fileName = data.fullFileName.split(".");
     data.fileName.length > 1 && data.fileName.pop();
     data.fileName = data.fileName.join(".");
-    text = text.replaceAll("${fileName}", data.fileName ?? "");
     // ext
-    if (!data.ext) {
+    if (isEmpty(data.ext)) {
         data.ext = data.fullFileName.split(".");
         data.ext = data.ext.length == 1 ? "" : data.ext[data.ext.length - 1];
     }
-    text = text.replaceAll("${ext}", data.ext ?? "");
+    // 标签
+    const tags = {
+        "$url$": data.url,
+        "$referer$": data.referer ?? data.initiator,
+        "$title$": data.title,
+        "${url}": data.url ?? "",
+        "${referer}": data.referer ?? "",
+        "${initiator}": data.referer ? data.referer : data.initiator,
+        "${webUrl}": data.webUrl ?? "",
+        "${title}": data.title ?? "",
+        "${now}": data.now,
+        "${year}": date.getFullYear(),
+        "${month}": appendZero(date.getMonth() + 1),
+        "${date}": appendZero(date.getDate()),
+        "${day}": data.days,
+        "${hours}": appendZero(date.getHours()),
+        "${minutes}": appendZero(date.getMinutes()),
+        "${seconds}": appendZero(date.getSeconds()),
+        "${fullDate}": data.fullDate,
+        "${time}": data.time,
+        "${fullFileName}": data.fullFileName ?? "",
+        "${fileName}": data.fileName ?? "",
+        "${ext}": data.ext ?? "",
+    }
+    for (let key in tags) {
+        text = text.replaceAll(key, tags[key]);
+    }
     //函数支持
     text = text.replace(/\$\{(fullFileName|fileName|ext|title|referer|url|now|fullDate|time|initiator|webUrl) ?\| ?(slice|replace|replaceAll|regexp|exists|to) ?:([^\}]+)\}/g, function (original, tag, action, arg) {
         return templatesFunction(data[tag], action, arg);
