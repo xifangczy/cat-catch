@@ -12,19 +12,17 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
     for (let key in items.Regex) {
         $("#regexList").append(Gethtml("Regex", { type: items.Regex[key].type, regex: items.Regex[key].regex, ext: items.Regex[key].ext, state: items.Regex[key].state }));
     }
-    $("#OtherAutoClear").val(items.OtherAutoClear);
-    $("#MobileUserAgent").val(items.MobileUserAgent);
-    $("#m3u8dlArg").val(items.m3u8dlArg);
-    $("#copyM3U8").val(items.copyM3U8);
-    $("#copyMPD").val(items.copyMPD);
-    $("#copyOther").val(items.copyOther);
-    // 注入脚本列表
-    G.scriptList.forEach(function (item, key) {
-        $("#injectScript").append(`<option value="${key}">${item.name}(${key})</option>`);
-    });
-    $("#Player").val(items.Player);
-    $("#trimTitleRE").val(items.trimTitleRE);
     setTimeout(() => {
+        // 注入脚本列表
+        G.scriptList.forEach(function (item, key) {
+            $("#injectScript").append(`<option value="${key}">${item.name}(${key})</option>`);
+        });
+        $("#OtherAutoClear").val(items.OtherAutoClear);
+        $("#MobileUserAgent").val(items.MobileUserAgent);
+        $("#m3u8dlArg").val(items.m3u8dlArg);
+        $("#copyM3U8").val(items.copyM3U8);
+        $("#copyMPD").val(items.copyMPD);
+        $("#copyOther").val(items.copyOther);
         $("#Debug").prop("checked", items.Debug);
         $("#TitleName").prop("checked", items.TitleName);
         $("#ShowWebIco").prop("checked", items.ShowWebIco);
@@ -33,7 +31,8 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
         $("#refreshClear").prop("checked", items.refreshClear);
         $("#catDownload").prop("checked", items.catDownload);
         $("#injectScript").val(items.injectScript);
-        m3u8dlArgTest();
+        $("#Player").val(items.Player);
+        $("#trimTitleRE").val(items.trimTitleRE);
     }, 100);
 });
 
@@ -187,6 +186,7 @@ function m3u8dlArgTest() {
     $("#m3u8dlArgResult").html(`${result}<br><br><a href="${m3u8dl}" class="test_url">${m3u8dl}</a>`);
 }
 $("#showTestTag").bind("click", function () {
+    m3u8dlArgTest();
     $("#testTag").slideToggle();
 });
 $("#testTag input, #m3u8dlArg").on("input", function () {
