@@ -1008,15 +1008,19 @@ $(function () {
     }
 });
 function getM3u8DlArg() {
+    let m3u8dlArg = G.m3u8dlArg;
     // 自定义文件名
     const customFilename = $("#customFilename").val().trim();
+    if (customFilename) {
+        m3u8dlArg = m3u8dlArg.replace(/--saveName "[^"]+"/g, `--saveName "${customFilename}"`);
+    }
     const data = {
         url: _m3u8Url,
-        title: customFilename ? customFilename : _title,
+        title: _title,
         referer: _referer,
         initiator: _referer ?? _initiator
     }
-    let m3u8dlArg = templates(G.m3u8dlArg, data);
+    m3u8dlArg = templates(m3u8dlArg, data);
 
     if (m3u8dlArg.includes("--maxThreads")) {
         m3u8dlArg = m3u8dlArg.replace(/--maxThreads "?[0-9]+"?/g, "");
