@@ -145,6 +145,8 @@ function templatesFunction(text, action) {
             } else if (arg[0] == "upperCase") {
                 text = text.toUpperCase();
             }
+        } else {
+            text = ""; break;
         }
     }
     return text;

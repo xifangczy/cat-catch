@@ -40,16 +40,20 @@ async function findMedia(data, raw = undefined, depth = 0) {
                 ext && window.postMessage({ action: "catCatchAddMedia", url: data[key], href: location.href, ext: ext });
                 continue;
             }
-            if (data[key].substring(0, 7) == "#EXTM3U") {
+            if (data[key].substring(0, 7).toUpperCase() == "#EXTM3U") {
                 isFullM3u8(data[key]) && toUrl(data[key]);
                 continue;
             }
-            if (data[key].substring(0, 34) == "data:application/vnd.apple.mpegurl") {
-                let text = data[key].substring(35);
+            if (data[key].substring(0, 34).toLowerCase() == "data:application/vnd.apple.mpegurl") {
+                let text = data[key].substring(35).toLowerCase();
                 if (text.substring(0, 7) == "base64,") {
                     text = window.atob(text.substring(7));
                 }
                 toUrl(text);
+                continue;
+            }
+            if (data[key].toLowerCase().includes("urn:mpeg:dash:schema:mpd")) {
+                toUrl(data[key], "mpd");
                 continue;
             }
             if (CATCH_SEARCH_DEBUG && data[key].includes("manifest")) {
@@ -72,16 +76,16 @@ XMLHttpRequest.prototype.open = function (method) {
             window.postMessage({ action: "catCatchAddKey", key: this.response, href: location.href, ext: "key" });
         }
         if (this.response == "" || typeof this.response != "string") { return; }
-        if (this.response.substring(0, 34) == "data:application/vnd.apple.mpegurl") {
-            let text = this.response.substring(35);
+        if (this.response.substring(0, 34).toLowerCase() == "data:application/vnd.apple.mpegurl") {
+            let text = this.response.substring(35).toLowerCase();
             if (text.substring(0, 7) == "base64,") {
                 text = window.atob(text.substring(7));
             }
             toUrl(text);
             return;
         }
-        if (this.responseURL.substring(0, 34) == "data:application/vnd.apple.mpegurl") {
-            let text = this.responseURL.substring(35);
+        if (this.responseURL.substring(0, 34).toLowerCase() == "data:application/vnd.apple.mpegurl") {
+            let text = this.responseURL.substring(35).toLowerCase();
             if (text.substring(0, 7) == "base64,") {
                 text = window.atob(text.substring(7));
             }
@@ -93,7 +97,7 @@ XMLHttpRequest.prototype.open = function (method) {
             ext && window.postMessage({ action: "catCatchAddMedia", url: this.response, href: location.href, ext: ext });
             return;
         }
-        if (this.response.includes("#EXTM3U")) {
+        if (this.response.toUpperCase().includes("#EXTM3U")) {
             if (this.response.substring(0, 7) == "#EXTM3U") {
                 if (method == "GET") {
                     window.postMessage({ action: "catCatchAddMedia", url: this.responseURL, href: location.href, ext: "m3u8" });
@@ -145,7 +149,7 @@ window.fetch = async function (input, init) {
                 findMedia(isJson);
                 return;
             }
-            if (text.substring(0, 7) == "#EXTM3U") {
+            if (text.substring(0, 7).toUpperCase() == "#EXTM3U") {
                 if (init?.method == undefined || (init.method && init.method.toUpperCase() == "GET")) {
                     window.postMessage({ action: "catCatchAddMedia", url: input, href: location.href, ext: "m3u8" });
                     return;
@@ -153,8 +157,8 @@ window.fetch = async function (input, init) {
                 isFullM3u8(text) && toUrl(text);
                 return;
             }
-            if (text.substring(0, 34) == "data:application/vnd.apple.mpegurl") {
-                let text = text.substring(35);
+            if (text.substring(0, 34).toLowerCase() == "data:application/vnd.apple.mpegurl") {
+                let text = text.substring(35).toLowerCase();
                 if (text.substring(0, 7) == "base64,") {
                     text = window.atob(text.substring(7));
                 }
