@@ -100,55 +100,65 @@ function deleteReferer(callback) {
 function appendZero(date) {
     return parseInt(date) < 10 ? `0${date}` : date;
 }
-function templatesFunction(text, action, arg = "") {
-    if (isEmpty(text) && action != "exists") { return "" };
+function templatesFunction(text, action) {
     text = text.toString();
-    action = action.trim();
-    arg = arg.split(",");
-    arg = arg.map(item => {
-        return item.trim().replace(/^['"]|['"]$/g, "");
-    });
-    if (action == "slice") {
-        return text.slice(...arg);
-    }
-    if (action == "replace") {
-        return text.replace(...arg);
-    }
-    if (action == "replaceAll") {
-        return text.replaceAll(...arg);
-    }
-    if (action == "regexp") {
-        arg = new RegExp(...arg);
-        const result = text.match(arg);
-        if (result && result.length >= 2) {
-            text = "";
-            for (let i = 1; i < result.length; i++) {
-                text += result[i].trim();
+    action = action.trim().split("|");
+    for (let item of action) {
+        item = item.split(":");
+        if (item.length != 2) { return ""; }
+        let action = item[0].trim();
+        let arg = item[1].trim().split(",");
+        arg = arg.map(item => {
+            return item.trim().replace(/^['"]|['"]$/g, "");
+        });
+        if (isEmpty(text) && action != "exists") { return "" };
+        if (action == "slice") {
+            text = text.slice(...arg);
+            continue;
+        }
+        if (action == "replace") {
+            text = text.replace(...arg);
+            continue;
+        }
+        if (action == "replaceAll") {
+            text = text.replaceAll(...arg);
+            continue;
+        }
+        if (action == "regexp") {
+            arg = new RegExp(...arg);
+            const result = text.match(arg);
+            if (result && result.length >= 2) {
+                text = "";
+                for (let i = 1; i < result.length; i++) {
+                    text += result[i].trim();
+                }
             }
+            continue;
         }
-        return text;
-    }
-    if (action == "exists") {
-        if (text) {
-            return arg[0].replaceAll("*", text);
+        if (action == "exists") {
+            if (text) {
+                return arg[0].replaceAll("*", text);
+            }
+            if (arg[1]) {
+                return arg[1].replaceAll("*", text);
+            }
+            text = "";
+            continue;
         }
-        if (arg[1]) {
-            return arg[1].replaceAll("*", text);
-        }
-        return "";
-    }
-    if (action == "to") {
-        if (arg[0] == "base64") {
-            return window.Base64 ? Base64.encode(text) : btoa(unescape(encodeURIComponent(text)));
-        }
-        if (arg[0] == "urlEncode") {
-            return encodeURIComponent(text);
-        }
-        if (arg[0] == "lowerCase") {
-            return text.toLowerCase();
-        }
-        if (arg[0] == "upperCase") {
-            return text.toUpperCase();
+        if (action == "to") {
+            if (arg[0] == "base64") {
+                text = window.Base64 ? Base64.encode(text) : btoa(unescape(encodeURIComponent(text)));
+            }
+            if (arg[0] == "urlEncode") {
+                text = encodeURIComponent(text);
+            }
+            if (arg[0] == "lowerCase") {
+                text = text.toLowerCase();
+            }
+            if (arg[0] == "upperCase") {
+                text = text.toUpperCase();
+            }
+            continue;
         }
     }
     return text;
@@ -199,8 +209,8 @@ function templates(text, data) {
         text = text.replaceAll(key, tags[key]);
     }
     //函数支持
-    text = text.replace(/\$\{(fullFileName|fileName|ext|title|referer|url|now|fullDate|time|initiator|webUrl) ?\| ?(slice|replace|replaceAll|regexp|exists|to) ?:([^\}]+)\}/g, function (original, tag, action, arg) {
-        return templatesFunction(data[tag], action, arg);
+    text = text.replace(/\$\{(fullFileName|fileName|ext|title|referer|url|now|fullDate|time|initiator|webUrl) ?\| ?([^}]+)\}/g, function (original, tag, action) {
+        return templatesFunction(data[tag], action);
     });
     return text;
 }
