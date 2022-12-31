@@ -97,70 +97,54 @@ function deleteReferer(callback) {
 }
 
 // 模板 函数 实现
-function appendZero(date) {
-    return parseInt(date) < 10 ? `0${date}` : date;
-}
 function templatesFunction(text, action) {
     text = text.toString();
     action = action.trim().split("|");
     for (let item of action) {
-        // 不使用 split(":") 方法 因为参数中 arg 可能包含 ":" 字符
-        const temp =  item.indexOf(":");
-        if(temp == -1){ return ""; }
+        // 不使用 split(":") 方法 参数中 arg 可能包含 ":" 字符
+        const temp = item.indexOf(":");
+        if (temp == -1) { return ""; }
         let action = item.slice(0, temp).trim();
         let arg = item.slice(temp + 1).trim().split(",");
-
         arg = arg.map(item => {
             return item.trim().replace(/^['"]|['"]$/g, "");
         });
         if (isEmpty(text) && action != "exists") { return "" };
         if (action == "slice") {
             text = text.slice(...arg);
-            continue;
-        }
-        if (action == "replace") {
+        } else if (action == "replace") {
             text = text.replace(...arg);
-            continue;
-        }
-        if (action == "replaceAll") {
+        } else if (action == "replaceAll") {
             text = text.replaceAll(...arg);
-            continue;
-        }
-        if (action == "regexp") {
+        } else if (action == "regexp") {
             arg = new RegExp(...arg);
             const result = text.match(arg);
+            text = "";
             if (result && result.length >= 2) {
-                text = "";
                 for (let i = 1; i < result.length; i++) {
                     text += result[i].trim();
                 }
             }
-            continue;
-        }
-        if (action == "exists") {
+        } else if (action == "exists") {
             if (text) {
-                return arg[0].replaceAll("*", text);
+                text = arg[0].replaceAll("*", text);
+                continue;
             }
             if (arg[1]) {
-                return arg[1].replaceAll("*", text);
+                text = arg[1].replaceAll("*", text);
+                continue;
             }
             text = "";
-            continue;
-        }
-        if (action == "to") {
+        } else if (action == "to") {
             if (arg[0] == "base64") {
                 text = window.Base64 ? Base64.encode(text) : btoa(unescape(encodeURIComponent(text)));
-            }
-            if (arg[0] == "urlEncode") {
+            } else if (arg[0] == "urlEncode") {
                 text = encodeURIComponent(text);
-            }
-            if (arg[0] == "lowerCase") {
+            } else if (arg[0] == "lowerCase") {
                 text = text.toLowerCase();
-            }
-            if (arg[0] == "upperCase") {
+            } else if (arg[0] == "upperCase") {
                 text = text.toUpperCase();
             }
-            continue;
         }
     }
     return text;
