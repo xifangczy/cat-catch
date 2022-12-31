@@ -97,21 +97,16 @@ function deleteReferer(callback) {
 }
 
 // 模板 函数 实现
+function appendZero(date) {
+    return parseInt(date) < 10 ? `0${date}` : date;
+}
 function templatesFunction(text, action, arg = "") {
     if (isEmpty(text) && action != "exists") { return "" };
     text = text.toString();
     action = action.trim();
     arg = arg.split(",");
     arg = arg.map(item => {
-        item = item.trim();
-        if (item[0] == "'" || item[0] == '"') {
-            item = item.slice(1);
-        }
-        const length = item.length - 1;
-        if (item[length] == "'" || item[length] == '"') {
-            item = item.slice(0, length);
-        }
-        return item;
+        return item.trim().replace(/^['"]|['"]$/g, "");
     });
     if (action == "slice") {
         return text.slice(...arg);
