@@ -98,7 +98,7 @@ function deleteReferer(callback) {
 
 // 模板 函数 实现
 function templatesFunction(text, action) {
-    text = text.toString();
+    text = isEmpty(text) ? "" : text.toString();
     action = action.trim().split("|");
     for (let item of action) {
         // 不使用 split(":") 方法 参数中 arg 可能包含 ":" 字符
