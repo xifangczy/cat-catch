@@ -143,7 +143,7 @@ function GetDefault(Obj) {
         case "MobileUserAgent":
             return "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
         case "m3u8dl": return false;
-        case "m3u8dlArg": return '"${url}" --workDir "%USERPROFILE%\\Downloads\\m3u8dl" --saveName "${title}_${now}" --enableDelAfterDone ${referer|exists:\'--headers "Referer:*"\'}';
+        case "m3u8dlArg": return `"\${url}" --workDir "%USERPROFILE%\\Downloads\\m3u8dl" --saveName "\${title}_\${now}" --enableDelAfterDone \${referer|exists:'--headers "Referer:*"'}`;
         case "injectScript": return "search.js";
         case "featMobileTabId": return [];
         case "featAutoDownTabId": return [];
@@ -151,7 +151,7 @@ function GetDefault(Obj) {
         case "mediaControl": return { tabid: 0, index: -1 };
         case "playbackRate": return 2;
         case "copyM3U8": return "${url}";
-        case "copyMPD": return "ffmpeg -headers \"referer: ${referer}\" -i \"${url}\" -c copy \"${title}.mp4\"";
+        case "copyMPD": return `ffmpeg \${referer|exists:'-headers "referer: *"'} -i "\${url}" -c copy "\${title}_\${now}.mp4"`;
         case "copyOther": return "${url}";
         case "refreshClear": return true;
         case "initComplete": return true;

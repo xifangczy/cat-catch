@@ -87,39 +87,6 @@
       </div>
     </section>
 
-    <section class="hide">
-      <h1 class="optionsTitle">
-        替换关键词
-      </h1>
-      <div class="optionBox">
-        <span class="explain">
-          用于 复制选项 和 N_m3u8DL-CLI 使用的关键词替换<br />
-          <br />
-          <b>${url}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 文件URL<b>*</b><br />
-          <b>${referer}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 请求头网址<b>*</b><br />
-          <b>${title}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 网页标题<b>*</b><br />
-          <b>${fullfilename}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 完整文件名(包含扩展)<b>*</b><br />
-          <b>${filename}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 文件名(不包含扩展)<b>*</b><br />
-          <b>${ext}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 扩展名(不含".")<b>*</b><br />
-          <b>${year}</b> 年 / <b>${month}</b> 月 / <b>${day}</b> 日 / <b>${hours}</b> 时 / <b>${minutes}</b> 分 / <b>${seconds}</b> 秒<br />
-          <b>${date}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 日期 示例(2020-12-28)<br />
-          <b>${time}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 时间 示例(21'30'55)<br />
-          <br />
-          <b>带"*"号 支持 slice replace regexp函数</b><br />
-          <b>示例:</b><br />
-          <b>${title|slice:0,5}</b> 截取前5个字符<br />
-          <b>${filename|slice:-10}</b> 截取末尾10个字符<br />
-          <b>${fullfilename|replace:"m3u8","mp4"}</b> m3u8 替换为 mp4<br />
-          <b>${title|replace:"网站",""}</b> 删除"网站"一词<br />
-          <b>${url|regexp:"(https?://[^?]*)"}</b> 提取不要参数的网址<br />
-          <b>${referer|exists:'--headers "Referer:*"'}</b>
-          <br />如果存在referer 则输出对应字符 反之不输出(*号会被替换成referer本身)<br />
-          <br />
-          <a href="https://o2bmm.gitbook.io/cat-catch/" target="_blank">关键词替换 说明文档</a>
-        </span>
-      </div>
-    </section>
-
     <section>
       <h1 class="optionsTitle">
         复制选项
@@ -164,45 +131,11 @@
             </div>
           </div>
           <div class="item">
-            <div>参数设置</div>
-            <button type="button" id="showM3u8Help">查看参数说明</button>
-            <span class="explain width100 hide" id="m3u8Help">
-              <br /><a href="https://o2bmm.gitbook.io/cat-catch/docs/settings#keywords" target="_blank">猫抓替换关键词列表</a><br /><br />
-              <b>m3u8DL 参数</b><br>
-              --workDir &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设定程序工作目录<br>
-              --saveName &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设定存储文件名(不包括后缀)<br>
-              --baseUrl &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设定Baseurl<br>
-              --headers &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设定请求头，格式 key:value 使用|分割不同的key&value<br>
-              --maxThreads &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Default: 32) 设定程序的最大线程数<br>
-              --minThreads &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Default: 16) 设定程序的最小线程数<br>
-              --retryCount &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Default: 15) 设定程序的重试次数<br>
-              --timeOut &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Default: 10) 设定程序网络请求的超时时间(单位为秒)<br>
-              --muxSetJson &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 使用外部json文件定义混流选项<br>
-              --useKeyFile &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 使用外部16字节文件定义AES-128解密KEY<br>
-              --useKeyBase64 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 使用Base64字符串定义AES-128解密KEY<br>
-              --useKeyIV &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 使用HEX字符串定义AES-128解密IV<br>
-              --downloadRange &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 仅下载视频的一部分分片或长度<br>
-              --liveRecDur &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 直播录制时，达到此长度自动退出软件(HH:MM:SS)<br>
-              --stopSpeed &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 当速度低于此值时，重试(单位为KB/s)<br>
-              --maxSpeed &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设置下载速度上限(单位为KB/s)<br>
-              --proxyAddress &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 设置HTTP/SOCKS5代理, 如 http://127.0.0.1:8080<br>
-              --enableDelAfterDone &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 开启下载后删除临时文件夹的功能<br>
-              --enableMuxFastStart &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 开启混流mp4的FastStart特性<br>
-              --enableBinaryMerge &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 开启二进制合并分片<br>
-              --enableParseOnly &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 开启仅解析模式(程序只进行到meta.json)<br>
-              --enableAudioOnly &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 合并时仅封装音频轨道<br>
-              --disableDateInfo &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 关闭混流中的日期写入<br>
-              --disableIntegrityCheck &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 不检测分片数量是否完整<br>
-              --noMerge &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 禁用自动合并<br>
-              --noProxy &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 不自动使用系统代理<br>
-              --registerUrlProtocol &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 注册m3u8dl链接协议<br>
-              --unregisterUrlProtocol &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 取消注册m3u8dl链接协议<br>
-              --enableChaCha20 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; enableChaCha20<br>
-              --chaCha20KeyBase64 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ChaCha20KeyBase64<br>
-              --chaCha20NonceBase64 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ChaCha20NonceBase64<br>
-              --help &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Display this help screen.<br>
-              --version &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Display version information.
-            </span>
+            <div style="margin-bottom: 5px;margin-top: 5px;">
+              <p>参数设置</p>
+              <a href="https://o2bmm.gitbook.io/cat-catch/docs/settings#keywords" target="_blank">猫抓替换关键词列表</a>
+              <a href="https://nilaoda.github.io/N_m3u8DL-CLI/Advanced.html" target="_blank" style="margin-left: 10px;">N_m3u8DL-CLI 参数</a>
+            </div>
             <textarea id="m3u8dlArg" type="text" class="width100 break-all" rows="3"></textarea>
           </div>
           <div id="testTag" class="hide break-all">

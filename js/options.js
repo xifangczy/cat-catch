@@ -317,10 +317,6 @@ $("#importOptionsFile").change(function () {
 $("#importOptions").bind("click", function () {
     $("#importOptionsFile").click();
 });
-// 参数说明
-$("#showM3u8Help").bind("click", function () {
-    $("#m3u8Help").slideToggle();
-});
 
 // 保存 后缀 类型 正则 配置
 function Save(option, sec = 0) {
