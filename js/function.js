@@ -104,10 +104,12 @@ function templatesFunction(text, action) {
     text = text.toString();
     action = action.trim().split("|");
     for (let item of action) {
-        item = item.split(":");
-        if (item.length != 2) { return ""; }
-        let action = item[0].trim();
-        let arg = item[1].trim().split(",");
+        // 不使用 split(":") 方法 因为参数中 arg 可能包含 ":" 字符
+        const temp =  item.indexOf(":");
+        if(temp == -1){ return ""; }
+        let action = item.slice(0, temp).trim();
+        let arg = item.slice(temp + 1).trim().split(",");
+
         arg = arg.map(item => {
             return item.trim().replace(/^['"]|['"]$/g, "");
         });
