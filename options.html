@@ -132,9 +132,9 @@
           </div>
           <div class="item">
             <div style="margin-bottom: 5px;margin-top: 5px;">
-              <p>参数设置</p>
               <a href="https://o2bmm.gitbook.io/cat-catch/docs/settings#keywords" target="_blank">猫抓替换关键词列表</a>
               <a href="https://nilaoda.github.io/N_m3u8DL-CLI/Advanced.html" target="_blank" style="margin-left: 10px;">N_m3u8DL-CLI 参数</a>
+              <p>参数设置</p>
             </div>
             <textarea id="m3u8dlArg" type="text" class="width100 break-all" rows="3"></textarea>
           </div>
@@ -153,7 +153,6 @@
         </span>
         <div style="margin-bottom: 5px;">
           <a href="https://o2bmm.gitbook.io/cat-catch/docs/settings#keywords" target="_blank">猫抓替换关键词列表</a>
-          <a href="https://nilaoda.github.io/N_m3u8DL-CLI/Advanced.html" target="_blank" style="margin-left: 10px;">N_m3u8DL-CLI 参数列表</a>
         </div>
         <div class="list">
           <div class="item">
@@ -161,12 +160,12 @@
             <textarea id="userAgent" type="text" class="width100"></textarea>
           </div>
           <div class="item">
-            <div>标签 ${mobileUserAgent} 模拟手机User Agent</div>
+            <div>标签 ${mobileUserAgent} / 模拟手机User Agent</div>
             <textarea id="MobileUserAgent" type="text" class="width100"></textarea>
           </div>
           <div class="item">
             <div> <p>测试</p> </div>
-            <textarea id="testTextarea" type="text" class="width100 break-all" rows="3">"${url}" --workDir "%USERPROFILE%\Downloads\m3u8dl" --saveName "${title}_${now}" --enableDelAfterDone ${referer|exists:'--headers "Referer:*"'}</textarea>
+            <textarea id="testTextarea" type="text" class="width100 break-all" rows="3">${url} ${referer|exists:'--headers "Referer:*"'} ${url|regexp:"(https?://[^?]*)"|replace:"http://","https://"|to:base64}</textarea>
           </div>
           <div id="testTag" class="hide break-all">
             ${url}<input type="text" class="width100" value="https://bmmmd.com/test.m3u8" id="url">

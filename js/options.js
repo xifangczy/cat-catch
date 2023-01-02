@@ -214,7 +214,7 @@ $("#ResetOption").bind("click", function () {
 // m3u8DL 参数设置
 $("#ResetM3u8dl").bind("click", function () {
     if (confirm("确认重置吗？")) {
-        $("#m3u8dlOption textarea").each(function () {
+        $("#m3u8dlOption textarea, #m3u8dlOption input").each(function () {
             const Option = this.id;
             chrome.storage.sync.set({ [Option]: GetDefault(Option) });
         });
