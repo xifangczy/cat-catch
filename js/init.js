@@ -32,7 +32,8 @@ G.OptionLists = [
     "youtube",
     "catDownload",
     "trimTitleRE",
-    "saveAs"
+    "saveAs",
+    "userAgent"
 ];
 G.TabIdList = [
     "featMobileTabId",
@@ -142,6 +143,7 @@ function GetDefault(Obj) {
         case "ShowWebIco": return true;
         case "MobileUserAgent":
             return "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
+        case "userAgent": return "";
         case "m3u8dl": return false;
         case "m3u8dlArg": return `"\${url}" --workDir "%USERPROFILE%\\Downloads\\m3u8dl" --saveName "\${title}_\${now}" --enableDelAfterDone \${referer|exists:'--headers "Referer:*"'}`;
         case "injectScript": return "search.js";

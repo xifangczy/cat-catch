@@ -189,15 +189,17 @@ function templates(text, data) {
         "${seconds}": appendZero(date.getSeconds()),
         "${fullDate}": data.fullDate,
         "${time}": data.time,
-        "${fullFileName}": data.fullFileName ?? "",
-        "${fileName}": data.fileName ?? "",
-        "${ext}": data.ext ?? "",
+        "${fullFileName}": data.fullFileName ? data.fullFileName : "",
+        "${fileName}": data.fileName ? data.fileName : "",
+        "${ext}": data.ext ? data.ext : "",
+        "${mobileUserAgent}": G.MobileUserAgent,
+        "${userAgent}": G.userAgent ? G.userAgent : navigator.userAgent,
     }
     for (let key in tags) {
         text = text.replaceAll(key, tags[key]);
     }
     //函数支持
-    text = text.replace(/\$\{(fullFileName|fileName|ext|title|referer|url|now|fullDate|time|initiator|webUrl) ?\| ?([^}]+)\}/g, function (original, tag, action) {
+    text = text.replace(/\$\{(fullFileName|fileName|ext|title|referer|url|now|fullDate|time|initiator|webUrl|userAgent) ?\| ?([^}]+)\}/g, function (original, tag, action) {
         return templatesFunction(data[tag], action);
     });
     return text;
