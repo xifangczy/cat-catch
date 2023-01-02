@@ -174,7 +174,7 @@ $("#allDisable, #allEnable").bind("click", function () {
     Save(obj);
 });
 // m3u8dlArg 输出测试
-function m3u8dlArgTest() {
+function testTag() {
     const data = {
         url: $("#url").val(),
         referer: $("#referer").val(),
@@ -182,16 +182,16 @@ function m3u8dlArgTest() {
         webUrl: $("#webUrl").val(),
         title: $("#title").val(),
     }
-    const result = templates($("#m3u8dlArg").val(), data);
+    const result = templates($("#testTextarea").val() ?? "", data);
     const m3u8dl = 'm3u8dl://' + Base64.encode(result);
-    $("#m3u8dlArgResult").html(`${result}<br><br><a href="${m3u8dl}" class="test_url">${m3u8dl}</a>`);
+    $("#tagTestResult").html(`${result}<br><br><a href="${m3u8dl}" class="test_url">${m3u8dl}</a>`);
 }
 $("#showTestTag").bind("click", function () {
-    m3u8dlArgTest();
+    testTag();
     $("#testTag").slideToggle();
 });
-$("#testTag input, #m3u8dlArg").on("input", function () {
-    m3u8dlArgTest();
+$("#testTag input, #testTextarea").on("input", function () {
+    testTag();
 });
 //重置后缀 重置类型 重置正则
 $("#ResetExt, #ResetType, #ResetRegex").bind("click", function () {
@@ -211,13 +211,22 @@ $("#ResetOption").bind("click", function () {
         location.reload();
     }
 });
-//m3u8DL 参数设置
+// m3u8DL 参数设置
 $("#ResetM3u8dl").bind("click", function () {
     if (confirm("确认重置吗？")) {
         $("#m3u8dlOption textarea").each(function () {
             const Option = this.id;
             chrome.storage.sync.set({ [Option]: GetDefault(Option) });
         });
+        location.reload();
+    }
+});
+// 重设标签
+$("#ResetTag").bind("click", function () {
+    if (confirm("确认重置吗？")) {
+        ["userAgent", "MobileUserAgent"].forEach(function(id){
+            chrome.storage.sync.set({ [id]: GetDefault(id) });
+        })
         location.reload();
     }
 });

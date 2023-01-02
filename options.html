@@ -138,17 +138,47 @@
             </div>
             <textarea id="m3u8dlArg" type="text" class="width100 break-all" rows="3"></textarea>
           </div>
+          <div class="button">
+            <button type="button" id="ResetM3u8dl">重置参数设置</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h1 class="optionsTitle">替换标签</h1>
+      <div class="optionBox" id="tag">
+        <span class="explain">
+          用于N_m3u8DL-CLI 和 复制选项 的标签设置和测试
+        </span>
+        <div style="margin-bottom: 5px;">
+          <a href="https://o2bmm.gitbook.io/cat-catch/docs/settings#keywords" target="_blank">猫抓替换关键词列表</a>
+          <a href="https://nilaoda.github.io/N_m3u8DL-CLI/Advanced.html" target="_blank" style="margin-left: 10px;">N_m3u8DL-CLI 参数列表</a>
+        </div>
+        <div class="list">
+          <div class="item">
+            <div>标签 ${userAgent} 留空默认为当前浏览器 User Agent</div>
+            <textarea id="userAgent" type="text" class="width100"></textarea>
+          </div>
+          <div class="item">
+            <div>标签 ${mobileUserAgent} 模拟手机User Agent</div>
+            <textarea id="MobileUserAgent" type="text" class="width100"></textarea>
+          </div>
+          <div class="item">
+            <div> <p>测试</p> </div>
+            <textarea id="testTextarea" type="text" class="width100 break-all" rows="3">"${url}" --workDir "%USERPROFILE%\Downloads\m3u8dl" --saveName "${title}_${now}" --enableDelAfterDone ${referer|exists:'--headers "Referer:*"'}</textarea>
+          </div>
           <div id="testTag" class="hide break-all">
             ${url}<input type="text" class="width100" value="https://bmmmd.com/test.m3u8" id="url">
             ${referer}<input type="text" class="width100" value="https://bmmmd.com/" id="referer">
             ${initiator}<input type="text" class="width100" value="https://bmmmd.com" id="initiator">
             ${webUrl}<input type="text" class="width100" value="https://bmmmd.com/test.html" id="webUrl">
             ${title}<input type="text" class="width100" value="测试视频" id="title">
-            替换后:<br><span id="m3u8dlArgResult"></span>
+            替换后:<br><span id="tagTestResult"></span>
           </div>
           <div class="button">
             <button type="button" id="showTestTag">测试</button>
-            <button type="button" id="ResetM3u8dl">重置参数设置</button>
+            <button type="button" id="ResetTag">重置标签</button>
           </div>
         </div>
       </div>
@@ -158,16 +188,6 @@
       <h1 class="optionsTitle">其他设置</h1>
       <div class="optionBox" id="OtherOption">
         <div class="list otherOption">
-          <div class="item">
-            <div>模拟手机User Agent</div>
-            <textarea id="MobileUserAgent" type="text" class="width100"></textarea>
-          </div>
-
-          <div class="item">
-            <div>标签${userAgent} 留空默认为当前浏览器 User Agent</div>
-            <textarea id="userAgent" type="text" class="width100"></textarea>
-          </div>
-
           <div class="item">
             <div>
               使用本地播放器调用协议打开视频预览 <select id="PlayerTemplate" class="select"></select>

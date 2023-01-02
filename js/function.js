@@ -169,6 +169,7 @@ function templates(text, data) {
         data.ext = data.fullFileName.split(".");
         data.ext = data.ext.length == 1 ? "" : data.ext[data.ext.length - 1];
     }
+    text = isEmpty(text) ? "" : text;
     // 标签
     const tags = {
         "$url$": data.url,
