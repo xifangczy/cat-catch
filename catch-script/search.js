@@ -45,8 +45,8 @@ async function findMedia(data, raw = undefined, depth = 0) {
                 continue;
             }
             if (data[key].substring(0, 34).toLowerCase() == "data:application/vnd.apple.mpegurl") {
-                let text = data[key].substring(35).toLowerCase();
-                if (text.substring(0, 7) == "base64,") {
+                let text = data[key].substring(35);
+                if (text.substring(0, 7).toLowerCase() == "base64,") {
                     text = window.atob(text.substring(7));
                 }
                 toUrl(text);
@@ -77,16 +77,16 @@ XMLHttpRequest.prototype.open = function (method) {
         }
         if (this.response == "" || typeof this.response != "string") { return; }
         if (this.response.substring(0, 34).toLowerCase() == "data:application/vnd.apple.mpegurl") {
-            let text = this.response.substring(35).toLowerCase();
-            if (text.substring(0, 7) == "base64,") {
+            let text = this.response.substring(35);
+            if (text.substring(0, 7).toLowerCase() == "base64,") {
                 text = window.atob(text.substring(7));
             }
             toUrl(text);
             return;
         }
         if (this.responseURL.substring(0, 34).toLowerCase() == "data:application/vnd.apple.mpegurl") {
-            let text = this.responseURL.substring(35).toLowerCase();
-            if (text.substring(0, 7) == "base64,") {
+            let text = this.responseURL.substring(35);
+            if (text.substring(0, 7).toLowerCase() == "base64,") {
                 text = window.atob(text.substring(7));
             }
             toUrl(text);
@@ -158,8 +158,8 @@ window.fetch = async function (input, init) {
                 return;
             }
             if (text.substring(0, 34).toLowerCase() == "data:application/vnd.apple.mpegurl") {
-                let text = text.substring(35).toLowerCase();
-                if (text.substring(0, 7) == "base64,") {
+                let text = text.substring(35);
+                if (text.substring(0, 7).toLowerCase() == "base64,") {
                     text = window.atob(text.substring(7));
                 }
                 toUrl(text);
