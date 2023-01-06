@@ -13,7 +13,7 @@ assignees: ''
  - 版本号
 
 **浏览器**
- - [ ] chromium 内核
- - [ ] firefox
+ - chromium 内核
+ - firefox
 
 **涉及网址**
