@@ -71,7 +71,7 @@ function AddMedia(data) {
     }
 
     //文件名
-    data.name = isEmpty(data.name) ? data.title + '.' + data.ext : stringModify(data.name);
+    data.name = isEmpty(data.name) ? data.title + '.' + data.ext : decodeURIComponent(stringModify(data.name));
 
     // Youtube
     if (data.name == "videoplayback" && data.url.includes("googlevideo.com")) {
