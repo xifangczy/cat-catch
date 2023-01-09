@@ -345,10 +345,18 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // 清理数据
     if (Message.Message == "clearData") {
+        // 当前标签
         if (Message.type) {
             delete cacheData[Message.tabId];
-        } else {
-            cacheData = {};
+            chrome.storage.local.set({ MediaData: cacheData });
+            clearRedundant();
+            sendResponse("OK");
+            return true;
+        }
+        // 其他标签
+        for(let item in cacheData){
+            if(item == Message.tabId){ continue; }
+            delete cacheData[item];
         }
         chrome.storage.local.set({ MediaData: cacheData });
         clearRedundant();

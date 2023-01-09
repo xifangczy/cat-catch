@@ -357,8 +357,9 @@ $('#ReSelect').click(function () {
 });
 // 清空数据
 $('#Clear').click(function () {
-    chrome.runtime.sendMessage({ Message: "clearData", tabId: G.tabId, type: $('.Active').attr("id") != "allTab" });
-    chrome.runtime.sendMessage({ Message: "ClearIcon" });
+    const type = $('.Active').attr("id") != "allTab";
+    chrome.runtime.sendMessage({ Message: "clearData", tabId: G.tabId, type: type });
+    type && chrome.runtime.sendMessage({ Message: "ClearIcon" });
     location.reload();
 });
 // 模拟手机端
