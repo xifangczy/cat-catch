@@ -359,7 +359,7 @@ $('#ReSelect').click(function () {
 $('#Clear').click(function () {
     const type = $('.Active').attr("id") != "allTab";
     chrome.runtime.sendMessage({ Message: "clearData", tabId: G.tabId, type: type });
-    type && chrome.runtime.sendMessage({ Message: "ClearIcon" });
+    !type && chrome.runtime.sendMessage({ Message: "ClearIcon" });
     location.reload();
 });
 // 模拟手机端
