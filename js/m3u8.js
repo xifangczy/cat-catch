@@ -509,27 +509,28 @@ $(function () {
     });
     // 只要音频
     $("#onlyAudio").on("change", function () {
-        if ($("#onlyAudio").prop("checked") && !$("#mp4").prop("checked")) {
-            $("#mp4").prop("checked", true);
+        if ($(this).prop("checked") && !$("#mp4").prop("checked") && !$("#ffmpeg").prop("checked")) {
+            $("#mp4").click();
         }
     });
     $("#mp4").on("change", function () {
-        if (!$("#mp4").prop("checked") && $("#onlyAudio").prop("checked")) {
-            $("#onlyAudio").prop("checked", false);
+        $("#ffmpeg").prop("checked") && $("#ffmpeg").click();
+        if (!$(this).prop("checked") && !$("#ffmpeg").prop("checked") && $("#onlyAudio").prop("checked")) {
+            $("#onlyAudio").click();
         }
     });
     $("#StreamSaver").on("change", function () {
         if ($(this).prop("checked")) {
             $progress.html("边下边存功能<br><b>不支持ffmpeg在线转换格式</b> <b>不支持错误切片重下</b> <b>不支持另存为</b>");
-            $("#ffmpeg").prop("checked", false);
+            $("#ffmpeg").prop("checked") && $("#ffmpeg").click();
             $("#saveAs").prop("checked", false);
         }
     });
     $("#ffmpeg").on("change", function () {
+        $("#mp4").prop("checked") && $("#mp4").click();
         if ($(this).prop("checked")) {
             $("#mp4").prop("checked", false);
             $("#StreamSaver").prop("checked", false);
-            $("#onlyAudio").prop("checked", false);
             $("#saveAs").prop("checked", false);
         }
     });
@@ -810,11 +811,12 @@ $(function () {
         if ($("#ffmpeg").prop("checked")) {
             chrome.runtime.sendMessage({
                 Message: "catCatchFFmpeg",
-                action: "transcode",
+                action: $("#onlyAudio").prop("checked") ? "onlyAudio" :"transcode",
                 media: [{ data: URL.createObjectURL(fileBlob) }],
                 title: `${GetFileName(_m3u8Url)}`
             });
             buttonState("#mergeTs", true);
+            $progress.html("已发送给在线ffmpeg");
             return;
         }
 
