@@ -12,12 +12,22 @@ _referer ? setReferer(_referer) : deleteReferer();
 
 $(function () {
     // 默认设置
-    chrome.storage.local.get({ thread: 32, mp4: true, onlyAudio: false, saveAs: false, skipDecrypt: false }, function (items) {
+    chrome.storage.local.get({
+        thread: 32,
+        mp4: true,
+        onlyAudio: false,
+        saveAs: false,
+        skipDecrypt: false,
+        StreamSaver: false,
+        ffmpeg: false,
+    }, function (items) {
         $("#thread").val(items.thread);
         $("#mp4").prop("checked", items.mp4);
         $("#onlyAudio").prop("checked", items.onlyAudio);
         $("#saveAs").prop("checked", items.saveAs);
         $("#skipDecrypt").prop("checked", items.skipDecrypt);
+        $("#StreamSaver").prop("checked", items.StreamSaver);
+        $("#ffmpeg").prop("checked", items.ffmpeg);
     });
     if (G.isFirefox) {
         $(".firefoxHide").each(function () { $(this).hide(); });
@@ -510,14 +520,12 @@ $(function () {
     });
     $("#StreamSaver").on("change", function () {
         if ($(this).prop("checked")) {
-            $progress.html("开启边下边存功能<br><b>不支持转换格式</b> <b>不支持错误切片重下</b> <b>不支持另存为</b>");
-            $("#mp4").prop("checked", false);
-            $("#ffmpegMp4").prop("checked", false);
-            $("#onlyAudio").prop("checked", false);
+            $progress.html("边下边存功能<br><b>不支持ffmpeg在线转换格式</b> <b>不支持错误切片重下</b> <b>不支持另存为</b>");
+            $("#ffmpeg").prop("checked", false);
             $("#saveAs").prop("checked", false);
         }
     });
-    $("#ffmpegMp4").on("change", function () {
+    $("#ffmpeg").on("change", function () {
         if ($(this).prop("checked")) {
             $("#mp4").prop("checked", false);
             $("#StreamSaver").prop("checked", false);
@@ -545,18 +553,15 @@ $(function () {
         return false;
     });
     // 储存设置
-    $("#thread, #mp4, #onlyAudio, #saveAs, #skipDecrypt").on("change", function () {
-        const thread = parseInt($("#thread").val());
-        const mp4 = $("#mp4").prop("checked");
-        const onlyAudio = $("#onlyAudio").prop("checked");
-        const saveAs = $("#saveAs").prop("checked");
-        const skipDecrypt = $("#skipDecrypt").prop("checked");
+    $("#thread, #mp4, #onlyAudio, #saveAs, #skipDecrypt, #StreamSaver, #ffmpeg").on("change", function () {
         chrome.storage.local.set({
-            thread: thread,
-            mp4: mp4,
-            onlyAudio: onlyAudio,
-            saveAs: saveAs,
-            skipDecrypt: skipDecrypt
+            thread: parseInt($("#thread").val()),
+            mp4: $("#mp4").prop("checked"),
+            onlyAudio: $("#onlyAudio").prop("checked"),
+            saveAs: $("#saveAs").prop("checked"),
+            skipDecrypt: $("#skipDecrypt").prop("checked"),
+            StreamSaver: $("#StreamSaver").prop("checked"),
+            ffmpeg: $("#ffmpeg").prop("checked"),
         });
     });
     // 上传key
@@ -647,9 +652,7 @@ $(function () {
         if ($("#StreamSaver").prop("checked")) {
             fileStream = createStreamSaver(_fragments[0].url);
             streamDownload(start, end);
-            $("#mp4").prop("checked", false);
-            $("#ffmpegMp4").prop("checked", false);
-            $("#onlyAudio").prop("checked", false);
+            $("#ffmpeg").prop("checked", false);
             $("#saveAs").prop("checked", false);
             $("#stopStream").show();
             return;
@@ -804,7 +807,7 @@ $(function () {
         ext = ext ? ext : "ts";
 
         // ffmpeg 转码
-        if ($("#ffmpegMp4").prop("checked")) {
+        if ($("#ffmpeg").prop("checked")) {
             chrome.runtime.sendMessage({
                 Message: "catCatchFFmpeg",
                 action: "transcode",
@@ -852,7 +855,7 @@ $(function () {
             }
             // 关闭监听
             transmuxer.off('data');
-            // 正确转换 下载格式改为 mp4
+            // 正确转换 下载格式改为 mp4 
             if (!headEncoding) {
                 fileBlob = new Blob(_tsBuffer, { type: "video/mp4" });
                 ext = "mp4";
@@ -882,6 +885,29 @@ $(function () {
         let downP = 0;  // 推流指针 帮助按照顺序下载
         const errorList = [];
         const downTotalTs = end - start + 1;  // 需要下载的文件数量
+        /* 转码工具 */
+        const checkMux = {
+            start: false,
+            headEncode: false,
+            enable: $("#mp4").prop("checked"),
+            onlyAudio: $("#onlyAudio").prop("checked")
+        };
+        const transmuxer = new muxjs.mp4.Transmuxer({ remux: !checkMux.onlyAudio });    // mux.js 对象
+        if (checkMux.enable) {
+            transmuxer.on('data', function (segment) {
+                if (checkMux.onlyAudio && segment.type != "audio") { return; }
+                // 头部信息
+                if (!checkMux.headEncode) {
+                    checkMux.headEncode = true;
+                    let data = new Uint8Array(segment.initSegment.byteLength + segment.data.byteLength);
+                    data.set(segment.initSegment, 0);
+                    data.set(segment.data, segment.initSegment.byteLength);
+                    fileStream.write(fixFileDuration(data, downDuration));
+                    return;
+                }
+                fileStream.write(segment.data);
+            });
+        }
         const tsInterval = setInterval(function () {
             // 停止下载flag
             if (stopDownload) {
@@ -889,6 +915,7 @@ $(function () {
                     fileStream.abort();
                     fileStream = undefined;
                 }
+                checkMux.enable && transmuxer.off('data');
                 clearInterval(tsInterval);
                 $progress.html(stopDownload);
                 buttonState("#mergeTs", true);
@@ -905,6 +932,7 @@ $(function () {
                         fileStream.close();
                         fileStream = undefined;
                     }, 1000);
+                    checkMux.enable && transmuxer.off('data');
                     $progress.html("合并已完成, 等待浏览器下载完成...");
                     $("#stopStream").hide();
                     buttonState("#mergeTs", true);
@@ -914,7 +942,17 @@ $(function () {
             // 检查当前推流指针是否有数据
             if (downList[downP].data) {
                 if (!fileStream) { clearInterval(tsInterval); return; }
-                fileStream.write(new Uint8Array(downList[downP].data));
+                if (checkMux.enable) {
+                    if(checkMux.start && !checkMux.headEncode){
+                        stopDownload = "格式转换错误, 请取消mp4转换, 重新下载.";
+                        return;
+                    }
+                    checkMux.start = true;
+                    transmuxer.push(new Uint8Array(downList[downP].data));
+                    transmuxer.flush();
+                } else {
+                    fileStream.write(new Uint8Array(downList[downP].data));
+                }
                 downList[downP].data = undefined;
                 downP++;
             }
@@ -996,7 +1034,8 @@ $(function () {
     // 流式下载
     function createStreamSaver(url) {
         streamSaver.mitm = "https://stream.bmmmd.com/mitm.html";
-        return streamSaver.createWriteStream(`${GetFileName(url)}.${GetExt(url)}`).getWriter();
+        const ext = $("#mp4").prop("checked") ? "mp4" : GetExt(url);
+        return streamSaver.createWriteStream(`${GetFileName(url)}.${ext}`).getWriter();
     }
     window.onunload = function () {
         fileStream && fileStream.abort();
