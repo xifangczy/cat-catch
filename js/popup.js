@@ -305,12 +305,12 @@ $('#DownFile').click(function () {
     checked.each(function () {
         const link = $(this).parents(".panel").find(".url a");
         const url = link.attr("href");
-        const filename = "CatCatch/" + link.attr("download");
+        const filename = "CatCatch/" + stringModify(link.attr("download"));
         const referer = link.data("referer");
         setTimeout(function () {
             chrome.downloads.download({
                 url: url,
-                filename: stringModify(filename)
+                filename: filename
             }, function (id) {
                 downData[id] = { url: url, downFileName: filename };
                 if (referer) { downData[id].referer = referer; }
