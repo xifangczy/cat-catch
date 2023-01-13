@@ -305,7 +305,9 @@ $('#DownFile').click(function () {
     checked.each(function () {
         const link = $(this).parents(".panel").find(".url a");
         const url = link.attr("href");
-        const filename = "CatCatch/" + stringModify(link.attr("download"));
+        let title = stringModify(link.data("title"));
+        title = title ? title : "CatCatch";
+        const filename = title + "/" + stringModify(link.attr("download"));
         const referer = link.data("referer");
         setTimeout(function () {
             chrome.downloads.download({
