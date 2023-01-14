@@ -193,10 +193,13 @@ Array.prototype.slice.toString = function () {
 // 拦截 window.btoa / window.atob
 const _btoa = window.btoa;
 window.btoa = function (data) {
-    let base64 = _btoa.apply(this, arguments);
+    const base64 = _btoa.apply(this, arguments);
     CATCH_SEARCH_DEBUG && console.log(base64, data, base64.length);
     if (base64.length == 24 && base64.substring(22, 24) == "==") {
         window.postMessage({ action: "catCatchAddKey", key: base64, href: location.href, ext: "base64Key" });
+    }
+    if(data.toUpperCase().substring(0, 7) == "#EXTM3U" && isFullM3u8(data)){
+        toUrl(data);
     }
     return base64;
 }
@@ -206,10 +209,13 @@ window.btoa.toString = function () {
 }
 const _atob = window.atob;
 window.atob = function (base64) {
-    let data = _atob.apply(this, arguments);
+    const data = _atob.apply(this, arguments);
     CATCH_SEARCH_DEBUG && console.log(base64, data, base64.length);
     if (base64.length == 24 && base64.substring(22, 24) == "==") {
         window.postMessage({ action: "catCatchAddKey", key: base64, href: location.href, ext: "base64Key" });
+    }
+    if(data.toUpperCase().substring(0, 7) == "#EXTM3U" && isFullM3u8(data)){
+        toUrl(data);
     }
     return data;
 }
