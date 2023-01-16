@@ -221,12 +221,16 @@ function findMedia(data, isRegex = false, filter = false) {
             debounceCount++;
             clearTimeout(debounce);
             debounce = setTimeout(() => {
-                chrome.storage.local.set({ MediaData: cacheData });
+                chrome.storage.local.set({ MediaData: cacheData }, function () {
+                    chrome.runtime.lastError && console.log(chrome.runtime.lastError);
+                });
             }, 5000);
         } else {
             clearTimeout(debounce);
             debounceCount = 0;
-            chrome.storage.local.set({ MediaData: cacheData });
+            chrome.storage.local.set({ MediaData: cacheData }, function () {
+                chrome.runtime.lastError && console.log(chrome.runtime.lastError);
+            });
         }
 
         if (data.tabId != -1) {
@@ -354,8 +358,8 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             return true;
         }
         // 其他标签
-        for(let item in cacheData){
-            if(item == Message.tabId){ continue; }
+        for (let item in cacheData) {
+            if (item == Message.tabId) { continue; }
             delete cacheData[item];
         }
         chrome.storage.local.set({ MediaData: cacheData });
@@ -513,7 +517,7 @@ function fileNameParse(pathname) {
 function getResponseHeadersValue(data) {
     let header = new Array();
     if (data.responseHeaders == undefined) { return header; }
-    for(let item of data.responseHeaders){
+    for (let item of data.responseHeaders) {
         switch (item.name.toLowerCase()) {
             case "content-length": header["size"] = item.value; break;
             case "content-type": header["type"] = item.value.split(";")[0].toLowerCase(); break;

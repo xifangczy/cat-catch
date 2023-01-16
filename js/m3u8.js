@@ -9,7 +9,6 @@ const getId = parseInt(params.get("getId"));
 const tabId = parseInt(params.get("tabid"));
 // 修改当前标签下的所有xhr的Referer
 _referer ? setReferer(_referer) : deleteReferer();
-
 $(function () {
     // 默认设置
     chrome.storage.local.get({
