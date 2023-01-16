@@ -43,20 +43,25 @@ $(function () {
         }).done(function (result) {
             // console.log(result);
             result = result.replace(/^try{/, "").replace(/}catch\(e\){.*}$/ig, ""); //去除try{}catch(e){}
-            let regexp = [
-                /^.*=({.*}).*$/,
-                /^.*\(({.*})\).*$/
-            ]
-            for (let regex of regexp) {
-                let res = new RegExp(regex, "ig").exec(result);
-                if (res) {
-                    // console.log(res);
-                    result = res[1];
-                    break;
+            try {
+                jsonContent = JSON.parse(result);
+            } catch (e) {
+                console.log(e);
+                let regexp = [
+                    /^.*=({.*}).*$/,
+                    /^.*\(({.*})\).*$/
+                ]
+                for (let regex of regexp) {
+                    let res = new RegExp(regex, "ig").exec(result);
+                    if (res) {
+                        // console.log(res);
+                        result = res[1];
+                        break;
+                    }
                 }
+                // console.log(result);
+                jsonContent = JSON.parse(result);
             }
-            // console.log(result);
-            jsonContent = JSON.parse(result);
             renderJson();
         });
     }
