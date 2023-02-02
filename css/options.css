@@ -242,7 +242,8 @@ textarea {
   width: 1034px;
 }
 .fullInput{
-  width: 975px;
+  /* width: 975px; */
+  width: 100%;
   margin: 5px 0 5px 0;
 }
 .select {
