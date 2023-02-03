@@ -1,7 +1,9 @@
-var _tabId = -1;   // 选择的页面ID
-var _index = -1;    //选择的视频索引
-var VideoTagTimer;  // 获取所有视频标签的定时器
-var VideoStateTimer;  // 获取所有视频信息的定时器
+let _tabId = -1;   // 选择的页面ID
+let _index = -1;    //选择的视频索引
+let VideoTagTimer;  // 获取所有视频标签的定时器
+let VideoStateTimer;  // 获取所有视频信息的定时器
+let compareTab = [];
+let compareVideo = [];
 
 function setVideoTagTimer() {
     clearInterval(VideoTagTimer);
@@ -10,10 +12,16 @@ function setVideoTagTimer() {
 function getVideoTag() {
     chrome.tabs.query({ windowType: "normal" }, function (tabs) {
         let videoTabList = [];
+        for (let tab of tabs) {
+            videoTabList.push(tab.id);
+        }
+        if(compareTab.toString() == videoTabList.toString()){
+            return;
+        }
+        compareTab = videoTabList;
         // 列出所有标签
         for (let tab of tabs) {
             if ($("#option" + tab.id).length == 1) { continue; }
-            videoTabList.push(tab.id);
             $("#videoTabIndex").append(`<option value='${tab.id}' id="option${tab.id}">${stringModify(tab.title)}</option>`);
         }
         // 删除没有媒体的标签. 异步的原因，使用一个for去处理无法保证标签顺序一致
@@ -58,13 +66,16 @@ function getVideoState() {
         state.speed == 1 ? $("#speed").html("倍数播放").data("switch", "speed") : $("#speed").html("正常播放").data("switch", "normal");
         $("#loop").prop("checked", state.loop);
         $("#muted").prop("checked", state.muted);
-        $("#videoIndex").empty();
-        for (let i = 0; i < state.count; i++) {
-            let src = state.src[i].split("/").pop();
-            if (src.length >= 60) {
-                src = src.substr(0, 35) + '...' + src.substr(-35);
+        if(compareVideo.toString() != state.src.toString()){
+            compareVideo = state.src;
+            $("#videoIndex").empty();
+            for (let i = 0; i < state.count; i++) {
+                let src = state.src[i].split("/").pop();
+                if (src.length >= 60) {
+                    src = src.substr(0, 35) + '...' + src.substr(-35);
+                }
+                $("#videoIndex").append(`<option value='${i}'>${src}</option>`);
             }
-            $("#videoIndex").append(`<option value='${i}'>${src}</option>`);
         }
         _index = _index == -1 ? 0 : _index;
         $("#videoIndex").val(_index);
