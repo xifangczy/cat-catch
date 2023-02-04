@@ -140,6 +140,8 @@ function templatesFunction(text, action) {
                 text = window.Base64 ? Base64.encode(text) : btoa(unescape(encodeURIComponent(text)));
             } else if (arg[0] == "urlEncode") {
                 text = encodeURIComponent(text);
+            } else if (arg[0] == "urlDecode") {
+                text = decodeURIComponent(text);
             } else if (arg[0] == "lowerCase") {
                 text = text.toLowerCase();
             } else if (arg[0] == "upperCase") {
