@@ -193,11 +193,13 @@ window.addEventListener("message", (event) => {
             !event.data.media instanceof Array ||
             event.data.media.length == 0
         ) { return; }
+        let title = event.data.title ?? document.title ?? new Date().getTime().toString();
+        title = title.replaceAll('"', "").replaceAll("'", "");
         chrome.runtime.sendMessage({
             Message: event.data.action,
             action: event.data.use,
             media: event.data.media,
-            title: event.data.title ?? document.title,
+            title: title,
             url: event.data.href ?? event.source.location.href
         });
     }
