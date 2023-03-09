@@ -31,9 +31,10 @@ G.OptionLists = [
     "initComplete",
     "youtube",
     "catDownload",
-    "trimTitleRE",
+    // "trimTitleRE",
     "saveAs",
-    "userAgent"
+    "userAgent",
+    "downFileName"
 ];
 G.TabIdList = [
     "featMobileTabId",
@@ -161,8 +162,9 @@ function GetDefault(Obj) {
         case "catDownload": return false;
         // case "trimTitleRE": return "([^-|–]*)";
         // case "trimTitleRE": return "(.*) [-–] ";
-        case "trimTitleRE": return "";
+        // case "trimTitleRE": return "";
         case "saveAs": return false;
+        case "downFileName": return "${title}.${ext}";
     }
 }
 // 初始变量

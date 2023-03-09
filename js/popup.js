@@ -59,7 +59,8 @@ chrome.downloads.onChanged.addListener(function (item) {
 function AddMedia(data) {
     // console.log(data);
     data._title = stringModify(data.title);
-    data.title = trimTitle(data._title);
+    // data.title = trimTitle(data._title);
+    data.title = data._title;
 
     // 正则匹配的备注扩展
     if (data.extraExt) {
@@ -87,7 +88,7 @@ function AddMedia(data) {
     }
 
     //添加下载文件名
-    data.downFileName = G.TitleName ? data.title + '.' + data.ext : data.name;
+    data.downFileName = G.TitleName ? templates(G.downFileName, data) : data.name;
 
     // 文件大小单位转换
     if (data.size) {
@@ -498,20 +499,20 @@ function copyLink(type, data) {
     return templates(text, data);
 }
 // 修剪标题
-function trimTitle(title) {
-    const _title = title;
-    if (!G.trimTitleRE) { return _title; }
-    try {
-        const result = title.match(G.trimTitleRE);
-        if (result && result.length >= 2) {
-            title = "";
-            for (let i = 1; i < result.length; i++) {
-                title += result[i].trim();
-            }
-        }
-        return title;
-    } catch (e) { console.log(e); return _title; }
-}
+// function trimTitle(title) {
+//     const _title = title;
+//     if (!G.trimTitleRE) { return _title; }
+//     try {
+//         const result = title.match(G.trimTitleRE);
+//         if (result && result.length >= 2) {
+//             title = "";
+//             for (let i = 1; i < result.length; i++) {
+//                 title += result[i].trim();
+//             }
+//         }
+//         return title;
+//     } catch (e) { console.log(e); return _title; }
+// }
 // 携带referer 下载
 function catDownload(obj) {
     chrome.tabs.get(G.tabId, function (tab) {
