@@ -194,7 +194,7 @@ window.addEventListener("message", (event) => {
             event.data.media.length == 0
         ) { return; }
         let title = event.data.title ?? document.title ?? new Date().getTime().toString();
-        title = title.replaceAll('"', "").replaceAll("'", "");
+        title = title.replaceAll('"', "").replaceAll("'", "").replaceAll(" ", "");
         chrome.runtime.sendMessage({
             Message: event.data.action,
             action: event.data.use,
