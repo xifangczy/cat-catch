@@ -14,7 +14,7 @@ body {
   background: #fff;
   margin: 0;
 }
-.bold{
+.bold {
   font-weight: bold;
 }
 .fixFirefoxRight {
@@ -42,7 +42,8 @@ body {
 .panel .url {
   padding: 5px;
 }
-.icon, .favicon {
+.icon,
+.favicon {
   transition: all 0.1s;
   width: 18px;
   height: 18px;
@@ -54,11 +55,11 @@ body {
 .icon:active {
   transform: scale(0.9);
 }
-.panel-heading .icon{
+.panel-heading .icon {
   padding-left: 2px;
   padding-right: 2px;
 }
-.favicon{
+.favicon {
   padding-right: 2px;
 }
 .panel-heading .size {
@@ -213,11 +214,11 @@ body {
 #PlayControl .loop {
   margin: 0 5px 0 5px;
 }
-label{
+label {
   cursor: pointer;
   user-select: none;
 }
-#PlayControl .volume{
+#PlayControl .volume {
   width: 100px;
 }
 .blue {
@@ -252,14 +253,70 @@ label{
   border-top: solid 1px rgb(0 0 0 / 50%);
   margin: 5px 0 5px 0;
 }
-.otherTips{
+.otherTips {
   text-align: center;
   color: rgb(26, 115, 232);
   font-weight: bold;
 }
-.moreButton{
+.moreButton {
   display: flex;
 }
-.moreButton div{
+.moreButton div {
   margin-right: 3px;
+}
+@media (prefers-color-scheme: dark) {
+  html,
+  body,
+  .button {
+    --background-color-two: #1e293b;
+    --line-color: #228e6c;
+    --background-color: #0f172a;
+    --text-color: #94a3b8;
+    color: var(--text-color);
+    background: var(--background-color);
+  }
+  .TabButton.Active {
+    background-color: var(--background-color-two);
+  }
+  .TabButton {
+    color: var(--text-color);
+  }
+  .button2 {
+    color: var(--text-color);
+    background: rgb(26 115 232 / 50%);
+  }
+  .button:hover,
+  .button2:hover {
+    background: var(--background-color-two);
+  }
+  #Tips,
+  #TipsFixed,
+  select,
+  #down,
+  .button2:active {
+    background: var(--background-color);
+  }
+  #otherOptions .nowrap,
+  .blue,
+  .otherTips,
+  select,
+  #Tips,
+  #TipsFixed {
+    color: var(--text-color);
+  }
+  .line {
+    border-top: solid 1px var(--line-color);
+  }
+  .panel-heading {
+    background-color: var(--background-color-two);
+  }
+  .icon {
+    filter: invert(100%);
+  }
+  input,
+  textarea,
+  select {
+    color: var(--text-color);
+    background: var(--background-color);
+  }
 }

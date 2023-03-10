@@ -193,8 +193,7 @@ button:active {
 }
 #m3u8_url,
 #mpd_url,
-.test_url
-{
+.test_url {
   overflow: hidden;
   display: block;
   text-overflow: ellipsis;
@@ -238,10 +237,10 @@ textarea {
 #tips input {
   color: rgb(26, 115, 232);
 }
-.keyUrl{
+.keyUrl {
   width: 1034px;
 }
-.fullInput{
+.fullInput {
   /* width: 975px; */
   width: 100%;
   margin: 5px 0 5px 0;
@@ -376,13 +375,13 @@ textarea {
 .flex {
   display: flex;
 }
-.m3u8dlArg{
+.m3u8dlArg {
   margin-top: 10px;
   height: 100px;
   word-break: break-all;
   width: 100%;
 }
-.break-all{
+.break-all {
   word-break: break-all;
 }
 /* MPD*/
@@ -442,4 +441,59 @@ a.json-placeholder {
 }
 a.json-placeholder:hover {
   text-decoration: underline;
+}
+@media (prefers-color-scheme: dark) {
+  html,
+  body,
+  .button,
+  button {
+    --background-color-two: #1e293b;
+    --line-color: #228e6c;
+    --background-color: #0f172a;
+    --text-color: #94a3b8;
+    --link-color: rgb(2 132 199/1);
+    color: var(--text-color);
+    background: var(--background-color);
+  }
+  .button2 {
+    color: var(--text-color);
+    background: rgb(26 115 232 / 50%);
+  }
+  .optionBox {
+    background: var(--background-color);
+    box-shadow: 0 1px 2px 0 rgb(255 255 255 / 30%),
+      0 1px 3px 1px rgb(255 255 255 / 15%);
+  }
+  .button2:active {
+    background: var(--background-color);
+  }
+  .explain,
+  .optionsTitle,
+  th,
+  .item {
+    color: var(--text-color);
+  }
+  input,
+  textarea,
+  select {
+    color: var(--text-color);
+    background: var(--background-color);
+  }
+  .select {
+    background-color: var(--background-color-two);
+  }
+  .switch .switchInput:checked + .switchRound {
+    background-color: rgb(26 115 232 / 50%);
+  }
+  a,
+  a:link,
+  a:visited,
+  #m3u8_url,
+  #mpd_url,
+  .test_url {
+    color: var(--link-color);
+  }
+  .themeColor {
+    color: var(--text-color);
+  }
 }
