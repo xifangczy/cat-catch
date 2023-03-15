@@ -167,11 +167,11 @@
             <div>标签 ${mobileUserAgent} / 模拟手机User Agent</div>
             <textarea id="MobileUserAgent" type="text" class="width100"></textarea>
           </div>
-          <div class="item">
-            <div> <p>测试</p> </div>
-            <textarea id="testTextarea" type="text" class="width100 break-all" rows="3">${url} ${referer|exists:'--headers "Referer:*"'} ${url|regexp:"(https?://[^?]*)"|replace:"http://","https://"|to:base64}</textarea>
-          </div>
           <div id="testTag" class="hide break-all">
+            <div class="item">
+              <div> <p>测试</p> </div>
+              <textarea id="testTextarea" type="text" class="width100 break-all" rows="3">${url} ${referer|exists:'--headers "Referer:*"'} ${url|regexp:"(https?://[^?]*)"|replace:"http://","https://"|to:base64}</textarea>
+            </div>
             ${url}<input type="text" class="width100" value="https://bmmmd.com/test.m3u8" id="url">
             ${referer}<input type="text" class="width100" value="https://bmmmd.com/" id="referer">
             ${initiator}<input type="text" class="width100" value="https://bmmmd.com" id="initiator">
