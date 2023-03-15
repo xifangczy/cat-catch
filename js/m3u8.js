@@ -632,6 +632,19 @@ $(function () {
         let customKey = $("#customKey").val().trim();
         if (customKey) {
             customKey = isHexKey(customKey) ? HexStringToArrayBuffer(customKey) : Base64ToArrayBuffer(customKey);
+            for (let i in _fragments) {
+                if(!_fragments[i].encrypted){
+                    _fragments[i].encrypted = true;
+                    _fragments[i].decryptdata = {};
+                    if (!keyContent.get("customKey")) {
+                        keyContent.set("customKey", true);
+                    }
+                    Object.defineProperty(_fragments[i].decryptdata, "keyContent", {
+                        get: function () { return keyContent.get("customKey"); },
+                        configurable: true
+                    });
+                }
+            }
             keyContent.forEach(function (value, key) {
                 keyContent.set(key, customKey);
             });
@@ -1011,7 +1024,8 @@ $(function () {
             return;
         }
         try {
-            return decryptor.decrypt(responseData, 0, _fragments[index].decryptdata.iv.buffer, true);
+            let iv = _fragments[index].decryptdata.iv ?? StringToUint8Array("0x00000000000000000000000000000000");
+            return decryptor.decrypt(responseData, 0, iv.buffer, true);
         } catch (e) {
             stopDownload = "解密失败，无法解密.";
             buttonState("#mergeTs", true);
