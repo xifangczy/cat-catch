@@ -183,7 +183,7 @@ function findMedia(data, isRegex = false, filter = false) {
         type: data.mime ?? header["type"],
         tabId: data.tabId,
         isRegex: isRegex,
-        requestId: data.requestId,
+        requestId: data.requestId ?? Date.now(),
         extraExt: data.extraExt,
         initiator: data.initiator,
         referer: data.referer
