@@ -54,7 +54,6 @@ chrome.downloads.onChanged.addListener(function (item) {
         delete downData[item.id];
     }
 });
-
 // 生成资源DOM
 function AddMedia(data) {
     // console.log(data);
@@ -112,7 +111,7 @@ function AddMedia(data) {
     }
     //添加html
     const html = $(`
-        <div class="panel" id="requestId${data.requestId}">
+        <div class="panel" id="requestId${data.requestId}" ext="${data.ext ? data.ext : "NULL"}">
             <div class="panel-heading">
                 <input type="checkbox" class="DownCheck" checked="true"/>
                 ${G.ShowWebIco ? `<img src="${data.favIconUrl}" class="favicon"/>` : ""}
@@ -358,6 +357,34 @@ $('#ReSelect').click(function () {
         $(this).prop('checked', !$(this).prop('checked'));
     });
 });
+// 筛选按钮
+$('#openFilter').click(function () {
+    if ($("#filter").is(":hidden")) {
+        const extFilter = new Set();
+        if ($('.TabShow .panel').length == 0) { return; }
+        $("#filter #ext").html("");
+        $('.TabShow .panel').each(function () {
+            let ext = $(this).attr("ext");
+            if (!extFilter.has(ext)) {
+                $("#filter #ext").append(`<label class="flexFilter" id="${ext}"><input type="checkbox" checked>${ext}</label>`);
+            }
+            extFilter.add(ext);
+        });
+        $("#filter").css("display", "flex");
+        return;
+    }
+    $("#filter").hide();
+});
+// 扩展筛选
+$('#filter #ext').click(function () {
+    $(this).find("label").each(function () {
+        if (!$(this).find("input").prop("checked")) {
+            $(`[ext='${this.id}'] input`).prop('checked', false);
+        } else {
+            $(`[ext='${this.id}'] input`).prop('checked', true);
+        }
+    });
+});
 // 清空数据
 $('#Clear').click(function () {
     const type = $('.Active').attr("id") != "allTab";
@@ -498,21 +525,6 @@ function copyLink(type, data) {
     }
     return templates(text, data);
 }
-// 修剪标题
-// function trimTitle(title) {
-//     const _title = title;
-//     if (!G.trimTitleRE) { return _title; }
-//     try {
-//         const result = title.match(G.trimTitleRE);
-//         if (result && result.length >= 2) {
-//             title = "";
-//             for (let i = 1; i < result.length; i++) {
-//                 title += result[i].trim();
-//             }
-//         }
-//         return title;
-//     } catch (e) { console.log(e); return _title; }
-// }
 // 携带referer 下载
 function catDownload(obj) {
     chrome.tabs.get(G.tabId, function (tab) {
@@ -548,4 +560,6 @@ function UItoggle() {
     } else if ($down.is(":hidden")) {
         $down.show();
     }
+    $("#filter").hide();
+    $("#filter #ext").html("");
 }

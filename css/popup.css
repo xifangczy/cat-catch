@@ -171,14 +171,32 @@ body {
 .TabShow {
   display: block !important;
 }
-#down {
+#down, #filter {
   display: flex;
-  justify-content: space-evenly;
   position: fixed;
-  bottom: 0;
   width: 100%;
   z-index: 999;
   background-color: #fff;
+}
+#down{
+  bottom: 0;
+  justify-content: space-evenly;
+}
+#filter{
+  display: none;
+  bottom: 26px;
+  justify-content: flex-start;
+}
+#filter #ext{
+  display: flex;
+  color: rgb(26, 115, 232);
+}
+#filter div{
+  margin-left: 5px;
+}
+.flexFilter{
+  display: flex;
+  align-items: center;
 }
 .container {
   margin-bottom: 30px;
@@ -293,6 +311,7 @@ label {
   #TipsFixed,
   select,
   #down,
+  #filter,
   .button2:active {
     background: var(--background-color);
   }
