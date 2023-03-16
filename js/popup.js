@@ -278,6 +278,8 @@ $(".Tabs .TabButton").click(function () {
     $(".container").removeClass("TabShow");
     $(".container").eq(index).addClass("TabShow");
     UItoggle();
+    $("#filter").hide();
+    $("#filter #ext").html("");
 });
 // 其他页面
 $('#allTab').click(function () {
@@ -558,6 +560,4 @@ function UItoggle() {
     } else if ($down.is(":hidden")) {
         $down.show();
     }
-    $("#filter").hide();
-    $("#filter #ext").html("");
 }
