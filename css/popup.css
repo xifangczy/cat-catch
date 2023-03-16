@@ -320,7 +320,8 @@ label {
   .otherTips,
   select,
   #Tips,
-  #TipsFixed {
+  #TipsFixed,
+  #filter #ext {
     color: var(--text-color);
   }
   .line {
