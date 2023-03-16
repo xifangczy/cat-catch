@@ -767,8 +767,9 @@ $(function () {
                     tsBuffer[currentIndex] = tsDecrypt(responseData, currentIndex); //解密m3u8
                     fileSize += tsBuffer[currentIndex].byteLength;
                     $fileSize.html("已下载:" + byteToSize(fileSize));
+                    downDuration += fragment.duration;
+                    // console.log(downDuration);
                     if (recorder) {
-                        downDuration += fragment.duration;
                         $fileDuration.html("录制时长:" + secToTime(downDuration));
                         return;
                     }
@@ -857,6 +858,7 @@ $(function () {
                     data.set(segment.initSegment, 0);
                     data.set(segment.data, segment.initSegment.byteLength);
                     // console.log(muxjs.mp4.tools.inspect(data));
+                    // console.log(downDuration);
                     _tsBuffer[index] = fixFileDuration(data, downDuration);
                     return;
                 }
@@ -1024,7 +1026,7 @@ $(function () {
             return;
         }
         try {
-            let iv = _fragments[index].decryptdata.iv ?? StringToUint8Array("0x00000000000000000000000000000000");
+            let iv = _fragments[index].decryptdata.iv ?? new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, index]);
             return decryptor.decrypt(responseData, 0, iv.buffer, true);
         } catch (e) {
             stopDownload = "解密失败，无法解密.";
@@ -1216,6 +1218,8 @@ function StringToUint8Array(str) {
 }
 /* 修正mp4文件显示时长 */
 function fixFileDuration(data, duration) {
+    // return data;
+    // console.log(data, duration);
     // duration = parseInt(duration);
     let mvhdBoxDuration = duration * 90000;
     function getBoxDuration(data, duration, index) {
@@ -1233,6 +1237,8 @@ function fixFileDuration(data, duration) {
         // mvhd
         if (data[i] == 0x6D && data[i + 1] == 0x76 && data[i + 2] == 0x68 && data[i + 3] == 0x64) {
             mvhdBoxDuration = getBoxDuration(data, duration, i);   // 获得 timescale
+            //删除创建日期
+            data[i+11] = 0;
             i += 20;    // mvhd 偏移20 为duration
             data[i] = (mvhdBoxDuration & 0xFF000000) >> 24;
             data[++i] = (mvhdBoxDuration & 0xFF0000) >> 16;
