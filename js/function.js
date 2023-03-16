@@ -181,7 +181,7 @@ function templates(text, data) {
         "${referer}": data.referer ?? "",
         "${initiator}": data.referer ? data.referer : data.initiator,
         "${webUrl}": data.webUrl ?? "",
-        "${title}": data.title ?? "",
+        "${title}": data._title ?? data.title,
         "${now}": data.now,
         "${year}": date.getFullYear(),
         "${month}": appendZero(date.getMonth() + 1),

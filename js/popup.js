@@ -56,10 +56,8 @@ chrome.downloads.onChanged.addListener(function (item) {
 });
 // 生成资源DOM
 function AddMedia(data) {
-    // console.log(data);
-    data._title = stringModify(data.title);
-    // data.title = trimTitle(data._title);
-    data.title = data._title;
+    data._title = data.title;
+    data.title = stringModify(data.title);
 
     // 正则匹配的备注扩展
     if (data.extraExt) {
@@ -125,7 +123,7 @@ function AddMedia(data) {
             </div>
             <div class="url hide">
                 <div id="mediaInfo" data-state="false">
-                    ${data._title ? `<b>标题:</b> ${data._title}` : ""}
+                    ${data.title ? `<b>标题:</b> ${data.title}` : ""}
                     ${data.type ? `<br><b>MIME:</b>  ${data.type}` : ""}
                 </div>
                 <div class="moreButton">
