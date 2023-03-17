@@ -7,6 +7,7 @@ const _title = params.get("title");
 const tsAddArg = params.get("tsAddArg");
 const getId = parseInt(params.get("getId"));
 const tabId = parseInt(params.get("tabid"));
+const key = params.get("key");
 // 修改当前标签下的所有xhr的Referer
 _referer ? setReferer(_referer) : deleteReferer();
 $(function () {
@@ -31,6 +32,7 @@ $(function () {
     if (G.isFirefox) {
         $(".firefoxHide").each(function () { $(this).hide(); });
     }
+    key && $("#customKey").val(key);
 
     //获取m3u8参数
     let _m3u8Arg = new RegExp("\\.m3u8\\?([^\n]*)").exec(_m3u8Url);
@@ -105,6 +107,17 @@ $(function () {
     }
 
     /* 解析函数 使用hls解析好的数据 进一步处理 */
+    function getNewUrl(item){
+        const url = encodeURIComponent(item.uri);
+        const referer = _referer ? "&referer=" + encodeURIComponent(_referer) : "&initiator=" + (_initiator ? encodeURIComponent(_initiator) : "");
+        const title = _title ? encodeURIComponent(_title) : "";
+        const name = GetFile(item.uri);
+        let newUrl = `/m3u8.html?url=${url}${referer}`;
+        if (title) { newUrl += `&title=${title}`; }
+        if (tabId) { newUrl += `&tabid=${tabId}`; }
+        if (key) { newUrl += `&key=${key}`; }
+        return [name, newUrl];
+    }
     function parseM3U8() {
         $("#m3u8_url").attr("href", _m3u8Url).html(_m3u8Url);
         hls.loadSource(_m3u8Url);    // 载入m3u8 url
@@ -118,13 +131,10 @@ $(function () {
                 $("#more_m3u8").show();
                 more = true;
                 for (let item of data.levels) {
-                    const url = encodeURIComponent(item.uri);
-                    const referer = _referer ? "&referer=" + encodeURIComponent(_referer) : "&initiator=" + encodeURIComponent(_initiator);
-                    const title = _title ? encodeURIComponent(_title) : "";
-                    const name = GetFile(item.uri);
+                    const [name, url] = getNewUrl(item);
                     const html = `<div class="block">
                         <div>${item.attrs.RESOLUTION ? "分辨率:" + item.attrs.RESOLUTION : ""}${item.attrs.BANDWIDTH ? " | 码率:" + (parseInt(item.attrs.BANDWIDTH / 1000) + " Kbps") : ""}</div>
-                        <a href="/m3u8.html?url=${url}${referer}&title=${title}&tabid=${tabId}">${name}</a>
+                        <a href="${url}">${name}</a>
                     </div>`;
                     $("#next_m3u8").append(html);
                 }
@@ -144,13 +154,10 @@ $(function () {
                             }
                         }
                     }
-                    const url = encodeURIComponent(item.url);
-                    const referer = _referer ? "&referer=" + encodeURIComponent(_referer) : "&initiator=" + encodeURIComponent(_initiator);
-                    const title = _title ? encodeURIComponent(_title) : "";
-                    const name = GetFile(item.url);
+                    const [name, url] = getNewUrl(item);
                     const html = `<div class="block">
                         <div>${item.name ? item.name : ""} | ${item.lang ? item.lang : ""}</div>
-                        <a href="/m3u8.html?url=${url}${referer}&title=${title}&tabid=${tabId}">${name}</a>
+                        <a href="${url}">${name}</a>
                     </div>`;
                     $("#next_audio").append(html);
                 }
@@ -160,13 +167,10 @@ $(function () {
                 $("#more_subtitle").show();
                 more = true;
                 for (let item of data.subtitleTracks) {
-                    const url = encodeURIComponent(item.url);
-                    const referer = _referer ? "&referer=" + encodeURIComponent(_referer) : "&initiator=" + encodeURIComponent(_initiator);
-                    const title = _title ? encodeURIComponent(_title) : "";
-                    const name = GetFile(item.url);
+                    const [name, url] = getNewUrl(item);
                     const html = `<div class="block">
                         <div>${item.name ? item.name : ""} | ${item.lang ? item.lang : ""}</div>
-                        <a href="/m3u8.html?url=${url}${referer}&title=${title}&tabid=${tabId}">${name}</a>
+                        <a href="${url}">${name}</a>
                     </div>`;
                     $("#next_subtitle").append(html);
                 }
@@ -366,7 +370,7 @@ $(function () {
                     <div class="method">加密算法(Method): <input type="text" value="${decryptdata.method ? decryptdata.method : "NONE"}" spellcheck="false" readonly="readonly"></div>
                     <div>密钥(Hex): <input type="text" value="${ArrayBufferToHexString(buffer)}" spellcheck="false" readonly="readonly"></div>
                     <div>密钥(Base64): <input type="text" value="${ArrayBufferToBase64(buffer)}" spellcheck="false" readonly="readonly"></div>
-                    <select id="maybeKey" class="m3u8Key select hide"><option value="tips">寻找到疑似Key</option></select>
+                    <select id="maybeKey" class="m3u8Key select hide"><option value="tips">寻找到疑似密钥</option></select>
                 </div>
             `);
         } else {
@@ -374,7 +378,7 @@ $(function () {
                 <div class="key flex">
                     <div class="method">加密算法(Method): <input type="text" value="${decryptdata.method ? decryptdata.method : "NONE"}" spellcheck="false" readonly="readonly"></div>
                     <div>密钥(Hex): <input type="text" value="密钥下载失败" spellcheck="false" readonly="readonly"></div>
-                    <select id="maybeKey" class="m3u8Key select hide"><option value="tips">寻找到疑似Key</option></select>
+                    <select id="maybeKey" class="m3u8Key select hide"><option value="tips">寻找到疑似密钥</option></select>
                 </div>
             `);
         }
@@ -610,7 +614,7 @@ $(function () {
         mergeTs();
     });
     // 在线下载合并ts
-    $("#mergeTs").click(function () {
+    $("#mergeTs").click(async function () {
         initDownload(); // 初始化下载变量
         // 设定起始序号
         let start = parseInt($("#rangeStart").val());
@@ -627,11 +631,35 @@ $(function () {
             $progress.html(`<b>序号最大不能超过${_fragments.length}</b>`);
             return;
         }
-
         /* 设定自定义密钥和IV */
         let customKey = $("#customKey").val().trim();
         if (customKey) {
-            customKey = isHexKey(customKey) ? HexStringToArrayBuffer(customKey) : Base64ToArrayBuffer(customKey);
+            // customKey = isHexKey(customKey) ? HexStringToArrayBuffer(customKey) : Base64ToArrayBuffer(customKey);
+            if(isHexKey(customKey)){
+                customKey = HexStringToArrayBuffer(customKey);
+            }else if(customKey.length == 24 && customKey.slice(-2) == "=="){
+                customKey = Base64ToArrayBuffer(customKey);
+                console.log(customKey);
+            }else if(/^http[s]*:\/\/.+/i.test(customKey)){
+                let flag = false;
+                await $.ajax({
+                    url: customKey,
+                    xhrFields: { responseType: "arraybuffer" }
+                }).fail(function () {
+                    flag = true;
+                }).done(function (responseData) {
+                    customKey = responseData;
+                    $("#customKey").val(ArrayBufferToBase64(customKey));
+                    $("#m3u8dlArg").val(getM3u8DlArg());
+                });
+                if(flag){
+                    $progress.html(`<b>密钥下载失败</b>`);
+                    return;
+                }
+            }else{
+                $progress.html(`<b>密钥不正确</b>`);
+                return;
+            }
             for (let i in _fragments) {
                 if(!_fragments[i].encrypted){
                     _fragments[i].encrypted = true;
@@ -1093,8 +1121,10 @@ function getM3u8DlArg() {
         if (isHexKey(customKey)) {
             customKey = HexStringToArrayBuffer(customKey);
             customKey = ArrayBufferToBase64(customKey);
+            m3u8dlArg += ` --useKeyBase64 "${customKey}"`;
+        }else if(customKey.length == 24 && customKey.slice(-2) == "=="){
+            m3u8dlArg += ` --useKeyBase64 "${customKey}"`;
         }
-        m3u8dlArg += ` --useKeyBase64 "${customKey}"`;
     }
     const customIV = $("#customIV").val();  // 自定义IV
     m3u8dlArg += customIV ? ` --useKeyIV "${customIV}"` : "";
