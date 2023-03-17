@@ -13,6 +13,8 @@ const $tips = $("#Tips");
 const $down = $("#down");
 // 储存下载id
 const downData = [];
+// 图标地址
+const favicon = new Map();
 // HeartBeat
 chrome.runtime.sendMessage(chrome.runtime.id, { Message: "HeartBeat" });
 // 清理冗余数据
@@ -102,17 +104,16 @@ function AddMedia(data) {
         parsing = "json";
     }
 
-    // 网站图标 不存在 使用duckduckgo图标服务
-    if (!data.favIconUrl) {
-        // data.favIconUrl = "https://icons.duckduckgo.com/ip3/" + new URL(data.initiator).hostname + ".ico";
-        data.favIconUrl = "img/web-favicon.png";
+    // 网站图标
+    if(data.favIconUrl && !favicon.has(data.webUrl)){
+        favicon.set(data.webUrl, data.favIconUrl);
     }
     //添加html
     const html = $(`
         <div class="panel" id="requestId${data.requestId}" ext="${data.ext ? data.ext : "NULL"}">
             <div class="panel-heading">
                 <input type="checkbox" class="DownCheck" checked="true"/>
-                ${G.ShowWebIco ? `<img src="${data.favIconUrl}" class="favicon"/>` : ""}
+                ${G.ShowWebIco ? `<img src="img/web-favicon.png" class="favicon faviconFlag"/>` : ""}
                 <img src="img/regex.png" class="favicon ${data.isRegex ? "" : "hide"}" title="正则表达式匹配 或 来自深度搜索"/>
                 <span class="name ${parsing || data.isRegex ? "bold" : ""}">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
@@ -560,4 +561,12 @@ function UItoggle() {
     } else if ($down.is(":hidden")) {
         $down.show();
     }
+    // 更新图标
+    $(".faviconFlag").each(function(){
+        let webUrl = $(this).parents('.panel').find('.url a').data("weburl");
+        if(favicon.has(webUrl)){
+            $(this).attr("src", favicon.get(webUrl));
+            $(this).removeClass("faviconFlag");
+        }
+    });
 }
