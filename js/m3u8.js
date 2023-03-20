@@ -280,7 +280,7 @@ $(function () {
             * 查看是否加密 下载key
             * firefox CSP政策不允许在script-src 使用blob 不能直接调用hls.js下载好的密钥
             */
-            if (data.fragments[i].encrypted) {
+            if (data.fragments[i].encrypted && data.fragments[i].decryptdata) {
                 isEncrypted = true;
                 // 填入key内容
                 Object.defineProperty(data.fragments[i].decryptdata, "keyContent", {
@@ -1248,8 +1248,6 @@ function StringToUint8Array(str) {
 }
 /* 修正mp4文件显示时长 */
 function fixFileDuration(data, duration) {
-    // return data;
-    // console.log(data, duration);
     // duration = parseInt(duration);
     let mvhdBoxDuration = duration * 90000;
     function getBoxDuration(data, duration, index) {
