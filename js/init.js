@@ -77,7 +77,7 @@ const ffmpeg = {
 const reProtocol = /^[\w]+:\/\/.+/i;
 const reFilename = /filename="?([^"]+)"?/;
 const reRange = /([\d]+)-([\d]+)\/([\d]+)/;
-const reYoutube = /&range=[^&]*|&rbuf=[^&]*|&rn=[^&]*|&cver=[^&]*|&altitags=[^&]*|&pot=[^&]*|&fallback_count=[^&]*/g;
+const reYoutube = /&(range|rbuf|rn|cver|altitags|pot|fallback_count)=[^&]*/g;
 const reStringModify = /['\\:\*\?"<\/>\|~]/g;
 
 // 防抖
