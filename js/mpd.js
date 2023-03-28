@@ -87,6 +87,7 @@ function parseMPD() {
     $("#loading").hide(); $("#main").show();
     mpdJson = mpdParser.parse(mpdContent, { manifestUri: _url });
     mpdXml = $(mpdContent);
+    console.log(mpdJson);
     if (mpdXml.find("contentprotection").length > 0) {
         $("#loading").show();
         $("#loading .optionBox").html("媒体有DRM保护, 可能无法下载和播放. 暂无加密分析以及解密功能, 请复制mpd文件地址, 使用第三方工具下载.");
@@ -126,7 +127,7 @@ function showSegment(type, index) {
     }
     $("#media_file").html(textarea);
     $("#count").html("共 " + items.segments.length + " 个文件" + "，总时长: " + secToTime(mpdJson.duration));
-    $("#tips").html('initialization: <input type="text" value="' + items.segments[0].map.resolvedUri + '" spellcheck="false" readonly="readonly" class="keyUrl">');
+    items.segments.length > 0 && $("#tips").html('initialization: <input type="text" value="' + items.segments[0].map.resolvedUri + '" spellcheck="false" readonly="readonly" class="keyUrl">');
     $("#info").html(getInfo(type));
 }
 
