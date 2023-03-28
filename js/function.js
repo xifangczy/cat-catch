@@ -96,10 +96,33 @@ function deleteReferer(callback) {
     });
 }
 
+// 分割字符串
+function splitString(text, separator) {
+    text = text.trim();
+    if (text.length == 0) { return []; }
+    const parts = [];
+    let inQuotes = false;
+    let inSingleQuotes = false;
+    let start = 0;
+
+    for (let i = 0; i < text.length; i++) {
+        if (text[i] === '|' && !inQuotes && !inSingleQuotes) {
+            parts.push(text.slice(start, i));
+            start = i + 1;
+        } else if (text[i] === '"' && !inSingleQuotes) {
+            inQuotes = !inQuotes;
+        } else if (text[i] === "'" && !inQuotes) {
+            inSingleQuotes = !inSingleQuotes;
+        }
+    }
+    parts.push(text.slice(start));
+    return parts;
+}
+
 // 模板 函数 实现
 function templatesFunction(text, action) {
     text = isEmpty(text) ? "" : text.toString();
-    action = action.trim().split("|");
+    action = splitString(action, "|");
     for (let item of action) {
         // 不使用 split(":") 方法 参数中 arg 可能包含 ":" 字符
         const temp = item.indexOf(":");
