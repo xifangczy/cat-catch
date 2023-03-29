@@ -31,7 +31,6 @@ G.OptionLists = [
     "initComplete",
     "youtube",
     "catDownload",
-    // "trimTitleRE",
     "saveAs",
     "userAgent",
     "downFileName"
@@ -160,9 +159,6 @@ function GetDefault(Obj) {
         case "initComplete": return true;
         case "youtube": return false;
         case "catDownload": return false;
-        // case "trimTitleRE": return "([^-|–]*)";
-        // case "trimTitleRE": return "(.*) [-–] ";
-        // case "trimTitleRE": return "";
         case "saveAs": return false;
         case "downFileName": return "${title}.${ext}";
     }

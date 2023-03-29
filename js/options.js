@@ -33,7 +33,6 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
         $("#catDownload").prop("checked", items.catDownload);
         $("#injectScript").val(items.injectScript);
         $("#Player").val(items.Player);
-        $("#trimTitleRE").val(items.trimTitleRE);
         $("#downFileName").val(items.downFileName);
     }, 100);
 });
@@ -141,7 +140,7 @@ $("#injectScript, #PlayerTemplate").change(function () {
 });
 //失去焦点 保存自动清理数 模拟手机User Agent 自定义播放调用模板
 let debounce2 = undefined;
-$("#OtherAutoClear, #MobileUserAgent, #m3u8dlArg, #copyM3U8, #copyMPD, #copyOther, #Player, #trimTitleRE, #userAgent, #downFileName").on("input", function () {
+$("#OtherAutoClear, #MobileUserAgent, #m3u8dlArg, #copyM3U8, #copyMPD, #copyOther, #Player, #userAgent, #downFileName").on("input", function () {
     const Option = this.id;
     let val = $(this).val();
     if (Option == "OtherAutoClear") {
