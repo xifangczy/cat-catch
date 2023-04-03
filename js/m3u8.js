@@ -65,6 +65,8 @@ $(function () {
     let recorder = false; // 开关
     let recorderIndex = 0;  // 下载索引
     let recorderLast = "";  // 最后下载的url
+    /* m3u8DL */
+    let addParam = false;
     /* DOM */
     const $fileSize = $("#fileSize");
     const $progress = $("#progress");
@@ -483,7 +485,7 @@ $(function () {
         $("#video").hide();
         hls.detachMedia($("#video")[0]);
         $("#media_file").show();
-        $(this).html("播放m3u8").data("switch", "on");
+        $(this).html("播放").data("switch", "on");
     });
     // 调用m3u8DL下载
     $("#m3u8DL").click(function () {
@@ -503,6 +505,12 @@ $(function () {
     // m3u8DL参数设置
     $("#setM3u8dl").click(function () {
         $("#m3u8dlArg").slideToggle();
+    });
+    // 设置载入参数
+    $("#loadParam").click(function () {
+        addParam = !addParam;
+        this.innerHTML = addParam ? "取消设置参数" : "载入设置参数";
+        $("#m3u8dlArg").val(getM3u8DlArg());
     });
     $("input").click(function () {
         $("#m3u8dlArg").val(getM3u8DlArg());
@@ -740,7 +748,7 @@ $(function () {
         const _tsThread = parseInt($("#thread").val());  // 原始线程数量
         let tsThread = _tsThread;  // 线程数量
         let index = start - 1; // 当前下载的索引
-        downTotalTs = end - start + 1;  // 需要下载的文件数量
+        downTotalTs = errorObj ? downTotalTs : end - start + 1;  // 需要下载的文件数量
         const tsInterval = setInterval(function () {
             // 停止下载flag
             if (stopDownload) {
@@ -1090,50 +1098,52 @@ $(function () {
             event.returnValue = `正在推流, 关闭后停止下载...`;
         }
     }
-});
-function getM3u8DlArg() {
-    let m3u8dlArg = G.m3u8dlArg;
-    // 自定义文件名
-    const customFilename = $("#customFilename").val().trim();
-    if (customFilename) {
-        m3u8dlArg = m3u8dlArg.replace(/--saveName "[^"]+"/g, `--saveName "${customFilename}"`);
-    }
-    const data = {
-        url: _m3u8Url,
-        title: _title,
-        referer: _referer,
-        initiator: _referer ?? _initiator
-    }
-    m3u8dlArg = templates(m3u8dlArg, data);
-
-    if (m3u8dlArg.includes("--maxThreads")) {
-        m3u8dlArg = m3u8dlArg.replace(/--maxThreads "?[0-9]+"?/g, "");
-    }
-    const tsThread = $("#thread").val();  // 线程数量
-    m3u8dlArg += ` --maxThreads "${tsThread}"`
-
-    const rangeStart = $("#rangeStart").val() - 1;  // 开始序列号
-    const rangeEnd = $("#rangeEnd").val() - 1;  // 结束序列号
-    m3u8dlArg += ` --downloadRange "${rangeStart}-${rangeEnd}"`
-
-    let customKey = $("#customKey").val().trim();  // 自定义密钥
-    if (customKey) {
-        if (isHexKey(customKey)) {
-            customKey = HexStringToArrayBuffer(customKey);
-            customKey = ArrayBufferToBase64(customKey);
-            m3u8dlArg += ` --useKeyBase64 "${customKey}"`;
-        }else if(customKey.length == 24 && customKey.slice(-2) == "=="){
-            m3u8dlArg += ` --useKeyBase64 "${customKey}"`;
+    function getM3u8DlArg() {
+        let m3u8dlArg = G.m3u8dlArg;
+        // 自定义文件名
+        const customFilename = $("#customFilename").val().trim();
+        if (customFilename && addParam) {
+            m3u8dlArg = m3u8dlArg.replace(/--saveName "[^"]+"/g, `--saveName "${customFilename}"`);
         }
+        const data = {
+            url: _m3u8Url,
+            title: _title,
+            referer: _referer,
+            initiator: _referer ?? _initiator
+        }
+        m3u8dlArg = templates(m3u8dlArg, data);
+    
+        if(!addParam){ return m3u8dlArg; }
+    
+        if (m3u8dlArg.includes("--maxThreads")) {
+            m3u8dlArg = m3u8dlArg.replace(/--maxThreads "?[0-9]+"?/g, "");
+        }
+        const tsThread = $("#thread").val();  // 线程数量
+        m3u8dlArg += ` --maxThreads "${tsThread}"`
+    
+        const rangeStart = $("#rangeStart").val() - 1;  // 开始序列号
+        const rangeEnd = $("#rangeEnd").val() - 1;  // 结束序列号
+        m3u8dlArg += ` --downloadRange "${rangeStart}-${rangeEnd}"`
+    
+        let customKey = $("#customKey").val().trim();  // 自定义密钥
+        if (customKey) {
+            if (isHexKey(customKey)) {
+                customKey = HexStringToArrayBuffer(customKey);
+                customKey = ArrayBufferToBase64(customKey);
+                m3u8dlArg += ` --useKeyBase64 "${customKey}"`;
+            }else if(customKey.length == 24 && customKey.slice(-2) == "=="){
+                m3u8dlArg += ` --useKeyBase64 "${customKey}"`;
+            }
+        }
+        const customIV = $("#customIV").val();  // 自定义IV
+        m3u8dlArg += customIV ? ` --useKeyIV "${customIV}"` : "";
+        // 只要音频
+        const onlyAudio = $("#onlyAudio").prop("checked");
+        m3u8dlArg += onlyAudio ? ` --enableAudioOnly` : "";
+    
+        return m3u8dlArg;
     }
-    const customIV = $("#customIV").val();  // 自定义IV
-    m3u8dlArg += customIV ? ` --useKeyIV "${customIV}"` : "";
-    // 只要音频
-    const onlyAudio = $("#onlyAudio").prop("checked");
-    m3u8dlArg += onlyAudio ? ` --enableAudioOnly` : "";
-    // m3u8dlArg = m3u8dlArg.replace(/  /g, " ");
-    return m3u8dlArg;
-}
+});
 // 写入ts链接
 function writeText(text) {
     if (typeof text == "object") {
