@@ -136,7 +136,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     if (Message.Message == "ffmpeg") {
         for (let item of Message.media) {
-            loadBlob({ action: Message.action, type: item.type ?? "video", data: item.data, title: Message.title });
+            loadBlob({ action: Message.action, type: item.type ?? "video", data: item.data, title: Message.title, name: item.name });
         }
         sendResponse("ok");
         return true;

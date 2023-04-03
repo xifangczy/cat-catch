@@ -7,8 +7,10 @@ const _fileName = params.get("filename");
 _referer ? setReferer(_referer, startDownload) : startDownload();
 
 function startDownload() {
+    // 储存blob
+    let blobUrl = "";
     // 下载的文件ID
-    var downId = 0;
+    let downId = 0;
     // 没有url 打开输入框
     if (!_url) {
         $("#getURL").show();
@@ -50,11 +52,15 @@ function startDownload() {
     }).done(function (result) {
         $downFilepProgress.html("下载完成，正在保存到硬盘...");
         try {
+            blobUrl = URL.createObjectURL(result);
             chrome.downloads.download({
-                url: URL.createObjectURL(result),
+                url: blobUrl,
                 filename: _fileName,
                 saveAs: G.saveAs
-            }, function (downloadId) { downId = downloadId });
+            }, function (downloadId) {
+                downId = downloadId;
+                $("#ffmpeg").show();
+            });
         } catch (e) {
             $downFilepProgress.html("下载失败... " + e);
         }
@@ -89,5 +95,14 @@ function startDownload() {
             return;
         }
         chrome.downloads.showDefaultFolder();
+    });
+
+    // 发送到在线ffmpeg
+    $("#ffmpeg").click(function () {
+        chrome.runtime.sendMessage({
+            Message: "catCatchFFmpeg",
+            action: "addMedia",
+            media: [{ data: blobUrl, name: getUrlFileName(_url)}]
+        });
     });
 }

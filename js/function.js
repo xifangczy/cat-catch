@@ -106,7 +106,7 @@ function splitString(text, separator) {
     let start = 0;
 
     for (let i = 0; i < text.length; i++) {
-        if (text[i] === '|' && !inQuotes && !inSingleQuotes) {
+        if (text[i] === separator && !inQuotes && !inSingleQuotes) {
             parts.push(text.slice(start, i));
             start = i + 1;
         } else if (text[i] === '"' && !inSingleQuotes) {
@@ -229,4 +229,10 @@ function templates(text, data) {
         return templatesFunction(data[tag], action);
     });
     return text;
+}
+// 从url中获取文件名
+function getUrlFileName(url) {
+    let pathname = new URL(url).pathname;
+    let filename = pathname.split("/").pop();
+    return filename ? filename : "NULL";
 }
