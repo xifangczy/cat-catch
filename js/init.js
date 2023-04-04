@@ -38,7 +38,6 @@ G.OptionLists = [
 G.TabIdList = [
     "featMobileTabId",
     "featAutoDownTabId",
-    "featCatchTabId",
     "mediaControl"
 ];
 
@@ -58,12 +57,10 @@ if (navigator.userAgent.includes("Chrome/")) {
 
 // 脚本列表
 G.scriptList = new Map();
-G.scriptList.set("search.js", { refresh: true, allFrames: true, world: "MAIN", name: "深度搜索" });
-G.scriptList.set("catch.js", { refresh: true, allFrames: true, world: "MAIN", name: "缓存捕捉" });
-G.scriptList.set("recorder.js", { refresh: false, allFrames: true, world: "MAIN", name: "视频录制" });
-if (G.version >= 104) {
-    G.scriptList.set("recorder2.js", { refresh: false, allFrames: false, world: "ISOLATED", name: "屏幕捕捉" });
-}
+G.scriptList.set("search.js", { key: "search", refresh: true, allFrames: true, world: "MAIN", name: "深度搜索", tabId: new Set() });
+G.scriptList.set("catch.js", { key: "catch", refresh: true, allFrames: true, world: "MAIN", name: "缓存捕捉", tabId: new Set() });
+G.scriptList.set("recorder.js", { key: "recorder", refresh: false, allFrames: true, world: "MAIN", name: "视频录制", tabId: new Set() });
+G.scriptList.set("recorder2.js", { key: "recorder2", refresh: false, allFrames: false, world: "ISOLATED", name: "屏幕捕捉", tabId: new Set() });
 
 // ffmpeg
 const ffmpeg = {
@@ -149,7 +146,6 @@ function GetDefault(Obj) {
         case "injectScript": return "search.js";
         case "featMobileTabId": return [];
         case "featAutoDownTabId": return [];
-        case "featCatchTabId": return [];
         case "mediaControl": return { tabid: 0, index: -1 };
         case "playbackRate": return 2;
         case "copyM3U8": return "${url}";
@@ -259,6 +255,15 @@ function clearRedundant() {
                     });
                 }
             }
+        });
+
+        // 清理脚本
+        G.scriptList.forEach(function(scriptList){
+            scriptList.tabId.forEach(function(tabId){
+                if (!allTabId.includes(tabId)) {
+                    scriptList.tabId.delete(tabId);
+                }
+            });
         });
     });
     refererData = [];

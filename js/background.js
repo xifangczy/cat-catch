@@ -249,8 +249,7 @@ function findMedia(data, isRegex = false, filter = false) {
 
 //监听来自popup 和 options的请求
 chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
-    if (G.featMobileTabId === undefined ||
-        G.featCatchTabId === undefined ||
+    if (G.featMobileTabId === undefined || 
         G.featAutoDownTabId === undefined
     ) {
         sendResponse("error");
@@ -281,10 +280,12 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     Message.tabId = Message.tabId ?? G.tabId;
     if (Message.Message == "getButtonState") {
         let state = {
-            mobile: G.featMobileTabId.includes(Message.tabId),
-            autodown: G.featAutoDownTabId.includes(Message.tabId), // 点击图标 立刻停止下载
-            catch: G.featCatchTabId.includes(Message.tabId)
+            MobileUserAgent: G.featMobileTabId.includes(Message.tabId),
+            AutoDown: G.featAutoDownTabId.includes(Message.tabId)
         }
+        G.scriptList.forEach(function (item, key) {
+            state[item.key] = item.tabId.has(Message.tabId);
+        });
         sendResponse(state);
         return true;
     }
@@ -312,33 +313,31 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         sendResponse("ok");
         return true;
     }
-    // 捕获
-    if (Message.Message == "catch") {
-        /* 不需要刷新的脚本 立即注入 */
-        G.injectScript = G.scriptList.has(G.injectScript) ? G.injectScript : GetDefault("injectScript");
-        let script = G.scriptList.get(G.injectScript);
-        if (!script.refresh) {
+    // 脚本
+    if (Message.Message == "script") {
+        if (!G.scriptList.has(Message.script)) {
+            sendResponse("error no exists");
+            return false;
+        }
+        const script = G.scriptList.get(Message.script);
+        const scriptTabid = script.tabId;
+        if (scriptTabid.has(Message.tabId)) {
+            scriptTabid.delete(Message.tabId);
+            script.refresh && chrome.tabs.reload(Message.tabId, { bypassCache: true });
+            sendResponse("ok");
+            return true;
+        }
+        scriptTabid.add(Message.tabId);
+        if(script.refresh){
+            chrome.tabs.reload(Message.tabId, { bypassCache: true });
+        }else{
             chrome.scripting.executeScript({
                 target: { tabId: Message.tabId, allFrames: script.allFrames },
-                files: ["catch-script/" + G.injectScript],
+                files: ["catch-script/" + Message.script],
                 injectImmediately: true,
                 world: script.world
             });
-            sendResponse("ok");
-            return true;
         }
-        /* 需要刷新页面的脚本 */
-        // 在列表中 删除 并刷新页面
-        if (G.featCatchTabId.includes(Message.tabId)) {
-            tabIdListRemove("featCatchTabId", Message.tabId);
-            chrome.tabs.reload(Message.tabId, { bypassCache: true });
-            sendResponse("ok");
-            return true;
-        }
-        // 不在列表中 加入 并刷新页面
-        G.featCatchTabId.push(Message.tabId);
-        chrome.storage.local.set({ featCatchTabId: G.featCatchTabId });
-        chrome.tabs.reload(Message.tabId, { bypassCache: true });
         sendResponse("ok");
         return true;
     }
@@ -389,7 +388,6 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         return true;
     }
     // ffmpeg在线转码
-    // if (Message.Message == "catCatchFFmpeg" && ffmpeg.action.includes(Message.action)) {
     if (Message.Message == "catCatchFFmpeg") {
         const data = { Message: "ffmpeg", action: Message.action, media: Message.media, title: Message.title };
         chrome.tabs.query({ url: ffmpeg.url }, function (tabs) {
@@ -435,15 +433,16 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
         if (isSpecialPage(tab.url) || tabId == 0 || tabId == -1) { return; }
 
         // 开启捕获
-        if (G.version >= 102 && G.featCatchTabId && G.featCatchTabId.includes(tabId)) {
-            G.injectScript = G.scriptList.has(G.injectScript) ? G.injectScript : GetDefault("injectScript");
-            let script = G.scriptList.get(G.injectScript);
-            let injectScript = "catch-script/" + G.injectScript;
-            chrome.scripting.executeScript({
-                target: { tabId: tabId, allFrames: script.allFrames },
-                files: [injectScript],
-                injectImmediately: true,
-                world: script.world
+        if (G.version >= 102) {
+            G.scriptList.forEach(function (item, key) {
+                if (item.tabId.has(tabId)) {
+                    chrome.scripting.executeScript({
+                        target: { tabId: tabId, allFrames: item.allFrames },
+                        files: [`catch-script/${key}`],
+                        injectImmediately: true,
+                        world: item.world
+                    });
+                }
             });
         }
         // 模拟手机端 修改 navigator 变量
@@ -479,7 +478,13 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
     // 清理 自动下载
     tabIdListRemove("featAutoDownTabId", tabId);
     // 清理 捕获
-    G.version >= 102 && tabIdListRemove("featCatchTabId", tabId);
+    if (G.version >= 102) {
+        G.scriptList.forEach(function(item){
+            if (item.tabId.has(tabId)) {
+                item.tabId.delete(tabId);
+            }
+        });
+    }
     chrome.alarms.create("nowClear", { when: Date.now() + 3000 });
 });
 

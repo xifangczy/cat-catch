@@ -280,6 +280,7 @@ $(".Tabs .TabButton").click(function () {
     $(".container").eq(index).addClass("TabShow");
     UItoggle();
     $("#filter").hide();
+    $("#scriptCatch").hide();
     $("#filter #ext").html("");
 });
 // 其他页面
@@ -386,6 +387,15 @@ $('#filter #ext').click(function () {
         }
     });
 });
+// 捕捉/录制 按钮
+$('#Catch').click(function () {
+    const $scriptCatch = $("#scriptCatch");
+    if ($scriptCatch.is(":hidden")) {
+        $scriptCatch.css("display", "flex");
+        return;
+    }
+    $scriptCatch.hide();
+});
 // 清空数据
 $('#Clear').click(function () {
     const type = $('.Active').attr("id") != "allTab";
@@ -415,6 +425,7 @@ $("#AutoDown").click(function () {
 });
 // 102以上开启 捕获按钮/注入脚本
 if (G.version >= 102) {
+    $("#search").show();
     $("#Catch").show();
     $("#otherScript").show();
 }
@@ -438,36 +449,18 @@ const interval = setInterval(function () {
     clearInterval(interval);
     // 获取模拟手机 自动下载 捕获 状态
     chrome.runtime.sendMessage({ Message: "getButtonState", tabId: G.tabId }, function (state) {
-        if (state.mobile) {
-            $("#MobileUserAgent").html("关闭模拟").data("switch", "off");
-        }
-        if (state.autodown) {
-            // Tips("已关闭自动下载", 500);
-            $("#AutoDown").html("关闭自动下载").data("switch", "off");
-        }
-        if (state.catch) {
-            $("#Catch").html("关闭脚本").data("switch", "off");
-        }
+        state.MobileUserAgent && $("#MobileUserAgent").html("关闭模拟");
+        state.AutoDown && $("#AutoDown").html("关闭自动下载");
+        state.search && $("#search").html("关闭搜索");
+        state.catch && $("#catch").html("关闭捕获");
+        state.recorder && $("#recorder").html("关闭录制");
+        state.recorder2 && $("#recorder2").html("关闭屏幕捕捉");
     });
-    // 捕获按钮
-    if ($("#Catch").data("switch") != "off") {
-        G.injectScript = G.scriptList.has(G.injectScript) ? G.injectScript : GetDefault("injectScript");
-        $("#Catch").html(G.scriptList.get(G.injectScript).name);
-    }
-    $("#Catch").click(function () {
-        chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId });
+    // 深度搜索
+    $("#scriptCatch button, #search").click(function () {
+        chrome.runtime.sendMessage({ Message: "script", tabId: G.tabId, script: this.id + ".js" });
         G.refreshClear && $('#Clear').click();
         location.reload();
-    });
-    G.scriptList.forEach(function (value, key) {
-        let button = $(`<button data-script="${key}" class="button2">${value.name}</button>`);
-        button.click(function () {
-            chrome.storage.sync.set({ injectScript: this.dataset.script }, function () {
-                chrome.runtime.sendMessage({ Message: "catch", tabId: G.tabId });
-                G.refreshClear && $('#Clear').click();
-            });
-        });
-        $(".otherScript").append(button);
     });
 
     // 上一次设定的倍数
