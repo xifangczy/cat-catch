@@ -13,10 +13,6 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
         $("#regexList").append(Gethtml("Regex", { type: items.Regex[key].type, regex: items.Regex[key].regex, ext: items.Regex[key].ext, state: items.Regex[key].state }));
     }
     setTimeout(() => {
-        // 注入脚本列表
-        G.scriptList.forEach(function (item, key) {
-            $("#injectScript").append(`<option value="${key}">${item.name}(${key})</option>`);
-        });
         $("#OtherAutoClear").val(items.OtherAutoClear);
         $("#MobileUserAgent").val(items.MobileUserAgent);
         $("#userAgent").val(items.userAgent);
@@ -31,7 +27,6 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
         $("#saveAs").prop("checked", items.saveAs);
         $("#refreshClear").prop("checked", items.refreshClear);
         $("#catDownload").prop("checked", items.catDownload);
-        $("#injectScript").val(items.injectScript);
         $("#Player").val(items.Player);
         $("#downFileName").val(items.downFileName);
     }, 100);
@@ -126,12 +121,9 @@ function Gethtml(Type, Param = new Object()) {
     return html;
 }
 // 注入脚本选择
-$("#injectScript, #PlayerTemplate").change(function () {
+$("#PlayerTemplate").change(function () {
     const Option = this.id;
     const Value = $(this).val();
-    if (Option == "injectScript" && G.scriptList.has(Value)) {
-        chrome.storage.sync.set({ [Option]: Value });
-    }
     if (Option == "PlayerTemplate" && playerList.has(Value) && Value != "tips") {
         const template = playerList.get(Value).template;
         $("#Player").val(template);

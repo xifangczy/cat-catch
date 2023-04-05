@@ -22,7 +22,6 @@ G.OptionLists = [
     "MobileUserAgent",
     "m3u8dl",
     "m3u8dlArg",
-    "injectScript",
     "playbackRate",
     "copyM3U8",
     "copyMPD",
@@ -143,7 +142,6 @@ function GetDefault(Obj) {
         case "userAgent": return "";
         case "m3u8dl": return false;
         case "m3u8dlArg": return `"\${url}" --workDir "%USERPROFILE%\\Downloads\\m3u8dl" --saveName "\${title}_\${now}" --enableDelAfterDone \${referer|exists:'--headers "Referer:*"'}`;
-        case "injectScript": return "search.js";
         case "featMobileTabId": return [];
         case "featAutoDownTabId": return [];
         case "mediaControl": return { tabid: 0, index: -1 };
