@@ -604,13 +604,13 @@ $(function () {
                 fileStream = createStreamSaver(_fragments[0].url);
             }
 
-            $(this).html(fileStream ? "停止下载" : "下载录制").addClass("button2").data("switch", "off");
+            $(this).html(fileStream ? "停止下载" : "下载录制").data("switch", "off");
             $progress.html(`等待直播数据中...`);
             return;
         }
         stopDownload = '停止录制';
         recorder = false;
-        $(this).html("录制直播").removeClass("button2").data("switch", "on");
+        $(this).html("录制直播").data("switch", "on");
         if (fileStream) {
             fileStream.close();
             fileStream = undefined;

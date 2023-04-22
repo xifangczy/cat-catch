@@ -102,8 +102,8 @@
             </div>
             <div class="merge" id="mergeDown">
               <div id="threadDiv" class="themeColor">下载线程数 <input type="number" value="32" id="thread" spellcheck="false" style="width: 35px;" step="1" min="1" max="256"/></div>
-              <label class="m3u8checkbox themeColor">mp4格式<input type="checkbox" id="mp4" checked="checked"/></label>
               <label class="m3u8checkbox themeColor">ffmpeg转码<input type="checkbox" id="ffmpeg"/></label>
+              <label class="m3u8checkbox themeColor">mp4格式<input type="checkbox" id="mp4"/></label>
               <label class="m3u8checkbox themeColor firefoxHide">边下边存<input type="checkbox" id="StreamSaver"/></label>
               <label class="m3u8checkbox themeColor">只要音频<input type="checkbox" id="onlyAudio"/></label>
               <label class="m3u8checkbox themeColor">另存为<input type="checkbox" id="saveAs"></label>
@@ -115,12 +115,12 @@
                   <input type="number" id="rangeEnd" spellcheck="false" placeholder="结束" step="1" min="1"/>
                 </div>
               </div>
+              <button id="recorder" class="button2 hide" data-switch="on" data-switch="on">录制直播</button>
               <button id="mergeTs" class="button2">合并下载</button>
               <button class="openDir">打开下载目录</button>
               <button id="errorDownload" class="hide button2">重试所有失败项</button>
               <button id="ForceDownload" class="hide button2">下载已有数据</button>
               <button id="stopStream" class="hide button2">停止下载</button>
-              <button id="recorder" data-switch="on" class="hide" data-switch="on">录制直播</button>
             </div>
             <div style="display: flex; margin-top: 10px;"><div id="progress"></div> <div id="fileSize"></div><div id="fileDuration"></div></div>
             <div class="block hide" id="errorTsList"></div>
