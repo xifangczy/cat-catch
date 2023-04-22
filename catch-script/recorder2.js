@@ -1,6 +1,6 @@
 (function () {
     console.log("recorder2.js Start");
-    if (document.getElementById("catCatchRecorder")) {
+    if (document.getElementById("catCatchRecorder2")) {
         return;
     }
     if (!navigator.mediaDevices) {
@@ -15,7 +15,7 @@
             50% { outline: 4px solid red; }
             100% { outline: 4px solid rgb(26, 115, 232); }
         }
-        #catCatchRecorder{
+        #catCatchRecorder2{
             font-weight: bold;
             position: absolute;
             cursor: move;
@@ -57,7 +57,7 @@
 
     // 添加div
     let cat = document.createElement("div");
-    cat.setAttribute("id", "catCatchRecorder");
+    cat.setAttribute("id", "catCatchRecorder2");
     cat.innerHTML = `<div id="catCatchRecorderinnerCropArea"></div>
         <div id="catCatchRecorderHeader">
             <div id="catCatchRecorderStart">开始录制</div>

@@ -8,7 +8,7 @@
     <div id="tips"></div>`;
     CatCatch.style = `position: fixed;
         z-index: 999999;
-        top: 15%;
+        top: 10%;
         left: 90%;
         background: #fff;
         border: solid 1px #c7c7c7;
