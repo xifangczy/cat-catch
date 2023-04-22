@@ -1,3 +1,20 @@
+/*定义整个滚动条高宽及背景：高宽分别对应横竖滚动条的尺寸*/
+::-webkit-scrollbar
+{
+    width:5px;
+}
+/*定义滚动条轨道：内阴影+圆角*/
+::-webkit-scrollbar-track
+{
+    background-color:#f5f5f500;
+}
+/*定义滑块：内阴影+圆角*/
+::-webkit-scrollbar-thumb
+{
+    border-radius:10px;
+    background-color:#1a73e8;
+}
+
 a {
   color: #3079ed;
   text-decoration: none;
@@ -21,7 +38,7 @@ body {
   margin-right: 10px;
 }
 .panel {
-  border: 1px solid #ddd;
+  border: 1px solid #ddd0;
   margin-bottom: 1px;
 }
 .panel-heading {
@@ -57,7 +74,6 @@ body {
 }
 .panel-heading .icon {
   padding-left: 2px;
-  padding-right: 2px;
 }
 .favicon {
   padding-right: 2px;
@@ -75,7 +91,7 @@ body {
   pointer-events: none;
   color: rgb(26, 115, 232);
   font-weight: bold;
-  border: 2px solid #cdcdcd;
+  border: 1px solid #cdcdcd12;
   border-radius: 2px;
   background: #f5f5f5;
   padding: 0 10px;
@@ -93,7 +109,7 @@ body {
 .button,
 .button2 {
   background: #fff;
-  border: solid 1px #c7c7c7;
+  border: solid 1px #c7c7c780;
   border-radius: 4px;
   color: rgb(26, 115, 232);
   cursor: pointer;
@@ -122,7 +138,7 @@ body {
 }
 .TabButton {
   text-align: center;
-  border: solid 1px #c7c7c7;
+  border: solid 1px #c7c7c700;
   color: rgb(26, 115, 232);
   border-radius: 5px 5px 0 0;
   cursor: pointer;
