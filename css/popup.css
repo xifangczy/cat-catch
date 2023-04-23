@@ -356,7 +356,10 @@ label {
     background-color: var(--background-color-two);
   }
   .icon {
-    filter: invert(100%);
+    filter: invert(30%);
+  }
+.moreButton .icon {
+    filter: invert(70%);
   }
   input,
   textarea,
