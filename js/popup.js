@@ -361,22 +361,25 @@ $('#ReSelect').click(function () {
 });
 // 筛选按钮
 $('#openFilter').click(function () {
-    $(".more").hide();
-    if ($("#filter").is(":hidden")) {
+    const $filter = $("#filter");
+    $(".more").not($filter).hide();
+    if ($filter.is(":hidden")) {
         const extFilter = new Set();
-        if ($('.TabShow .panel').length == 0) { return; }
-        $("#filter #ext").html("");
-        $('.TabShow .panel').each(function () {
+        const $panel = $('.TabShow .panel');
+        const $filter_ext = $("#filter #ext");
+        if ($panel.length == 0) { return; }
+        $filter_ext.html("");
+        $panel.each(function () {
             let ext = $(this).attr("ext");
             if (!extFilter.has(ext)) {
-                $("#filter #ext").append(`<label class="flexFilter" id="${ext}"><input type="checkbox" checked>${ext}</label>`);
+                $filter_ext.append(`<label class="flexFilter" id="${ext}"><input type="checkbox" checked>${ext}</label>`);
             }
             extFilter.add(ext);
         });
-        $("#filter").css("display", "flex");
+        $filter.css("display", "flex");
         return;
     }
-    $("#filter").hide();
+    $filter.hide();
 });
 // 扩展筛选
 $('#filter #ext').click(function () {
@@ -390,14 +393,15 @@ $('#filter #ext').click(function () {
 });
 // 展开按钮
 $('#openUnfold').click(function () {
-    $(".more").hide();
+    if ($('.TabShow .panel').length == 0) { return; }
+    $(".more").not("#unfold").hide();
     $("#unfold").toggle();
 });
 // 展开全部
 $('#unfoldAll').click(function () {
     $('.TabShow .panel').each(function () {
         const $DOM = $(this);
-        if($DOM.find(".url").is(":hidden")){
+        if ($DOM.find(".url").is(":hidden")) {
             $DOM.find(".panel-heading").click();
         }
     });
@@ -407,7 +411,7 @@ $('#unfoldPlay').click(function () {
     $('.TabShow .panel').each(function () {
         const $DOM = $(this);
         const data = { ext: $DOM.attr("ext"), type: $DOM.attr("mime") };
-        if(isPlay(data) && $DOM.find(".url").is(":hidden")){
+        if (isPlay(data) && $DOM.find(".url").is(":hidden")) {
             $DOM.find(".panel-heading").click();
         }
     });
@@ -416,7 +420,7 @@ $('#unfoldPlay').click(function () {
 $('#unfoldFilter').click(function () {
     $('.TabShow .panel').each(function () {
         const $DOM = $(this);
-        if($DOM.find(".url").is(":hidden") && $DOM.find("input").prop('checked')){
+        if ($DOM.find(".url").is(":hidden") && $DOM.find("input").prop('checked')) {
             $DOM.find(".panel-heading").click();
         }
     });
@@ -425,15 +429,15 @@ $('#unfoldFilter').click(function () {
 $('#fold').click(function () {
     $('.TabShow .panel').each(function () {
         const $DOM = $(this);
-        if($DOM.find(".url").is(":visible")){
+        if ($DOM.find(".url").is(":visible")) {
             $DOM.find(".panel-heading").click();
         }
     });
 });
 // 捕捉/录制 按钮
 $('#Catch').click(function () {
-    $(".more").hide();
     const $scriptCatch = $("#scriptCatch");
+    $(".more").not($scriptCatch).hide();
     if ($scriptCatch.is(":hidden")) {
         $scriptCatch.css("display", "flex");
         return;
