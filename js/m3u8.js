@@ -14,12 +14,12 @@ $(function () {
     // 默认设置
     chrome.storage.local.get({
         thread: 32,
-        mp4: true,
+        mp4: false,
         onlyAudio: false,
         saveAs: false,
         skipDecrypt: false,
         StreamSaver: false,
-        ffmpeg: false,
+        ffmpeg: true,
     }, function (items) {
         $("#thread").val(items.thread);
         $("#mp4").prop("checked", items.mp4);
