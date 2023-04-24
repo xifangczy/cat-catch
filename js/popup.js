@@ -105,12 +105,12 @@ function AddMedia(data) {
     }
 
     // 网站图标
-    if(data.favIconUrl && !favicon.has(data.webUrl)){
+    if (data.favIconUrl && !favicon.has(data.webUrl)) {
         favicon.set(data.webUrl, data.favIconUrl);
     }
     //添加html
     const html = $(`
-        <div class="panel" id="requestId${data.requestId}" ext="${data.ext ? data.ext : "NULL"}">
+        <div class="panel" id="requestId${data.requestId}" ext="${data.ext ? data.ext : "NULL"}" mime="${data.type ? data.type : "NULL"}">
             <div class="panel-heading">
                 <input type="checkbox" class="DownCheck" checked="true"/>
                 ${G.ShowWebIco ? `<img src="img/web-favicon.png" class="favicon faviconFlag"/>` : ""}
@@ -361,6 +361,7 @@ $('#ReSelect').click(function () {
 });
 // 筛选按钮
 $('#openFilter').click(function () {
+    $(".more").hide();
     if ($("#filter").is(":hidden")) {
         const extFilter = new Set();
         if ($('.TabShow .panel').length == 0) { return; }
@@ -387,8 +388,51 @@ $('#filter #ext').click(function () {
         }
     });
 });
+// 展开按钮
+$('#openUnfold').click(function () {
+    $(".more").hide();
+    $("#unfold").toggle();
+});
+// 展开全部
+$('#unfoldAll').click(function () {
+    $('.TabShow .panel').each(function () {
+        const $DOM = $(this);
+        if($DOM.find(".url").is(":hidden")){
+            $DOM.find(".panel-heading").click();
+        }
+    });
+});
+// 展开可播放
+$('#unfoldPlay').click(function () {
+    $('.TabShow .panel').each(function () {
+        const $DOM = $(this);
+        const data = { ext: $DOM.attr("ext"), type: $DOM.attr("mime") };
+        if(isPlay(data) && $DOM.find(".url").is(":hidden")){
+            $DOM.find(".panel-heading").click();
+        }
+    });
+});
+// 展开选中的
+$('#unfoldFilter').click(function () {
+    $('.TabShow .panel').each(function () {
+        const $DOM = $(this);
+        if($DOM.find(".url").is(":hidden") && $DOM.find("input").prop('checked')){
+            $DOM.find(".panel-heading").click();
+        }
+    });
+});
+// 关闭展开
+$('#fold').click(function () {
+    $('.TabShow .panel').each(function () {
+        const $DOM = $(this);
+        if($DOM.find(".url").is(":visible")){
+            $DOM.find(".panel-heading").click();
+        }
+    });
+});
 // 捕捉/录制 按钮
 $('#Catch').click(function () {
+    $(".more").hide();
     const $scriptCatch = $("#scriptCatch");
     if ($scriptCatch.is(":hidden")) {
         $scriptCatch.css("display", "flex");
@@ -555,9 +599,9 @@ function UItoggle() {
         $down.show();
     }
     // 更新图标
-    $(".faviconFlag").each(function(){
+    $(".faviconFlag").each(function () {
         let webUrl = $(this).parents('.panel').find('.url a').data("weburl");
-        if(favicon.has(webUrl)){
+        if (favicon.has(webUrl)) {
             $(this).attr("src", favicon.get(webUrl));
             $(this).removeClass("faviconFlag");
         }

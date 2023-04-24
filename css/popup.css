@@ -189,10 +189,6 @@ body {
 #scriptCatch {
   justify-content: flex-end;
 }
-#scriptCatch button {
-  margin-left: 0.5rem;
-  font-size: 12px;
-}
 #down,
 .more {
   display: flex;
@@ -209,6 +205,10 @@ body {
   display: none;
   bottom: 26px;
   justify-content: flex-start;
+}
+.more button{
+  margin-left: 0.5rem;
+  font-size: 12px;
 }
 #filter #ext {
   display: flex;
