@@ -32,7 +32,8 @@ G.OptionLists = [
     "catDownload",
     "saveAs",
     "userAgent",
-    "downFileName"
+    "downFileName",
+    "css"
 ];
 G.TabIdList = [
     "featMobileTabId",
@@ -155,6 +156,7 @@ function GetDefault(Obj) {
         case "catDownload": return false;
         case "saveAs": return false;
         case "downFileName": return "${title}.${ext}";
+        case "css": return "";
     }
 }
 // 初始变量

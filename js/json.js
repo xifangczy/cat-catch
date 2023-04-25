@@ -6,6 +6,7 @@ const _referer = params.get("referer");
 _referer && setReferer(_referer);
 
 $(function () {
+    $(`<style>${G.css}</style>`).appendTo("head");
     var jsonContent = "";
     var options = {
         collapsed: true,

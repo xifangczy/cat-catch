@@ -1,21 +1,5 @@
-/*定义整个滚动条高宽及背景：高宽分别对应横竖滚动条的尺寸*/
-::-webkit-scrollbar {
-    width:5px;
-}
-html, textarea {
-  scrollbar-width: thin;
-}
-/*定义滚动条轨道：内阴影+圆角*/
-::-webkit-scrollbar-track {
-    background-color:#f5f5f500;
-}
-/*定义滑块：内阴影+圆角*/
-::-webkit-scrollbar-thumb {
-    border-radius:10px;
-    background-color:#1a73e8;
-}
 body {
-  background: rgb(248, 249, 250);
+  background: var(--background-color);
   font-size: 13px;
   font-family: "Microsoft YaHei", "Helvetica", "Arial", sans-serif;
 }
@@ -24,7 +8,7 @@ body {
   width: 640px;
 }
 /* 显示优化 */
-.wrapper  input {
+.wrapper input {
   margin-right: 10px;
 }
 
@@ -45,7 +29,7 @@ p {
   display: none;
 }
 .optionBox {
-  background: white;
+  background: var(--optionBox-color);
   border-radius: 4px;
   box-shadow: 0 1px 2px 0 rgb(60 64 67 / 30%), 0 1px 3px 1px rgb(60 64 67 / 15%);
   padding: 0.75em 1.25em;
@@ -55,8 +39,9 @@ table {
   width: 100%;
   text-align: center;
 }
-input, textarea {
-  border: solid 1px rgb(20 69 137 / 40%);
+input,
+textarea {
+  border: var(--input-border);
   padding: 5px 5px;
 }
 input.ext {
@@ -101,7 +86,7 @@ input#OtherAutoClear {
   display: block;
   width: 100%;
   height: 100%;
-  background-color: rgb(189, 193, 198);
+  background-color: var(--switch-off-color);
   transition: all 0.2s ease-in-out;
 }
 .switch .switchRoundBtn {
@@ -112,14 +97,14 @@ input#OtherAutoClear {
   bottom: 3px;
   width: 18px;
   height: 18px;
-  background-color: #fff;
+  background-color: var(--switch-round-color);
   transition: all 0.2s ease-in-out;
 }
 .switch .switchInput {
   display: none;
 }
 .switch .switchInput:checked + .switchRound {
-  background-color: rgb(26, 115, 232);
+  background-color: var(--switch-on-color);
 }
 .switch .switchInput:checked + .switchRound > .switchRoundBtn {
   left: 29px;
@@ -152,19 +137,19 @@ input#OtherAutoClear {
   margin-top: 20px;
 }
 .RemoveButton {
-  fill: rgb(95, 99, 104);
+  fill: var(--text-color);
   height: 20px;
   cursor: pointer;
 }
 .themeColor {
-  color: rgb(26, 115, 232);
+  color: var(--text2-color);
 }
 button,
 .button2 {
-  background: #fff;
+  background: var(--button-color);
   border: solid 1px #c7c7c780;
   border-radius: 4px;
-  color: rgb(26, 115, 232);
+  color: var(--button-text-color);
   cursor: pointer;
   padding: calc(0.5em - 1px) 1em;
   margin-left: 5px;
@@ -173,24 +158,24 @@ button,
   /* margin-top: 10px; */
 }
 button:hover {
-  background: rgb(66 133 244 / 4%);
+  background: var(--button-hover-color);
 }
 button:active {
-  background: rgb(66 133 244 / 10%);
+  background: var(--button-active-color);
 }
-.button {
+.flex-end {
   display: flex;
   justify-content: flex-end;
 }
 .button2 {
-  background: rgb(26 115 232);
-  color: rgb(255 255 255);
+  background: var(--button2-color);
+  color: var(--button2-text-color);
 }
 .button2:hover {
-  background: rgb(26 115 232 / 90%);
+  background: var(--button2-hover-color);
 }
 .button2:active {
-  background: rgb(26 115 232 / 50%);
+  background: var(--button2-active-color);
 }
 .no-drop {
   background-color: #ccc !important;
@@ -198,7 +183,7 @@ button:active {
   color: #fff;
 }
 .explain {
-  color: rgb(95, 99, 104);
+  color: var(--text-color);
 }
 #typeList,
 #extList {
@@ -266,7 +251,8 @@ textarea {
   appearance: none;
   background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIxMiIgZmlsbD0iIzVGNjM2OCI+PHBhdGggZD0iTTAgMGgyNEwxMiAxMnoiLz48L3N2Zz4=)
     calc(100% - 8px) center no-repeat;
-  background-color: rgb(241, 243, 244);
+  /* background-color: rgb(241, 243, 244); */
+  background-color: var(--background-color-two);
   background-size: 10px;
   border: none;
   border-radius: 4px;
@@ -454,59 +440,4 @@ a.json-placeholder {
 }
 a.json-placeholder:hover {
   text-decoration: underline;
-}
-@media (prefers-color-scheme: dark) {
-  html,
-  body,
-  .button,
-  button {
-    --background-color-two: #1e293b;
-    --line-color: #228e6c;
-    --background-color: #0f172a;
-    --text-color: #94a3b8;
-    --link-color: rgb(2 132 199/1);
-    color: var(--text-color);
-    background: var(--background-color);
-  }
-  .button2 {
-    color: var(--text-color);
-    background: rgb(26 115 232 / 50%);
-  }
-  .optionBox {
-    background: var(--background-color);
-    box-shadow: 0 1px 2px 0 rgb(255 255 255 / 30%),
-      0 1px 3px 1px rgb(255 255 255 / 15%);
-  }
-  .button2:active {
-    background: var(--background-color);
-  }
-  .explain,
-  .optionsTitle,
-  th,
-  .item {
-    color: var(--text-color);
-  }
-  input,
-  textarea,
-  select {
-    color: var(--text-color);
-    background: var(--background-color);
-  }
-  .select {
-    background-color: var(--background-color-two);
-  }
-  .switch .switchInput:checked + .switchRound {
-    background-color: rgb(26 115 232 / 50%);
-  }
-  a,
-  a:link,
-  a:visited,
-  #m3u8_url,
-  #mpd_url,
-  .test_url {
-    color: var(--link-color);
-  }
-  .themeColor {
-    color: var(--text-color);
-  }
 }

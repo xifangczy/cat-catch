@@ -1,0 +1,87 @@
+:root {
+  --background-color: #fff;
+  --background-color-two: #f5f5f5;
+  --text-color: #000;
+  --text2-color: rgb(26, 115, 232);
+  --link-color: #3079ed;
+
+  --optionBox-color: var(--background-color);
+
+  --button-color: #fff;
+  --button-text-color: rgb(26, 115, 232);
+  --button-hover-color: rgb(66 133 244 / 4%);
+  --button-active-color: rgb(66 133 244 / 10%);
+
+  --button2-color: rgb(26, 115, 232);
+  --button2-hover-color: rgb(26 115 232 / 90%);
+  --button2-active-color: rgb(26 115 232 / 50%);
+  --button2-text-color: #fff;
+
+  --scrollbar-track-color: #f5f5f500;
+  --scrollbar-thumb-color: #1a73e8;
+
+  --switch-off-color: rgb(189, 193, 198);
+  --switch-on-color: rgb(26, 115, 232);
+  --switch-round-color: #fff;
+
+  --input-border: solid 1px #000;
+}
+html {
+  color: var(--text-color);
+  background: var(--background-color);
+  scrollbar-width: thin;
+}
+input,
+textarea,
+select {
+  color: var(--text-color);
+  background: var(--background-color);
+  scrollbar-width: thin;
+}
+a,
+a:link,
+a:visited {
+  color: var(--link-color);
+}
+/*定义整个滚动条高宽及背景：高宽分别对应横竖滚动条的尺寸*/
+::-webkit-scrollbar {
+  width: 5px;
+}
+/*定义滚动条轨道：内阴影+圆角*/
+::-webkit-scrollbar-track {
+  background-color: var(--scrollbar-track-color);
+}
+/*定义滑块：内阴影+圆角*/
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: var(--scrollbar-thumb-color);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #0f172a;
+    --background-color-two: #1e293b;
+    --text-color: #fff;
+    --text2-color: #fff;
+    --link-color: #94a3b8;
+
+    --optionBox-color: var(--background-color-two);
+
+    --button-color: #161b22;
+    --button-text-color: #fff;
+    --button-hover-color: rgb(66 133 244 / 4%);
+    --button-active-color: rgb(66 133 244 / 10%);
+    --button2-color: rgb(26 115 232 / 50%);
+    --button2-text-color: #fff;
+    --button2-hover-color: rgb(26 115 232 / 90%);
+    --button2-active-color: rgb(26 115 232 / 50%);
+
+    --scrollbar-track-color: #f5f5f500;
+    --scrollbar-thumb-color: #1a73e8;
+
+    --switch-off-color: rgb(189, 193, 198);
+    --switch-on-color: rgb(26 115 232 / 50%);
+    --switch-round-color: #fff;
+
+    --input-border: solid 1px #ffffffb6;
+  }
+}

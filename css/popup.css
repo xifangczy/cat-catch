@@ -1,21 +1,4 @@
-/*定义整个滚动条高宽及背景：高宽分别对应横竖滚动条的尺寸*/
-::-webkit-scrollbar {
-    width:5px;
-}
-html {
-  scrollbar-width: thin;
-}
-/*定义滚动条轨道：内阴影+圆角*/
-::-webkit-scrollbar-track {
-    background-color:#f5f5f500;
-}
-/*定义滑块：内阴影+圆角*/
-::-webkit-scrollbar-thumb {
-    border-radius:10px;
-    background-color:#1a73e8;
-}
 a {
-  color: #3079ed;
   text-decoration: none;
   word-break: break-all;
 }
@@ -27,7 +10,7 @@ body {
   font-size: 12px;
   width: 500px;
   overflow-x: hidden;
-  background: #fff;
+  background: var(--background-color);
   margin: 0;
 }
 .bold {
@@ -42,8 +25,8 @@ body {
 }
 .panel-heading {
   padding: 5px 5px 5px 5px;
-  background-color: #f5f5f5;
-  border-color: #ddd;
+  background-color: var(--background-color-two);
+  /* border-color: #ddd; */
   cursor: pointer;
   display: flex;
   flex-direction: row;
@@ -88,11 +71,11 @@ body {
   text-align: center;
   z-index: 9999;
   pointer-events: none;
-  color: rgb(26, 115, 232);
+  color: var(--text2-color);
   font-weight: bold;
   border: 1px solid #cdcdcd12;
   border-radius: 2px;
-  background: #f5f5f5;
+  background: var(--background-color-two);
   padding: 0 10px;
   margin-bottom: 1px;
 }
@@ -105,32 +88,33 @@ body {
   max-width: 488px;
   text-align: center;
 }
-.button,
+button,
 .button2 {
-  background: #fff;
+  background: var(--button-color);
   border: solid 1px #c7c7c780;
   border-radius: 4px;
-  color: rgb(26, 115, 232);
+  color: var(--text2-color);
   cursor: pointer;
   padding: 3px 3px 3px 3px;
   margin: 0 0 3px 0;
   user-select: none;
+  font-size: 12px;
 }
-.button:hover {
-  background: rgb(66 133 244 / 4%);
+button:hover {
+  background: var(--button-hover-color);
 }
-.button:active {
-  background: rgb(66 133 244 / 10%);
+button:active {
+  background: var(--button-active-color);
 }
 .button2 {
-  background: rgb(26 115 232);
-  color: rgb(255 255 255);
+  background: var(--button2-color);
+  color: var(--button2-text-color);
 }
 .button2:hover {
-  background: rgb(26 115 232 / 90%);
+  background: var(--button2-hover-color);
 }
 .button2:active {
-  background: rgb(26 115 232 / 50%);
+  background: var(--button2-active-color);
 }
 .Tabs {
   display: flex;
@@ -138,7 +122,7 @@ body {
 .TabButton {
   text-align: center;
   border: solid 1px #c7c7c700;
-  color: rgb(26, 115, 232);
+  color: var(--text2-color);
   border-radius: 5px 5px 0 0;
   cursor: pointer;
   width: 50%;
@@ -151,28 +135,12 @@ body {
   user-select: none;
 }
 .TabButton.Active {
-  background-color: #f5f5f5;
+  background-color: var(--background-color-two);
   border-bottom-color: transparent;
   font-weight: bold;
 }
 .TabButton.Active div {
   font-weight: bold;
-}
-#ToBottom {
-  text-align: center;
-  background: #fff;
-  border: solid 1px #c7c7c7;
-  border-radius: 4px;
-  color: rgb(26, 115, 232);
-  cursor: pointer;
-  padding: 2px 10px 2px 10px;
-  margin-bottom: 1px;
-}
-#ToBottom:hover {
-  background: #f5f5f5;
-}
-#ToBottom:active {
-  background: #ddd;
 }
 .DownCheck {
   margin: 0 2px 0 0;
@@ -195,7 +163,7 @@ body {
   position: fixed;
   width: 100%;
   z-index: 999;
-  background-color: #fff;
+  background-color: var(--background-color);
 }
 #down {
   bottom: 0;
@@ -206,7 +174,7 @@ body {
   bottom: 26px;
   justify-content: flex-start;
 }
-.more button{
+.more button {
   margin-left: 0.5rem;
   font-size: 12px;
 }
@@ -264,7 +232,7 @@ label {
   width: 100px;
 }
 .blue {
-  color: rgb(26, 115, 232);
+  color: var(--text2-color);
 }
 .flexColumn {
   display: flex;
@@ -297,7 +265,7 @@ label {
 }
 .otherTips {
   text-align: center;
-  color: rgb(26, 115, 232);
+  color: var(--text2-color);
   font-weight: bold;
 }
 .moreButton {
@@ -305,65 +273,4 @@ label {
 }
 .moreButton div {
   margin-right: 3px;
-}
-@media (prefers-color-scheme: dark) {
-  html,
-  body,
-  .button {
-    --background-color-two: #1e293b;
-    --line-color: #228e6c;
-    --background-color: #0f172a;
-    --text-color: #94a3b8;
-    color: var(--text-color);
-    background: var(--background-color);
-  }
-  .TabButton.Active {
-    background-color: var(--background-color-two);
-  }
-  .TabButton {
-    color: var(--text-color);
-  }
-  .button2 {
-    color: var(--text-color);
-    background: rgb(26 115 232 / 50%);
-  }
-  .button:hover,
-  .button2:hover {
-    background: var(--background-color-two);
-  }
-  #Tips,
-  #TipsFixed,
-  select,
-  #down,
-  #filter,
-  .button2:active {
-    background: var(--background-color);
-  }
-  #otherOptions .nowrap,
-  .blue,
-  .otherTips,
-  select,
-  #Tips,
-  #TipsFixed,
-  #filter #ext {
-    color: var(--text-color);
-  }
-  .line {
-    border-top: solid 1px var(--line-color);
-  }
-  .panel-heading {
-    background-color: var(--background-color-two);
-  }
-  .icon {
-    filter: invert(30%);
-  }
-.moreButton .icon {
-    filter: invert(70%);
-  }
-  input,
-  textarea,
-  select {
-    color: var(--text-color);
-    background: var(--background-color);
-  }
 }

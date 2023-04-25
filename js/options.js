@@ -12,6 +12,7 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
     for (let key in items.Regex) {
         $("#regexList").append(Gethtml("Regex", { type: items.Regex[key].type, regex: items.Regex[key].regex, ext: items.Regex[key].ext, state: items.Regex[key].state }));
     }
+    $(`<style>${items.css}</style>`).appendTo("head");
     setTimeout(() => {
         $("#OtherAutoClear").val(items.OtherAutoClear);
         $("#MobileUserAgent").val(items.MobileUserAgent);
@@ -29,6 +30,7 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
         $("#catDownload").prop("checked", items.catDownload);
         $("#Player").val(items.Player);
         $("#downFileName").val(items.downFileName);
+        $("#css").val(items.css);
     }, 100);
 });
 
@@ -132,7 +134,7 @@ $("#PlayerTemplate").change(function () {
 });
 //失去焦点 保存自动清理数 模拟手机User Agent 自定义播放调用模板
 let debounce2 = undefined;
-$("#OtherAutoClear, #MobileUserAgent, #m3u8dlArg, #copyM3U8, #copyMPD, #copyOther, #Player, #userAgent, #downFileName").on("input", function () {
+$("#OtherAutoClear, #MobileUserAgent, #m3u8dlArg, #copyM3U8, #copyMPD, #copyOther, #Player, #userAgent, #downFileName, #css").on("input", function () {
     const Option = this.id;
     let val = $(this).val();
     if (Option == "OtherAutoClear") {

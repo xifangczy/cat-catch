@@ -114,13 +114,28 @@ function AddMedia(data) {
             <div class="panel-heading">
                 <input type="checkbox" class="DownCheck" checked="true"/>
                 ${G.ShowWebIco ? `<img src="img/web-favicon.png" class="favicon faviconFlag"/>` : ""}
-                <img src="img/regex.png" class="favicon ${data.isRegex ? "" : "hide"}" title="正则表达式匹配 或 来自深度搜索"/>
+                <picture>
+                    <source srcset="img/regex-dark.png" media="(prefers-color-scheme: dark)">
+                    <img src="img/regex.png" class="favicon ${data.isRegex ? "" : "hide"}" title="正则表达式匹配 或 来自深度搜索"/>
+                </picture>
                 <span class="name ${parsing || data.isRegex ? "bold" : ""}">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
-                <img src="img/copy.png" class="icon" id="copy" title="复制地址"/>
-                <img src="img/parsing.png" class="icon ${parsing ? "" : "hide"}" id="parsing" data-type="${parsing}" title="解析"/>
-                <img src="img/${G.Player ? "player.png" : "play.png"}" class="icon ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
-                <img src="img/download.png" class="icon" id="download" title="下载"/>
+                <picture>
+                    <source srcset="img/copy-dark.png" media="(prefers-color-scheme: dark)">
+                    <img src="img/copy.png" class="icon" id="copy" title="复制地址"/>
+                </picture>
+                <picture>
+                    <source srcset="img/parsing-dark.png" media="(prefers-color-scheme: dark)">
+                    <img src="img/parsing.png" class="icon ${parsing ? "" : "hide"}" id="parsing" data-type="${parsing}" title="解析"/>
+                </picture>
+                <picture>
+                    <source srcset="img/${G.Player ? "player-dark.png" : "play-dark.png"}" media="(prefers-color-scheme: dark)">
+                    <img src="img/${G.Player ? "player.png" : "play.png"}" class="icon ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
+                </picture>
+                <picture>
+                    <source srcset="img/download-dark.png" media="(prefers-color-scheme: dark)">
+                    <img src="img/download.png" class="icon" id="download" title="下载"/>
+                </picture>
             </div>
             <div class="url hide">
                 <div id="mediaInfo" data-state="false">
@@ -128,8 +143,18 @@ function AddMedia(data) {
                     ${data.type ? `<br><b>MIME:</b>  ${data.type}` : ""}
                 </div>
                 <div class="moreButton">
-                    <div id="qrcode"><img src="img/qrcode.png" class="icon" title="显示资源地址二维码"/></div>
-                    <div id="catDown"><img src="img/cat-down.png" class="icon" title="携带referer参数下载"/></div>
+                    <div id="qrcode">
+                    <picture>
+                        <source srcset="img/qrcode-dark.png" media="(prefers-color-scheme: dark)">
+                        <img src="img/qrcode.png" class="icon" title="显示资源地址二维码"/>
+                    </picture>
+                    </div>
+                    <div id="catDown">
+                        <picture>
+                            <source srcset="img/cat-down-dark.png" media="(prefers-color-scheme: dark)">
+                            <img src="img/cat-down.png" class="icon" title="携带referer参数下载"/>
+                        </picture>
+                    </div>
                 </div>
                 <a href="${data.url}" target="_blank" download="${data.downFileName}" data-referer="${data.referer ?? ""}" data-initiator="${data.initiator}" data-title="${data.title}" data-weburl="${data.webUrl}">${data.url}</a>
                 <br>
@@ -520,7 +545,9 @@ const interval = setInterval(function () {
 
     // 上一次设定的倍数
     $("#playbackRate").val(G.playbackRate);
-}, 10);
+
+    $(`<style>${G.css}</style>`).appendTo("head");
+}, 4);
 /********************绑定事件END********************/
 
 /* 格式判断 */

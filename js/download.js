@@ -7,6 +7,7 @@ const _fileName = params.get("filename");
 _referer ? setReferer(_referer, startDownload) : startDownload();
 
 function startDownload() {
+    $(`<style>${G.css}</style>`).appendTo("head");
     // 储存blob
     let blobUrl = "";
     // 下载的文件ID

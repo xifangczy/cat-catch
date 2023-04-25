@@ -11,6 +11,7 @@ const key = params.get("key");
 // 修改当前标签下的所有xhr的Referer
 _referer ? setReferer(_referer) : deleteReferer();
 $(function () {
+    $(`<style>${G.css}</style>`).appendTo("head");
     // 默认设置
     chrome.storage.local.get({
         thread: 32,

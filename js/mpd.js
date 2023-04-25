@@ -19,6 +19,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 });
 
 $(function () {
+    $(`<style>${G.css}</style>`).appendTo("head");
     if (_url) {
         fetch(_url)
             .then(response => response.text())
