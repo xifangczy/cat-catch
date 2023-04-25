@@ -147,7 +147,7 @@ input#OtherAutoClear {
 button,
 .button2 {
   background: var(--button-color);
-  border: solid 1px #c7c7c780;
+  border: var(--button-border);
   border-radius: 4px;
   color: var(--button-text-color);
   cursor: pointer;

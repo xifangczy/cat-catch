@@ -8,6 +8,7 @@
   --optionBox-color: var(--background-color);
 
   --button-color: #fff;
+  --button-border: solid 1px #c7c7c780;
   --button-text-color: rgb(26, 115, 232);
   --button-hover-color: rgb(66 133 244 / 4%);
   --button-active-color: rgb(66 133 244 / 10%);
@@ -67,10 +68,13 @@ a:visited {
     --optionBox-color: var(--background-color-two);
 
     --button-color: #161b22;
+    --button-border: solid 1px #c7c7c780;
     --button-text-color: #fff;
     --button-hover-color: rgb(66 133 244 / 4%);
     --button-active-color: rgb(66 133 244 / 10%);
+
     --button2-color: rgb(26 115 232 / 50%);
+    --button2-border: solid 1px #c7c7c780;
     --button2-text-color: #fff;
     --button2-hover-color: rgb(26 115 232 / 90%);
     --button2-active-color: rgb(26 115 232 / 50%);
