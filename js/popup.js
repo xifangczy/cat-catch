@@ -448,8 +448,15 @@ $('#Catch').click(function () {
 $('#Clear').click(function () {
     const type = $('.Active').attr("id") != "allTab";
     chrome.runtime.sendMessage({ Message: "clearData", tabId: G.tabId, type: type });
-    type && chrome.runtime.sendMessage({ Message: "ClearIcon" });
-    location.reload();
+    chrome.runtime.sendMessage({ Message: "ClearIcon", type: type });
+    if (type) {
+        currentCount = 0;
+        $current.empty();
+    } else {
+        allCount = 0;
+        $all.empty();
+    }
+    UItoggle();
 });
 // 模拟手机端
 $("#MobileUserAgent").click(function () {
@@ -594,8 +601,8 @@ function Tips(text, delay = 200) {
 function UItoggle() {
     let length = $('.TabShow .panel').length;
     length > 0 ? $tips.hide() : $tips.show().html("还没闻到味儿~");
-    currentCount && $currentCount.text("[" + currentCount + "]");
-    allCount && $allCount.text("[" + allCount + "]");
+    $currentCount.text(currentCount ? `[${currentCount}]` : "");
+    $allCount.text(allCount ? `[${allCount}]` : "");
     if ($('.TabShow').attr("id") == "otherOptions") {
         $tips.hide();
         $down.hide();

@@ -249,7 +249,7 @@ function findMedia(data, isRegex = false, filter = false) {
 
 //监听来自popup 和 options的请求
 chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
-    if (G.featMobileTabId === undefined || 
+    if (G.featMobileTabId === undefined ||
         G.featAutoDownTabId === undefined
     ) {
         sendResponse("error");
@@ -266,13 +266,10 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // 图标设置
     if (Message.Message == "ClearIcon") {
-        if (Message.tabId == undefined || Message.tabId == "-1") {
-            SetIcon({ tips: false });
-        }
-        if (Message.tabId == undefined) {
+        if (Message.type) {
             SetIcon({ tabId: G.tabId });
-        } else if (Message.tabId != "-1") {
-            SetIcon({ tabId: Message.tabId });
+        } else {
+            SetIcon({ tips: false });
         }
         sendResponse("ok");
         return true;
@@ -328,9 +325,9 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             return true;
         }
         scriptTabid.add(Message.tabId);
-        if(script.refresh){
+        if (script.refresh) {
             chrome.tabs.reload(Message.tabId, { bypassCache: true });
-        }else{
+        } else {
             chrome.scripting.executeScript({
                 target: { tabId: Message.tabId, allFrames: script.allFrames },
                 files: ["catch-script/" + Message.script],
@@ -479,7 +476,7 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
     tabIdListRemove("featAutoDownTabId", tabId);
     // 清理 捕获
     if (G.version >= 102) {
-        G.scriptList.forEach(function(item){
+        G.scriptList.forEach(function (item) {
             if (item.tabId.has(tabId)) {
                 item.tabId.delete(tabId);
             }

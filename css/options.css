@@ -55,7 +55,7 @@ table {
   width: 100%;
   text-align: center;
 }
-input {
+input, textarea {
   border: solid 1px rgb(20 69 137 / 40%);
   padding: 5px 5px;
 }
