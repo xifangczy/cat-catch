@@ -38,6 +38,7 @@ select {
   color: var(--text-color);
   background: var(--background-color);
   scrollbar-width: thin;
+  border: var(--input-border);
 }
 a,
 a:link,
