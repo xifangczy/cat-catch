@@ -14,6 +14,7 @@
   --button-active-color: rgb(66 133 244 / 10%);
 
   --button2-color: rgb(26, 115, 232);
+  --button2-text-color: #fff;
   --button2-hover-color: rgb(26 115 232 / 90%);
   --button2-active-color: rgb(26 115 232 / 50%);
   --button2-text-color: #fff;
@@ -88,5 +89,26 @@ a:visited {
     --switch-round-color: #fff;
 
     --input-border: solid 1px #ffffffb6;
+  }
+  img.regex {
+    content: url(../img/regex-dark.png);
+  }
+  img.copy {
+    content: url(../img/copy-dark.png);
+  }
+  img.parsing {
+    content: url(../img/parsing-dark.png);
+  }
+  img.play {
+    content: url(../img/play-dark.png);
+  }
+  img.download {
+    content: url(../img/download-dark.png);
+  }
+  img.qrcode {
+    content: url(../img/qrcode-dark.png);
+  }
+  img.cat-down {
+    content: url(../img/cat-down-dark.png);
   }
 }
