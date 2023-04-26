@@ -94,10 +94,6 @@ function findMedia(data, isRegex = false, filter = false) {
         // 去掉不必要的参数 防止重复
         data.url = data.url.replace(reYoutube, "");
     }
-    // 调试模式
-    if (G.Debug) {
-        console.log({ data, G, isRegex });
-    }
 
     const header = getResponseHeadersValue(data);
     let [name, ext] = fileNameParse(urlParsing.pathname);
