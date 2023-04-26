@@ -7,11 +7,9 @@ body {
   margin: 0 auto;
   width: 640px;
 }
-/* 显示优化 */
 .wrapper input {
   margin-right: 10px;
 }
-
 h1 {
   font-size: 1.125em;
   font-weight: normal;
@@ -24,9 +22,6 @@ h2 {
 }
 p {
   margin: auto;
-}
-.hide {
-  display: none;
 }
 .optionBox {
   background: var(--optionBox-color);
@@ -41,7 +36,6 @@ table {
 }
 input,
 textarea {
-  border: var(--input-border);
   padding: 5px 5px;
 }
 input.ext {
@@ -71,9 +65,6 @@ input.regex {
 input#OtherAutoClear {
   margin-left: 250px;
   width: 45px;
-}
-.width100 {
-  width: 100%;
 }
 /* 滑动开关 组件 */
 .switch {
@@ -146,36 +137,12 @@ input#OtherAutoClear {
 }
 button,
 .button2 {
-  background: var(--button-color);
-  border: var(--button-border);
-  border-radius: 4px;
-  color: var(--button-text-color);
-  cursor: pointer;
   padding: calc(0.5em - 1px) 1em;
-  margin-left: 5px;
-  margin-right: 5px;
-  user-select: none;
-  /* margin-top: 10px; */
-}
-button:hover {
-  background: var(--button-hover-color);
-}
-button:active {
-  background: var(--button-active-color);
+  margin: 5px 5px 5px 5px;
 }
 .flex-end {
   display: flex;
   justify-content: flex-end;
-}
-.button2 {
-  background: var(--button2-color);
-  color: var(--button2-text-color);
-}
-.button2:hover {
-  background: var(--button2-hover-color);
-}
-.button2:active {
-  background: var(--button2-active-color);
 }
 .no-drop {
   background-color: #ccc !important;
@@ -343,10 +310,6 @@ textarea {
 }
 #loading a {
   word-break: break-all;
-}
-.line {
-  border-top: solid 1px rgb(0 0 0 / 50%);
-  margin: 10px 0 10px 0;
 }
 #next_m3u8 a {
   word-break: break-all;

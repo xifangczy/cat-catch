@@ -13,9 +13,6 @@ body {
   background: var(--background-color);
   margin: 0;
 }
-.bold {
-  font-weight: bold;
-}
 .fixFirefoxRight {
   margin-right: 5px;
 }
@@ -90,31 +87,7 @@ body {
 }
 button,
 .button2 {
-  background: var(--button-color);
-  border: var(--button-border);
-  border-radius: 4px;
-  color: var(--text2-color);
-  cursor: pointer;
   padding: 3px 3px 3px 3px;
-  margin: 0 0 3px 0;
-  user-select: none;
-  font-size: 12px;
-}
-button:hover {
-  background: var(--button-hover-color);
-}
-button:active {
-  background: var(--button-active-color);
-}
-.button2 {
-  background: var(--button2-color);
-  color: var(--button2-text-color);
-}
-.button2:hover {
-  background: var(--button2-hover-color);
-}
-.button2:active {
-  background: var(--button2-active-color);
 }
 .Tabs {
   display: flex;
@@ -147,9 +120,6 @@ button:active {
   width: 15px;
   height: 15px;
   flex: 0 0 auto;
-}
-.hide {
-  display: none;
 }
 .TabShow {
   display: block !important;
@@ -231,9 +201,6 @@ label {
 #PlayControl .volume {
   width: 100px;
 }
-.blue {
-  color: var(--text2-color);
-}
 .flexColumn {
   display: flex;
   flex-direction: column;
@@ -244,12 +211,6 @@ label {
   flex-direction: row;
   align-items: center;
 }
-.width100 {
-  width: 100%;
-}
-.height100 {
-  height: 100%;
-}
 .nowrap {
   word-break: keep-all;
 }
@@ -258,10 +219,6 @@ label {
   width: 100%;
   margin-right: 10px;
   text-align: center;
-}
-.line {
-  border-top: solid 1px rgb(0 0 0 / 50%);
-  margin: 5px 0 5px 0;
 }
 .otherTips {
   text-align: center;

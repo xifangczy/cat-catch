@@ -46,6 +46,52 @@ a:link,
 a:visited {
   color: var(--link-color);
 }
+button,
+.button2 {
+  background: var(--button-color);
+  border: var(--button-border);
+  border-radius: 4px;
+  color: var(--text2-color);
+  cursor: pointer;
+  margin: 0 0 3px 0;
+  user-select: none;
+  font-size: 12px;
+}
+button:hover {
+  background: var(--button-hover-color);
+}
+button:active {
+  background: var(--button-active-color);
+}
+.button2 {
+  background: var(--button2-color);
+  color: var(--button2-text-color);
+}
+.button2:hover {
+  background: var(--button2-hover-color);
+}
+.button2:active {
+  background: var(--button2-active-color);
+}
+.bold {
+  font-weight: bold;
+}
+.hide {
+  display: none;
+}
+.textColor {
+  color: var(--text2-color);
+}
+.width100 {
+  width: 100%;
+}
+.height100 {
+  height: 100%;
+}
+.line {
+  border-top: solid 1px rgb(0 0 0 / 50%);
+  margin: 10px 0 10px 0;
+}
 /*定义整个滚动条高宽及背景：高宽分别对应横竖滚动条的尺寸*/
 ::-webkit-scrollbar {
   width: 5px;
