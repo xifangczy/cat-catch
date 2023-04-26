@@ -104,10 +104,6 @@ input#OtherAutoClear {
   border-radius: 50px;
 }
 /* 滑动开关 组件 END */
-.icon {
-  cursor: pointer;
-  margin-left: 5px;
-}
 .list {
   padding-left: 10px;
   padding-top: 5px;
@@ -132,13 +128,11 @@ input#OtherAutoClear {
   height: 20px;
   cursor: pointer;
 }
-.themeColor {
-  color: var(--text2-color);
-}
 button,
 .button2 {
   padding: calc(0.5em - 1px) 1em;
   margin: 5px 5px 5px 5px;
+  font-size: 13px;
 }
 .flex-end {
   display: flex;
