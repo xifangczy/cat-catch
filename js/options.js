@@ -3,6 +3,7 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
     if (items.Ext === undefined || items.Type === undefined || items.Regex === undefined) {
         location.reload();
     }
+    $(`<style>${items.css}</style>`).appendTo("head");
     for (let key in items.Ext) {
         $("#extList").append(Gethtml("Ext", { ext: items.Ext[key].ext, size: items.Ext[key].size, state: items.Ext[key].state }));
     }
@@ -12,25 +13,15 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
     for (let key in items.Regex) {
         $("#regexList").append(Gethtml("Regex", { type: items.Regex[key].type, regex: items.Regex[key].regex, ext: items.Regex[key].ext, state: items.Regex[key].state }));
     }
-    $(`<style>${items.css}</style>`).appendTo("head");
     setTimeout(() => {
-        $("#OtherAutoClear").val(items.OtherAutoClear);
-        $("#MobileUserAgent").val(items.MobileUserAgent);
-        $("#userAgent").val(items.userAgent);
-        $("#m3u8dlArg").val(items.m3u8dlArg);
-        $("#copyM3U8").val(items.copyM3U8);
-        $("#copyMPD").val(items.copyMPD);
-        $("#copyOther").val(items.copyOther);
-        $("#Debug").prop("checked", items.Debug);
-        $("#TitleName").prop("checked", items.TitleName);
-        $("#ShowWebIco").prop("checked", items.ShowWebIco);
-        $("#m3u8dl").prop("checked", items.m3u8dl);
-        $("#saveAs").prop("checked", items.saveAs);
-        $("#refreshClear").prop("checked", items.refreshClear);
-        $("#catDownload").prop("checked", items.catDownload);
-        $("#Player").val(items.Player);
-        $("#downFileName").val(items.downFileName);
-        $("#css").val(items.css);
+        for (let key in items) {
+            if (key == "Ext" || key == "Type" || key == "Regex") { continue; }
+            if(typeof items[key] == "boolean"){
+                $(`#${key}`).prop("checked", items[key]);
+            }else{
+                $(`#${key}`).val(items[key]);
+            }
+        }
     }, 100);
 });
 
@@ -122,7 +113,7 @@ function Gethtml(Type, Param = new Object()) {
     }
     return html;
 }
-// 注入脚本选择
+// 预览模板
 $("#PlayerTemplate").change(function () {
     const Option = this.id;
     const Value = $(this).val();
@@ -134,7 +125,7 @@ $("#PlayerTemplate").change(function () {
 });
 //失去焦点 保存自动清理数 模拟手机User Agent 自定义播放调用模板
 let debounce2 = undefined;
-$("#OtherAutoClear, #MobileUserAgent, #m3u8dlArg, #copyM3U8, #copyMPD, #copyOther, #Player, #userAgent, #downFileName, #css").on("input", function () {
+$("[save='input']").on("input", function () {
     const Option = this.id;
     let val = $(this).val();
     if (Option == "OtherAutoClear") {
@@ -146,7 +137,7 @@ $("#OtherAutoClear, #MobileUserAgent, #m3u8dlArg, #copyM3U8, #copyMPD, #copyOthe
     }, 300);
 });
 // 调试模式 使用网页标题做文件名 使用PotPlayer预览 显示网站图标 刷新自动清理
-$("#Debug, #TitleName, #ShowWebIco, #m3u8dl, #refreshClear, #catDownload, #saveAs").bind("click", function () {
+$("[save='click']").bind("click", function () {
     const Option = this.id;
     chrome.storage.sync.set({ [Option]: $(this).prop('checked') });
 });
@@ -218,7 +209,7 @@ $("#ResetM3u8dl").bind("click", function () {
 // 重设标签
 $("#ResetTag").bind("click", function () {
     if (confirm("确认重置吗？")) {
-        ["userAgent", "MobileUserAgent", "downFileName"].forEach(function(id){
+        ["userAgent", "MobileUserAgent", "downFileName"].forEach(function (id) {
             chrome.storage.sync.set({ [id]: GetDefault(id) });
         })
         location.reload();

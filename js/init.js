@@ -12,7 +12,6 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 // 所有设置变量
 G.OptionLists = [
     "Ext",
-    "Debug",
     "TitleName",
     "OtherAutoClear",
     "Player",
@@ -132,7 +131,6 @@ function GetDefault(Obj) {
     switch (Obj) {
         case "Ext": return defaultExt;
         case "Type": return defaultType;
-        case "Debug": return false;
         case "TitleName": return false;
         case "OtherAutoClear": return 100;
         case "Player": return "";
