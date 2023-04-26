@@ -67,11 +67,6 @@ function startDownload() {
         }
     });
 
-    // 监听提示变化修改网页标题 非常影响效率 取消
-    // $("#downFilepProgress").bind("DOMNodeInserted", function (e) {
-    //     document.title = e.target.innerHTML;
-    // });
-
     // 监听下载事件 修改提示
     chrome.downloads.onChanged.addListener(function (downloadDelta) {
         if (!downloadDelta.state) { return; }
