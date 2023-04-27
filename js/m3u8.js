@@ -539,7 +539,6 @@ $(function () {
         }
     });
     $("#ffmpeg").on("change", function () {
-        $("#mp4").prop("checked") && $("#mp4").click();
         if ($(this).prop("checked")) {
             $("#mp4").prop("checked", false);
             $("#StreamSaver").prop("checked", false);
