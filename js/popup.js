@@ -461,6 +461,11 @@ $('#Clear').click(function () {
 // 模拟手机端
 $("#MobileUserAgent").click(function () {
     const action = $(this).data("switch");
+    if (action == "on") {
+        $(this).html("关闭模拟").data("switch", "off");
+    } else {
+        $(this).html("模拟手机").data("switch", "on");
+    }
     chrome.runtime.sendMessage({ Message: "mobileUserAgent", tabId: G.tabId, action: action }, function () {
         G.refreshClear ? $('#Clear').click() : location.reload();
     });
@@ -470,13 +475,14 @@ $("#AutoDown").click(function () {
     const action = $(this).data("switch");
     if (action == "on") {
         if (confirm("当前页面找到资源立刻尝试下载\n是否确认开启?")) {
-            $("#AutoDown").html("关闭自动下载").data("switch", "off");
-            chrome.runtime.sendMessage({ Message: "autoDown", tabId: G.tabId, action: action });
+            $(this).html("关闭自动下载").data("switch", "off");
+        } else {
+            return true;
         }
     } else {
-        $("#AutoDown").html("自动下载").data("switch", "on");
-        chrome.runtime.sendMessage({ Message: "autoDown", tabId: G.tabId, action: action });
+        $(this).html("自动下载").data("switch", "on");
     }
+    chrome.runtime.sendMessage({ Message: "autoDown", tabId: G.tabId, action: action });
 });
 // 102以上开启 捕获按钮/注入脚本
 if (G.version >= 102) {
@@ -504,8 +510,8 @@ const interval = setInterval(function () {
     clearInterval(interval);
     // 获取模拟手机 自动下载 捕获 状态
     chrome.runtime.sendMessage({ Message: "getButtonState", tabId: G.tabId }, function (state) {
-        state.MobileUserAgent && $("#MobileUserAgent").html("关闭模拟");
-        state.AutoDown && $("#AutoDown").html("关闭自动下载");
+        state.MobileUserAgent && $("#MobileUserAgent").html("关闭模拟").data("switch", "off");
+        state.AutoDown && $("#AutoDown").html("关闭自动下载").data("switch", "off");
         state.search && $("#search").html("关闭搜索");
         state.catch && $("#catch").html("关闭捕获");
         state.recorder && $("#recorder").html("关闭录制");
