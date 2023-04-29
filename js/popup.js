@@ -11,6 +11,8 @@ let allCount = 0;
 // 提示 操作按钮 DOM
 const $tips = $("#Tips");
 const $down = $("#down");
+// 储存资源
+const allData = new Map();
 // 储存下载id
 const downData = [];
 // 图标地址
@@ -95,30 +97,34 @@ function AddMedia(data) {
     }
 
     // 是否需要解析
-    let parsing = false;
+    data.parsing = false;
     if (isM3U8(data)) {
-        parsing = "m3u8";
+        data.parsing = "m3u8";
     } else if (isMPD(data)) {
-        parsing = "mpd";
+        data.parsing = "mpd";
     } else if (isJSON(data)) {
-        parsing = "json";
+        data.parsing = "json";
     }
 
     // 网站图标
     if (data.favIconUrl && !favicon.has(data.webUrl)) {
         favicon.set(data.webUrl, data.favIconUrl);
     }
+
+    // 临时储存
+    allData.set(data.requestId, data);
+
     //添加html
     const html = $(`
-        <div class="panel" id="requestId${data.requestId}" ext="${data.ext ? data.ext : "NULL"}" mime="${data.type ? data.type : "NULL"}">
+        <div class="panel" requestId="${data.requestId}" ext="${data.ext ? data.ext : "NULL"}" mime="${data.type ? data.type : "NULL"}">
             <div class="panel-heading">
                 <input type="checkbox" class="DownCheck" checked="true"/>
                 ${G.ShowWebIco ? `<img src="img/web-favicon.png" class="favicon faviconFlag"/>` : ""}
                 <img src="img/regex.png" class="favicon regex ${data.isRegex ? "" : "hide"}" title="正则表达式匹配 或 来自深度搜索"/>
-                <span class="name ${parsing || data.isRegex ? "bold" : ""}">${trimName}</span>
+                <span class="name ${data.parsing || data.isRegex ? "bold" : ""}">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
                 <img src="img/copy.png" class="icon copy" id="copy" title="复制地址"/>
-                <img src="img/parsing.png" class="icon parsing ${parsing ? "" : "hide"}" id="parsing" data-type="${parsing}" title="解析"/>
+                <img src="img/parsing.png" class="icon parsing ${data.parsing ? "" : "hide"}" id="parsing" data-type="${data.parsing}" title="解析"/>
                 <img src="img/play.png" class="icon play ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
                 <img src="img/download.png" class="icon download" id="download" title="下载"/>
             </div>
@@ -131,7 +137,7 @@ function AddMedia(data) {
                     <div id="qrcode"><img src="img/qrcode.png" class="icon qrcode" title="显示资源地址二维码"/></div>
                     <div id="catDown"><img src="img/cat-down.png" class="icon cat-down" title="携带referer参数下载"/></div>
                 </div>
-                <a href="${data.url}" target="_blank" download="${data.downFileName}" data-referer="${data.referer ?? ""}" data-initiator="${data.initiator}" data-title="${data.title}" data-weburl="${data.webUrl}">${data.url}</a>
+                <a href="${data.url}" target="_blank" download="${data.downFileName}">${data.url}</a>
                 <br>
                 <img id="screenshots" class="hide"/>
                 <video id="preview" class="hide" controls></video>
@@ -204,7 +210,7 @@ function AddMedia(data) {
     });
     //点击复制网址
     html.find('#copy').click(function () {
-        const text = copyLink(parsing, data);
+        const text = copyLink(data);
         navigator.clipboard.writeText(text);
         Tips("已复制到剪贴板");
         return false;
@@ -250,9 +256,8 @@ function AddMedia(data) {
     });
     //解析m3u8
     html.find('#parsing').click(function () {
-        const type = $(this).data("type");
         chrome.tabs.get(G.tabId, function (tab) {
-            let url = `/${type}.html?url=${encodeURIComponent(data.url)}&title=${encodeURIComponent(data.title)}&tabid=${data.tabId}`;
+            let url = `/${data.parsing}.html?url=${encodeURIComponent(data.url)}&title=${encodeURIComponent(data.title)}&tabid=${data.tabId}`;
             if (data.referer) {
                 url += `&referer=${encodeURIComponent(data.referer)}`;
             } else {
@@ -305,22 +310,12 @@ $('#DownFile').click(function () {
         return;
     }
     checked.each(function () {
-        const link = $(this).parents(".panel").find(".url a");
-        const url = link.attr("href");
-        let title = stringModify(link.data("title"));
-        title = title ? title : "CatCatch";
-        const filename = title + "/" + stringModify(link.attr("download"));
-        const referer = link.data("referer");
+        const data = allData.get($(this).parents('.panel').attr("requestId"));
         setTimeout(function () {
             chrome.downloads.download({
-                url: url,
-                filename: filename
-            }, function (id) {
-                downData[id] = { url: url, downFileName: filename };
-                if (referer) { downData[id].referer = referer; }
-                downData[id].initiator = referer ? referer : link.data('initiator');
-                downData[id].webUrl = link.data("weburl");
-            });
+                url: data.url,
+                filename: data.title + "/" + data.downFileName
+            }, function (id) { downData[id] = data; });
         }, 500);
     });
 });
@@ -330,17 +325,10 @@ $('#AllCopy').click(function () {
     if (checked.length == 0) { return false };
     const url = [];
     checked.each(function () {
-        const type = $(this).siblings("#parsing").data("type");
-        const link = $(this).parents('.panel').find('.url a');
-        let href = link.attr('href');
-        if (type) {
-            const referer = link.data('referer');
-            const title = link.data('title');
-            const data = { url: href, title: title };
-            if (referer) { data.referer = referer; }
-            data.initiator = referer ? referer : link.data('initiator');
-            data.webUrl = link.data("weburl");
-            href = copyLink(type, data);
+        const data = allData.get($(this).parents('.panel').attr("requestId"));
+        let href = data.url;
+        if (data.parsing) {
+            href = copyLink(data);
         }
         url.push(href);
     });
@@ -571,11 +559,11 @@ function isPicture(data) {
     )
 }
 // 复制选项
-function copyLink(type, data) {
+function copyLink(data) {
     let text = data.url;
-    if (type == "m3u8") {
+    if (data.parsing == "m3u8") {
         text = G.copyM3U8;
-    } else if (type == "mpd") {
+    } else if (data.parsing == "mpd") {
         text = G.copyMPD;
     } else {
         text = G.copyOther;
@@ -619,9 +607,9 @@ function UItoggle() {
     }
     // 更新图标
     $(".faviconFlag").each(function () {
-        let webUrl = $(this).parents('.panel').find('.url a').data("weburl");
-        if (favicon.has(webUrl)) {
-            $(this).attr("src", favicon.get(webUrl));
+        const data = allData.get($(this).parents('.panel').attr("requestId"));
+        if (favicon.has(data.webUrl)) {
+            $(this).attr("src", favicon.get(data.webUrl));
             $(this).removeClass("faviconFlag");
         }
     });
