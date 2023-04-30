@@ -45,6 +45,9 @@ body {
   height: 18px;
   cursor: pointer;
 }
+.faviconFlag{
+  display: none;
+}
 .icon:hover {
   transform: scale(1.1);
 }

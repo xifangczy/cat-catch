@@ -62,7 +62,6 @@ chrome.downloads.onChanged.addListener(function (item) {
 function AddMedia(data) {
     data._title = data.title;
     data.title = stringModify(data.title);
-
     // 正则匹配的备注扩展
     if (data.extraExt) {
         data.ext = data.extraExt;
@@ -71,31 +70,25 @@ function AddMedia(data) {
     if (data.ext === undefined && data.type !== undefined) {
         data.ext = data.type.split("/")[1];
     }
-
     //文件名
     data.name = isEmpty(data.name) ? data.title + '.' + data.ext : decodeURIComponent(stringModify(data.name));
-
     // Youtube
     if (data.name == "videoplayback" && data.url.includes("googlevideo.com")) {
         data.name = data.title + '.' + data.ext;
         const size = data.url.match(/&clen=([\d]*)/);
         data.size = size ? size[1] : 0;
     }
-
     //截取文件名长度
     let trimName = data.name;
     if (data.name.length >= 60) {
         trimName = trimName.substr(0, 20) + '...' + trimName.substr(-23);
     }
-
     //添加下载文件名
     data.downFileName = G.TitleName ? templates(G.downFileName, data) : data.name;
-
     // 文件大小单位转换
     if (data.size) {
         data.size = byteToSize(data.size);
     }
-
     // 是否需要解析
     data.parsing = false;
     if (isM3U8(data)) {
@@ -105,21 +98,17 @@ function AddMedia(data) {
     } else if (isJSON(data)) {
         data.parsing = "json";
     }
-
     // 网站图标
     if (data.favIconUrl && !favicon.has(data.webUrl)) {
         favicon.set(data.webUrl, data.favIconUrl);
     }
-
-    // 临时储存
     allData.set(data.requestId, data);
-
     //添加html
-    const html = $(`
+    data.html = $(`
         <div class="panel" requestId="${data.requestId}" ext="${data.ext ? data.ext : "NULL"}" mime="${data.type ? data.type : "NULL"}">
             <div class="panel-heading">
-                <input type="checkbox" class="DownCheck" checked="true"/>
-                ${G.ShowWebIco ? `<img src="img/web-favicon.png" class="favicon faviconFlag"/>` : ""}
+                <input type="checkbox" class="DownCheck" checked="true" requestId="${data.requestId}"/>
+                ${G.ShowWebIco ? `<img class="favicon faviconFlag" requestId="${data.requestId}"/>` : ""}
                 <img src="img/regex.png" class="favicon regex ${data.isRegex ? "" : "hide"}" title="正则表达式匹配 或 来自深度搜索"/>
                 <span class="name ${data.parsing || data.isRegex ? "bold" : ""}">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
@@ -145,11 +134,10 @@ function AddMedia(data) {
         </div>`);
     ////////////////////////绑定事件////////////////////////
     //展开网址
-    html.find('.panel-heading').click(function (event) {
-        const html = $(this).parent();
-        const urlPanel = html.find(".url");
-        const mediaInfo = html.find("#mediaInfo");
-        const preview = html.find("#preview");
+    data.html.find('.panel-heading').click(function (event) {
+        const urlPanel = data.html.find(".url");
+        const mediaInfo = data.html.find("#mediaInfo");
+        const preview = data.html.find("#preview");
         if (urlPanel.is(":visible")) {
             if (event.target.id == "play") {
                 preview.show().trigger("play");
@@ -181,7 +169,7 @@ function AddMedia(data) {
             } else if (isPlay(data)) {
                 preview.attr("src", data.url);
             } else if (isPicture(data)) {
-                html.find("#screenshots").show().attr("src", data.url);
+                data.html.find("#screenshots").show().attr("src", data.url);
                 return false;
             } else {
                 return false;
@@ -200,23 +188,23 @@ function AddMedia(data) {
         return false;
     });
     // 二维码
-    html.find("#qrcode").click(function () {
+    data.html.find("#qrcode").click(function () {
         const size = data.url.length >= 300 ? 400 : 256;
         $(this).html("").qrcode({ width: size, height: size, text: data.url }).off("click");
     });
     // 猫抓下载器 下载
-    html.find("#catDown").click(function () {
+    data.html.find("#catDown").click(function () {
         catDownload(data);
     });
     //点击复制网址
-    html.find('#copy').click(function () {
+    data.html.find('#copy').click(function () {
         const text = copyLink(data);
         navigator.clipboard.writeText(text);
         Tips("已复制到剪贴板");
         return false;
     });
     // 下载
-    html.find('#download').click(function () {
+    data.html.find('#download').click(function () {
         if (G.m3u8dl && (isM3U8(data) || isMPD(data))) {
             let m3u8dlArg = templates(G.m3u8dlArg, data);
             let url = 'm3u8dl://' + Base64.encode(m3u8dlArg);
@@ -240,7 +228,7 @@ function AddMedia(data) {
         return false;
     });
     //播放
-    html.find('#play').click(function () {
+    data.html.find('#play').click(function () {
         if (isEmpty(G.Player)) { return true; }
         if (G.Player == "$shareApi$" || G.Player == "${shareApi}") {
             navigator.share({ url: data.url });
@@ -255,7 +243,7 @@ function AddMedia(data) {
         return false;
     });
     //解析m3u8
-    html.find('#parsing').click(function () {
+    data.html.find('#parsing').click(function () {
         chrome.tabs.get(G.tabId, function (tab) {
             let url = `/${data.parsing}.html?url=${encodeURIComponent(data.url)}&title=${encodeURIComponent(data.title)}&tabid=${data.tabId}`;
             if (data.referer) {
@@ -268,11 +256,10 @@ function AddMedia(data) {
         return false;
     });
     //多选框
-    html.find('input').click(function (event) {
+    data.html.find('input').click(function (event) {
         event.originalEvent.cancelBubble = true;
     });
-
-    return html;
+    return data.html;
 }
 
 /********************绑定事件********************/
@@ -310,7 +297,7 @@ $('#DownFile').click(function () {
         return;
     }
     checked.each(function () {
-        const data = allData.get($(this).parents('.panel').attr("requestId"));
+        const data = allData.get($(this).attr("requestId"));
         setTimeout(function () {
             chrome.downloads.download({
                 url: data.url,
@@ -325,7 +312,7 @@ $('#AllCopy').click(function () {
     if (checked.length == 0) { return false };
     const url = [];
     checked.each(function () {
-        const data = allData.get($(this).parents('.panel').attr("requestId"));
+        const data = allData.get($(this).attr("requestId"));
         let href = data.url;
         if (data.parsing) {
             href = copyLink(data);
@@ -483,14 +470,13 @@ if (G.isFirefox) {
     $("body").addClass("fixFirefoxRight");
     $(".firefoxHide").each(function () { $(this).hide(); });
 }
-
 // 解决浏览器字体设置超过16px按钮变高遮挡一条资源
 if ($down[0].offsetHeight > 30) {
     $(".container").css("margin-bottom", ($down[0].offsetHeight + 2) + "px");
 }
 // 跳转页面
-$(".otherFeat .button2, #Options").click(function () {
-    chrome.tabs.create({ url: $(this).data("go") });
+$("[go]").click(function () {
+    chrome.tabs.create({ url: $(this).attr("go") });
 });
 // 一些需要等待G变量加载完整的操作
 const interval = setInterval(function () {
@@ -607,7 +593,7 @@ function UItoggle() {
     }
     // 更新图标
     $(".faviconFlag").each(function () {
-        const data = allData.get($(this).parents('.panel').attr("requestId"));
+        const data = allData.get($(this).attr("requestId"));
         if (favicon.has(data.webUrl)) {
             $(this).attr("src", favicon.get(data.webUrl));
             $(this).removeClass("faviconFlag");
