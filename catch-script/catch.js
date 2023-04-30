@@ -1,13 +1,13 @@
 (function () {
     console.log("catch.js Start");
     if (document.getElementById("CatCatchCatch")) { return; }
-
+    
     const CatCatch = document.createElement("div");
     CatCatch.setAttribute("id", "CatCatchCatch");
     CatCatch.innerHTML = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAAKlBMVEUAAADLlROxbBlRAD16GS5oAjWWQiOCIytgADidUx/95gHqwwTx0gDZqwT6kfLuAAAACnRSTlMA/vUejV7kuzi8za0PswAAANpJREFUGNNjwA1YSxkYTEqhnKZLLi6F1w0gnKA1shdvHYNxdq1atWobjLMKCOAyC3etlVrUAOH4HtNZmLgoAMKpXX37zO1FwcZAwMDguGq1zKpFmTNnzqx0Bpp2WvrU7ttn9py+I8JgLn1R8Pad22vurNkjwsBReHv33junzuyRnOnMwNCSeFH27K5dq1SNgcZxFMnuWrNq1W5VkNntihdv7ToteGcT0C7mIkE1qbWCYjJnM4CqEoWKdoslChXuUgXJqIcLebiphSgCZRhaPDhcDFhdmUMCGIgEAFA+Uc02aZg9AAAAAElFTkSuQmCC" style="-webkit-user-drag: none;width: 20px;">
     <div id="tips"></div>
-    <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown") == "true" ? "checked" : ""}>完成捕获自动下载</label>
-    <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg") == "true" ? "checked" : ""}>使用ffmpeg合并</label>`;
+    <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown")}>完成捕获自动下载</label>
+    <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg")}>使用ffmpeg合并</label>`;
     CatCatch.style = `position: fixed;
         z-index: 999999;
         top: 10%;
@@ -28,14 +28,11 @@
     document.getElementsByTagName('html')[0].appendChild(CatCatch);
     const cat = CatCatch.querySelector("#tips");
 
-    const $autoDOwn = document.querySelector("#CatCatchCatch #autoDown");
-    const $ffmpeg = document.querySelector("#CatCatchCatch #ffmpeg");
-
-    $autoDOwn.addEventListener('change', function (event) {
-        localStorage.setItem("CatCatchCatch_autoDown", this.checked);
+    document.querySelector("#CatCatchCatch #autoDown").addEventListener('change', function (event) {
+        localStorage.setItem("CatCatchCatch_autoDown", this.checked ? "checked" : "");
     });
-    $ffmpeg.addEventListener('change', function (event) {
-        localStorage.setItem("CatCatchCatch_ffmpeg", this.checked);
+    document.querySelector("#CatCatchCatch #ffmpeg").addEventListener('change', function (event) {
+        localStorage.setItem("CatCatchCatch_ffmpeg", this.checked ? "checked" : "");
     });
 
     // 操作按钮
@@ -87,7 +84,7 @@
         isComplete = true;
         cat.innerHTML = "捕获完成<br>点击下载";
         _endOfStream.call(this);
-        $autoDOwn.checked && CatCatch.click();
+        localStorage.getItem("CatCatchCatch_autoDown") == "checked" && catchDownload();
     }
 
     // 下载资源
@@ -96,7 +93,7 @@
             alert("没抓到有效数据");
             return;
         }
-        if (catchMedia.length >= 2 && $ffmpeg.checked) {
+        if (catchMedia.length >= 2 && localStorage.getItem("CatCatchCatch_ffmpeg") == "checked") {
             const media = [];
             for (let item of catchMedia) {
                 const mime = item.mimeType.split(';')[0];
