@@ -6,6 +6,8 @@
     CatCatch.setAttribute("id", "CatCatchCatch");
     CatCatch.innerHTML = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAAKlBMVEUAAADLlROxbBlRAD16GS5oAjWWQiOCIytgADidUx/95gHqwwTx0gDZqwT6kfLuAAAACnRSTlMA/vUejV7kuzi8za0PswAAANpJREFUGNNjwA1YSxkYTEqhnKZLLi6F1w0gnKA1shdvHYNxdq1atWobjLMKCOAyC3etlVrUAOH4HtNZmLgoAMKpXX37zO1FwcZAwMDguGq1zKpFmTNnzqx0Bpp2WvrU7ttn9py+I8JgLn1R8Pad22vurNkjwsBReHv33junzuyRnOnMwNCSeFH27K5dq1SNgcZxFMnuWrNq1W5VkNntihdv7ToteGcT0C7mIkE1qbWCYjJnM4CqEoWKdoslChXuUgXJqIcLebiphSgCZRhaPDhcDFhdmUMCGIgEAFA+Uc02aZg9AAAAAElFTkSuQmCC" style="-webkit-user-drag: none;width: 20px;">
     <div id="tips"></div>
+    <button id="download">下载已捕获的数据</button>
+    <button id="clean">清理缓存</button>
     <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown")}>完成捕获自动下载</label>
     <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg")}>使用ffmpeg合并</label>`;
     CatCatch.style = `position: fixed;
@@ -34,13 +36,21 @@
     document.querySelector("#CatCatchCatch #ffmpeg").addEventListener('change', function (event) {
         localStorage.setItem("CatCatchCatch_ffmpeg", this.checked ? "checked" : "");
     });
+    document.querySelector("#CatCatchCatch #clean").addEventListener('click', function (event) {
+        catchMedia = [];
+        isComplete = false;
+        alert("清理完毕");
+    });
+    document.querySelector("#CatCatchCatch #download").addEventListener('click', function (event) {
+        catchDownload();
+    });
 
     // 操作按钮
     let isMove = false;
     let isComplete = false;
     CatCatch.addEventListener('click', function (event) {
         if (event.target.id == "tips" || event.target.id == "CatCatchCatch") {
-            !isMove && catchDownload();
+            // !isMove && catchDownload();
             isMove = false;
         }
     });
@@ -63,7 +73,7 @@
     let catchMedia = [];
     const _AddSourceBuffer = window.MediaSource.prototype.addSourceBuffer;
     window.MediaSource.prototype.addSourceBuffer = function (mimeType) {
-        cat.innerHTML = "捕获数据中...<br>下载已捕获的数据";
+        cat.innerHTML = "捕获数据中...";
         const sourceBuffer = _AddSourceBuffer.call(this, mimeType);
         const _appendBuffer = sourceBuffer.appendBuffer;
         const bufferList = [];
@@ -82,7 +92,7 @@
     let _endOfStream = window.MediaSource.prototype.endOfStream;
     window.MediaSource.prototype.endOfStream = function () {
         isComplete = true;
-        cat.innerHTML = "捕获完成<br>点击下载";
+        cat.innerHTML = "捕获完成";
         _endOfStream.call(this);
         localStorage.getItem("CatCatchCatch_autoDown") == "checked" && catchDownload();
     }
@@ -117,6 +127,7 @@
         if (isComplete) {
             catchMedia = [];
             isComplete = false;
+            cat.innerHTML = "下载完毕...";
         }
     }
 })();
