@@ -14,11 +14,11 @@
         z-index: 999999;
         top: 10%;
         left: 90%;
-        background: #fff;
+        background: rgb(255 255 255 / 70%);
         border: solid 1px #c7c7c7;
         border-radius: 4px;
         color: rgb(26, 115, 232);
-        cursor: pointer;
+        cursor: grab;
         padding: 5px 5px 5px 5px;
         font-size: 12px;
         font-family: "Microsoft YaHei", "Helvetica", "Arial", sans-serif;
@@ -28,20 +28,20 @@
         justify-content: space-evenly;
         flex-direction: column;`;
     document.getElementsByTagName('html')[0].appendChild(CatCatch);
-    const cat = CatCatch.querySelector("#tips");
+    const tips = CatCatch.querySelector("#tips");
 
-    document.querySelector("#CatCatchCatch #autoDown").addEventListener('change', function (event) {
+    CatCatch.querySelector("#autoDown").addEventListener('change', function (event) {
         localStorage.setItem("CatCatchCatch_autoDown", this.checked ? "checked" : "");
     });
-    document.querySelector("#CatCatchCatch #ffmpeg").addEventListener('change', function (event) {
+    CatCatch.querySelector("#ffmpeg").addEventListener('change', function (event) {
         localStorage.setItem("CatCatchCatch_ffmpeg", this.checked ? "checked" : "");
     });
-    document.querySelector("#CatCatchCatch #clean").addEventListener('click', function (event) {
+    CatCatch.querySelector("#clean").addEventListener('click', function (event) {
         catchMedia = [];
         isComplete = false;
         alert("清理完毕");
     });
-    document.querySelector("#CatCatchCatch #download").addEventListener('click', function (event) {
+    CatCatch.querySelector("#download").addEventListener('click', function (event) {
         catchDownload();
     });
 
@@ -49,10 +49,7 @@
     let isMove = false;
     let isComplete = false;
     CatCatch.addEventListener('click', function (event) {
-        if (event.target.id == "tips" || event.target.id == "CatCatchCatch") {
-            // !isMove && catchDownload();
-            isMove = false;
-        }
+        isMove = false;
     });
     let x, y;
     function move(event) {
@@ -69,11 +66,11 @@
         });
     });
 
-    cat.innerHTML = "等待视频播放";
+    tips.innerHTML = "等待视频播放";
     let catchMedia = [];
     const _AddSourceBuffer = window.MediaSource.prototype.addSourceBuffer;
     window.MediaSource.prototype.addSourceBuffer = function (mimeType) {
-        cat.innerHTML = "捕获数据中...";
+        tips.innerHTML = "捕获数据中...";
         const sourceBuffer = _AddSourceBuffer.call(this, mimeType);
         const _appendBuffer = sourceBuffer.appendBuffer;
         const bufferList = [];
@@ -83,7 +80,7 @@
             _appendBuffer.call(this, data);
         }
         return sourceBuffer;
-    }
+    } 
     // 反检测
     window.MediaSource.prototype.addSourceBuffer.toString = function () {
         return _AddSourceBuffer.toString();
@@ -92,7 +89,7 @@
     let _endOfStream = window.MediaSource.prototype.endOfStream;
     window.MediaSource.prototype.endOfStream = function () {
         isComplete = true;
-        cat.innerHTML = "捕获完成";
+        tips.innerHTML = "捕获完成";
         _endOfStream.call(this);
         localStorage.getItem("CatCatchCatch_autoDown") == "checked" && catchDownload();
     }
@@ -113,21 +110,21 @@
             }
             window.postMessage({ action: "catCatchFFmpeg", use: "merge", media: media, title: document.title });
         } else {
+            const a = document.createElement('a');
             for (let item of catchMedia) {
                 const mime = item.mimeType.split(';')[0];
                 const type = mime.split('/')[0] == "video" ? "mp4" : "mp3";
                 const fileBlob = new Blob(item.bufferList, { type: mime });
-                const a = document.createElement('a');
                 a.href = URL.createObjectURL(fileBlob);
                 a.download = `${document.title}.${type}`;
                 a.click();
-                a.remove();
             }
+            a.remove();
         }
         if (isComplete) {
             catchMedia = [];
             isComplete = false;
-            cat.innerHTML = "下载完毕...";
+            tips.innerHTML = "下载完毕...";
         }
     }
 })();
