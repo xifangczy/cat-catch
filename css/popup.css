@@ -137,7 +137,7 @@ button,
   position: fixed;
   width: 100%;
   z-index: 999;
-  background-color: var(--background-color);
+  background-color: var(--background-color-opacity);
 }
 #down {
   bottom: 0;
@@ -154,7 +154,7 @@ button,
 }
 #filter #ext {
   display: flex;
-  color: rgb(26, 115, 232);
+  color: var(--text-color);
 }
 #filter div {
   margin-left: 5px;

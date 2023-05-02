@@ -11,14 +11,18 @@ let allCount = 0;
 // 提示 操作按钮 DOM
 const $tips = $("#Tips");
 const $down = $("#down");
-// 储存资源
+// 储存所有资源数据
 const allData = new Map();
+allData.set(true, new Map());   // 当前标签
+allData.set(false, new Map());  // 其他页面
+// 筛选
+const $filter_ext = $("#filter #ext");
+const filterSelect = new Map();    // 储存筛选选项
+const filterExt = new Set();    // 储存所有不重复的扩展名
 // 储存下载id
 const downData = [];
 // 图标地址
 const favicon = new Map();
-// 后缀筛选
-const extFilter = new Set();
 // HeartBeat
 chrome.runtime.sendMessage(chrome.runtime.id, { Message: "HeartBeat" });
 // 清理冗余数据
@@ -38,7 +42,7 @@ chrome.storage.local.get("MediaData", function (items) {
 });
 // 监听资源数据
 chrome.runtime.onMessage.addListener(function (MediaData, sender, sendResponse) {
-    const html = AddMedia(MediaData);
+    const html = AddMedia(MediaData, MediaData.tabId == G.tabId);
     if (MediaData.tabId == G.tabId) {
         !currentCount && $mediaList.append($current);
         currentCount++;
@@ -61,7 +65,7 @@ chrome.downloads.onChanged.addListener(function (item) {
     }
 });
 // 生成资源DOM
-function AddMedia(data) {
+function AddMedia(data, currentTab = true) {
     data._title = data.title;
     data.title = stringModify(data.title);
     // 正则匹配的备注扩展
@@ -72,7 +76,6 @@ function AddMedia(data) {
     if (data.ext === undefined && data.type !== undefined) {
         data.ext = data.type.split("/")[1];
     }
-    extFilter.add(data.ext);
     //文件名
     data.name = isEmpty(data.name) ? data.title + '.' + data.ext : decodeURIComponent(stringModify(data.name));
     // Youtube
@@ -105,12 +108,11 @@ function AddMedia(data) {
     if (data.favIconUrl && !favicon.has(data.webUrl)) {
         favicon.set(data.webUrl, data.favIconUrl);
     }
-    allData.set(data.requestId, data);
     //添加html
     data.html = $(`
         <div class="panel" requestId="${data.requestId}" ext="${data.ext ? data.ext : "NULL"}" mime="${data.type ? data.type : "NULL"}">
             <div class="panel-heading">
-                <input type="checkbox" class="DownCheck" checked="true" requestId="${data.requestId}"/>
+                <input type="checkbox" class="DownCheck" requestId="${data.requestId}" checked/>
                 ${G.ShowWebIco ? `<img class="favicon faviconFlag" requestId="${data.requestId}"/>` : ""}
                 <img src="img/regex.png" class="favicon regex ${data.isRegex ? "" : "hide"}" title="正则表达式匹配 或 来自深度搜索"/>
                 <span class="name ${data.parsing || data.isRegex ? "bold" : ""}">${trimName}</span>
@@ -262,6 +264,34 @@ function AddMedia(data) {
     data.html.find('input').click(function (event) {
         event.originalEvent.cancelBubble = true;
     });
+
+    // 使用Map 储存数据
+    allData.get(currentTab).set(data.requestId, data);
+
+    // 筛选
+    if (!filterExt.has(data.ext)) {
+        filterExt.add(data.ext);
+        filterSelect.set(data.ext, true);
+        const html = $(`<label class="flexFilter" id="${data.ext}"><input type="checkbox" checked>${data.ext}</label>`);
+        html.click(function () {
+            filterSelect.set(this.id, html.find("input").prop("checked"));
+            $('.panel').each(function () {
+                if (filterSelect.get($(this).attr("ext"))) {
+                    $(this).find("input").prop("checked", true);
+                    $(this).show();
+                } else {
+                    $(this).find("input").prop("checked", false);
+                    $(this).hide();
+                }
+            });
+        });
+        $filter_ext.append(html);
+    }
+    if (!filterSelect.get(data.ext)) {
+        data.html.hide();
+        data.html.find("input").prop("checked", false);
+    }
+
     return data.html;
 }
 
@@ -285,7 +315,7 @@ $('#allTab').click(function () {
             if (key == G.tabId) { continue; }
             allCount += items.MediaData[key].length;
             for (let i = 0; i < items.MediaData[key].length; i++) {
-                $all.append(AddMedia(items.MediaData[key][i]));
+                $all.append(AddMedia(items.MediaData[key][i], false));
             }
         }
         allCount && $allMediaList.append($all);
@@ -298,8 +328,9 @@ $('#DownFile').click(function () {
     if (checked.length >= 10 && !confirm("共 " + checked.length + "个文件，是否确认下载?")) {
         return;
     }
+    const currentTab = $('.Active').attr("id") == "currentTab";
     checked.each(function () {
-        const data = allData.get($(this).attr("requestId"));
+        const data = allData.get(currentTab).get($(this).attr("requestId"));
         setTimeout(function () {
             chrome.downloads.download({
                 url: data.url,
@@ -313,8 +344,9 @@ $('#AllCopy').click(function () {
     const checked = $('.TabShow :checked');
     if (checked.length == 0) { return false };
     const url = [];
+    const currentTab = $('.Active').attr("id") == "currentTab";
     checked.each(function () {
-        const data = allData.get($(this).attr("requestId"));
+        const data = allData.get(currentTab).get($(this).attr("requestId"));
         let href = data.url;
         if (data.parsing) {
             href = copyLink(data);
@@ -341,22 +373,6 @@ $('#openFilter').click(function () {
     const $filter = $("#filter");
     $(".more").not($filter).hide();
     if ($filter.is(":hidden")) {
-        const $panel = $('.TabShow .panel');
-        const $filter_ext = $("#filter #ext");
-        if ($panel.length == 0) { return; }
-        for(let ext of extFilter){
-            if(!$filter_ext.find(`#${ext}`).length > 0){
-                const html = $(`<label class="flexFilter" id="${ext}"><input type="checkbox" checked>${ext}</label>`);
-                html.click(function(){
-                    const checked = html.find("input").prop("checked");
-                    $(`.panel[ext='${ext}']`).each(function(){
-                        $(this).find("input").prop("checked", checked);
-                        checked ? $(this).show() : $(this).hide();
-                    });
-                });
-                $filter_ext.append(html);
-            }
-        }
         $filter.css("display", "flex");
         return;
     }
@@ -588,8 +604,9 @@ function UItoggle() {
         $down.show();
     }
     // 更新图标
+    const currentTab = $('.Active').attr("id") == "currentTab";
     $(".faviconFlag").each(function () {
-        const data = allData.get($(this).attr("requestId"));
+        const data = allData.get(currentTab).get($(this).attr("requestId"));
         if (favicon.has(data.webUrl)) {
             $(this).attr("src", favicon.get(data.webUrl));
             $(this).removeClass("faviconFlag");
