@@ -13,10 +13,14 @@ const $tips = $("#Tips");
 const $down = $("#down");
 // 储存所有资源数据
 const allData = new Map();
+allData.set(true, new Map());   // 当前页面
+allData.set(false, new Map());  // 其他页面
 // 筛选
 const $filter_ext = $("#filter #ext");
 const filterSelect = new Map();    // 储存筛选选项
 const filterExt = new Set();    // 储存所有不重复的扩展名
+// 当前所在页面
+let activeTab = true;
 // 储存下载id
 const downData = [];
 // 图标地址
@@ -259,12 +263,23 @@ function AddMedia(data, currentTab = true) {
         return false;
     });
     //多选框
+    data._checked = true;
     data.html.find('input').click(function (event) {
+        data._checked = $(this).prop("checked");
         event.originalEvent.cancelBubble = true;
+    });
+    Object.defineProperty(data, "checked", {
+        get: function () {
+            return data._checked;
+        },
+        set: function (newValue) {
+            _checked = newValue;
+            data.html.find('input').prop("checked", newValue);
+        }
     });
 
     // 使用Map 储存数据
-    allData.set(data.requestId, data);
+    allData.get(currentTab).set(data.requestId, data);
 
     // 筛选
     if (!filterExt.has(data.ext)) {
@@ -273,7 +288,7 @@ function AddMedia(data, currentTab = true) {
         const html = $(`<label class="flexFilter" id="${data.ext}"><input type="checkbox" checked>${data.ext}</label>`);
         html.click(function () {
             filterSelect.set(this.id, html.find("input").prop("checked"));
-            allData.forEach(function (value) {
+            getAllData().forEach(function (value) {
                 if (filterSelect.get(value.ext)) {
                     value.html.find("input").prop("checked", true);
                     value.html.show();
@@ -304,6 +319,7 @@ $(".Tabs .TabButton").click(function () {
     UItoggle();
     $("#filter").hide();
     $("#scriptCatch").hide();
+    activeTab = $('.Active').attr("id") == "currentTab";
 });
 // 其他页面
 $('#allTab').click(function () {
@@ -322,47 +338,42 @@ $('#allTab').click(function () {
 });
 // 下载选中文件
 $('#DownFile').click(function () {
-    const checked = $('.TabShow :checked');
-    if (checked.length >= 10 && !confirm("共 " + checked.length + "个文件，是否确认下载?")) {
+    const confirm = $('.TabShow :checked').length;
+    if (confirm >= 10 && !confirm("共 " + confirm + "个文件，是否确认下载?")) {
         return;
     }
-    checked.each(function () {
-        const data = allData.get($(this).attr("requestId"));
-        setTimeout(function () {
-            chrome.downloads.download({
-                url: data.url,
-                filename: data.title + "/" + data.downFileName
-            }, function (id) { downData[id] = data; });
-        }, 500);
+    getData().forEach(function (data) {
+        if (data.checked) {
+            setTimeout(function () {
+                chrome.downloads.download({
+                    url: data.url,
+                    filename: data.title + "/" + data.downFileName
+                }, function (id) { downData[id] = data; });
+            }, 500);
+        }
     });
 });
 // 复制选中文件
 $('#AllCopy').click(function () {
-    const checked = $('.TabShow :checked');
-    if (checked.length == 0) { return false };
     const url = [];
-    const currentTab = $('.Active').attr("id") == "currentTab";
-    checked.each(function () {
-        const data = allData.get($(this).attr("requestId"));
-        let href = data.url;
-        if (data.parsing) {
-            href = copyLink(data);
+    getData().forEach(function (data) {
+        if (data.checked) {
+            url.push(data.parsing ? copyLink(data) : data.url);
         }
-        url.push(href);
     });
     navigator.clipboard.writeText(url.join("\n"));
     Tips("已复制到剪贴板");
 });
 // 全选
 $('#AllSelect').click(function () {
-    $('.TabShow input').each(function () {
-        $(this).prop("checked", true);
+    getData().forEach(function (data) {
+        data.checked = true;
     });
 });
 // 反选
 $('#ReSelect').click(function () {
-    $('.TabShow input').each(function () {
-        $(this).prop('checked', !$(this).prop('checked'));
+    getData().forEach(function (data) {
+        data.checked = !data.checked;
     });
 });
 // 筛选按钮
@@ -377,44 +388,39 @@ $('#openFilter').click(function () {
 });
 // 展开按钮
 $('#openUnfold').click(function () {
-    if ($('.TabShow .panel').length == 0) { return; }
+    if (getData().size == 0) { return; }
     $(".more").not("#unfold").hide();
     $("#unfold").toggle();
 });
 // 展开全部
 $('#unfoldAll').click(function () {
-    $('.TabShow .panel').each(function () {
-        const $DOM = $(this);
-        if ($DOM.find(".url").is(":hidden")) {
-            $DOM.find(".panel-heading").click();
+    getData().forEach(function (data) {
+        if (data.html.find(".url").is(":hidden")) {
+            data.html.find(".panel-heading").click();
         }
     });
 });
 // 展开可播放
 $('#unfoldPlay').click(function () {
-    $('.TabShow .panel').each(function () {
-        const $DOM = $(this);
-        const data = { ext: $DOM.attr("ext"), type: $DOM.attr("mime") };
-        if (isPlay(data) && $DOM.find(".url").is(":hidden")) {
-            $DOM.find(".panel-heading").click();
+    getData().forEach(function (data) {
+        if (isPlay(data) && data.html.find(".url").is(":hidden")) {
+            data.html.find(".panel-heading").click();
         }
     });
 });
 // 展开选中的
 $('#unfoldFilter').click(function () {
-    $('.TabShow .panel').each(function () {
-        const $DOM = $(this);
-        if ($DOM.find(".url").is(":hidden") && $DOM.find("input").prop('checked')) {
-            $DOM.find(".panel-heading").click();
+    getData().forEach(function (data) {
+        if (data.html.find(".url").is(":hidden") && data.checked) {
+            data.html.find(".panel-heading").click();
         }
     });
 });
 // 关闭展开
 $('#fold').click(function () {
-    $('.TabShow .panel').each(function () {
-        const $DOM = $(this);
-        if ($DOM.find(".url").is(":visible")) {
-            $DOM.find(".panel-heading").click();
+    getData().forEach(function (data) {
+        if (data.html.find(".url").is(":visible")) {
+            data.html.find(".panel-heading").click();
         }
     });
 });
@@ -590,8 +596,7 @@ function Tips(text, delay = 200) {
 * 如果标签是其他设置 隐藏底部按钮
 */
 function UItoggle() {
-    let length = $('.TabShow .panel').length;
-    length > 0 ? $tips.hide() : $tips.show().html("还没闻到味儿~");
+    getData().size > 0 ? $tips.hide() : $tips.show().html("还没闻到味儿~");
     $currentCount.text(currentCount ? `[${currentCount}]` : "");
     $allCount.text(allCount ? `[${allCount}]` : "");
     if ($('.TabShow').attr("id") == "otherOptions") {
@@ -602,10 +607,26 @@ function UItoggle() {
     }
     // 更新图标
     $(".faviconFlag").each(function () {
-        const data = allData.get($(this).attr("requestId"));
+        const data = getData($(this).attr("requestId"));
         if (favicon.has(data.webUrl)) {
             $(this).attr("src", favicon.get(data.webUrl));
             $(this).removeClass("faviconFlag");
         }
     });
+}
+function getData(requestId = false) {
+    if (requestId) {
+        return allData.get(activeTab).get(requestId);
+    }
+    return allData.get(activeTab);
+}
+function getAllData() {
+    const data = [];
+    allData.get(true).forEach(function (value) {
+        data.push(value);
+    });
+    allData.get(false).forEach(function (value) {
+        data.push(value);
+    });
+    return data;
 }
