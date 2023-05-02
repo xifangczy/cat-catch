@@ -13,8 +13,6 @@ const $tips = $("#Tips");
 const $down = $("#down");
 // 储存所有资源数据
 const allData = new Map();
-allData.set(true, new Map());   // 当前标签
-allData.set(false, new Map());  // 其他页面
 // 筛选
 const $filter_ext = $("#filter #ext");
 const filterSelect = new Map();    // 储存筛选选项
@@ -266,7 +264,7 @@ function AddMedia(data, currentTab = true) {
     });
 
     // 使用Map 储存数据
-    allData.get(currentTab).set(data.requestId, data);
+    allData.set(data.requestId, data);
 
     // 筛选
     if (!filterExt.has(data.ext)) {
@@ -275,13 +273,13 @@ function AddMedia(data, currentTab = true) {
         const html = $(`<label class="flexFilter" id="${data.ext}"><input type="checkbox" checked>${data.ext}</label>`);
         html.click(function () {
             filterSelect.set(this.id, html.find("input").prop("checked"));
-            $('.panel').each(function () {
-                if (filterSelect.get($(this).attr("ext"))) {
-                    $(this).find("input").prop("checked", true);
-                    $(this).show();
+            allData.forEach(function (value) {
+                if (filterSelect.get(value.ext)) {
+                    value.html.find("input").prop("checked", true);
+                    value.html.show();
                 } else {
-                    $(this).find("input").prop("checked", false);
-                    $(this).hide();
+                    value.html.find("input").prop("checked", false);
+                    value.html.hide();
                 }
             });
         });
@@ -328,9 +326,8 @@ $('#DownFile').click(function () {
     if (checked.length >= 10 && !confirm("共 " + checked.length + "个文件，是否确认下载?")) {
         return;
     }
-    const currentTab = $('.Active').attr("id") == "currentTab";
     checked.each(function () {
-        const data = allData.get(currentTab).get($(this).attr("requestId"));
+        const data = allData.get($(this).attr("requestId"));
         setTimeout(function () {
             chrome.downloads.download({
                 url: data.url,
@@ -346,7 +343,7 @@ $('#AllCopy').click(function () {
     const url = [];
     const currentTab = $('.Active').attr("id") == "currentTab";
     checked.each(function () {
-        const data = allData.get(currentTab).get($(this).attr("requestId"));
+        const data = allData.get($(this).attr("requestId"));
         let href = data.url;
         if (data.parsing) {
             href = copyLink(data);
@@ -604,9 +601,8 @@ function UItoggle() {
         $down.show();
     }
     // 更新图标
-    const currentTab = $('.Active').attr("id") == "currentTab";
     $(".faviconFlag").each(function () {
-        const data = allData.get(currentTab).get($(this).attr("requestId"));
+        const data = allData.get($(this).attr("requestId"));
         if (favicon.has(data.webUrl)) {
             $(this).attr("src", favicon.get(data.webUrl));
             $(this).removeClass("faviconFlag");
