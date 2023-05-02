@@ -12,9 +12,10 @@ let allCount = 0;
 const $tips = $("#Tips");
 const $down = $("#down");
 // 储存所有资源数据
-const allData = new Map();
-allData.set(true, new Map());   // 当前页面
-allData.set(false, new Map());  // 其他页面
+const allData = new Map([
+    [true, new Map()],  // 当前页面
+    [false, new Map()]  // 其他页面
+]);
 // 筛选
 const $filter_ext = $("#filter #ext");
 const filterSelect = new Map();    // 储存筛选选项
@@ -339,7 +340,8 @@ $('#allTab').click(function () {
 });
 // 下载选中文件
 $('#DownFile').click(function () {
-    const confirm = $('.TabShow :checked').length;
+    let confirm = 0
+    getData().forEach(function (data) { data.checked && confirm++; });
     if (confirm >= 10 && !confirm("共 " + confirm + "个文件，是否确认下载?")) {
         return;
     }
