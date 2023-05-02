@@ -110,6 +110,7 @@ function AddMedia(data, currentTab = true) {
     if (data.favIconUrl && !favicon.has(data.webUrl)) {
         favicon.set(data.webUrl, data.favIconUrl);
     }
+    data.isPlay = isPlay(data);
     //添加html
     data.html = $(`
         <div class="panel" requestId="${data.requestId}" ext="${data.ext ? data.ext : "NULL"}" mime="${data.type ? data.type : "NULL"}">
@@ -121,7 +122,7 @@ function AddMedia(data, currentTab = true) {
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
                 <img src="img/copy.png" class="icon copy" id="copy" title="复制地址"/>
                 <img src="img/parsing.png" class="icon parsing ${data.parsing ? "" : "hide"}" id="parsing" data-type="${data.parsing}" title="解析"/>
-                <img src="img/play.png" class="icon play ${isPlay(data) ? "" : "hide"}" id="play" title="预览"/>
+                <img src="img/play.png" class="icon play ${data.isPlay ? "" : "hide"}" id="play" title="预览"/>
                 <img src="img/download.png" class="icon download" id="download" title="下载"/>
             </div>
             <div class="url hide">
@@ -173,7 +174,7 @@ function AddMedia(data, currentTab = true) {
                         mediaInfo.append("<br><b>m3u8播放列表</b>");
                     }
                 });
-            } else if (isPlay(data)) {
+            } else if (data.isPlay) {
                 preview.attr("src", data.url);
             } else if (isPicture(data)) {
                 data.html.find("#screenshots").show().attr("src", data.url);
@@ -273,7 +274,7 @@ function AddMedia(data, currentTab = true) {
             return data._checked;
         },
         set: function (newValue) {
-            _checked = newValue;
+            data._checked = newValue;
             data.html.find('input').prop("checked", newValue);
         }
     });
@@ -403,7 +404,7 @@ $('#unfoldAll').click(function () {
 // 展开可播放
 $('#unfoldPlay').click(function () {
     getData().forEach(function (data) {
-        if (isPlay(data) && data.html.find(".url").is(":hidden")) {
+        if (data.isPlay && data.html.find(".url").is(":hidden")) {
             data.html.find(".panel-heading").click();
         }
     });
