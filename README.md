@@ -39,6 +39,7 @@ https://o2bmm.gitbook.io/cat-catch/
 - [jquery.json-viewer](https://github.com/abodelot/jquery.json-viewer)
 - [Momo707577045](https://github.com/Momo707577045)
 - [mpd-parser](https://github.com/videojs/mpd-parser)
+- [StreamSaver.js](https://github.com/jimmywarting/StreamSaver.js)
 
 # 📜License
 GPL-3.0 license
