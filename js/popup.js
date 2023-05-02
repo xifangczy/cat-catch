@@ -18,8 +18,7 @@ const allData = new Map([
 ]);
 // 筛选
 const $filter_ext = $("#filter #ext");
-const filterSelect = new Map();    // 储存筛选选项
-const filterExt = new Set();    // 储存所有不重复的扩展名
+const filterExt = new Map();    // 储存所有不重复的扩展名
 // 当前所在页面
 let activeTab = true;
 // 储存下载id
@@ -285,13 +284,12 @@ function AddMedia(data, currentTab = true) {
 
     // 筛选
     if (!filterExt.has(data.ext)) {
-        filterExt.add(data.ext);
-        filterSelect.set(data.ext, true);
+        filterExt.set(data.ext, true);
         const html = $(`<label class="flexFilter" id="${data.ext}"><input type="checkbox" checked>${data.ext}</label>`);
         html.click(function () {
-            filterSelect.set(this.id, html.find("input").prop("checked"));
+            filterExt.set(this.id, html.find("input").prop("checked"));
             getAllData().forEach(function (value) {
-                if (filterSelect.get(value.ext)) {
+                if (filterExt.get(value.ext)) {
                     value.html.find("input").prop("checked", true);
                     value.html.show();
                 } else {
@@ -302,7 +300,7 @@ function AddMedia(data, currentTab = true) {
         });
         $filter_ext.append(html);
     }
-    if (!filterSelect.get(data.ext)) {
+    if (!filterExt.get(data.ext)) {
         data.html.hide();
         data.html.find("input").prop("checked", false);
     }
