@@ -17,6 +17,8 @@ const allData = new Map();
 const downData = [];
 // 图标地址
 const favicon = new Map();
+// 后缀筛选
+const extFilter = new Set();
 // HeartBeat
 chrome.runtime.sendMessage(chrome.runtime.id, { Message: "HeartBeat" });
 // 清理冗余数据
@@ -70,6 +72,7 @@ function AddMedia(data) {
     if (data.ext === undefined && data.type !== undefined) {
         data.ext = data.type.split("/")[1];
     }
+    extFilter.add(data.ext);
     //文件名
     data.name = isEmpty(data.name) ? data.title + '.' + data.ext : decodeURIComponent(stringModify(data.name));
     // Youtube
@@ -273,7 +276,6 @@ $(".Tabs .TabButton").click(function () {
     UItoggle();
     $("#filter").hide();
     $("#scriptCatch").hide();
-    $("#filter #ext").html("");
 });
 // 其他页面
 $('#allTab').click(function () {
@@ -339,32 +341,26 @@ $('#openFilter').click(function () {
     const $filter = $("#filter");
     $(".more").not($filter).hide();
     if ($filter.is(":hidden")) {
-        const extFilter = new Set();
         const $panel = $('.TabShow .panel');
         const $filter_ext = $("#filter #ext");
         if ($panel.length == 0) { return; }
-        $filter_ext.html("");
-        $panel.each(function () {
-            let ext = $(this).attr("ext");
-            if (!extFilter.has(ext)) {
-                $filter_ext.append(`<label class="flexFilter" id="${ext}"><input type="checkbox" checked>${ext}</label>`);
+        for(let ext of extFilter){
+            if(!$filter_ext.find(`#${ext}`).length > 0){
+                const html = $(`<label class="flexFilter" id="${ext}"><input type="checkbox" checked>${ext}</label>`);
+                html.click(function(){
+                    const checked = html.find("input").prop("checked");
+                    $(`.panel[ext='${ext}']`).each(function(){
+                        $(this).find("input").prop("checked", checked);
+                        checked ? $(this).show() : $(this).hide();
+                    });
+                });
+                $filter_ext.append(html);
             }
-            extFilter.add(ext);
-        });
+        }
         $filter.css("display", "flex");
         return;
     }
     $filter.hide();
-});
-// 扩展筛选
-$('#filter #ext').click(function () {
-    $(this).find("label").each(function () {
-        if (!$(this).find("input").prop("checked")) {
-            $(`[ext='${this.id}'] input`).prop('checked', false);
-        } else {
-            $(`[ext='${this.id}'] input`).prop('checked', true);
-        }
-    });
 });
 // 展开按钮
 $('#openUnfold').click(function () {
