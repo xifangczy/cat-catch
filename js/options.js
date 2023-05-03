@@ -16,9 +16,9 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
     setTimeout(() => {
         for (let key in items) {
             if (key == "Ext" || key == "Type" || key == "Regex") { continue; }
-            if(typeof items[key] == "boolean"){
+            if (typeof items[key] == "boolean") {
                 $(`#${key}`).prop("checked", items[key]);
-            }else{
+            } else {
                 $(`#${key}`).val(items[key]);
             }
         }
@@ -182,7 +182,7 @@ $("#testTag input, #testTextarea").on("input", function () {
 $("#ResetExt, #ResetType, #ResetRegex").bind("click", function () {
     if (confirm("确认重置吗？")) {
         const Option = $(this).data("reset");
-        chrome.storage.sync.set({ [Option]: GetDefault(Option) });
+        chrome.storage.sync.set({ [Option]: G.OptionLists[Option] });
         location.reload();
     }
 });
@@ -191,7 +191,7 @@ $("#ResetOption").bind("click", function () {
     if (confirm("确认重置吗？")) {
         $("#OtherOption input, #OtherOption textarea").each(function () {
             const Option = this.id;
-            chrome.storage.sync.set({ [Option]: GetDefault(Option) });
+            chrome.storage.sync.set({ [Option]: G.OptionLists[Option] });
         });
         location.reload();
     }
@@ -201,7 +201,7 @@ $("#ResetM3u8dl").bind("click", function () {
     if (confirm("确认重置吗？")) {
         $("#m3u8dlOption textarea, #m3u8dlOption input").each(function () {
             const Option = this.id;
-            chrome.storage.sync.set({ [Option]: GetDefault(Option) });
+            chrome.storage.sync.set({ [Option]: G.OptionLists[Option] });
         });
         location.reload();
     }
@@ -210,7 +210,7 @@ $("#ResetM3u8dl").bind("click", function () {
 $("#ResetTag").bind("click", function () {
     if (confirm("确认重置吗？")) {
         ["userAgent", "MobileUserAgent", "downFileName"].forEach(function (id) {
-            chrome.storage.sync.set({ [id]: GetDefault(id) });
+            chrome.storage.sync.set({ [id]: G.OptionLists[Option] });
         })
         location.reload();
     }
@@ -218,9 +218,9 @@ $("#ResetTag").bind("click", function () {
 //重置复制选项
 $("#ResetCopy").bind("click", function () {
     if (confirm("确认重置吗？")) {
-        chrome.storage.sync.set({ copyM3U8: GetDefault("copyM3U8") });
-        chrome.storage.sync.set({ copyMPD: GetDefault("copyMPD") });
-        chrome.storage.sync.set({ copyOther: GetDefault("copyOther") });
+        chrome.storage.sync.set({ copyM3U8: G.OptionLists.copyM3U8 });
+        chrome.storage.sync.set({ copyMPD: G.OptionLists.copyMPD });
+        chrome.storage.sync.set({ copyOther: G.OptionLists.copyOther });
         location.reload();
     }
 });
@@ -274,7 +274,7 @@ $("#testRegex, #testUrl").keyup(function () {
 });
 //导出配置
 $("#exportOptions").bind("click", function () {
-    chrome.storage.sync.get(function (items) {
+    chrome.storage.sync.get(null, function (items) {
         let ExportData = JSON.stringify(items);
         ExportData = "data:text/plain," + Base64.encode(ExportData);
         let date = new Date();
@@ -300,7 +300,7 @@ $("#importOptionsFile").change(function () {
             importData = Base64.decode(importData);
             importData = JSON.parse(importData);
         }
-        for (let item of G.OptionLists) {
+        for (let item in G.OptionLists) {
             chrome.storage.sync.set({ [item]: importData[item] });
         }
         alert("导入完成");
