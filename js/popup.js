@@ -18,7 +18,8 @@ const allData = new Map([
 ]);
 // 筛选
 const $filter_ext = $("#filter #ext");
-const filterExt = new Map();    // 储存所有不重复的扩展名
+// 储存所有扩展名，保存是否筛选状态 来判断新加入的资源 立刻判断是否需要隐藏
+const filterExt = new Map();
 // 当前所在页面
 let activeTab = true;
 // 储存下载id
@@ -142,20 +143,23 @@ function AddMedia(data, currentTab = true) {
         </div>`);
     ////////////////////////绑定事件////////////////////////
     //展开网址
-    data.html.find('.panel-heading').click(function (event) {
-        const urlPanel = data.html.find(".url");
+    data.urlPanel = data.html.find(".url");
+    data.urlPanelShow = false;
+    data.panelHeading = data.html.find(".panel-heading");
+    data.panelHeading.click(function (event) {
+        data.urlPanelShow = !data.urlPanelShow;
         const mediaInfo = data.html.find("#mediaInfo");
         const preview = data.html.find("#preview");
-        if (urlPanel.is(":visible")) {
+        if (!data.urlPanelShow) {
             if (event.target.id == "play") {
                 preview.show().trigger("play");
                 return false;
             }
-            urlPanel.hide();
+            data.urlPanel.hide();
             !preview[0].paused && preview.trigger("pause");
             return false;
         }
-        urlPanel.show();
+        data.urlPanel.show();
         if (!mediaInfo.data("state")) {
             mediaInfo.data("state", true);
             if (isM3U8(data)) {
@@ -263,17 +267,17 @@ function AddMedia(data, currentTab = true) {
         });
         return false;
     });
-    //多选框
+    // 多选框 创建checked属性 值和checked状态绑定
     data._checked = true;
     data.html.find('input').click(function (event) {
         data._checked = $(this).prop("checked");
         event.originalEvent.cancelBubble = true;
     });
     Object.defineProperty(data, "checked", {
-        get: function () {
+        get() {
             return data._checked;
         },
-        set: function (newValue) {
+        set(newValue) {
             data._checked = newValue;
             data.html.find('input').prop("checked", newValue);
         }
@@ -300,6 +304,7 @@ function AddMedia(data, currentTab = true) {
         });
         $filter_ext.append(html);
     }
+    // 如果被筛选出去 直接隐藏
     if (!filterExt.get(data.ext)) {
         data.html.hide();
         data.html.find("input").prop("checked", false);
@@ -317,9 +322,8 @@ $(".Tabs .TabButton").click(function () {
     $(".container").removeClass("TabShow");
     $(".container").eq(index).addClass("TabShow");
     UItoggle();
-    $("#filter").hide();
-    $("#scriptCatch").hide();
-    activeTab = $('.Active').attr("id") == "currentTab";
+    $("#filter, #scriptCatch, #unfold").hide();
+    activeTab = $(this).attr("id") == "currentTab";
 });
 // 其他页面
 $('#allTab').click(function () {
@@ -365,75 +369,59 @@ $('#AllCopy').click(function () {
     navigator.clipboard.writeText(url.join("\n"));
     Tips("已复制到剪贴板");
 });
-// 全选
-$('#AllSelect').click(function () {
+// 全选 反选
+$('#AllSelect, #ReSelect').click(function () {
+    const checked = this.id == "AllSelect";
     getData().forEach(function (data) {
-        data.checked = true;
+        data.checked = checked ? checked : !data.checked;
     });
 });
-// 反选
-$('#ReSelect').click(function () {
-    getData().forEach(function (data) {
-        data.checked = !data.checked;
-    });
-});
-// 筛选按钮
-$('#openFilter').click(function () {
-    const $filter = $("#filter");
-    $(".more").not($filter).hide();
-    if ($filter.is(":hidden")) {
-        $filter.css("display", "flex");
+// unfoldAll展开全部  unfoldPlay展开可播放 unfoldFilter展开选中的 fold关闭展开
+$('#unfold button').click(function () {
+    $("#unfold").hide();
+    if (this.id == "unfoldAll") {
+        getData().forEach(function (data) {
+            !data.urlPanelShow && data.panelHeading.click();
+        });
         return;
     }
-    $filter.hide();
-});
-// 展开按钮
-$('#openUnfold').click(function () {
-    if (getData().size == 0) { return; }
-    $(".more").not("#unfold").hide();
-    $("#unfold").toggle();
-});
-// 展开全部
-$('#unfoldAll').click(function () {
-    getData().forEach(function (data) {
-        if (data.html.find(".url").is(":hidden")) {
-            data.html.find(".panel-heading").click();
-        }
-    });
-});
-// 展开可播放
-$('#unfoldPlay').click(function () {
-    getData().forEach(function (data) {
-        if (data.isPlay && data.html.find(".url").is(":hidden")) {
-            data.html.find(".panel-heading").click();
-        }
-    });
-});
-// 展开选中的
-$('#unfoldFilter').click(function () {
-    getData().forEach(function (data) {
-        if (data.html.find(".url").is(":hidden") && data.checked) {
-            data.html.find(".panel-heading").click();
-        }
-    });
-});
-// 关闭展开
-$('#fold').click(function () {
-    getData().forEach(function (data) {
-        if (data.html.find(".url").is(":visible")) {
-            data.html.find(".panel-heading").click();
-        }
-    });
-});
-// 捕捉/录制 按钮
-$('#Catch').click(function () {
-    const $scriptCatch = $("#scriptCatch");
-    $(".more").not($scriptCatch).hide();
-    if ($scriptCatch.is(":hidden")) {
-        $scriptCatch.css("display", "flex");
+    if (this.id == "unfoldPlay") {
+        getData().forEach(function (data) {
+            if (data.isPlay && !data.urlPanelShow) {
+                data.panelHeading.click();
+            }
+        });
         return;
     }
-    $scriptCatch.hide();
+    if (this.id == "unfoldFilter") {
+        getData().forEach(function (data) {
+            if (!data.urlPanelShow && data.checked) {
+                data.panelHeading.click();
+            }
+        });
+        return;
+    }
+    if (this.id == "fold") {
+        getData().forEach(function (data) {
+            data.urlPanelShow && data.panelHeading.click();
+        });
+        return;
+    }
+});
+// 捕捉/录制 展开按钮 筛选按钮 按钮
+$('#Catch, #openUnfold, #openFilter').click(function () {
+    // const _height = parseInt($(".container").css("margin-bottom"));
+    // $(".container").css("margin-bottom", ($down[0].offsetHeight + 26) + "px");
+    const $panel = $(`#${this.getAttribute("panel")}`);
+    $(".more").not($panel).hide();
+    if (this.id == "Catch" || this.id == "openFilter" || this.id == "openUnfold") {
+        if ($panel.is(":hidden")) {
+            $panel.css("display", "flex");
+            return;
+        }
+        // $(".container").css("margin-bottom", _height);
+        $panel.hide();
+    }
 });
 // 清空数据
 $('#Clear').click(function () {
@@ -507,8 +495,9 @@ const interval = setInterval(function () {
         state.recorder && $("#recorder").html("关闭录制");
         state.recorder2 && $("#recorder2").html("关闭屏幕捕捉");
     });
-    // 深度搜索
+    // 深度搜索 注入脚本
     $("#scriptCatch button, #search").click(function () {
+        $("#scriptCatch").hide();
         chrome.runtime.sendMessage({ Message: "script", tabId: G.tabId, script: this.id + ".js" });
         G.refreshClear && $('#Clear').click();
         location.reload();
@@ -615,19 +604,17 @@ function UItoggle() {
         }
     });
 }
+// 获取当前标签的资源列表 存在requestId返回该资源
 function getData(requestId = false) {
     if (requestId) {
         return allData.get(activeTab).get(requestId);
     }
     return allData.get(activeTab);
 }
+// 获取所有资源列表
 function getAllData() {
     const data = [];
-    allData.get(true).forEach(function (value) {
-        data.push(value);
-    });
-    allData.get(false).forEach(function (value) {
-        data.push(value);
-    });
+    data.push(...allData.get(true).values())
+    data.push(...allData.get(false).values())
     return data;
 }
