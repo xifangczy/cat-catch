@@ -513,7 +513,7 @@ function fileNameParse(pathname) {
 //获取Header属性的值
 function getResponseHeadersValue(data) {
     let header = new Array();
-    if (data.responseHeaders == undefined) { return header; }
+    if (data.responseHeaders == undefined || data.responseHeaders.length == 0) { return header; }
     for (let item of data.responseHeaders) {
         switch (item.name.toLowerCase()) {
             case "content-length": header["size"] = item.value; break;
@@ -525,7 +525,7 @@ function getResponseHeadersValue(data) {
     return header;
 }
 function getReferer(data) {
-    if (data.requestHeaders == undefined) { return false; }
+    if (data.requestHeaders == undefined || data.requestHeaders.length == 0) { return false; }
     for (let item of data.requestHeaders) {
         if (item.name.toLowerCase() == "referer") {
             return item.value.toLowerCase();

@@ -114,10 +114,10 @@ function AddMedia(data, currentTab = true) {
     data.isPlay = isPlay(data);
     //添加html
     data.html = $(`
-        <div class="panel" requestId="${data.requestId}" ext="${data.ext ? data.ext : "NULL"}" mime="${data.type ? data.type : "NULL"}">
+        <div class="panel">
             <div class="panel-heading">
-                <input type="checkbox" class="DownCheck" requestId="${data.requestId}" checked/>
-                ${G.ShowWebIco ? `<img class="favicon faviconFlag" requestId="${data.requestId}"/>` : ""}
+                <input type="checkbox" class="DownCheck" checked/>
+                ${G.ShowWebIco ? `<img class="favicon ${!data.favIconUrl ? "faviconFlag" : ""}" requestId="${data.requestId}" src="${data.favIconUrl}"/>` : ""}
                 <img src="img/regex.png" class="favicon regex ${data.isRegex ? "" : "hide"}" title="正则表达式匹配 或 来自深度搜索"/>
                 <span class="name ${data.parsing || data.isRegex ? "bold" : ""}">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
@@ -270,7 +270,7 @@ function AddMedia(data, currentTab = true) {
     // 多选框 创建checked属性 值和checked状态绑定
     data._checked = true;
     data.html.find('input').click(function (event) {
-        data._checked = $(this).prop("checked");
+        data._checked = this.checked;
         event.originalEvent.cancelBubble = true;
     });
     Object.defineProperty(data, "checked", {
@@ -323,7 +323,7 @@ $(".Tabs .TabButton").click(function () {
     $(".container").eq(index).addClass("TabShow");
     UItoggle();
     $("#filter, #scriptCatch, #unfold").hide();
-    activeTab = $(this).attr("id") == "currentTab";
+    activeTab = this.id == "currentTab";
 });
 // 其他页面
 $('#allTab').click(function () {
@@ -425,10 +425,9 @@ $('#Catch, #openUnfold, #openFilter').click(function () {
 });
 // 清空数据
 $('#Clear').click(function () {
-    const type = $('.Active').attr("id") != "allTab";
-    chrome.runtime.sendMessage({ Message: "clearData", tabId: G.tabId, type: type });
-    chrome.runtime.sendMessage({ Message: "ClearIcon", type: type });
-    if (type) {
+    chrome.runtime.sendMessage({ Message: "clearData", tabId: G.tabId, type: activeTab });
+    chrome.runtime.sendMessage({ Message: "ClearIcon", type: activeTab });
+    if (activeTab) {
         currentCount = 0;
         $current.empty();
     } else {
@@ -480,7 +479,7 @@ if ($down[0].offsetHeight > 30) {
 }
 // 跳转页面
 $("[go]").click(function () {
-    chrome.tabs.create({ url: $(this).attr("go") });
+    chrome.tabs.create({ url: this.getAttribute("go") });
 });
 // 一些需要等待G变量加载完整的操作
 const interval = setInterval(function () {
@@ -597,10 +596,10 @@ function UItoggle() {
     }
     // 更新图标
     $(".faviconFlag").each(function () {
-        const data = getData($(this).attr("requestId"));
+        const data = getData(this.getAttribute("requestId"));
         if (favicon.has(data.webUrl)) {
-            $(this).attr("src", favicon.get(data.webUrl));
-            $(this).removeClass("faviconFlag");
+            this.setAttribute("src", favicon.get(data.webUrl));
+            this.classList.remove("faviconFlag");
         }
     });
 }
@@ -614,7 +613,7 @@ function getData(requestId = false) {
 // 获取所有资源列表
 function getAllData() {
     const data = [];
-    data.push(...allData.get(true).values())
-    data.push(...allData.get(false).values())
+    data.push(...allData.get(true).values());
+    data.push(...allData.get(false).values());
     return data;
 }

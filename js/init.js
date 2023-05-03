@@ -53,14 +53,14 @@ G.OptionLists = {
         { "type": "application/dash+xml", "size": 0, "state": true },
         { "type": "application/m4s", "size": 0, "state": true }
     ],
-    TitleName: false,
-    OtherAutoClear: 100,
-    Player: "",
     Regex: [
         { "type": "ig", "regex": ".*vurl=([^&]*)", "ext": "m3u8", "state": true },
         { "type": "ig", "regex": "/getvinfo\\?", "ext": "json", "state": true },
         { "type": "ig", "regex": "https://cache\\.video\\.[a-z]*\\.com/dash\\?tvid=.*", "ext": "json", "state": true }
     ],
+    TitleName: false,
+    OtherAutoClear: 100,
+    Player: "",
     ShowWebIco: true,
     MobileUserAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1",
     m3u8dl: false,
@@ -76,7 +76,7 @@ G.OptionLists = {
     saveAs: false,
     userAgent: "",
     downFileName: "${title}.${ext}",
-    css: ""
+    css: "",
 };
 G.TabIdList = {
     featMobileTabId: [],
@@ -88,14 +88,16 @@ G.TabIdList = {
 InitOptions();
 
 // 102版本以上 非Firefox 开启更多功能
-G.isFirefox = navigator.userAgent.includes("Firefox/");
-G.isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
+// G.isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
+G.isFirefox = false;
 G.version = 93;
 if (navigator.userAgent.includes("Chrome/")) {
     const version = navigator.userAgent.match(/Chrome\/([\d]+)/);
     if (version && version[1]) {
         G.version = parseInt(version[1]);
     }
+} else if (navigator.userAgent.includes("Firefox/")) {
+    G.isFirefox = true;
 }
 
 // 脚本列表
@@ -163,8 +165,9 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 // 扩展升级，清空本地储存
 chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason == "update") {
-        InitOptions();
-        chrome.storage.local.clear();
+        chrome.storage.local.clear(function () {
+            InitOptions();
+        });
         chrome.alarms.create("nowClear", { when: Date.now() + 3000 });
     }
 });
@@ -186,7 +189,6 @@ function clearRedundant() {
             }
             chrome.storage.local.set({ MediaData: cacheData });
         }
-
         // 清理 declarativeNetRequest
         chrome.declarativeNetRequest.getSessionRules(function (rules) {
             for (let item of rules) {
@@ -197,7 +199,6 @@ function clearRedundant() {
                 }
             }
         });
-
         // 清理脚本
         G.scriptList.forEach(function (scriptList) {
             scriptList.tabId.forEach(function (tabId) {
