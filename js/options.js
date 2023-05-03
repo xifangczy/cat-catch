@@ -210,7 +210,7 @@ $("#ResetM3u8dl").bind("click", function () {
 $("#ResetTag").bind("click", function () {
     if (confirm("确认重置吗？")) {
         ["userAgent", "MobileUserAgent", "downFileName"].forEach(function (id) {
-            chrome.storage.sync.set({ [id]: G.OptionLists[Option] });
+            chrome.storage.sync.set({ [id]: G.OptionLists[id] });
         })
         location.reload();
     }
