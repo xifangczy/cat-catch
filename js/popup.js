@@ -380,7 +380,6 @@ $('#unfold button').click(function () {
     $("#unfold").hide();
     const id = this.id;
     getData().forEach(function (data) {
-        console.log(data.urlPanelShow, !data.checked)
         if (data.html.is(":hidden")) { return true; }
         if (id == "unfoldAll" && data.urlPanelShow) {
             return true;

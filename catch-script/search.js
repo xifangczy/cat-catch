@@ -1,6 +1,6 @@
 (function () {
     console.log("start search.js");
-    const CATCH_SEARCH_DEBUG = true;
+    const CATCH_SEARCH_DEBUG = false;
 
     // 拦截JSON.parse 分析内容
     const _JSONparse = JSON.parse;

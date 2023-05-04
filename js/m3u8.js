@@ -199,7 +199,6 @@ $(function () {
         hls.on(Hls.Events.ERROR, function (event, data) {
             $("#loading").show();
             $("#loading .optionBox").html(`解析或播放m3u8文件中有错误, 详细错误信息查看控制台`);
-            console.log(data);
             // 尝试添加删除referer
             if (data.type == "networkError") {
                 if (!autoReferer) {
