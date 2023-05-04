@@ -5,6 +5,7 @@ const _referer = params.get("referer");
 const _initiator = params.get("initiator");
 const _title = params.get("title");
 const tsAddArg = params.get("tsAddArg");
+const autoReferer = params.get("autoReferer");
 const getId = parseInt(params.get("getId"));
 const tabId = parseInt(params.get("tabid"));
 const key = params.get("key");
@@ -110,7 +111,7 @@ $(function () {
     }
 
     /* 解析函数 使用hls解析好的数据 进一步处理 */
-    function getNewUrl(item){
+    function getNewUrl(item) {
         const url = encodeURIComponent(item.uri);
         const referer = _referer ? "&referer=" + encodeURIComponent(_referer) : "&initiator=" + (_initiator ? encodeURIComponent(_initiator) : "");
         const title = _title ? encodeURIComponent(_title) : "";
@@ -201,6 +202,12 @@ $(function () {
             console.log(data);
             // 尝试添加删除referer
             if (data.type == "networkError") {
+                if (!autoReferer) {
+                    if (_referer) {
+                        window.location.href = window.location.href.replace("&referer=", "&initiator=") + "&autoReferer=1";
+                    }
+                    window.location.href = window.location.href.replace("&initiator=", "&referer=") + "&autoReferer=1";
+                }
                 if (_referer) {
                     $("#loading .optionBox").append(`<p><a href="${window.location.href.replace("&referer=", "&initiator=")}">删除Referer重新尝试</a></p>`);
                     return;
@@ -643,12 +650,12 @@ $(function () {
         let customKey = $("#customKey").val().trim();
         if (customKey) {
             // customKey = isHexKey(customKey) ? HexStringToArrayBuffer(customKey) : Base64ToArrayBuffer(customKey);
-            if(isHexKey(customKey)){
+            if (isHexKey(customKey)) {
                 customKey = HexStringToArrayBuffer(customKey);
-            }else if(customKey.length == 24 && customKey.slice(-2) == "=="){
+            } else if (customKey.length == 24 && customKey.slice(-2) == "==") {
                 customKey = Base64ToArrayBuffer(customKey);
                 console.log(customKey);
-            }else if(/^http[s]*:\/\/.+/i.test(customKey)){
+            } else if (/^http[s]*:\/\/.+/i.test(customKey)) {
                 let flag = false;
                 await $.ajax({
                     url: customKey,
@@ -660,16 +667,16 @@ $(function () {
                     $("#customKey").val(ArrayBufferToBase64(customKey));
                     $("#m3u8dlArg").val(getM3u8DlArg());
                 });
-                if(flag){
+                if (flag) {
                     $progress.html(`<b>密钥下载失败</b>`);
                     return;
                 }
-            }else{
+            } else {
                 $progress.html(`<b>密钥不正确</b>`);
                 return;
             }
             for (let i in _fragments) {
-                if(!_fragments[i].encrypted){
+                if (!_fragments[i].encrypted) {
                     _fragments[i].encrypted = true;
                     _fragments[i].decryptdata = {};
                     if (!keyContent.get("customKey")) {
@@ -860,7 +867,7 @@ $(function () {
         if ($("#ffmpeg").prop("checked")) {
             chrome.runtime.sendMessage({
                 Message: "catCatchFFmpeg",
-                action: $("#onlyAudio").prop("checked") ? "onlyAudio" :"transcode",
+                action: $("#onlyAudio").prop("checked") ? "onlyAudio" : "transcode",
                 media: [{ data: URL.createObjectURL(fileBlob) }],
                 title: `${GetFileName(_m3u8Url)}`
             });
@@ -995,7 +1002,7 @@ $(function () {
             if (downList[downP].data) {
                 if (!fileStream) { clearInterval(tsInterval); return; }
                 if (checkMux.enable) {
-                    if(checkMux.start && !checkMux.headEncode){
+                    if (checkMux.start && !checkMux.headEncode) {
                         stopDownload = "格式转换错误, 请取消mp4转换, 重新下载.";
                         return;
                     }
@@ -1112,26 +1119,26 @@ $(function () {
             initiator: _referer ?? _initiator
         }
         m3u8dlArg = templates(m3u8dlArg, data);
-    
-        if(!addParam){ return m3u8dlArg; }
-    
+
+        if (!addParam) { return m3u8dlArg; }
+
         if (m3u8dlArg.includes("--maxThreads")) {
             m3u8dlArg = m3u8dlArg.replace(/--maxThreads "?[0-9]+"?/g, "");
         }
         const tsThread = $("#thread").val();  // 线程数量
         m3u8dlArg += ` --maxThreads "${tsThread}"`
-    
+
         const rangeStart = $("#rangeStart").val() - 1;  // 开始序列号
         const rangeEnd = $("#rangeEnd").val() - 1;  // 结束序列号
         m3u8dlArg += ` --downloadRange "${rangeStart}-${rangeEnd}"`
-    
+
         let customKey = $("#customKey").val().trim();  // 自定义密钥
         if (customKey) {
             if (isHexKey(customKey)) {
                 customKey = HexStringToArrayBuffer(customKey);
                 customKey = ArrayBufferToBase64(customKey);
                 m3u8dlArg += ` --useKeyBase64 "${customKey}"`;
-            }else if(customKey.length == 24 && customKey.slice(-2) == "=="){
+            } else if (customKey.length == 24 && customKey.slice(-2) == "==") {
                 m3u8dlArg += ` --useKeyBase64 "${customKey}"`;
             }
         }
@@ -1140,7 +1147,7 @@ $(function () {
         // 只要音频
         const onlyAudio = $("#onlyAudio").prop("checked");
         m3u8dlArg += onlyAudio ? ` --enableAudioOnly` : "";
-    
+
         return m3u8dlArg;
     }
 });
@@ -1276,7 +1283,7 @@ function fixFileDuration(data, duration) {
         if (data[i] == 0x6D && data[i + 1] == 0x76 && data[i + 2] == 0x68 && data[i + 3] == 0x64) {
             mvhdBoxDuration = getBoxDuration(data, duration, i);   // 获得 timescale
             //删除创建日期
-            data[i+11] = 0;
+            data[i + 11] = 0;
             i += 20;    // mvhd 偏移20 为duration
             data[i] = (mvhdBoxDuration & 0xFF000000) >> 24;
             data[++i] = (mvhdBoxDuration & 0xFF0000) >> 16;
