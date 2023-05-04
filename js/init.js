@@ -81,7 +81,7 @@ G.OptionLists = {
 G.TabIdList = {
     featMobileTabId: [],
     featAutoDownTabId: [],
-    mediaControl: [],
+    mediaControl: { tabid: 0, index: -1 },
 };
 
 // Init
