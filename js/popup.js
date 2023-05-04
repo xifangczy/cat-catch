@@ -316,14 +316,13 @@ function AddMedia(data, currentTab = true) {
 /********************绑定事件********************/
 //标签切换
 $(".Tabs .TabButton").click(function () {
+    activeTab = this.id == "currentTab";
     const index = $(this).index();
     $(".Tabs .TabButton").removeClass('Active');
     $(this).addClass("Active");
-    $(".container").removeClass("TabShow");
-    $(".container").eq(index).addClass("TabShow");
+    $(".container").removeClass("TabShow").eq(index).addClass("TabShow");
     UItoggle();
     $("#filter, #scriptCatch, #unfold").hide();
-    activeTab = this.id == "currentTab";
 });
 // 其他页面
 $('#allTab').click(function () {
