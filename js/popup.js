@@ -90,7 +90,7 @@ function AddMedia(data, currentTab = true) {
     //截取文件名长度
     let trimName = data.name;
     if (data.name.length >= 60) {
-        trimName = trimName.substr(0, 20) + '...' + trimName.substr(-23);
+        trimName = trimName.substr(0, 20) + '...' + trimName.substr(-24);
     }
     //添加下载文件名
     data.downFileName = G.TitleName ? templates(G.downFileName, data) : data.name;
@@ -378,34 +378,21 @@ $('#AllSelect, #ReSelect').click(function () {
 // unfoldAll展开全部  unfoldPlay展开可播放 unfoldFilter展开选中的 fold关闭展开
 $('#unfold button').click(function () {
     $("#unfold").hide();
-    if (this.id == "unfoldAll") {
-        getData().forEach(function (data) {
-            !data.urlPanelShow && data.panelHeading.click();
-        });
-        return;
-    }
-    if (this.id == "unfoldPlay") {
-        getData().forEach(function (data) {
-            if (data.isPlay && !data.urlPanelShow) {
-                data.panelHeading.click();
-            }
-        });
-        return;
-    }
-    if (this.id == "unfoldFilter") {
-        getData().forEach(function (data) {
-            if (!data.urlPanelShow && data.checked) {
-                data.panelHeading.click();
-            }
-        });
-        return;
-    }
-    if (this.id == "fold") {
-        getData().forEach(function (data) {
-            data.urlPanelShow && data.panelHeading.click();
-        });
-        return;
-    }
+    const id = this.id;
+    getData().forEach(function (data) {
+        console.log(data.urlPanelShow, !data.checked)
+        if (data.html.is(":hidden")) { return true; }
+        if (id == "unfoldAll" && data.urlPanelShow) {
+            return true;
+        } else if (id == "unfoldPlay" && !data.isPlay || data.urlPanelShow) {
+            return true;
+        } else if (id == "unfoldFilter" && !data.checked || data.urlPanelShow) {
+            return true;
+        } else if (id == "fold" && !data.urlPanelShow) {
+            return true;
+        }
+        data.panelHeading.click();
+    });
 });
 // 捕捉/录制 展开按钮 筛选按钮 按钮
 $('#Catch, #openUnfold, #openFilter').click(function () {
@@ -610,7 +597,7 @@ function getData(requestId = false) {
     }
     return allData.get(activeTab);
 }
-function emptyData(){
+function emptyData() {
     allData.get(activeTab).clear();
 }
 // 获取所有资源列表
