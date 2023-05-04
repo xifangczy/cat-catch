@@ -187,13 +187,13 @@ function findMedia(data, isRegex = false, filter = false) {
             referer: data.referer
         };
         // 幽灵资源 查源
-        if (info.tabId == -1) {
+        if (info.tabId == -1 && info.referer) {
             if (webInfo?.url == info.referer) {
                 info.tabId = webInfo.id;
-            } else if (info.referer) {
+            } else {
                 await chrome.tabs.query({ url: info.referer }, function (webInfo) {
                     if (chrome.runtime.lastError) { return; }
-                    info.tabId = webInfo.length > 0 ? webInfo[0].id : 0;
+                    info.tabId = webInfo.length > 0 ? webInfo[0].id : -1;
                 });
             }
         }
