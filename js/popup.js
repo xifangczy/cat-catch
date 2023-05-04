@@ -433,6 +433,7 @@ $('#Clear').click(function () {
         allCount = 0;
         $all.empty();
     }
+    emptyData();
     UItoggle();
 });
 // 模拟手机端
@@ -608,6 +609,9 @@ function getData(requestId = false) {
         return allData.get(activeTab).get(requestId);
     }
     return allData.get(activeTab);
+}
+function emptyData(){
+    allData.get(activeTab).clear();
 }
 // 获取所有资源列表
 function getAllData() {
