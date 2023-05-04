@@ -170,25 +170,36 @@ function findMedia(data, isRegex = false, filter = false) {
             if (cacheData[G.tabId][key].url == data.url) { return; }
         }
     }
-    const info = {
-        name: name,
-        url: data.url,
-        size: header["size"],
-        ext: ext,
-        type: data.mime ?? header["type"],
-        tabId: data.tabId,
-        isRegex: isRegex,
-        requestId: data.requestId ?? Date.now().toString(),
-        extraExt: data.extraExt,
-        initiator: data.initiator,
-        referer: data.referer
-    };
     const getTabId = data.tabId == -1 ? G.tabId : data.tabId;
-    chrome.tabs.get(getTabId, function (webInfo) {
+    chrome.tabs.get(getTabId, async function (webInfo) {
         if (chrome.runtime.lastError) { return; }
+        const info = {
+            name: name,
+            url: data.url,
+            size: header["size"],
+            ext: ext,
+            type: data.mime ?? header["type"],
+            tabId: data.tabId,
+            isRegex: isRegex,
+            requestId: data.requestId ?? Date.now().toString(),
+            extraExt: data.extraExt,
+            initiator: data.initiator,
+            referer: data.referer
+        };
+        // 幽灵资源 查源
+        if (info.tabId == -1) {
+            if (webInfo?.url == info.referer) {
+                info.tabId = webInfo.id;
+            } else if (info.referer) {
+                await chrome.tabs.query({ url: info.referer }, function (webInfo) {
+                    if (chrome.runtime.lastError) { return; }
+                    info.tabId = webInfo.length > 0 ? webInfo[0].id : 0;
+                });
+            }
+        }
         // 不存在 initiator 和 referer 使用web url代替initiator
         if (info.initiator == undefined || info.initiator == "null") {
-            info.initiator = data.referer ?? webInfo?.url;
+            info.initiator = info.referer ?? webInfo?.url;
         }
         // 装载页面信息
         info.title = webInfo?.title ?? "NULL";
@@ -196,23 +207,23 @@ function findMedia(data, isRegex = false, filter = false) {
         info.webUrl = webInfo?.url;
         // 发送到popup 并检查自动下载
         chrome.runtime.sendMessage(info, function () {
-            if (data.tabId != -1 && G.featAutoDownTabId && G.featAutoDownTabId.includes(data.tabId)) {
+            if (info.tabId != -1 && G.featAutoDownTabId && G.featAutoDownTabId.includes(info.tabId)) {
                 const downDir = info.title == "NULL" ? "CatCatch/" : info.title + "/";
                 chrome.downloads.download({
-                    url: data.url,
+                    url: info.url,
                     filename: downDir + info.name
                 });
             }
             if (chrome.runtime.lastError) { return; }
         });
         // 储存数据
-        if (cacheData[data.tabId] == undefined) {
-            cacheData[data.tabId] = [];
+        if (cacheData[info.tabId] == undefined) {
+            cacheData[info.tabId] = [];
         }
-        cacheData[data.tabId].push(info);
+        cacheData[info.tabId].push(info);
         // 视频切片太多 频繁储存 严重影响性能
         // 当前标签媒体数量大于1000 开启防抖 等待5秒储存 或 积累10个资源储存一次。
-        if (cacheData[data.tabId].length >= 1000 && debounceCount <= 10) {
+        if (cacheData[info.tabId].length >= 1000 && debounceCount <= 10) {
             debounceCount++;
             clearTimeout(debounce);
             debounce = setTimeout(() => {
@@ -227,9 +238,8 @@ function findMedia(data, isRegex = false, filter = false) {
                 chrome.runtime.lastError && console.log(chrome.runtime.lastError);
             });
         }
-
-        if (data.tabId != -1) {
-            SetIcon({ number: cacheData[data.tabId].length, tabId: data.tabId });
+        if (info.tabId != -1) {
+            SetIcon({ number: cacheData[info.tabId].length, tabId: info.tabId });
         } else {
             SetIcon({ tips: true });
             //自动清理幽灵数据
