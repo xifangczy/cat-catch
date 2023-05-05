@@ -380,7 +380,6 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             for (let item of tabs) {
                 if (item.url == Message.href) {
                     findMedia({ url: Message.url, tabId: item.id, extraExt: Message.extraExt, mime: Message.mime }, true, true);
-                    sendResponse("ok");
                     return true;
                 }
             }
@@ -398,7 +397,6 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
                     ffmpeg.tab = tab.id;
                     ffmpeg.data = data;
                 });
-                sendResponse("ok");
                 return true;
             }
             chrome.tabs.sendMessage(tabs[0].id, data);
