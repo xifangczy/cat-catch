@@ -89,7 +89,7 @@ function AddMedia(data, currentTab = true) {
     }
     //截取文件名长度
     let trimName = data.name;
-    if (data.name.length >= 60) {
+    if (data.name.length >= 50) {
         trimName = trimName.substr(0, 20) + '...' + trimName.substr(-24);
     }
     //添加下载文件名
@@ -112,6 +112,7 @@ function AddMedia(data, currentTab = true) {
         favicon.set(data.webUrl, data.favIconUrl);
     }
     data.isPlay = isPlay(data);
+    
     //添加html
     data.html = $(`
         <div class="panel">

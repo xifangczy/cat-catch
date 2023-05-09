@@ -23,7 +23,6 @@ body {
 .panel-heading {
   padding: 5px 5px 5px 5px;
   background-color: var(--background-color-two);
-  /* border-color: #ddd; */
   cursor: pointer;
   display: flex;
   flex-direction: row;
@@ -34,6 +33,7 @@ body {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+  /* margin-right: 0.5rem; */
 }
 .panel .url {
   padding: 5px;
@@ -45,7 +45,7 @@ body {
   height: 18px;
   cursor: pointer;
 }
-.faviconFlag{
+.faviconFlag {
   display: none;
 }
 .icon:hover {
