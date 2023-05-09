@@ -191,9 +191,11 @@ function findMedia(data, isRegex = false, filter = false) {
             if (webInfo?.url == info.referer) {
                 info.tabId = webInfo.id;
             } else {
-                await chrome.tabs.query({ url: info.referer }, function (webInfo) {
+                await chrome.tabs.query({ url: info.referer }, function (newWebInfo) {
                     if (chrome.runtime.lastError) { return; }
-                    info.tabId = webInfo.length > 0 ? webInfo[0].id : -1;
+                    if(newWebInfo.length > 0){
+                        webInfo = newWebInfo[0];
+                    }
                 });
             }
         }
