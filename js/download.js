@@ -3,6 +3,8 @@ const params = new URL(location.href).searchParams;
 const _url = params.get("url");
 const _referer = params.get("referer");
 const _fileName = params.get("filename");
+const autosend = params.get("autosend");
+
 // 修改当前标签下的所有xhr的Referer
 _referer ? setReferer(_referer, startDownload) : startDownload();
 
@@ -35,7 +37,6 @@ function startDownload() {
         xhr: function () {
             let xhr = new XMLHttpRequest();
             xhr.addEventListener("progress", function (evt) {
-                // console.log(byteToSize(evt.total));
                 let progress = Math.round(evt.loaded / evt.total * 10000) / 100.00;
                 if (progress != Infinity) {
                     progress = progress + "%";
@@ -51,16 +52,28 @@ function startDownload() {
     }).fail(function (result) {
         $downFilepProgress.html("下载失败... " + JSON.stringify(result));
     }).done(function (result) {
-        $downFilepProgress.html("下载完成，正在保存到硬盘...");
+        // console.log(result);
         try {
             blobUrl = URL.createObjectURL(result);
+            $("#ffmpeg").show();
+            if (autosend) {
+                chrome.runtime.sendMessage({
+                    Message: "catCatchFFmpeg",
+                    action: "popupAddMedia",
+                    media: [{ data: blobUrl, name: getUrlFileName(_url) }]
+                }, function () {
+                    $downFilepProgress.html("正在发送到ffmpeg");
+                    setTimeout(() => { window.close(); }, 1000 + Math.ceil(Math.random() * 999));
+                });
+                return true;
+            }
+            $downFilepProgress.html("下载完成，正在保存到硬盘...");
             chrome.downloads.download({
                 url: blobUrl,
                 filename: _fileName,
                 saveAs: G.saveAs
             }, function (downloadId) {
                 downId = downloadId;
-                $("#ffmpeg").show();
             });
         } catch (e) {
             $downFilepProgress.html("下载失败... " + e);
@@ -98,7 +111,9 @@ function startDownload() {
         chrome.runtime.sendMessage({
             Message: "catCatchFFmpeg",
             action: "addMedia",
-            media: [{ data: blobUrl, name: getUrlFileName(_url)}]
+            media: [{ data: blobUrl, name: getUrlFileName(_url) }]
+        }, function () {
+            $downFilepProgress.html("已发送发到在线ffmpeg");
         });
     });
 }

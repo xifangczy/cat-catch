@@ -342,12 +342,20 @@ $('#allTab').click(function () {
 });
 // 下载选中文件
 $('#DownFile').click(function () {
-    let confirm = 0
-    getData().forEach(function (data) { data.checked && confirm++; });
-    if (confirm >= 10 && !confirm("共 " + confirm + "个文件，是否确认下载?")) {
+    let fileNum = 0;
+    let ffmpeg = false;
+    getData().forEach(function (data) { data.checked && fileNum++; });
+    if (fileNum >= 10 && !confirm("共 " + fileNum + "个文件，是否确认下载?")) {
         return;
     }
+    if (fileNum == 2 && confirm("发送到在线ffmpeg合并?")) {
+        ffmpeg = true;
+    }
     getData().forEach(function (data) {
+        if(ffmpeg){
+            catDownload(data, true);
+            return true;
+        }
         if (data.checked) {
             setTimeout(function () {
                 chrome.downloads.download({
@@ -548,7 +556,8 @@ function copyLink(data) {
     return templates(text, data);
 }
 // 携带referer 下载
-function catDownload(obj) {
+function catDownload(obj, autoSend = false) {
+    autoSend = autoSend ? "&autosend=1" : "";
     chrome.tabs.get(G.tabId, function (tab) {
         chrome.tabs.create({
             url: `/download.html?url=${encodeURIComponent(
@@ -557,7 +566,7 @@ function catDownload(obj) {
                 obj.referer ?? obj.initiator
             )}&filename=${encodeURIComponent(
                 obj.downFileName
-            )}`,
+            )}${autoSend}`,
             index: tab.index + 1
         });
     });

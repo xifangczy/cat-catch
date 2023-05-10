@@ -193,7 +193,7 @@ function findMedia(data, isRegex = false, filter = false) {
             } else {
                 await chrome.tabs.query({ url: info.referer }, function (newWebInfo) {
                     if (chrome.runtime.lastError) { return; }
-                    if(newWebInfo.length > 0){
+                    if (newWebInfo.length > 0) {
                         webInfo = newWebInfo[0];
                     }
                 });
@@ -392,7 +392,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // ffmpeg在线转码
     if (Message.Message == "catCatchFFmpeg") {
-        const data = { Message: "ffmpeg", action: Message.action, media: Message.media, title: Message.title };
+        const data = { Message: "ffmpeg", action: Message.action, media: Message.media, title: Message.title, url: Message.url };
         chrome.tabs.query({ url: ffmpeg.url }, function (tabs) {
             if (chrome.runtime.lastError || !tabs.length) {
                 chrome.tabs.create({ url: ffmpeg.url }, function (tab) {
