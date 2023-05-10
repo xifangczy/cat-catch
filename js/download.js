@@ -52,20 +52,13 @@ function startDownload() {
     }).fail(function (result) {
         $downFilepProgress.html("下载失败... " + JSON.stringify(result));
     }).done(function (result) {
-        // console.log(result);
         try {
             blobUrl = URL.createObjectURL(result);
             $("#ffmpeg").show();
+            // 自动发送到ffmpeg
             if (autosend) {
-                chrome.runtime.sendMessage({
-                    Message: "catCatchFFmpeg",
-                    action: "popupAddMedia",
-                    media: [{ data: blobUrl, name: getUrlFileName(_url) }]
-                }, function () {
-                    $downFilepProgress.html("正在发送到ffmpeg");
-                    setTimeout(() => { window.close(); }, 1000 + Math.ceil(Math.random() * 999));
-                });
-                return true;
+                sendFile(blobUrl, "popupAddMedia", true);
+                return;
             }
             $downFilepProgress.html("下载完成，正在保存到硬盘...");
             chrome.downloads.download({
@@ -108,12 +101,17 @@ function startDownload() {
 
     // 发送到在线ffmpeg
     $("#ffmpeg").click(function () {
+        sendFile(blobUrl);
+    });
+
+    function sendFile(url, action = "addMedia", close = false) {
         chrome.runtime.sendMessage({
             Message: "catCatchFFmpeg",
-            action: "addMedia",
-            media: [{ data: blobUrl, name: getUrlFileName(_url) }]
+            action: action,
+            media: [{ data: url, name: getUrlFileName(_url) }]
         }, function () {
-            $downFilepProgress.html("已发送发到在线ffmpeg");
+            $downFilepProgress.html("已发送到在线ffmpeg");
+            close && setTimeout(() => { window.close(); }, 1000 + Math.ceil(Math.random() * 999));
         });
-    });
+    }
 }

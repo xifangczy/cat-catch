@@ -112,7 +112,7 @@ function AddMedia(data, currentTab = true) {
         favicon.set(data.webUrl, data.favIconUrl);
     }
     data.isPlay = isPlay(data);
-    
+
     //添加html
     data.html = $(`
         <div class="panel">
@@ -343,17 +343,18 @@ $('#allTab').click(function () {
 // 下载选中文件
 $('#DownFile').click(function () {
     let fileNum = 0;
-    let ffmpeg = false;
+    let sendffmpeg = false;
     getData().forEach(function (data) { data.checked && fileNum++; });
     if (fileNum >= 10 && !confirm("共 " + fileNum + "个文件，是否确认下载?")) {
         return;
     }
     if (fileNum == 2 && confirm("发送到在线ffmpeg合并?")) {
-        ffmpeg = true;
+        chrome.tabs.create({ url: ffmpeg.url });
+        sendffmpeg = true;
     }
     getData().forEach(function (data) {
-        if(ffmpeg){
-            catDownload(data, true);
+        if (sendffmpeg) {
+            catDownload(data, "&autosend=1");
             return true;
         }
         if (data.checked) {
@@ -556,8 +557,7 @@ function copyLink(data) {
     return templates(text, data);
 }
 // 携带referer 下载
-function catDownload(obj, autoSend = false) {
-    autoSend = autoSend ? "&autosend=1" : "";
+function catDownload(obj, extra = "") {
     chrome.tabs.get(G.tabId, function (tab) {
         chrome.tabs.create({
             url: `/download.html?url=${encodeURIComponent(
@@ -566,8 +566,9 @@ function catDownload(obj, autoSend = false) {
                 obj.referer ?? obj.initiator
             )}&filename=${encodeURIComponent(
                 obj.downFileName
-            )}${autoSend}`,
-            index: tab.index + 1
+            )}${extra}`,
+            index: tab.index + 1,
+            active: extra ? false : true
         });
     });
 }
