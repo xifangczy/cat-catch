@@ -349,7 +349,12 @@ $('#DownFile').click(function () {
         return;
     }
     if (fileNum == 2 && confirm("发送到在线ffmpeg合并?")) {
-        chrome.tabs.create({ url: ffmpeg.url });
+        // chrome.tabs.create({ url: ffmpeg.url });
+        chrome.runtime.sendMessage({
+            Message: "catCatchFFmpeg",
+            action: "openFFmpeg",
+            extra: "等待接收媒体文件..."
+        });
         sendffmpeg = true;
     }
     getData().forEach(function (data) {

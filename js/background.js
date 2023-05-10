@@ -392,7 +392,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // ffmpeg在线转码
     if (Message.Message == "catCatchFFmpeg") {
-        const data = { Message: "ffmpeg", action: Message.action, media: Message.media, title: Message.title, url: Message.url };
+        const data = { Message: "ffmpeg", action: Message.action, media: Message.media, title: Message.title, url: Message.url, extra: Message.extra };
         chrome.tabs.query({ url: ffmpeg.url }, function (tabs) {
             if (chrome.runtime.lastError || !tabs.length) {
                 chrome.tabs.create({ url: ffmpeg.url }, function (tab) {

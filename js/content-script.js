@@ -135,8 +135,13 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         return true;
     }
     if (Message.Message == "ffmpeg") {
+        if (Message.media == undefined) {
+            window.postMessage({ action: Message.action, title: Message.title, extra: Message.extra });
+            sendResponse("ok");
+            return true;
+        }
         for (let item of Message.media) {
-            loadBlob({ action: Message.action, type: item.type ?? "video", data: item.data, title: Message.title, name: item.name });
+            loadBlob({ action: Message.action, type: item.type ?? "video", data: item.data, title: Message.title, name: item.name, extra: Message.extra });
         }
         sendResponse("ok");
         return true;
@@ -200,7 +205,8 @@ window.addEventListener("message", (event) => {
             action: event.data.use,
             media: event.data.media,
             title: title,
-            url: event.data.href ?? event.source.location.href
+            url: event.data.href ?? event.source.location.href,
+            extra: event.data.extra
         });
     }
 }, false);
@@ -226,10 +232,10 @@ function loadBlob(data) {
     xhr.onreadystatechange = () => {
         if (xhr.readyState === 4 && xhr.status === 200) {
             xhr.response.arrayBuffer()
-            .then(function(buffer){
-                data.data = buffer;
-                window.postMessage(data, "*", [buffer]);
-            });
+                .then(function (buffer) {
+                    data.data = buffer;
+                    window.postMessage(data, "*", [buffer]);
+                });
         }
     };
     xhr.open("GET", data.data);
