@@ -360,13 +360,13 @@ $('#DownFile').click(function () {
         chrome.runtime.sendMessage({
             Message: "catCatchFFmpeg",
             action: "openFFmpeg",
-            extra: "等待接收媒体文件..."
+            extra: "等待接收媒体文件...请勿关闭本页面...可以前往 猫抓下载器 查看下载进度..."
         });
         sendffmpeg = true;
     }
     getData().forEach(function (data) {
         if (sendffmpeg) {
-            catDownload(data, "&autosend=1");
+            catDownload(data, "&autosend=1&autoClose=1");
             return true;
         }
         if (data.checked) {

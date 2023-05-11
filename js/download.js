@@ -5,6 +5,7 @@ const _referer = params.get("referer");
 const _fileName = params.get("filename");
 const autosend = params.get("autosend");
 const downDir = params.get("downDir");
+const autoClose = params.get("autoClose");
 
 // 修改当前标签下的所有xhr的Referer
 _referer ? setReferer(_referer, startDownload) : startDownload();
@@ -28,6 +29,8 @@ function startDownload() {
 
     const $downFilepProgress = $("#downFilepProgress");
     const $progress = $(".progress");
+
+    $("#autoClose").prop("checked", autoClose);
 
     // 使用ajax下载文件
     $("#downfile").show();
@@ -58,7 +61,7 @@ function startDownload() {
             $("#ffmpeg").show();
             // 自动发送到ffmpeg
             if (autosend) {
-                sendFile(blobUrl, "popupAddMedia", true);
+                sendFile(blobUrl, "popupAddMedia");
                 return;
             }
             $downFilepProgress.html("下载完成，正在保存到硬盘...");
@@ -113,7 +116,7 @@ function startDownload() {
             media: [{ data: url, name: getUrlFileName(_url) }]
         }, function () {
             $downFilepProgress.html("已发送到在线ffmpeg");
-            close && setTimeout(() => { window.close(); }, 1000 + Math.ceil(Math.random() * 999));
+            $("#autoClose").prop("checked") && setTimeout(() => { window.close(); }, 1000 + Math.ceil(Math.random() * 999));
         });
     }
 }
