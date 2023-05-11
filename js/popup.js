@@ -63,7 +63,8 @@ chrome.downloads.onChanged.addListener(function (item) {
     if (G.catDownload) { delete downData[item.id]; return; }
     const errorList = ["SERVER_BAD_CONTENT", "SERVER_UNAUTHORIZED", "SERVER_UNAUTHORIZED", "SERVER_FORBIDDEN", "SERVER_UNREACHABLE", "SERVER_CROSS_ORIGIN_REDIRECT"];
     if (item.error && errorList.includes(item.error.current) && downData[item.id]) {
-        catDownload(downData[item.id]);
+        const downDir = downData[item.id].downDir ? `&downDir=${downData[item.id].downDir}` : ""
+        catDownload(downData[item.id], downDir);
         delete downData[item.id];
     }
 });
@@ -95,6 +96,7 @@ function AddMedia(data, currentTab = true) {
     //添加下载文件名
     data.downFileName = G.TitleName ? templates(G.downFileName, data) : data.name;
     // 文件大小单位转换
+    data._size = data.size;
     if (data.size) {
         data.size = byteToSize(data.size);
     }
@@ -344,11 +346,16 @@ $('#allTab').click(function () {
 $('#DownFile').click(function () {
     let fileNum = 0;
     let sendffmpeg = false;
-    getData().forEach(function (data) { data.checked && fileNum++; });
+    let maxSize = 0;
+    getData().forEach(function (data) {
+        if (!data.checked) { return; }
+        fileNum++;
+        maxSize = data._size > maxSize ? data._size : maxSize;
+    });
     if (fileNum >= 10 && !confirm("共 " + fileNum + "个文件，是否确认下载?")) {
         return;
     }
-    if (fileNum == 2 && confirm("发送到在线ffmpeg合并?")) {
+    if (fileNum == 2 && maxSize < 2147483648 && confirm("发送到在线ffmpeg合并?")) {
         // chrome.tabs.create({ url: ffmpeg.url });
         chrome.runtime.sendMessage({
             Message: "catCatchFFmpeg",
@@ -367,7 +374,10 @@ $('#DownFile').click(function () {
                 chrome.downloads.download({
                     url: data.url,
                     filename: data.title + "/" + data.downFileName
-                }, function (id) { downData[id] = data; });
+                }, function (id) {
+                    data.downDir = data.title;
+                    downData[id] = data;
+                });
             }, 500);
         }
     });
@@ -563,6 +573,10 @@ function copyLink(data) {
 }
 // 携带referer 下载
 function catDownload(obj, extra = "") {
+    if (obj._size >= 2147483648) {
+        alert(`文件大小${obj.downFileName}超过2GB, 请使用第三法下载软件下载.`);
+        return;
+    }
     chrome.tabs.get(G.tabId, function (tab) {
         chrome.tabs.create({
             url: `/download.html?url=${encodeURIComponent(
