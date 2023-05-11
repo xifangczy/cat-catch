@@ -1,6 +1,7 @@
 (function () {
     console.log("start search.js");
     const CATCH_SEARCH_DEBUG = false;
+    const filter = new Set();
 
     // 拦截JSON.parse 分析内容
     const _JSONparse = JSON.parse;
@@ -14,9 +15,11 @@
         return _JSONparse.toString();
     }
 
-    async function findMedia(data, raw = undefined, depth = 0) {
+    async function findMedia(data, depth = 0) {
         CATCH_SEARCH_DEBUG && console.log(data);
+        let index = 0;
         for (let key in data) {
+            if (index != 0) { depth = 0; } index++;
             if (typeof data[key] == "object") {
                 // 查找疑似key
                 if (data[key] instanceof Array && data[key].length == 16) {
@@ -25,20 +28,19 @@
                         if (typeof item != "number" || item > 255) { flag = false; break; }
                     }
                     if (flag) {
-                        window.postMessage({ action: "catCatchAddKey", key: data[key], href: location.href, ext: "key" });
+                        postData({ action: "catCatchAddKey", key: data[key], href: location.href, ext: "key" });
                         continue;
                     }
                     continue;
                 }
-                if (depth > 25) { continue; }  // 防止死循环 最大深度
-                if (!raw) { raw = data; }
-                findMedia(data[key], raw, ++depth);
+                if (depth > 10) { continue; }  // 防止死循环 最大深度
+                findMedia(data[key], ++depth);
                 continue;
             }
             if (typeof data[key] == "string") {
                 if (isUrl(data[key])) {
                     let ext = getExtension(data[key]);
-                    ext && window.postMessage({ action: "catCatchAddMedia", url: data[key], href: location.href, ext: ext });
+                    ext && postData({ action: "catCatchAddMedia", url: data[key], href: location.href, ext: ext });
                     continue;
                 }
                 if (data[key].substring(0, 7).toUpperCase() == "#EXTM3U") {
@@ -71,28 +73,28 @@
             if (this.status != 200) { return; }
             // 查找疑似key
             if (this.responseType == "arraybuffer" && this.response?.byteLength && this.response.byteLength == 16) {
-                window.postMessage({ action: "catCatchAddKey", key: this.response, href: location.href, ext: "key" });
+                postData({ action: "catCatchAddKey", key: this.response, href: location.href, ext: "key" });
             }
             if (this.response == "" || typeof this.response != "string") { return; }
-            if(this.response.substring(0, 17).toLowerCase() == "data:application/"){
+            if (this.response.substring(0, 17).toLowerCase() == "data:application/") {
                 const text = this.response.substring(17);
                 toUrl(getDataM3U8(text));
                 return;
             }
-            if(this.responseURL.substring(0, 17).toLowerCase() == "data:application/"){
+            if (this.responseURL.substring(0, 17).toLowerCase() == "data:application/") {
                 const text = getDataM3U8(this.responseURL.substring(17));
                 text && toUrl(text);
                 return;
             }
             if (isUrl(this.response)) {
                 const ext = getExtension(this.response);
-                ext && window.postMessage({ action: "catCatchAddMedia", url: this.response, href: location.href, ext: ext });
+                ext && postData({ action: "catCatchAddMedia", url: this.response, href: location.href, ext: ext });
                 return;
             }
             if (this.response.toUpperCase().includes("#EXTM3U")) {
                 if (this.response.substring(0, 7) == "#EXTM3U") {
                     if (method == "GET") {
-                        window.postMessage({ action: "catCatchAddMedia", url: this.responseURL, href: location.href, ext: "m3u8" });
+                        postData({ action: "catCatchAddMedia", url: this.responseURL, href: location.href, ext: "m3u8" });
                         return;
                     }
                     isFullM3u8(this.response) && toUrl(this.response);
@@ -100,7 +102,7 @@
                 }
                 if (isJSON(this.response)) {
                     if (method == "GET") {
-                        window.postMessage({ action: "catCatchAddMedia", url: this.responseURL, href: location.href, ext: "json" });
+                        postData({ action: "catCatchAddMedia", url: this.responseURL, href: location.href, ext: "json" });
                         return;
                     }
                     toUrl(this.response, "json");
@@ -130,7 +132,7 @@
             .then(arrayBuffer => {
                 CATCH_SEARCH_DEBUG && console.log({ arrayBuffer, input });
                 if (arrayBuffer.byteLength == 16) {
-                    window.postMessage({ action: "catCatchAddKey", key: arrayBuffer, href: location.href, ext: "key" });
+                    postData({ action: "catCatchAddKey", key: arrayBuffer, href: location.href, ext: "key" });
                     return;
                 }
                 let text = new TextDecoder().decode(arrayBuffer);
@@ -143,7 +145,7 @@
                 }
                 if (text.substring(0, 7).toUpperCase() == "#EXTM3U") {
                     if (init?.method == undefined || (init.method && init.method.toUpperCase() == "GET")) {
-                        window.postMessage({ action: "catCatchAddMedia", url: input, href: location.href, ext: "m3u8" });
+                        postData({ action: "catCatchAddMedia", url: input, href: location.href, ext: "m3u8" });
                         return;
                     }
                     isFullM3u8(text) && toUrl(text);
@@ -170,7 +172,7 @@
             for (let item of data) {
                 if (typeof item != "number" || item > 255) { return data; }
             }
-            window.postMessage({ action: "catCatchAddKey", key: data, href: location.href, ext: "key" });
+            postData({ action: "catCatchAddKey", key: data, href: location.href, ext: "key" });
         }
         return data;
     }
@@ -185,9 +187,9 @@
         const base64 = _btoa.apply(this, arguments);
         CATCH_SEARCH_DEBUG && console.log(base64, data, base64.length);
         if (base64.length == 24 && base64.substring(22, 24) == "==") {
-            window.postMessage({ action: "catCatchAddKey", key: base64, href: location.href, ext: "base64Key" });
+            postData({ action: "catCatchAddKey", key: base64, href: location.href, ext: "base64Key" });
         }
-        if(data.toUpperCase().substring(0, 7) == "#EXTM3U" && isFullM3u8(data)){
+        if (data.toUpperCase().substring(0, 7) == "#EXTM3U" && isFullM3u8(data)) {
             toUrl(data);
         }
         return base64;
@@ -201,9 +203,9 @@
         const data = _atob.apply(this, arguments);
         CATCH_SEARCH_DEBUG && console.log(base64, data, base64.length);
         if (base64.length == 24 && base64.substring(22, 24) == "==") {
-            window.postMessage({ action: "catCatchAddKey", key: base64, href: location.href, ext: "base64Key" });
+            postData({ action: "catCatchAddKey", key: base64, href: location.href, ext: "base64Key" });
         }
-        if(data.toUpperCase().substring(0, 7) == "#EXTM3U" && isFullM3u8(data)){
+        if (data.toUpperCase().substring(0, 7) == "#EXTM3U" && isFullM3u8(data)) {
             toUrl(data);
         }
         return data;
@@ -253,22 +255,30 @@
     }
     function toUrl(text, ext = "m3u8") {
         let url = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(text)]));
-        window.postMessage({ action: "catCatchAddMedia", url: url, href: location.href, ext: ext });
+        postData({ action: "catCatchAddMedia", url: url, href: location.href, ext: ext });
     }
-    function getDataM3U8(text){
+    function getDataM3U8(text) {
         const type = ["vnd.apple.mpegurl", "x-mpegurl"];
         let isM3U8 = false;
-        for (let item of type){
-            if(text.substring(0, item.length).toLowerCase() == item){
+        for (let item of type) {
+            if (text.substring(0, item.length).toLowerCase() == item) {
                 text = text.substring(item.length + 1);
                 isM3U8 = true;
                 break;
             }
         }
-        if(!isM3U8){ return false; }
+        if (!isM3U8) { return false; }
         if (text.substring(0, 7).toLowerCase() == "base64,") {
             return window.atob(text.substring(7));
         }
         return text;
+    }
+    function postData(data) {
+        const key = data.url ? data.url : data.key;
+        if (filter.has(key)) { return false; }
+        window.postMessage(data);
+        filter.add(key);
+        console.log(filter);
+        return true;
     }
 })();
