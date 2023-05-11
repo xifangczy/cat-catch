@@ -2,7 +2,7 @@
     console.log("start search.js");
     const CATCH_SEARCH_DEBUG = false;
     const filter = new Set();
-
+    
     // 拦截JSON.parse 分析内容
     const _JSONparse = JSON.parse;
     JSON.parse = function () {
@@ -273,12 +273,20 @@
         }
         return text;
     }
+
+    // 筛选重复 防抖
+    let debounce = undefined;
+    const tempSave = [];
     function postData(data) {
         const key = data.url ? data.url : data.key;
         if (filter.has(key)) { return false; }
-        window.postMessage(data);
         filter.add(key);
-        console.log(filter);
-        return true;
+        tempSave.push(data);
+        clearTimeout(debounce);
+        debounce = setTimeout(() => {
+            tempSave.forEach(function () {
+                window.postMessage(tempSave.shift());
+            });
+        }, 500);
     }
 })();
