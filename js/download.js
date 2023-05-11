@@ -62,7 +62,7 @@ function startDownload() {
             $("#ffmpeg").show();
             // 自动发送到ffmpeg
             if (autosend) {
-                sendFile(blobUrl, "popupAddMedia");
+                sendFile("popupAddMedia");
                 return;
             }
             $downFilepProgress.html("下载完成，正在保存到硬盘...");
@@ -110,11 +110,11 @@ function startDownload() {
         sendFile(blobUrl);
     });
 
-    function sendFile(url, action = "addMedia", close = false) {
+    function sendFile(action = "addMedia") {
         chrome.runtime.sendMessage({
             Message: "catCatchFFmpeg",
             action: action,
-            media: [{ data: url, name: getUrlFileName(_url) }],
+            media: [{ data: blobUrl, name: getUrlFileName(_url) }],
             title: title
         }, function () {
             $downFilepProgress.html("已发送到在线ffmpeg");
