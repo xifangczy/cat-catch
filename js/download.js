@@ -4,6 +4,7 @@ const _url = params.get("url");
 const _referer = params.get("referer");
 const _fileName = params.get("filename");
 const autosend = params.get("autosend");
+const downDir = params.get("downDir");
 
 // 修改当前标签下的所有xhr的Referer
 _referer ? setReferer(_referer, startDownload) : startDownload();
@@ -63,7 +64,7 @@ function startDownload() {
             $downFilepProgress.html("下载完成，正在保存到硬盘...");
             chrome.downloads.download({
                 url: blobUrl,
-                filename: _fileName,
+                filename: downDir ? downDir + "/" + _fileName : _fileName,
                 saveAs: G.saveAs
             }, function (downloadId) {
                 downId = downloadId;
@@ -78,6 +79,7 @@ function startDownload() {
         if (!downloadDelta.state) { return; }
         if (downloadDelta.state.current == "complete" && downId != 0) {
             $downFilepProgress.html("已保存到硬盘, 请查看浏览器已下载内容");
+            // if (downDir) { window.close(); }
         }
     });
 
