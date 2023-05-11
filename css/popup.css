@@ -152,6 +152,15 @@ button,
   margin-left: 0.5rem;
   font-size: 12px;
 }
+#filter{
+  flex-wrap: wrap;
+}
+#filter #regular button{
+  margin-left: 0px;
+}
+#filter .regular{
+  margin-left: 5px;
+}
 #filter #ext {
   display: flex;
   color: var(--text-color);

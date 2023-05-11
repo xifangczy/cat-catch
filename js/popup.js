@@ -433,6 +433,19 @@ $('#Catch, #openUnfold, #openFilter').click(function () {
         $panel.hide();
     }
 });
+
+// 正则筛选
+$("#regularFilter").click(function () {
+    const regex = new RegExp($("#regular input").val());
+    getData().forEach(function (data) {
+        if (!regex.test(data.url)) {
+            data.checked = false;
+            data.html.hide();
+        }
+    });
+    $("#filter").hide();
+});
+
 // 清空数据
 $('#Clear').click(function () {
     chrome.runtime.sendMessage({ Message: "clearData", tabId: G.tabId, type: activeTab });
