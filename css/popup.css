@@ -160,6 +160,7 @@ button,
 }
 #filter .regular{
   margin-left: 5px;
+  margin-top: 5px;
 }
 #filter #ext {
   display: flex;

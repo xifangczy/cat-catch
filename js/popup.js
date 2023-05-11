@@ -435,15 +435,18 @@ $('#Catch, #openUnfold, #openFilter').click(function () {
 });
 
 // 正则筛选
-$("#regularFilter").click(function () {
-    const regex = new RegExp($("#regular input").val());
-    getData().forEach(function (data) {
-        if (!regex.test(data.url)) {
-            data.checked = false;
-            data.html.hide();
-        }
-    });
-    $("#filter").hide();
+// $("#regularFilter").click(function () {
+$("#regular input").bind('keypress', function(event){
+    if(event.keyCode == "13"){
+        const regex = new RegExp($(this).val());
+        getData().forEach(function (data) {
+            if (!regex.test(data.url)) {
+                data.checked = false;
+                data.html.hide();
+            }
+        });
+        $("#filter").hide();
+    }
 });
 
 // 清空数据
