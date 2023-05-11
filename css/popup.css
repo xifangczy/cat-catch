@@ -128,9 +128,6 @@ button,
 .TabShow {
   display: block !important;
 }
-#scriptCatch {
-  justify-content: flex-end;
-}
 #down,
 .more {
   display: flex;
@@ -182,6 +179,9 @@ button,
   max-height: 260px;
   cursor: pointer;
   margin: auto;
+}
+.flex-end{
+  justify-content: flex-end;
 }
 #otherOptions {
   margin: 5px;

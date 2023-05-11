@@ -401,8 +401,9 @@ $('#AllSelect, #ReSelect').click(function () {
     });
 });
 // unfoldAll展开全部  unfoldPlay展开可播放 unfoldFilter展开选中的 fold关闭展开
-$('#unfold button').click(function () {
-    $("#unfold").hide();
+$('#unfoldAll, #unfoldPlay, #unfoldFilter, #fold').click(function () {
+    // $("#unfold").hide();
+    $("#features").hide();
     const id = this.id;
     getData().forEach(function (data) {
         if (data.html.is(":hidden")) { return true; }
@@ -419,19 +420,17 @@ $('#unfold button').click(function () {
     });
 });
 // 捕捉/录制 展开按钮 筛选按钮 按钮
-$('#Catch, #openUnfold, #openFilter').click(function () {
+$('#Catch, #openUnfold, #openFilter, #more').click(function () {
     // const _height = parseInt($(".container").css("margin-bottom"));
     // $(".container").css("margin-bottom", ($down[0].offsetHeight + 26) + "px");
     const $panel = $(`#${this.getAttribute("panel")}`);
     $(".more").not($panel).hide();
-    if (this.id == "Catch" || this.id == "openFilter" || this.id == "openUnfold") {
-        if ($panel.is(":hidden")) {
-            $panel.css("display", "flex");
-            return;
-        }
-        // $(".container").css("margin-bottom", _height);
-        $panel.hide();
+    if ($panel.is(":hidden")) {
+        $panel.css("display", "flex");
+        return;
     }
+    // $(".container").css("margin-bottom", _height);
+    $panel.hide();
 });
 
 // 正则筛选
