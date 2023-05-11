@@ -344,18 +344,19 @@ $('#allTab').click(function () {
 });
 // 下载选中文件
 $('#DownFile').click(function () {
-    let fileNum = 0;
     let sendffmpeg = false;
     let maxSize = 0;
+    const tempData = [];
     getData().forEach(function (data) {
-        if (!data.checked) { return; }
-        fileNum++;
-        maxSize = data._size > maxSize ? data._size : maxSize;
+        if (data.checked) {
+            maxSize = data._size > maxSize ? data._size : maxSize;
+            tempData.push(data);
+        }
     });
-    if (fileNum >= 10 && !confirm("共 " + fileNum + "个文件，是否确认下载?")) {
+    if (tempData.length >= 10 && !confirm("共 " + tempData.length + "个文件，是否确认下载?")) {
         return;
     }
-    if (fileNum == 2 && maxSize < 2147483648 && confirm("发送到在线ffmpeg合并?")) {
+    if (tempData.length == 2 && maxSize < 2147483648 && confirm("发送到在线ffmpeg合并?")) {
         // chrome.tabs.create({ url: ffmpeg.url });
         chrome.runtime.sendMessage({
             Message: "catCatchFFmpeg",
@@ -364,22 +365,20 @@ $('#DownFile').click(function () {
         });
         sendffmpeg = true;
     }
-    getData().forEach(function (data) {
+    tempData.forEach(function (data) {
         if (sendffmpeg) {
-            catDownload(data, "&autosend=1&autoClose=1");
+            catDownload(data, "&autosend=1&autoClose=1&title=" + data.title);
             return true;
         }
-        if (data.checked) {
-            setTimeout(function () {
-                chrome.downloads.download({
-                    url: data.url,
-                    filename: data.title + "/" + data.downFileName
-                }, function (id) {
-                    data.downDir = data.title;
-                    downData[id] = data;
-                });
-            }, 500);
-        }
+        setTimeout(function () {
+            chrome.downloads.download({
+                url: data.url,
+                filename: data.title + "/" + data.downFileName
+            }, function (id) {
+                data.downDir = data.title;
+                downData[id] = data;
+            });
+        }, 500);
     });
 });
 // 复制选中文件
@@ -435,8 +434,8 @@ $('#Catch, #openUnfold, #openFilter, #more').click(function () {
 
 // 正则筛选
 // $("#regularFilter").click(function () {
-$("#regular input").bind('keypress', function(event){
-    if(event.keyCode == "13"){
+$("#regular input").bind('keypress', function (event) {
+    if (event.keyCode == "13") {
         const regex = new RegExp($(this).val());
         getData().forEach(function (data) {
             if (!regex.test(data.url)) {

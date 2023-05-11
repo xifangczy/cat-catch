@@ -6,6 +6,7 @@ const _fileName = params.get("filename");
 const autosend = params.get("autosend");
 const downDir = params.get("downDir");
 const autoClose = params.get("autoClose");
+const title = params.get("title");
 
 // 修改当前标签下的所有xhr的Referer
 _referer ? setReferer(_referer, startDownload) : startDownload();
@@ -113,7 +114,8 @@ function startDownload() {
         chrome.runtime.sendMessage({
             Message: "catCatchFFmpeg",
             action: action,
-            media: [{ data: url, name: getUrlFileName(_url) }]
+            media: [{ data: url, name: getUrlFileName(_url) }],
+            title: title
         }, function () {
             $downFilepProgress.html("已发送到在线ffmpeg");
             $("#autoClose").prop("checked") && setTimeout(() => { window.close(); }, 1000 + Math.ceil(Math.random() * 999));
