@@ -1,8 +1,9 @@
+const CATCH_SEARCH_ONLY = true;
 (function () {
     console.log("start search.js");
     const CATCH_SEARCH_DEBUG = false;
     const filter = new Set();
-    
+
     // 拦截JSON.parse 分析内容
     const _JSONparse = JSON.parse;
     JSON.parse = function () {
@@ -33,7 +34,7 @@
                     }
                     continue;
                 }
-                if (depth > 10) { continue; }  // 防止死循环 最大深度
+                // if (depth > 10) { continue; }  // 防止死循环 最大深度
                 findMedia(data[key], ++depth);
                 continue;
             }
@@ -273,20 +274,11 @@
         }
         return text;
     }
-
-    // 筛选重复 防抖
-    let debounce = undefined;
-    const tempSave = [];
     function postData(data) {
         const key = data.url ? data.url : data.key;
         if (filter.has(key)) { return false; }
         filter.add(key);
-        tempSave.push(data);
-        clearTimeout(debounce);
-        debounce = setTimeout(() => {
-            tempSave.forEach(function () {
-                window.postMessage(tempSave.shift());
-            });
-        }, 500);
+        data.requestId = Date.now().toString() + filter.size;
+        window.postMessage(data);
     }
 })();
