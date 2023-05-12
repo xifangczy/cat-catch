@@ -393,7 +393,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // ffmpeg在线转码
     if (Message.Message == "catCatchFFmpeg") {
-        const data = { Message: "ffmpeg", action: Message.action, media: Message.media, title: Message.title, url: Message.url, extra: Message.extra };
+        const data = { Message: "ffmpeg", action: Message.action, media: Message.media, title: Message.title, url: Message.url, extra: Message.extra, tabId: Message.tabId };
         chrome.tabs.query({ url: ffmpeg.url }, function (tabs) {
             if (chrome.runtime.lastError || !tabs.length) {
                 chrome.tabs.create({ url: ffmpeg.url }, function (tab) {
@@ -461,13 +461,11 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
             });
         }
     }
-    if (changeInfo.status == "complete") {
-        if (ffmpeg.tab && tabId == ffmpeg.tab) {
-            setTimeout(() => {
-                chrome.tabs.sendMessage(tabId, ffmpeg.data);
-                ffmpeg.tab = 0;
-            }, 500);
-        }
+    if (changeInfo.status == "complete" && ffmpeg.tab && tabId == ffmpeg.tab) {
+        setTimeout(() => {
+            chrome.tabs.sendMessage(tabId, ffmpeg.data);
+            ffmpeg.tab = 0;
+        }, 500);
     }
 });
 // 标签关闭 清除数据

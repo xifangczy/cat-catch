@@ -136,12 +136,12 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     if (Message.Message == "ffmpeg") {
         if (Message.media == undefined) {
-            window.postMessage({ action: Message.action, title: Message.title, extra: Message.extra });
+            window.postMessage({ action: Message.action, title: Message.title, extra: Message.extra, tabId: Message.tabId });
             sendResponse("ok");
             return true;
         }
         for (let item of Message.media) {
-            loadBlob({ action: Message.action, type: item.type ?? "video", data: item.data, title: Message.title, name: item.name, extra: Message.extra });
+            loadBlob({ action: Message.action, type: item.type ?? "video", data: item.data, title: Message.title, name: item.name, extra: Message.extra, tabId: Message.tabId });
         }
         sendResponse("ok");
         return true;
@@ -207,8 +207,13 @@ window.addEventListener("message", (event) => {
             media: event.data.media,
             title: title,
             url: event.data.href ?? event.source.location.href,
-            extra: event.data.extra
+            extra: event.data.extra,
+            tabId: event.data.tabId
         });
+    }
+    if (event.data.action == "catCatchFFmpegResult") {
+        if (!event.data.state || !event.data.tabId) { return; }
+        chrome.runtime.sendMessage({ Message: "catCatchFFmpegResult", state: event.data.state, tabId: event.data.tabId });
     }
 }, false);
 

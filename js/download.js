@@ -11,6 +11,8 @@ const title = params.get("title");
 // 修改当前标签下的所有xhr的Referer
 _referer ? setReferer(_referer, startDownload) : startDownload();
 
+let tabId = 0;
+
 function startDownload() {
     $(`<style>${G.css}</style>`).appendTo("head");
     // 储存blob
@@ -111,14 +113,26 @@ function startDownload() {
     });
 
     function sendFile(action = "addMedia") {
-        chrome.runtime.sendMessage({
-            Message: "catCatchFFmpeg",
-            action: action,
-            media: [{ data: blobUrl, name: getUrlFileName(_url) }],
-            title: title
-        }, function () {
-            $downFilepProgress.html("已发送到在线ffmpeg");
-            $("#autoClose").prop("checked") && setTimeout(() => { window.close(); }, 1000 + Math.ceil(Math.random() * 999));
+        chrome.tabs.getCurrent(function (tab) {
+            tabId = tab.id;
+            chrome.runtime.sendMessage({
+                Message: "catCatchFFmpeg",
+                action: action,
+                media: [{ data: blobUrl, name: getUrlFileName(_url) }],
+                title: title,
+                tabId: tabId
+            }, function () {
+                $downFilepProgress.html("已发送到在线ffmpeg");
+            });
         });
     }
 }
+
+chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
+    if (!Message.Message || Message.Message != "catCatchFFmpegResult" || Message.state != "ok" || tabId == 0 || Message.tabId != tabId) { return; }
+    if (Message.state == "ok" && $("#autoClose").prop("checked")) {
+        setTimeout(() => {
+            window.close();
+        }, Math.ceil(Math.random() * 999));
+    }
+});

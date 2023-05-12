@@ -361,7 +361,7 @@ $('#DownFile').click(function () {
         chrome.runtime.sendMessage({
             Message: "catCatchFFmpeg",
             action: "openFFmpeg",
-            extra: "等待接收媒体文件...请勿关闭本页面...可以前往 猫抓下载器 查看下载进度..."
+            extra: "等待接收媒体文件...请勿关闭本页面...猫抓下载器 页面可查看下载进度...若下载完毕没有自动发送到在线ffmpeg 请手动再次点击发送按钮."
         });
         sendffmpeg = true;
     }
