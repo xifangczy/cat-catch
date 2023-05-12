@@ -107,7 +107,7 @@ function startDownload() {
 
     // 发送到在线ffmpeg
     $("#ffmpeg").click(function () {
-        sendFile(blobUrl);
+        sendFile();
     });
 
     function sendFile(action = "addMedia") {
