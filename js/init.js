@@ -153,10 +153,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     }
     for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
         if (key == "Ext") {
-            G.Ext = new Map();
-            for (let key in newValue) {
-                G.Ext.set(newValue[key].ext, newValue[key]);
-            }
+            G.Ext = new Map(newValue.map(item => [item.ext, item]));
             continue;
         }
         G[key] = newValue;
