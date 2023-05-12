@@ -34,7 +34,7 @@ const CATCH_SEARCH_ONLY = true;
                     }
                     continue;
                 }
-                // if (depth > 10) { continue; }  // 防止死循环 最大深度
+                if (depth > 10) { continue; }  // 防止死循环 最大深度
                 findMedia(data[key], ++depth);
                 continue;
             }
