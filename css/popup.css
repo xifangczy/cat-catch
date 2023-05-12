@@ -144,6 +144,8 @@ button,
   display: none;
   bottom: 26px;
   justify-content: flex-start;
+  padding-bottom: 2px;
+  padding-top: 2px;
 }
 .more button {
   margin-left: 0.5rem;
@@ -155,9 +157,11 @@ button,
 #filter #regular button{
   margin-left: 0px;
 }
+#filter #regular input{
+  width: 98%;
+}
 #filter .regular{
   margin-left: 5px;
-  margin-top: 5px;
 }
 #filter #ext {
   display: flex;
