@@ -195,6 +195,7 @@ function findMedia(data, isRegex = false, filter = false) {
                     if (chrome.runtime.lastError) { return; }
                     if (newWebInfo.length > 0) {
                         webInfo = newWebInfo[0];
+                        info.tabId = newWebInfo[0].id;
                     }
                 });
             }
