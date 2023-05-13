@@ -864,15 +864,19 @@ $(function () {
 
         // ffmpeg 转码
         if ($("#ffmpeg").prop("checked")) {
-            chrome.runtime.sendMessage({
-                Message: "catCatchFFmpeg",
-                action: $("#onlyAudio").prop("checked") ? "onlyAudio" : "transcode",
-                media: [{ data: URL.createObjectURL(fileBlob) }],
-                title: `${GetFileName(_m3u8Url)}`
-            });
-            buttonState("#mergeTs", true);
-            $progress.html("已发送给在线ffmpeg");
-            return;
+            if (fileBlob.size < 2147483648) {
+                chrome.runtime.sendMessage({
+                    Message: "catCatchFFmpeg",
+                    action: $("#onlyAudio").prop("checked") ? "onlyAudio" : "transcode",
+                    media: [{ data: URL.createObjectURL(fileBlob) }],
+                    title: `${GetFileName(_m3u8Url)}`
+                });
+                buttonState("#mergeTs", true);
+                $progress.html("已发送给在线ffmpeg");
+                return;
+            } else {
+                $progress.html("视频大于2G 无法使用在线ffmpeg");
+            }
         }
 
         /* 有初始化切片 可能是fMP4 获取初始化切片的后缀 */
