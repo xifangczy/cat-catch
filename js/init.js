@@ -206,4 +206,7 @@ function clearRedundant() {
         });
     });
     refererData = [];
+    
+    ffmpeg.tab = 0;
+    ffmpeg.data = undefined;
 }
