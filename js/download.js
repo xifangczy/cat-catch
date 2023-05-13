@@ -9,11 +9,15 @@ const autoClose = params.get("autoClose");
 const title = params.get("title");
 
 // 修改当前标签下的所有xhr的Referer
-_referer ? setReferer(_referer, startDownload) : startDownload();
+_referer ? setReferer(_referer, start) : start();
 
-let tabId = 0;
+function start() {
+    chrome.tabs.getCurrent(function (tab) {
+        startDownload(tab.id);
+    });
+}
 
-function startDownload() {
+function startDownload(tabId) {
     $(`<style>${G.css}</style>`).appendTo("head");
     // 储存blob
     let blobUrl = "";
@@ -111,10 +115,11 @@ function startDownload() {
     $("#ffmpeg").click(function () {
         sendFile();
     });
-
     function sendFile(action = "addMedia") {
-        chrome.tabs.getCurrent(function (tab) {
-            tabId = tab.id;
+        chrome.tabs.query({ url: ffmpeg.url }, function (tabs) {
+            if (tabs.length && tabs[0].status != "complete") {
+                setTimeout(() => { sendFile(action); }, 500);
+            }
             chrome.runtime.sendMessage({
                 Message: "catCatchFFmpeg",
                 action: action,
@@ -126,13 +131,12 @@ function startDownload() {
             });
         });
     }
+    chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
+        if (!Message.Message || Message.Message != "catCatchFFmpegResult" || Message.state != "ok" || tabId == 0 || Message.tabId != tabId) { return; }
+        if (Message.state == "ok" && $("#autoClose").prop("checked")) {
+            setTimeout(() => {
+                window.close();
+            }, Math.ceil(Math.random() * 999));
+        }
+    });
 }
-
-chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
-    if (!Message.Message || Message.Message != "catCatchFFmpegResult" || Message.state != "ok" || tabId == 0 || Message.tabId != tabId) { return; }
-    if (Message.state == "ok" && $("#autoClose").prop("checked")) {
-        setTimeout(() => {
-            window.close();
-        }, Math.ceil(Math.random() * 999));
-    }
-});
