@@ -110,7 +110,7 @@ G.scriptList.set("recorder2.js", { key: "recorder2", refresh: false, allFrames: 
 // ffmpeg
 const ffmpeg = {
     tab: 0,
-    url: "https://ffmpeg.bmmmd.com/"
+    url: "https://ffmpeg.bmmmd.com/",
 }
 
 // 正则预编译

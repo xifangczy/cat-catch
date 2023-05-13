@@ -464,6 +464,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (changeInfo.status == "complete" && ffmpeg.tab && tabId == ffmpeg.tab) {
         setTimeout(() => {
             chrome.tabs.sendMessage(tabId, ffmpeg.data);
+            ffmpeg.data = undefined;
             ffmpeg.tab = 0;
         }, 500);
     }
