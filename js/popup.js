@@ -367,7 +367,7 @@ $('#DownFile').click(function () {
     }
     tempData.forEach(function (data) {
         if (sendffmpeg) {
-            catDownload(data, "&autosend=1&autoClose=1&title=" + data.title);
+            catDownload(data, "&autosend=1&autoClose=1&title=" + data._title);
             return true;
         }
         setTimeout(function () {

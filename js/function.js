@@ -19,11 +19,11 @@ function secToTime(sec) {
 function byteToSize(byte) {
     if (!byte || byte < 1024) { return 0; }
     if (byte < 1024 * 1024) {
-        return parseFloat((byte / 1024).toFixed(1)) + "KB";
+        return (byte / 1024).toFixed(1) + "KB";
     } else if (byte < 1024 * 1024 * 1024) {
-        return parseFloat((byte / 1024 / 1024).toFixed(1)) + "MB";
+        return (byte / 1024 / 1024).toFixed(1) + "MB";
     } else {
-        return parseFloat((byte / 1024 / 1024 / 1024).toFixed(1)) + "GB";
+        return (byte / 1024 / 1024 / 1024).toFixed(1) + "GB";
     }
 }
 // 替换掉不允许的文件名称字符

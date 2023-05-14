@@ -42,6 +42,7 @@ function startDownload(tabId) {
     // 使用ajax下载文件
     $("#downfile").show();
     $downFilepProgress.html("后台下载中...");
+    let fileTotal = 0;
     $.ajax({
         url: _url,
         xhrFields: { responseType: "blob" },
@@ -50,8 +51,9 @@ function startDownload(tabId) {
             xhr.addEventListener("progress", function (evt) {
                 let progress = Math.round(evt.loaded / evt.total * 10000) / 100.00;
                 if (progress != Infinity) {
+                    fileTotal = fileTotal ? fileTotal : byteToSize(evt.total);
                     progress = progress + "%";
-                    $downFilepProgress.html(byteToSize(evt.loaded) + " " + progress);
+                    $downFilepProgress.html(byteToSize(evt.loaded) + " / " + fileTotal + " " + progress);
                     $progress.css("width", progress);
                 } else {
                     $downFilepProgress.html("未知大小...");
@@ -90,6 +92,11 @@ function startDownload(tabId) {
         if (downloadDelta.state.current == "complete" && downId != 0) {
             $downFilepProgress.html("已保存到硬盘, 请查看浏览器已下载内容");
             // if (downDir) { window.close(); }
+            if ($("#autoClose").prop("checked")) {
+                setTimeout(() => {
+                    window.close();
+                }, Math.ceil(Math.random() * 999));
+            }
         }
     });
 
