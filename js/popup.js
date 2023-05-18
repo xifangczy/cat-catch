@@ -63,8 +63,7 @@ chrome.downloads.onChanged.addListener(function (item) {
     if (G.catDownload) { delete downData[item.id]; return; }
     const errorList = ["SERVER_BAD_CONTENT", "SERVER_UNAUTHORIZED", "SERVER_UNAUTHORIZED", "SERVER_FORBIDDEN", "SERVER_UNREACHABLE", "SERVER_CROSS_ORIGIN_REDIRECT"];
     if (item.error && errorList.includes(item.error.current) && downData[item.id]) {
-        const downDir = downData[item.id].downDir ? `&downDir=${downData[item.id].downDir}` : ""
-        catDownload(downData[item.id], downDir);
+        catDownload(downData[item.id]);
         delete downData[item.id];
     }
 });
@@ -357,7 +356,6 @@ $('#DownFile').click(function () {
         return;
     }
     if (tempData.length == 2 && maxSize < 2147483648 && confirm("发送到在线ffmpeg合并?")) {
-        // chrome.tabs.create({ url: ffmpeg.url });
         chrome.runtime.sendMessage({
             Message: "catCatchFFmpeg",
             action: "openFFmpeg",
@@ -373,11 +371,8 @@ $('#DownFile').click(function () {
         setTimeout(function () {
             chrome.downloads.download({
                 url: data.url,
-                filename: data.title + "/" + data.downFileName
-            }, function (id) {
-                data.downDir = data.title;
-                downData[id] = data;
-            });
+                filename: data.downFileName
+            }, function (id) { downData[id] = data; });
         }, 500);
     });
 });
@@ -433,7 +428,6 @@ $('#Catch, #openUnfold, #openFilter, #more').click(function () {
 });
 
 // 正则筛选
-// $("#regularFilter").click(function () {
 $("#regular input").bind('keypress', function (event) {
     if (event.keyCode == "13") {
         const regex = new RegExp($(this).val());
