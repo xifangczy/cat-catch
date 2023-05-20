@@ -191,9 +191,14 @@ function AddMedia(data, currentTab = true) {
             preview.on("loadedmetadata", function () {
                 preview.show();
                 if (this.duration && this.duration != Infinity) {
+                    data.duration = this.duration;
                     mediaInfo.append("<br><b>时长:</b> " + secToTime(this.duration));
                 }
-                this.videoHeight && mediaInfo.append("<br><b>分辨率:</b> " + this.videoWidth + "x" + this.videoHeight);
+                if(this.videoHeight && this.videoWidth){
+                    mediaInfo.append("<br><b>分辨率:</b> " + this.videoWidth + "x" + this.videoHeight);
+                    data.videoWidth = this.videoWidth;
+                    data.videoHeight = this.videoHeight;
+                }
             });
         }
         if (event.target.id == "play") {
@@ -343,7 +348,6 @@ $('#allTab').click(function () {
 });
 // 下载选中文件
 $('#DownFile').click(function () {
-    let sendffmpeg = false;
     let maxSize = 0;
     const tempData = [];
     getData().forEach(function (data) {
@@ -355,19 +359,18 @@ $('#DownFile').click(function () {
     if (tempData.length >= 10 && !confirm("共 " + tempData.length + "个文件，是否确认下载?")) {
         return;
     }
-    if (tempData.length == 2 && maxSize < 2147483648 && confirm("发送到在线ffmpeg合并?")) {
+    if (tempData.length == 2 && maxSize < 2147483648 && confirm("是否合并视频音频?")) {
         chrome.runtime.sendMessage({
             Message: "catCatchFFmpeg",
             action: "openFFmpeg",
-            extra: "等待接收媒体文件...请勿关闭本页面...猫抓下载器 页面可查看下载进度...若下载完毕没有自动发送到在线ffmpeg 请手动再次点击发送按钮."
+            extra: "等待接收媒体文件...请勿关闭本页面...猫抓下载器 页面可查看下载进度..."
         });
-        sendffmpeg = true;
+        tempData.forEach(function (data) {
+            catDownload(data, "&autosend=1&autoClose=1&title=" + data._title);
+        });
+        return true;
     }
     tempData.forEach(function (data) {
-        if (sendffmpeg) {
-            catDownload(data, "&autosend=1&autoClose=1&title=" + data._title);
-            return true;
-        }
         setTimeout(function () {
             chrome.downloads.download({
                 url: data.url,
