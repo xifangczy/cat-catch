@@ -501,7 +501,7 @@ chrome.commands.onCommand.addListener(function (command) {
         }
     } else if (command == "catch") {
         const scriptTabid = G.scriptList.get("catch.js").tabId;
-        scriptTabid.has(G.tabId) ? scriptTabid.delete(G.tabId) : scriptTabid.add(Message.tabId);
+        scriptTabid.has(G.tabId) ? scriptTabid.delete(G.tabId) : scriptTabid.add(G.tabId);
         chrome.tabs.reload(G.tabId, { bypassCache: true });
     } else if (command == "m3u8") {
         chrome.tabs.create({ url: "m3u8.html" });
