@@ -32,6 +32,21 @@
     "*://*/*",
     "<all_urls>"
   ],
+  "commands": {
+    "_execute_browser_action": {},
+    "auto_down": {
+      "description": "自动下载"
+    },
+    "catch": {
+      "description": "缓存捕捉"
+    },
+    "m3u8": {
+      "description": "m3u8解析器"
+    },
+    "clear": {
+      "description": "清空当前标签数据"
+    }
+  },
   "browser_specific_settings": {
     "gecko": {
       "id": "xifangczy@gmail.com",

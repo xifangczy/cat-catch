@@ -490,6 +490,29 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
     chrome.alarms.create("nowClear", { when: Date.now() + 3000 });
 });
 
+// 快捷键
+chrome.commands.onCommand.addListener(function (command) {
+    if (command == "auto_down") {
+        if (G.featAutoDownTabId.includes(G.tabId)) {
+            tabIdListRemove("featAutoDownTabId", G.tabId);
+        } else {
+            G.featAutoDownTabId.push(G.tabId);
+            chrome.storage.local.set({ featAutoDownTabId: G.featAutoDownTabId });
+        }
+    } else if (command == "catch") {
+        const scriptTabid = G.scriptList.get("catch.js").tabId;
+        scriptTabid.has(G.tabId) ? scriptTabid.delete(G.tabId) : scriptTabid.add(Message.tabId);
+        chrome.tabs.reload(G.tabId, { bypassCache: true });
+    } else if (command == "m3u8") {
+        chrome.tabs.create({ url: "m3u8.html" });
+    } else if (command == "clear") {
+        delete cacheData[G.tabId];
+        chrome.storage.local.set({ MediaData: cacheData });
+        clearRedundant();
+        SetIcon({ tabId: G.tabId });
+    }
+});
+
 //检查扩展名以及大小限制
 function CheckExtension(ext, size) {
     const Ext = G.Ext.get(ext);
