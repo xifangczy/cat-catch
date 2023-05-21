@@ -160,9 +160,11 @@ function findMedia(data, isRegex = false, filter = false) {
     if (cacheData[data.tabId] == undefined) {
         cacheData[data.tabId] = [];
     }
-    // 查重
-    for (let key in cacheData[data.tabId]) {
-        if (cacheData[data.tabId][key].url == data.url) { return; }
+    // 查重 避免CPU占用 大于2000 不查重
+    if (cacheData[data.tabId].length <= 2000) {
+        for (let key in cacheData[data.tabId]) {
+            if (cacheData[data.tabId][key].url == data.url) { return; }
+        }
     }
     //幽灵数据与当前标签资源查重
     if (data.tabId == -1 && cacheData[G.tabId] !== undefined) {
