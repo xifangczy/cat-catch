@@ -275,15 +275,14 @@ $(function () {
         /* 获取 m3u8文件原始内容 MANIFEST_PARSED也能获取但偶尔会为空(BUG?) 放在LEVEL_LOADED获取更安全*/
         _m3u8Content = data.m3u8;
         for (let i in data.fragments) {
-            /* 
+            /*
             * 少部分网站下载ts必须带有参数才能正常下载
-            * ts地址如果没有参数 添加m3u8地址的参数
+            * 添加m3u8地址的参数
             */
             if (tsAddArg && _m3u8Arg) {
                 const flag = new RegExp("[?]([^\n]*)").exec(data.fragments[i].url);
-                if (!flag) {
-                    data.fragments[i].url = data.fragments[i].url + "?" + _m3u8Arg;
-                }
+                const sep = flag ? '&' : '?';
+                data.fragments[i].url = data.fragments[i].url + sep + _m3u8Arg;
             }
             /* 
             * 查看是否加密 下载key
