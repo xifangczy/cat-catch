@@ -4,11 +4,12 @@ let _m3u8Url = params.get("url");
 const _referer = params.get("referer");
 const _initiator = params.get("initiator");
 const _title = params.get("title");
-const tsAddArg = params.get("tsAddArg");
+let tsAddArg = params.get("tsAddArg");
 const autoReferer = params.get("autoReferer");
 const getId = parseInt(params.get("getId"));
 const tabId = parseInt(params.get("tabid"));
 const key = params.get("key");
+
 // 修改当前标签下的所有xhr的Referer
 _referer ? setReferer(_referer) : deleteReferer();
 $(function () {
@@ -31,10 +32,13 @@ $(function () {
         $("#StreamSaver").prop("checked", items.StreamSaver);
         $("#ffmpeg").prop("checked", items.ffmpeg);
     });
-    if (G.isFirefox) {
-        $(".firefoxHide").each(function () { $(this).hide(); });
-    }
+
+    G.isFirefox && $(".firefoxHide").each(function () { $(this).hide(); });
     key && $("#customKey").val(key);
+    if (tsAddArg) {
+        tsAddArg = decodeURIComponent(tsAddArg);
+        $("#tsAddArg").html("还原ts参数");
+    }
 
     //获取m3u8参数
     let _m3u8Arg = new RegExp("\\.m3u8\\?([^\n]*)").exec(_m3u8Url);
@@ -279,10 +283,9 @@ $(function () {
             * 少部分网站下载ts必须带有参数才能正常下载
             * 添加m3u8地址的参数
             */
-            if (tsAddArg && _m3u8Arg) {
-                const flag = new RegExp("[?]([^\n]*)").exec(data.fragments[i].url);
-                const sep = flag ? '&' : '?';
-                data.fragments[i].url = data.fragments[i].url + sep + _m3u8Arg;
+            if (tsAddArg) {
+                const flag = new RegExp("[?]([^\n]*)").exec(data.fragments[i].url) ? '&' : '?';
+                data.fragments[i].url = data.fragments[i].url + flag + tsAddArg;
             }
             /* 
             * 查看是否加密 下载key
@@ -737,13 +740,16 @@ $(function () {
         });
     });
     // 添加ts 参数
-    _m3u8Arg && $("#tsAddArg").show();
+    // _m3u8Arg && $("#tsAddArg").show();
     $("#tsAddArg").click(function () {
         if (tsAddArg) {
             window.location.href = window.location.href.replace(/&tsAddArg=[^&]*/g, "");
             return;
         }
-        window.location.href = window.location.href + "&tsAddArg=1";
+        const arg = window.prompt("需要添加的参数", _m3u8Arg ?? "");
+        if (arg) {
+            window.location.href += "&tsAddArg=" + encodeURIComponent(arg);
+        }
     });
     /**************************** 下载TS文件 ****************************/
     // start 开始下载的索引
