@@ -538,7 +538,7 @@ function CheckType(dataType, dataSize) {
 
 // 获取文件名 后缀
 function fileNameParse(pathname) {
-    let fileName = pathname.split("/").pop();
+    let fileName = decodeURI(pathname.split("/").pop());
     let ext = fileName.split(".");
     ext = ext.length == 1 ? undefined : ext.pop().toLowerCase();
     return [fileName, ext ? ext : undefined];
