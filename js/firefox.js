@@ -4,10 +4,12 @@ if (typeof (browser) == "object") {
     chrome.action.setBadgeText = browser.browserAction.setBadgeText;
     chrome.action.setTitle = browser.browserAction.setTitle;
 
-    function importScripts(script) {
-        let js = document.createElement('script');
-        js.src = script;
-        document.head.appendChild(js);
+    function importScripts() {
+        for(let script of arguments){
+            const js = document.createElement('script');
+            js.src = script;
+            document.head.appendChild(js);
+        }
     }
 
     // webRequest.onBeforeSendHeaders To declarativeNetRequest.updateSessionRules
