@@ -1,4 +1,31 @@
 ## 更新说明
+### 2.4.0
+[Added] 加入自定义css
+
+[Added] 音频 视频 一键合并
+
+[Added] popup页面正则筛选
+
+[Added] 自定义快捷键支持
+
+[Added] popup页面支持正则筛选
+
+[Added] m3u8 碎片文件自定义参数
+
+[Changed] 筛选 现在能隐藏不要的数据 而不是取消勾选
+
+[Changed] 重写优化popup大部分代码
+
+[Changed] 重写初始化部分代码
+
+[Changed] m3u8解析器 默认设置改为 ffmpeg转码 而不是mp4转码
+
+[Changed] 删除 调试模式
+
+[Fixed] 深度搜索 深度判断的bug
+
+[Fixed] 很多bug
+
 ### 2.3.3
 [Changed] 解析器m3u8DL默认不载入设置参数 #149
 
