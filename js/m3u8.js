@@ -1056,7 +1056,7 @@ $(function () {
                     tsThread++;
                 });
             }
-        }, 10);
+        }, 4);
     }
 
     // ts解密
@@ -1299,8 +1299,7 @@ function fixFileDuration(data, duration) {
         // mvhd
         if (data[i] == 0x6D && data[i + 1] == 0x76 && data[i + 2] == 0x68 && data[i + 3] == 0x64) {
             mvhdBoxDuration = getBoxDuration(data, duration, i);   // 获得 timescale
-            //删除创建日期
-            data[i + 11] = 0;
+            data[i + 11] = 0;   //删除创建日期
             i += 20;    // mvhd 偏移20 为duration
             data[i] = (mvhdBoxDuration & 0xFF000000) >> 24;
             data[++i] = (mvhdBoxDuration & 0xFF0000) >> 16;
