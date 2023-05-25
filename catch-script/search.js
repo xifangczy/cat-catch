@@ -259,7 +259,7 @@ const CATCH_SEARCH_ONLY = true;
         postData({ action: "catCatchAddMedia", url: url, href: location.href, ext: ext });
     }
     function getDataM3U8(text) {
-        const type = ["vnd.apple.mpegurl", "x-mpegurl"];
+        const type = ["vnd.apple.mpegurl", "x-mpegurl", "mpegurl"];
         let isM3U8 = false;
         for (let item of type) {
             if (text.substring(0, item.length).toLowerCase() == item) {
