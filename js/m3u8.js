@@ -15,7 +15,7 @@ _referer ? setReferer(_referer) : deleteReferer();
 $(function () {
     $(`<style>${G.css}</style>`).appendTo("head");
     // 默认设置
-    chrome.storage.local.get({
+    const allOption = {
         thread: 32,
         mp4: false,
         onlyAudio: false,
@@ -23,14 +23,18 @@ $(function () {
         skipDecrypt: false,
         StreamSaver: false,
         ffmpeg: true,
-    }, function (items) {
-        $("#thread").val(items.thread);
-        $("#mp4").prop("checked", items.mp4);
-        $("#onlyAudio").prop("checked", items.onlyAudio);
-        $("#saveAs").prop("checked", items.saveAs);
-        $("#skipDecrypt").prop("checked", items.skipDecrypt);
-        $("#StreamSaver").prop("checked", items.StreamSaver);
-        $("#ffmpeg").prop("checked", items.ffmpeg);
+        useKeyBase64: false,
+        addParam: false,
+    };
+    chrome.storage.local.get(allOption, function (items) {
+        for (let key in items) {
+            allOption[key] = items[key];
+            if (typeof items[key] == "boolean") {
+                $(`#${key}`).prop("checked", items[key]);
+            } else {
+                $(`#${key}`).val(items[key]);
+            }
+        }
     });
 
     G.isFirefox && $(".firefoxHide").each(function () { $(this).hide(); });
@@ -56,6 +60,7 @@ $(function () {
     const initData = new Map(); // 储存map的url
     const decryptor = new AESDecryptor(); // 解密工具 来自hls.js 分离出来的
     let skipDecrypt = false; // 是否跳过解密
+    let decryptBase64Key = ""; // 储存base64密钥
     /* 下载相关 */
     let downId = 0; // 下载id
     let stopDownload = false; // 停止下载flag
@@ -71,8 +76,6 @@ $(function () {
     let recorder = false; // 开关
     let recorderIndex = 0;  // 下载索引
     let recorderLast = "";  // 最后下载的url
-    /* m3u8DL */
-    let addParam = false;
     /* DOM */
     const $fileSize = $("#fileSize");
     const $progress = $("#progress");
@@ -309,6 +312,8 @@ $(function () {
                             if (buffer.byteLength == 16) {
                                 keyContent.set(data.fragments[i].decryptdata.uri, buffer); // 储存密钥
                                 showKeyInfo(buffer, data.fragments[i].decryptdata, i);
+                                decryptBase64Key = ArrayBufferToBase64(buffer);
+                                allOption.useKeyBase64 && $("#m3u8dlArg").val(getM3u8DlArg());
                                 return;
                             }
                             showKeyInfo(false, data.fragments[i].decryptdata, i);
@@ -413,6 +418,7 @@ $(function () {
         let _iv = decryptdata.iv.toString();
         if (_iv != iv && _iv != iv2) {
             iv = "0x" + ArrayBufferToHexString(decryptdata.iv.buffer);
+            decryptIV.push(iv);
             $("#tips").append('<div class="key flex"><div>偏移量(IV): <input type="text" value="' + iv + '" spellcheck="false" readonly="readonly" class="offset"></div></div>');
         }
         // $("#tips").append("<div class=\"line\"></div>");
@@ -516,9 +522,7 @@ $(function () {
         $("#m3u8dlArg").slideToggle();
     });
     // 设置载入参数
-    $("#loadParam").click(function () {
-        addParam = !addParam;
-        this.innerHTML = addParam ? "取消设置参数" : "载入设置参数";
+    $("#addParam").click(function () {
         $("#m3u8dlArg").val(getM3u8DlArg());
     });
     $("input").click(function () {
@@ -573,16 +577,18 @@ $(function () {
         return false;
     });
     // 储存设置
-    $("#thread, #mp4, #onlyAudio, #saveAs, #skipDecrypt, #StreamSaver, #ffmpeg").on("change", function () {
-        chrome.storage.local.set({
-            thread: parseInt($("#thread").val()),
-            mp4: $("#mp4").prop("checked"),
-            onlyAudio: $("#onlyAudio").prop("checked"),
-            saveAs: $("#saveAs").prop("checked"),
-            skipDecrypt: $("#skipDecrypt").prop("checked"),
-            StreamSaver: $("#StreamSaver").prop("checked"),
-            ffmpeg: $("#ffmpeg").prop("checked"),
-        });
+    $("[save='change']").on("change", function () {
+        // 有些选项存在互斥 需储存全部设置
+        allOption.thread = parseInt($("#thread").val());
+        allOption.mp4 = $("#mp4").prop("checked");
+        allOption.onlyAudio = $("#onlyAudio").prop("checked");
+        allOption.saveAs = $("#saveAs").prop("checked");
+        allOption.skipDecrypt = $("#skipDecrypt").prop("checked");
+        allOption.StreamSaver = $("#StreamSaver").prop("checked");
+        allOption.ffmpeg = $("#ffmpeg").prop("checked");
+        allOption.useKeyBase64 = $("#useKeyBase64").prop("checked");
+        allOption.addParam = $("#addParam").prop("checked");
+        chrome.storage.local.set(allOption);
     });
     // 上传key
     $("#uploadKeyFile").change(function () {
@@ -1115,6 +1121,7 @@ $(function () {
     }
     function getM3u8DlArg() {
         let m3u8dlArg = G.m3u8dlArg;
+        const addParam = $("#addParam").prop("checked");
         // 自定义文件名
         const customFilename = $("#customFilename").val().trim();
         if (customFilename && addParam) {
@@ -1149,6 +1156,8 @@ $(function () {
             } else if (customKey.length == 24 && customKey.slice(-2) == "==") {
                 m3u8dlArg += ` --useKeyBase64 "${customKey}"`;
             }
+        } else if($("#useKeyBase64").prop("checked") && decryptBase64Key){
+            m3u8dlArg += ` --useKeyBase64 "${decryptBase64Key}"`;
         }
         const customIV = $("#customIV").val();  // 自定义IV
         m3u8dlArg += customIV ? ` --useKeyIV "${customIV}"` : "";
