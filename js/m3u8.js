@@ -23,7 +23,7 @@ $(function () {
         skipDecrypt: false,
         StreamSaver: false,
         ffmpeg: true,
-        useKeyBase64: false,
+        // useKeyBase64: false,
         addParam: false,
     };
     chrome.storage.local.get(allOption, function (items) {
@@ -60,7 +60,7 @@ $(function () {
     const initData = new Map(); // 储存map的url
     const decryptor = new AESDecryptor(); // 解密工具 来自hls.js 分离出来的
     let skipDecrypt = false; // 是否跳过解密
-    let decryptBase64Key = ""; // 储存base64密钥
+    // let decryptBase64Key = ""; // 储存base64密钥
     /* 下载相关 */
     let downId = 0; // 下载id
     let stopDownload = false; // 停止下载flag
@@ -312,8 +312,8 @@ $(function () {
                             if (buffer.byteLength == 16) {
                                 keyContent.set(data.fragments[i].decryptdata.uri, buffer); // 储存密钥
                                 showKeyInfo(buffer, data.fragments[i].decryptdata, i);
-                                decryptBase64Key = ArrayBufferToBase64(buffer);
-                                allOption.useKeyBase64 && $("#m3u8dlArg").val(getM3u8DlArg());
+                                // decryptBase64Key = ArrayBufferToBase64(buffer);
+                                // allOption.useKeyBase64 && $("#m3u8dlArg").val(getM3u8DlArg());
                                 return;
                             }
                             showKeyInfo(false, data.fragments[i].decryptdata, i);
@@ -418,7 +418,6 @@ $(function () {
         let _iv = decryptdata.iv.toString();
         if (_iv != iv && _iv != iv2) {
             iv = "0x" + ArrayBufferToHexString(decryptdata.iv.buffer);
-            decryptIV.push(iv);
             $("#tips").append('<div class="key flex"><div>偏移量(IV): <input type="text" value="' + iv + '" spellcheck="false" readonly="readonly" class="offset"></div></div>');
         }
         // $("#tips").append("<div class=\"line\"></div>");
@@ -1156,9 +1155,10 @@ $(function () {
             } else if (customKey.length == 24 && customKey.slice(-2) == "==") {
                 m3u8dlArg += ` --useKeyBase64 "${customKey}"`;
             }
-        } else if($("#useKeyBase64").prop("checked") && decryptBase64Key){
-            m3u8dlArg += ` --useKeyBase64 "${decryptBase64Key}"`;
         }
+        //  else if($("#useKeyBase64").prop("checked") && decryptBase64Key){
+        //     m3u8dlArg += ` --useKeyBase64 "${decryptBase64Key}"`;
+        // }
         const customIV = $("#customIV").val();  // 自定义IV
         m3u8dlArg += customIV ? ` --useKeyIV "${customIV}"` : "";
         // 只要音频
