@@ -160,8 +160,8 @@ function findMedia(data, isRegex = false, filter = false) {
     if (cacheData[data.tabId] == undefined) {
         cacheData[data.tabId] = [];
     }
-    // 查重 避免CPU占用 大于500 不查重
-    if (cacheData[data.tabId].length <= 500) {
+    // 查重 避免CPU占用 大于233 不查重
+    if (cacheData[data.tabId].length <= 233) {
         for (let key in cacheData[data.tabId]) {
             if (cacheData[data.tabId][key].url == data.url) { return; }
         }
@@ -227,8 +227,8 @@ function findMedia(data, isRegex = false, filter = false) {
         }
         cacheData[info.tabId].push(info);
         // 视频切片太多 频繁储存 严重影响性能
-        // 当前标签媒体数量大于500 开启防抖 等待5秒储存 或 积累10个资源储存一次。
-        if (cacheData[info.tabId].length >= 500 && debounceCount <= 10) {
+        // 当前标签媒体数量大于100 开启防抖 等待5秒储存 或 积累10个资源储存一次。
+        if (cacheData[info.tabId].length >= 100 && debounceCount <= 10) {
             debounceCount++;
             clearTimeout(debounce);
             debounce = setTimeout(() => {
