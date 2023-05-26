@@ -624,7 +624,7 @@ function UItoggle() {
     // 更新图标
     $(".faviconFlag").each(function () {
         const data = getData(this.getAttribute("requestId"));
-        if (favicon.has(data.webUrl)) {
+        if (data.webUrl && favicon.has(data.webUrl)) {
             this.setAttribute("src", favicon.get(data.webUrl));
             this.classList.remove("faviconFlag");
         }
