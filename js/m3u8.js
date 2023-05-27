@@ -38,7 +38,7 @@ $(function () {
 
     G.isFirefox && $(".firefoxHide").each(function () { $(this).hide(); });
     key && $("#customKey").val(key);
-    if (tsAddArg) {
+    if (tsAddArg != null) {
         tsAddArg = decodeURIComponent(tsAddArg);
         $("#tsAddArg").html("还原ts参数");
     }
@@ -284,9 +284,11 @@ $(function () {
             * 少部分网站下载ts必须带有参数才能正常下载
             * 添加m3u8地址的参数
             */
-            if (tsAddArg) {
-                const flag = new RegExp("[?]([^\n]*)").exec(data.fragments[i].url) ? '&' : '?';
-                data.fragments[i].url = data.fragments[i].url + flag + tsAddArg;
+            if (tsAddArg != null) {
+                const arg = new RegExp("([^?]*)").exec(data.fragments[i].url);
+                if (arg && arg[0]) {
+                    data.fragments[i].url = arg[0] + (tsAddArg ? "?" + tsAddArg : "");
+                }
             }
             /* 
             * 查看是否加密 下载key
@@ -738,14 +740,13 @@ $(function () {
         });
     });
     // 添加ts 参数
-    // _m3u8Arg && $("#tsAddArg").show();
     $("#tsAddArg").click(function () {
-        if (tsAddArg) {
+        if (tsAddArg != null) {
             window.location.href = window.location.href.replace(/&tsAddArg=[^&]*/g, "");
             return;
         }
         const arg = window.prompt("需要添加的参数", _m3u8Arg ?? "");
-        if (arg) {
+        if (arg != null) {
             window.location.href += "&tsAddArg=" + encodeURIComponent(arg);
         }
     });
