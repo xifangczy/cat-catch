@@ -194,7 +194,7 @@ function AddMedia(data, currentTab = true) {
                     data.duration = this.duration;
                     mediaInfo.append("<br><b>时长:</b> " + secToTime(this.duration));
                 }
-                if(this.videoHeight && this.videoWidth){
+                if (this.videoHeight && this.videoWidth) {
                     mediaInfo.append("<br><b>分辨率:</b> " + this.videoWidth + "x" + this.videoHeight);
                     data.videoWidth = this.videoWidth;
                     data.videoHeight = this.videoHeight;
@@ -352,7 +352,8 @@ $('#DownFile').click(function () {
     const tempData = [];
     getData().forEach(function (data) {
         if (data.checked) {
-            maxSize = data._size > maxSize ? data._size : maxSize;
+            const size = data._size ?? 0;
+            maxSize = size > maxSize ? size : maxSize;
             tempData.push(data);
         }
     });
