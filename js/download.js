@@ -42,13 +42,21 @@ function startDownload(tabId) {
     $("#downfile").show();
     $downFilepProgress.html("后台下载中...");
     let fileTotal = 0;
+    let progress = undefined;
+    let timer = setInterval(() => {
+        if (progress == "100%" || progress == Infinity) {
+            clearInterval(timer);
+            return;
+        }
+        document.title = progress;
+    }, 500);
     $.ajax({
         url: _url,
         xhrFields: { responseType: "blob" },
         xhr: function () {
             let xhr = new XMLHttpRequest();
             xhr.addEventListener("progress", function (evt) {
-                let progress = Math.round(evt.loaded / evt.total * 10000) / 100.00;
+                progress = Math.round(evt.loaded / evt.total * 10000) / 100.00;
                 if (progress != Infinity) {
                     fileTotal = fileTotal ? fileTotal : byteToSize(evt.total);
                     progress = progress + "%";
@@ -62,6 +70,7 @@ function startDownload(tabId) {
             return xhr;
         }
     }).fail(function (result) {
+        document.title = "下载失败...";
         $downFilepProgress.html("下载失败... " + JSON.stringify(result));
     }).done(function (result) {
         try {
@@ -72,7 +81,8 @@ function startDownload(tabId) {
                 sendFile("popupAddMedia");
                 return;
             }
-            $downFilepProgress.html("下载完成，正在保存到硬盘...");
+            $downFilepProgress.html("正在保存到硬盘...");
+            document.title = "正在保存到硬盘...";
             chrome.downloads.download({
                 url: blobUrl,
                 filename: _fileName,
@@ -89,6 +99,7 @@ function startDownload(tabId) {
     chrome.downloads.onChanged.addListener(function (downloadDelta) {
         if (!downloadDelta.state) { return; }
         if (downloadDelta.state.current == "complete" && downId != 0) {
+            document.title = "下载完成!";
             $downFilepProgress.html("已保存到硬盘, 请查看浏览器已下载内容");
             if ($("#autoClose").prop("checked")) {
                 setTimeout(() => {
