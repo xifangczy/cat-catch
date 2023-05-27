@@ -207,3 +207,23 @@ function clearRedundant() {
     });
     refererData = [];
 }
+
+// 替换掉不允许的文件名称字符
+function stringModify(str) {
+    if (!str) { return str; }
+    return str.replace(reStringModify, function (m) {
+        return {
+            "'": '&#39;',
+            '\\': '&#92;',
+            '/': '&#47;',
+            ':': '&#58;',
+            '*': '&#42;',
+            '?': '&#63;',
+            '"': '&quot;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '|': '&#124;',
+            '~': '_'
+        }[m];
+    });
+}

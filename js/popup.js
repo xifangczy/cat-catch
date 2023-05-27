@@ -475,11 +475,7 @@ $("#MobileUserAgent").click(function () {
 $("#AutoDown").click(function () {
     const action = $(this).data("switch");
     if (action == "on") {
-        if (confirm("当前页面找到资源立刻尝试下载\n是否确认开启?")) {
-            $(this).html("关闭自动下载").data("switch", "off");
-        } else {
-            return true;
-        }
+        $(this).html("关闭自动下载").data("switch", "off");
     } else {
         $(this).html("自动下载").data("switch", "on");
     }

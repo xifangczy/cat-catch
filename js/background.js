@@ -167,7 +167,7 @@ function findMedia(data, isRegex = false, filter = false) {
         }
     }
     //幽灵数据与当前标签资源查重
-    if (data.tabId == -1 && cacheData[G.tabId] !== undefined) {
+    if (data.tabId == -1 && cacheData[G.tabId] !== undefined && cacheData[G.tabId].length <= 233) {
         for (let key in cacheData[G.tabId]) {
             if (cacheData[G.tabId][key].url == data.url) { return; }
         }
@@ -213,7 +213,7 @@ function findMedia(data, isRegex = false, filter = false) {
         // 发送到popup 并检查自动下载
         chrome.runtime.sendMessage(info, function () {
             if (info.tabId != -1 && G.featAutoDownTabId && G.featAutoDownTabId.includes(info.tabId)) {
-                const downDir = info.title == "NULL" ? "CatCatch/" : info.title + "/";
+                const downDir = info.title == "NULL" ? "CatCatch/" : stringModify(info.title) + "/";
                 chrome.downloads.download({
                     url: info.url,
                     filename: downDir + info.name
