@@ -24,7 +24,6 @@
         border: solid 1px #c7c7c7;
         border-radius: 4px;
         color: rgb(26, 115, 232);
-        cursor: grab;
         padding: 5px 5px 5px 5px;
         font-size: 12px;
         font-family: "Microsoft YaHei", "Helvetica", "Arial", sans-serif;
