@@ -584,10 +584,6 @@ function copyLink(data) {
 }
 // 携带referer 下载
 function catDownload(obj, extra = "") {
-    if (obj._size >= 2147483648) {
-        alert(`文件大小${obj.downFileName}超过2GB, 请使用第三法下载软件下载.`);
-        return;
-    }
     chrome.tabs.get(G.tabId, function (tab) {
         chrome.tabs.create({
             url: `/download.html?url=${encodeURIComponent(
