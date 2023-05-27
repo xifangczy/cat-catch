@@ -5,7 +5,7 @@ const _referer = params.get("referer");
 const _initiator = params.get("initiator");
 const _title = params.get("title");
 let tsAddArg = params.get("tsAddArg");
-const autoReferer = params.get("autoReferer");
+let autoReferer = params.get("autoReferer");
 const getId = parseInt(params.get("getId"));
 const tabId = parseInt(params.get("tabid"));
 const key = params.get("key");
@@ -204,6 +204,11 @@ $(function () {
         hls.on(Hls.Events.ERROR, function (event, data) {
             $("#loading").show();
             $("#loading .optionBox").html(`解析或播放m3u8文件中有错误, 详细错误信息查看控制台`);
+            // 出错 如果正在录制中 自动点击下载录制按钮
+            if(recorder){
+                $("#recorder").click();
+                autoReferer = true;
+            }
             // 尝试添加删除referer
             if (data.type == "networkError") {
                 if (!autoReferer) {
