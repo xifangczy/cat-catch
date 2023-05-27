@@ -1,7 +1,7 @@
 (function () {
     console.log("catch.js Start");
     if (document.getElementById("CatCatchCatch")) { return; }
-    
+
     const CatCatch = document.createElement("div");
     CatCatch.setAttribute("id", "CatCatchCatch");
     CatCatch.innerHTML = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAAKlBMVEUAAADLlROxbBlRAD16GS5oAjWWQiOCIytgADidUx/95gHqwwTx0gDZqwT6kfLuAAAACnRSTlMA/vUejV7kuzi8za0PswAAANpJREFUGNNjwA1YSxkYTEqhnKZLLi6F1w0gnKA1shdvHYNxdq1atWobjLMKCOAyC3etlVrUAOH4HtNZmLgoAMKpXX37zO1FwcZAwMDguGq1zKpFmTNnzqx0Bpp2WvrU7ttn9py+I8JgLn1R8Pad22vurNkjwsBReHv33junzuyRnOnMwNCSeFH27K5dq1SNgcZxFMnuWrNq1W5VkNntihdv7ToteGcT0C7mIkE1qbWCYjJnM4CqEoWKdoslChXuUgXJqIcLebiphSgCZRhaPDhcDFhdmUMCGIgEAFA+Uc02aZg9AAAAAElFTkSuQmCC" style="-webkit-user-drag: none;width: 20px;">
@@ -9,12 +9,18 @@
     <button id="download">下载已捕获的数据</button>
     <button id="clean">清理缓存</button>
     <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown")}>完成捕获自动下载</label>
-    <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg")}>使用ffmpeg合并</label>`;
+    <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg")}>使用ffmpeg合并</label>
+    <details>
+        <summary>文件名设置</summary>
+        文件名: <div id="fileName"></div>
+        表达式: <div id="selector">未设置</div>
+        <button id="setName">设置表达式</button>
+    </details>`;
     CatCatch.style = `position: fixed;
         z-index: 999999;
         top: 10%;
         left: 90%;
-        background: rgb(255 255 255 / 70%);
+        background: rgb(255 255 255 / 80%);
         border: solid 1px #c7c7c7;
         border-radius: 4px;
         color: rgb(26, 115, 232);
@@ -26,7 +32,8 @@
         display: flex;
         align-items: flex-start;
         justify-content: space-evenly;
-        flex-direction: column;`;
+        flex-direction: column;
+        line-height: 20px;`;
     document.getElementsByTagName('html')[0].appendChild(CatCatch);
     const tips = CatCatch.querySelector("#tips");
 
@@ -43,6 +50,24 @@
     });
     CatCatch.querySelector("#download").addEventListener('click', function (event) {
         catchDownload();
+    });
+
+    // 文件名设置
+    const fileName = CatCatch.querySelector("#fileName");
+    const selector = CatCatch.querySelector("#selector");
+    selector.innerText = localStorage.getItem("CatCatchCatch_selector") ?? "未设置";
+    CatCatch.querySelector("#setName").addEventListener('click', function (event) {
+        const result = window.prompt("文件名获取Selector表达式", localStorage.getItem("CatCatchCatch_selector") ?? "");
+        if (result == null) { return; }
+        if (result == "") { clearFileNameSelector(); return; }
+        const title = document.querySelector(result);
+        if (title && title.innerText) {
+            fileName.innerText = title.innerText;
+            selector.innerText = result;
+            localStorage.setItem("CatCatchCatch_selector", result);
+        } else {
+            clearFileNameSelector("表达式错误, 无法获取或内容为空!");
+        }
     });
 
     // 操作按钮
@@ -70,6 +95,13 @@
     let catchMedia = [];
     const _AddSourceBuffer = window.MediaSource.prototype.addSourceBuffer;
     window.MediaSource.prototype.addSourceBuffer = function (mimeType) {
+        // 标题获取
+        if (localStorage.getItem("CatCatchCatch_selector")) {
+            const title = document.querySelector(localStorage.getItem("CatCatchCatch_selector"));
+            fileName.innerText = title && title.innerText ? title.innerText : document.title;
+        } else {
+            fileName.innerText = document.title;
+        }
         tips.innerHTML = "捕获数据中...";
         const sourceBuffer = _AddSourceBuffer.call(this, mimeType);
         const _appendBuffer = sourceBuffer.appendBuffer;
@@ -80,7 +112,7 @@
             _appendBuffer.call(this, data);
         }
         return sourceBuffer;
-    } 
+    }
     // 反检测
     window.MediaSource.prototype.addSourceBuffer.toString = function () {
         return _AddSourceBuffer.toString();
@@ -108,7 +140,7 @@
                 const type = mime.split('/')[0];
                 media.push({ data: URL.createObjectURL(fileBlob), type: type });
             }
-            window.postMessage({ action: "catCatchFFmpeg", use: "merge", media: media, title: document.title });
+            window.postMessage({ action: "catCatchFFmpeg", use: "merge", media: media, title: fileName.innerText });
         } else {
             const a = document.createElement('a');
             for (let item of catchMedia) {
@@ -116,7 +148,7 @@
                 const type = mime.split('/')[0] == "video" ? "mp4" : "mp3";
                 const fileBlob = new Blob(item.bufferList, { type: mime });
                 a.href = URL.createObjectURL(fileBlob);
-                a.download = `${document.title}.${type}`;
+                a.download = `${fileName.innerText}.${type}`;
                 a.click();
             }
             a.remove();
@@ -126,5 +158,12 @@
             isComplete = false;
             tips.innerHTML = "下载完毕...";
         }
+    }
+
+    function clearFileNameSelector(warning = "") {
+        localStorage.removeItem("CatCatchCatch_selector");
+        selector.innerText = "未设置";
+        fileName.innerText = document.title;
+        warning && alert(warning);
     }
 })();
