@@ -44,11 +44,11 @@ function startDownload(tabId) {
     let fileTotal = 0;
     let progress = undefined;
     let timer = setInterval(() => {
+        document.title = progress;
         if (progress == "100%" || progress == Infinity) {
             clearInterval(timer);
             return;
         }
-        document.title = progress;
     }, 500);
     $.ajax({
         url: _url,
