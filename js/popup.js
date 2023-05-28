@@ -422,6 +422,7 @@ $('#Catch, #openUnfold, #openFilter, #more').click(function () {
     // const _height = parseInt($(".container").css("margin-bottom"));
     // $(".container").css("margin-bottom", ($down[0].offsetHeight + 26) + "px");
     const $panel = $(`#${this.getAttribute("panel")}`);
+    $panel.css("bottom", $down[0].offsetHeight + "px");
     $(".more").not($panel).hide();
     if ($panel.is(":hidden")) {
         $panel.css("display", "flex");

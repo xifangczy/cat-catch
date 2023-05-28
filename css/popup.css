@@ -146,6 +146,7 @@ button,
   justify-content: flex-start;
   padding-bottom: 2px;
   padding-top: 2px;
+  z-index: 9999;
 }
 .more button {
   margin-left: 0.5rem;
