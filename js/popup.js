@@ -400,22 +400,28 @@ $('#AllSelect, #ReSelect').click(function () {
 });
 // unfoldAll展开全部  unfoldPlay展开可播放 unfoldFilter展开选中的 fold关闭展开
 $('#unfoldAll, #unfoldPlay, #unfoldFilter, #fold').click(function () {
-    // $("#unfold").hide();
     $("#features").hide();
-    const id = this.id;
-    getData().forEach(function (data) {
-        if (data.html.is(":hidden")) { return true; }
-        if (id == "unfoldAll" && data.urlPanelShow) {
-            return true;
-        } else if (id == "unfoldPlay" && !data.isPlay || data.urlPanelShow) {
-            return true;
-        } else if (id == "unfoldFilter" && !data.checked || data.urlPanelShow) {
-            return true;
-        } else if (id == "fold" && !data.urlPanelShow) {
-            return true;
-        }
-        data.panelHeading.click();
-    });
+    if (this.id == "unfoldAll") {
+        getData().forEach(function (data) {
+            if (data.html.is(":hidden")) { return true; }
+            !data.urlPanelShow && data.panelHeading.click();
+        });
+    } else if (this.id == "unfoldPlay") {
+        getData().forEach(function (data) {
+            if (data.html.is(":hidden")) { return true; }
+            data.isPlay && !data.urlPanelShow && data.panelHeading.click();
+        });
+    } else if (this.id == "unfoldFilter") {
+        getData().forEach(function (data) {
+            if (data.html.is(":hidden")) { return true; }
+            data.checked && !data.urlPanelShow && data.panelHeading.click();
+        });
+    } else if (this.id == "fold") {
+        getData().forEach(function (data) {
+            if (data.html.is(":hidden")) { return true; }
+            data.urlPanelShow && data.panelHeading.click();
+        });
+    }
 });
 // 捕捉/录制 展开按钮 筛选按钮 按钮
 $('#Catch, #openUnfold, #openFilter, #more').click(function () {
