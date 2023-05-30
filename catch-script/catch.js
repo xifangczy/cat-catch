@@ -139,7 +139,7 @@
                 const type = mime.split('/')[0];
                 media.push({ data: URL.createObjectURL(fileBlob), type: type });
             }
-            window.postMessage({ action: "catCatchFFmpeg", use: "merge", media: media, title: fileName.innerText });
+            window.postMessage({ action: "catCatchFFmpeg", use: "merge", media: media, title: fileName.innerText.trim() });
         } else {
             const a = document.createElement('a');
             for (let item of catchMedia) {
@@ -147,7 +147,7 @@
                 const type = mime.split('/')[0] == "video" ? "mp4" : "mp3";
                 const fileBlob = new Blob(item.bufferList, { type: mime });
                 a.href = URL.createObjectURL(fileBlob);
-                a.download = `${fileName.innerText}.${type}`;
+                a.download = `${fileName.innerText.trim()}.${type}`;
                 a.click();
             }
             a.remove();
