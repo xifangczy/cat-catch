@@ -68,12 +68,16 @@ $(function () {
     let downTotalTs = 0;  // 需要下载的文件数量
     const tsBuffer = []; // ts内容缓存
     const errorTsList = []; // 下载错误ts序号列表
-    // let StreamSaver = false; // 流式下载
     let fileStream = undefined; // 流式下载文件输出流
+    const downSet = {};   // 下载设置
     /* 录制相关 */
     let recorder = false; // 开关
     let recorderIndex = 0;  // 下载索引
     let recorderLast = "";  // 最后下载的url
+    /* mp4 转码工具 */
+    let transmuxer = undefined;
+    let transmuxerStatus = false;
+    let transmuxerheadEncode = undefined;
     /* DOM */
     const $fileSize = $("#fileSize");
     const $progress = $("#progress");
@@ -205,7 +209,7 @@ $(function () {
             $("#loading").show();
             $("#loading .optionBox").html(`解析或播放m3u8文件中有错误, 详细错误信息查看控制台`);
             // 出错 如果正在录制中 自动点击下载录制按钮
-            if(recorder){
+            if (recorder) {
                 $("#recorder").click();
                 autoReferer = true;
             }
@@ -534,17 +538,32 @@ $(function () {
     });
     // 只要音频
     $("#onlyAudio").on("change", function () {
+        if (transmuxer) {
+            $(this).prop("checked", !$(this).prop("checked"));
+            alert("已启用转码, 无法更改此设置");
+            return;
+        }
         if ($(this).prop("checked") && !$("#mp4").prop("checked") && !$("#ffmpeg").prop("checked")) {
             $("#mp4").click();
         }
     });
     $("#mp4").on("change", function () {
+        if (transmuxer) {
+            $(this).prop("checked", !$(this).prop("checked"));
+            alert("已启用转码, 无法更改此设置");
+            return;
+        }
         $("#ffmpeg").prop("checked") && $("#ffmpeg").click();
         if (!$(this).prop("checked") && !$("#ffmpeg").prop("checked") && $("#onlyAudio").prop("checked")) {
             $("#onlyAudio").click();
         }
     });
     $("#StreamSaver").on("change", function () {
+        if (transmuxer) {
+            $(this).prop("checked", !$(this).prop("checked"));
+            alert("已启用转码, 无法更改此设置");
+            return;
+        }
         if ($(this).prop("checked")) {
             $progress.html("边下边存功能<br><b>不支持ffmpeg在线转换格式</b> <b>不支持错误切片重下</b> <b>不支持另存为</b>");
             $("#ffmpeg").prop("checked") && $("#ffmpeg").click();
@@ -552,6 +571,11 @@ $(function () {
         }
     });
     $("#ffmpeg").on("change", function () {
+        if (transmuxer) {
+            $(this).prop("checked", !$(this).prop("checked"));
+            alert("已启用转码, 无法更改此设置");
+            return;
+        }
         if ($(this).prop("checked")) {
             $("#mp4").prop("checked", false);
             $("#StreamSaver").prop("checked", false);
@@ -631,6 +655,7 @@ $(function () {
             buttonState("#mergeTs", true);
             initDownload();
             $progress.html(stopDownload);
+            transmuxer = undefined;
             return true;
         }
         mergeTs();
@@ -894,19 +919,18 @@ $(function () {
             ext = ext ? ext : "ts";
         }
         // 转码mp4
-        if ($("#mp4").prop("checked") && ext.toLowerCase() != "mp4") {
+        if (downSet.mp4 && ext.toLowerCase() != "mp4") {
             let index;
-            let headEncoding = true;
+            transmuxerheadEncode = false;
             /* 转码工具 */
-            const onlyAudio = $("#onlyAudio").prop("checked");
-            const transmuxer = new muxjs.mp4.Transmuxer({ remux: !onlyAudio });    // mux.js 对象
+            transmuxer = new muxjs.mp4.Transmuxer({ remux: !downSet.onlyAudio });    // mux.js 对象
             // 转码服务监听
             transmuxer.on('data', function (segment) {
                 // console.log(segment);
-                if (onlyAudio && segment.type != "audio") { return; }
+                if (downSet.onlyAudio && segment.type != "audio") { return; }
                 // 头部信息
-                if (headEncoding) {
-                    headEncoding = false;
+                if (!transmuxerheadEncode) {
+                    transmuxerheadEncode = true;
                     let data = new Uint8Array(segment.initSegment.byteLength + segment.data.byteLength);
                     data.set(segment.initSegment, 0);
                     data.set(segment.data, segment.initSegment.byteLength);
@@ -923,11 +947,12 @@ $(function () {
             // 关闭监听
             transmuxer.off('data');
             // 正确转换 下载格式改为 mp4 
-            if (!headEncoding) {
+            if (transmuxerheadEncode) {
                 fileBlob = new Blob(_tsBuffer, { type: "video/mp4" });
                 ext = "mp4";
             }
-            delete transmuxer;
+            transmuxer = undefined;
+            transmuxerheadEncode = undefined;
         }
         chrome.downloads.download({
             url: URL.createObjectURL(fileBlob),
@@ -953,20 +978,14 @@ $(function () {
         const errorList = [];
         const downTotalTs = end - start + 1;  // 需要下载的文件数量
         /* 转码工具 */
-        const checkMux = {
-            start: false,
-            headEncode: false,
-            enable: $("#mp4").prop("checked"),
-            onlyAudio: $("#onlyAudio").prop("checked")
-        };
-        const transmuxer = new muxjs.mp4.Transmuxer({ remux: !checkMux.onlyAudio });    // mux.js 对象
-        if (checkMux.enable) {
+        if (downSet.mp4 && transmuxer == undefined) {
+            transmuxer = new muxjs.mp4.Transmuxer({ remux: !downSet.onlyAudio});    // mux.js 对象
             transmuxer.on('data', function (segment) {
-                if (checkMux.onlyAudio && segment.type != "audio") { return; }
+                if (downSet.onlyAudio&& segment.type != "audio") { return; }
                 // 头部信息
-                if (!checkMux.headEncode) {
-                    checkMux.headEncode = true;
-                    let data = new Uint8Array(segment.initSegment.byteLength + segment.data.byteLength);
+                if (!transmuxerheadEncode) {
+                    transmuxerheadEncode = true;
+                    const data = new Uint8Array(segment.initSegment.byteLength + segment.data.byteLength);
                     data.set(segment.initSegment, 0);
                     data.set(segment.data, segment.initSegment.byteLength);
                     fileStream.write(fixFileDuration(data, downDuration));
@@ -982,7 +1001,7 @@ $(function () {
                     fileStream.abort();
                     fileStream = undefined;
                 }
-                checkMux.enable && transmuxer.off('data');
+                downSet.mp4 && transmuxer.off('data');
                 clearInterval(tsInterval);
                 $progress.html(stopDownload);
                 buttonState("#mergeTs", true);
@@ -999,7 +1018,10 @@ $(function () {
                         fileStream.close();
                         fileStream = undefined;
                     }, 1000);
-                    checkMux.enable && transmuxer.off('data');
+                    if (downSet.mp4) {
+                        transmuxer.off('data');
+                        transmuxer = undefined;
+                    }
                     $progress.html("合并已完成, 等待浏览器下载完成...");
                     $("#stopStream").hide();
                     buttonState("#mergeTs", true);
@@ -1009,12 +1031,13 @@ $(function () {
             // 检查当前推流指针是否有数据
             if (downList[downP].data) {
                 if (!fileStream) { clearInterval(tsInterval); return; }
-                if (checkMux.enable) {
-                    if (checkMux.start && !checkMux.headEncode) {
+                if (downSet.mp4) {
+                    // 如果编码已经开始 但没有任何headEncode 转码错误 取消
+                    if (transmuxerStatus && !transmuxerheadEncode) {
                         stopDownload = "格式转换错误, 请取消mp4转换, 重新下载.";
                         return;
                     }
-                    checkMux.start = true;
+                    transmuxerStatus = true;
                     transmuxer.push(new Uint8Array(downList[downP].data));
                     transmuxer.flush();
                 } else {
@@ -1097,6 +1120,13 @@ $(function () {
         recorderIndex = 0;  // 录制直播索引
         recorderLast = "";  // 录制最后下载的url
         fileStream = undefined; // 流式下载 文件流
+        // 转码工具初始化
+        transmuxer = undefined;
+        transmuxerStatus = false;
+        transmuxerheadEncode = undefined;
+        // 避免下载中途 更改设置 暂时储存下载配置
+        downSet.mp4 = $("#mp4").prop("checked");
+        downSet.onlyAudio = $("#onlyAudio").prop("checked");
     }
 
     // 流式下载
