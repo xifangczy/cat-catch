@@ -60,19 +60,13 @@ chrome.webRequest.onErrorOccurred.addListener(
     }, { urls: ["<all_urls>"] }
 );
 
-function findMedia(data, isRegex = false, filter = false) {
+function findMedia(data, isRegex = false, filter = false, timer = false) {
+    if (timer) { return; }
     // Service Worker被强行杀死之后重新自我唤醒，等待全局变量初始化完成。
-    if (!G || G.Ext === undefined ||
-        G.OtherAutoClear === undefined ||
-        G.Type === undefined ||
-        G.Regex === undefined ||
-        G.featAutoDownTabId === undefined ||
-        G.tabId === undefined ||
-        cacheData.init
-    ) {
+    if (!G || G.Ext == undefined || G.tabId == undefined || cacheData.init) {
         setTimeout(() => {
-            findMedia(data, isRegex, filter);
-        }, 100);
+            findMedia(data, isRegex, filter, true);
+        }, 233);
         return;
     }
     // 屏蔽特殊页面发起的资源
@@ -94,7 +88,6 @@ function findMedia(data, isRegex = false, filter = false) {
         data.url = data.url.replace(reYoutube, "");
     }
 
-    const header = getResponseHeadersValue(data);
     let [name, ext] = fileNameParse(urlParsing.pathname);
 
     //正则匹配
@@ -120,11 +113,15 @@ function findMedia(data, isRegex = false, filter = false) {
         return;
     }
 
-    // 通过视频范围计算完整视频大小
-    if (header["range"]) {
-        const size = header["range"].match(reRange);
-        if (size) {
-            header["size"] = parseInt(header["size"] * (size[3] / (size[2] - size[1])));
+    let header = {};
+    if (!isRegex) {
+        header = getResponseHeadersValue(data);
+        // 通过视频范围计算完整视频大小
+        if (header["range"]) {
+            const size = header["range"].match(reRange);
+            if (size) {
+                header["size"] = parseInt(header["size"] * (size[3] / (size[2] - size[1])));
+            }
         }
     }
 
@@ -160,16 +157,19 @@ function findMedia(data, isRegex = false, filter = false) {
     if (cacheData[data.tabId] == undefined) {
         cacheData[data.tabId] = [];
     }
-    // 查重 避免CPU占用 大于233 不查重
-    if (cacheData[data.tabId].length <= 233) {
-        for (let key in cacheData[data.tabId]) {
-            if (cacheData[data.tabId][key].url == data.url) { return; }
+
+    if (G.checkDuplicates) {
+        // 查重 避免CPU占用 大于233 不查重
+        if (cacheData[data.tabId].length <= 233) {
+            for (let key in cacheData[data.tabId]) {
+                if (cacheData[data.tabId][key].url == data.url) { return; }
+            }
         }
-    }
-    //幽灵数据与当前标签资源查重
-    if (data.tabId == -1 && cacheData[G.tabId] !== undefined && cacheData[G.tabId].length <= 233) {
-        for (let key in cacheData[G.tabId]) {
-            if (cacheData[G.tabId][key].url == data.url) { return; }
+        //幽灵数据与当前标签资源查重
+        if (data.tabId == -1 && cacheData[G.tabId] !== undefined && cacheData[G.tabId].length <= 233) {
+            for (let key in cacheData[G.tabId]) {
+                if (cacheData[G.tabId][key].url == data.url) { return; }
+            }
         }
     }
     const getTabId = data.tabId == -1 ? G.tabId : data.tabId;
@@ -235,6 +235,7 @@ function findMedia(data, isRegex = false, filter = false) {
                 chrome.storage.local.set({ MediaData: cacheData }, function () {
                     chrome.runtime.lastError && console.log(chrome.runtime.lastError);
                 });
+                refreshIcon(info.tabId);
             }, 5000);
         } else {
             clearTimeout(debounce);
@@ -242,17 +243,7 @@ function findMedia(data, isRegex = false, filter = false) {
             chrome.storage.local.set({ MediaData: cacheData }, function () {
                 chrome.runtime.lastError && console.log(chrome.runtime.lastError);
             });
-        }
-        if (info.tabId != -1) {
-            SetIcon({ number: cacheData[info.tabId].length, tabId: info.tabId });
-        } else {
-            SetIcon({ tips: true });
-            //自动清理幽灵数据
-            if (cacheData[-1].length > G.OtherAutoClear) {
-                delete cacheData[-1];
-                chrome.storage.local.set({ MediaData: cacheData });
-                SetIcon({ tips: false });
-            }
+            refreshIcon(info.tabId);
         }
     });
 }
@@ -568,6 +559,19 @@ function getReferer(data) {
     }
     return false;
 }
+function refreshIcon(tabId) {
+    if (tabId != -1) {
+        SetIcon({ number: cacheData[tabId].length, tabId: tabId });
+    } else {
+        SetIcon({ tips: true });
+        //自动清理幽灵数据
+        if (cacheData[-1].length > G.OtherAutoClear) {
+            delete cacheData[-1];
+            chrome.storage.local.set({ MediaData: cacheData });
+            SetIcon({ tips: false });
+        }
+    }
+}
 //设置扩展图标
 function SetIcon(obj) {
     if (obj.tips != undefined) {
@@ -624,12 +628,8 @@ function tabIdListRemove(str, tabId) {
 
 // 判断特殊页面
 function isSpecialPage(url) {
-    if (url == "" || url == undefined || url == "null") { return true; }
-    let urlParsing = {};
-    try { urlParsing = new URL(url); } catch (e) { return true; }
-    return !(urlParsing.protocol == "https:" ||
-        urlParsing.protocol == "http:" ||
-        urlParsing.protocol == "blob:")
+    if (!url || url == "null") { return true; }
+    return !(url.startsWith("http://") || url.startsWith("https://") || url.startsWith("blob:"));
 }
 
 // 测试

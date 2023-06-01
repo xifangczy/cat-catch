@@ -4,7 +4,7 @@ var G = {};
 var cacheData = { init: true };
 var refererData = [];
 // 当前tabID
-chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+chrome.tabs.query({ active: true }, function (tabs) {
     if (tabs[0] && tabs[0].id) {
         G.tabId = tabs[0].id;
     }
@@ -21,7 +21,7 @@ G.OptionLists = {
         { "ext": "wav", "size": 0, "state": true },
         { "ext": "m4a", "size": 0, "state": true },
         { "ext": "letv", "size": 0, "state": true },
-        { "ext": "ts", "size": 0, "state": true },
+        { "ext": "ts", "size": 0, "state": false },
         { "ext": "webm", "size": 0, "state": true },
         { "ext": "ogg", "size": 0, "state": true },
         { "ext": "ogv", "size": 0, "state": true },
@@ -54,8 +54,6 @@ G.OptionLists = {
         { "type": "application/m4s", "size": 0, "state": true }
     ],
     Regex: [
-        { "type": "ig", "regex": ".*vurl=([^&]*)", "ext": "m3u8", "state": true },
-        { "type": "ig", "regex": "/getvinfo\\?", "ext": "json", "state": true },
         { "type": "ig", "regex": "https://cache\\.video\\.[a-z]*\\.com/dash\\?tvid=.*", "ext": "json", "state": true }
     ],
     TitleName: false,
@@ -77,6 +75,7 @@ G.OptionLists = {
     userAgent: "",
     downFileName: "${title}.${ext}",
     css: "",
+    checkDuplicates: true
 };
 G.TabIdList = {
     featMobileTabId: [],

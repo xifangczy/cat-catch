@@ -4,13 +4,10 @@ function appendZero(date) {
 }
 // 秒转换成时间
 function secToTime(sec) {
-    let time = "";
-    let hour = Math.floor(sec / 3600);
-    let min = Math.floor((sec % 3600) / 60);
-    sec = Math.floor(sec % 60);
-    if (hour > 0) {
-        time = hour + ":";
-    }
+    let hour = (sec / 3600) | 0;
+    let min = ((sec % 3600) / 60) | 0;
+    sec = (sec % 60) | 0;
+    let time = hour > 0 ? hour + ":" : "";
     time += appendZero(min) + ":";
     time += appendZero(sec);
     return time;
