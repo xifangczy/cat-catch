@@ -7,6 +7,8 @@ var refererData = [];
 chrome.tabs.query({ active: true }, function (tabs) {
     if (tabs[0] && tabs[0].id) {
         G.tabId = tabs[0].id;
+    } else {
+        G.tabId = -1;
     }
 });
 // 所有设置变量 默认值
