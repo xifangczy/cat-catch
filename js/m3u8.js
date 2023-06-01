@@ -429,6 +429,12 @@ $(function () {
         }
     }
     /**************************** 监听 / 按钮绑定 ****************************/
+    // 标题
+    let progressTimer = setInterval(() => {
+        if ($progress.html()) {
+            document.title = $progress.html();
+        }
+    }, 1000);
     // 监听下载事件 修改提示
     chrome.downloads.onChanged.addListener(function (downloadDelta) {
         if (!downloadDelta.state) { return; }
@@ -979,9 +985,9 @@ $(function () {
         const downTotalTs = end - start + 1;  // 需要下载的文件数量
         /* 转码工具 */
         if (downSet.mp4 && transmuxer == undefined) {
-            transmuxer = new muxjs.mp4.Transmuxer({ remux: !downSet.onlyAudio});    // mux.js 对象
+            transmuxer = new muxjs.mp4.Transmuxer({ remux: !downSet.onlyAudio });    // mux.js 对象
             transmuxer.on('data', function (segment) {
-                if (downSet.onlyAudio&& segment.type != "audio") { return; }
+                if (downSet.onlyAudio && segment.type != "audio") { return; }
                 // 头部信息
                 if (!transmuxerheadEncode) {
                     transmuxerheadEncode = true;
