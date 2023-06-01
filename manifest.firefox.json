@@ -34,6 +34,9 @@
   ],
   "commands": {
     "_execute_browser_action": {},
+    "enable": {
+      "description": "暂停 / 启用"
+    },
     "auto_down": {
       "description": "自动下载"
     },

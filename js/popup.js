@@ -37,10 +37,11 @@ chrome.storage.local.get("MediaData", function (items) {
         return;
     }
     currentCount = items.MediaData[G.tabId].length;
+    if (currentCount >= 500 && !confirm(`共 ${currentCount} 条资源, 是否取消加载?`)) {
+        UItoggle();
+        return;
+    }
     for (let key = 0; key < currentCount; key++) {
-        if (key == 200 && !confirm('资源过多!! 是否继续加载所有资源?')) {
-            break;
-        }
         $current.append(AddMedia(items.MediaData[G.tabId][key]));
     }
     $mediaList.append($current);
@@ -61,6 +62,7 @@ chrome.runtime.onMessage.addListener(function (MediaData, sender, sendResponse) 
     }
     sendResponse("OK");
 });
+
 // 监听下载 出现服务器拒绝错误 调用下载器
 chrome.downloads.onChanged.addListener(function (item) {
     if (G.catDownload) { delete downData[item.id]; return; }
@@ -510,6 +512,13 @@ if ($down[0].offsetHeight > 30) {
 $("[go]").click(function () {
     chrome.tabs.create({ url: this.getAttribute("go") });
 });
+// 暂停 启用
+$("#enable").click(function () {
+    chrome.storage.sync.set({ enable: !G.enable }, function () {
+        $("#enable").html(G.enable ? "暂停" : "启用");
+        chrome.action.setIcon({ path: G.enable ? "/img/icon.png" : "/img/icon-disable.png" });
+    });
+});
 // 一些需要等待G变量加载完整的操作
 const interval = setInterval(function () {
     if (!G.initComplete || !G.tabId) { return; }
@@ -535,6 +544,9 @@ const interval = setInterval(function () {
     $("#playbackRate").val(G.playbackRate);
 
     $(`<style>${G.css}</style>`).appendTo("head");
+
+    // 暂停
+    $("#enable").html(G.enable ? "暂停" : "启用");
 }, 4);
 /********************绑定事件END********************/
 

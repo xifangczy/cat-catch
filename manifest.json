@@ -32,6 +32,9 @@
   ],
   "commands": {
     "_execute_action": {},
+    "enable": {
+      "description": "暂停 / 启用"
+    },
     "auto_down": {
       "description": "自动下载"
     },

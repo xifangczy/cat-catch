@@ -69,6 +69,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         }, 233);
         return;
     }
+    if (!G.enable) { return; }
     // 屏蔽特殊页面发起的资源
     if (data.initiator != "null" &&
         data.initiator != undefined &&
@@ -172,8 +173,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
             }
         }
     }
-    const getTabId = data.tabId == -1 ? G.tabId : data.tabId;
-    chrome.tabs.get(getTabId, async function (webInfo) {
+    chrome.tabs.get(data.tabId == -1 ? G.tabId : data.tabId, async function (webInfo) {
         if (chrome.runtime.lastError) { return; }
         const info = {
             name: name,
@@ -503,6 +503,9 @@ chrome.commands.onCommand.addListener(function (command) {
         chrome.storage.local.set({ MediaData: cacheData });
         clearRedundant();
         SetIcon({ tabId: G.tabId });
+    } else if (command == "enable") {
+        chrome.storage.sync.set({ enable: !G.enable });
+        chrome.action.setIcon({ path: G.enable ? "/img/icon.png" : "/img/icon-disable.png" });
     }
 });
 
