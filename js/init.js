@@ -77,7 +77,7 @@ G.OptionLists = {
     userAgent: "",
     downFileName: "${title}.${ext}",
     css: "",
-    checkDuplicates: true,
+    checkDuplicates: false,
     enable: true
 };
 G.TabIdList = {

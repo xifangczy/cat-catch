@@ -160,14 +160,14 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
     }
 
     if (G.checkDuplicates) {
-        // 查重 避免CPU占用 大于233 不查重
-        if (cacheData[data.tabId].length <= 233) {
+        // 查重 避免CPU占用 大于500 不查重
+        if (cacheData[data.tabId].length <= 500) {
             for (let key in cacheData[data.tabId]) {
                 if (cacheData[data.tabId][key].url == data.url) { return; }
             }
         }
         //幽灵数据与当前标签资源查重
-        if (data.tabId == -1 && cacheData[G.tabId] !== undefined && cacheData[G.tabId].length <= 233) {
+        if (data.tabId == -1 && cacheData[G.tabId] !== undefined && cacheData[G.tabId].length <= 500) {
             for (let key in cacheData[G.tabId]) {
                 if (cacheData[G.tabId][key].url == data.url) { return; }
             }
