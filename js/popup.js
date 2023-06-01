@@ -38,6 +38,9 @@ chrome.storage.local.get("MediaData", function (items) {
     }
     currentCount = items.MediaData[G.tabId].length;
     for (let key = 0; key < currentCount; key++) {
+        if (key == 200 && !confirm('资源过多!! 是否继续加载所有资源?')) {
+            break;
+        }
         $current.append(AddMedia(items.MediaData[G.tabId][key]));
     }
     $mediaList.append($current);
@@ -624,7 +627,7 @@ function UItoggle() {
     // 更新图标
     $(".faviconFlag").each(function () {
         const data = getData(this.getAttribute("requestId"));
-        if (data.webUrl && favicon.has(data.webUrl)) {
+        if (data && data.webUrl && favicon.has(data.webUrl)) {
             this.setAttribute("src", favicon.get(data.webUrl));
             this.classList.remove("faviconFlag");
         }
