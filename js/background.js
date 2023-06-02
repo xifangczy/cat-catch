@@ -95,7 +95,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
     if (isRegex && !filter) {
         for (let key in G.Regex) {
             if (!G.Regex[key].state) { continue; }
-            const result = new RegExp(G.Regex[key].regex, G.Regex[key].type).exec(data.url);
+            const result = G.Regex[key].regex.exec(data.url);
             if (result == null) { continue; }
             data.extraExt = G.Regex[key].ext ? G.Regex[key].ext : undefined;
             if (result.length == 1) {
@@ -159,18 +159,13 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         cacheData[data.tabId] = [];
     }
 
-    if (G.checkDuplicates) {
-        // 查重 避免CPU占用 大于500 不查重
-        if (cacheData[data.tabId].length <= 500) {
-            for (let key in cacheData[data.tabId]) {
-                if (cacheData[data.tabId][key].url == data.url) { return; }
-            }
-        }
-        //幽灵数据与当前标签资源查重
-        if (data.tabId == -1 && cacheData[G.tabId] !== undefined && cacheData[G.tabId].length <= 500) {
-            for (let key in cacheData[G.tabId]) {
-                if (cacheData[G.tabId][key].url == data.url) { return; }
-            }
+    // 查重 避免CPU占用 大于500 强制开启
+    if (G.checkDuplicates && cacheData[data.tabId].length <= 500) {
+        for (let item of cacheData[data.tabId]) {
+            if (item.url.length == data.url.length &&
+                item.name == name &&
+                item.cacheURL.host == urlParsing.host &&
+                item.cacheURL.search == urlParsing.search) { return; }
         }
     }
     chrome.tabs.get(data.tabId == -1 ? G.tabId : data.tabId, async function (webInfo) {
@@ -186,7 +181,8 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
             requestId: data.requestId ?? Date.now().toString(),
             extraExt: data.extraExt,
             initiator: data.initiator,
-            referer: data.referer
+            referer: data.referer,
+            cacheURL: { host: urlParsing.host, search: urlParsing.search }
         };
         // 幽灵资源 查源
         if (info.tabId == -1 && info.referer) {

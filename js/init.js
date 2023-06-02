@@ -77,7 +77,7 @@ G.OptionLists = {
     userAgent: "",
     downFileName: "${title}.${ext}",
     css: "",
-    checkDuplicates: false,
+    checkDuplicates: true,
     enable: true
 };
 G.TabIdList = {
@@ -140,6 +140,10 @@ function InitOptions() {
     chrome.storage.sync.get(G.OptionLists, function (items) {
         // Ext的Array转为Map类型
         items.Ext = new Map(items.Ext.map(item => [item.ext, item]));
+        // 预编译正则匹配
+        items.Regex = items.Regex.map(item => {
+            return { regex: new RegExp(item.regex, item.type), ext: item.ext, state: item.state }
+        });
         G = { ...items, ...G };
     });
     // 读取local配置数据 交给全局变量G
@@ -156,6 +160,12 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
         if (key == "Ext") {
             G.Ext = new Map(newValue.map(item => [item.ext, item]));
+            continue;
+        }
+        if (key == "Regex") {
+            G.Regex = newValue.map(item => {
+                return { regex: new RegExp(item.regex, item.type), ext: item.ext, state: item.state }
+            });
             continue;
         }
         G[key] = newValue;
