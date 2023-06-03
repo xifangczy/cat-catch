@@ -4,7 +4,7 @@ var G = {};
 var cacheData = { init: true };
 var refererData = [];
 // 当前tabID
-chrome.tabs.query({ active: true }, function (tabs) {
+chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     if (tabs[0] && tabs[0].id) {
         G.tabId = tabs[0].id;
     } else {
