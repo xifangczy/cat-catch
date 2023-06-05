@@ -561,11 +561,11 @@ function getReferer(data) {
 }
 function refreshIcon(tabId) {
     if (tabId != -1) {
-        SetIcon({ number: cacheData[tabId].length, tabId: tabId });
+        cacheData[tabId] && SetIcon({ number: cacheData[tabId].length, tabId: tabId });
     } else {
         SetIcon({ tips: true });
         //自动清理幽灵数据
-        if (cacheData[-1].length > G.OtherAutoClear) {
+        if (cacheData[-1] && cacheData[-1].length > G.OtherAutoClear) {
             delete cacheData[-1];
             chrome.storage.local.set({ MediaData: cacheData });
             SetIcon({ tips: false });
