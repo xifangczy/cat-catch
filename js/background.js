@@ -161,7 +161,8 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
 
     // 查重 避免CPU占用 大于500 强制开启
     if (G.checkDuplicates && cacheData[data.tabId].length <= 500) {
-        for (let item of cacheData[data.tabId]) {
+        const findId = data.tabId == -1 ? G.tabId : data.tabId;
+        for (let item of cacheData[findId]) {
             if (item.url.length == data.url.length &&
                 item.name == name &&
                 item.cacheURL.host == urlParsing.host &&
