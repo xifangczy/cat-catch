@@ -124,7 +124,7 @@ $(function () {
         const url = encodeURIComponent(item.uri);
         const referer = _referer ? "&referer=" + encodeURIComponent(_referer) : "&initiator=" + (_initiator ? encodeURIComponent(_initiator) : "");
         const title = _title ? encodeURIComponent(_title) : "";
-        const name = GetFile(item.uri);
+        const name = GetFile(item.uri ?? item.url);
         let newUrl = `/m3u8.html?url=${url}${referer}`;
         if (title) { newUrl += `&title=${title}`; }
         if (tabId) { newUrl += `&tabid=${tabId}`; }
@@ -206,6 +206,7 @@ $(function () {
         });
         // m3u8下载or解析错误
         hls.on(Hls.Events.ERROR, function (event, data) {
+            console.log(data);
             $("#loading").show();
             $("#loading .optionBox").html(`解析或播放m3u8文件中有错误, 详细错误信息查看控制台`);
             // 出错 如果正在录制中 自动点击下载录制按钮
