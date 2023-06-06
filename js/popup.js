@@ -521,7 +521,7 @@ $("#enable").click(function () {
 });
 // 一些需要等待G变量加载完整的操作
 const interval = setInterval(function () {
-    if (!G.initComplete || !G.tabId) { return; }
+    if (!G.initSyncComplete || !G.initLocalComplete || !G.tabId) { return; }
     clearInterval(interval);
     // 获取模拟手机 自动下载 捕获 状态
     chrome.runtime.sendMessage({ Message: "getButtonState", tabId: G.tabId }, function (state) {

@@ -70,7 +70,8 @@ G.OptionLists = {
     copyMPD: `ffmpeg \${referer|exists:'-headers "referer: *"'} -i "\${url}" -c copy "\${title}_\${now}.mp4"`,
     copyOther: "${url}",
     refreshClear: true,
-    initComplete: true,
+    initSyncComplete: false,
+    initLocalComplete: false,
     youtube: false,
     catDownload: false,
     saveAs: false,
@@ -145,10 +146,12 @@ function InitOptions() {
             return { regex: new RegExp(item.regex, item.type), ext: item.ext, state: item.state }
         });
         G = { ...items, ...G };
+        G.initSyncComplete = true;
     });
     // 读取local配置数据 交给全局变量G
     chrome.storage.local.get(G.TabIdList, function (items) {
         G = { ...items, ...G };
+        G.initLocalComplete = true;
     });
 }
 // 监听变化，新值给全局变量
