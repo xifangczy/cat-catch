@@ -121,7 +121,7 @@ $(function () {
 
     /* 解析函数 使用hls解析好的数据 进一步处理 */
     function getNewUrl(item) {
-        const url = encodeURIComponent(item.uri);
+        const url = encodeURIComponent(item.uri ?? item.url);
         const referer = _referer ? "&referer=" + encodeURIComponent(_referer) : "&initiator=" + (_initiator ? encodeURIComponent(_initiator) : "");
         const title = _title ? encodeURIComponent(_title) : "";
         const name = GetFile(item.uri ?? item.url);
@@ -907,8 +907,9 @@ $(function () {
                 chrome.runtime.sendMessage({
                     Message: "catCatchFFmpeg",
                     action: $("#onlyAudio").prop("checked") ? "onlyAudio" : "transcode",
-                    media: [{ data: URL.createObjectURL(fileBlob) }],
-                    title: `${GetFileName(_m3u8Url)}`
+                    media: [{ data: URL.createObjectURL(fileBlob), name: `memory${new Date().getTime()}.${ext}` }],
+                    title: `${GetFileName(_m3u8Url)}`,
+                    name: "memory" + new Date().getTime() + "." + ext
                 });
                 buttonState("#mergeTs", true);
                 $progress.html("已发送给在线ffmpeg");
