@@ -385,30 +385,11 @@ $(function () {
         $("#rangeStart").val(1);
         $("#rangeEnd").val(_fragments.length);
         $("#m3u8dlArg").val(getM3u8DlArg());
-    }
-    function showKeyInfo(buffer, decryptdata, i) {
-        $("#tips").append('密钥地址(KeyURL): <input type="text" value="' + decryptdata.uri + '" spellcheck="false" readonly="readonly" class="keyUrl">');
-        if (buffer) {
-            $("#tips").append(`
-                <div class="key flex">
-                    <div class="method">加密算法(Method): <input type="text" value="${decryptdata.method ? decryptdata.method : "NONE"}" spellcheck="false" readonly="readonly"></div>
-                    <div>密钥(Hex): <input type="text" value="${ArrayBufferToHexString(buffer)}" spellcheck="false" readonly="readonly"></div>
-                    <div>密钥(Base64): <input type="text" value="${ArrayBufferToBase64(buffer)}" spellcheck="false" readonly="readonly"></div>
-                    <select id="maybeKey" class="m3u8Key select hide"><option value="tips">寻找到疑似密钥</option></select>
-                </div>
-            `);
-        } else {
-            $("#tips").append(`
-                <div class="key flex">
-                    <div class="method">加密算法(Method): <input type="text" value="${decryptdata.method ? decryptdata.method : "NONE"}" spellcheck="false" readonly="readonly"></div>
-                    <div>密钥(Hex): <input type="text" value="密钥下载失败" spellcheck="false" readonly="readonly"></div>
-                    <select id="maybeKey" class="m3u8Key select hide"><option value="tips">寻找到疑似密钥</option></select>
-                </div>
-            `);
-        }
+
         if (tabId) {
             chrome.tabs.sendMessage(tabId, { Message: "getKey" }, function (result) {
                 if (chrome.runtime.lastError || !result || result.length == 0) { return; }
+                $("#tips").append(`<select id="maybeKey" class="m3u8Key select hide"><option value="tips">寻找到疑似密钥</option></select>`);
                 const maybeKey = $("#maybeKey");
                 for (let item of result) {
                     maybeKey.append(`<option value="${item}">${item}</option>`);
@@ -419,6 +400,25 @@ $(function () {
                     $("#m3u8dlArg").val(getM3u8DlArg());
                 });
             });
+        }
+    }
+    function showKeyInfo(buffer, decryptdata, i) {
+        $("#tips").append('密钥地址(KeyURL): <input type="text" value="' + decryptdata.uri + '" spellcheck="false" readonly="readonly" class="keyUrl">');
+        if (buffer) {
+            $("#tips").append(`
+                <div class="key flex">
+                    <div class="method">加密算法(Method): <input type="text" value="${decryptdata.method ? decryptdata.method : "NONE"}" spellcheck="false" readonly="readonly"></div>
+                    <div>密钥(Hex): <input type="text" value="${ArrayBufferToHexString(buffer)}" spellcheck="false" readonly="readonly"></div>
+                    <div>密钥(Base64): <input type="text" value="${ArrayBufferToBase64(buffer)}" spellcheck="false" readonly="readonly"></div>
+                </div>
+            `);
+        } else {
+            $("#tips").append(`
+                <div class="key flex">
+                    <div class="method">加密算法(Method): <input type="text" value="${decryptdata.method ? decryptdata.method : "NONE"}" spellcheck="false" readonly="readonly"></div>
+                    <div>密钥(Hex): <input type="text" value="密钥下载失败" spellcheck="false" readonly="readonly"></div>
+                </div>
+            `);
         }
         // 如果是默认iv 则不显示
         let iv = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i + 1]).toString();
