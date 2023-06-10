@@ -265,7 +265,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     // 图标设置
     if (Message.Message == "ClearIcon") {
         if (Message.type) {
-            SetIcon({ tabId: G.tabId });
+            G.tabId && SetIcon({ tabId: G.tabId });
         } else {
             SetIcon({ tips: false });
         }
