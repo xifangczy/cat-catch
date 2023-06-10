@@ -19,6 +19,15 @@ const CATCH_SEARCH_ONLY = true;
     async function findMedia(data, depth = 0) {
         CATCH_SEARCH_DEBUG && console.log(data);
         let index = 0;
+        if (data.length == 16) {
+            const isKey = data.every(function (value) {
+                return typeof value == 'number' && value <= 256
+            });
+            if (isKey) {
+                postData({ action: "catCatchAddKey", key: data, href: location.href, ext: "key" });
+                return;
+            }
+        }
         for (let key in data) {
             if (index != 0) { depth = 0; } index++;
             if (typeof data[key] == "object") {
