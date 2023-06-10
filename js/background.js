@@ -164,7 +164,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         const findId = data.tabId == -1 ? G.tabId : data.tabId;
         for (let item of cacheData[findId]) {
             if (item.url.length == data.url.length &&
-                item.name == name &&
+                item.cacheURL.pathname == urlParsing.pathname &&
                 item.cacheURL.host == urlParsing.host &&
                 item.cacheURL.search == urlParsing.search) { return; }
         }
@@ -183,7 +183,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
             extraExt: data.extraExt,
             initiator: data.initiator,
             referer: data.referer,
-            cacheURL: { host: urlParsing.host, search: urlParsing.search }
+            cacheURL: { host: urlParsing.host, search: urlParsing.search, pathname: urlParsing.pathname }
         };
         // 幽灵资源 查源
         if (info.tabId == -1 && info.referer) {
