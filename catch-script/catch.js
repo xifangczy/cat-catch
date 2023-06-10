@@ -54,15 +54,15 @@
     // 文件名设置
     const fileName = CatCatch.querySelector("#fileName");
     const selector = CatCatch.querySelector("#selector");
-    selector.innerText = localStorage.getItem("CatCatchCatch_selector") ?? "未设置";
+    selector.innerHTML = localStorage.getItem("CatCatchCatch_selector") ?? "未设置";
     CatCatch.querySelector("#setName").addEventListener('click', function (event) {
         const result = window.prompt("文件名获取Selector表达式", localStorage.getItem("CatCatchCatch_selector") ?? "");
         if (result == null) { return; }
         if (result == "") { clearFileNameSelector(); return; }
         const title = document.querySelector(result);
-        if (title && title.innerText) {
-            fileName.innerText = title.innerText;
-            selector.innerText = result;
+        if (title && title.innerHTML) {
+            fileName.innerHTML = title.innerHTML;
+            selector.innerHTML = result;
             localStorage.setItem("CatCatchCatch_selector", result);
         } else {
             clearFileNameSelector("表达式错误, 无法获取或内容为空!");
@@ -97,9 +97,9 @@
         // 标题获取
         if (localStorage.getItem("CatCatchCatch_selector")) {
             const title = document.querySelector(localStorage.getItem("CatCatchCatch_selector"));
-            fileName.innerText = title && title.innerText ? title.innerText : document.title;
+            fileName.innerHTML = title && title.innerHTML ? title.innerHTML : document.title;
         } else {
-            fileName.innerText = document.title;
+            fileName.innerHTML = document.title;
         }
         tips.innerHTML = "捕获数据中...";
         const sourceBuffer = _AddSourceBuffer.call(this, mimeType);
@@ -139,7 +139,7 @@
                 const type = mime.split('/')[0];
                 media.push({ data: URL.createObjectURL(fileBlob), type: type });
             }
-            window.postMessage({ action: "catCatchFFmpeg", use: "merge", media: media, title: fileName.innerText.trim() });
+            window.postMessage({ action: "catCatchFFmpeg", use: "merge", media: media, title: fileName.innerHTML.trim() });
         } else {
             const a = document.createElement('a');
             for (let item of catchMedia) {
@@ -147,7 +147,7 @@
                 const type = mime.split('/')[0] == "video" ? "mp4" : "mp3";
                 const fileBlob = new Blob(item.bufferList, { type: mime });
                 a.href = URL.createObjectURL(fileBlob);
-                a.download = `${fileName.innerText.trim()}.${type}`;
+                a.download = `${fileName.innerHTML.trim()}.${type}`;
                 a.click();
             }
             a.remove();
@@ -161,8 +161,8 @@
 
     function clearFileNameSelector(warning = "") {
         localStorage.removeItem("CatCatchCatch_selector");
-        selector.innerText = "未设置";
-        fileName.innerText = document.title;
+        selector.innerHTML = "未设置";
+        fileName.innerHTML = document.title;
         warning && alert(warning);
     }
 })();
