@@ -19,7 +19,8 @@ const CATCH_SEARCH_ONLY = true;
     async function findMedia(data, depth = 0) {
         CATCH_SEARCH_DEBUG && console.log(data);
         let index = 0;
-        if (data.length == 16) {
+        if (!data) { return; }
+        if (data instanceof Array && data.length == 16) {
             const isKey = data.every(function (value) {
                 return typeof value == 'number' && value <= 256
             });
@@ -33,14 +34,10 @@ const CATCH_SEARCH_ONLY = true;
             if (typeof data[key] == "object") {
                 // 查找疑似key
                 if (data[key] instanceof Array && data[key].length == 16) {
-                    let flag = true;
-                    for (let item of data[key]) {
-                        if (typeof item != "number" || item > 255) { flag = false; break; }
-                    }
-                    if (flag) {
-                        postData({ action: "catCatchAddKey", key: data[key], href: location.href, ext: "key" });
-                        continue;
-                    }
+                    const isKey = data[key].every(function (value) {
+                        return typeof value == 'number' && value <= 256
+                    });
+                    isKey && postData({ action: "catCatchAddKey", key: data[key], href: location.href, ext: "key" });
                     continue;
                 }
                 if (depth > 10) { continue; }  // 防止死循环 最大深度
