@@ -431,15 +431,14 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
         // 开启捕获
         if (G.version >= 102) {
-            G.scriptList.forEach(function (item, key) {
-                if (item.tabId.has(tabId)) {
-                    chrome.scripting.executeScript({
-                        target: { tabId: tabId, allFrames: item.allFrames },
-                        files: [`catch-script/${key}`],
-                        injectImmediately: true,
-                        world: item.world
-                    });
-                }
+            G.scriptList.forEach(function (item, script) {
+                if (!item.tabId.has(tabId)) { return true; }
+                chrome.scripting.executeScript({
+                    target: { tabId: tabId, allFrames: item.allFrames },
+                    files: [`catch-script/${script}`],
+                    injectImmediately: true,
+                    world: item.world
+                });
             });
         }
         // 模拟手机端 修改 navigator 变量
@@ -458,16 +457,16 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (changeInfo.status == "complete") {
         // 开启捕获
         if (G.version >= 102) {
-            G.scriptList.forEach(function (item, key) {
+            G.scriptList.forEach(function (item, script) {
                 if (!item.tabId.has(tabId) || !item.allFrames) { return true; }
-                chrome.webNavigation.getAllFrames({ tabId: G.tabId }, function (frames) {
+                chrome.webNavigation.getAllFrames({ tabId: tabId }, function (frames) {
                     const frameId = [];
                     frames.forEach(function (item) {
                         if (item.frameId != 0) { frameId.push(item.frameId); }
                     });
                     chrome.scripting.executeScript({
                         target: { tabId: tabId, frameIds: frameId },
-                        files: [`catch-script/${key}`],
+                        files: [`catch-script/${script}`],
                         injectImmediately: true,
                         world: item.world
                     });
