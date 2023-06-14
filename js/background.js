@@ -193,7 +193,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
             if (webInfo?.url == info.referer) {
                 info.tabId = webInfo.id;
             } else {
-                await chrome.tabs.query({ url: info.referer }, function (newWebInfo) {
+                await chrome.tabs.query({ url: info.referer ?? info.initiator }, function (newWebInfo) {
                     if (chrome.runtime.lastError) { return; }
                     if (newWebInfo.length > 0) {
                         webInfo = newWebInfo[0];
@@ -415,6 +415,7 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
 
 // 标签更新 清除数据
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    // console.log(tabId, changeInfo, tab);
     if (changeInfo.status == "loading") {
         // 刷新页面 清理数据
         if (G.refreshClear) {
@@ -454,12 +455,32 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
             });
         }
     }
-    if (changeInfo.status == "complete" && ffmpeg.tab && tabId == ffmpeg.tab) {
-        setTimeout(() => {
-            chrome.tabs.sendMessage(tabId, ffmpeg.data);
-            ffmpeg.data = undefined;
-            ffmpeg.tab = 0;
-        }, 500);
+    if (changeInfo.status == "complete") {
+        // 开启捕获
+        if (G.version >= 102) {
+            G.scriptList.forEach(function (item, key) {
+                if (!item.tabId.has(tabId) || !item.allFrames) { return true; }
+                chrome.webNavigation.getAllFrames({ tabId: G.tabId }, function (frames) {
+                    const frameId = [];
+                    frames.forEach(function (item) {
+                        if (item.frameId != 0) { frameId.push(item.frameId); }
+                    });
+                    chrome.scripting.executeScript({
+                        target: { tabId: tabId, frameIds: frameId },
+                        files: [`catch-script/${key}`],
+                        injectImmediately: true,
+                        world: item.world
+                    });
+                });
+            });
+        }
+        if (ffmpeg.tab && tabId == ffmpeg.tab) {
+            setTimeout(() => {
+                chrome.tabs.sendMessage(tabId, ffmpeg.data);
+                ffmpeg.data = undefined;
+                ffmpeg.tab = 0;
+            }, 500);
+        }
     }
 });
 // 标签关闭 清除数据

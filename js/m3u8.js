@@ -215,7 +215,7 @@ $(function () {
                 autoReferer = true;
             }
             // 尝试添加删除referer
-            if (data.type == "networkError") {
+            if (data.type == "networkError" && data.details != "keyLoadError") {
                 if (!autoReferer) {
                     if (_referer) {
                         window.location.href = window.location.href.replace("&referer=", "&initiator=") + "&autoReferer=1";
@@ -387,16 +387,20 @@ $(function () {
         $("#m3u8dlArg").val(getM3u8DlArg());
 
         if (tabId) {
-            chrome.tabs.sendMessage(tabId, { Message: "getKey" }, function (result) {
-                if (chrome.runtime.lastError || !result || result.length == 0) { return; }
-                const maybeKey = $("#maybeKey select");
-                for (let item of result) {
-                    maybeKey.append(`<option value="${item}">${item}</option>`);
-                }
-                $("#maybeKey").show();
-                maybeKey.change(function () {
-                    this.value != "tips" && $("#customKey").val(this.value);
-                    $("#m3u8dlArg").val(getM3u8DlArg());
+            chrome.webNavigation.getAllFrames({ tabId: tabId }, function (frames) {
+                frames.forEach(function (frame) {
+                    chrome.tabs.sendMessage(tabId, { Message: "getKey" }, { frameId: frame.frameId }, function (result) {
+                        if (chrome.runtime.lastError || !result || result.length == 0) { return; }
+                        const maybeKey = $("#maybeKey select");
+                        for (let item of result) {
+                            maybeKey.append(`<option value="${item}">${item}</option>`);
+                        }
+                        $("#maybeKey").show();
+                        maybeKey.change(function () {
+                            this.value != "tips" && $("#customKey").val(this.value);
+                            $("#m3u8dlArg").val(getM3u8DlArg());
+                        });
+                    });
                 });
             });
         }
