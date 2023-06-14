@@ -389,12 +389,11 @@ $(function () {
         if (tabId) {
             chrome.tabs.sendMessage(tabId, { Message: "getKey" }, function (result) {
                 if (chrome.runtime.lastError || !result || result.length == 0) { return; }
-                $("#tips").append(`<select id="maybeKey" class="m3u8Key select hide"><option value="tips">寻找到疑似密钥</option></select>`);
-                const maybeKey = $("#maybeKey");
+                const maybeKey = $("#maybeKey select");
                 for (let item of result) {
                     maybeKey.append(`<option value="${item}">${item}</option>`);
                 }
-                maybeKey.show();
+                $("#maybeKey").show();
                 maybeKey.change(function () {
                     this.value != "tips" && $("#customKey").val(this.value);
                     $("#m3u8dlArg").val(getM3u8DlArg());
