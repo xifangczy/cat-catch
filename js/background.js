@@ -158,6 +158,9 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
     if (cacheData[data.tabId] == undefined) {
         cacheData[data.tabId] = [];
     }
+    if (cacheData[G.tabId] == undefined) {
+        cacheData[G.tabId] = [];
+    }
 
     // 查重 避免CPU占用 大于500 强制开启
     if (G.checkDuplicates && cacheData[data.tabId].length <= 500) {
