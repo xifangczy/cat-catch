@@ -155,12 +155,8 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
 
     if (!filter) { return; }
 
-    if (cacheData[data.tabId] == undefined) {
-        cacheData[data.tabId] = [];
-    }
-    if (cacheData[G.tabId] == undefined) {
-        cacheData[G.tabId] = [];
-    }
+    cacheData[data.tabId] ??= [];
+    cacheData[G.tabId] ??= [];
 
     // 查重 避免CPU占用 大于500 强制开启
     if (G.checkDuplicates && cacheData[data.tabId].length <= 500) {
@@ -222,9 +218,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
             if (chrome.runtime.lastError) { return; }
         });
         // 储存数据
-        if (cacheData[info.tabId] == undefined) {
-            cacheData[info.tabId] = [];
-        }
+        cacheData[info.tabId] ??= [];
         cacheData[info.tabId].push(info);
         // 视频切片太多 频繁储存 严重影响性能
         // 当前标签媒体数量大于100 开启防抖 等待5秒储存 或 积累10个资源储存一次。
@@ -464,7 +458,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
                     frames.forEach(function (item) {
                         if (item.frameId != 0) { frameId.push(item.frameId); }
                     });
-                    chrome.scripting.executeScript({
+                    frameId.length && chrome.scripting.executeScript({
                         target: { tabId: tabId, frameIds: frameId },
                         files: [`catch-script/${script}`],
                         injectImmediately: true,
@@ -495,9 +489,7 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
     // 清理 捕获
     if (G.version >= 102) {
         G.scriptList.forEach(function (item) {
-            if (item.tabId.has(tabId)) {
-                item.tabId.delete(tabId);
-            }
+            item.tabId.has(tabId) && item.tabId.delete(tabId);
         });
     }
     chrome.alarms.create("nowClear", { when: Date.now() + 3000 });
