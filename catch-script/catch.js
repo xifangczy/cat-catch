@@ -6,8 +6,9 @@
     CatCatch.setAttribute("id", "CatCatchCatch");
     CatCatch.innerHTML = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAAKlBMVEUAAADLlROxbBlRAD16GS5oAjWWQiOCIytgADidUx/95gHqwwTx0gDZqwT6kfLuAAAACnRSTlMA/vUejV7kuzi8za0PswAAANpJREFUGNNjwA1YSxkYTEqhnKZLLi6F1w0gnKA1shdvHYNxdq1atWobjLMKCOAyC3etlVrUAOH4HtNZmLgoAMKpXX37zO1FwcZAwMDguGq1zKpFmTNnzqx0Bpp2WvrU7ttn9py+I8JgLn1R8Pad22vurNkjwsBReHv33junzuyRnOnMwNCSeFH27K5dq1SNgcZxFMnuWrNq1W5VkNntihdv7ToteGcT0C7mIkE1qbWCYjJnM4CqEoWKdoslChXuUgXJqIcLebiphSgCZRhaPDhcDFhdmUMCGIgEAFA+Uc02aZg9AAAAAElFTkSuQmCC" style="-webkit-user-drag: none;width: 20px;">
     <div id="tips"></div>
-    <button id="download">下载已捕获的数据</button>
-    <button id="clean">清理缓存</button>
+    <button id="download" style="border:solid 1px #000;">下载已捕获的数据</button>
+    <button id="clean" style="border:solid 1px #000;">清理缓存</button>
+    <button id="close" style="border:solid 1px #000;">关闭</button>
     <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown")}>完成捕获自动下载</label>
     <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg")}>使用ffmpeg合并</label>
     <details>
@@ -49,6 +50,12 @@
     });
     CatCatch.querySelector("#download").addEventListener('click', function (event) {
         catchDownload();
+    });
+    CatCatch.querySelector("#close").addEventListener('click', function (event) {
+        if (confirm("确认关闭?")) {
+            CatCatch.style.display = "none";
+            console.log(`猫抓\n恢复显示捕获面板\ndocument.getElementById("CatCatchCatch").style.display = "flex";`);
+        }
     });
 
     // 文件名设置
