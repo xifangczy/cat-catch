@@ -97,11 +97,21 @@ $(function () {
             if (referer != "") {
                 setReferer(referer);
             }
+            if (!m3u8Text.includes("#EXTM3U")) {
+                // ts列表链接 转 m3u8
+                const tsList = m3u8Text.split("\n");
+                m3u8Text = "#EXTM3U\n";
+                m3u8Text += "#EXT-X-TARGETDURATION:233\n";
+                for (let ts of tsList) {
+                    if (ts) {
+                        m3u8Text += "#EXTINF:1\n";
+                        m3u8Text += ts + "\n";
+                    }
+                }
+                m3u8Text += "#EXT-X-ENDLIST";
+            }
             if (baseUrl != "") {
                 m3u8Text = addBashUrl(baseUrl, m3u8Text);
-            }
-            if (!m3u8Text.includes("#EXTM3U")) {
-                m3u8Text = tsListTom3u8Text(m3u8Text);
             }
             _m3u8Url = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(m3u8Text)]));
             parseM3U8();
@@ -214,19 +224,22 @@ $(function () {
                 $("#recorder").click();
                 autoReferer = true;
             }
+            if (!_initiator && !_referer) {
+                autoReferer = true;
+            }
             // 尝试添加删除referer
             if (data.type == "networkError" && data.details != "keyLoadError") {
-                if (!autoReferer) {
-                    if (_referer) {
-                        window.location.href = window.location.href.replace("&referer=", "&initiator=") + "&autoReferer=1";
-                    }
-                    window.location.href = window.location.href.replace("&initiator=", "&referer=") + "&autoReferer=1";
-                }
+                let href = window.location.href;
                 if (_referer) {
-                    $("#loading .optionBox").append(`<p><a href="${window.location.href.replace("&referer=", "&initiator=")}">删除Referer重新尝试</a></p>`);
-                    return;
+                    href = href.replace("&referer=", "&initiator=");
+                    $("#loading .optionBox").append(`<p><a href="${href}">删除Referer重新尝试</a></p>`);
+                } else if (_initiator) {
+                    href = href.replace("&initiator=", "&referer=");
+                    $("#loading .optionBox").append(`<p><a href="${href}">添加Referer重新尝试</a></p>`);
                 }
-                _initiator && $("#loading .optionBox").append(`<p><a href="${window.location.href.replace("&initiator=", "&referer=")}">添加Referer重新尝试</a></p>`);
+                if (!autoReferer) {
+                    window.location.href = href + "&autoReferer=1";
+                }
             }
         });
         hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
@@ -1386,19 +1399,5 @@ function addBashUrl(baseUrl, m3u8Text) {
         }
         m3u8Text += m3u8_split[key] + "\n";
     }
-    return m3u8Text;
-}
-// ts列表转换成m3u8
-function tsListTom3u8Text(tsList) {
-    tsList = tsList.split("\n");
-    let m3u8Text = "#EXTM3U\n";
-    m3u8Text += "#EXT-X-TARGETDURATION:10\n";
-    for (let key in tsList) {
-        if (tsList[key]) {
-            m3u8Text += "#EXTINF:1\n";
-            m3u8Text += tsList[key] + "\n";
-        }
-    }
-    m3u8Text += "#EXT-X-ENDLIST";
     return m3u8Text;
 }
