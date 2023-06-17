@@ -76,22 +76,25 @@ chrome.downloads.onChanged.addListener(function (item) {
 function AddMedia(data, currentTab = true) {
     data._title = data.title;
     data.title = stringModify(data.title);
-    // 正则匹配的备注扩展
-    if (data.extraExt) {
-        data.ext = data.extraExt;
-    }
+    // Youtube
+    // if (data.name == "videoplayback" && data.url.includes("googlevideo.com")) {
+    //     const size = data.url.match(/&clen=([\d]*)/);
+    //     data.size = size ? size[1] : 0;
+    //     const mime = data.url.match(/&mime=([^&]*)/);
+    //     data.type = mime ? decodeURIComponent(mime[1]) : 'NULL';
+    //     data.ext = data.type.split("/")[1];
+    //     data.name = data.title + '.' + data.ext;
+    // }
     // 不存在扩展使用类型
     if (data.ext === undefined && data.type !== undefined) {
         data.ext = data.type.split("/")[1];
     }
+    // 正则匹配的备注扩展
+    if (data.extraExt) {
+        data.ext = data.extraExt;
+    }
     //文件名
     data.name = isEmpty(data.name) ? data.title + '.' + data.ext : decodeURIComponent(stringModify(data.name));
-    // Youtube
-    if (data.name == "videoplayback" && data.url.includes("googlevideo.com")) {
-        data.name = data.title + '.' + data.ext;
-        const size = data.url.match(/&clen=([\d]*)/);
-        data.size = size ? size[1] : 0;
-    }
     //截取文件名长度
     let trimName = data.name;
     if (data.name.length >= 50) {

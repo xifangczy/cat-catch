@@ -79,15 +79,16 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         isSpecialPage(data.originUrl)) { return; }
     // 屏蔽特殊页面的资源
     if (isSpecialPage(data.url)) { return; }
-    const urlParsing = new URL(data.url);
+    let urlParsing = new URL(data.url);
     // 屏蔽Youtube
-    if (urlParsing.host.includes("googlevideo.com")) {
-        // Chrome商店版本 跳过youtube
-        if (chrome.runtime.id == "jfedfbgedapdagkghmgibemcoggfppbb" && !G.youtube) { return; }
-        // 完整视频/音频 &range=[^&]*
-        // 去掉不必要的参数 防止重复
-        data.url = data.url.replace(reYoutube, "");
-    }
+    // if (urlParsing.host.includes("googlevideo.com")) {
+    //     // Chrome商店版本 跳过youtube
+    //     if (chrome.runtime.id == "jfedfbgedapdagkghmgibemcoggfppbb" && !G.youtube) { return; }
+    //     // 完整视频/音频 &range=[^&]*
+    //     // 去掉不必要的参数 防止重复
+    //     data.url = data.url.replace(reYoutube, "");
+    //     urlParsing = new URL(data.url);
+    // }
 
     let [name, ext] = fileNameParse(urlParsing.pathname);
 
