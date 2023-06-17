@@ -76,15 +76,6 @@ chrome.downloads.onChanged.addListener(function (item) {
 function AddMedia(data, currentTab = true) {
     data._title = data.title;
     data.title = stringModify(data.title);
-    // Youtube
-    // if (data.name == "videoplayback" && data.url.includes("googlevideo.com")) {
-    //     const size = data.url.match(/&clen=([\d]*)/);
-    //     data.size = size ? size[1] : 0;
-    //     const mime = data.url.match(/&mime=([^&]*)/);
-    //     data.type = mime ? decodeURIComponent(mime[1]) : 'NULL';
-    //     data.ext = data.type.split("/")[1];
-    //     data.name = data.title + '.' + data.ext;
-    // }
     // 不存在扩展使用类型
     if (data.ext === undefined && data.type !== undefined) {
         data.ext = data.type.split("/")[1];

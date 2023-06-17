@@ -72,7 +72,6 @@ G.OptionLists = {
     refreshClear: true,
     initSyncComplete: false,
     initLocalComplete: false,
-    // youtube: false,
     catDownload: false,
     saveAs: false,
     userAgent: "",
