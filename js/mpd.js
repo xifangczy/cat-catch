@@ -128,7 +128,7 @@ function showSegment(type, index) {
     }
     $("#media_file").html(textarea);
     $("#count").html("共 " + items.segments.length + " 个文件" + "，总时长: " + secToTime(mpdJson.duration));
-    items.segments.length > 0 && $("#tips").html('initialization: <input type="text" value="' + items.segments[0].map.resolvedUri + '" spellcheck="false" readonly="readonly" class="keyUrl">');
+    items.segments.length > 0 && $("#tips").html('initialization: <input type="text" value="' + items.segments[0].map.resolvedUri + '" spellcheck="false" readonly="readonly" class="width100">');
     $("#info").html(getInfo(type));
 }
 
