@@ -211,26 +211,33 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         // 储存数据
         cacheData[info.tabId] ??= [];
         cacheData[info.tabId].push(info);
-        // 视频切片太多 频繁储存 严重影响性能
+        
         // 当前标签媒体数量大于100 开启防抖 等待5秒储存 或 积累10个资源储存一次。
         if (cacheData[info.tabId].length >= 100 && debounceCount <= 10) {
             debounceCount++;
             clearTimeout(debounce);
-            debounce = setTimeout(() => {
-                chrome.storage.local.set({ MediaData: cacheData }, function () {
-                    chrome.runtime.lastError && console.log(chrome.runtime.lastError);
-                });
-                refreshIcon(info.tabId);
-            }, 5000);
-        } else {
-            clearTimeout(debounce);
-            debounceCount = 0;
-            chrome.storage.local.set({ MediaData: cacheData }, function () {
-                chrome.runtime.lastError && console.log(chrome.runtime.lastError);
-            });
-            refreshIcon(info.tabId);
+            debounce = setTimeout(function () { save(info.tabId); }, 5000);
+            return;
         }
+        // 时间间隔小于500毫秒 等待2秒储存
+        if (Date.now() - debounceTime <= 500) {
+            clearTimeout(debounce);
+            debounceTime = Date.now();
+            debounce = setTimeout(function () { save(info.tabId); }, 2000);
+            return;
+        }
+        save(info.tabId);
     });
+}
+// cacheData数据 储存到 chrome.storage.local
+function save(tabId) {
+    clearTimeout(debounce);
+    debounceTime = Date.now();
+    debounceCount = 0;
+    chrome.storage.local.set({ MediaData: cacheData }, function () {
+        chrome.runtime.lastError && console.log(chrome.runtime.lastError);
+    });
+    refreshIcon(tabId);
 }
 
 //监听来自popup 和 options的请求

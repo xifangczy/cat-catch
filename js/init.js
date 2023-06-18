@@ -125,6 +125,7 @@ const reStringModify = /['\\:\*\?"<\/>\|~]/g;
 // 防抖
 let debounce = undefined;
 let debounceCount = 0;
+let debounceTime = 0;
 
 // 初始变量
 function InitOptions() {
