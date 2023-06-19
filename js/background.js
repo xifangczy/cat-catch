@@ -412,7 +412,7 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
 
 //切换窗口，更新全局变量G.tabId
 chrome.windows.onFocusChanged.addListener(function (activeInfo) {
-    if (activeInfo.tabId == -1) { return; }
+    if (!activeInfo.tabId || activeInfo.tabId == -1) { return; }
     G.tabId = activeInfo.tabId;
 }, { filters: ["normal"] });
 
@@ -431,7 +431,8 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
         // 跳过特殊页面
         if (isSpecialPage(tab.url) || tabId == 0 || tabId == -1) { return; }
-
+        G.tabId = tabId;
+        
         // 开启捕获
         if (G.version >= 102) {
             G.scriptList.forEach(function (item, script) {
