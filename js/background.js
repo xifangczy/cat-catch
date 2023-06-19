@@ -176,8 +176,8 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
             cacheURL: { host: urlParsing.host, search: urlParsing.search, pathname: urlParsing.pathname }
         };
         // 幽灵资源 查源
-        if (info.tabId == -1 && info.referer) {
-            if (webInfo?.url == info.referer) {
+        if (info.tabId == -1) {
+            if (webInfo?.url == info.referer || webInfo?.url == info.initiator) {
                 info.tabId = webInfo.id;
             } else {
                 await chrome.tabs.query({ url: info.referer ?? info.initiator }, function (newWebInfo) {
