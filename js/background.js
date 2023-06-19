@@ -240,7 +240,7 @@ function save(tabId) {
     refreshIcon(tabId);
 }
 
-//监听来自popup 和 options的请求
+// 监听来自popup 和 options的请求
 chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     if (G.featMobileTabId === undefined ||
         G.featAutoDownTabId === undefined
@@ -337,6 +337,11 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // Heart Beat
     if (Message.Message == "HeartBeat") {
+        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+            if (tabs[0] && tabs[0].id) {
+                G.tabId = tabs[0].id;
+            }
+        });
         sendResponse("HeartBeat OK");
         return true;
     }
@@ -400,7 +405,13 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     return true;
 });
 
-//切换标签，更新全局变量G.tabId 更新图标
+// 选定标签 更新G.tabId
+chrome.tabs.onHighlighted.addListener(function (activeInfo) {
+    if (!activeInfo.tabId || activeInfo.tabId == -1) { return; }
+    G.tabId = activeInfo.tabId;
+});
+
+// 切换标签，更新全局变量G.tabId 更新图标
 chrome.tabs.onActivated.addListener(function (activeInfo) {
     G.tabId = activeInfo.tabId;
     if (cacheData[G.tabId] !== undefined) {
@@ -410,7 +421,7 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
     SetIcon({ tabId: G.tabId });
 });
 
-//切换窗口，更新全局变量G.tabId
+// 切换窗口，更新全局变量G.tabId
 chrome.windows.onFocusChanged.addListener(function (activeInfo) {
     if (!activeInfo.tabId || activeInfo.tabId == -1) { return; }
     G.tabId = activeInfo.tabId;
@@ -432,7 +443,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
         // 跳过特殊页面
         if (isSpecialPage(tab.url) || tabId == 0 || tabId == -1) { return; }
         G.tabId = tabId;
-        
+
         // 开启捕获
         if (G.version >= 102) {
             G.scriptList.forEach(function (item, script) {
