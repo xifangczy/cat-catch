@@ -399,6 +399,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     sendResponse("Error");
     return true;
 });
+
 //切换标签，更新全局变量G.tabId 更新图标
 chrome.tabs.onActivated.addListener(function (activeInfo) {
     G.tabId = activeInfo.tabId;
@@ -408,6 +409,12 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
     }
     SetIcon({ tabId: G.tabId });
 });
+
+//切换窗口，更新全局变量G.tabId
+chrome.windows.onFocusChanged.addListener(function (activeInfo) {
+    if (activeInfo.tabId == -1) { return; }
+    G.tabId = activeInfo.tabId;
+}, { filters: ["normal"] });
 
 // 标签更新 清除数据
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
@@ -478,6 +485,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
         }
     }
 });
+
 // 标签关闭 清除数据
 chrome.tabs.onRemoved.addListener(function (tabId) {
     // 清理缓存数据
