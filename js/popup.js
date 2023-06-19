@@ -31,18 +31,19 @@ chrome.runtime.sendMessage(chrome.runtime.id, { Message: "HeartBeat" });
 // 清理冗余数据
 chrome.runtime.sendMessage(chrome.runtime.id, { Message: "clearRedundant" });
 // 填充数据
-chrome.storage.local.get("MediaData", function (items) {
-    if (items.MediaData === undefined || items.MediaData[G.tabId] == undefined) {
+chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getData" }, function (data) {
+    // console.log(data)
+    if (!data) {
         $tips.html("还没闻到味儿~");
         return;
     }
-    currentCount = items.MediaData[G.tabId].length;
+    currentCount = data.length;
     if (currentCount >= 500 && !confirm(`共 ${currentCount} 条资源, 是否取消加载?`)) {
         UItoggle();
         return;
     }
     for (let key = 0; key < currentCount; key++) {
-        $current.append(AddMedia(items.MediaData[G.tabId][key]));
+        $current.append(AddMedia(data[key]));
     }
     $mediaList.append($current);
     UItoggle();
@@ -350,13 +351,14 @@ $(".Tabs .TabButton").click(function () {
 });
 // 其他页面
 $('#allTab').click(function () {
-    !allCount && chrome.storage.local.get("MediaData", function (items) {
-        if (items.MediaData === undefined) { return; }
-        for (let key in items.MediaData) {
+    !allCount && chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getAllData" }, function (data) {
+        console.log(data);
+        if (!data) { return; }
+        for (let key in data) {
             if (key == G.tabId) { continue; }
-            allCount += items.MediaData[key].length;
-            for (let i = 0; i < items.MediaData[key].length; i++) {
-                $all.append(AddMedia(items.MediaData[key][i], false));
+            allCount += data[key].length;
+            for (let i = 0; i < data[key].length; i++) {
+                $all.append(AddMedia(data[key][i], false));
             }
         }
         allCount && $allMediaList.append($all);

@@ -211,7 +211,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         // 储存数据
         cacheData[info.tabId] ??= [];
         cacheData[info.tabId].push(info);
-        
+
         // 当前标签媒体数量大于100 开启防抖 等待5秒储存 或 积累10个资源储存一次。
         if (cacheData[info.tabId].length >= 100 && debounceCount <= 10) {
             debounceCount++;
@@ -253,7 +253,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         sendResponse("ok");
         return true;
     }
-    if (Message.Message == "getData") {
+    if (Message.Message == "getAllData") {
         sendResponse(cacheData);
         return true;
     }
@@ -268,6 +268,10 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         return true;
     }
     Message.tabId = Message.tabId ?? G.tabId;
+    if (Message.Message == "getData") {
+        sendResponse(cacheData[Message.tabId]);
+        return true;
+    }
     if (Message.Message == "getButtonState") {
         let state = {
             MobileUserAgent: G.featMobileTabId.includes(Message.tabId),
