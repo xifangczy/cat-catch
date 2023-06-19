@@ -30,40 +30,6 @@ const favicon = new Map();
 chrome.runtime.sendMessage(chrome.runtime.id, { Message: "HeartBeat" });
 // 清理冗余数据
 chrome.runtime.sendMessage(chrome.runtime.id, { Message: "clearRedundant" });
-// 填充数据
-chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getData" }, function (data) {
-    // console.log(data)
-    if (!data) {
-        $tips.html("还没闻到味儿~");
-        return;
-    }
-    currentCount = data.length;
-    if (currentCount >= 500 && !confirm(`共 ${currentCount} 条资源, 是否取消加载?`)) {
-        UItoggle();
-        return;
-    }
-    for (let key = 0; key < currentCount; key++) {
-        $current.append(AddMedia(data[key]));
-    }
-    $mediaList.append($current);
-    UItoggle();
-});
-// 监听资源数据
-chrome.runtime.onMessage.addListener(function (MediaData, sender, sendResponse) {
-    const html = AddMedia(MediaData, MediaData.tabId == G.tabId);
-    if (MediaData.tabId == G.tabId) {
-        !currentCount && $mediaList.append($current);
-        currentCount++;
-        $current.append(html);
-        UItoggle();
-    } else if (allCount) {
-        allCount++;
-        $all.append(html);
-        UItoggle();
-    }
-    sendResponse("OK");
-});
-
 // 监听下载 出现服务器拒绝错误 调用下载器
 chrome.downloads.onChanged.addListener(function (item) {
     if (G.catDownload) { delete downData[item.id]; return; }
@@ -352,7 +318,7 @@ $(".Tabs .TabButton").click(function () {
 // 其他页面
 $('#allTab').click(function () {
     !allCount && chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getAllData" }, function (data) {
-        console.log(data);
+        // console.log(data);
         if (!data) { return; }
         for (let key in data) {
             if (key == G.tabId) { continue; }
@@ -537,6 +503,39 @@ $("#enable").click(function () {
 const interval = setInterval(function () {
     if (!G.initSyncComplete || !G.initLocalComplete || !G.tabId) { return; }
     clearInterval(interval);
+    // 填充数据
+    chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getData", tabId: G.tabId }, function (data) {
+        if (!data || data === "OK") {
+            $tips.html("还没闻到味儿~");
+            return;
+        }
+        currentCount = data.length;
+        if (currentCount >= 500 && !confirm(`共 ${currentCount} 条资源, 是否取消加载?`)) {
+            UItoggle();
+            return;
+        }
+        for (let key = 0; key < currentCount; key++) {
+            $current.append(AddMedia(data[key]));
+        }
+        $mediaList.append($current);
+        UItoggle();
+    });
+    // 监听资源数据
+    chrome.runtime.onMessage.addListener(function (MediaData, sender, sendResponse) {
+        if (MediaData.Message) { return; }
+        const html = AddMedia(MediaData, MediaData.tabId == G.tabId);
+        if (MediaData.tabId == G.tabId) {
+            !currentCount && $mediaList.append($current);
+            currentCount++;
+            $current.append(html);
+            UItoggle();
+        } else if (allCount) {
+            allCount++;
+            $all.append(html);
+            UItoggle();
+        }
+        sendResponse("OK");
+    });
     // 获取模拟手机 自动下载 捕获 状态
     chrome.runtime.sendMessage({ Message: "getButtonState", tabId: G.tabId }, function (state) {
         state.MobileUserAgent && $("#MobileUserAgent").html("关闭模拟").data("switch", "off");
