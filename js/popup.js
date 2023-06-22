@@ -510,7 +510,7 @@ const interval = setInterval(function () {
             return;
         }
         currentCount = data.length;
-        if (currentCount >= 500 && !confirm(`共 ${currentCount} 条资源, 是否取消加载?`)) {
+        if (currentCount >= 500 && confirm(`共 ${currentCount} 条资源, 是否取消加载?`)) {
             UItoggle();
             return;
         }
