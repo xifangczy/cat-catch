@@ -1,6 +1,7 @@
-const CATCH_SEARCH_ONLY = true;
+// const CATCH_SEARCH_ONLY = true;
 (function () {
-    console.log("start search.js");
+    const _log = console.log;
+    _log("start search.js");
     const CATCH_SEARCH_DEBUG = false;
     const filter = new Set();
 
@@ -17,7 +18,7 @@ const CATCH_SEARCH_ONLY = true;
     }
 
     async function findMedia(data, depth = 0) {
-        CATCH_SEARCH_DEBUG && console.log(data);
+        CATCH_SEARCH_DEBUG && _log(data);
         let index = 0;
         if (!data) { return; }
         if (data instanceof Array && data.length == 16) {
@@ -64,7 +65,7 @@ const CATCH_SEARCH_ONLY = true;
                     continue;
                 }
                 if (CATCH_SEARCH_DEBUG && data[key].includes("manifest")) {
-                    console.log(data);
+                    _log(data);
                 }
             }
         }
@@ -74,9 +75,9 @@ const CATCH_SEARCH_ONLY = true;
     const _xhrOpen = XMLHttpRequest.prototype.open;
     XMLHttpRequest.prototype.open = function (method) {
         method = method.toUpperCase();
-        CATCH_SEARCH_DEBUG && console.log(this);
+        CATCH_SEARCH_DEBUG && _log(this);
         this.addEventListener("readystatechange", function (event) {
-            CATCH_SEARCH_DEBUG && console.log(this);
+            CATCH_SEARCH_DEBUG && _log(this);
             if (this.status != 200) { return; }
             // 查找疑似key
             if (this.responseType == "arraybuffer" && this.response?.byteLength && this.response.byteLength == 16) {
@@ -134,10 +135,10 @@ const CATCH_SEARCH_ONLY = true;
     window.fetch = async function (input, init) {
         const response = await _fetch.apply(this, arguments);
         const clone = response.clone();
-        CATCH_SEARCH_DEBUG && console.log(response);
+        CATCH_SEARCH_DEBUG && _log(response);
         response.arrayBuffer()
             .then(arrayBuffer => {
-                CATCH_SEARCH_DEBUG && console.log({ arrayBuffer, input });
+                CATCH_SEARCH_DEBUG && _log({ arrayBuffer, input });
                 if (arrayBuffer.byteLength == 16) {
                     postData({ action: "catCatchAddKey", key: arrayBuffer, href: location.href, ext: "key" });
                     return;
@@ -192,7 +193,7 @@ const CATCH_SEARCH_ONLY = true;
     const _btoa = window.btoa;
     window.btoa = function (data) {
         const base64 = _btoa.apply(this, arguments);
-        CATCH_SEARCH_DEBUG && console.log(base64, data, base64.length);
+        CATCH_SEARCH_DEBUG && _log(base64, data, base64.length);
         if (base64.length == 24 && base64.substring(22, 24) == "==") {
             postData({ action: "catCatchAddKey", key: base64, href: location.href, ext: "base64Key" });
         }
@@ -208,7 +209,7 @@ const CATCH_SEARCH_ONLY = true;
     const _atob = window.atob;
     window.atob = function (base64) {
         const data = _atob.apply(this, arguments);
-        CATCH_SEARCH_DEBUG && console.log(base64, data, base64.length);
+        CATCH_SEARCH_DEBUG && _log(base64, data, base64.length);
         if (base64.length == 24 && base64.substring(22, 24) == "==") {
             postData({ action: "catCatchAddKey", key: base64, href: location.href, ext: "base64Key" });
         }
