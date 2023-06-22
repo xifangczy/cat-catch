@@ -427,7 +427,7 @@ chrome.windows.onFocusChanged.addListener(function (activeInfo) {
     G.tabId = activeInfo.tabId;
 }, { filters: ["normal"] });
 
-// 标签更新 清除数据
+// 标签更新 清除数据 插入脚本
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     // console.log(tabId, changeInfo, tab);
     if (changeInfo.status == "loading") {
@@ -477,7 +477,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
                 chrome.webNavigation.getAllFrames({ tabId: tabId }, function (frames) {
                     const frameId = [];
                     frames.forEach(function (item) {
-                        if (item.frameId != 0) { frameId.push(item.frameId); }
+                        if (item.frameId != 0 && !isSpecialPage(item.url)) { frameId.push(item.frameId); }
                     });
                     frameId.length && chrome.scripting.executeScript({
                         target: { tabId: tabId, frameIds: frameId },
