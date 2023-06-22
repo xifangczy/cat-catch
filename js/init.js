@@ -143,7 +143,9 @@ function InitOptions() {
         items.Ext = new Map(items.Ext.map(item => [item.ext, item]));
         // 预编译正则匹配
         items.Regex = items.Regex.map(item => {
-            return { regex: new RegExp(item.regex, item.type), ext: item.ext, state: item.state }
+            let reg = undefined;
+            try { reg = new RegExp(item.regex, item.type) } catch (e) { item.state = false; }
+            return { regex: reg, ext: item.ext, state: item.state }
         });
         G = { ...items, ...G };
         G.initSyncComplete = true;
@@ -167,7 +169,9 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
         }
         if (key == "Regex") {
             G.Regex = newValue.map(item => {
-                return { regex: new RegExp(item.regex, item.type), ext: item.ext, state: item.state }
+                let reg = undefined;
+                try { reg = new RegExp(item.regex, item.type) } catch (e) { item.state = false; }
+                return { regex: reg, ext: item.ext, state: item.state }
             });
             continue;
         }
