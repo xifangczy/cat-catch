@@ -175,18 +175,27 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
             referer: data.referer,
             cacheURL: { host: urlParsing.host, search: urlParsing.search, pathname: urlParsing.pathname }
         };
-        // 幽灵资源 查源
+        // 幽灵资源 溯源
         if (info.tabId == -1) {
             if (webInfo?.url == info.referer || webInfo?.url == info.initiator) {
                 info.tabId = webInfo.id;
-            } else {
-                await chrome.tabs.query({ url: info.referer ?? info.initiator }, function (newWebInfo) {
-                    if (chrome.runtime.lastError) { return; }
-                    if (newWebInfo.length > 0) {
-                        webInfo = newWebInfo[0];
-                        info.tabId = newWebInfo[0].id;
+            }
+            const url = info.referer ?? info.initiator;
+            if (info.tabId == -1 && url) {
+                const newWebInfo = await chrome.tabs.query({ url: url });
+                if (newWebInfo.length > 0) {
+                    webInfo = newWebInfo[0];
+                    info.tabId = newWebInfo[0].id;
+                }
+            }
+            if (info.tabId == -1) {
+                const frames = await chrome.webNavigation.getAllFrames({ tabId: G.tabId });
+                for (let frame of frames) {
+                    if (frame.url == url) {
+                        info.tabId = G.tabId;
+                        break;
                     }
-                });
+                }
             }
         }
         // 不存在 initiator 和 referer 使用web url代替initiator
@@ -380,7 +389,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
                     return true;
                 }
             }
-            findMedia({ url: Message.url, tabId: -1, extraExt: Message.extraExt, mime: Message.mime, requestId: Message.requestId }, true, true);
+            findMedia({ url: Message.url, tabId: -1, extraExt: Message.extraExt, mime: Message.mime, requestId: Message.requestId, initiator: Message.href }, true, true);
         });
         sendResponse("ok");
         return true;
