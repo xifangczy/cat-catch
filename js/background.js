@@ -471,23 +471,23 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     }
     if (changeInfo.status == "complete") {
         // 开启捕获
-        if (G.version >= 102) {
-            G.scriptList.forEach(function (item, script) {
-                if (!item.tabId.has(tabId) || !item.allFrames) { return true; }
-                chrome.webNavigation.getAllFrames({ tabId: tabId }, function (frames) {
-                    const frameId = [];
-                    frames.forEach(function (item) {
-                        if (item.frameId != 0 && !isSpecialPage(item.url)) { frameId.push(item.frameId); }
-                    });
-                    frameId.length && chrome.scripting.executeScript({
-                        target: { tabId: tabId, frameIds: frameId },
-                        files: [`catch-script/${script}`],
-                        injectImmediately: true,
-                        world: item.world
-                    });
-                });
-            });
-        }
+        // if (G.version >= 102) {
+        //     G.scriptList.forEach(function (item, script) {
+        //         if (!item.tabId.has(tabId) || !item.allFrames) { return true; }
+        //         chrome.webNavigation.getAllFrames({ tabId: tabId }, function (frames) {
+        //             const frameId = [];
+        //             frames.forEach(function (item) {
+        //                 if (item.frameId != 0 && !isSpecialPage(item.url)) { frameId.push(item.frameId); }
+        //             });
+        //             frameId.length && chrome.scripting.executeScript({
+        //                 target: { tabId: tabId, frameIds: frameId },
+        //                 files: [`catch-script/${script}`],
+        //                 injectImmediately: true,
+        //                 world: item.world
+        //             });
+        //         });
+        //     });
+        // }
         if (ffmpeg.tab && tabId == ffmpeg.tab) {
             setTimeout(() => {
                 chrome.tabs.sendMessage(tabId, ffmpeg.data);
@@ -541,6 +541,20 @@ chrome.commands.onCommand.addListener(function (command) {
         chrome.storage.sync.set({ enable: !G.enable });
         chrome.action.setIcon({ path: G.enable ? "/img/icon.png" : "/img/icon-disable.png" });
     }
+});
+
+// 载入frame时 加载脚本
+chrome.webNavigation.onCommitted.addListener(function (details) {
+    if (G.version < 102 || details.frameId == 0 || isSpecialPage(details.url)) { return; }
+    G.scriptList.forEach(function (item, script) {
+        if (!item.tabId.has(details.tabId) || !item.allFrames) { return true; }
+        chrome.scripting.executeScript({
+            target: { tabId: details.tabId, frameIds: [details.frameId] },
+            files: [`catch-script/${script}`],
+            injectImmediately: true,
+            world: item.world
+        });
+    });
 });
 
 //检查扩展名以及大小限制
