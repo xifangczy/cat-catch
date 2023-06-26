@@ -401,6 +401,7 @@ $(function () {
 
         if (tabId) {
             chrome.webNavigation.getAllFrames({ tabId: tabId }, function (frames) {
+                if (!frames) { return; }
                 frames.forEach(function (frame) {
                     chrome.tabs.sendMessage(tabId, { Message: "getKey" }, { frameId: frame.frameId }, function (result) {
                         if (chrome.runtime.lastError || !result || result.length == 0) { return; }
