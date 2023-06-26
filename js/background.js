@@ -478,32 +478,12 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
             });
         }
     }
-    if (changeInfo.status == "complete") {
-        // 开启捕获
-        // if (G.version >= 102) {
-        //     G.scriptList.forEach(function (item, script) {
-        //         if (!item.tabId.has(tabId) || !item.allFrames) { return true; }
-        //         chrome.webNavigation.getAllFrames({ tabId: tabId }, function (frames) {
-        //             const frameId = [];
-        //             frames.forEach(function (item) {
-        //                 if (item.frameId != 0 && !isSpecialPage(item.url)) { frameId.push(item.frameId); }
-        //             });
-        //             frameId.length && chrome.scripting.executeScript({
-        //                 target: { tabId: tabId, frameIds: frameId },
-        //                 files: [`catch-script/${script}`],
-        //                 injectImmediately: true,
-        //                 world: item.world
-        //             });
-        //         });
-        //     });
-        // }
-        if (ffmpeg.tab && tabId == ffmpeg.tab) {
-            setTimeout(() => {
-                chrome.tabs.sendMessage(tabId, ffmpeg.data);
-                ffmpeg.data = undefined;
-                ffmpeg.tab = 0;
-            }, 500);
-        }
+    if (changeInfo.status == "complete" && ffmpeg.tab && tabId == ffmpeg.tab) {
+        setTimeout(() => {
+            chrome.tabs.sendMessage(tabId, ffmpeg.data);
+            ffmpeg.data = undefined;
+            ffmpeg.tab = 0;
+        }, 500);
     }
 });
 
