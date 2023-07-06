@@ -9,8 +9,8 @@
     <button id="download" style="border:solid 1px #000;">下载已捕获的数据</button>
     <button id="clean" style="border:solid 1px #000;">清理缓存</button>
     <button id="close" style="border:solid 1px #000;">关闭</button>
-    <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown")}>完成捕获自动下载</label>
-    <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg")}>使用ffmpeg合并</label>
+    <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown")} style="-webkit-appearance: auto;">完成捕获自动下载</label>
+    <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg")} style="-webkit-appearance: auto;">使用ffmpeg合并</label>
     <details>
         <summary>文件名设置</summary>
         文件名: <div id="fileName"></div>
