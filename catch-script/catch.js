@@ -131,6 +131,10 @@
         _endOfStream.call(this);
         localStorage.getItem("CatCatchCatch_autoDown") == "checked" && catchDownload();
     }
+    // 反检测
+    window.MediaSource.prototype.endOfStream.toString = function () {
+        return _endOfStream.toString();
+    }
 
     // 下载资源
     function catchDownload() {
