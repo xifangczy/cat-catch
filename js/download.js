@@ -14,7 +14,7 @@ function start() {
     if (autoClose) {
         $("#autoClose").prop("checked", true);
     } else {
-        chrome.storage.local.get({ downAutoClose: false }, function (data) {
+        chrome.storage.local.get({ downAutoClose: true }, function (data) {
             $("#autoClose").prop("checked", data.downAutoClose);
         });
     }
