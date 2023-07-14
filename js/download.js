@@ -11,6 +11,13 @@ const title = params.get("title");
 _referer ? setReferer(_referer, start) : start();
 
 function start() {
+    if (autoClose) {
+        $("#autoClose").prop("checked", true);
+    } else {
+        chrome.storage.local.get({ downAutoClose: false }, function (data) {
+            $("#autoClose").prop("checked", data.downAutoClose);
+        });
+    }
     chrome.tabs.getCurrent(function (tab) {
         startDownload(tab.id);
     });
@@ -35,8 +42,6 @@ function startDownload(tabId) {
 
     const $downFilepProgress = $("#downFilepProgress");
     const $progress = $(".progress");
-
-    $("#autoClose").prop("checked", autoClose);
 
     // 使用ajax下载文件
     $("#downfile").show();
@@ -125,6 +130,13 @@ function startDownload(tabId) {
             return;
         }
         chrome.downloads.showDefaultFolder();
+    });
+
+    // 下载完成关闭本页面
+    $("#autoClose").click(function () {
+        chrome.storage.local.set({
+            downAutoClose: $("#autoClose").prop("checked")
+        });
     });
 
     // 发送到在线ffmpeg
