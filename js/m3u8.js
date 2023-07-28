@@ -536,6 +536,10 @@ $(function () {
     });
     // 调用m3u8DL下载
     $("#m3u8DL").click(function () {
+        if(_m3u8Url.startsWith("blob:")){
+            alert("blob地址无法调用m3u8DL下载");
+            return;
+        }
         const m3u8dlArg = $("#m3u8dlArg").val();
         navigator.clipboard.writeText(m3u8dlArg);
         const m3u8dl = 'm3u8dl://' + Base64.encode(m3u8dlArg);

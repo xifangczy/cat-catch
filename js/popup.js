@@ -209,19 +209,22 @@ function AddMedia(data, currentTab = true) {
     // 下载
     data.html.find('#download').click(function () {
         if (G.m3u8dl && (isM3U8(data) || isMPD(data))) {
-            let m3u8dlArg = templates(G.m3u8dlArg, data);
-            let url = 'm3u8dl://' + Base64.encode(m3u8dlArg);
-            if (url.length >= 2046) {
-                navigator.clipboard.writeText(m3u8dlArg);
-                Tips("m3u8dl参数太长无法唤醒m3u8DL程序, 请手动粘贴下载。", 2000);
+            if(!data.url.startsWith("blob:")){
+                let m3u8dlArg = templates(G.m3u8dlArg, data);
+                let url = 'm3u8dl://' + Base64.encode(m3u8dlArg);
+                if (url.length >= 2046) {
+                    navigator.clipboard.writeText(m3u8dlArg);
+                    Tips("m3u8dl参数太长无法唤醒m3u8DL程序, 请手动粘贴下载。", 2000);
+                    return false;
+                }
+                if (G.isFirefox) {
+                    window.location.href = url;
+                    return false;
+                }
+                chrome.tabs.update({ url: url });
                 return false;
             }
-            if (G.isFirefox) {
-                window.location.href = url;
-                return false;
-            }
-            chrome.tabs.update({ url: url });
-            return false;
+            Tips("blob地址无法调用m3u8DL下载", 1500);
         }
         chrome.downloads.download({
             url: data.url,
