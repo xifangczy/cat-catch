@@ -225,11 +225,16 @@
 
     // 拦截fromCharCode
     const _fromCharCode = String.fromCharCode;
+    let m3u8Text = '';
     String.fromCharCode = function(){
         const data = _fromCharCode.apply(this, arguments);
-        if(data.length < 32){ return data; }
-        if (data.substring(0, 7).toUpperCase() == "#EXTM3U" && isFullM3u8(data)) {
-            toUrl(data.split("#EXT-X-ENDLIST")[0] + "#EXT-X-ENDLIST");
+        if(data.length < 7){ return data; }
+        if (data.substring(0, 7).toUpperCase() == "#EXTM3U" || m3u8Text != '') {
+            m3u8Text += data;
+            if(data.includes("#EXT-X-ENDLIST")){
+                toUrl(m3u8Text.split("#EXT-X-ENDLIST")[0] + "#EXT-X-ENDLIST");
+                m3u8Text = '';
+            }
             return data;
         }
         if(data.length == 32){
