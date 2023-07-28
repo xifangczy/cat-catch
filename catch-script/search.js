@@ -223,6 +223,30 @@
         return _atob.toString();
     }
 
+    // 拦截fromCharCode
+    const _fromCharCode = String.fromCharCode;
+    String.fromCharCode = function(){
+        const data = _fromCharCode.apply(this, arguments);
+        if(data.length < 32){ return data; }
+        if (data.toUpperCase().substring(0, 7) == "#EXTM3U" && isFullM3u8(data)) {
+            toUrl(data.split("#EXT-X-ENDLIST")[0] + "#EXT-X-ENDLIST");
+            return data;
+        }
+        if(data.length == 32){
+            postData({ action: "catCatchAddKey", key: data, href: location.href, ext: "key" });
+            return data;
+        }
+        const maybeKey = data.replaceAll("\u0010", "");
+        if(maybeKey.length == 32){
+            postData({ action: "catCatchAddKey", key: maybeKey, href: location.href, ext: "key" });
+        }
+        return data;
+    }
+    // 反检测
+    String.fromCharCodetoString = function () {
+        return _fromCharCode.toString();
+    }
+
     function isUrl(str) {
         return /^http[s]*:\/\/.+/i.test(str);
     }
