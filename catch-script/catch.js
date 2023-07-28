@@ -52,10 +52,12 @@
         catchDownload();
     });
     CatCatch.querySelector("#close").addEventListener('click', function (event) {
-        if (confirm("确认关闭?\n此为临时关闭, 完全关闭请在猫抓扩展中关闭.")) {
-            CatCatch.style.display = "none";
-            console.log(`猫抓\n恢复显示捕获面板\ndocument.getElementById("CatCatchCatch").style.display = "flex";`);
-        }
+        // if (confirm("确认关闭?\n此为临时关闭, 完全关闭请在猫抓扩展中关闭.")) {
+        //     CatCatch.style.display = "none";
+        //     console.log(`猫抓\n恢复显示捕获面板\ndocument.getElementById("CatCatchCatch").style.display = "flex";`);
+        // }
+        CatCatch.style.display = "none";
+        console.log(`猫抓\n恢复显示捕获面板\ndocument.getElementById("CatCatchCatch").style.display = "flex";`);
     });
 
     // 文件名设置
