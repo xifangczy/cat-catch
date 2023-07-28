@@ -1381,7 +1381,7 @@ function fixFileDuration(data, duration) {
     return data;
 }
 function isHexKey(str) {
-    return /[0-9a-fA-F]{32}/.test(str);
+    return /^[0-9a-fA-F]{32}$/.test(str);
 }
 // m3u8文件内容加入bashUrl
 function addBashUrl(baseUrl, m3u8Text) {
