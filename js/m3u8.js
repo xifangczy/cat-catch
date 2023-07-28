@@ -217,6 +217,9 @@ $(function () {
         // m3u8下载or解析错误
         hls.on(Hls.Events.ERROR, function (event, data) {
             console.log(data);
+            if (data.type == "mediaError" && data.details == "fragParsingError") {
+                hls.stopLoad();
+            }
             $("#loading").show();
             $("#loading .optionBox").html(`解析或播放m3u8文件中有错误, 详细错误信息查看控制台`);
             // 出错 如果正在录制中 自动点击下载录制按钮
