@@ -12,7 +12,6 @@
         findMedia(data);
         return data;
     }
-    // 反检测
     JSON.parse.toString = function () {
         return _JSONparse.toString();
     }
@@ -125,7 +124,6 @@
         });
         _xhrOpen.apply(this, arguments);
     }
-    // 反检测
     XMLHttpRequest.prototype.open.toString = function () {
         return _xhrOpen.toString();
     }
@@ -167,7 +165,6 @@
             });
         return clone;
     }
-    // 反检测
     window.fetch.toString = function () {
         return _fetch.toString();
     }
@@ -184,7 +181,6 @@
         }
         return data;
     }
-    // 反检测
     Array.prototype.slice.toString = function () {
         return _slice.toString();
     }
@@ -218,7 +214,6 @@
         }
         return data;
     }
-    // 反检测
     window.atob.toString = function () {
         return _atob.toString();
     }
@@ -226,28 +221,23 @@
     // 拦截fromCharCode
     const _fromCharCode = String.fromCharCode;
     let m3u8Text = '';
-    String.fromCharCode = function(){
+    String.fromCharCode = function () {
         const data = _fromCharCode.apply(this, arguments);
-        if(data.length < 7){ return data; }
-        if (data.substring(0, 7).toUpperCase() == "#EXTM3U" || m3u8Text != '') {
+        if (data.length < 7) { return data; }
+        if (data.substring(0, 7) == "#EXTM3U" || data.includes("#EXTINF:")) {
             m3u8Text += data;
-            if(data.includes("#EXT-X-ENDLIST")){
+            if (m3u8Text.includes("#EXT-X-ENDLIST")) {
                 toUrl(m3u8Text.split("#EXT-X-ENDLIST")[0] + "#EXT-X-ENDLIST");
                 m3u8Text = '';
             }
             return data;
         }
-        if(data.length == 32){
-            postData({ action: "catCatchAddKey", key: data, href: location.href, ext: "key" });
-            return data;
-        }
-        const maybeKey = data.replaceAll("\u0010", "");
-        if(maybeKey.length == 32){
-            postData({ action: "catCatchAddKey", key: maybeKey, href: location.href, ext: "key" });
+        const key = data.replaceAll("\u0010", "");
+        if (key.length == 32) {
+            postData({ action: "catCatchAddKey", key: key, href: location.href, ext: "key" });
         }
         return data;
     }
-    // 反检测
     String.fromCharCodetoString = function () {
         return _fromCharCode.toString();
     }
