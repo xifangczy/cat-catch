@@ -238,7 +238,7 @@
         }
         return data;
     }
-    String.fromCharCodetoString = function () {
+    String.fromCharCode.toString = function () {
         return _fromCharCode.toString();
     }
 
