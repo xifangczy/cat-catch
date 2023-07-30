@@ -198,7 +198,6 @@
         }
         return base64;
     }
-    // 反检测
     window.btoa.toString = function () {
         return _btoa.toString();
     }

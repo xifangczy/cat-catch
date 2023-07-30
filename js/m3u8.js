@@ -402,7 +402,7 @@ $(function () {
         $("#rangeEnd").val(_fragments.length);
         $("#m3u8dlArg").val(getM3u8DlArg());
 
-        if (tabId) {
+        if (tabId && tabId != -1) {
             chrome.webNavigation.getAllFrames({ tabId: tabId }, function (frames) {
                 if (!frames) { return; }
                 frames.forEach(function (frame) {
