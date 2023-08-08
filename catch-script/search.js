@@ -5,7 +5,7 @@
     const CATCH_SEARCH_DEBUG = false;
     const filter = new Set();
 
-    // 拦截JSON.parse 分析内容
+    // JSON.parse
     const _JSONparse = JSON.parse;
     JSON.parse = function () {
         let data = _JSONparse.apply(this, arguments);
@@ -70,7 +70,7 @@
         }
     }
 
-    // 拦截 XHR 分析内容
+    // XHR
     const _xhrOpen = XMLHttpRequest.prototype.open;
     XMLHttpRequest.prototype.open = function (method) {
         method = method.toUpperCase();
@@ -101,10 +101,7 @@
             if (this.response.toUpperCase().includes("#EXTM3U")) {
                 if (this.response.substring(0, 7) == "#EXTM3U") {
                     if (method == "GET") {
-                        let BashUrl = this.responseURL.split("/");
-                        BashUrl.pop();
-                        BashUrl = BashUrl.join("/") + "/";
-                        toUrl(addBashUrl(BashUrl, this.response));
+                        toUrl(addBashUrl(getBashUrl(this.responseURL), this.response));
                         postData({ action: "catCatchAddMedia", url: this.responseURL, href: location.href, ext: "m3u8" });
                         return;
                     }
@@ -132,7 +129,7 @@
         return _xhrOpen.toString();
     }
 
-    // 拦截 fetch 分析内容
+    // fetch
     const _fetch = window.fetch;
     window.fetch = async function (input, init) {
         const response = await _fetch.apply(this, arguments);
@@ -155,6 +152,7 @@
                 }
                 if (text.substring(0, 7).toUpperCase() == "#EXTM3U") {
                     if (init?.method == undefined || (init.method && init.method.toUpperCase() == "GET")) {
+                        toUrl(addBashUrl(getBashUrl(input), text));
                         postData({ action: "catCatchAddMedia", url: input, href: location.href, ext: "m3u8" });
                         return;
                     }
@@ -173,7 +171,7 @@
         return _fetch.toString();
     }
 
-    // 拦截 Array.prototype.slice
+    // Array.prototype.slice
     const _slice = Array.prototype.slice;
     Array.prototype.slice = function (start, end) {
         let data = _slice.apply(this, arguments);
@@ -189,7 +187,7 @@
         return _slice.toString();
     }
 
-    // 拦截 window.btoa / window.atob
+    // window.btoa / window.atob
     const _btoa = window.btoa;
     window.btoa = function (data) {
         const base64 = _btoa.apply(this, arguments);
@@ -221,7 +219,7 @@
         return _atob.toString();
     }
 
-    // 拦截fromCharCode
+    // fromCharCode
     const _fromCharCode = String.fromCharCode;
     let m3u8Text = '';
     String.fromCharCode = function () {
@@ -261,21 +259,26 @@
         }
         return false;
     }
+    function getBashUrl(url) {
+        let bashUrl = url.split("/");
+        bashUrl.pop();
+        return bashUrl.join("/") + "/";
+    }
     function addBashUrl(baseUrl, m3u8Text) {
         let m3u8_split = m3u8Text.split("\n");
         m3u8Text = "";
-        for (let key in m3u8_split) {
-            if (isEmpty(m3u8_split[key])) { continue; }
-            if (m3u8_split[key].includes("URI=")) {
-                let KeyURL = reKeyURL.exec(m3u8_split[key]);
+        for (let ts of m3u8_split) {
+            if (ts == "" || ts == " " || ts == "\n") { continue; }
+            if (ts.includes("URI=")) {
+                let KeyURL = reKeyURL.exec(ts);
                 if (KeyURL && KeyURL[1] && !isUrl(KeyURL[1])) {
-                    m3u8_split[key] = m3u8_split[key].replace(reKeyURL, 'URI="' + baseUrl + KeyURL[1] + '"');
+                    ts = ts.replace(reKeyURL, 'URI="' + baseUrl + KeyURL[1] + '"');
                 }
             }
-            if (!m3u8_split[key].includes("#") && !isUrl(m3u8_split[key])) {
-                m3u8_split[key] = baseUrl + m3u8_split[key];
+            if (ts[0] != "#" && !isUrl(ts)) {
+                ts = baseUrl + ts;
             }
-            m3u8Text += m3u8_split[key] + "\n";
+            m3u8Text += ts + "\n";
         }
         return m3u8Text;
     }
@@ -331,8 +334,5 @@
         filter.add(key);
         data.requestId = Date.now().toString() + filter.size;
         window.postMessage(data);
-    }
-    function isEmpty(obj) {
-        return (typeof obj == "undefined" || obj == null || obj == "" || obj == " ");
     }
 })();
