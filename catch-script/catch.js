@@ -2,22 +2,26 @@
     console.log("catch.js Start");
     if (document.getElementById("CatCatchCatch")) { return; }
 
+    const buttonStyle = 'style="all: unset;border:solid 1px #000;margin: 2px;padding: 2px;"';
+    const checkboxStyle = 'style="all: unset;-webkit-appearance: auto;"';
+
     const CatCatch = document.createElement("div");
     CatCatch.setAttribute("id", "CatCatchCatch");
     CatCatch.innerHTML = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAAKlBMVEUAAADLlROxbBlRAD16GS5oAjWWQiOCIytgADidUx/95gHqwwTx0gDZqwT6kfLuAAAACnRSTlMA/vUejV7kuzi8za0PswAAANpJREFUGNNjwA1YSxkYTEqhnKZLLi6F1w0gnKA1shdvHYNxdq1atWobjLMKCOAyC3etlVrUAOH4HtNZmLgoAMKpXX37zO1FwcZAwMDguGq1zKpFmTNnzqx0Bpp2WvrU7ttn9py+I8JgLn1R8Pad22vurNkjwsBReHv33junzuyRnOnMwNCSeFH27K5dq1SNgcZxFMnuWrNq1W5VkNntihdv7ToteGcT0C7mIkE1qbWCYjJnM4CqEoWKdoslChXuUgXJqIcLebiphSgCZRhaPDhcDFhdmUMCGIgEAFA+Uc02aZg9AAAAAElFTkSuQmCC" style="-webkit-user-drag: none;width: 20px;">
     <div id="tips"></div>
-    <button id="download" style="border:solid 1px #000;">下载已捕获的数据</button>
-    <button id="clean" style="border:solid 1px #000;">清理缓存</button>
-    <button id="close" style="border:solid 1px #000;">关闭</button>
-    <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown")} style="-webkit-appearance: auto;">完成捕获自动下载</label>
-    <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg")} style="-webkit-appearance: auto;">使用ffmpeg合并</label>
+    <button id="download" ${buttonStyle}>下载已捕获的数据</button>
+    <button id="clean" ${buttonStyle}>清理缓存</button>
+    <button id="close" ${buttonStyle}>关闭</button>
+    <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown")} ${checkboxStyle}>完成捕获自动下载</label>
+    <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg")} ${checkboxStyle}>使用ffmpeg合并</label>
     <details>
         <summary>文件名设置</summary>
         文件名: <div id="fileName"></div>
         表达式: <div id="selector">未设置</div>
-        <button id="setName">设置表达式</button>
+        <button id="setName" ${buttonStyle}>设置表达式</button>
     </details>`;
-    CatCatch.style = `position: fixed;
+    CatCatch.style = `all: unset;
+        position: fixed;
         z-index: 999999;
         top: 10%;
         left: 90%;
@@ -43,10 +47,12 @@
     CatCatch.querySelector("#ffmpeg").addEventListener('change', function (event) {
         localStorage.setItem("CatCatchCatch_ffmpeg", this.checked ? "checked" : "");
     });
-    CatCatch.querySelector("#clean").addEventListener('click', function (event) {
-        catchMedia = [];
+    const $clean = CatCatch.querySelector("#clean");
+    $clean.addEventListener('click', function (event) {
+        catchMedia.splice(0);
         isComplete = false;
-        alert("清理完毕");
+        $clean.innerHTML = "清理完成!";
+        setTimeout(() => { $clean.innerHTML = "清理缓存"; }, 1000);
     });
     CatCatch.querySelector("#download").addEventListener('click', function (event) {
         catchDownload();
@@ -96,7 +102,7 @@
     });
 
     tips.innerHTML = "等待视频播放";
-    let catchMedia = [];
+    const catchMedia = [];
     const _AddSourceBuffer = window.MediaSource.prototype.addSourceBuffer;
     window.MediaSource.prototype.addSourceBuffer = function (mimeType) {
         // 标题获取
@@ -117,19 +123,17 @@
         }
         return sourceBuffer;
     }
-    // 反检测
     window.MediaSource.prototype.addSourceBuffer.toString = function () {
         return _AddSourceBuffer.toString();
     }
 
-    let _endOfStream = window.MediaSource.prototype.endOfStream;
+    const _endOfStream = window.MediaSource.prototype.endOfStream;
     window.MediaSource.prototype.endOfStream = function () {
         isComplete = true;
         tips.innerHTML = "捕获完成";
         _endOfStream.call(this);
         localStorage.getItem("CatCatchCatch_autoDown") == "checked" && catchDownload();
     }
-    // 反检测
     window.MediaSource.prototype.endOfStream.toString = function () {
         return _endOfStream.toString();
     }
@@ -162,7 +166,7 @@
             a.remove();
         }
         if (isComplete) {
-            catchMedia = [];
+            catchMedia.splice(0);
             isComplete = false;
             tips.innerHTML = "下载完毕...";
         }
