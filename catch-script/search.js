@@ -84,8 +84,8 @@
             }
             if (this.response == "" || typeof this.response != "string") { return; }
             if (this.response.substring(0, 17).toLowerCase() == "data:application/") {
-                const text = this.response.substring(17);
-                toUrl(getDataM3U8(text));
+                const text = getDataM3U8(this.response.substring(17));
+                text && toUrl(text);
                 return;
             }
             if (this.responseURL.substring(0, 17).toLowerCase() == "data:application/") {
@@ -101,6 +101,10 @@
             if (this.response.toUpperCase().includes("#EXTM3U")) {
                 if (this.response.substring(0, 7) == "#EXTM3U") {
                     if (method == "GET") {
+                        let BashUrl = this.responseURL.split("/");
+                        BashUrl.pop();
+                        BashUrl = BashUrl.join("/") + "/";
+                        toUrl(addBashUrl(BashUrl, this.response));
                         postData({ action: "catCatchAddMedia", url: this.responseURL, href: location.href, ext: "m3u8" });
                         return;
                     }
@@ -241,8 +245,12 @@
         return _fromCharCode.toString();
     }
 
+    // 正则预编译
+    const reKeyURL = /URI="(.*)"/;
+    const reIsUrl = /^http[s]*:\/\/.+/i;
+
     function isUrl(str) {
-        return /^http[s]*:\/\/.+/i.test(str);
+        return reIsUrl.test(str);
     }
     function isFullM3u8(text) {
         let tsLists = text.split("\n");
@@ -252,6 +260,24 @@
             return false;
         }
         return false;
+    }
+    function addBashUrl(baseUrl, m3u8Text) {
+        let m3u8_split = m3u8Text.split("\n");
+        m3u8Text = "";
+        for (let key in m3u8_split) {
+            if (isEmpty(m3u8_split[key])) { continue; }
+            if (m3u8_split[key].includes("URI=")) {
+                let KeyURL = reKeyURL.exec(m3u8_split[key]);
+                if (KeyURL && KeyURL[1] && !isUrl(KeyURL[1])) {
+                    m3u8_split[key] = m3u8_split[key].replace(reKeyURL, 'URI="' + baseUrl + KeyURL[1] + '"');
+                }
+            }
+            if (!m3u8_split[key].includes("#") && !isUrl(m3u8_split[key])) {
+                m3u8_split[key] = baseUrl + m3u8_split[key];
+            }
+            m3u8Text += m3u8_split[key] + "\n";
+        }
+        return m3u8Text;
     }
     function isJSON(str) {
         if (typeof str == "object") {
@@ -305,5 +331,8 @@
         filter.add(key);
         data.requestId = Date.now().toString() + filter.size;
         window.postMessage(data);
+    }
+    function isEmpty(obj) {
+        return (typeof obj == "undefined" || obj == null || obj == "" || obj == " ");
     }
 })();
