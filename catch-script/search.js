@@ -4,6 +4,9 @@
     _log("start search.js");
     const CATCH_SEARCH_DEBUG = false;
     const filter = new Set();
+    // 正则预编译
+    const reKeyURL = /URI="(.*)"/;
+    const reIsUrl = /^http[s]*:\/\/.+/i;
 
     // JSON.parse
     const _JSONparse = JSON.parse;
@@ -242,10 +245,6 @@
     String.fromCharCode.toString = function () {
         return _fromCharCode.toString();
     }
-
-    // 正则预编译
-    const reKeyURL = /URI="(.*)"/;
-    const reIsUrl = /^http[s]*:\/\/.+/i;
 
     function isUrl(str) {
         return reIsUrl.test(str);
