@@ -2,23 +2,23 @@
     console.log("catch.js Start");
     if (document.getElementById("CatCatchCatch")) { return; }
 
-    const buttonStyle = 'style="all: unset;border:solid 1px #000;margin: 2px;padding: 2px;"';
-    const checkboxStyle = 'style="all: unset;-webkit-appearance: auto;"';
+    const buttonStyle = 'style="all: unset; border:solid 1px #000; margin: 2px;padding: 2px; background: #fff; border-radius: 4px; border: solid 1px #c7c7c780;"';
+    const checkboxStyle = 'style="all: unset; -webkit-appearance: auto;"';
 
     const CatCatch = document.createElement("div");
     CatCatch.setAttribute("id", "CatCatchCatch");
     CatCatch.innerHTML = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAAKlBMVEUAAADLlROxbBlRAD16GS5oAjWWQiOCIytgADidUx/95gHqwwTx0gDZqwT6kfLuAAAACnRSTlMA/vUejV7kuzi8za0PswAAANpJREFUGNNjwA1YSxkYTEqhnKZLLi6F1w0gnKA1shdvHYNxdq1atWobjLMKCOAyC3etlVrUAOH4HtNZmLgoAMKpXX37zO1FwcZAwMDguGq1zKpFmTNnzqx0Bpp2WvrU7ttn9py+I8JgLn1R8Pad22vurNkjwsBReHv33junzuyRnOnMwNCSeFH27K5dq1SNgcZxFMnuWrNq1W5VkNntihdv7ToteGcT0C7mIkE1qbWCYjJnM4CqEoWKdoslChXuUgXJqIcLebiphSgCZRhaPDhcDFhdmUMCGIgEAFA+Uc02aZg9AAAAAElFTkSuQmCC" style="-webkit-user-drag: none;width: 20px;">
     <div id="tips"></div>
     <button id="download" ${buttonStyle}>下载已捕获的数据</button>
+    <button id="clean" ${buttonStyle}>删除已捕获数据</button>
     <button id="restart" ${buttonStyle}>从头捕获</button>
-    <button id="clean" ${buttonStyle}>清理缓存</button>
     <button id="close" ${buttonStyle}>关闭</button>
     <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown")} ${checkboxStyle}>完成捕获自动下载</label>
     <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg")} ${checkboxStyle}>使用ffmpeg合并</label>
     <details>
         <summary>文件名设置</summary>
-        文件名: <div id="fileName"></div>
-        表达式: <div id="selector">未设置</div>
+        文件名: <div id="fileName" style="font-weight:bold;"></div>
+        表达式: <div id="selector" style="font-weight:bold;">未设置</div>
         <button id="setName" ${buttonStyle}>设置表达式</button>
     </details>`;
     CatCatch.style = `all: unset;
@@ -26,7 +26,7 @@
         z-index: 999999;
         top: 10%;
         left: 90%;
-        background: rgb(255 255 255 / 80%);
+        background: rgb(255 255 255 / 85%);
         border: solid 1px #c7c7c7;
         border-radius: 4px;
         color: rgb(26, 115, 232);
@@ -111,6 +111,7 @@
     tips.innerHTML = "等待视频播放";
     let catchMedia = [];
     let bufferList = {};
+    let mediaSize = 0;
     const _AddSourceBuffer = window.MediaSource.prototype.addSourceBuffer;
     window.MediaSource.prototype.addSourceBuffer = function (mimeType) {
         // 标题获取
@@ -127,6 +128,8 @@
         bufferList[type] = [];
         catchMedia.push({ mimeType, bufferList: bufferList[type] });
         sourceBuffer.appendBuffer = function (data) {
+            mediaSize += data.byteLength;
+            tips.innerHTML = "捕获数据中: " + byteToSize(mediaSize);
             bufferList[type].push(data);
             _appendBuffer.call(this, data);
         }
@@ -187,9 +190,10 @@
         warning && alert(warning);
     }
 
-    function clearCache(all = false){
+    function clearCache(all = false) {
         isComplete = false;
-        if(all){
+        mediaSize = 0;
+        if (all) {
             catchMedia = [];
             bufferList = {};
             return;
@@ -197,5 +201,15 @@
         Object.keys(bufferList).forEach(key => {
             bufferList[key].splice(1);
         });
+    }
+    function byteToSize(byte) {
+        if (!byte || byte < 1024) { return 0; }
+        if (byte < 1024 * 1024) {
+            return (byte / 1024).toFixed(1) + "KB";
+        } else if (byte < 1024 * 1024 * 1024) {
+            return (byte / 1024 / 1024).toFixed(1) + "MB";
+        } else {
+            return (byte / 1024 / 1024 / 1024).toFixed(1) + "GB";
+        }
     }
 })();
