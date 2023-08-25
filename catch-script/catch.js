@@ -10,6 +10,7 @@
     CatCatch.innerHTML = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAAKlBMVEUAAADLlROxbBlRAD16GS5oAjWWQiOCIytgADidUx/95gHqwwTx0gDZqwT6kfLuAAAACnRSTlMA/vUejV7kuzi8za0PswAAANpJREFUGNNjwA1YSxkYTEqhnKZLLi6F1w0gnKA1shdvHYNxdq1atWobjLMKCOAyC3etlVrUAOH4HtNZmLgoAMKpXX37zO1FwcZAwMDguGq1zKpFmTNnzqx0Bpp2WvrU7ttn9py+I8JgLn1R8Pad22vurNkjwsBReHv33junzuyRnOnMwNCSeFH27K5dq1SNgcZxFMnuWrNq1W5VkNntihdv7ToteGcT0C7mIkE1qbWCYjJnM4CqEoWKdoslChXuUgXJqIcLebiphSgCZRhaPDhcDFhdmUMCGIgEAFA+Uc02aZg9AAAAAElFTkSuQmCC" style="-webkit-user-drag: none;width: 20px;">
     <div id="tips"></div>
     <button id="download" ${buttonStyle}>下载已捕获的数据</button>
+    <button id="restart" ${buttonStyle}>从头捕获</button>
     <button id="clean" ${buttonStyle}>清理缓存</button>
     <button id="close" ${buttonStyle}>关闭</button>
     <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown")} ${checkboxStyle}>完成捕获自动下载</label>
@@ -49,8 +50,7 @@
     });
     const $clean = CatCatch.querySelector("#clean");
     $clean.addEventListener('click', function (event) {
-        catchMedia.splice(0);
-        isComplete = false;
+        clearCache();
         $clean.innerHTML = "清理完成!";
         setTimeout(() => { $clean.innerHTML = "清理缓存"; }, 1000);
     });
@@ -60,6 +60,13 @@
     CatCatch.querySelector("#close").addEventListener('click', function (event) {
         CatCatch.style.display = "none";
         console.log(`猫抓\n恢复显示捕获面板\ndocument.getElementById("CatCatchCatch").style.display = "flex";`);
+    });
+    CatCatch.querySelector("#restart").addEventListener('click', function (event) {
+        clearCache();
+        document.querySelectorAll("video").forEach(function (element) {
+            element.currentTime = 0;
+            element.play();
+        });
     });
 
     // 文件名设置
@@ -102,7 +109,8 @@
     });
 
     tips.innerHTML = "等待视频播放";
-    const catchMedia = [];
+    let catchMedia = [];
+    let bufferList = {};
     const _AddSourceBuffer = window.MediaSource.prototype.addSourceBuffer;
     window.MediaSource.prototype.addSourceBuffer = function (mimeType) {
         // 标题获取
@@ -115,10 +123,11 @@
         tips.innerHTML = "捕获数据中...";
         const sourceBuffer = _AddSourceBuffer.call(this, mimeType);
         const _appendBuffer = sourceBuffer.appendBuffer;
-        const bufferList = [];
-        catchMedia.push({ mimeType, bufferList });
+        const type = mimeType.split("/").shift();
+        bufferList[type] = [];
+        catchMedia.push({ mimeType, bufferList: bufferList[type] });
         sourceBuffer.appendBuffer = function (data) {
-            bufferList.push(data);
+            bufferList[type].push(data);
             _appendBuffer.call(this, data);
         }
         return sourceBuffer;
@@ -166,8 +175,7 @@
             a.remove();
         }
         if (isComplete) {
-            catchMedia.splice(0);
-            isComplete = false;
+            clearCache(true);
             tips.innerHTML = "下载完毕...";
         }
     }
@@ -177,5 +185,17 @@
         selector.innerHTML = "未设置";
         fileName.innerHTML = document.title;
         warning && alert(warning);
+    }
+
+    function clearCache(all = false){
+        isComplete = false;
+        if(all){
+            catchMedia = [];
+            bufferList = {};
+            return;
+        }
+        Object.keys(bufferList).forEach(key => {
+            bufferList[key].splice(1);
+        });
     }
 })();
