@@ -4,7 +4,6 @@
     _log("start search.js");
     const CATCH_SEARCH_DEBUG = false;
     const filter = new Set();
-    // 正则预编译
     const reKeyURL = /URI="(.*)"/;
     const reIsUrl = /^http[s]*:\/\/.+/i;
 
