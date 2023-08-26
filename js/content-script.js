@@ -147,6 +147,14 @@
             sendResponse("ok");
             return true;
         }
+        if (Message.Message == "getPage") {
+            if (Message.find) {
+                sendResponse(document.querySelector(Message.find).innerHTML);
+                return true;
+            }
+            sendResponse(document.documentElement.outerHTML);
+            return true;
+        }
     });
 
     // Heart Beat
