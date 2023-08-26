@@ -26,6 +26,8 @@ let activeTab = true;
 const downData = [];
 // 图标地址
 const favicon = new Map();
+// 当前页面DOM
+let pageDOM = undefined;
 // HeartBeat
 chrome.runtime.sendMessage(chrome.runtime.id, { Message: "HeartBeat" });
 // 清理冗余数据
@@ -59,7 +61,7 @@ function AddMedia(data, currentTab = true) {
         trimName = trimName.substr(0, 25) + '...' + trimName.substr(-30);
     }
     //添加下载文件名
-    data.downFileName = G.TitleName ? templates(G.downFileName, data) : data.name;
+    data.downFileName = G.TitleName ? templates(G.downFileName, data, pageDOM) : data.name;
     // 文件大小单位转换
     data._size = data.size;
     if (data.size) {
@@ -210,7 +212,7 @@ function AddMedia(data, currentTab = true) {
     data.html.find('#download').click(function () {
         if (G.m3u8dl && (isM3U8(data) || isMPD(data))) {
             if(!data.url.startsWith("blob:")){
-                let m3u8dlArg = templates(G.m3u8dlArg, data);
+                let m3u8dlArg = templates(G.m3u8dlArg, data, pageDOM);
                 let url = 'm3u8dl://' + Base64.encode(m3u8dlArg);
                 if (url.length >= 2046) {
                     navigator.clipboard.writeText(m3u8dlArg);
@@ -240,7 +242,7 @@ function AddMedia(data, currentTab = true) {
             navigator.share({ url: data.url });
             return false;
         }
-        let url = templates(G.Player, data);
+        let url = templates(G.Player, data, pageDOM);
         if (G.isFirefox) {
             window.location.href = url;
             return false;
@@ -506,6 +508,10 @@ $("#enable").click(function () {
 const interval = setInterval(function () {
     if (!G.initSyncComplete || !G.initLocalComplete || !G.tabId) { return; }
     clearInterval(interval);
+    // 获取页面DOM
+    chrome.tabs.sendMessage(G.tabId, { Message: "getPage" }, { frameId: 0 }, function (result) {
+        pageDOM = new DOMParser().parseFromString(result, 'text/html');
+    });
     // 填充数据
     chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getData", tabId: G.tabId }, function (data) {
         if (!data || data === "OK") {
@@ -615,7 +621,7 @@ function copyLink(data) {
     } else {
         text = G.copyOther;
     }
-    return templates(text, data);
+    return templates(text, data, pageDOM);
 }
 // 携带referer 下载
 function catDownload(obj, extra = "") {

@@ -98,7 +98,7 @@ function splitString(text, separator) {
 }
 
 // 模板 函数 实现
-function templatesFunction(text, action) {
+function templatesFunction(text, action, pageDOM = undefined) {
     text = isEmpty(text) ? "" : text.toString();
     action = splitString(action, "|");
     for (let item of action) {
@@ -110,7 +110,7 @@ function templatesFunction(text, action) {
         arg = arg.map(item => {
             return item.trim().replace(/^['"]|['"]$/g, "");
         });
-        if (isEmpty(text) && action != "exists") { return "" };
+        if (isEmpty(text) && action != "exists" && action != "find") { return "" };
         if (action == "slice") {
             text = text.slice(...arg);
         } else if (action == "replace") {
@@ -148,13 +148,22 @@ function templatesFunction(text, action) {
             } else if (arg[0] == "upperCase") {
                 text = text.toUpperCase();
             }
+        } else if (action == "find") {
+            text = "";
+            if (pageDOM) {
+                try {
+                    text = pageDOM.querySelector(arg[0]).innerHTML;
+                } catch (e) {
+                    console.log(e);
+                }
+            }
         } else {
             text = ""; break;
         }
     }
     return text;
 }
-function templates(text, data) {
+function templates(text, data, pageDOM = undefined) {
     if (isEmpty(text)) { return ""; }
     // 日期
     const date = new Date();
@@ -203,8 +212,8 @@ function templates(text, data) {
         text = text.replaceAll(key, tags[key]);
     }
     //函数支持
-    text = text.replace(/\$\{(fullFileName|fileName|ext|title|referer|url|now|fullDate|time|initiator|webUrl|userAgent) ?\| ?([^}]+)\}/g, function (original, tag, action) {
-        return templatesFunction(data[tag], action);
+    text = text.replace(/\$\{(fullFileName|fileName|ext|title|referer|url|now|fullDate|time|initiator|webUrl|userAgent|page) ?\| ?([^}]+)\}/g, function (original, tag, action) {
+        return templatesFunction(data[tag], action, pageDOM);
     });
     return text;
 }

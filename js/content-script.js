@@ -149,7 +149,8 @@
         }
         if (Message.Message == "getPage") {
             if (Message.find) {
-                sendResponse(document.querySelector(Message.find).innerHTML);
+                const DOM = document.querySelector(Message.find);
+                DOM ? sendResponse(DOM.innerHTML) : sendResponse("");
                 return true;
             }
             sendResponse(document.documentElement.outerHTML);
