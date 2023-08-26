@@ -61,7 +61,10 @@ function AddMedia(data, currentTab = true) {
         trimName = trimName.substr(0, 25) + '...' + trimName.substr(-30);
     }
     //添加下载文件名
-    data.downFileName = G.TitleName ? templates(G.downFileName, data, pageDOM) : data.name;
+    Object.defineProperty(data, "pageDOM", {
+        get() { return pageDOM; }
+    });
+    data.downFileName = G.TitleName ? templates(G.downFileName, data) : data.name;
     // 文件大小单位转换
     data._size = data.size;
     if (data.size) {
@@ -212,7 +215,7 @@ function AddMedia(data, currentTab = true) {
     data.html.find('#download').click(function () {
         if (G.m3u8dl && (isM3U8(data) || isMPD(data))) {
             if(!data.url.startsWith("blob:")){
-                let m3u8dlArg = templates(G.m3u8dlArg, data, pageDOM);
+                let m3u8dlArg = templates(G.m3u8dlArg, data);
                 let url = 'm3u8dl://' + Base64.encode(m3u8dlArg);
                 if (url.length >= 2046) {
                     navigator.clipboard.writeText(m3u8dlArg);
@@ -242,7 +245,7 @@ function AddMedia(data, currentTab = true) {
             navigator.share({ url: data.url });
             return false;
         }
-        let url = templates(G.Player, data, pageDOM);
+        let url = templates(G.Player, data);
         if (G.isFirefox) {
             window.location.href = url;
             return false;
@@ -621,7 +624,7 @@ function copyLink(data) {
     } else {
         text = G.copyOther;
     }
-    return templates(text, data, pageDOM);
+    return templates(text, data);
 }
 // 携带referer 下载
 function catDownload(obj, extra = "") {

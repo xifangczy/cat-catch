@@ -98,7 +98,7 @@ function splitString(text, separator) {
 }
 
 // 模板 函数 实现
-function templatesFunction(text, action, pageDOM = undefined) {
+function templatesFunction(text, action, data) {
     text = isEmpty(text) ? "" : text.toString();
     action = splitString(action, "|");
     for (let item of action) {
@@ -150,9 +150,9 @@ function templatesFunction(text, action, pageDOM = undefined) {
             }
         } else if (action == "find") {
             text = "";
-            if (pageDOM) {
+            if (data.pageDOM) {
                 try {
-                    text = pageDOM.querySelector(arg[0]).innerHTML;
+                    text = data.pageDOM.querySelector(arg[0]).innerHTML;
                 } catch (e) {
                     console.log(e);
                 }
@@ -163,7 +163,7 @@ function templatesFunction(text, action, pageDOM = undefined) {
     }
     return text;
 }
-function templates(text, data, pageDOM = undefined) {
+function templates(text, data) {
     if (isEmpty(text)) { return ""; }
     // 日期
     const date = new Date();
@@ -213,7 +213,7 @@ function templates(text, data, pageDOM = undefined) {
     }
     //函数支持
     text = text.replace(/\$\{(fullFileName|fileName|ext|title|referer|url|now|fullDate|time|initiator|webUrl|userAgent|page) ?\| ?([^}]+)\}/g, function (original, tag, action) {
-        return templatesFunction(data[tag], action, pageDOM);
+        return templatesFunction(data[tag], action, data);
     });
     return text;
 }
