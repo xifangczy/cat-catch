@@ -120,6 +120,7 @@ const reProtocol = /^[\w]+:\/\/.+/i;
 const reFilename = /filename="?([^"]+)"?/;
 const reRange = /([\d]+)-([\d]+)\/([\d]+)/;
 const reStringModify = /['\\:\*\?"<\/>\|~]/g;
+const reTemplates = /\$\{(fullFileName|fileName|ext|title|referer|url|now|fullDate|time|initiator|webUrl|userAgent|page) ?\| ?([^}]+)\}/g;
 
 // 防抖
 let debounce = undefined;

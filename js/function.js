@@ -212,7 +212,7 @@ function templates(text, data) {
         text = text.replaceAll(key, tags[key]);
     }
     //函数支持
-    text = text.replace(/\$\{(fullFileName|fileName|ext|title|referer|url|now|fullDate|time|initiator|webUrl|userAgent|page) ?\| ?([^}]+)\}/g, function (original, tag, action) {
+    text = text.replace(reTemplates, function (original, tag, action) {
         return templatesFunction(data[tag], action, data);
     });
     return text;
