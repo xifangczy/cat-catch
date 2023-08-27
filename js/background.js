@@ -149,9 +149,10 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
     cacheData[data.tabId] ??= [];
     cacheData[G.tabId] ??= [];
 
-    // 查重 避免CPU占用 大于500 强制开启
+    const findId = data.tabId == -1 ? G.tabId : data.tabId;
+
+    // 查重 避免CPU占用 大于500 强制关闭查重
     if (G.checkDuplicates && cacheData[data.tabId].length <= 500) {
-        const findId = data.tabId == -1 ? G.tabId : data.tabId;
         for (let item of cacheData[findId]) {
             if (item.url.length == data.url.length &&
                 item.cacheURL.pathname == urlParsing.pathname &&
@@ -159,7 +160,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
                 item.cacheURL.search == urlParsing.search) { return; }
         }
     }
-    chrome.tabs.get(data.tabId == -1 ? G.tabId : data.tabId, async function (webInfo) {
+    chrome.tabs.get(findId, async function (webInfo) {
         if (chrome.runtime.lastError) { return; }
         const info = {
             name: name,
