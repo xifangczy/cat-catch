@@ -10,7 +10,7 @@
         window.console.log = newIframe.contentWindow.catCatchLOG;
     }
     console.log("start search.js");
-    const CATCH_SEARCH_DEBUG = true;
+    const CATCH_SEARCH_DEBUG = false;
     const filter = new Set();
     const reKeyURL = /URI="(.*)"/;
     const reIsUrl = /^http[s]*:\/\/.+/i;
