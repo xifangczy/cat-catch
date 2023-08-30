@@ -738,17 +738,15 @@ $(function () {
                 return;
             }
             for (let i in _fragments) {
-                if (!_fragments[i].encrypted) {
-                    _fragments[i].encrypted = true;
-                    _fragments[i].decryptdata = {};
-                    if (!keyContent.get("customKey")) {
-                        keyContent.set("customKey", true);
-                    }
-                    Object.defineProperty(_fragments[i].decryptdata, "keyContent", {
-                        get: function () { return keyContent.get("customKey"); },
-                        configurable: true
-                    });
+                _fragments[i].encrypted = true;
+                _fragments[i].decryptdata = {};
+                if (!keyContent.get("customKey")) {
+                    keyContent.set("customKey", true);
                 }
+                Object.defineProperty(_fragments[i].decryptdata, "keyContent", {
+                    get: function () { return keyContent.get("customKey"); },
+                    configurable: true
+                });
             }
             keyContent.forEach(function (value, key) {
                 keyContent.set(key, customKey);
@@ -1120,12 +1118,13 @@ $(function () {
             newData.set(new Uint8Array(responseData), initLength);
             responseData = newData.buffer;
         }
-        if (skipDecrypt || recorder || !_fragments[index].encrypted) {
+        if (skipDecrypt || recorder || !_fragments[index].encrypted || !_fragments[index].encrypted.keyContent) {
             return responseData;
         }
         try {
             decryptor.expandKey(_fragments[index].decryptdata.keyContent);
         } catch (e) {
+            console.log(_fragments);
             stopDownload = "密钥类型错误";
             buttonState("#mergeTs", true);
             console.log(e);
