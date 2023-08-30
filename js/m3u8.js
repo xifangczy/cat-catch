@@ -536,7 +536,7 @@ $(function () {
     });
     // 调用m3u8DL下载
     $("#m3u8DL").click(function () {
-        if(_m3u8Url.startsWith("blob:")){
+        if (_m3u8Url.startsWith("blob:")) {
             alert("blob地址无法调用m3u8DL下载");
             return;
         }
@@ -1118,13 +1118,12 @@ $(function () {
             newData.set(new Uint8Array(responseData), initLength);
             responseData = newData.buffer;
         }
-        if (skipDecrypt || recorder || !_fragments[index].encrypted || !_fragments[index].encrypted.keyContent) {
+        if (skipDecrypt || recorder || !_fragments[index].encrypted) {
             return responseData;
         }
         try {
             decryptor.expandKey(_fragments[index].decryptdata.keyContent);
         } catch (e) {
-            console.log(_fragments);
             stopDownload = "密钥类型错误";
             buttonState("#mergeTs", true);
             console.log(e);
