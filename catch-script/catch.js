@@ -200,6 +200,7 @@
         }
         Object.keys(bufferList).forEach(key => {
             bufferList[key].splice(1);
+            mediaSize += bufferList[key][0].byteLength;
         });
     }
     function byteToSize(byte) {
