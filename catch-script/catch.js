@@ -19,7 +19,9 @@
         <summary>文件名设置</summary>
         文件名: <div id="fileName" style="font-weight:bold;"></div>
         表达式: <div id="selector" style="font-weight:bold;">未设置</div>
-        <button id="setName" ${buttonStyle}>设置表达式</button>
+        正则: <div id="regular" style="font-weight:bold;">未设置</div>
+        <button id="setSelector" ${buttonStyle}>设置表达式</button>
+        <button id="setRegular" ${buttonStyle}>设置正则</button>
     </details>`;
     CatCatch.style = `all: unset;
         position: fixed;
@@ -73,18 +75,31 @@
     const fileName = CatCatch.querySelector("#fileName");
     const selector = CatCatch.querySelector("#selector");
     selector.innerHTML = localStorage.getItem("CatCatchCatch_selector") ?? "未设置";
-    CatCatch.querySelector("#setName").addEventListener('click', function (event) {
+    CatCatch.querySelector("#setSelector").addEventListener('click', function (event) {
         const result = window.prompt("文件名获取Selector表达式", localStorage.getItem("CatCatchCatch_selector") ?? "");
         if (result == null) { return; }
-        if (result == "") { clearFileNameSelector(); return; }
+        if (result == "") { clearFileName("selector"); return; }
         const title = document.querySelector(result);
         if (title && title.innerHTML) {
-            fileName.innerHTML = title.innerHTML;
-            selector.innerHTML = result;
+            selector.innerHTML = stringModify(result);
             localStorage.setItem("CatCatchCatch_selector", result);
+            getFileName();
         } else {
-            clearFileNameSelector("表达式错误, 无法获取或内容为空!");
+            clearFileName("selector", "表达式错误, 无法获取或内容为空!");
         }
+    });
+    const regular = CatCatch.querySelector("#regular");
+    regular.innerHTML = localStorage.getItem("CatCatchCatch_regular") ?? "未设置";
+    CatCatch.querySelector("#setRegular").addEventListener('click', function (event) {
+        let result = window.prompt("文件名获取正则", localStorage.getItem("CatCatchCatch_regular") ?? "");
+        if (result == null) { return; }
+        if (result == "") { clearFileName("regular"); return; }
+        try {
+            new RegExp(result);
+            regular.innerHTML = stringModify(result);
+            localStorage.setItem("CatCatchCatch_regular", result);
+            getFileName();
+        } catch (e) { clearFileName("regular", "正则表达式错误"); console.log(e); }
     });
 
     // 操作按钮
@@ -115,12 +130,7 @@
     const _AddSourceBuffer = window.MediaSource.prototype.addSourceBuffer;
     window.MediaSource.prototype.addSourceBuffer = function (mimeType) {
         // 标题获取
-        if (localStorage.getItem("CatCatchCatch_selector")) {
-            const title = document.querySelector(localStorage.getItem("CatCatchCatch_selector"));
-            fileName.innerHTML = title && title.innerHTML ? title.innerHTML : document.title;
-        } else {
-            fileName.innerHTML = document.title;
-        }
+        getFileName();
         tips.innerHTML = "捕获数据中...";
         const sourceBuffer = _AddSourceBuffer.call(this, mimeType);
         const _appendBuffer = sourceBuffer.appendBuffer;
@@ -183,10 +193,16 @@
         }
     }
 
-    function clearFileNameSelector(warning = "") {
-        localStorage.removeItem("CatCatchCatch_selector");
-        selector.innerHTML = "未设置";
-        fileName.innerHTML = document.title;
+    // function clearFileNameSelector(warning = "") {
+    //     localStorage.removeItem("CatCatchCatch_selector");
+    //     selector.innerHTML = "未设置";
+    //     getFileName();
+    //     warning && alert(warning);
+    // }
+    function clearFileName(obj = "selector", warning = "") {
+        localStorage.removeItem("CatCatchCatch_" + obj);
+        (obj == "selector" ? selector : regular).innerHTML = "未设置";
+        getFileName();
         warning && alert(warning);
     }
 
@@ -212,5 +228,45 @@
         } else {
             return (byte / 1024 / 1024 / 1024).toFixed(1) + "GB";
         }
+    }
+    function getFileName() {
+        let name = "";
+        if (localStorage.getItem("CatCatchCatch_selector")) {
+            const title = document.querySelector(localStorage.getItem("CatCatchCatch_selector"));
+            if (title && title.innerHTML) {
+                name = title.innerHTML;
+            }
+        }
+        if (localStorage.getItem("CatCatchCatch_regular")) {
+            const str = name == "" ? document.documentElement.outerHTML : name;
+            try {
+                const reg = new RegExp(localStorage.getItem("CatCatchCatch_regular"), "g");
+                let result = str.match(reg);
+                console.log(result, reg);
+                if (result) {
+                    result = result.filter((item) => { return item !== ""; });
+                    name = result.join("_");
+                }
+            } catch (e) { console.log(e); }
+        }
+        fileName.innerHTML = name ? stringModify(name) : stringModify(document.title);
+    }
+    function stringModify(str) {
+        if (!str) { return str; }
+        return str.replace(/['\\:\*\?"<\/>\|~]/g, function (m) {
+            return {
+                "'": '&#39;',
+                '\\': '&#92;',
+                '/': '&#47;',
+                ':': '&#58;',
+                '*': '&#42;',
+                '?': '&#63;',
+                '"': '&quot;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '|': '&#124;',
+                '~': '_'
+            }[m];
+        });
     }
 })();
