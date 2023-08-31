@@ -321,7 +321,8 @@ $(".Tabs .TabButton").click(function () {
     $(this).addClass("Active");
     $(".container").removeClass("TabShow").eq(index).addClass("TabShow");
     UItoggle();
-    $("#filter, #scriptCatch, #unfold").hide();
+    // $("#filter, #scriptCatch, #unfold").hide();
+    $("#filter, #unfold").hide();
 });
 // 其他页面
 $('#allTab').click(function () {
@@ -417,7 +418,8 @@ $('#unfoldAll, #unfoldPlay, #unfoldFilter, #fold').click(function () {
     }
 });
 // 捕捉/录制 展开按钮 筛选按钮 按钮
-$('#Catch, #openUnfold, #openFilter, #more').click(function () {
+// $('#Catch, #openUnfold, #openFilter, #more').click(function () {
+$('#openFilter, #more').click(function () {
     // const _height = parseInt($(".container").css("margin-bottom"));
     // $(".container").css("margin-bottom", ($down[0].offsetHeight + 26) + "px");
     const $panel = $(`#${this.getAttribute("panel")}`);
@@ -484,7 +486,7 @@ $("#AutoDown").click(function () {
 // 102以上开启 捕获按钮/注入脚本
 if (G.version >= 102) {
     $("#search").show();
-    $("#Catch").show();
+    $("#catch").show();
     $("#otherScript").show();
 }
 // Firefox 关闭画中画 全屏 修复右边滚动条遮挡
@@ -557,9 +559,9 @@ const interval = setInterval(function () {
         state.recorder && $("#recorder").html("关闭录制");
         state.recorder2 && $("#recorder2").html("关闭屏幕捕捉");
     });
-    // 深度搜索 注入脚本
-    $("#scriptCatch button, #search").click(function () {
-        $("#scriptCatch").hide();
+    // 深度搜索 缓存捕捉 注入脚本
+    $("#search, #catch, #recorder, #recorder2").click(function () {
+        // $("#features").hide();
         chrome.runtime.sendMessage({ Message: "script", tabId: G.tabId, script: this.id + ".js" });
         G.refreshClear && $('#Clear').click();
         location.reload();
