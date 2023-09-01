@@ -16,6 +16,7 @@
     <button id="clean" ${buttonStyle}>删除已捕获数据</button>
     <button id="restart" ${buttonStyle}>从头捕获</button>
     <button id="close" ${buttonStyle}>关闭</button>
+    <button id="test" style="display: none;">test</button>
     <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown")} ${checkboxStyle}>完成捕获自动下载</label>
     <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg")} ${checkboxStyle}>使用ffmpeg合并</label>
     <details>
@@ -73,6 +74,10 @@
             element.currentTime = 0;
             element.play();
         });
+    });
+    CatCatch.querySelector("#test").addEventListener('click', function (event) {
+        console.log(catchMedia);
+        console.log(bufferList);
     });
 
     // 文件名设置
@@ -217,10 +222,10 @@
             bufferList = {};
             return;
         }
-        Object.keys(bufferList).forEach(key => {
-            bufferList[key].splice(1);
-            mediaSize += bufferList[key][0].byteLength;
-        });
+        for(let key in catchMedia){
+            catchMedia[key].bufferList.splice(1);
+            mediaSize += catchMedia[key].bufferList[0].byteLength;
+        }
     }
     function byteToSize(byte) {
         if (!byte || byte < 1024) { return 0; }
