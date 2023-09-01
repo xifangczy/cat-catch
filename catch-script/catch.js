@@ -2,6 +2,9 @@
     console.log("catch.js Start");
     if (document.getElementById("CatCatchCatch")) { return; }
 
+    // 启用开关
+    let enable = true;
+
     const buttonStyle = 'style="all: unset; border:solid 1px #000; margin: 2px;padding: 2px; background: #fff; border-radius: 4px; border: solid 1px #c7c7c780;"';
     const checkboxStyle = 'style="all: unset; -webkit-appearance: auto;"';
 
@@ -13,15 +16,16 @@
     <button id="clean" ${buttonStyle}>删除已捕获数据</button>
     <button id="restart" ${buttonStyle}>从头捕获</button>
     <button id="close" ${buttonStyle}>关闭</button>
+    <button id="test" ${buttonStyle}>测试</button>
     <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown")} ${checkboxStyle}>完成捕获自动下载</label>
     <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg")} ${checkboxStyle}>使用ffmpeg合并</label>
     <details>
         <summary>文件名设置</summary>
-        文件名: <div id="fileName" style="font-weight:bold;"></div>
-        表达式: <div id="selector" style="font-weight:bold;">未设置</div>
-        正则: <div id="regular" style="font-weight:bold;">未设置</div>
+        <div style="font-weight:bold;">文件名: </div><div id="fileName"></div>
+        <div style="font-weight:bold;">表达式: </div><div id="selector">未设置</div>
+        <div style="font-weight:bold;">正则: </div><div id="regular">未设置</div>
         <button id="setSelector" ${buttonStyle}>设置表达式</button>
-        <button id="setRegular" ${buttonStyle}>设置正则</button>
+        <button id="setRegular" ${buttonStyle}>设置正则提取</button>
     </details>`;
     CatCatch.style = `all: unset;
         position: fixed;
@@ -60,6 +64,7 @@
         catchDownload();
     });
     CatCatch.querySelector("#close").addEventListener('click', function (event) {
+        enable = false;
         CatCatch.style.display = "none";
         console.log(`猫抓\n恢复显示捕获面板\ndocument.getElementById("CatCatchCatch").style.display = "flex";`);
     });
@@ -69,6 +74,9 @@
             element.currentTime = 0;
             element.play();
         });
+    });
+    CatCatch.querySelector("#test").addEventListener('click', function (event) {
+        console.log(bufferList);
     });
 
     // 文件名设置
@@ -103,14 +111,9 @@
     });
 
     // 操作按钮
-    let isMove = false;
     let isComplete = false;
-    CatCatch.addEventListener('click', function (event) {
-        isMove = false;
-    });
     let x, y;
     function move(event) {
-        isMove = true;
         CatCatch.style.left = event.pageX - x + 'px';
         CatCatch.style.top = event.pageY - y + 'px';
     }
@@ -138,9 +141,11 @@
         bufferList[type] = [];
         catchMedia.push({ mimeType, bufferList: bufferList[type] });
         sourceBuffer.appendBuffer = function (data) {
-            mediaSize += data.byteLength;
-            tips.innerHTML = "捕获数据中: " + byteToSize(mediaSize);
-            bufferList[type].push(data);
+            if (enable) {
+                mediaSize += data.byteLength;
+                tips.innerHTML = "捕获数据中: " + byteToSize(mediaSize);
+                bufferList[type].push(data);
+            }
             _appendBuffer.call(this, data);
         }
         return sourceBuffer;
@@ -151,10 +156,12 @@
 
     const _endOfStream = window.MediaSource.prototype.endOfStream;
     window.MediaSource.prototype.endOfStream = function () {
-        isComplete = true;
-        tips.innerHTML = "捕获完成";
+        if (enable) {
+            isComplete = true;
+            tips.innerHTML = "捕获完成";
+            localStorage.getItem("CatCatchCatch_autoDown") == "checked" && catchDownload();
+        }
         _endOfStream.call(this);
-        localStorage.getItem("CatCatchCatch_autoDown") == "checked" && catchDownload();
     }
     window.MediaSource.prototype.endOfStream.toString = function () {
         return _endOfStream.toString();
@@ -165,6 +172,13 @@
         if (catchMedia.length == 0) {
             alert("没抓到有效数据");
             return;
+        }
+        // catchMedia 预处理 解决 从头捕获 文件头重复
+        for (let key in catchMedia) {
+            const data = new Uint8Array(catchMedia[key].bufferList[1]);
+            if(data[4] == 0x66 && data[5] == 0x74 && data[6] == 0x79 && data[7] == 0x70){
+                catchMedia[key].bufferList.splice(0,1);
+            }
         }
         if (catchMedia.length >= 2 && localStorage.getItem("CatCatchCatch_ffmpeg") == "checked") {
             const media = [];
@@ -192,13 +206,6 @@
             tips.innerHTML = "下载完毕...";
         }
     }
-
-    // function clearFileNameSelector(warning = "") {
-    //     localStorage.removeItem("CatCatchCatch_selector");
-    //     selector.innerHTML = "未设置";
-    //     getFileName();
-    //     warning && alert(warning);
-    // }
     function clearFileName(obj = "selector", warning = "") {
         localStorage.removeItem("CatCatchCatch_" + obj);
         (obj == "selector" ? selector : regular).innerHTML = "未设置";
