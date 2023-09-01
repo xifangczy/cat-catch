@@ -16,7 +16,6 @@
     <button id="clean" ${buttonStyle}>删除已捕获数据</button>
     <button id="restart" ${buttonStyle}>从头捕获</button>
     <button id="close" ${buttonStyle}>关闭</button>
-    <button id="test" ${buttonStyle}>测试</button>
     <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown")} ${checkboxStyle}>完成捕获自动下载</label>
     <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg")} ${checkboxStyle}>使用ffmpeg合并</label>
     <details>
@@ -74,9 +73,6 @@
             element.currentTime = 0;
             element.play();
         });
-    });
-    CatCatch.querySelector("#test").addEventListener('click', function (event) {
-        console.log(bufferList);
     });
 
     // 文件名设置
@@ -176,8 +172,8 @@
         // catchMedia 预处理 解决 从头捕获 文件头重复
         for (let key in catchMedia) {
             const data = new Uint8Array(catchMedia[key].bufferList[1]);
-            if(data[4] == 0x66 && data[5] == 0x74 && data[6] == 0x79 && data[7] == 0x70){
-                catchMedia[key].bufferList.splice(0,1);
+            if (data[4] == 0x66 && data[5] == 0x74 && data[6] == 0x79 && data[7] == 0x70) {
+                catchMedia[key].bufferList.splice(0, 1);
             }
         }
         if (catchMedia.length >= 2 && localStorage.getItem("CatCatchCatch_ffmpeg") == "checked") {
