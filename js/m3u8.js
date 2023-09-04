@@ -617,7 +617,8 @@ $(function () {
     let debounce2 = undefined;
     $("#rangeStart, #rangeEnd, #thread").on("wheel", function (event) {
         $(this).blur();
-        let number = parseInt($(this).val());
+        let number = $(this).val();
+        number = parseInt(number ? number : 1);
         number = event.originalEvent.wheelDelta < 0 ? number - 1 : number + 1;
         if (number < $(this).attr("min") || number > $(this).attr("max")) {
             return false;
@@ -631,6 +632,21 @@ $(function () {
             }, 500);
         }
         return false;
+    });
+    $("#rangeStart, #rangeEnd, #thread").keyup(function () {
+        if ($(this).val() == '') {
+            switch (this.id) {
+                case 'rangeStart':
+                    $(this).val(1);
+                    break;
+                case 'rangeEnd':
+                    $(this).val(_fragments.length);
+                    break;
+                case 'thread':
+                    $(this).val(32);
+                    break;
+            }
+        }
     });
     // 储存设置
     $("[save='change']").on("change", function () {
