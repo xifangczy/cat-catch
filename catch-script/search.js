@@ -1,7 +1,8 @@
 // const CATCH_SEARCH_ONLY = true;
 (function () {
+    const CATCH_SEARCH_DEBUG = false;
     // 防止 console.log 被劫持
-    if (console.log.toString() != 'function log() { [native code] }') {
+    if (CATCH_SEARCH_DEBUG && console.log.toString() != 'function log() { [native code] }') {
         const newIframe = top.document.createElement("iframe");
         newIframe.style.width = 0;
         newIframe.style.height = 0;
@@ -10,7 +11,6 @@
         window.console.log = newIframe.contentWindow.catCatchLOG;
     }
     console.log("start search.js");
-    const CATCH_SEARCH_DEBUG = false;
     const filter = new Set();
     const reKeyURL = /URI="(.*)"/;
     const reIsUrl = /^http[s]*:\/\/.+/i;
