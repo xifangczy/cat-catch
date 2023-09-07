@@ -35,7 +35,7 @@ chrome.runtime.sendMessage(chrome.runtime.id, { Message: "clearRedundant" });
 // 监听下载 出现服务器拒绝错误 调用下载器
 chrome.downloads.onChanged.addListener(function (item) {
     if (G.catDownload) { delete downData[item.id]; return; }
-    const errorList = ["SERVER_BAD_CONTENT", "SERVER_UNAUTHORIZED", "SERVER_UNAUTHORIZED", "SERVER_FORBIDDEN", "SERVER_UNREACHABLE", "SERVER_CROSS_ORIGIN_REDIRECT"];
+    const errorList = ["SERVER_BAD_CONTENT", "SERVER_UNAUTHORIZED", "SERVER_FORBIDDEN", "SERVER_UNREACHABLE", "SERVER_CROSS_ORIGIN_REDIRECT", "SERVER_FAILED"];
     if (item.error && errorList.includes(item.error.current) && downData[item.id]) {
         catDownload(downData[item.id]);
         delete downData[item.id];
