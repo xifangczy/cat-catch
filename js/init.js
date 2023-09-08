@@ -67,7 +67,7 @@ G.OptionLists = {
     m3u8dlArg: `"\${url}" --workDir "%USERPROFILE%\\Downloads\\m3u8dl" --saveName "\${title}_\${now}" --enableDelAfterDone \${referer|exists:'--headers "Referer:*"'}`,
     playbackRate: 2,
     copyM3U8: "${url}",
-    copyMPD: `ffmpeg \${referer|exists:'-headers "referer: *"'} -i "\${url}" -c copy "\${title}_\${now}.mp4"`,
+    copyMPD: "${url}",
     copyOther: "${url}",
     refreshClear: true,
     initSyncComplete: false,
