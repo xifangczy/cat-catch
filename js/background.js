@@ -70,7 +70,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         return;
     }
     if (!G.enable) { return; }
-    if (G.blackList.has(data.requestId)) {
+    if (!isRegex && G.blackList.has(data.requestId)) {
         G.blackList.delete(data.requestId);
         return;
     }
@@ -215,6 +215,11 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         info.title = webInfo?.title ?? "NULL";
         info.favIconUrl = webInfo?.favIconUrl;
         info.webUrl = webInfo?.url;
+        // 屏蔽资源
+        if (!isRegex && G.blackList.has(data.requestId)) {
+            G.blackList.delete(data.requestId);
+            return;
+        }
         // 发送到popup 并检查自动下载
         chrome.runtime.sendMessage(info, function () {
             if (info.tabId != -1 && G.featAutoDownTabId && G.featAutoDownTabId.includes(info.tabId)) {
