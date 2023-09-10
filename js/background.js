@@ -154,21 +154,23 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
 
     if (!filter) { return; }
 
+    data.tabId = data.tabId == -1 ? G.tabId : data.tabId;
+
     cacheData[data.tabId] ??= [];
     cacheData[G.tabId] ??= [];
 
-    const findId = data.tabId == -1 ? G.tabId : data.tabId;
+    // const findId = data.tabId == -1 ? G.tabId : data.tabId;
 
     // 查重 避免CPU占用 大于500 强制关闭查重
     if (G.checkDuplicates && cacheData[data.tabId].length <= 500) {
-        for (let item of cacheData[findId]) {
+        for (let item of cacheData[data.tabId]) {
             if (item.url.length == data.url.length &&
                 item.cacheURL.pathname == urlParsing.pathname &&
                 item.cacheURL.host == urlParsing.host &&
                 item.cacheURL.search == urlParsing.search) { return; }
         }
     }
-    chrome.tabs.get(findId, async function (webInfo) {
+    chrome.tabs.get(data.tabId, async function (webInfo) {
         if (chrome.runtime.lastError) { return; }
         const info = {
             name: name,
@@ -185,28 +187,28 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
             cacheURL: { host: urlParsing.host, search: urlParsing.search, pathname: urlParsing.pathname }
         };
         // 幽灵资源 溯源
-        if (info.tabId == -1) {
-            if (webInfo?.url == info.referer || webInfo?.url == info.initiator) {
-                info.tabId = webInfo.id;
-            }
-            const url = info.referer ?? info.initiator;
-            if (info.tabId == -1 && url) {
-                const newWebInfo = await chrome.tabs.query({ url: url });
-                if (newWebInfo.length > 0) {
-                    webInfo = newWebInfo[0];
-                    info.tabId = newWebInfo[0].id;
-                }
-            }
-            if (info.tabId == -1) {
-                const frames = await chrome.webNavigation.getAllFrames({ tabId: G.tabId });
-                for (let frame of frames) {
-                    if (frame.url == url) {
-                        info.tabId = G.tabId;
-                        break;
-                    }
-                }
-            }
-        }
+        // if (info.tabId == -1) {
+        //     if (webInfo?.url == info.referer || webInfo?.url == info.initiator) {
+        //         info.tabId = webInfo.id;
+        //     }
+        //     const url = info.referer ?? info.initiator;
+        //     if (info.tabId == -1 && url) {
+        //         const newWebInfo = await chrome.tabs.query({ url: url });
+        //         if (newWebInfo.length > 0) {
+        //             webInfo = newWebInfo[0];
+        //             info.tabId = newWebInfo[0].id;
+        //         }
+        //     }
+        //     if (info.tabId == -1) {
+        //         const frames = await chrome.webNavigation.getAllFrames({ tabId: G.tabId });
+        //         for (let frame of frames) {
+        //             if (frame.url == url) {
+        //                 info.tabId = G.tabId;
+        //                 break;
+        //             }
+        //         }
+        //     }
+        // }
         // 不存在 initiator 和 referer 使用web url代替initiator
         if (info.initiator == undefined || info.initiator == "null") {
             info.initiator = info.referer ?? webInfo?.url;
@@ -260,7 +262,8 @@ function save(tabId) {
     chrome.storage.local.set({ MediaData: cacheData }, function () {
         chrome.runtime.lastError && console.log(chrome.runtime.lastError);
     });
-    refreshIcon(tabId);
+    // refreshIcon(tabId);
+    cacheData[tabId] && SetIcon({ number: cacheData[tabId].length, tabId: tabId });
 }
 
 // 监听来自popup 和 options的请求
@@ -615,19 +618,19 @@ function getReferer(data) {
     }
     return false;
 }
-function refreshIcon(tabId) {
-    if (tabId != -1) {
-        cacheData[tabId] && SetIcon({ number: cacheData[tabId].length, tabId: tabId });
-    } else {
-        SetIcon({ tips: true });
-        //自动清理幽灵数据
-        if (cacheData[-1] && cacheData[-1].length > G.OtherAutoClear) {
-            delete cacheData[-1];
-            chrome.storage.local.set({ MediaData: cacheData });
-            SetIcon({ tips: false });
-        }
-    }
-}
+// function refreshIcon(tabId) {
+//     if (tabId != -1) {
+//         cacheData[tabId] && SetIcon({ number: cacheData[tabId].length, tabId: tabId });
+//     } else {
+//         SetIcon({ tips: true });
+//         //自动清理幽灵数据
+//         if (cacheData[-1] && cacheData[-1].length > G.OtherAutoClear) {
+//             delete cacheData[-1];
+//             chrome.storage.local.set({ MediaData: cacheData });
+//             SetIcon({ tips: false });
+//         }
+//     }
+// }
 //设置扩展图标
 function SetIcon(obj) {
     if (obj.tips != undefined) {

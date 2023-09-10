@@ -62,10 +62,10 @@ input.regex {
   width: 320px;
   text-align: center;
 }
-input#OtherAutoClear {
+/* input#OtherAutoClear {
   margin-left: 250px;
   width: 45px;
-}
+} */
 /* 滑动开关 组件 */
 .switch {
   height: 22px;
