@@ -135,10 +135,7 @@ $("#PlayerTemplate").change(function () {
 let debounce2 = undefined;
 $("[save='input']").on("input", function () {
     const Option = this.id;
-    let val = $(this).val();
-    // if (Option == "OtherAutoClear") {
-    //     val = parseInt(val);
-    // }
+    const val = $(this).val();
     clearTimeout(debounce2);
     debounce2 = setTimeout(() => {
         chrome.storage.sync.set({ [Option]: val });

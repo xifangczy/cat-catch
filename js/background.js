@@ -186,29 +186,6 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
             referer: data.referer,
             cacheURL: { host: urlParsing.host, search: urlParsing.search, pathname: urlParsing.pathname }
         };
-        // 幽灵资源 溯源
-        // if (info.tabId == -1) {
-        //     if (webInfo?.url == info.referer || webInfo?.url == info.initiator) {
-        //         info.tabId = webInfo.id;
-        //     }
-        //     const url = info.referer ?? info.initiator;
-        //     if (info.tabId == -1 && url) {
-        //         const newWebInfo = await chrome.tabs.query({ url: url });
-        //         if (newWebInfo.length > 0) {
-        //             webInfo = newWebInfo[0];
-        //             info.tabId = newWebInfo[0].id;
-        //         }
-        //     }
-        //     if (info.tabId == -1) {
-        //         const frames = await chrome.webNavigation.getAllFrames({ tabId: G.tabId });
-        //         for (let frame of frames) {
-        //             if (frame.url == url) {
-        //                 info.tabId = G.tabId;
-        //                 break;
-        //             }
-        //         }
-        //     }
-        // }
         // 不存在 initiator 和 referer 使用web url代替initiator
         if (info.initiator == undefined || info.initiator == "null") {
             info.initiator = info.referer ?? webInfo?.url;
@@ -262,7 +239,6 @@ function save(tabId) {
     chrome.storage.local.set({ MediaData: cacheData }, function () {
         chrome.runtime.lastError && console.log(chrome.runtime.lastError);
     });
-    // refreshIcon(tabId);
     cacheData[tabId] && SetIcon({ number: cacheData[tabId].length, tabId: tabId });
 }
 
@@ -618,19 +594,6 @@ function getReferer(data) {
     }
     return false;
 }
-// function refreshIcon(tabId) {
-//     if (tabId != -1) {
-//         cacheData[tabId] && SetIcon({ number: cacheData[tabId].length, tabId: tabId });
-//     } else {
-//         SetIcon({ tips: true });
-//         //自动清理幽灵数据
-//         if (cacheData[-1] && cacheData[-1].length > G.OtherAutoClear) {
-//             delete cacheData[-1];
-//             chrome.storage.local.set({ MediaData: cacheData });
-//             SetIcon({ tips: false });
-//         }
-//     }
-// }
 //设置扩展图标
 function SetIcon(obj) {
     if (obj.tips != undefined) {
