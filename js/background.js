@@ -70,6 +70,10 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         return;
     }
     if (!G.enable) { return; }
+    if (G.blackList.has(data.requestId)) {
+        G.blackList.delete(data.requestId);
+        return;
+    }
     // 屏蔽特殊页面发起的资源
     if (data.initiator != "null" &&
         data.initiator != undefined &&
@@ -85,9 +89,13 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
     //正则匹配
     if (isRegex && !filter) {
         for (let key in G.Regex) {
-            if (!G.Regex[key].state) { continue; }
+            // if (!G.Regex[key].state) { continue; }
             const result = G.Regex[key].regex.exec(data.url);
             if (result == null) { continue; }
+            if (!G.Regex[key].state) {
+                G.blackList.add(data.requestId);
+                return;
+            }
             data.extraExt = G.Regex[key].ext ? G.Regex[key].ext : undefined;
             if (result.length == 1) {
                 findMedia(data, true, true);
@@ -504,6 +512,8 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
             item.tabId.has(tabId) && item.tabId.delete(tabId);
         });
     }
+    // 清理黑名单缓存
+    G.blackList.clear();
     chrome.alarms.create("nowClear", { when: Date.now() + 3000 });
 });
 

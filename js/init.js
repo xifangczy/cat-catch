@@ -3,6 +3,7 @@ var G = {};
 // 缓存数据
 var cacheData = { init: true };
 var refererData = [];
+G.blackList = new Set();
 // 当前tabID
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     if (tabs[0] && tabs[0].id) {
@@ -225,6 +226,7 @@ function clearRedundant() {
         });
     });
     refererData = [];
+    G.blackList.clear();
 }
 
 // 替换掉不允许的文件名称字符
