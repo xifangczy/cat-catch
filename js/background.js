@@ -89,10 +89,10 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
     //正则匹配
     if (isRegex && !filter) {
         for (let key in G.Regex) {
-            // if (!G.Regex[key].state) { continue; }
+            if (!G.Regex[key].state) { continue; }
             const result = G.Regex[key].regex.exec(data.url);
             if (result == null) { continue; }
-            if (!G.Regex[key].state) {
+            if (G.Regex[key].blackList) {
                 G.blackList.add(data.requestId);
                 return;
             }

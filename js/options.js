@@ -11,7 +11,7 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
         $("#typeList").append(Gethtml("Type", { type: items.Type[key].type, size: items.Type[key].size, state: items.Type[key].state }));
     }
     for (let key in items.Regex) {
-        $("#regexList").append(Gethtml("Regex", { type: items.Regex[key].type, regex: items.Regex[key].regex, ext: items.Regex[key].ext, state: items.Regex[key].state }));
+        $("#regexList").append(Gethtml("Regex", { type: items.Regex[key].type, regex: items.Regex[key].regex, ext: items.Regex[key].ext, blackList: items.Regex[key].blackList, state: items.Regex[key].state }));
     }
     setTimeout(() => {
         for (let key in items) {
@@ -70,6 +70,14 @@ function Gethtml(Type, Param = new Object()) {
             html = `<td><input type="text" value="${Param.type ? Param.type : ""}" id="type" class="regexType"></td>`
             html += `<td><input type="text" value="${Param.regex ? Param.regex : ""}" placeholder="正则表达式" id="regex" class="regex"></td>`
             html += `<td><input type="text" value="${Param.ext ? Param.ext : ""}" id="regexExt" class="regexExt"></td>`
+            html += `<td>
+            <div class="switch">
+                <label class="switchLabel switchRadius">
+                    <input type="checkbox" id="blackList" class="switchInput" ${Param.blackList ? 'checked="checked"' : ""}/>
+                    <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+                </label>
+            </div>
+        </td>`
     }
     html = $(`<tr data-type="${Type}">
             ${html}
@@ -354,6 +362,7 @@ function Save(option, sec = 0) {
                 let GetRegex = $(this).find("#regex").val();
                 let GetExt = $(this).find("#regexExt").val()
                 let GetState = $(this).find("#state").prop("checked");
+                let GetBlackList = $(this).find("#blackList").prop("checked");
                 try {
                     new RegExp("", GetType);
                 } catch (e) {
@@ -361,7 +370,7 @@ function Save(option, sec = 0) {
                 }
                 if (isEmpty(GetRegex)) { return true; }
                 GetExt = GetExt ? GetExt.toLowerCase() : "";
-                Regex.push({ type: GetType, regex: GetRegex, ext: GetExt, state: GetState });
+                Regex.push({ type: GetType, regex: GetRegex, ext: GetExt, blackList: GetBlackList, state: GetState });
             });
             chrome.storage.sync.set({ Regex: Regex });
             return;

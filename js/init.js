@@ -146,7 +146,7 @@ function InitOptions() {
         items.Regex = items.Regex.map(item => {
             let reg = undefined;
             try { reg = new RegExp(item.regex, item.type) } catch (e) { item.state = false; }
-            return { regex: reg, ext: item.ext, state: item.state }
+            return { regex: reg, ext: item.ext, blackList: item.blackList, state: item.state }
         });
         G = { ...items, ...G };
         G.initSyncComplete = true;
@@ -164,15 +164,15 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
         return;
     }
     for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
-        if (key == "Ext") {
+        if (key == "Ext" && newValue) {
             G.Ext = new Map(newValue.map(item => [item.ext, item]));
             continue;
         }
-        if (key == "Regex") {
+        if (key == "Regex" && newValue) {
             G.Regex = newValue.map(item => {
                 let reg = undefined;
                 try { reg = new RegExp(item.regex, item.type) } catch (e) { item.state = false; }
-                return { regex: reg, ext: item.ext, state: item.state }
+                return { regex: reg, ext: item.ext, blackList: item.blackList, state: item.state }
             });
             continue;
         }
