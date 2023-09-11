@@ -28,15 +28,15 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
 //新增格式
 $("#AddExt").bind("click", function () {
     $("#extList").append(Gethtml("Ext", { state: true }));
-    $("#extList #text").last().focus();
+    $("#extList [name=text]").last().focus();
 });
 $("#AddType").bind("click", function () {
     $("#typeList").append(Gethtml("Type", { state: true }));
-    $("#typeList #text").last().focus();
+    $("#typeList [name=text]").last().focus();
 });
 $("#AddRegex").bind("click", function () {
     $("#regexList").append(Gethtml("Regex", { type: "ig", state: true }));
-    $("#regexList #text").last().focus();
+    $("#regexList [name=text]").last().focus();
 });
 $("#version").html("猫抓 v" + chrome.runtime.getManifest().version);
 
@@ -59,21 +59,21 @@ function Gethtml(Type, Param = new Object()) {
     let html = "";
     switch (Type) {
         case "Ext":
-            html = `<td><input type="text" value="${Param.ext ? Param.ext : ""}" id="text" placeholder="后缀名" class="ext"></td>`
-            html += `<td><input type="number" placeholder="大小限制" value="${Param.size ? Param.size : 0}" class="size" id="size">KB</td>`
+            html = `<td><input type="text" value="${Param.ext ? Param.ext : ""}" name="text" placeholder="后缀名" class="ext"></td>`
+            html += `<td><input type="number" placeholder="大小限制" value="${Param.size ? Param.size : 0}" class="size" name="size">KB</td>`
             break;
         case "Type":
-            html = `<td><input type="text" value="${Param.type ? Param.type : ""}" id="text" placeholder="类型" class="type"></td>`
-            html += `<td><input type="number" placeholder="大小限制" value="${Param.size ? Param.size : 0}" class="size" id="size">KB</td>`
+            html = `<td><input type="text" value="${Param.type ? Param.type : ""}" name="text" placeholder="类型" class="type"></td>`
+            html += `<td><input type="number" placeholder="大小限制" value="${Param.size ? Param.size : 0}" class="size" name="size">KB</td>`
             break;
         case "Regex":
-            html = `<td><input type="text" value="${Param.type ? Param.type : ""}" id="type" class="regexType"></td>`
-            html += `<td><input type="text" value="${Param.regex ? Param.regex : ""}" placeholder="正则表达式" id="regex" class="regex"></td>`
-            html += `<td><input type="text" value="${Param.ext ? Param.ext : ""}" id="regexExt" class="regexExt"></td>`
+            html = `<td><input type="text" value="${Param.type ? Param.type : ""}" name="type" class="regexType"></td>`
+            html += `<td><input type="text" value="${Param.regex ? Param.regex : ""}" placeholder="正则表达式" name="regex" class="regex"></td>`
+            html += `<td><input type="text" value="${Param.ext ? Param.ext : ""}" name="regexExt" class="regexExt"></td>`
             html += `<td>
             <div class="switch">
                 <label class="switchLabel switchRadius">
-                    <input type="checkbox" id="blackList" class="switchInput" ${Param.blackList ? 'checked="checked"' : ""}/>
+                    <input type="checkbox" name="blackList" class="switchInput" ${Param.blackList ? 'checked="checked"' : ""}/>
                     <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
                 </label>
             </div>
@@ -84,7 +84,7 @@ function Gethtml(Type, Param = new Object()) {
             <td>
                 <div class="switch">
                     <label class="switchLabel switchRadius">
-                        <input type="checkbox" id="state" class="switchInput" ${Param.state ? 'checked="checked"' : ""}/>
+                        <input type="checkbox" name="state" class="switchInput" ${Param.state ? 'checked="checked"' : ""}/>
                         <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
                     </label>
                 </div>
@@ -102,13 +102,13 @@ function Gethtml(Type, Param = new Object()) {
     html.find("input").on("input", function () {
         Save(Type, 200);
     });
-    html.find("#state").on("click", function () {
+    html.find("[name=state]").on("click", function () {
         Save(Type);
     });
     if (Type == "Type") {
         html.find("input").blur(function () {
             $("#typeList tr").each(function () {
-                let GetText = $(this).find("#text").val();
+                let GetText = $(this).find("[name=text]").val();
                 if (isEmpty(GetText)) { return true; }
                 GetText = GetText.trim();
                 const test = GetText.split("/");
@@ -152,11 +152,11 @@ $("#allDisable, #allEnable").bind("click", function () {
     let obj = $(this).data("switch");
     let query;
     if (obj == "Ext") {
-        query = $("#extList #state");
+        query = $("#extList [name=state]");
     } else if (obj == "Type") {
-        query = $("#typeList #state");
+        query = $("#typeList [name=state]");
     } else if (obj == "Regex") {
-        query = $("#regexList #state");
+        query = $("#regexList [name=state]");
     }
     query.each(function () {
         $(this).prop("checked", state);
@@ -325,9 +325,9 @@ function Save(option, sec = 0) {
         if (option == "Ext") {
             let Ext = new Array();
             $("#extList tr").each(function () {
-                let GetText = $(this).find("#text").val();
-                let GetSize = parseInt($(this).find("#size").val());
-                let GetState = $(this).find("#state").prop("checked");
+                let GetText = $(this).find("[name=text]").val();
+                let GetSize = parseInt($(this).find("[name=size]").val());
+                let GetState = $(this).find("[name=state]").prop("checked");
                 if (isEmpty(GetText)) { return true; }
                 if (isEmpty(GetSize)) { GetSize = 0; }
                 Ext.push({ ext: GetText.toLowerCase(), size: GetSize, state: GetState });
@@ -338,9 +338,9 @@ function Save(option, sec = 0) {
         if (option == "Type") {
             let Type = new Array();
             $("#typeList tr").each(function () {
-                let GetText = $(this).find("#text").val();
-                let GetSize = parseInt($(this).find("#size").val());
-                let GetState = $(this).find("#state").prop("checked");
+                let GetText = $(this).find("[name=text]").val();
+                let GetSize = parseInt($(this).find("[name=size]").val());
+                let GetState = $(this).find("[name=state]").prop("checked");
                 if (isEmpty(GetText)) { return true; }
                 if (isEmpty(GetSize)) { GetSize = 0; }
                 GetText = GetText.trim();
@@ -355,11 +355,11 @@ function Save(option, sec = 0) {
         if (option == "Regex") {
             let Regex = new Array();
             $("#regexList tr").each(function () {
-                let GetType = $(this).find("#type").val();
-                let GetRegex = $(this).find("#regex").val();
-                let GetExt = $(this).find("#regexExt").val()
-                let GetState = $(this).find("#state").prop("checked");
-                let GetBlackList = $(this).find("#blackList").prop("checked");
+                let GetType = $(this).find("[name=type]").val();
+                let GetRegex = $(this).find("[name=regex]").val();
+                let GetExt = $(this).find("[name=regexExt]").val()
+                let GetState = $(this).find("[name=state]").prop("checked");
+                let GetBlackList = $(this).find("[name=blackList]").prop("checked");
                 try {
                     new RegExp("", GetType);
                 } catch (e) {
