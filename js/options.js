@@ -148,8 +148,8 @@ $("[save='click']").bind("click", function () {
 });
 // 一键禁用/启用
 $("#allDisable, #allEnable").bind("click", function () {
-    let state = this.id == "allDisable" ? false : true;
-    let obj = $(this).data("switch");
+    const state = this.id == "allEnable";
+    const obj = $(this).data("switch");
     let query;
     if (obj == "Ext") {
         query = $("#extList [name=state]");
@@ -296,7 +296,7 @@ $("#exportOptions").bind("click", function () {
 });
 //导入配置
 $("#importOptionsFile").change(function () {
-    let fileReader = new FileReader();
+    const fileReader = new FileReader();
     fileReader.onload = function () {
         let importData = this.result;
         try {
@@ -305,13 +305,14 @@ $("#importOptionsFile").change(function () {
             importData = Base64.decode(importData);
             importData = JSON.parse(importData);
         }
+        const keys = Object.keys(G.OptionLists);
         for (let item in G.OptionLists) {
-            chrome.storage.sync.set({ [item]: importData[item] });
+            keys.includes(item) && chrome.storage.sync.set({ [item]: importData[item] });
         }
         alert("导入完成");
         location.reload();
     }
-    let file = $("#importOptionsFile").prop('files')[0];
+    const file = $("#importOptionsFile").prop('files')[0];
     fileReader.readAsText(file);
 });
 $("#importOptions").bind("click", function () {
