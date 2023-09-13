@@ -5,8 +5,8 @@
     // 启用开关
     let enable = true;
 
-    const buttonStyle = 'style="all: unset; border:solid 1px #000; margin: 2px;padding: 2px; background: #fff; border-radius: 4px; border: solid 1px #c7c7c780;"';
-    const checkboxStyle = 'style="all: unset; -webkit-appearance: auto;"';
+    const buttonStyle = 'style="border:solid 1px #000; margin: 2px;padding: 2px; background: #fff; border-radius: 4px; border: solid 1px #c7c7c780;"';
+    const checkboxStyle = 'style="-webkit-appearance: auto;"';
 
     const CatCatch = document.createElement("div");
     CatCatch.setAttribute("id", "CatCatchCatch");
@@ -27,7 +27,7 @@
         <button id="setSelector" ${buttonStyle}>设置表达式</button>
         <button id="setRegular" ${buttonStyle}>设置正则提取</button>
     </details>`;
-    CatCatch.style = `all: unset;
+    CatCatch.style = `
         position: fixed;
         z-index: 999999;
         top: 10%;
