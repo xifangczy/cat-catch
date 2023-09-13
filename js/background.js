@@ -90,6 +90,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
     if (isRegex && !filter) {
         for (let key in G.Regex) {
             if (!G.Regex[key].state) { continue; }
+            G.Regex[key].regex.lastIndex = 0;
             const result = G.Regex[key].regex.exec(data.url);
             if (result == null) { continue; }
             if (G.Regex[key].blackList) {
