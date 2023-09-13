@@ -57,7 +57,8 @@ G.OptionLists = {
         { "type": "application/m4s", "size": 0, "state": true }
     ],
     Regex: [
-        { "type": "ig", "regex": "https://cache\\.video\\.[a-z]*\\.com/dash\\?tvid=.*", "ext": "json", "state": true }
+        { "type": "ig", "regex": "https://cache\\.video\\.[a-z]*\\.com/dash\\?tvid=.*", "ext": "json", "state": false },
+        { "type": "ig", "regex": ".*\\.bilivideo\\.(com|cn).*\\/live-bvc\\/.*m4s", "ext": "", "blackList": true, "state": false },
     ],
     TitleName: false,
     Player: "",
