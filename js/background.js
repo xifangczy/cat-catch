@@ -318,14 +318,15 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         }
         const script = G.scriptList.get(Message.script);
         const scriptTabid = script.tabId;
+        const refresh = Message.refresh ?? script.refresh;
         if (scriptTabid.has(Message.tabId)) {
             scriptTabid.delete(Message.tabId);
-            script.refresh && chrome.tabs.reload(Message.tabId, { bypassCache: true });
+            refresh && chrome.tabs.reload(Message.tabId, { bypassCache: true });
             sendResponse("ok");
             return true;
         }
         scriptTabid.add(Message.tabId);
-        if (script.refresh) {
+        if (refresh) {
             chrome.tabs.reload(Message.tabId, { bypassCache: true });
         } else {
             chrome.scripting.executeScript({

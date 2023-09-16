@@ -225,6 +225,10 @@
             if (!event.data.state || !event.data.tabId) { return; }
             chrome.runtime.sendMessage({ Message: "catCatchFFmpegResult", state: event.data.state, tabId: event.data.tabId });
         }
+        if (event.data.action == "catCatchToBackground") {
+            delete event.data.action;
+            chrome.runtime.sendMessage(event.data);
+        }
     }, false);
 
     function ArrayToBase64(data) {

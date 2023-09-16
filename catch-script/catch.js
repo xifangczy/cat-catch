@@ -5,7 +5,7 @@
     // 启用开关
     let enable = true;
 
-    const buttonStyle = 'style="border:solid 1px #000;margin:2px;padding:2px;background:#fff;border-radius:4px;border:solid 1px #c7c7c780;"color:#000;';
+    const buttonStyle = 'style="border:solid 1px #000;margin:2px;padding:2px;background:#fff;border-radius:4px;border:solid 1px #c7c7c780;color:#000;"';
     const checkboxStyle = 'style="-webkit-appearance: auto;"';
 
     const CatCatch = document.createElement("div");
@@ -66,7 +66,7 @@
     CatCatch.querySelector("#close").addEventListener('click', function (event) {
         enable = false;
         CatCatch.style.display = "none";
-        console.log(`猫抓\n恢复显示捕获面板\ndocument.getElementById("CatCatchCatch").style.display = "flex";`);
+        window.postMessage({ action: "catCatchToBackground", Message: "script", script: "catch.js", refresh: false });
     });
     CatCatch.querySelector("#restart").addEventListener('click', function (event) {
         clearCache();
@@ -222,7 +222,7 @@
             bufferList = {};
             return;
         }
-        for(let key in catchMedia){
+        for (let key in catchMedia) {
             catchMedia[key].bufferList.splice(1);
             mediaSize += catchMedia[key].bufferList[0].byteLength;
         }
