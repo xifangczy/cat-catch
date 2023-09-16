@@ -44,7 +44,7 @@ function setVideoStateTimer() {
     clearInterval(VideoStateTimer);
     VideoStateTimer = setInterval(getVideoState, 500);
 }
-function getVideoState() {
+function getVideoState(setSpeed = false) {
     if (_tabId == -1) {
         let currentTabId = $("#videoTabIndex").val();
         if (currentTabId == -1) { return; }
@@ -66,6 +66,9 @@ function getVideoState() {
         state.speed == 1 ? $("#speed").html("倍数播放").data("switch", "speed") : $("#speed").html("正常播放").data("switch", "normal");
         $("#loop").prop("checked", state.loop);
         $("#muted").prop("checked", state.muted);
+        if(setSpeed && state.speed != 1){
+            $("#playbackRate").val(state.speed);
+        }
         if(compareVideo.toString() != state.src.toString()){
             compareVideo = state.src;
             $("#videoIndex").empty();
@@ -97,7 +100,7 @@ $("#otherTab").click(function () {
                 _index = G.mediaControl.index;
             }
             $("#videoTabIndex").val(_tabId);
-            setVideoTagTimer(); getVideoState(); setVideoStateTimer();
+            setVideoTagTimer(); getVideoState(true); setVideoStateTimer();
             chrome.storage.local.set({ mediaControl: { tabid: _tabId, index: _index } });
         });
     });
@@ -113,7 +116,7 @@ $("#videoIndex, #videoTabIndex").change(function () {
         _index = parseInt($("#videoIndex").val());
     }
     chrome.storage.local.set({ mediaControl: { tabid: _tabId, index: _index } });
-    getVideoState();
+    getVideoState(true);
 });
 let wheelPlaybackRateTimeout;
 $("#playbackRate").on("wheel", function (event) {

@@ -5,7 +5,7 @@
     // 启用开关
     let enable = true;
 
-    const buttonStyle = 'style="border:solid 1px #000; margin: 2px;padding: 2px; background: #fff; border-radius: 4px; border: solid 1px #c7c7c780;"';
+    const buttonStyle = 'style="border:solid 1px #000;margin:2px;padding:2px;background:#fff;border-radius:4px;border:solid 1px #c7c7c780;"color:#000;';
     const checkboxStyle = 'style="-webkit-appearance: auto;"';
 
     const CatCatch = document.createElement("div");
