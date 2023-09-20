@@ -431,54 +431,43 @@ chrome.windows.onFocusChanged.addListener(function (activeInfo) {
     G.tabId = activeInfo.tabId;
 }, { filters: ["normal"] });
 
-// 标签更新 清除数据 插入脚本
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-    // console.log(tabId, changeInfo, tab);
-    if (changeInfo.status == "loading") {
-        // 刷新页面 清理数据
-        if (G.refreshClear) {
-            delete cacheData[tabId];
-            chrome.storage.local.set({ MediaData: cacheData });
-            SetIcon({ tabId: tabId });
-        } else if (cacheData[G.tabId] !== undefined) {
-            SetIcon({ number: cacheData[G.tabId].length, tabId: tabId });
-        }
 
-        // 跳过特殊页面
-        if (isSpecialPage(tab.url) || tabId == 0 || tabId == -1) { return; }
-        G.tabId = tabId;
+// 载入frame时
+chrome.webNavigation.onCommitted.addListener(function (details) {
+    if (isSpecialPage(details.url) || details.tabId == 0 || details.tabId == -1) { return; }
 
-        // 开启捕获
-        if (G.version >= 102) {
-            G.scriptList.forEach(function (item, script) {
-                if (!item.tabId.has(tabId)) { return true; }
-                chrome.scripting.executeScript({
-                    target: { tabId: tabId, allFrames: item.allFrames },
-                    files: [`catch-script/${script}`],
-                    injectImmediately: true,
-                    world: item.world
-                });
-            });
-        }
-        // 模拟手机端 修改 navigator 变量
-        if (G.version >= 102 && G.featMobileTabId && G.featMobileTabId.includes(tabId)) {
-            chrome.scripting.executeScript({
-                args: [G.MobileUserAgent.toString()],
-                target: { tabId: tabId, allFrames: true },
-                func: function () {
-                    Object.defineProperty(navigator, 'userAgent', { value: arguments[0], writable: false });
-                },
-                injectImmediately: true,
-                world: "MAIN"
-            });
-        }
+    // 刷新清理角标数
+    if (details.frameId == 0 && details.transitionType == "reload" && G.refreshClear) {
+        delete cacheData[details.tabId];
+        chrome.storage.local.set({ MediaData: cacheData });
+        SetIcon({ tabId: details.tabId });
     }
-    if (changeInfo.status == "complete" && ffmpeg.tab && tabId == ffmpeg.tab) {
-        setTimeout(() => {
-            chrome.tabs.sendMessage(tabId, ffmpeg.data);
-            ffmpeg.data = undefined;
-            ffmpeg.tab = 0;
-        }, 500);
+
+    // chrome内核版本 102 以下不支持 chrome.scripting.executeScript API
+    if (G.version < 102) { return; }
+
+    // catch-script 脚本
+    G.scriptList.forEach(function (item, script) {
+        if (!item.tabId.has(details.tabId) || !item.allFrames) { return true; }
+        chrome.scripting.executeScript({
+            target: { tabId: details.tabId, frameIds: [details.frameId] },
+            files: [`catch-script/${script}`],
+            injectImmediately: true,
+            world: item.world
+        });
+    });
+
+    // 模拟手机
+    if (G.featMobileTabId && G.featMobileTabId.includes(details.tabId)) {
+        chrome.scripting.executeScript({
+            args: [G.MobileUserAgent.toString()],
+            target: { tabId: details.tabId, frameIds: [details.frameId] },
+            func: function () {
+                Object.defineProperty(navigator, 'userAgent', { value: arguments[0], writable: false });
+            },
+            injectImmediately: true,
+            world: "MAIN"
+        });
     }
 });
 
@@ -529,18 +518,14 @@ chrome.commands.onCommand.addListener(function (command) {
     }
 });
 
-// 载入frame时 加载脚本
-chrome.webNavigation.onCommitted.addListener(function (details) {
-    if (G.version < 102 || details.frameId == 0 || isSpecialPage(details.url)) { return; }
-    G.scriptList.forEach(function (item, script) {
-        if (!item.tabId.has(details.tabId) || !item.allFrames) { return true; }
-        chrome.scripting.executeScript({
-            target: { tabId: details.tabId, frameIds: [details.frameId] },
-            files: [`catch-script/${script}`],
-            injectImmediately: true,
-            world: item.world
-        });
-    });
+chrome.webNavigation.onCompleted.addListener(function (details) {
+    if (ffmpeg.tab && details.tabId == ffmpeg.tab) {
+        setTimeout(() => {
+            chrome.tabs.sendMessage(details.tabId, ffmpeg.data);
+            ffmpeg.data = undefined;
+            ffmpeg.tab = 0;
+        }, 500);
+    }
 });
 
 //检查扩展名以及大小限制
