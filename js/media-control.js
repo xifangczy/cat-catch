@@ -28,7 +28,6 @@
             // 删除没有媒体的标签. 异步的原因，使用一个for去处理无法保证标签顺序一致
             for (let tab of videoTabList) {
                 chrome.tabs.sendMessage(tab, { Message: "getVideoState", index: 0 }, { frameId: 0 }, function (state) {
-                    console.log(tab, state);
                     if (chrome.runtime.lastError || state.count == 0) {
                         $("#option" + tab).remove();
                         return;
