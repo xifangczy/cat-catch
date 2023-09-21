@@ -142,6 +142,8 @@ function InitOptions() {
     chrome.storage.sync.get(G.OptionLists, function (items) {
         // Ext的Array转为Map类型
         items.Ext = new Map(items.Ext.map(item => [item.ext, item]));
+        // Type的Array转为Map类型
+        items.Type = new Map(items.Type.map(item => [item.type, { size: item.size, state: item.state }]));
         // 预编译正则匹配
         items.Regex = items.Regex.map(item => {
             let reg = undefined;
@@ -164,11 +166,18 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
         return;
     }
     for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
-        if (key == "Ext" && newValue) {
+        if (key == "Ext") {
+            newValue ??= G.OptionLists.Ext;
             G.Ext = new Map(newValue.map(item => [item.ext, item]));
             continue;
         }
-        if (key == "Regex" && newValue) {
+        if (key == "Type") {
+            newValue ??= G.OptionLists.Type;
+            G.Type = new Map(newValue.map(item => [item.type, { size: item.size, state: item.state }]));
+            continue;
+        }
+        if (key == "Regex") {
+            newValue ??= G.OptionLists.Regex;
             G.Regex = newValue.map(item => {
                 let reg = undefined;
                 try { reg = new RegExp(item.regex, item.type) } catch (e) { item.state = false; }
@@ -191,10 +200,8 @@ chrome.runtime.onInstalled.addListener(function (details) {
 
 // 清理冗余数据
 function clearRedundant() {
-    // console.log("clearRedundant");
     chrome.tabs.query({}, function (tabs) {
-        // let allTabId = [-1];    // 初始化一个-1 防止断开sw重连后 幽灵数据丢失
-        const allTabId = [];    // 初始化一个-1 防止断开sw重连后 幽灵数据丢失
+        const allTabId = [];
         for (let item of tabs) {
             allTabId.push(item.id);
         }
