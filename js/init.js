@@ -166,18 +166,16 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
         return;
     }
     for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
+        newValue ??= G.OptionLists[key];
         if (key == "Ext") {
-            newValue ??= G.OptionLists.Ext;
             G.Ext = new Map(newValue.map(item => [item.ext, item]));
             continue;
         }
         if (key == "Type") {
-            newValue ??= G.OptionLists.Type;
             G.Type = new Map(newValue.map(item => [item.type, { size: item.size, state: item.state }]));
             continue;
         }
         if (key == "Regex") {
-            newValue ??= G.OptionLists.Regex;
             G.Regex = newValue.map(item => {
                 let reg = undefined;
                 try { reg = new RegExp(item.regex, item.type) } catch (e) { item.state = false; }
