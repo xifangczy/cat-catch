@@ -21,8 +21,7 @@ chrome.runtime.onConnect.addListener(function (Port) {
 chrome.alarms.create("nowClear", { when: Date.now() + 3000 });  // 3秒后清理立即清理一次
 chrome.alarms.create("clear", { periodInMinutes: 60 }); // 60分钟清理一次冗余数据
 chrome.alarms.onAlarm.addListener(function (alarm) {
-    alarm.name == "clear" && clearRedundant();
-    alarm.name == "nowClear" && clearRedundant();
+    clearRedundant();
 });
 
 // onBeforeRequest 浏览器发送请求之前使用正则匹配发送请求的URL
@@ -474,9 +473,11 @@ chrome.webNavigation.onCommitted.addListener(function (details) {
 // 标签关闭 清除数据
 chrome.tabs.onRemoved.addListener(function (tabId) {
     // 清理缓存数据
-    delete cacheData[tabId];
-    chrome.storage.local.set({ MediaData: cacheData });
-    refererData = [];
+    chrome.alarms.get("nowClear", function (alarm) {
+        if (!alarm) {
+            chrome.alarms.create("nowClear", { when: Date.now() + 1000 });
+        }
+    });
     // 清理 模拟手机
     mobileUserAgent(tabId, false);
     // 清理 自动下载
@@ -487,9 +488,6 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
             item.tabId.has(tabId) && item.tabId.delete(tabId);
         });
     }
-    // 清理黑名单缓存
-    G.blackList.clear();
-    chrome.alarms.create("nowClear", { when: Date.now() + 3000 });
 });
 
 // 快捷键
@@ -538,17 +536,11 @@ function CheckExtension(ext, size) {
 }
 //检查类型以及大小限制
 function CheckType(dataType, dataSize) {
-    for (let key in G.Type) {
-        let TypeSplit = dataType.split("/");
-        let OptionSplit = G.Type[key].type.split("/");
-        if (OptionSplit[0] == TypeSplit[0] && (OptionSplit[1] == TypeSplit[1] || OptionSplit[1] == "*")) {
-            if (G.Type[key].size != 0 && dataSize != undefined && dataSize <= G.Type[key].size * 1024) {
-                return "break";
-            }
-            return G.Type[key].state ? true : "break";
-        }
-    }
-    return false;
+    const typeInfo = G.Type.get(dataType.split("/")[0] + "/*") || G.Type.get(dataType);
+    if (!typeInfo) { return false; }
+    if (!typeInfo.state) { return "break"; }
+    if (typeInfo.size != 0 && dataSize != undefined && dataSize <= typeInfo.size * 1024) { return "break"; }
+    return true;
 }
 
 // 获取文件名 后缀
