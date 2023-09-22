@@ -138,11 +138,6 @@ button,
   display: flex;
   justify-content: flex-end;
 }
-.no-drop {
-  background-color: #ccc !important;
-  cursor: no-drop;
-  color: #fff;
-}
 .explain {
   color: var(--text-color);
 }

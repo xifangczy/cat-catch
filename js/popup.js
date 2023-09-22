@@ -11,6 +11,7 @@ let allCount = 0;
 // 提示 操作按钮 DOM
 const $tips = $("#Tips");
 const $down = $("#down");
+const $mergeDown = $("#mergeDown");
 // 储存所有资源数据
 const allData = new Map([
     [true, new Map()],  // 当前页面
@@ -214,7 +215,7 @@ function AddMedia(data, currentTab = true) {
     // 下载
     data.html.find('#download').click(function () {
         if (G.m3u8dl && (isM3U8(data) || isMPD(data))) {
-            if(!data.url.startsWith("blob:")){
+            if (!data.url.startsWith("blob:")) {
                 let m3u8dlArg = templates(G.m3u8dlArg, data);
                 let url = 'm3u8dl://' + Base64.encode(m3u8dlArg);
                 if (url.length >= 2046) {
@@ -270,6 +271,7 @@ function AddMedia(data, currentTab = true) {
     data._checked = true;
     data.html.find('input').click(function (event) {
         data._checked = this.checked;
+        mergeDownButton();
         event.originalEvent.cancelBubble = true;
     });
     Object.defineProperty(data, "checked", {
@@ -342,36 +344,29 @@ $('#allTab').click(function () {
 });
 // 下载选中文件
 $('#DownFile').click(function () {
-    let maxSize = 0;
-    const tempData = [];
-    getData().forEach(function (data) {
-        if (data.checked) {
-            const size = data._size ?? 0;
-            maxSize = size > maxSize ? size : maxSize;
-            tempData.push(data);
-        }
-    });
-    if (tempData.length >= 10 && !confirm("共 " + tempData.length + "个文件，是否确认下载?")) {
+    const [checkedData, maxSize] = getCheckedData();
+    if (checkedData.length >= 10 && !confirm("共 " + checkedData.length + "个文件，是否确认下载?")) {
         return;
     }
-    if (tempData.length == 2 && maxSize < 2147483648 && confirm("是否合并视频音频?")) {
-        chrome.runtime.sendMessage({
-            Message: "catCatchFFmpeg",
-            action: "openFFmpeg",
-            extra: "等待接收媒体文件...请勿关闭本页面...猫抓下载器 页面可查看下载进度..."
-        });
-        tempData.forEach(function (data) {
-            catDownload(data, "&autosend=1&autoClose=1&title=" + data._title);
-        });
-        return true;
-    }
-    tempData.forEach(function (data) {
+    checkedData.forEach(function (data) {
         setTimeout(function () {
             chrome.downloads.download({
                 url: data.url,
                 filename: data.downFileName
             }, function (id) { downData[id] = data; });
         }, 500);
+    });
+});
+// 合并下载
+$('#mergeDown').click(function () {
+    const [checkedData, maxSize] = getCheckedData();
+    chrome.runtime.sendMessage({
+        Message: "catCatchFFmpeg",
+        action: "openFFmpeg",
+        extra: "等待接收媒体文件...请勿关闭本页面...猫抓下载器 页面可查看下载进度..."
+    });
+    checkedData.forEach(function (data) {
+        catDownload(data, "&autosend=1&autoClose=1&title=" + data._title);
     });
 });
 // 复制选中文件
@@ -671,6 +666,28 @@ function UItoggle() {
             this.classList.remove("faviconFlag");
         }
     });
+    if (getData().size >= 2) { mergeDownButton(); }
+}
+// 检查是否符合条件 更改 合并下载 按钮状态
+function mergeDownButton() {
+    const [checkedData, maxSize] = getCheckedData();
+    $mergeDown.prop("disabled", true).addClass("no-drop");
+    if (checkedData.length == 2 && maxSize < 2147483648) {
+        $mergeDown.prop("disabled", false).removeClass("no-drop");
+    }
+}
+// 获取当前标签 所有选择的文件
+function getCheckedData() {
+    const checkedData = [];
+    let maxSize = 0;
+    getData().forEach(function (data) {
+        if (data.checked) {
+            const size = data._size ?? 0;
+            maxSize = size > maxSize ? size : maxSize;
+            checkedData.push(data);
+        }
+    });
+    return [checkedData, maxSize];
 }
 // 获取当前标签的资源列表 存在requestId返回该资源
 function getData(requestId = false) {

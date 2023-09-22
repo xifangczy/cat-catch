@@ -101,6 +101,11 @@ button:active {
   border-top: solid 1px rgb(0 0 0 / 50%);
   margin: 10px 0 10px 0;
 }
+.no-drop {
+  background-color: #ccc !important;
+  cursor: no-drop;
+  color: var(--button2-text-color);
+}
 /*定义整个滚动条高宽及背景：高宽分别对应横竖滚动条的尺寸*/
 ::-webkit-scrollbar {
   width: 5px;
