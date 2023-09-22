@@ -21,7 +21,10 @@ chrome.runtime.onConnect.addListener(function (Port) {
 chrome.alarms.create("nowClear", { when: Date.now() + 3000 });  // 3秒后清理立即清理一次
 chrome.alarms.create("clear", { periodInMinutes: 60 }); // 60分钟清理一次冗余数据
 chrome.alarms.onAlarm.addListener(function (alarm) {
-    clearRedundant();
+    if (alarm.name === "nowClear" || alarm.name === "clear") {
+        clearRedundant();
+        return;
+    }
 });
 
 // onBeforeRequest 浏览器发送请求之前使用正则匹配发送请求的URL
@@ -158,9 +161,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
 
     cacheData[data.tabId] ??= [];
     cacheData[G.tabId] ??= [];
-
-    // const findId = data.tabId == -1 ? G.tabId : data.tabId;
-
+    
     // 查重 避免CPU占用 大于500 强制关闭查重
     if (G.checkDuplicates && cacheData[data.tabId].length <= 500) {
         for (let item of cacheData[data.tabId]) {
