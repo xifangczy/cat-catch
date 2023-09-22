@@ -671,10 +671,11 @@ function UItoggle() {
 // 检查是否符合条件 更改 合并下载 按钮状态
 function mergeDownButton() {
     const [checkedData, maxSize] = getCheckedData();
-    $mergeDown.prop("disabled", true).addClass("no-drop");
     if (checkedData.length == 2 && maxSize < 2147483648) {
-        $mergeDown.prop("disabled", false).removeClass("no-drop");
+        $mergeDown.show();
+        return;
     }
+    $mergeDown.hide();
 }
 // 获取当前标签 所有选择的文件
 function getCheckedData() {
