@@ -1,101 +1,112 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" type="text/css" href="css/public.css" media="all" />
-    <link rel="stylesheet" type="text/css" href="css/popup.css" media="all" />
-    <script src="js/init.js"></script>
-    <script src="lib/jquery.min.js"></script>
-    <script src="js/function.js"></script>
-  </head>
-  <body>
-    <div class="Tabs">
-      <div id="currentTab" class="TabButton Active">
-        当前页面
-        <div id="quantity"></div>
-      </div>
-      <div id="allTab" class="TabButton">
-        其他页面
-        <div id="quantity"></div>
-      </div>
-      <div id="otherTab" class="TabButton">
-        媒体控制 / 其他功能
-      </div>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" type="text/css" href="css/public.css" media="all" />
+  <link rel="stylesheet" type="text/css" href="css/popup.css" media="all" />
+  <script src="js/init.js"></script>
+  <script src="lib/jquery.min.js"></script>
+  <script src="js/function.js"></script>
+</head>
+
+<body>
+  <div class="Tabs">
+    <div id="currentTab" class="TabButton Active">
+      当前页面
+      <div id="quantity"></div>
     </div>
-    <div id="Tips">数据载入中...</div>
-    <div id="TipsFixed">~</div>
-    <div id="mediaList" class="container hide TabShow"></div>
-    <div id="allMediaList" class="container hide"></div>
-    <div id="otherOptions" class="container hide">
+    <div id="allTab" class="TabButton">
+      其他页面
+      <div id="quantity"></div>
+    </div>
+    <div id="otherTab" class="TabButton">
+      媒体控制 / 其他功能
+    </div>
+  </div>
+  <div id="Tips">数据载入中...</div>
+  <div id="TipsFixed">~</div>
+  <div id="mediaList" class="container hide TabShow"></div>
+  <div id="allMediaList" class="container hide"></div>
+  <div id="otherOptions" class="container hide">
     <div class="otherTips">媒体控制</div>
     <div class="flexRow">
       <b class="nowrap">选择网页:</b>
       <select id="videoTabIndex">
-        <option value ="-1" id="videoTabTips">未检测到有媒体的网页</option>
+        <option value="-1" id="videoTabTips">未检测到有媒体的网页</option>
       </select>
     </div>
     <div class="flexRow">
       <b class="nowrap">选择媒体:</b>
       <select id="videoIndex">
-        <option value ="-1" id="videoIndexTips">未检测到可操控媒体</option>
+        <option value="-1" id="videoIndexTips">未检测到可操控媒体</option>
       </select>
     </div>
-      <div id="PlayControl" class="textColor">
-        倍数:<input id="playbackRate" type="number" value="2" min="0.1" max="16" step="1"/>
-        <button id="speed" class="button2">倍速播放</button>
-        <button id="control" data-switch="play">播放</button>
-        <button id="pip" class="firefoxHide">画中画</button>
-        <button id="fullScreen" class="firefoxHide">全屏</button>
-        <button id="screenshot" data-switch="play">截图</button>
-        <label class="flexColumn loop"><div>循环</div><input type="checkbox" id="loop"></label>
-        <label class="flexColumn muted"><div>静音</div><input type="checkbox" id="muted"></label>
-        <div class="flexColumn"><div>音 量</div><input type="range" id="volume" class="volume" min="0" max="1" value="1" step="0.01"/></div>
-        <div class="flexColumn width100"><div id="timeShow"></div><input type="range" id="time" class="width100" min="0" max="100" value="0" step="1"/></div>
+    <div id="PlayControl" class="textColor">
+      倍数:<input id="playbackRate" type="number" value="2" min="0.1" max="16" step="1" />
+      <button id="speed" class="button2">倍速播放</button>
+      <button id="control" data-switch="play">播放</button>
+      <button id="pip" class="firefoxHide">画中画</button>
+      <button id="fullScreen" class="firefoxHide">全屏</button>
+      <button id="screenshot" data-switch="play">截图</button>
+      <label class="flexColumn loop">
+        <div>循环</div><input type="checkbox" id="loop">
+      </label>
+      <label class="flexColumn muted">
+        <div>静音</div><input type="checkbox" id="muted">
+      </label>
+      <div class="flexColumn">
+        <div>音 量</div><input type="range" id="volume" class="volume" min="0" max="1" value="1" step="0.01" />
       </div>
-      <div class="line"></div>
-      <div class="otherTips">功能入口</div>
-      <div class="otherFeat flexRow">
-        <button go="download.html" class="button2">下载器</button>
-        <button go="m3u8.html" class="button2">M3U8解析器</button>
-        <button go="mpd.html" class="button2">MPD解析器</button>
-        <button go="json.html" class="button2">JSON格式化</button>
-        <button go="https://ffmpeg.bmmmd.com/" class="button2">FFmpeg</button>
+      <div class="flexColumn width100">
+        <div id="timeShow"></div><input type="range" id="time" class="width100" min="0" max="100" value="0" step="1" />
       </div>
     </div>
-    <div id="filter" class="more">
-      <span id="regular" class="width100 regular">
-        <input type="text" placeholder="正则筛选 匹配资源url 回车确认"><button id="regularFilter" class="hide">确认</button>
-      </span>
-      <div id="ext"></div>
+    <div class="line"></div>
+    <div class="otherTips">功能入口</div>
+    <div class="otherFeat flexRow">
+      <button go="download.html" class="button2">下载器</button>
+      <button go="m3u8.html" class="button2">M3U8解析器</button>
+      <button go="mpd.html" class="button2">MPD解析器</button>
+      <button go="json.html" class="button2">JSON格式化</button>
+      <button go="https://ffmpeg.bmmmd.com/" class="button2">FFmpeg</button>
     </div>
-    <div id="features" class="more flex-end">
-      <button id="unfoldAll">展开全部</button>
-      <button id="unfoldPlay">展开可播放的</button>
-      <button id="unfoldFilter">展开所选</button>
-      <button id="fold">关闭展开</button>
-      <button class="button2" id="recorder">视频录制</button>
-      <button class="button2" id="recorder2">屏幕捕捉</button>
-      <button id="MobileUserAgent" class="button2" data-switch="on">模拟手机</button>
-      <button id="AutoDown" class="button2" data-switch="on">自动下载</button>
-    </div>
-    <div id="down">
-      <button id="mergeDown" class="button2 no-drop" disabled>在线合并</button>
-      <button id="DownFile">下载</button>
-      <button id="AllCopy">复制</button>
-      <button id="AllSelect" class="hide">全选</button>
-      <button id="ReSelect">反选</button>
-      <button id="openFilter" panel="filter">筛选</button>
-      <button id="Clear">清空</button>
-      <button id="search" class="button2 hide">深度搜索</button>
-      <button id="catch" class="button2 hide">缓存捕捉</button>
-      <button id="more" class="button2" panel="features">更多功能</button>
-      <button id="enable" class="button2">暂停</button>
-      <button id="Options" go="options.html" class="button2">设置</button>
-    </div>
-    <script src="lib/base64.js"></script>
-    <script src="js/popup.js"></script>
-    <script src="js/media-control.js"></script>
-    <script src="lib/jquery.qrcode.min.js"></script>
-    <script src="lib/hls.min.js"></script>
-  </body>
+  </div>
+  <div id="filter" class="more">
+    <span id="regular" class="width100 regular">
+      <input type="text" placeholder="正则筛选 匹配资源url 回车确认"><button id="regularFilter" class="hide">确认</button>
+    </span>
+    <div id="ext"></div>
+  </div>
+  <div id="features" class="more flex-end">
+    <button id="unfoldAll">展开全部</button>
+    <button id="unfoldPlay">展开可播放的</button>
+    <button id="unfoldFilter">展开所选</button>
+    <button id="fold">关闭展开</button>
+    <button class="button2" id="recorder">视频录制</button>
+    <button class="button2" id="recorder2">屏幕捕捉</button>
+    <button id="MobileUserAgent" class="button2" data-switch="on">模拟手机</button>
+    <button id="AutoDown" class="button2" data-switch="on">自动下载</button>
+  </div>
+  <div id="down">
+    <button id="mergeDown" class="button2 hide" disabled>在线合并</button>
+    <button id="DownFile">下载</button>
+    <button id="AllCopy">复制</button>
+    <button id="AllSelect">全选</button>
+    <button id="ReSelect">反选</button>
+    <button id="openFilter" panel="filter">筛选</button>
+    <button id="Clear">清空</button>
+    <button id="search" class="button2 hide">深度搜索</button>
+    <button id="catch" class="button2 hide">缓存捕捉</button>
+    <button id="more" class="button2" panel="features">更多功能</button>
+    <button id="enable" class="button2">暂停</button>
+    <button id="Options" go="options.html" class="button2">设置</button>
+  </div>
+  <script src="lib/base64.js"></script>
+  <script src="js/popup.js"></script>
+  <script src="js/media-control.js"></script>
+  <script src="lib/jquery.qrcode.min.js"></script>
+  <script src="lib/hls.min.js"></script>
+</body>
+
 </html>
