@@ -99,21 +99,21 @@
         <span class="explain">
           为方便使用第三方应用，自定义复制按钮写入剪贴板的内容。<br />
           <a href="https://o2bmm.gitbook.io/cat-catch/docs/settings#keywords" target="_blank">猫抓替换关键词列表</a><br /><br />
-        <div class="item">
-          <div>HLS m3u8文件</div>
-          <textarea id="copyM3U8" save="input" type="text" class="width100"></textarea>
-        </div>
-        <div class="item" style="margin-top: 10px;">
-          <div>DASH mpb文件</div>
-          <textarea id="copyMPD" save="input" type="text" class="width100"></textarea>
-        </div>
-        <div class="item" style="margin-top: 10px;">
-          <div>其他文件</div>
-          <textarea id="copyOther" save="input" type="text" class="width100"></textarea>
-        </div>
-        <div class="flex-end">
-          <button type="button" id="ResetCopy">重置复制设置</button>
-        </div>
+          <div class="item">
+            <div>HLS m3u8文件</div>
+            <textarea id="copyM3U8" save="input" type="text" class="width100"></textarea>
+          </div>
+          <div class="item" style="margin-top: 10px;">
+            <div>DASH mpb文件</div>
+            <textarea id="copyMPD" save="input" type="text" class="width100"></textarea>
+          </div>
+          <div class="item" style="margin-top: 10px;">
+            <div>其他文件</div>
+            <textarea id="copyOther" save="input" type="text" class="width100"></textarea>
+          </div>
+          <div class="flex-end">
+            <button type="button" id="ResetCopy">重置复制设置</button>
+          </div>
       </div>
     </section>
 
@@ -137,7 +137,8 @@
           <div class="item">
             <div style="margin-bottom: 5px;margin-top: 5px;">
               <a href="https://o2bmm.gitbook.io/cat-catch/docs/settings#keywords" target="_blank">猫抓替换关键词列表</a>
-              <a href="https://nilaoda.github.io/N_m3u8DL-CLI/Advanced.html" target="_blank" style="margin-left: 10px;">N_m3u8DL-CLI 参数</a>
+              <a href="https://nilaoda.github.io/N_m3u8DL-CLI/Advanced.html" target="_blank"
+                style="margin-left: 10px;">N_m3u8DL-CLI 参数</a>
               <p>参数设置</p>
             </div>
             <textarea id="m3u8dlArg" save="input" type="text" class="width100 break-all" rows="3"></textarea>
@@ -173,8 +174,11 @@
           </div>
           <div id="testTag" class="hide break-all">
             <div class="item">
-              <div> <p>测试</p> </div>
-              <textarea id="testTextarea" type="text" class="width100 break-all" rows="3">${url} ${referer|exists:'--headers "Referer:*"'} ${url|regexp:"(https?://[^?]*)"|replace:"http://","https://"|to:base64}</textarea>
+              <div>
+                <p>测试</p>
+              </div>
+              <textarea id="testTextarea" type="text" class="width100 break-all"
+                rows="3">${url} ${referer|exists:'--headers "Referer:*"'} ${url|regexp:"(https?://[^?]*)"|replace:"http://","https://"|to:base64}</textarea>
             </div>
             ${url}<input type="text" class="width100" value="https://bmmmd.com/test.m3u8" id="url">
             ${referer}<input type="text" class="width100" value="https://bmmmd.com/" id="referer">
@@ -186,6 +190,46 @@
           <div class="flex-end">
             <button type="button" id="showTestTag">测试</button>
             <button type="button" id="ResetTag">重置标签设置</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h1 class="optionsTitle">下载器</h1>
+      <div class="optionBox" id="downOption">
+        <span class="explain">
+          如果检测到资源下载失败, 自动启用下载器再次尝试下载.
+        </span>
+        <div class="list">
+          <div class="item">
+            <div>始终不启用猫抓下载器</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="catDownload" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div>下载完自动关闭页面</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="downAutoClose" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div>后台打开下载器页面</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="downActive" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
           </div>
         </div>
       </div>
@@ -237,16 +281,6 @@
             <div class="switch">
               <label class="switchLabel switchRadius">
                 <input type="checkbox" id="refreshClear" save="click" class="switchInput" />
-                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
-              </label>
-            </div>
-          </div>
-
-          <div class="item">
-            <div>始终不启用猫抓下载器</div>
-            <div class="switch">
-              <label class="switchLabel switchRadius">
-                <input type="checkbox" id="catDownload" save="click" class="switchInput" />
                 <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
               </label>
             </div>

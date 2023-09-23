@@ -625,7 +625,7 @@ function copyLink(data) {
 }
 // 携带referer 下载
 function catDownload(obj, extra = "") {
-    let active = !G.downInActive;
+    let active = !G.downActive;
     if (extra) { active = false; }
     chrome.tabs.get(G.tabId, function (tab) {
         chrome.tabs.create({

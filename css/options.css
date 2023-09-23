@@ -139,7 +139,7 @@ button,
   justify-content: flex-end;
 }
 .explain {
-  color: var(--text-color);
+  color: #6c6c6c;
 }
 #typeList,
 #extList {

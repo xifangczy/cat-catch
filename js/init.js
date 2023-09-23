@@ -79,14 +79,15 @@ G.OptionLists = {
     downFileName: "${title}.${ext}",
     css: "",
     checkDuplicates: true,
-    enable: true
+    enable: true,
+    downActive: false,
+    downAutoClose: false,
 };
 // 本地储存的配置
 G.LocalVar = {
     featMobileTabId: [],
     featAutoDownTabId: [],
     mediaControl: { tabid: 0, index: -1 },
-    downInActive: false
 };
 
 // Init

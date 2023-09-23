@@ -11,16 +11,9 @@ const title = params.get("title");
 _referer ? setReferer(_referer, start) : start();
 
 function start() {
-    if (autoClose) {
-        $("#autoClose").prop("checked", true);
-    } else {
-        chrome.storage.local.get({ downAutoClose: true }, function (data) {
-            $("#autoClose").prop("checked", data.downAutoClose);
-        });
-    }
-    chrome.storage.local.get({ downInActive: false }, function (data) {
-        $("#downInActive").prop("checked", data.downInActive);
-    });
+    $("#autoClose").prop("checked", autoClose ? true : G.downAutoClose);
+    $("#downInActive").prop("checked", G.downActive);
+
     chrome.tabs.getCurrent(function (tab) {
         startDownload(tab.id);
     });
@@ -137,15 +130,15 @@ function startDownload(tabId) {
 
     // 下载完成关闭本页面
     $("#autoClose").click(function () {
-        chrome.storage.local.set({
+        chrome.storage.sync.set({
             downAutoClose: $("#autoClose").prop("checked")
         });
     });
 
     // 不跳转到下载器页面
-    $("#downInActive").click(function () {
-        chrome.storage.local.set({
-            downInActive: $("#downInActive").prop("checked")
+    $("#downActive").click(function () {
+        chrome.storage.sync.set({
+            downActive: $("#downActive").prop("checked")
         });
     });
 
