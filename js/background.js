@@ -36,10 +36,8 @@ chrome.webRequest.onBeforeRequest.addListener(
 // 保存Referer
 chrome.webRequest.onSendHeaders.addListener(
     function (data) {
-        let referer = getReferer(data);
-        if (referer) {
-            refererData["requestId" + data.requestId] = referer;
-        }
+        const referer = getReferer(data);
+        referer && G.referer.set(data.requestId, referer);
     }, { urls: ["<all_urls>"] }, ['requestHeaders',
         chrome.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS].filter(Boolean)
 );
@@ -47,9 +45,10 @@ chrome.webRequest.onSendHeaders.addListener(
 chrome.webRequest.onResponseStarted.addListener(
     function (data) {
         try {
-            if (refererData["requestId" + data.requestId]) {
-                data.referer = refererData["requestId" + data.requestId];
-                delete refererData["requestId" + data.requestId];
+            const referer = G.referer.get(data.requestId);
+            if (referer) {
+                data.referer = referer;
+                G.referer.delete(data.requestId);
             }
             findMedia(data);
         } catch (e) { console.log(e, data); }
@@ -58,7 +57,8 @@ chrome.webRequest.onResponseStarted.addListener(
 // 删除失败的refererData
 chrome.webRequest.onErrorOccurred.addListener(
     function (data) {
-        delete refererData["requestId" + data.requestId];
+        G.referer.delete(data.requestId);
+        G.blackList.delete(data.requestId);
     }, { urls: ["<all_urls>"] }
 );
 
@@ -161,7 +161,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
 
     cacheData[data.tabId] ??= [];
     cacheData[G.tabId] ??= [];
-    
+
     // 查重 避免CPU占用 大于500 强制关闭查重
     if (G.checkDuplicates && cacheData[data.tabId].length <= 500) {
         for (let item of cacheData[data.tabId]) {
@@ -480,7 +480,7 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
         }
     });
     // 清理 模拟手机
-    mobileUserAgent(tabId, false);
+    tabIdListRemove("featMobileTabId", tabId);
     // 清理 自动下载
     tabIdListRemove("featAutoDownTabId", tabId);
     // 清理 捕获

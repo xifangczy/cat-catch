@@ -4,6 +4,7 @@ var G = {};
 var cacheData = { init: true };
 var refererData = [];
 G.blackList = new Set();
+G.referer = new Map();
 // 当前tabID
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     if (tabs[0] && tabs[0].id) {
@@ -234,8 +235,8 @@ function clearRedundant() {
             });
         });
     });
-    refererData = [];
-    G.blackList.clear();
+    // G.referer.clear();
+    // G.blackList.clear();
 }
 
 // 替换掉不允许的文件名称字符
