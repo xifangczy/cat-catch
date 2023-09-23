@@ -2,7 +2,6 @@
 var G = {};
 // 缓存数据
 var cacheData = { init: true };
-var refererData = [];
 G.blackList = new Set();
 G.referer = new Map();
 // 当前tabID
@@ -91,9 +90,6 @@ G.LocalVar = {
     mediaControl: { tabid: 0, index: -1 },
 };
 
-// Init
-InitOptions();
-
 // 102版本以上 非Firefox 开启更多功能
 // G.isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
 G.isFirefox = false;
@@ -131,6 +127,9 @@ const reTemplates = /\$\{(fullFileName|fileName|ext|title|referer|url|now|fullDa
 let debounce = undefined;
 let debounceCount = 0;
 let debounceTime = 0;
+
+// Init
+InitOptions();
 
 // 初始变量
 function InitOptions() {

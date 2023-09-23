@@ -478,6 +478,12 @@ $("#AutoDown").click(function () {
     }
     chrome.runtime.sendMessage({ Message: "autoDown", tabId: G.tabId, action: action });
 });
+// 深度搜索 缓存捕捉 注入脚本
+$("#search, #catch, #recorder, #recorder2").click(function () {
+    chrome.runtime.sendMessage({ Message: "script", tabId: G.tabId, script: this.id + ".js" });
+    G.refreshClear && $('#Clear').click();
+    location.reload();
+});
 // 102以上开启 捕获按钮/注入脚本
 if (G.version >= 102) {
     $("#search").show();
@@ -554,13 +560,6 @@ const interval = setInterval(function () {
         state.catch && $("#catch").html("关闭捕获");
         state.recorder && $("#recorder").html("关闭录制");
         state.recorder2 && $("#recorder2").html("关闭屏幕捕捉");
-    });
-    // 深度搜索 缓存捕捉 注入脚本
-    $("#search, #catch, #recorder, #recorder2").click(function () {
-        // $("#features").hide();
-        chrome.runtime.sendMessage({ Message: "script", tabId: G.tabId, script: this.id + ".js" });
-        G.refreshClear && $('#Clear').click();
-        location.reload();
     });
 
     // 上一次设定的倍数
