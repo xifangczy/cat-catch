@@ -12,7 +12,7 @@ _referer ? setReferer(_referer, start) : start();
 
 function start() {
     $("#autoClose").prop("checked", autoClose ? true : G.downAutoClose);
-    $("#downInActive").prop("checked", G.downActive);
+    $("#downActive").prop("checked", G.downActive);
 
     chrome.tabs.getCurrent(function (tab) {
         startDownload(tab.id);
