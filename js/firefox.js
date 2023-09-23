@@ -5,7 +5,7 @@ if (typeof (browser) == "object") {
     chrome.action.setTitle = browser.browserAction.setTitle;
 
     function importScripts() {
-        for(let script of arguments){
+        for (let script of arguments) {
             const js = document.createElement('script');
             js.src = script;
             document.head.appendChild(js);
@@ -58,4 +58,9 @@ if (typeof (browser) == "object") {
     chrome.scripting.executeScript = (obj) => {
         return;
     }
+
+    // browser.windows.onFocusChanged.addListener 少一个参数
+    chrome.windows.onFocusChanged.addListener = (listener, obj) => {
+        browser.windows.onFocusChanged.addListener(listener);
+    };
 }
