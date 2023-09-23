@@ -510,6 +510,7 @@ const interval = setInterval(function () {
     clearInterval(interval);
     // 获取页面DOM
     chrome.tabs.sendMessage(G.tabId, { Message: "getPage" }, { frameId: 0 }, function (result) {
+        if (chrome.runtime.lastError) { return; }
         pageDOM = new DOMParser().parseFromString(result, 'text/html');
     });
     // 填充数据
@@ -575,7 +576,7 @@ const interval = setInterval(function () {
 /* 格式判断 */
 function isPlay(data) {
     if (G.Player && !isJSON(data) && !isPicture(data)) { return true; }
-    const extArray = ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'm4a', '3gp', 'mpeg', 'mov'];
+    const extArray = ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'm4a', '3gp', 'mpeg', 'mov', 'm4s'];
     const typeArray = ['video/ogg', 'video/mp4', 'video/webm', 'audio/ogg', 'audio/mp3', 'audio/wav', 'audio/m4a', 'video/3gp', 'video/mpeg', 'video/mov'];
     return extArray.includes(data.ext) || typeArray.includes(data.type) || isM3U8(data);
 }
@@ -671,9 +672,12 @@ function UItoggle() {
     if (getData().size >= 2) { mergeDownButton(); }
 }
 // 检查是否符合条件 更改 合并下载 按钮状态
+function mergeDownButtonCheck(data) {
+    return data.type.startsWith("video") || data.type.startsWith("audio") || data.type.endsWith("octet-stream");
+}
 function mergeDownButton() {
     const [checkedData, maxSize] = getCheckedData();
-    if (checkedData.length == 2 && maxSize < 2147483648) {
+    if (checkedData.length == 2 && checkedData.every(mergeDownButtonCheck) && maxSize < 2147483648) {
         $mergeDown.show();
         return;
     }
