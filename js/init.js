@@ -85,6 +85,7 @@ G.TabIdList = {
     featMobileTabId: [],
     featAutoDownTabId: [],
     mediaControl: { tabid: 0, index: -1 },
+    downInActive: false
 };
 
 // Init

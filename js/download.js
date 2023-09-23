@@ -18,6 +18,9 @@ function start() {
             $("#autoClose").prop("checked", data.downAutoClose);
         });
     }
+    chrome.storage.local.get({ downInActive: false }, function (data) {
+        $("#downInActive").prop("checked", data.downInActive);
+    });
     chrome.tabs.getCurrent(function (tab) {
         startDownload(tab.id);
     });
@@ -136,6 +139,13 @@ function startDownload(tabId) {
     $("#autoClose").click(function () {
         chrome.storage.local.set({
             downAutoClose: $("#autoClose").prop("checked")
+        });
+    });
+
+    // 不跳转到下载器页面
+    $("#downInActive").click(function () {
+        chrome.storage.local.set({
+            downInActive: $("#downInActive").prop("checked")
         });
     });
 

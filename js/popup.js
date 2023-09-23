@@ -625,6 +625,8 @@ function copyLink(data) {
 }
 // 携带referer 下载
 function catDownload(obj, extra = "") {
+    let active = !G.downInActive;
+    if (extra) { active = false; }
     chrome.tabs.get(G.tabId, function (tab) {
         chrome.tabs.create({
             url: `/download.html?url=${encodeURIComponent(
@@ -635,7 +637,7 @@ function catDownload(obj, extra = "") {
                 obj.downFileName
             )}${extra}`,
             index: tab.index + 1,
-            active: extra ? false : true
+            active: active
         });
     });
 }
