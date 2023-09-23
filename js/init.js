@@ -81,7 +81,8 @@ G.OptionLists = {
     checkDuplicates: true,
     enable: true
 };
-G.TabIdList = {
+// 本地储存的配置
+G.LocalVar = {
     featMobileTabId: [],
     featAutoDownTabId: [],
     mediaControl: { tabid: 0, index: -1 },
@@ -155,7 +156,7 @@ function InitOptions() {
         G.initSyncComplete = true;
     });
     // 读取local配置数据 交给全局变量G
-    chrome.storage.local.get(G.TabIdList, function (items) {
+    chrome.storage.local.get(G.LocalVar, function (items) {
         G = { ...items, ...G };
         G.initLocalComplete = true;
     });
