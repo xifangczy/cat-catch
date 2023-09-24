@@ -12,6 +12,13 @@ function secToTime(sec) {
     time += appendZero(sec);
     return time;
 }
+// 时间格式转为秒
+function timeToSec(time) {
+    let sec = 0;
+    let arr = time.split(":");
+    sec = parseInt(arr[0]) * 3600 + parseInt(arr[1]) * 60 + parseInt(arr[2]);
+    return sec;
+}
 // 字节转换成大小
 function byteToSize(byte) {
     if (!byte || byte < 1024) { return 0; }

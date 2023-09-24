@@ -711,11 +711,21 @@ $(function () {
     $("#mergeTs").click(async function () {
         initDownload(); // 初始化下载变量
         // 设定起始序号
-        let start = parseInt($("#rangeStart").val());
-        start = start ? start - 1 : 0;
+        let start = $("#rangeStart").val();
+        if (start.includes(":")) {
+            start = timeToIndex(start);
+        } else {
+            start = parseInt(start);
+            start = start ? start - 1 : 0;
+        }
         // 设定结束序号
-        let end = parseInt($("#rangeEnd").val());
-        end = end ? end - 1 : _fragments.length - 1;
+        let end = $("#rangeEnd").val();
+        if (end.includes(":")) {
+            end = timeToIndex(end);
+        } else {
+            end = parseInt(end);
+            end = end ? end - 1 : _fragments.length - 1;
+        }
         // 检查序号
         if (start > end) {
             $progress.html(`<b>开始序号不能大于结束序号</b>`);
@@ -1234,6 +1244,20 @@ $(function () {
         m3u8dlArg += onlyAudio ? ` --enableAudioOnly` : "";
 
         return m3u8dlArg;
+    }
+    /**
+     * 时间格式转为切片序号
+     * @param {string} time
+     * @returns {number}
+     */
+    function timeToIndex(time) {
+        time = timeToSec(time);
+        let index = 0;
+        for (; index <= _fragments.length; index++) {
+            time -= _fragments[index].duration;
+            if (time <= 0) { break; }
+        }
+        return index;
     }
 });
 // 写入ts链接

@@ -97,6 +97,7 @@
             <button id="copyM3U8dl">复制命令</button>
             <button id="setM3u8dl">显示命令</button>
             <label class="m3u8checkbox textColor">载入设置参数<input type="checkbox" id="addParam" save="change" /></label>
+            <button class="openDir hide">下载目录</button>
           </div>
           <textarea id="m3u8dlArg" type="text" class="m3u8dlArg hide"></textarea>
           <div class="line"></div>
@@ -120,13 +121,12 @@
             <div class="rangeDown textColor">
               下载范围
               <div class="merge">
-                <input type="number" id="rangeStart" spellcheck="false" placeholder="开始" step="1" min="1" />
-                <input type="number" id="rangeEnd" spellcheck="false" placeholder="结束" step="1" min="1" />
+                <input type="text" id="rangeStart" spellcheck="false" placeholder="开始" />
+                <input type="text" id="rangeEnd" spellcheck="false" placeholder="结束" />
               </div>
             </div>
             <button id="recorder" class="button2 hide" data-switch="on" data-switch="on">录制直播</button>
             <button id="mergeTs" class="button2">合并下载</button>
-            <button class="openDir">打开下载目录</button>
             <button id="errorDownload" class="hide button2">重下失败项</button>
             <button id="ForceDownload" class="hide button2">下载已有数据</button>
             <button id="stopStream" class="hide button2">停止下载</button>
