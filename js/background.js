@@ -473,22 +473,8 @@ chrome.webNavigation.onCommitted.addListener(function (details) {
 chrome.tabs.onRemoved.addListener(function (tabId) {
     // 清理缓存数据
     chrome.alarms.get("nowClear", function (alarm) {
-        if (!alarm) {
-            chrome.alarms.create("nowClear", { when: Date.now() + 1000 });
-        }
+        !alarm && chrome.alarms.create("nowClear", { when: Date.now() + 1000 });
     });
-    if (G.initLocalComplete) {
-        // 清理 模拟手机
-        G.featMobileTabId.delete(tabId);
-        // 清理 自动下载
-        G.featAutoDownTabId.delete(tabId);
-    }
-    // 清理 捕获
-    if (G.version >= 102) {
-        G.scriptList.forEach(function (item) {
-            item.tabId.has(tabId) && item.tabId.delete(tabId);
-        });
-    }
 });
 
 // 快捷键
@@ -612,7 +598,7 @@ function mobileUserAgent(tabId, change = false) {
         });
         return true;
     }
-    G.featMobileTabId.delete(tabId);
+    G.featMobileTabId.delete(tabId) && chrome.storage.local.set({ featMobileTabId: Array.from(G.featMobileTabId) });
     chrome.declarativeNetRequest.updateSessionRules({
         removeRuleIds: [tabId]
     });

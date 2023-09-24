@@ -153,13 +153,13 @@ function InitOptions() {
             try { reg = new RegExp(item.regex, item.type) } catch (e) { item.state = false; }
             return { regex: reg, ext: item.ext, blackList: item.blackList, state: item.state }
         });
-        items.featMobileTabId = new Set(items.featMobileTabId);
-        items.featAutoDownTabId = new Set(items.featAutoDownTabId);
         G = { ...items, ...G };
         G.initSyncComplete = true;
     });
     // 读取local配置数据 交给全局变量G
     chrome.storage.local.get(G.LocalVar, function (items) {
+        items.featMobileTabId = new Set(items.featMobileTabId);
+        items.featAutoDownTabId = new Set(items.featAutoDownTabId);
         G = { ...items, ...G };
         G.initLocalComplete = true;
     });
@@ -221,10 +221,11 @@ function clearRedundant() {
             }
             chrome.storage.local.set({ MediaData: cacheData });
         }
-        // 清理 declarativeNetRequest
+        // 清理 declarativeNetRequest 模拟手机
         chrome.declarativeNetRequest.getSessionRules(function (rules) {
             for (let item of rules) {
                 if (!allTabId.includes(item.id)) {
+                    G.featMobileTabId.delete(item.id) && chrome.storage.local.set({ featMobileTabId: Array.from(G.featMobileTabId) });
                     chrome.declarativeNetRequest.updateSessionRules({
                         removeRuleIds: [item.id]
                     });
@@ -238,6 +239,12 @@ function clearRedundant() {
                     scriptList.tabId.delete(tabId);
                 }
             });
+        });
+        // 清理自动下载
+        G.featAutoDownTabId.forEach(function (tabId) {
+            if (!allTabId.includes(tabId)) {
+                G.featAutoDownTabId.delete(tabId) && chrome.storage.local.set({ featAutoDownTabId: Array.from(G.featAutoDownTabId) });
+            }
         });
     });
     // G.referer.clear();
