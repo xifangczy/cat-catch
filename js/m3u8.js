@@ -1223,8 +1223,10 @@ $(function () {
         const tsThread = $("#thread").val();  // 线程数量
         m3u8dlArg += ` --maxThreads "${tsThread}"`
 
-        const rangeStart = $("#rangeStart").val() - 1;  // 开始序列号
-        const rangeEnd = $("#rangeEnd").val() - 1;  // 结束序列号
+        let rangeStart = $("#rangeStart").val();
+        rangeStart = rangeStart.includes(":") ? rangeStart : rangeStart - 1;
+        let rangeEnd = $("#rangeEnd").val();
+        rangeEnd = rangeEnd.includes(":") ? rangeEnd : rangeEnd - 1;
         m3u8dlArg += ` --downloadRange "${rangeStart}-${rangeEnd}"`
 
         let customKey = $("#customKey").val().trim();  // 自定义密钥
@@ -1251,7 +1253,8 @@ $(function () {
      * @returns {number}
      */
     function timeToIndex(time) {
-        time = timeToSec(time);
+        const arr = time.split(":");
+        time = parseInt(arr[0]) * 3600 + parseInt(arr[1]) * 60 + parseInt(arr[2]);
         let index = 0;
         for (; index <= _fragments.length; index++) {
             time -= _fragments[index].duration;
