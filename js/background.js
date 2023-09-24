@@ -303,7 +303,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             G.featAutoDownTabId.delete(Message.tabId);
         } else {
             G.featAutoDownTabId.add(Message.tabId);
-            chrome.storage.local.set({ featAutoDownTabId: Array.from(G.featMobileTabId) });
+            chrome.storage.local.set({ featAutoDownTabId: Array.from(G.featAutoDownTabId) });
         }
         sendResponse("ok");
         return true;
