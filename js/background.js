@@ -9,7 +9,7 @@ chrome.runtime.onConnect.addListener(function (Port) {
     if (Port.name !== "HeartBeat") return;
     Port.postMessage("HeartBeat");
     Port.onMessage.addListener(function (message, Port) { return; });
-    let interval = setInterval(function () {
+    const interval = setInterval(function () {
         clearInterval(interval);
         Port.disconnect();
     }, 250000);
@@ -533,7 +533,7 @@ function fileNameParse(pathname) {
 }
 //获取Header属性的值
 function getResponseHeadersValue(data) {
-    let header = new Array();
+    const header = new Array();
     if (data.responseHeaders == undefined || data.responseHeaders.length == 0) { return header; }
     for (let item of data.responseHeaders) {
         switch (item.name.toLowerCase()) {

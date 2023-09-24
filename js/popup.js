@@ -669,6 +669,9 @@ function UItoggle() {
 }
 // 检查是否符合条件 更改 合并下载 按钮状态
 function mergeDownButtonCheck(data) {
+    if (!data.type) {
+        return ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'm4a', '3gp', 'mpeg', 'mov', 'm4s', 'aac'].includes(data.ext);
+    }
     return data.type.startsWith("video") || data.type.startsWith("audio") || data.type.endsWith("octet-stream");
 }
 function mergeDownButton() {
