@@ -480,7 +480,8 @@ $("#search, #catch, #recorder, #recorder2").click(function () {
 if (G.version >= 102) {
     $("#search").show();
     $("#catch").show();
-    $("#otherScript").show();
+    $("#recorder").show();
+    $("#recorder2").show();
 }
 // Firefox 关闭画中画 全屏 修复右边滚动条遮挡
 if (G.isFirefox) {
