@@ -188,12 +188,8 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
             });
             continue;
         }
-        if (key == "featMobileTabId") {
-            G.featMobileTabId = new Set(newValue);
-            continue;
-        }
-        if (key == "featAutoDownTabId") {
-            G.featAutoDownTabId = new Set(newValue);
+        if (key == "featMobileTabId" || key == "featAutoDownTabId") {
+            G[key] = new Set(newValue);
             continue;
         }
         G[key] = newValue;

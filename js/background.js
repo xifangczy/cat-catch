@@ -605,7 +605,7 @@ function mobileUserAgent(tabId, change = false) {
                     }]
                 },
                 "condition": {
-                    "tabIds": Array.from(G.featMobileTabId),
+                    "tabIds": [tabId],
                     "resourceTypes": ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "object", "xmlhttprequest", "ping", "csp_report", "media", "websocket", "webtransport", "webbundle", "other"]
                 }
             }]
