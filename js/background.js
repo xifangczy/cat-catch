@@ -286,13 +286,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // 模拟手机
     if (Message.Message == "mobileUserAgent") {
-        if (G.featMobileTabId.has(Message.tabId)) {
-            mobileUserAgent(Message.tabId, false);
-        } else {
-            G.featMobileTabId.add(Message.tabId);
-            chrome.storage.local.set({ featMobileTabId: Array.from(G.featMobileTabId) });
-            mobileUserAgent(Message.tabId, true);
-        }
+        mobileUserAgent(Message.tabId, !G.featMobileTabId.has(Message.tabId));
         chrome.tabs.reload(Message.tabId, { bypassCache: true });
         sendResponse("ok");
         return true;
@@ -303,8 +297,8 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             G.featAutoDownTabId.delete(Message.tabId);
         } else {
             G.featAutoDownTabId.add(Message.tabId);
-            chrome.storage.local.set({ featAutoDownTabId: Array.from(G.featAutoDownTabId) });
         }
+        chrome.storage.local.set({ featAutoDownTabId: Array.from(G.featAutoDownTabId) });
         sendResponse("ok");
         return true;
     }
@@ -578,6 +572,8 @@ function SetIcon(obj) {
 // 模拟手机端
 function mobileUserAgent(tabId, change = false) {
     if (change) {
+        G.featMobileTabId.add(tabId);
+        chrome.storage.local.set({ featMobileTabId: Array.from(G.featMobileTabId) });
         chrome.declarativeNetRequest.updateSessionRules({
             removeRuleIds: [tabId],
             addRules: [{
