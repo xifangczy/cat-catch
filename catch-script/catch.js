@@ -24,8 +24,8 @@
         <div style="font-weight:bold;">文件名: </div><div id="fileName"></div>
         <div style="font-weight:bold;">表达式: </div><div id="selector">未设置</div>
         <div style="font-weight:bold;">正则: </div><div id="regular">未设置</div>
-        <button id="setSelector" ${buttonStyle}>设置表达式</button>
-        <button id="setRegular" ${buttonStyle}>设置正则提取</button>
+        <button id="setSelector" ${buttonStyle}>表达式提取</button>
+        <button id="setRegular" ${buttonStyle}>正则提取</button>
     </details>`;
     CatCatch.style = `
         position: fixed;
