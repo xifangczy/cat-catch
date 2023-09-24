@@ -202,7 +202,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         }
         // 发送到popup 并检查自动下载
         chrome.runtime.sendMessage(info, function () {
-            if (info.tabId != -1 && G.featAutoDownTabId.size > 0 && G.featAutoDownTabId.has(info.tabId)) {
+            if (G.featAutoDownTabId.size > 0 && G.featAutoDownTabId.has(info.tabId)) {
                 const downDir = info.title == "NULL" ? "CatCatch/" : stringModify(info.title) + "/";
                 chrome.downloads.download({
                     url: info.url,
@@ -478,8 +478,8 @@ chrome.commands.onCommand.addListener(function (command) {
             G.featAutoDownTabId.delete(G.tabId);
         } else {
             G.featAutoDownTabId.add(G.tabId);
-            chrome.storage.local.set({ featAutoDownTabId: Array.from(G.featAutoDownTabId) });
         }
+        chrome.storage.local.set({ featAutoDownTabId: Array.from(G.featAutoDownTabId) });
     } else if (command == "catch") {
         const scriptTabid = G.scriptList.get("catch.js").tabId;
         scriptTabid.has(G.tabId) ? scriptTabid.delete(G.tabId) : scriptTabid.add(G.tabId);
