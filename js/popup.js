@@ -453,36 +453,28 @@ $('#Clear').click(function () {
         allCount = 0;
         $all.empty();
     }
-    emptyData();
+    allData.get(activeTab).clear();
     UItoggle();
 });
 // 模拟手机端
 $("#MobileUserAgent").click(function () {
-    const action = $(this).data("switch");
-    if (action == "on") {
-        $(this).html("关闭模拟").data("switch", "off");
-    } else {
-        $(this).html("模拟手机").data("switch", "on");
-    }
-    chrome.runtime.sendMessage({ Message: "mobileUserAgent", tabId: G.tabId, action: action }, function () {
-        G.refreshClear ? $('#Clear').click() : location.reload();
+    chrome.runtime.sendMessage({ Message: "mobileUserAgent", tabId: G.tabId }, function () {
+        G.refreshClear && $('#Clear').click();
+        updateButton();
     });
 });
 // 自动下载
 $("#AutoDown").click(function () {
-    const action = $(this).data("switch");
-    if (action == "on") {
-        $(this).html("关闭自动下载").data("switch", "off");
-    } else {
-        $(this).html("自动下载").data("switch", "on");
-    }
-    chrome.runtime.sendMessage({ Message: "autoDown", tabId: G.tabId, action: action });
+    chrome.runtime.sendMessage({ Message: "autoDown", tabId: G.tabId }, function () {
+        updateButton();
+    });
 });
 // 深度搜索 缓存捕捉 注入脚本
 $("#search, #catch, #recorder, #recorder2").click(function () {
-    chrome.runtime.sendMessage({ Message: "script", tabId: G.tabId, script: this.id + ".js" });
-    G.refreshClear && $('#Clear').click();
-    location.reload();
+    chrome.runtime.sendMessage({ Message: "script", tabId: G.tabId, script: this.id + ".js" }, function () {
+        G.refreshClear && $('#Clear').click();
+        updateButton();
+    });
 });
 // 102以上开启 捕获按钮/注入脚本
 if (G.version >= 102) {
@@ -553,14 +545,7 @@ const interval = setInterval(function () {
         sendResponse("OK");
     });
     // 获取模拟手机 自动下载 捕获 状态
-    chrome.runtime.sendMessage({ Message: "getButtonState", tabId: G.tabId }, function (state) {
-        state.MobileUserAgent && $("#MobileUserAgent").html("关闭模拟").data("switch", "off");
-        state.AutoDown && $("#AutoDown").html("关闭自动下载").data("switch", "off");
-        state.search && $("#search").html("关闭搜索");
-        state.catch && $("#catch").html("关闭捕获");
-        state.recorder && $("#recorder").html("关闭录制");
-        state.recorder2 && $("#recorder2").html("关闭屏幕捕捉");
-    });
+    updateButton();
 
     // 上一次设定的倍数
     $("#playbackRate").val(G.playbackRate);
@@ -572,6 +557,17 @@ const interval = setInterval(function () {
 }, 4);
 /********************绑定事件END********************/
 
+// 按钮状态更新
+function updateButton() {
+    chrome.runtime.sendMessage({ Message: "getButtonState", tabId: G.tabId }, function (state) {
+        $("#MobileUserAgent").html(state.MobileUserAgent ? "关闭模拟" : "模拟手机");
+        $("#AutoDown").html(state.AutoDown ? "关闭下载" : "自动下载");
+        $("#search").html(state.search ? "关闭搜索" : "深度搜索");
+        $("#catch").html(state.catch ? "关闭捕获" : "缓存捕获");
+        $("#recorder").html(state.recorder ? "关闭录制" : "视频录制");
+        $("#recorder2").html(state.recorder2 ? "关闭屏幕捕捉" : "屏幕捕捉");
+    });
+}
 /* 格式判断 */
 function isPlay(data) {
     if (G.Player && !isJSON(data) && !isPicture(data)) { return true; }
@@ -701,9 +697,6 @@ function getData(requestId = false) {
         return allData.get(activeTab).get(requestId);
     }
     return allData.get(activeTab);
-}
-function emptyData() {
-    allData.get(activeTab).clear();
 }
 // 获取所有资源列表
 function getAllData() {

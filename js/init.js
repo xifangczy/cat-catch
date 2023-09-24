@@ -153,6 +153,8 @@ function InitOptions() {
             try { reg = new RegExp(item.regex, item.type) } catch (e) { item.state = false; }
             return { regex: reg, ext: item.ext, blackList: item.blackList, state: item.state }
         });
+        items.featMobileTabId = new Set(items.featMobileTabId);
+        items.featAutoDownTabId = new Set(items.featAutoDownTabId);
         G = { ...items, ...G };
         G.initSyncComplete = true;
     });
@@ -184,6 +186,14 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
                 try { reg = new RegExp(item.regex, item.type) } catch (e) { item.state = false; }
                 return { regex: reg, ext: item.ext, blackList: item.blackList, state: item.state }
             });
+            continue;
+        }
+        if (key == "featMobileTabId") {
+            G.featMobileTabId = new Set(newValue);
+            continue;
+        }
+        if (key == "featAutoDownTabId") {
+            G.featAutoDownTabId = new Set(newValue);
             continue;
         }
         G[key] = newValue;
