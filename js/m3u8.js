@@ -726,7 +726,6 @@ $(function () {
             end = parseInt(end);
             end = end ? end - 1 : _fragments.length - 1;
         }
-        // console.log(start, end)
         // 检查序号
         if (start == -1 || end == -1) {
             $progress.html(`<b>序号错误</b>`);
