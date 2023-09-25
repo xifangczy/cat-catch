@@ -728,6 +728,10 @@ $(function () {
         }
         // console.log(start, end)
         // 检查序号
+        if (start == -1 || end == -1) {
+            $progress.html(`<b>序号错误</b>`);
+            return;
+        }
         if (start > end) {
             $progress.html(`<b>开始序号不能大于结束序号</b>`);
             return;
@@ -1254,13 +1258,8 @@ $(function () {
      * @returns {number}
      */
     function timeToIndex(time) {
-        const arr = time.split(":");
-        time = parseInt(arr[0]) * 3600 + parseInt(arr[1]) * 60 + parseInt(arr[2]);
-        let index = 0;
-        for (; _fragments[index] && time > 0; index++) {
-            time -= _fragments[index].duration;
-        }
-        return index;
+        let totalSeconds = time.split(":").reduce((acc, time) => 60 * acc + +time);
+        return _fragments.findIndex(fragment => (totalSeconds -= fragment.duration) < 0);
     }
 });
 // 写入ts链接
