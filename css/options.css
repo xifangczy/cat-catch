@@ -178,6 +178,13 @@ textarea {
   font-size: 12px;
   font-family: "Microsoft YaHei", "Helvetica", "Arial", sans-serif;
 }
+#textarea {
+  text-align: center;
+}
+#textarea video {
+  max-height: 100vh;
+  max-width: 100vw;
+}
 #media_file {
   word-break: break-all;
 }

@@ -1256,7 +1256,7 @@ $(function () {
         const arr = time.split(":");
         time = parseInt(arr[0]) * 3600 + parseInt(arr[1]) * 60 + parseInt(arr[2]);
         let index = 0;
-        for (; index <= _fragments.length; index++) {
+        for (; _fragments[index]; index++) {
             time -= _fragments[index].duration;
             if (time <= 0) { break; }
         }
