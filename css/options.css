@@ -182,8 +182,8 @@ textarea {
   text-align: center;
 }
 #textarea video {
-  max-height: 100vh;
-  max-width: 100vw;
+  max-height: 80vh;
+  max-width: 100%;
 }
 #media_file {
   word-break: break-all;

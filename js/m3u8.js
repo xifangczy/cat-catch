@@ -726,6 +726,7 @@ $(function () {
             end = parseInt(end);
             end = end ? end - 1 : _fragments.length - 1;
         }
+        // console.log(start, end)
         // 检查序号
         if (start > end) {
             $progress.html(`<b>开始序号不能大于结束序号</b>`);
@@ -1256,9 +1257,8 @@ $(function () {
         const arr = time.split(":");
         time = parseInt(arr[0]) * 3600 + parseInt(arr[1]) * 60 + parseInt(arr[2]);
         let index = 0;
-        for (; _fragments[index]; index++) {
+        for (; _fragments[index] && time > 0; index++) {
             time -= _fragments[index].duration;
-            if (time <= 0) { break; }
         }
         return index;
     }
