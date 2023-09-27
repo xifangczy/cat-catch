@@ -214,24 +214,15 @@ function clearRedundant() {
         }
         if (!cacheData.init) {
             // 清理 缓存数据
+            let cacheDataFlag = false;
             for (let key in cacheData) {
                 if (!allTabId.includes(parseInt(key))) {
+                    cacheDataFlag = true;
                     delete cacheData[key];
                 }
             }
-            chrome.storage.local.set({ MediaData: cacheData });
+            cacheDataFlag && chrome.storage.local.set({ MediaData: cacheData });
         }
-        // 清理 declarativeNetRequest 模拟手机
-        chrome.declarativeNetRequest.getSessionRules(function (rules) {
-            for (let item of rules) {
-                if (!allTabId.includes(item.id)) {
-                    G.featMobileTabId.delete(item.id) && chrome.storage.local.set({ featMobileTabId: Array.from(G.featMobileTabId) });
-                    chrome.declarativeNetRequest.updateSessionRules({
-                        removeRuleIds: [item.id]
-                    });
-                }
-            }
-        });
         // 清理脚本
         G.scriptList.forEach(function (scriptList) {
             scriptList.tabId.forEach(function (tabId) {
@@ -240,12 +231,32 @@ function clearRedundant() {
                 }
             });
         });
+
+        if (!G.initLocalComplete) { return; }
+
+        // 清理 declarativeNetRequest 模拟手机
+        chrome.declarativeNetRequest.getSessionRules(function (rules) {
+            let mobileFlag = false;
+            for (let item of rules) {
+                if (!allTabId.includes(item.id)) {
+                    mobileFlag = true;
+                    G.featMobileTabId.delete(item.id);
+                    chrome.declarativeNetRequest.updateSessionRules({
+                        removeRuleIds: [item.id]
+                    });
+                }
+            }
+            mobileFlag && chrome.storage.local.set({ featMobileTabId: Array.from(G.featMobileTabId) });
+        });
         // 清理自动下载
+        let autoDownFlag = false;
         G.featAutoDownTabId.forEach(function (tabId) {
             if (!allTabId.includes(tabId)) {
-                G.featAutoDownTabId.delete(tabId) && chrome.storage.local.set({ featAutoDownTabId: Array.from(G.featAutoDownTabId) });
+                autoDownFlag = true;
+                G.featAutoDownTabId.delete(tabId);
             }
         });
+        autoDownFlag && chrome.storage.local.set({ featAutoDownTabId: Array.from(G.featAutoDownTabId) });
     });
     // G.referer.clear();
     // G.blackList.clear();

@@ -178,7 +178,7 @@
         for (let key in catchMedia) {
             const data = new Uint8Array(catchMedia[key].bufferList[1]);
             if (data[4] == 0x66 && data[5] == 0x74 && data[6] == 0x79 && data[7] == 0x70) {
-                catchMedia[key].bufferList.splice(0, 1);
+                catchMedia[key].bufferList.shift();
             }
         }
         if (catchMedia.length >= 2 && localStorage.getItem("CatCatchCatch_ffmpeg") == "checked") {

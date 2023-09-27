@@ -182,7 +182,7 @@
     }
 
     window.addEventListener("message", (event) => {
-        if (!event.data.action) { return; }
+        if (!event.data || !event.data.action) { return; }
         if (event.data.action == "catCatchAddMedia") {
             if (!event.data.url) { return; }
             chrome.runtime.sendMessage({
