@@ -253,6 +253,18 @@
         return _fromCharCode.toString();
     }
 
+    // DataView
+    const _DataView = DataView;
+    DataView = function () {
+        if (arguments[0] instanceof ArrayBuffer && arguments[0].byteLength == 16) {
+            postData({ action: "catCatchAddKey", key: arguments[0], href: location.href, ext: "key" });
+        }
+        return new _DataView(...arguments);
+    }
+    DataView.toString = function () {
+        return _DataView.toString();
+    }
+
     function isUrl(str) {
         return reIsUrl.test(str);
     }
