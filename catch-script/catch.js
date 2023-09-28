@@ -15,7 +15,7 @@
     <button id="download" ${buttonStyle}>下载已捕获的数据</button>
     <button id="clean" ${buttonStyle}>删除已捕获数据</button>
     <button id="restart" ${buttonStyle}>从头捕获</button>
-    <button id="close" ${buttonStyle}>关闭</button>
+    <div><button id="hide" ${buttonStyle}>隐藏</button><button id="close" ${buttonStyle}>关闭</button></div>
     <button id="test" style="display: none;">test</button>
     <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown")} ${checkboxStyle}>完成捕获自动下载</label>
     <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg")} ${checkboxStyle}>使用ffmpeg合并</label>
@@ -64,6 +64,9 @@
     CatCatch.querySelector("#download").addEventListener('click', function (event) {
         catchDownload();
     });
+    CatCatch.querySelector("#hide").addEventListener('click', function (event) {
+        CatCatch.style.display = "none";
+    });
     CatCatch.querySelector("#close").addEventListener('click', function (event) {
         enable = false;
         CatCatch.style.display = "none";
@@ -76,13 +79,13 @@
             element.play();
         });
     });
-    CatCatch.querySelector("#test").addEventListener('click', function (event) {
-        console.log(catchMedia);
-        console.log(bufferList);
-    });
     CatCatch.querySelector("#setFileName").addEventListener('click', function (event) {
         setFileName = window.prompt("输入文件名, 不包含扩展名", setFileName ?? "");
         getFileName();
+    });
+    CatCatch.querySelector("#test").addEventListener('click', function (event) {
+        console.log(catchMedia);
+        console.log(bufferList);
     });
 
     // 文件名设置
