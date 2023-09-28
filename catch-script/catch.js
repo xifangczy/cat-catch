@@ -26,6 +26,7 @@
         <div style="font-weight:bold;">正则: </div><div id="regular">未设置</div>
         <button id="setSelector" ${buttonStyle}>表达式提取</button>
         <button id="setRegular" ${buttonStyle}>正则提取</button>
+        <button id="setFileName" ${buttonStyle}>手动填写</button>
     </details>`;
     CatCatch.style = `
         position: fixed;
@@ -79,8 +80,13 @@
         console.log(catchMedia);
         console.log(bufferList);
     });
+    CatCatch.querySelector("#setFileName").addEventListener('click', function (event) {
+        setFileName = window.prompt("输入文件名, 不包含扩展名", setFileName ?? "");
+        getFileName();
+    });
 
     // 文件名设置
+    let setFileName = null;
     const fileName = CatCatch.querySelector("#fileName");
     const selector = CatCatch.querySelector("#selector");
     selector.innerHTML = localStorage.getItem("CatCatchCatch_selector") ?? "未设置";
@@ -238,6 +244,10 @@
         }
     }
     function getFileName() {
+        if (setFileName) {
+            fileName.innerHTML = stringModify(setFileName);
+            return;
+        }
         let name = "";
         if (localStorage.getItem("CatCatchCatch_selector")) {
             const title = document.querySelector(localStorage.getItem("CatCatchCatch_selector"));
