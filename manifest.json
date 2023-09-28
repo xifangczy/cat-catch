@@ -48,20 +48,32 @@
       "description": "清空当前标签数据"
     }
   },
-  "host_permissions": ["*://*/*", "<all_urls>"],
+  "host_permissions": [
+    "*://*/*",
+    "<all_urls>"
+  ],
   "content_scripts": [
     {
-      "matches": ["https://*/*", "http://*/*"],
-      "js": ["js/content-script.js"],
+      "matches": [
+        "https://*/*",
+        "http://*/*"
+      ],
+      "js": [
+        "js/content-script.js"
+      ],
       "run_at": "document_start",
       "all_frames": true
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["catch-script/*"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "catch-script/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ],
-  "version": "2.4.4"
+  "version": "2.4.5"
 }

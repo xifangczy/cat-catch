@@ -1,6 +1,9 @@
 {
   "background": {
-    "scripts": ["js/firefox.js", "js/background.js"]
+    "scripts": [
+      "js/firefox.js",
+      "js/background.js"
+    ]
   },
   "browser_action": {
     "default_icon": "img/icon.png",
@@ -58,12 +61,19 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://*/*", "http://*/*"],
-      "js": ["js/content-script.js"],
+      "matches": [
+        "https://*/*",
+        "http://*/*"
+      ],
+      "js": [
+        "js/content-script.js"
+      ],
       "all_frames": true,
       "run_at": "document_start"
     }
   ],
-  "web_accessible_resources": ["catch-script/*"],
-  "version": "2.4.4"
+  "web_accessible_resources": [
+    "catch-script/*"
+  ],
+  "version": "2.4.5"
 }
