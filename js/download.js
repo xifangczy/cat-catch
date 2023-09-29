@@ -89,10 +89,11 @@ function startDownload(tabId) {
                 filename: _fileName,
                 saveAs: G.saveAs
             }, function (downloadId) {
+                URL.revokeObjectURL(blobUrl);
                 downId = downloadId;
             });
         } catch (e) {
-            $downFilepProgress.html("下载失败... " + e);
+            $downFilepProgress.html("保存到磁盘失败... " + e);
         }
     });
 
@@ -159,6 +160,7 @@ function startDownload(tabId) {
                 tabId: tabId
             }, function () {
                 $downFilepProgress.html("已发送到在线ffmpeg");
+                URL.revokeObjectURL(blobUrl);
             });
         });
     }
