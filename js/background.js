@@ -426,10 +426,11 @@ chrome.windows.onFocusChanged.addListener(function (activeInfo) {
 
 // 载入frame时
 chrome.webNavigation.onCommitted.addListener(function (details) {
-    if (isSpecialPage(details.url) || details.tabId == 0 || details.tabId == -1) { return; }
+    if (isSpecialPage(details.url) || details.tabId == 0 || details.tabId == -1 || !G.initSyncComplete) { return; }
 
     // 刷新清理角标数
-    if (details.frameId == 0 && details.transitionType == "reload" && G.refreshClear) {
+    if (details.frameId == 0 && G.refreshClear && details.transitionType == "reload") {
+        // if (details.frameId == 0 && G.refreshClear && (details.transitionType == "reload" || details.transitionType == "link")) {
         delete cacheData[details.tabId];
         chrome.storage.local.set({ MediaData: cacheData });
         SetIcon({ tabId: details.tabId });
