@@ -89,7 +89,6 @@ function startDownload(tabId) {
                 filename: _fileName,
                 saveAs: G.saveAs
             }, function (downloadId) {
-                URL.revokeObjectURL(blobUrl);
                 downId = downloadId;
             });
         } catch (e) {
@@ -158,14 +157,12 @@ function startDownload(tabId) {
                 media: [{ data: blobUrl, name: getUrlFileName(_url) }],
                 title: title,
                 tabId: tabId
-            }, function () {
-                $downFilepProgress.html("已发送到在线ffmpeg");
-                URL.revokeObjectURL(blobUrl);
             });
         });
     }
     chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         if (!Message.Message || Message.Message != "catCatchFFmpegResult" || Message.state != "ok" || tabId == 0 || Message.tabId != tabId) { return; }
+        $downFilepProgress.html("已发送到在线ffmpeg");
         if (Message.state == "ok" && $("#autoClose").prop("checked")) {
             setTimeout(() => {
                 window.close();
