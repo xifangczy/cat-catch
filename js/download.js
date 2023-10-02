@@ -11,8 +11,11 @@ const title = params.get("title");
 _referer ? setReferer(_referer, start) : start();
 
 function start() {
-    $("#autoClose").prop("checked", autoClose ? true : G.downAutoClose);
-    $("#downActive").prop("checked", G.downActive);
+    awaitG(function () {
+        $("#autoClose").prop("checked", autoClose ? true : G.downAutoClose);
+        $("#downActive").prop("checked", G.downActive);
+        $(`<style>${G.css}</style>`).appendTo("head");
+    });
 
     chrome.tabs.getCurrent(function (tab) {
         startDownload(tab.id);
@@ -20,7 +23,6 @@ function start() {
 }
 
 function startDownload(tabId) {
-    $(`<style>${G.css}</style>`).appendTo("head");
     // 储存blob
     let blobUrl = "";
     // 下载的文件ID

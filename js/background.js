@@ -423,14 +423,17 @@ chrome.windows.onFocusChanged.addListener(function (activeInfo) {
     G.tabId = activeInfo.tabId;
 }, { filters: ["normal"] });
 
+// chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+//     console.log(tabId, changeInfo, tab);
+// });
 
 // 载入frame时
 chrome.webNavigation.onCommitted.addListener(function (details) {
+    // console.log(details)
     if (isSpecialPage(details.url) || details.tabId == 0 || details.tabId == -1 || !G.initSyncComplete) { return; }
-
     // 刷新清理角标数
-    if (details.frameId == 0 && G.refreshClear && details.transitionType == "reload") {
-        // if (details.frameId == 0 && G.refreshClear && (details.transitionType == "reload" || details.transitionType == "link")) {
+    // if (details.frameId == 0 && G.refreshClear && cacheData[details.tabId] && details.transitionType == "reload") {
+    if (details.frameId == 0 && G.refreshClear && cacheData[details.tabId] && (details.transitionType == "reload" || details.transitionType == "link")) {
         delete cacheData[details.tabId];
         chrome.storage.local.set({ MediaData: cacheData });
         SetIcon({ tabId: details.tabId });

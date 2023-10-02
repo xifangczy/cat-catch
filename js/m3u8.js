@@ -13,7 +13,11 @@ const key = params.get("key");
 // 修改当前标签下的所有xhr的Referer
 _referer ? setReferer(_referer) : deleteReferer();
 $(function () {
-    $(`<style>${G.css}</style>`).appendTo("head");
+    awaitG(function () {
+        $(`<style>${G.css}</style>`).appendTo("head");
+        G.isFirefox && $(".firefoxHide").each(function () { $(this).hide(); });
+    });
+
     // 默认设置
     const allOption = {
         thread: 32,
@@ -36,7 +40,6 @@ $(function () {
         }
     });
 
-    G.isFirefox && $(".firefoxHide").each(function () { $(this).hide(); });
     key && $("#customKey").val(key);
     if (tsAddArg != null) {
         tsAddArg = decodeURIComponent(tsAddArg);

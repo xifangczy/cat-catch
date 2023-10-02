@@ -74,6 +74,16 @@ function deleteReferer(callback) {
     });
 }
 
+
+function awaitG(callback, sec = 0) {
+    const timer = setInterval(() => {
+        if (G.initSyncComplete && G.initLocalComplete) {
+            clearInterval(timer);
+            callback();
+        }
+    }, sec);
+}
+
 // 分割字符串
 function splitString(text, separator) {
     text = text.trim();
