@@ -6,12 +6,12 @@ const _initiator = params.get("initiator");
 const _title = params.get("title");
 let tsAddArg = params.get("tsAddArg");
 let autoReferer = params.get("autoReferer");
-const getId = parseInt(params.get("getId"));
 const tabId = parseInt(params.get("tabid"));
 const key = params.get("key");
 
 // 修改当前标签下的所有xhr的Referer
 _referer ? setReferer(_referer) : deleteReferer();
+
 $(function () {
     awaitG(function () {
         $(`<style>${G.css}</style>`).appendTo("head");
@@ -121,6 +121,7 @@ $(function () {
             $("#m3u8Custom").hide();
         });
         // 从mpd解析器读取数据
+        const getId = parseInt(params.get("getId"));
         if (getId) {
             chrome.tabs.sendMessage(getId, "getM3u8", function (result) {
                 $("#m3u8Text").html(result.m3u8Content);
@@ -921,6 +922,7 @@ $(function () {
             }
         }, 10);
     }
+
     // 下载ts出现错误
     function downloadTsError(index) {
         if ($("#errorTsList").is(':hidden')) {
