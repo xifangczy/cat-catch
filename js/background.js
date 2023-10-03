@@ -429,8 +429,9 @@ chrome.windows.onFocusChanged.addListener(function (activeInfo) {
 
 // 标签更新 清理数据
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-    if (isSpecialPage(tab.url) || tabId == 0 || tabId == -1 || !G.initSyncComplete) { return; }
-    if (changeInfo.status == "loading" && G.refreshClear) {
+    // console.log(tabId, changeInfo, tab);
+    if (isSpecialPage(tab.url) || tabId <= 0 || !G.initSyncComplete) { return; }
+    if (changeInfo.status && changeInfo.status == "loading" && G.refreshClear) {
         delete cacheData[tabId];
         chrome.alarms.get("save", function (alarm) {
             !alarm && chrome.alarms.create("save", { when: Date.now() + 1000 });
@@ -441,7 +442,8 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
 // 载入frame时
 chrome.webNavigation.onCommitted.addListener(function (details) {
-    if (isSpecialPage(details.url) || details.tabId == 0 || details.tabId == -1 || !G.initSyncComplete) { return; }
+    // console.log(details);
+    if (isSpecialPage(details.url) || details.tabId <= 0 || !G.initSyncComplete) { return; }
 
     // chrome内核版本 102 以下不支持 chrome.scripting.executeScript API
     if (G.version < 102) { return; }
