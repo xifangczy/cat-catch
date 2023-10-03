@@ -25,6 +25,10 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
         clearRedundant();
         return;
     }
+    if (alarm.name === "save") {
+        chrome.storage.local.set({ MediaData: cacheData });
+        return;
+    }
 });
 
 // onBeforeRequest 浏览器发送请求之前使用正则匹配发送请求的URL
@@ -423,21 +427,21 @@ chrome.windows.onFocusChanged.addListener(function (activeInfo) {
     G.tabId = activeInfo.tabId;
 }, { filters: ["normal"] });
 
-// chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-//     console.log(tabId, changeInfo, tab);
-// });
+// 标签更新 清理数据
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    if (isSpecialPage(tab.url) || tabId == 0 || tabId == -1 || !G.initSyncComplete) { return; }
+    if (changeInfo.status == "loading" && G.refreshClear) {
+        delete cacheData[tabId];
+        chrome.alarms.get("save", function (alarm) {
+            !alarm && chrome.alarms.create("save", { when: Date.now() + 1000 });
+        });
+        SetIcon({ tabId: tabId });
+    }
+});
 
 // 载入frame时
 chrome.webNavigation.onCommitted.addListener(function (details) {
-    // console.log(details)
     if (isSpecialPage(details.url) || details.tabId == 0 || details.tabId == -1 || !G.initSyncComplete) { return; }
-    // 刷新清理角标数
-    // if (details.frameId == 0 && G.refreshClear && cacheData[details.tabId] && details.transitionType == "reload") {
-    if (details.frameId == 0 && G.refreshClear && cacheData[details.tabId] && (details.transitionType == "reload" || details.transitionType == "link")) {
-        delete cacheData[details.tabId];
-        chrome.storage.local.set({ MediaData: cacheData });
-        SetIcon({ tabId: details.tabId });
-    }
 
     // chrome内核版本 102 以下不支持 chrome.scripting.executeScript API
     if (G.version < 102) { return; }
