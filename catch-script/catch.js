@@ -16,7 +16,6 @@
     <button id="clean" ${buttonStyle}>删除已捕获数据</button>
     <button id="restart" ${buttonStyle}>从头捕获</button>
     <div><button id="hide" ${buttonStyle}>隐藏</button><button id="close" ${buttonStyle}>关闭</button></div>
-    <button id="test" style="display: none;">test</button>
     <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown")} ${checkboxStyle}>完成捕获自动下载</label>
     <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg")} ${checkboxStyle}>使用ffmpeg合并</label>
     <details>
@@ -27,6 +26,11 @@
         <button id="setSelector" ${buttonStyle}>表达式提取</button>
         <button id="setRegular" ${buttonStyle}>正则提取</button>
         <button id="setFileName" ${buttonStyle}>手动填写</button>
+    </details>
+    <details>
+    <summary>test</summary>
+        <label><input type="checkbox" id="checkHead" ${checkboxStyle} checked>清理多余头部数据</label>
+        <button id="test" ${buttonStyle}>test</button>
     </details>`;
     CatCatch.style = `
         position: fixed;
@@ -140,6 +144,7 @@
     let catchMedia = [];
     let bufferList = {};
     let mediaSize = 0;
+    let index = 0;
     const _AddSourceBuffer = window.MediaSource.prototype.addSourceBuffer;
     window.MediaSource.prototype.addSourceBuffer = function (mimeType) {
         // 标题获取
@@ -147,7 +152,7 @@
         tips.innerHTML = "捕获数据中...";
         const sourceBuffer = _AddSourceBuffer.call(this, mimeType);
         const _appendBuffer = sourceBuffer.appendBuffer;
-        const type = mimeType.split("/").shift();
+        const type = mimeType.split("/").shift() + (++index);
         bufferList[type] = [];
         catchMedia.push({ mimeType, bufferList: bufferList[type] });
         sourceBuffer.appendBuffer = function (data) {
@@ -184,10 +189,12 @@
             return;
         }
         // catchMedia 预处理 解决 从头捕获 文件头重复 临时解决办法
-        for (let key in catchMedia) {
-            const data = new Uint8Array(catchMedia[key].bufferList[1]);
-            if (data[4] == 0x66 && data[5] == 0x74 && data[6] == 0x79 && data[7] == 0x70) {
-                catchMedia[key].bufferList.shift();
+        if (CatCatch.querySelector("#checkHead").checked) {
+            for (let key in catchMedia) {
+                const data = new Uint8Array(catchMedia[key].bufferList[1]);
+                if (data[4] == 0x66 && data[5] == 0x74 && data[6] == 0x79 && data[7] == 0x70) {
+                    catchMedia[key].bufferList.shift();
+                }
             }
         }
         if (catchMedia.length >= 2 && localStorage.getItem("CatCatchCatch_ffmpeg") == "checked") {
