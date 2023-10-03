@@ -42,9 +42,9 @@ function isEmpty(obj) {
 // 修改请求头Referer
 function setReferer(referer, callback) {
     chrome.tabs.getCurrent(function (tabs) {
-        chrome.declarativeNetRequest.updateSessionRules({
-            removeRuleIds: [tabs.id],
-            addRules: [{
+        const rules = { removeRuleIds: [tabs.id] };
+        if (referer) {
+            rules.addRules = [{
                 "id": tabs.id,
                 "action": {
                     "type": "modifyHeaders",
@@ -58,8 +58,9 @@ function setReferer(referer, callback) {
                     "tabIds": [tabs.id],
                     "resourceTypes": ["xmlhttprequest"]
                 }
-            }]
-        }, function () {
+            }];
+        }
+        chrome.declarativeNetRequest.updateSessionRules(rules, function () {
             callback && callback();
         });
     });
