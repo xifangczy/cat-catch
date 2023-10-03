@@ -10,4 +10,5 @@ const tabId = parseInt(params.get("tabid"));
 const key = params.get("key");
 
 // 修改当前标签下的所有xhr的Referer
-_referer ? setReferer(_referer) : deleteReferer();
+let refererReady = false;
+_referer ? setReferer(_referer, () => { refererReady = true }) : deleteReferer(() => { refererReady = true });
