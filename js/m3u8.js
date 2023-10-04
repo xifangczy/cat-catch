@@ -1011,8 +1011,8 @@ function downloadNew(start, end) {
     // 载入切片列表
     down.fragments = _fragments;
     // 下载错误
-    down.on('error', function (error, fragment) {
-        if (error.type != "download") { return; }
+    down.on('downloadError', function (error, fragment) {
+        console.log(error);
         if ($("#errorTsList").is(':hidden')) {
             $("#ForceDownload").show();
             $("#errorDownload").show();
@@ -1132,6 +1132,7 @@ function mergeTs() {
                 let data = new Uint8Array(segment.initSegment.byteLength + segment.data.byteLength);
                 data.set(segment.initSegment, 0);
                 data.set(segment.data, segment.initSegment.byteLength);
+                console.log(downDuration);
                 _tsBuffer[index] = fixFileDuration(data, downDuration);
                 return;
             }

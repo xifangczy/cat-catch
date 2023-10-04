@@ -14,9 +14,9 @@ class FragmentDownloader {
         this._stop = true;               // 停止下载
         this.done = false;               // 下载完成
         this.decrypt = null;             // 解密函数
-        this.transcode = null;           // 转码器函数
+        this.transcode = null;           // 转码函数
         this.success = 0;                // 成功下载数量
-        this.total = 0;                  //列表总数
+        this.total = 0;                  // 列表总数
         this.errorList = new WeakSet();  // 下载错误的列表
         this.bufferize = 0;              // 已下载buffer大小
         this.duration = 0;               // 已下载时长
@@ -61,7 +61,7 @@ class FragmentDownloader {
         this.decrypt = callback;
     }
     /**
-     * 设定转码器
+     * 设定转码函数
      * @param {Function} callback 
      */
     setTranscode(callback) {
@@ -121,7 +121,7 @@ class FragmentDownloader {
             })
             .then(buffer => {
                 this.emit('decryptedData', buffer);
-                // 存在转码 调用转码函数 否则直接返回buffer
+                // 存在转码函数 调用转码函数 否则直接返回buffer
                 return this.transcode ? this.transcode(buffer, fragment.index == 0) : buffer;
             })
             .then(buffer => {
@@ -155,7 +155,7 @@ class FragmentDownloader {
                     this.emit('allCompleted', this.buffer, this.fragments);
                 }
             }).catch((error) => {
-                this.emit('error', { ...error, type: "download" }, fragment);
+                this.emit('downloadError', error, fragment);
                 // 储存下载错误切片
                 !this.errorList.has(fragment) && this.errorList.add(fragment);
             });
@@ -172,7 +172,7 @@ class FragmentDownloader {
         this.total = this.fragments.length;
         // 总数为空 抛出错误
         if (this.total == 0) {
-            this.emit('error', { type: "other" });
+            this.emit('error', 'List is empty');
             return;
         }
         // 获取总时长
