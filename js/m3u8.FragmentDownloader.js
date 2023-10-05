@@ -1,33 +1,25 @@
 class FragmentDownloader {
     constructor() {
+        this._fragments = [];             // 切片列表
+        this.thread = 32;                // 线程数
+        this.events = {};                // events
+        this.decrypt = null;             // 解密函数
+        this.transcode = null;           // 转码函数
         this.init();
     }
     /**
      * 初始化所有变量
      */
     init() {
-        this.fragments = [];             // 切片列表
-        this.thread = 32;                // 线程数
         this.index = 0;                  // 当前任务索引
         this.buffer = [];                // 储存的buffer
-        this.events = {};                // events
-        this._stop = true;               // 停止下载
+        this._stop = false;               // 停止下载
         this.done = false;               // 下载完成
-        this.decrypt = null;             // 解密函数
-        this.transcode = null;           // 转码函数
         this.success = 0;                // 成功下载数量
-        this.total = 0;                  // 列表总数
         this.errorList = new WeakSet();  // 下载错误的列表
         this.bufferize = 0;              // 已下载buffer大小
         this.duration = 0;               // 已下载时长
-        this.totalDuration = 0;          // 总时长
         this.pushIndex = 0;              // 推送顺序下载索引
-    }
-    /**
-     * 初始化所有变量 init的别名
-     */
-    clear() {
-        this.init();
     }
     /**
      * 设置监听
@@ -85,13 +77,70 @@ class FragmentDownloader {
      * 按照顺序推送buffer数据
      */
     async sequentialPush() {
-        for (; this.pushIndex < this.total; this.pushIndex++) {
+        for (; this.pushIndex < this.fragments.length; this.pushIndex++) {
             if (this.buffer[this.pushIndex]) {
                 this.emit('sequentialPush', this.buffer[this.pushIndex]);
                 continue;
             }
             break;
         }
+    }
+    /**
+     * 限定下载范围
+     * @param {number} start 下载范围 开始索引
+     * @param {number} end 下载范围 结束索引
+     * @returns {boolean}
+     */
+    range(start = 0, end = this.fragments.length) {
+        if (start > end) {
+            this.emit('error', 'start > end');
+            return false;
+        }
+        if (end > this.fragments.length) {
+            this.emit('error', 'end > total');
+            return false;
+        }
+        if (start >= this.fragments.length) {
+            this.emit('error', 'start >= total');
+            return false;
+        }
+        if (start != 0 || end != this.fragments.length) {
+            this.fragments = this.fragments.slice(start, end);
+            // 更改过下载范围 重新设定index
+            this.fragments.forEach((fragment, index) => {
+                fragment.index = index;
+            });
+        }
+        // 总数为空 抛出错误
+        if (this.fragments.length == 0) {
+            this.emit('error', 'List is empty');
+            return false;
+        }
+        return true;
+    }
+    /**
+     * 获取切片总数量
+     * @returns {number}
+     */
+    get total() {
+        return this.fragments.length;
+    }
+    /**
+     * 获取切片总时间
+     * @returns {number}
+     */
+    get totalDuration() {
+        return this.fragments.reduce((total, fragment) => total + fragment.duration, 0);
+    }
+    /**
+     * 切片对象数组的 setter getter
+     */
+    set fragments(fragments) {
+        // 增加index参数 为多线程异步下载 根据index属性顺序保存
+        this._fragments = fragments.map((fragment, index) => ({ ...fragment, index }));
+    }
+    get fragments() {
+        return this._fragments;
     }
     /**
      * 下载器 使用fetch下载文件
@@ -125,12 +174,12 @@ class FragmentDownloader {
                 return this.transcode ? this.transcode(buffer, fragment.index == 0) : buffer;
             })
             .then(buffer => {
-                // 储存解密/转码后的buffer
-                this.buffer[fragment.index] = buffer;
                 if (this._stop) {
                     this.emit('stop', this._stop);
                     return;
                 }
+                // 储存解密/转码后的buffer
+                this.buffer[fragment.index] = buffer;
                 // 成功数+1 累计buffer大小和视频时长
                 this.success++;
                 this.bufferize += buffer.byteLength;
@@ -145,12 +194,12 @@ class FragmentDownloader {
                 this.emit('completed', buffer, fragment);
 
                 // 下载下一个切片
-                if (!directDownload && this.index < this.total) {
+                if (!directDownload && this.index < this.fragments.length) {
                     this.downloader();
                     return;
                 }
                 // 下载完成
-                if (this.success == this.total) {
+                if (this.success == this.fragments.length) {
                     this.done = true;
                     this.emit('allCompleted', this.buffer, this.fragments);
                 }
@@ -167,25 +216,25 @@ class FragmentDownloader {
      */
     start(start = 0, end = this.fragments.length) {
         // 从下载范围内 切出需要下载的部分
-        this.fragments = this.fragments.slice(start, end);
-        // 设置下载所需总数
-        this.total = this.fragments.length;
-        // 总数为空 抛出错误
-        if (this.total == 0) {
-            this.emit('error', 'List is empty');
+        if (!this.range(start, end)) {
             return;
         }
-        // 获取总时长
-        this.totalDuration = this.fragments.reduce((total, fragment) => total + fragment.duration, 0);
-        // 如果不存在index属性则添加
-        if (!this.fragments.every(f => f.hasOwnProperty("index"))) {
-            this.fragments.map((fragment, index) => { fragment.index = index; return fragment; });
-        }
-        this._stop = false;
-        this.done = false;
+        // 初始化变量
+        this.init();
         // 开始下载 多少线程开启多少个下载器
-        for (let i = 0; i < this.thread && i < this.total; i++) {
+        for (let i = 0; i < this.thread && i < this.fragments.length; i++) {
             this.downloader();
         }
+    }
+    /**
+     * 销毁 初始化所有变量
+     */
+    destroy() {
+        this._fragments = [];
+        this.thread = 32;
+        this.events = {};
+        this.decrypt = null;
+        this.transcode = null;
+        this.init();
     }
 }

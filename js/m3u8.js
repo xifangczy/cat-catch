@@ -381,8 +381,7 @@ function parseTs(data) {
             encrypted: data.fragments[i].encrypted,
             duration: data.fragments[i].duration,
             initSegment: initSegment,
-            sn: data.fragments[i].sn,
-            index: +i
+            sn: data.fragments[i].sn
         });
     }
 
@@ -1050,6 +1049,9 @@ function downloadNew(start, end) {
     down.on('sequentialPush', function (buffer) {
         // fileStream.write(new Uint8Array(buffer));
     });
+    down.on('error', function (error) {
+        console.log(error);
+    });
     // 开始下载
     down.start(start, end + 1);
 }
@@ -1083,7 +1085,7 @@ function mergeTs() {
         delete tsBuffer[i];
     }
     tsBuffer = [];
-    down.clear();
+    down.destroy();
     // 默认下载格式
     let fileBlob = new Blob(_tsBuffer, { type: "video/MP2T" });
     let ext = _fragments[0].url.split("/").pop();
