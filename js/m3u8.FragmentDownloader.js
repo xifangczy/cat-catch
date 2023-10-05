@@ -1,6 +1,6 @@
 class FragmentDownloader {
     constructor() {
-        this._fragments = [];             // 切片列表
+        this._fragments = [];            // 切片列表
         this.thread = 32;                // 线程数
         this.events = {};                // events
         this.decrypt = null;             // 解密函数

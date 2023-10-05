@@ -724,11 +724,9 @@ $("#recorder").click(function () {
     $(this).html("录制直播").data("switch", "on");
     if (fileStream) {
         fileStream.close();
-        fileStream = undefined;
         buttonState("#mergeTs", true);
         initDownload();
         $progress.html(stopDownload);
-        transmuxer = undefined;
         return true;
     }
     mergeTs();
@@ -1046,11 +1044,9 @@ function downloadNew(start = 0, end = _fragments.length) {
     });
     // 全部下载完成
     down.on('allCompleted', function (buffer) {
-        downSet.mp4 && !down.mapTag && transmuxer.off('data');
-        // fileStream ? fileStream.close() : mergeTsNew();
         !fileStream && mergeTsNew();
 
-        // 历史遗留 待解决
+        transmuxer?.off('data');
         transmuxer = undefined;
         transmuxerheadEncode = undefined;
     });
@@ -1187,7 +1183,6 @@ function mergeTs() {
                 let data = new Uint8Array(segment.initSegment.byteLength + segment.data.byteLength);
                 data.set(segment.initSegment, 0);
                 data.set(segment.data, segment.initSegment.byteLength);
-                console.log(downDuration);
                 _tsBuffer[index] = fixFileDuration(data, downDuration);
                 return;
             }
