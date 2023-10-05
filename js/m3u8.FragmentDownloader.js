@@ -76,10 +76,12 @@ class FragmentDownloader {
     /**
      * 按照顺序推送buffer数据
      */
-    async sequentialPush() {
+    sequentialPush() {
+        if (!this.events["sequentialPush"]) { return; }
         for (; this.pushIndex < this.fragments.length; this.pushIndex++) {
             if (this.buffer[this.pushIndex]) {
                 this.emit('sequentialPush', this.buffer[this.pushIndex]);
+                delete this.buffer[this.pushIndex];
                 continue;
             }
             break;
@@ -141,6 +143,16 @@ class FragmentDownloader {
     }
     get fragments() {
         return this._fragments;
+    }
+    /**
+     * 获取 #EXT-X-MAP 标签的文件url
+     * @returns {string}
+     */
+    get mapTag() {
+        if (this.fragments[0].initSegment && this.fragments[0].initSegment.url) {
+            return this.fragments[0].initSegment.url;
+        }
+        return "";
     }
     /**
      * 下载器 使用fetch下载文件
@@ -228,6 +240,7 @@ class FragmentDownloader {
      * 销毁 初始化所有变量
      */
     destroy() {
+        this.stop();
         this._fragments = [];
         this.thread = 32;
         this.events = {};
