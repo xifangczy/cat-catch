@@ -1052,6 +1052,9 @@ function downloadNew(start, end) {
     down.on('error', function (error) {
         console.log(error);
     });
+    down.on('stop', function (error) {
+        console.log(error);
+    });
     // 开始下载
     down.start(start, end + 1);
 }

@@ -13,13 +13,13 @@ class FragmentDownloader {
     init() {
         this.index = 0;                  // 当前任务索引
         this.buffer = [];                // 储存的buffer
-        this._stop = false;               // 停止下载
-        this.done = false;               // 下载完成
+        this.state = 'waiting';          // 下载器状态 waiting running done abort
         this.success = 0;                // 成功下载数量
         this.errorList = new WeakSet();  // 下载错误的列表
         this.bufferize = 0;              // 已下载buffer大小
         this.duration = 0;               // 已下载时长
         this.pushIndex = 0;              // 推送顺序下载索引
+        this.controller = new AbortController();
     }
     /**
      * 设置监听
@@ -63,7 +63,7 @@ class FragmentDownloader {
      * 停止下载
      */
     stop() {
-        this._stop = true;
+        this.controller.abort();
     }
     /**
      * 检查对象是否错误列表内
@@ -147,16 +147,13 @@ class FragmentDownloader {
      * @param {object} fragment 重新下载的对象
      */
     downloader(fragment = null) {
-        if (this._stop) {
-            this.emit('stop', this._stop);
-            return;
-        }
         // 是否直接下载对象
         const directDownload = !!fragment;
         // 不存在下载对象 从提取fragments
         fragment ??= this.fragments[this.index++];
         this.emit('start', fragment);
-        fetch(fragment.url)
+        this.state = 'running';
+        fetch(fragment.url, { signal: this.controller.signal })
             .then(response => {
                 if (!response.ok) {
                     throw new Error(response.status);
@@ -174,10 +171,6 @@ class FragmentDownloader {
                 return this.transcode ? this.transcode(buffer, fragment.index == 0) : buffer;
             })
             .then(buffer => {
-                if (this._stop) {
-                    this.emit('stop', this._stop);
-                    return;
-                }
                 // 储存解密/转码后的buffer
                 this.buffer[fragment.index] = buffer;
                 // 成功数+1 累计buffer大小和视频时长
@@ -200,10 +193,15 @@ class FragmentDownloader {
                 }
                 // 下载完成
                 if (this.success == this.fragments.length) {
-                    this.done = true;
+                    this.state = 'done';
                     this.emit('allCompleted', this.buffer, this.fragments);
                 }
             }).catch((error) => {
+                if (error.name == 'AbortError') {
+                    this.state = 'abort';
+                    this.emit('stop', error);
+                    return;
+                }
                 this.emit('downloadError', error, fragment);
                 // 储存下载错误切片
                 !this.errorList.has(fragment) && this.errorList.add(fragment);
