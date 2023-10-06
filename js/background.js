@@ -432,11 +432,13 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     // console.log(tabId, changeInfo, tab);
     if (isSpecialPage(tab.url) || tabId <= 0 || !G.initSyncComplete) { return; }
     if (changeInfo.status && changeInfo.status == "loading" && G.refreshClear) {
-        delete cacheData[tabId];
         chrome.alarms.get("save", function (alarm) {
-            !alarm && chrome.alarms.create("save", { when: Date.now() + 1000 });
+            if (!alarm) {
+                delete cacheData[tabId];
+                SetIcon({ tabId: tabId });
+                chrome.alarms.create("save", { when: Date.now() + 1000 });
+            }
         });
-        SetIcon({ tabId: tabId });
     }
 });
 
