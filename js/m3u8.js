@@ -10,7 +10,7 @@ const tabId = parseInt(params.get("tabid"));
 const key = params.get("key");
 
 // 修改当前标签下的所有xhr的Referer 修改完成 运行init函数
-setReferer(_referer, init);
+setReferer(_referer, () => { awaitG(init); });
 
 // 默认设置
 const allOption = {
@@ -65,7 +65,7 @@ const $m3u8dlArg = $("#m3u8dlArg");
  */
 function init() {
     // 自定义CSS
-    awaitG(function () { $(`<style>${G.css}</style>`).appendTo("head"); });
+    $(`<style>${G.css}</style>`).appendTo("head");
 
     // 隐藏firefox 不支持的功能
     G.isFirefox && $(".firefoxHide").each(function () { $(this).hide(); });
