@@ -279,10 +279,11 @@
           <div class="item">
             <div>刷新、跳转到新页面 清空当前标签抓取的数据</div>
             <div class="switch">
-              <label class="switchLabel switchRadius">
-                <input type="checkbox" id="refreshClear" save="click" class="switchInput" />
-                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
-              </label>
+              <select id="autoClearMode" class="select" save="select">
+                <option value="0">不清空</option>
+                <option value="1">正常清理</option>
+                <option value="2">更频繁</option>
+              </select>
             </div>
           </div>
 

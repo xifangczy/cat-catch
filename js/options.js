@@ -123,9 +123,8 @@ function Gethtml(Type, Param = new Object()) {
 }
 // 预览模板
 $("#PlayerTemplate").change(function () {
-    const Option = this.id;
     const Value = $(this).val();
-    if (Option == "PlayerTemplate" && playerList.has(Value) && Value != "tips") {
+    if (this.id == "PlayerTemplate" && playerList.has(Value) && Value != "tips") {
         const template = playerList.get(Value).template;
         $("#Player").val(template);
         chrome.storage.sync.set({ Player: template });
@@ -134,18 +133,21 @@ $("#PlayerTemplate").change(function () {
 //失去焦点 保存自动清理数 模拟手机User Agent 自定义播放调用模板
 let debounce2 = undefined;
 $("[save='input']").on("input", function () {
-    const Option = this.id;
     const val = $(this).val();
     clearTimeout(debounce2);
     debounce2 = setTimeout(() => {
-        chrome.storage.sync.set({ [Option]: val });
+        chrome.storage.sync.set({ [this.id]: val });
     }, 300);
 });
 // 调试模式 使用网页标题做文件名 使用PotPlayer预览 显示网站图标 刷新自动清理
 $("[save='click']").bind("click", function () {
-    const Option = this.id;
-    chrome.storage.sync.set({ [Option]: $(this).prop('checked') });
+    chrome.storage.sync.set({ [this.id]: $(this).prop('checked') });
 });
+// [save='select'] 元素 储存
+$("[save='select']").on("change", function () {
+    chrome.storage.sync.set({ [this.id]: parseInt($(this).val()) });
+});
+
 // 一键禁用/启用
 $("#allDisable, #allEnable").bind("click", function () {
     const state = this.id == "allEnable";

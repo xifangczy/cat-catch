@@ -228,6 +228,9 @@ textarea {
 #PlayerTemplate {
   width: 200px;
 }
+#autoClearMode {
+  width: 100px;
+}
 #errorTsList p {
   color: red;
   word-break: break-all;

@@ -1,5 +1,7 @@
 // 全局变量
 var G = {};
+G.initSyncComplete = false;
+G.initLocalComplete = false;
 // 缓存数据
 var cacheData = { init: true };
 G.blackList = new Set();
@@ -70,9 +72,7 @@ G.OptionLists = {
     copyM3U8: "${url}",
     copyMPD: "${url}",
     copyOther: "${url}",
-    refreshClear: true,
-    initSyncComplete: false,
-    initLocalComplete: false,
+    autoClearMode: 1,
     catDownload: false,
     saveAs: false,
     userAgent: "",
@@ -87,7 +87,7 @@ G.OptionLists = {
 G.LocalVar = {
     featMobileTabId: [],
     featAutoDownTabId: [],
-    mediaControl: { tabid: 0, index: -1 },
+    mediaControl: { tabid: 0, index: -1 }
 };
 
 // 102版本以上 非Firefox 开启更多功能
@@ -153,6 +153,13 @@ function InitOptions() {
             try { reg = new RegExp(item.regex, item.type) } catch (e) { item.state = false; }
             return { regex: reg, ext: item.ext, blackList: item.blackList, state: item.state }
         });
+
+        // 2.4.6 refreshClear 更改为 autoClearMode
+        if (G.hasOwnProperty("refreshClear")) {
+            items.autoClearMode = G.refreshClear ? 1 : 0;
+            delete G.refreshClear;
+        }
+
         G = { ...items, ...G };
         G.initSyncComplete = true;
     });
