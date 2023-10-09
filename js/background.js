@@ -430,7 +430,7 @@ chrome.windows.onFocusChanged.addListener(function (activeInfo) {
 // 标签更新 清理数据
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (isSpecialPage(tab.url) || tabId <= 0 || !G.initSyncComplete) { return; }
-    if (changeInfo.status && changeInfo.status == "loading" && G.refreshClear && G.autoClearMode == 2) {
+    if (changeInfo.status && changeInfo.status == "loading" && G.autoClearMode == 2) {
         chrome.alarms.get("save", function (alarm) {
             if (!alarm) {
                 delete cacheData[tabId];

@@ -153,13 +153,6 @@ function InitOptions() {
             try { reg = new RegExp(item.regex, item.type) } catch (e) { item.state = false; }
             return { regex: reg, ext: item.ext, blackList: item.blackList, state: item.state }
         });
-
-        // 2.4.6 refreshClear 更改为 autoClearMode
-        if (G.hasOwnProperty("refreshClear")) {
-            items.autoClearMode = G.refreshClear ? 1 : 0;
-            delete G.refreshClear;
-        }
-
         G = { ...items, ...G };
         G.initSyncComplete = true;
     });
