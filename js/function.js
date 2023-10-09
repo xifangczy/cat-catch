@@ -65,6 +65,28 @@ function setReferer(referer, callback) {
         });
     });
 }
+function setRefererPopup(referer, callback) {
+    const rules = { removeRuleIds: [1] };
+    if (referer) {
+        rules.addRules = [{
+            "id": 1,
+            "action": {
+                "type": "modifyHeaders",
+                "requestHeaders": [{
+                    "header": "Referer",
+                    "operation": "set",
+                    "value": referer
+                }]
+            },
+            "condition": {
+                "resourceTypes": ["xmlhttprequest", "media", "image"]
+            }
+        }];
+    }
+    chrome.declarativeNetRequest.updateSessionRules(rules, function () {
+        callback && callback();
+    });
+}
 function deleteReferer(callback) {
     chrome.tabs.getCurrent(function (tabs) {
         chrome.declarativeNetRequest.updateSessionRules({

@@ -137,9 +137,11 @@ function AddMedia(data, currentTab = true) {
         if (!mediaInfo.data("state")) {
             mediaInfo.data("state", true);
             if (isM3U8(data)) {
-                let hls = new Hls({ enableWorker: false });
-                hls.loadSource(data.url);
-                hls.attachMedia(preview[0]);
+                const hls = new Hls({ enableWorker: false });
+                setRefererPopup(data.referer, function () {
+                    hls.loadSource(data.url);
+                    hls.attachMedia(preview[0]);
+                });
                 hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
                     if (data.tracks && !data.tracks.audiovideo) {
                         !data.tracks.audio && mediaInfo.append("<br><b>无音频</b>");
@@ -171,9 +173,13 @@ function AddMedia(data, currentTab = true) {
                     }
                 });
             } else if (data.isPlay) {
-                preview.attr("src", data.url);
+                setRefererPopup(data.referer, function () {
+                    preview.attr("src", data.url);
+                });
             } else if (isPicture(data)) {
-                data.html.find("#screenshots").show().attr("src", data.url);
+                setRefererPopup(data.referer, function () {
+                    data.html.find("#screenshots").show().attr("src", data.url);
+                });
                 return false;
             } else {
                 return false;
