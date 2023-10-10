@@ -154,6 +154,10 @@ function InitOptions() {
             return { regex: reg, ext: item.ext, blackList: item.blackList, state: item.state }
         });
         G = { ...items, ...G };
+
+        const icon = { path: G.enable ? "/img/icon.png" : "/img/icon-disable.png" };
+        G.isFirefox ? browser.browserAction.setIcon(icon) : chrome.action.setIcon(icon);
+
         G.initSyncComplete = true;
     });
     // 读取local配置数据 交给全局变量G

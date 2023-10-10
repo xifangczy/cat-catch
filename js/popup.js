@@ -504,9 +504,8 @@ $("[go]").click(function () {
 });
 // 暂停 启用
 $("#enable").click(function () {
-    chrome.storage.sync.set({ enable: !G.enable }, function () {
-        $("#enable").html(G.enable ? "暂停" : "启用");
-        chrome.action.setIcon({ path: G.enable ? "/img/icon.png" : "/img/icon-disable.png" });
+    chrome.runtime.sendMessage({ Message: "enable" }, function (state) {
+        $("#enable").html(state ? "暂停" : "启用");
     });
 });
 // 一些需要等待G变量加载完整的操作
@@ -558,9 +557,6 @@ const interval = setInterval(function () {
     $("#playbackRate").val(G.playbackRate);
 
     $(`<style>${G.css}</style>`).appendTo("head");
-
-    // 暂停
-    $("#enable").html(G.enable ? "暂停" : "启用");
 }, 4);
 /********************绑定事件END********************/
 
@@ -573,6 +569,7 @@ function updateButton() {
         $("#catch").html(state.catch ? "关闭捕获" : "缓存捕获");
         $("#recorder").html(state.recorder ? "关闭录制" : "视频录制");
         $("#recorder2").html(state.recorder2 ? "关闭屏幕捕捉" : "屏幕捕捉");
+        $("#enable").html(state.enable ? "暂停" : "启用");
     });
 }
 /* 格式判断 */

@@ -249,7 +249,7 @@ function save(tabId) {
 
 // 监听来自popup 和 options的请求
 chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
-    if (!G.initLocalComplete) {
+    if (!G.initLocalComplete || !G.initSyncComplete) {
         sendResponse("error");
         return true;
     }
@@ -272,6 +272,13 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         sendResponse("ok");
         return true;
     }
+    if (Message.Message == "enable") {
+        G.enable = !G.enable;
+        chrome.storage.sync.set({ enable: G.enable });
+        chrome.action.setIcon({ path: G.enable ? "/img/icon.png" : "/img/icon-disable.png" });
+        sendResponse(G.enable);
+        return true;
+    }
     Message.tabId = Message.tabId ?? G.tabId;
     if (Message.Message == "getData") {
         sendResponse(cacheData[Message.tabId]);
@@ -280,7 +287,8 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     if (Message.Message == "getButtonState") {
         let state = {
             MobileUserAgent: G.featMobileTabId.has(Message.tabId),
-            AutoDown: G.featAutoDownTabId.has(Message.tabId)
+            AutoDown: G.featAutoDownTabId.has(Message.tabId),
+            enable: G.enable,
         }
         G.scriptList.forEach(function (item, key) {
             state[item.key] = item.tabId.has(Message.tabId);
@@ -510,7 +518,8 @@ chrome.commands.onCommand.addListener(function (command) {
         clearRedundant();
         SetIcon({ tabId: G.tabId });
     } else if (command == "enable") {
-        chrome.storage.sync.set({ enable: !G.enable });
+        G.enable = !G.enable;
+        chrome.storage.sync.set({ enable: G.enable });
         chrome.action.setIcon({ path: G.enable ? "/img/icon.png" : "/img/icon-disable.png" });
     }
 });
@@ -606,7 +615,7 @@ function mobileUserAgent(tabId, change = false) {
                 },
                 "condition": {
                     "tabIds": [tabId],
-                    "resourceTypes": ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "object", "xmlhttprequest", "ping", "csp_report", "media", "websocket", "webtransport", "webbundle", "other"]
+                    "resourceTypes": Object.values(chrome.declarativeNetRequest.ResourceType)
                 }
             }]
         });
