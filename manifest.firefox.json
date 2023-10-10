@@ -33,7 +33,8 @@
     "scripting",
     "activeTab",
     "*://*/*",
-    "<all_urls>"
+    "<all_urls>",
+    "declarativeNetRequest"
   ],
   "commands": {
     "_execute_browser_action": {},
