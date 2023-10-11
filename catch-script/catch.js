@@ -148,7 +148,7 @@
     const _AddSourceBuffer = window.MediaSource.prototype.addSourceBuffer;
     window.MediaSource.prototype.addSourceBuffer = function (mimeType) {
         // 标题获取
-        getFileName();
+        setTimeout(() => { getFileName(); }, 2000);
         tips.innerHTML = "捕获数据中...";
         const sourceBuffer = _AddSourceBuffer.call(this, mimeType);
         const _appendBuffer = sourceBuffer.appendBuffer;
