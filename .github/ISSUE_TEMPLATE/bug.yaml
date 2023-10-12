@@ -1,6 +1,5 @@
 name: Bug 报告 Bug Report
 description: 创建一个bug报告. File a bug report
-title: ""
 body:
   - type: input
     id: version
