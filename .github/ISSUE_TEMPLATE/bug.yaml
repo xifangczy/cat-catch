@@ -6,6 +6,8 @@ body:
     attributes:
       label: 扩展版本号 extension version
       placeholder: e.g. vX.Y.Z
+    validations:
+      required: true
   - type: dropdown
     id: browser
     attributes:
@@ -17,6 +19,8 @@ body:
         - Chromium
         - 360浏览器
         - 其他基于 Chromium 的浏览器
+    validations:
+      required: true
   - type: input
     id: browserVersion
     attributes:
@@ -31,3 +35,5 @@ body:
     id: description
     attributes:
       label: 请详细描述问题
+    validations:
+      required: true
