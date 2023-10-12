@@ -1,55 +1,181 @@
 (function () {
     console.log("recorder.js Start");
-    if (document.getElementById("catCatchRecorder")) {
-        return;
-    }
+    if (document.getElementById("catCatchRecorder")) { return; }
+
+    const buttonStyle = 'style="border:solid 1px #000;margin:2px;padding:2px;background:#fff;border-radius:4px;border:solid 1px #c7c7c780;color:#000;"';
+    const checkboxStyle = 'style="-webkit-appearance: auto;"';
+
     const CatCatch = document.createElement("div");
-    CatCatch.setAttribute("id", "catCatchRecorder");
-    CatCatch.setAttribute("data-switch", "on");
-    CatCatch.innerHTML = '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAAKlBMVEUAAADLlROxbBlRAD16GS5oAjWWQiOCIytgADidUx/95gHqwwTx0gDZqwT6kfLuAAAACnRSTlMA/vUejV7kuzi8za0PswAAANpJREFUGNNjwA1YSxkYTEqhnKZLLi6F1w0gnKA1shdvHYNxdq1atWobjLMKCOAyC3etlVrUAOH4HtNZmLgoAMKpXX37zO1FwcZAwMDguGq1zKpFmTNnzqx0Bpp2WvrU7ttn9py+I8JgLn1R8Pad22vurNkjwsBReHv33junzuyRnOnMwNCSeFH27K5dq1SNgcZxFMnuWrNq1W5VkNntihdv7ToteGcT0C7mIkE1qbWCYjJnM4CqEoWKdoslChXuUgXJqIcLebiphSgCZRhaPDhcDFhdmUMCGIgEAFA+Uc02aZg9AAAAAElFTkSuQmCC" style="-webkit-user-drag: none;width: 20px;"><div id="tips"></div>';
-    CatCatch.style = `position: fixed;
+    CatCatch.setAttribute("id", "CatCatchCatch");
+    CatCatch.innerHTML = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAAKlBMVEUAAADLlROxbBlRAD16GS5oAjWWQiOCIytgADidUx/95gHqwwTx0gDZqwT6kfLuAAAACnRSTlMA/vUejV7kuzi8za0PswAAANpJREFUGNNjwA1YSxkYTEqhnKZLLi6F1w0gnKA1shdvHYNxdq1atWobjLMKCOAyC3etlVrUAOH4HtNZmLgoAMKpXX37zO1FwcZAwMDguGq1zKpFmTNnzqx0Bpp2WvrU7ttn9py+I8JgLn1R8Pad22vurNkjwsBReHv33junzuyRnOnMwNCSeFH27K5dq1SNgcZxFMnuWrNq1W5VkNntihdv7ToteGcT0C7mIkE1qbWCYjJnM4CqEoWKdoslChXuUgXJqIcLebiphSgCZRhaPDhcDFhdmUMCGIgEAFA+Uc02aZg9AAAAAElFTkSuQmCC" style="-webkit-user-drag: none;width: 20px;">
+    <div id="tips"></div>
+    选择视频: <select id="videoList" style="max-width: 200px;"></select>
+    录制编码: <select id="mimeTypeList" style="max-width: 200px;"></select>
+    <div>
+        <button id="getVideo" ${buttonStyle}>读取视频</button>
+        <button id="start" ${buttonStyle}>开始录制</button>
+        <button id="stop" ${buttonStyle}>停止录制</button>
+    </div>
+    <div>
+        <button id="hide" ${buttonStyle}>隐藏</button>
+        <button id="close" ${buttonStyle}>关闭</button>
+    </div>`;
+    CatCatch.style = `
+        position: fixed;
         z-index: 999999;
-        top: 15%;
-        left: 90%;
-        background: #fff;
+        top: 10%;
+        left: 80%;
+        background: rgb(255 255 255 / 85%);
         border: solid 1px #c7c7c7;
         border-radius: 4px;
         color: rgb(26, 115, 232);
-        cursor: pointer;
         padding: 5px 5px 5px 5px;
-        font-size: 15px;
+        font-size: 12px;
         font-family: "Microsoft YaHei", "Helvetica", "Arial", sans-serif;
         user-select: none;
         display: flex;
-        align-items: center;
-        justify-content: space-evenly;`;
+        align-items: flex-start;
+        justify-content: space-evenly;
+        flex-direction: column;
+        line-height: 20px;`;
     document.getElementsByTagName('html')[0].appendChild(CatCatch);
-    const cat = CatCatch.querySelector("#tips");
 
-    let isMove = false;
-    CatCatch.addEventListener('click', function (event) {
-        if (!isMove) {
-            switch (cat.getAttribute("data-switch")) {
-                case "on":
-                    try {
-                        recorder.start();
-                    } catch (e) {
-                        cat.innerHTML = "无法捕获视频<br>点击重试";
-                        cat.setAttribute("data-switch", "error");
-                    }
-                    break;
-                case "off":
-                    recorder.stop(); break;
-                case "error":
-                    Start(); break;
-                default: return;
-            }
-        }
-        isMove = false;
+    const $tips = CatCatch.querySelector("#tips");
+    const $videoList = CatCatch.querySelector("#videoList");
+    const $mimeTypeList = CatCatch.querySelector("#mimeTypeList");
+    const $start = CatCatch.querySelector("#start");
+    const $stop = CatCatch.querySelector("#stop");
+    let videoList = [];
+    $tips.innerHTML = "请先读取视频列表";
+    let recorder = {};
+    let option = { mimeType: 'video/webm;codecs=vp9,opus' };
+
+    CatCatch.querySelector("#hide").addEventListener('click', function (event) {
+        CatCatch.style.display = "none";
     });
+    CatCatch.querySelector("#close").addEventListener('click', function (event) {
+        recorder.stop();
+        CatCatch.style.display = "none";
+        window.postMessage({ action: "catCatchToBackground", Message: "script", script: "recorder.js", refresh: false });
+    });
+
+    function init() {
+        getVideo();
+        $start.style.display = 'inline';
+        $stop.style.display = 'none';
+    }
+    setTimeout(init, 500);
+
+    // #region 视频编码选择
+    function setMimeType() {
+        function getSupportedMimeTypes(media, types, codecs) {
+            const supported = [];
+            types.forEach((type) => {
+                const mimeType = `${media}/${type}`;
+                codecs.forEach((codec) => [`${mimeType};codecs=${codec}`].forEach(variation => {
+                    if (MediaRecorder.isTypeSupported(variation)) {
+                        supported.push(variation);
+                    }
+                }));
+                if (MediaRecorder.isTypeSupported(mimeType)) {
+                    supported.push(mimeType);
+                }
+            });
+            return supported;
+        };
+        const videoTypes = ["webm", "ogg", "mp4", "x-matroska"];
+        const codecs = ["should-not-be-supported", "vp9", "vp8", "avc1", "av1", "h265", "h.265", "h264", "h.264", "opus", "pcm", "aac", "mpeg", "mp4a"];
+        const supportedVideos = getSupportedMimeTypes("video", videoTypes, codecs);
+        supportedVideos.forEach(function (type) {
+            $mimeTypeList.options.add(new Option(type, type));
+        });
+        option.mimeType = supportedVideos[0];
+
+        $mimeTypeList.addEventListener('change', function (event) {
+            if (recorder && recorder.state && recorder.state === 'recording') {
+                $tips.innerHTML = "录制中不能更改编码";
+                return;
+            }
+            if (MediaRecorder.isTypeSupported(event.target.value)) {
+                option.mimeType = event.target.value;
+                $tips.innerHTML = "已选择编码：" + event.target.value;
+            } else {
+                $tips.innerHTML = "不支持此格式";
+            }
+        });
+    }
+    setMimeType();
+    // #endregion 视频编码选择
+
+    // #region 获取视频列表
+    function getVideo() {
+        videoList = [];
+        $videoList.options.length = 0;
+        document.querySelectorAll("video, audio").forEach(function (video, index) {
+            if (video.currentSrc) {
+                const src = video.currentSrc.split("/").pop();
+                videoList.push(video);
+                $videoList.options.add(new Option(src, index));
+            }
+        });
+        $tips.innerHTML = videoList.length ? "请点击开始录制" : "没有检测到视频, 请重新读取";
+    }
+    CatCatch.querySelector("#getVideo").addEventListener('click', getVideo);
+    CatCatch.querySelector("#stop").addEventListener('click', function () {
+        recorder.stop();
+    });
+    // #endregion 获取视频列表
+
+    CatCatch.querySelector("#start").addEventListener('click', function (event) {
+        if (!MediaRecorder.isTypeSupported(option.mimeType)) {
+            $tips.innerHTML = "不支持录制此格式";
+            return;
+        }
+        init();
+        const index = $videoList.value;
+        if (index && videoList[index]) {
+            const stream = videoList[index].captureStream();
+            recorder = new MediaRecorder(stream, option);
+            recorder.ondataavailable = function (event) {
+                $tips.innerHTML = "正在下载";
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(event.data);
+                a.download = `${document.title}`;
+                a.click();
+                a.remove();
+                $tips.innerHTML = "下载完成";
+            }
+            recorder.onstart = function (event) {
+                $stop.style.display = 'inline';
+                $start.style.display = 'none';
+                $tips.innerHTML = "正在录制";
+            }
+            recorder.onstop = function (event) {
+                $tips.innerHTML = "已停止录制";
+                init();
+            }
+            recorder.onerror = function (event) {
+                init();
+                $tips.innerHTML = "录制失败<br>详情看控制台信息";
+                console.log(event);
+            };
+            recorder.start();
+            videoList[index].play();
+            setTimeout(() => {
+                if (recorder.state === 'recording') {
+                    $stop.style.display = 'inline';
+                    $start.style.display = 'none';
+                    $tips.innerHTML = "正在录制";
+                }
+            }, 500);
+        } else {
+            $tips.innerHTML = "请确认视频是否存在";
+        }
+    });
+
+    // #region 移动逻辑
     let x, y;
     function move(event) {
-        isMove = true;
         CatCatch.style.left = event.pageX - x + 'px';
         CatCatch.style.top = event.pageY - y + 'px';
     }
@@ -61,75 +187,5 @@
             document.removeEventListener('mousemove', move);
         });
     });
-
-    var buffer = [];
-    var steam;
-    var option = { mimeType: 'video/webm;codecs=vp9,opus' };
-    var recorder = {};
-
-    Start();
-    function Start() {
-        let videoCount = document.getElementsByTagName("video").length;
-        if (videoCount == 0) {
-            cat.innerHTML = "无法找到视频标签<br>点击重试";
-            cat.setAttribute("data-switch", "error");
-            return;
-        }
-        if (videoCount == 1) {
-            getStream(0);
-            return;
-        }
-        let HTML = '<select id="videoSelect"><option value="-1">存在多个视频标签，请选择</option>';
-        for (let i = 0; i < videoCount; i++) {
-            HTML += `<option value="${i}">第${i + 1}个视频标签</option>`;
-        }
-        HTML += `</select>`;
-        cat.innerHTML = HTML;
-        cat.setAttribute("data-switch", "select");
-        document.getElementById("videoSelect").addEventListener('change', function (event) {
-            if (event.target.value == -1) return;
-            getStream(event.target.value);
-        });
-    }
-
-    function getStream(index) {
-        try {
-            steam = document.getElementsByTagName("video")[index].captureStream();
-            recorder = new MediaRecorder(steam, option);
-            cat.innerHTML = "开启录制";
-            cat.setAttribute("data-switch", "on");
-        } catch (e) {
-            console.log(e);
-            cat.innerHTML = "无法捕获视频<br>点击重试";
-            cat.setAttribute("data-switch", "error");
-        }
-    }
-
-    recorder.ondataavailable = function (e) {
-        buffer.push(e.data);
-    }
-    recorder.onstart = function (e) {
-        buffer = [];
-        cat.innerHTML = "正在录制<br>关闭录制并下载";
-        cat.setAttribute("data-switch", "off");
-    }
-    recorder.onstop = function (e) {
-        cat.setAttribute("data-switch", "on");
-        cat.innerHTML = "等待下载";
-
-        const fileBlob = new Blob(buffer, { type: option });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(fileBlob);
-        a.download = `${document.title}.webm`;
-        a.click();
-        a.remove();
-        buffer = [];
-
-        cat.setAttribute("data-switch", "on");
-        cat.innerHTML = "下载完成<br>再次开启录制";
-    }
-    recorder.onerror = function (event) {
-        cat.innerHTML = "录制失败<br>详情看控制台信息";
-        console.log(event);
-    };
+    // #endregion 移动逻辑
 })();
