@@ -35,7 +35,7 @@ const initData = new Map(); // 储存map的url
 const decryptor = new AESDecryptor(); // 解密工具 来自hls.js 分离出来的
 let skipDecrypt = false; // 是否跳过解密
 /* 下载相关 */
-const down = new FragmentDownloader();
+// const down = new FragmentDownloader();
 let downId = 0; // 下载id
 let stopDownload = false; // 停止下载flag
 let fileSize = 0; // 文件大小
@@ -948,12 +948,9 @@ function downloadTs(start = 0, end = _fragments.length - 1, errorObj = undefined
 }
 
 function downloadNew(start = 0, end = _fragments.length) {
-    // 销毁重建FragmentDownloader
-    down.destroy();
-    // 载入切片列表
-    down.fragments = _fragments;
-    // 设定线程
-    down.thread = parseInt($("#thread").val());
+    // 切片下载器
+    const down = new FragmentDownloader(_fragments, parseInt($("#thread").val()));
+
     // 解密函数
     down.setDecrypt(function (buffer, fragment) {
         return new Promise(function (resolve, reject) {
@@ -1044,7 +1041,7 @@ function downloadNew(start = 0, end = _fragments.length) {
     });
     // 全部下载完成
     down.on('allCompleted', function (buffer) {
-        !fileStream && mergeTsNew();
+        !fileStream && mergeTsNew(down);
 
         transmuxer?.off('data');
         transmuxer = undefined;
@@ -1080,7 +1077,7 @@ function downloadTsError(index) {
     $('#errorTsList').append(html);
 }
 // 合并下载
-function mergeTsNew() {
+function mergeTsNew(down) {
     // 创建Blob
     const fileBlob = new Blob(down.buffer, { type: down.transcode ? "video/mp4" : "video/MP2T" });
 
@@ -1105,6 +1102,7 @@ function mergeTsNew() {
             $progress.html("已发送给在线ffmpeg");
             return;
         }
+        buttonState("#mergeTs", true);
         $progress.html("视频大于2G 无法使用在线ffmpeg");
         return;
     }
