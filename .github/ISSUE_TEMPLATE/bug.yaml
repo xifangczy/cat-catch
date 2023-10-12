@@ -1,0 +1,34 @@
+name: Bug 报告 Bug Report
+description: 创建一个bug报告. File a bug report
+title: ""
+body:
+  - type: input
+    id: version
+    attributes:
+      label: 扩展版本号 extension version
+      placeholder: e.g. vX.Y.Z
+  - type: dropdown
+    id: browser
+    attributes:
+      label: 浏览器
+      options:
+        - Google Chrome
+        - Microsoft Edge
+        - Firefox
+        - Chromium
+        - 360浏览器
+        - 其他基于 Chromium 的浏览器
+  - type: input
+    id: browserVersion
+    attributes:
+      label: 浏览器版本号
+      placeholder: e.g. vX.Y.Z
+  - type: input
+    id: url
+    attributes:
+      label: 涉及网址
+      placeholder: e.g. https://example.com
+  - type: textarea
+    id: description
+    attributes:
+      label: 请详细描述问题
