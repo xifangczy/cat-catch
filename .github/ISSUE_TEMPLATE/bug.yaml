@@ -6,7 +6,6 @@ body:
     attributes:
       label: 扩展版本号 extension version
       placeholder: e.g. vX.Y.Z
-      description: 扩展设置 最底部 查看版本号
   - type: dropdown
     id: browser
     attributes:
@@ -30,6 +29,7 @@ body:
     attributes:
       label: 涉及网址
       placeholder: e.g. https://example.com
+      description: 请提供发生问题的网址 需要授权登陆才能播放的请通过邮箱提交bug
   - type: textarea
     id: description
     attributes:
