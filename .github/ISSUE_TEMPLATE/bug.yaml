@@ -6,8 +6,7 @@ body:
     attributes:
       label: 扩展版本号 extension version
       placeholder: e.g. vX.Y.Z
-    validations:
-      required: true
+      description: 扩展设置 最底部 查看版本号
   - type: dropdown
     id: browser
     attributes:
