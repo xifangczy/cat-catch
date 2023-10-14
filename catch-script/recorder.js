@@ -11,12 +11,11 @@
     <div id="tips"></div>
     选择视频: <select id="videoList" style="max-width: 200px;"></select>
     录制编码: <select id="mimeTypeList" style="max-width: 200px;"></select>
+    <label><input type="checkbox" id="ffmpeg"} ${checkboxStyle}>使用ffmpeg转码</label>
     <div>
         <button id="getVideo" ${buttonStyle}>读取视频</button>
         <button id="start" ${buttonStyle}>开始录制</button>
         <button id="stop" ${buttonStyle}>停止录制</button>
-    </div>
-    <div>
         <button id="hide" ${buttonStyle}>隐藏</button>
         <button id="close" ${buttonStyle}>关闭</button>
     </div>`;
@@ -46,7 +45,7 @@
     const $start = CatCatch.querySelector("#start");
     const $stop = CatCatch.querySelector("#stop");
     let videoList = [];
-    $tips.innerHTML = "请先读取视频列表";
+    $tips.innerHTML = "没有检测到视频, 请重新读取";
     let recorder = {};
     let option = { mimeType: 'video/webm;codecs=vp9,opus' };
 
@@ -137,7 +136,16 @@
             const stream = videoList[index].captureStream();
             recorder = new MediaRecorder(stream, option);
             recorder.ondataavailable = function (event) {
-                $tips.innerHTML = "正在下载";
+                if (CatCatch.querySelector("#ffmpeg").checked) {
+                    window.postMessage({
+                        action: "catCatchFFmpeg",
+                        use: "transcode",
+                        media: [{ data: URL.createObjectURL(event.data), type: option.mimeType }],
+                        title: document.title.trim()
+                    });
+                    $tips.innerHTML = "已推送到ffmpeg";
+                    return;
+                }
                 const a = document.createElement('a');
                 a.href = URL.createObjectURL(event.data);
                 a.download = `${document.title}`;
