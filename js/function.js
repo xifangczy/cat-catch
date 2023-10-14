@@ -256,3 +256,21 @@ function getUrlFileName(url) {
     let filename = pathname.split("/").pop();
     return filename ? filename : "NULL";
 }
+
+// 判断文件是否需要修复
+function specialFile(data) {
+    if (data.cacheURL.host.includes("googlevideo.com") && data.cacheURL.pathname == "/videoplayback") {
+        return "youtube";
+    }
+    return "";
+}
+// 文件修复
+const filePatch = {
+    youtube: function (buffer) {
+        buffer = new Uint8Array(buffer);
+        if (buffer && buffer[0] == 0x14 && buffer[1] == 0x2F && buffer[2] == 0x08 && buffer[2] == 0x00) {
+            buffer = buffer.slice(25);
+        }
+        return buffer.buffer;
+    }
+}

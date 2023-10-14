@@ -238,6 +238,11 @@ function AddMedia(data, currentTab = true) {
             }
             Tips("blob地址无法调用m3u8DL下载", 1500);
         }
+        // const flag = specialFile(data);
+        // if (flag) {
+        //     catDownload(data, "&fileFlag=" + flag);
+        //     return false;
+        // }
         chrome.downloads.download({
             url: data.url,
             filename: data.downFileName,

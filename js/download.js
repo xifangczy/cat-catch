@@ -6,6 +6,7 @@ const _fileName = params.get("filename");
 const autosend = params.get("autosend");
 const autoClose = params.get("autoClose");
 const title = params.get("title");
+// const fileFlag = params.get("fileFlag");
 
 // 修改当前标签下的所有xhr的Referer
 _referer ? setReferer(_referer, start) : start();
@@ -77,6 +78,12 @@ function startDownload(tabId) {
         $downFilepProgress.html("下载失败... " + JSON.stringify(result));
     }).done(function (result) {
         try {
+            // if (fileFlag) {
+            //     const type = result.type;
+            //     buffer = await result.arrayBuffer();
+            //     result = filePatch[fileFlag](buffer);
+            //     result = new Blob([result], { type: type });
+            // }
             blobUrl = URL.createObjectURL(result);
             $("#ffmpeg").show();
             // 自动发送到ffmpeg
