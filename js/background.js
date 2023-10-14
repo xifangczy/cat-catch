@@ -97,7 +97,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         for (let key in G.Regex) {
             if (!G.Regex[key].state) { continue; }
             G.Regex[key].regex.lastIndex = 0;
-            const result = G.Regex[key].regex.exec(data.url);
+            let result = G.Regex[key].regex.exec(data.url);
             if (result == null) { continue; }
             if (G.Regex[key].blackList) {
                 G.blackList.add(data.requestId);
@@ -108,13 +108,13 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
                 findMedia(data, true, true);
                 return;
             }
-            for (let i = 1; i < result.length; i++) {
-                data.url = decodeURIComponent(result[i]);
-                if (!reProtocol.test(data.url)) {
-                    data.url = urlParsing.protocol + "//" + data.url;
-                }
-                findMedia(data, true, true);
+            result.shift();
+            result = result.map(str => decodeURIComponent(str));
+            if (!result[0].startsWith('https://') && !result[0].startsWith('http://')) {
+                result[0] = urlParsing.protocol + "//" + data.url;
             }
+            data.url = result.join("");
+            findMedia(data, true, true);
             return;
         }
         return;

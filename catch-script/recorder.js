@@ -53,7 +53,7 @@
         CatCatch.style.display = "none";
     });
     CatCatch.querySelector("#close").addEventListener('click', function (event) {
-        recorder.stop();
+        recorder?.state && recorder.stop();
         CatCatch.style.display = "none";
         window.postMessage({ action: "catCatchToBackground", Message: "script", script: "recorder.js", refresh: false });
     });
