@@ -1,4 +1,4 @@
-class FragmentDownloader {
+class Downloader {
     constructor(fragments = [], thread = 16) {
         this.fragments = fragments;      // 切片列表
         this.thread = thread;            // 线程数

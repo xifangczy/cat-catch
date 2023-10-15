@@ -949,7 +949,7 @@ function downloadTs(start = 0, end = _fragments.length - 1, errorObj = undefined
 
 function downloadNew(start = 0, end = _fragments.length) {
     // 切片下载器
-    const down = new FragmentDownloader(_fragments, parseInt($("#thread").val()));
+    const down = new Downloader(_fragments, parseInt($("#thread").val()));
 
     // 解密函数
     down.setDecrypt(function (buffer, fragment) {
@@ -1043,7 +1043,7 @@ function downloadNew(start = 0, end = _fragments.length) {
     down.on('allCompleted', function (buffer) {
         !fileStream && mergeTsNew(down);
 
-        transmuxer?.off('data');
+        transmuxer?.off && transmuxer.off('data');
         transmuxer = undefined;
         transmuxerheadEncode = undefined;
     });

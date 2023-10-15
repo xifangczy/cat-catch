@@ -66,7 +66,9 @@
         setTimeout(() => { $clean.innerHTML = "清理缓存"; }, 1000);
     });
     CatCatch.querySelector("#download").addEventListener('click', function (event) {
-        catchDownload();
+        if (isComplete || window.confirm("提前下载可能会造成数据混乱.确认？")) {
+            catchDownload();
+        }
     });
     CatCatch.querySelector("#hide").addEventListener('click', function (event) {
         CatCatch.style.display = "none";
