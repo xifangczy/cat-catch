@@ -265,6 +265,18 @@
         return _DataView.toString();
     }
 
+    // escape
+    const _escape = window.escape;
+    escape = function (str) {
+        if (str.length == 24 && str.substring(22, 24) == "==") {
+            postData({ action: "catCatchAddKey", key: str, href: location.href, ext: "base64Key" });
+        }
+        return _escape(str);
+    }
+    escape.toString = function () {
+        return _escape.toString();
+    }
+
     function isUrl(str) {
         return reIsUrl.test(str);
     }
