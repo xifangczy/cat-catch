@@ -172,4 +172,7 @@ button:active {
   img.cat-down {
     content: url(../img/cat-down-dark.png);
   }
+  img.aria2 {
+    content: url(../img/aria2-dark.png);
+  }
 }

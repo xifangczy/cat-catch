@@ -99,7 +99,7 @@ function AddMedia(data, currentTab = true) {
                 <img src="img/parsing.png" class="icon parsing ${data.parsing ? "" : "hide"}" id="parsing" data-type="${data.parsing}" title="解析"/>
                 <img src="img/play.png" class="icon play ${data.isPlay ? "" : "hide"}" id="play" title="预览"/>
                 <img src="img/download.png" class="icon download" id="download" title="下载"/>
-                <img src="img/aria2.png" class="icon download" id="aria2" title="发送到 Aria2"/>
+                <img src="img/aria2.png" class="icon aria2 ${G.enableAria2Rpc ? "" : "hide"}"" id="aria2" title="发送到 Aria2"/>
             </div>
             <div class="url hide">
                 <div id="mediaInfo" data-state="false">
@@ -221,6 +221,10 @@ function AddMedia(data, currentTab = true) {
     });
     // 发送到Aria2
     data.html.find('#aria2').click(function () {
+        const params = { out: data.downFileName };
+        if (data.referer) {
+            params.referer = data.referer;
+        }
         $.ajax({
             type: "POST",
             url: G.aria2Rpc,
@@ -228,21 +232,19 @@ function AddMedia(data, currentTab = true) {
                 "jsonrpc": "2.0",
                 "id": "id1",
                 "method": "aria2.addUri",
-                "params": [[
-                        data.url
-                    ], {
-                        "out": (data._title ?? data.title) + "." + (data.ext ? data.ext : "")
-            }]}),
+                "params": [[data.url], params]
+            }),
             contentType: "application/json; charset=utf-8",
             dataType: "json",
-            success: function(data){
+            success: function (data) {
                 Tips("已发送到 Aria2: " + JSON.stringify(data), 2000);
             },
-            error: function(errMsg) {
+            error: function (errMsg) {
                 Tips("发送到 Aria2 失败", 2000);
                 console.log(errMsg);
             }
         });
+        return false;
     });
     // 下载
     data.html.find('#download').click(function () {
