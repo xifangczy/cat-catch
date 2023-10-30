@@ -99,6 +99,7 @@ function AddMedia(data, currentTab = true) {
                 <img src="img/parsing.png" class="icon parsing ${data.parsing ? "" : "hide"}" id="parsing" data-type="${data.parsing}" title="解析"/>
                 <img src="img/play.png" class="icon play ${data.isPlay ? "" : "hide"}" id="play" title="预览"/>
                 <img src="img/download.png" class="icon download" id="download" title="下载"/>
+                <img src="img/aria2.png" class="icon download" id="aria2" title="发送到 Aria2"/>
             </div>
             <div class="url hide">
                 <div id="mediaInfo" data-state="false">
@@ -217,6 +218,31 @@ function AddMedia(data, currentTab = true) {
         navigator.clipboard.writeText(text);
         Tips("已复制到剪贴板");
         return false;
+    });
+    // 发送到Aria2
+    data.html.find('#aria2').click(function () {
+        $.ajax({
+            type: "POST",
+            url: G.aria2Rpc,
+            data: JSON.stringify({
+                "jsonrpc": "2.0",
+                "id": "id1",
+                "method": "aria2.addUri",
+                "params": [[
+                        data.url
+                    ], {
+                        "out": (data._title ?? data.title) + "." + (data.ext ? data.ext : "")
+            }]}),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function(data){
+                Tips("已发送到 Aria2: " + JSON.stringify(data), 2000);
+            },
+            error: function(errMsg) {
+                Tips("发送到 Aria2 失败", 2000);
+                console.log(errMsg);
+            }
+        });
     });
     // 下载
     data.html.find('#download').click(function () {

@@ -82,6 +82,7 @@ G.OptionLists = {
     enable: true,
     downActive: false,
     downAutoClose: false,
+    aria2Rpc: "http://localhost:6800/jsonrpc",
 };
 // 本地储存的配置
 G.LocalVar = {
