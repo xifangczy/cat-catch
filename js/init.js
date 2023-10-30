@@ -72,7 +72,7 @@ G.OptionLists = {
     copyM3U8: "${url}",
     copyMPD: "${url}",
     copyOther: "${url}",
-    autoClearMode: 1,
+    autoClearMode: 2,
     catDownload: false,
     saveAs: false,
     userAgent: "",
