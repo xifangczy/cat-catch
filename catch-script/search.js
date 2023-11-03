@@ -255,15 +255,24 @@
 
     // DataView
     const _DataView = DataView;
-    DataView = function () {
-        if (arguments[0] instanceof ArrayBuffer && arguments[0].byteLength == 16) {
-            postData({ action: "catCatchAddKey", key: arguments[0], href: location.href, ext: "key" });
+    DataView = new Proxy(_DataView, {
+        construct(target, args) {
+            let instance = new target(...args);
+            instance.setInt32 = new Proxy(instance.setInt32, {
+                apply(target, thisArg, argArray) {
+                    Reflect.apply(target, thisArg, argArray);
+                    if (thisArg.byteLength == 16) {
+                        postData({ action: "catCatchAddKey", key: thisArg.buffer, href: location.href, ext: "key" });
+                    }
+                    return;
+                }
+            });
+            if (instance.byteLength == 16) {
+                postData({ action: "catCatchAddKey", key: instance.buffer, href: location.href, ext: "key" });
+            }
+            return instance;
         }
-        return new _DataView(...arguments);
-    }
-    DataView.toString = function () {
-        return _DataView.toString();
-    }
+    });
 
     // escape
     const _escape = window.escape;
@@ -359,10 +368,28 @@
         return text;
     }
     function postData(data) {
-        const key = data.url ? data.url : data.key;
+        let key = data.url ? data.url : data.key;
+        if (key instanceof ArrayBuffer || key instanceof Array) {
+            key = ArrayToBase64(key);
+        }
         if (filter.has(key)) { return false; }
         filter.add(key);
         data.requestId = Date.now().toString() + filter.size;
         window.postMessage(data);
+    }
+    function ArrayToBase64(data) {
+        try {
+            let bytes = new Uint8Array(data);
+            let binary = "";
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            if (typeof _btoa == "function") {
+                return _btoa(binary);
+            }
+            return btoa(binary);
+        } catch (e) {
+            return false;
+        }
     }
 })();
