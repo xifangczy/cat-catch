@@ -558,6 +558,7 @@ const interval = setInterval(function () {
         }
         currentCount = data.length;
         if (currentCount >= 500 && confirm(`共 ${currentCount} 条资源, 是否取消加载?`)) {
+            $mediaList.append($current);
             UItoggle();
             return;
         }
