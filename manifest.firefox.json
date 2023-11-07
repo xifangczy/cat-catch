@@ -31,7 +31,6 @@
     "webNavigation",
     "alarms",
     "scripting",
-    // "activeTab",
     "*://*/*",
     "<all_urls>",
     "declarativeNetRequest"
