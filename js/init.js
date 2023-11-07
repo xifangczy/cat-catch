@@ -273,6 +273,7 @@ function clearRedundant() {
 function stringModify(str) {
     if (!str) { return str; }
     reStringModify.lastIndex = 0;
+    str = str.replaceAll(/\u200B/g, "").replaceAll(/\u200C/g, "").replaceAll(/\u200D/g, "");
     return str.replace(reStringModify, function (m) {
         return {
             "'": '&#39;',

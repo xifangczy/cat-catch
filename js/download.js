@@ -95,7 +95,7 @@ function startDownload(tabId) {
             document.title = "正在保存到硬盘...";
             chrome.downloads.download({
                 url: blobUrl,
-                filename: _fileName,
+                filename: stringModify(_fileName),
                 saveAs: G.saveAs
             }, function (downloadId) {
                 downId = downloadId;
