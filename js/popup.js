@@ -108,7 +108,7 @@ function AddMedia(data, currentTab = true) {
                 </div>
                 <div class="moreButton">
                     <div id="qrcode"><img src="img/qrcode.png" class="icon qrcode" title="显示资源地址二维码"/></div>
-                    <div id="catDown"><img src="img/cat-down.png" class="icon cat-down" title="携带referer参数下载"/></div>
+                    <div id="catDown"><img src="img/cat-down.png" class="icon cat-down" title="携带请求头参数下载"/></div>
                 </div>
                 <a href="${data.url}" target="_blank" download="${data.downFileName}">${data.url}</a>
                 <br>
@@ -301,15 +301,9 @@ function AddMedia(data, currentTab = true) {
     data.html.find('#parsing').click(function () {
         chrome.tabs.get(G.tabId, function (tab) {
             let url = `/${data.parsing}.html?url=${encodeURIComponent(data.url)}&title=${encodeURIComponent(data.title)}&tabid=${data.tabId == -1 ? G.tabId : data.tabId}&initiator=${encodeURIComponent(data.initiator)}`;
-            // JSON.stringify(data.requestHeaders);
             if (data.requestHeaders) {
                 url += `&requestHeaders=${encodeURIComponent(JSON.stringify(data.requestHeaders))}`;
             }
-            // if (data.requestHeaders?.referer) {
-            //     url += `&referer=${encodeURIComponent(data.requestHeaders.referer)}`;
-            // } else if (data.requestHeaders?.origin) {
-            //     url += `&origin=${encodeURIComponent(data.requestHeaders.origin)}`;
-            // }
             chrome.tabs.create({ url: url, index: tab.index + 1 });
         });
         return false;
@@ -673,10 +667,12 @@ function catDownload(obj, extra = "") {
         chrome.tabs.create({
             url: `/download.html?url=${encodeURIComponent(
                 obj.url
-            )}&referer=${encodeURIComponent(
-                obj.referer ?? obj.initiator
+            )}&requestHeaders=${encodeURIComponent(
+                JSON.stringify(obj.requestHeaders)
             )}&filename=${encodeURIComponent(
                 obj.downFileName
+            )}&initiator=${encodeURIComponent(
+                obj.initiator
             )}${extra}`,
             index: tab.index + 1,
             active: active

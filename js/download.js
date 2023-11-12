@@ -1,7 +1,9 @@
 // url 参数解析
 const params = new URL(location.href).searchParams;
 const _url = params.get("url");
-const _referer = params.get("referer");
+// const _referer = params.get("referer");
+const _initiator = params.get("initiator");
+const _requestHeaders = params.get("requestHeaders");
 const _fileName = params.get("filename");
 const autosend = params.get("autosend");
 const autoClose = params.get("autoClose");
@@ -9,7 +11,11 @@ const title = params.get("title");
 // const fileFlag = params.get("fileFlag");
 
 // 修改当前标签下的所有xhr的Referer
-_referer ? setReferer(_referer, start) : start();
+const requestHeaders = _requestHeaders ? JSON.parse(_requestHeaders) : {};
+if (!requestHeaders.referer) {
+    requestHeaders.referer = _initiator;
+}
+setRequestHeaders(requestHeaders, () => { awaitG(start); });
 
 function start() {
     awaitG(function () {
