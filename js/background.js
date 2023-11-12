@@ -37,11 +37,11 @@ chrome.webRequest.onBeforeRequest.addListener(
         try { findMedia(data, true); } catch (e) { console.log(e); }
     }, { urls: ["<all_urls>"] }, ["requestBody"]
 );
-// 保存Referer
+// 保存requestHeaders
 chrome.webRequest.onSendHeaders.addListener(
     function (data) {
-        const referer = getReferer(data);
-        referer && G.referer.set(data.requestId, referer);
+        const requestHeaders = getRequestHeaders(data);
+        requestHeaders && G.requestHeaders.set(data.requestId, requestHeaders);
     }, { urls: ["<all_urls>"] }, ['requestHeaders',
         chrome.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS].filter(Boolean)
 );
@@ -49,19 +49,19 @@ chrome.webRequest.onSendHeaders.addListener(
 chrome.webRequest.onResponseStarted.addListener(
     function (data) {
         try {
-            const referer = G.referer.get(data.requestId);
-            if (referer) {
-                data.referer = referer;
-                G.referer.delete(data.requestId);
+            const requestHeaders = G.requestHeaders.get(data.requestId);
+            if (requestHeaders) {
+                data.requestHeaders = requestHeaders;
+                G.requestHeaders.delete(data.requestId);
             }
             findMedia(data);
         } catch (e) { console.log(e, data); }
     }, { urls: ["<all_urls>"] }, ["responseHeaders"]
 );
-// 删除失败的refererData
+// 删除失败的requestHeadersData
 chrome.webRequest.onErrorOccurred.addListener(
     function (data) {
-        G.referer.delete(data.requestId);
+        G.requestHeaders.delete(data.requestId);
         G.blackList.delete(data.requestId);
     }, { urls: ["<all_urls>"] }
 );
@@ -188,12 +188,13 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
             requestId: data.requestId ?? Date.now().toString(),
             extraExt: data.extraExt,
             initiator: data.initiator,
-            referer: data.referer,
+            // referer: data.referer,
+            requestHeaders: data.requestHeaders,
             cacheURL: { host: urlParsing.host, search: urlParsing.search, pathname: urlParsing.pathname }
         };
         // 不存在 initiator 和 referer 使用web url代替initiator
         if (info.initiator == undefined || info.initiator == "null") {
-            info.initiator = info.referer ?? webInfo?.url;
+            info.initiator = info.requestHeaders?.referer ?? webInfo?.url;
         }
         // 装载页面信息
         info.title = webInfo?.title ?? "NULL";
@@ -572,12 +573,20 @@ function getResponseHeadersValue(data) {
     }
     return header;
 }
-function getReferer(data) {
+function getRequestHeaders(data) {
     if (data.requestHeaders == undefined || data.requestHeaders.length == 0) { return false; }
+    const header = {};
     for (let item of data.requestHeaders) {
-        if (item.name.toLowerCase() == "referer") {
-            return item.value.toLowerCase();
+        item.name = item.name.toLowerCase();
+        if (item.name == "referer") {
+            header.referer = item.value.toLowerCase();
         }
+        if (item.name == "origin") {
+            header.origin = item.value.toLowerCase();
+        }
+    }
+    if (Object.keys(header).length) {
+        return header;
     }
     return false;
 }

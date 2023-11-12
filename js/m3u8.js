@@ -1,7 +1,8 @@
 // url 参数解析
 const params = new URL(location.href).searchParams;
 let _m3u8Url = params.get("url");
-const _referer = params.get("referer");
+// const _referer = params.get("referer");
+const _requestHeaders = params.get("requestHeaders");
 const _initiator = params.get("initiator");
 const _title = params.get("title");
 let tsAddArg = params.get("tsAddArg");
@@ -10,7 +11,8 @@ const tabId = parseInt(params.get("tabid"));
 const key = params.get("key");
 
 // 修改当前标签下的所有xhr的Referer 修改完成 运行init函数
-setReferer(_referer, () => { awaitG(init); });
+const requestHeaders = _requestHeaders ? JSON.parse(_requestHeaders) : {};
+setRequestHeaders(requestHeaders, () => { awaitG(init); });
 
 // 默认设置
 const allOption = {
@@ -206,7 +208,7 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
     }
     function getNewUrl(item) {
         const url = encodeURIComponent(item.uri ?? item.url);
-        const referer = _referer ? "&referer=" + encodeURIComponent(_referer) : "&initiator=" + (_initiator ? encodeURIComponent(_initiator) : "");
+        const referer = requestHeaders.referer ? "&referer=" + encodeURIComponent(requestHeaders.referer) : "&initiator=" + (_initiator ? encodeURIComponent(_initiator) : "");
         const title = _title ? encodeURIComponent(_title) : "";
         const name = GetFile(item.uri ?? item.url);
         let newUrl = `/m3u8.html?url=${url}${referer}`;
@@ -246,23 +248,42 @@ hls.on(Hls.Events.ERROR, function (event, data) {
     }
     $("#loading").show();
     $("#loading .optionBox").html(`解析或播放m3u8文件中有错误, 详细错误信息查看控制台`);
+    // // 出错 如果正在录制中 自动点击下载录制按钮
+    // if (recorder) {
+    //     $("#recorder").click();
+    //     autoReferer = true;
+    // }
+    // if (!_initiator && !_referer) {
+    //     autoReferer = true;
+    // }
+    // // 尝试添加删除referer
+    // if (data.type == "networkError" && data.details != "keyLoadError") {
+    //     let href = window.location.href;
+    //     if (_referer) {
+    //         href = href.replace("&referer=", "&initiator=");
+    //         $("#loading .optionBox").append(`<p><a href="${href}">删除Referer重新尝试</a></p>`);
+    //     } else if (_initiator) {
+    //         href = href.replace("&initiator=", "&referer=");
+    //         $("#loading .optionBox").append(`<p><a href="${href}">添加Referer重新尝试</a></p>`);
+    //     }
+    //     if (!autoReferer) {
+    //         window.location.href = href + "&autoReferer=1";
+    //     }
+    // }
+
     // 出错 如果正在录制中 自动点击下载录制按钮
     if (recorder) {
         $("#recorder").click();
         autoReferer = true;
+        return;
     }
-    if (!_initiator && !_referer) {
-        autoReferer = true;
-    }
-    // 尝试添加删除referer
+
+    // 尝试添加 / 删除请求头
     if (data.type == "networkError" && data.details != "keyLoadError") {
         let href = window.location.href;
-        if (_referer) {
-            href = href.replace("&referer=", "&initiator=");
-            $("#loading .optionBox").append(`<p><a href="${href}">删除Referer重新尝试</a></p>`);
-        } else if (_initiator) {
-            href = href.replace("&initiator=", "&referer=");
-            $("#loading .optionBox").append(`<p><a href="${href}">添加Referer重新尝试</a></p>`);
+        if (!Object.keys(requestHeaders).length && _initiator) {
+            href += "&requestHeaders=" + encodeURIComponent(JSON.stringify({ "Referer": _initiator }));
+            $("#loading .optionBox").append(`<p><a href="${href}">添加请求头重新尝试</a></p>`);
         }
         if (!autoReferer) {
             window.location.href = href + "&autoReferer=1";
@@ -1401,8 +1422,8 @@ function getM3u8DlArg() {
     const data = {
         url: _m3u8Url,
         title: _title,
-        referer: _referer,
-        initiator: _referer ?? _initiator
+        referer: requestHeaders.referer,
+        initiator: requestHeaders.referer ?? _initiator
     }
     m3u8dlArg = templates(m3u8dlArg, data);
 

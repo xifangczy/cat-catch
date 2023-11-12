@@ -139,7 +139,11 @@ function AddMedia(data, currentTab = true) {
             mediaInfo.data("state", true);
             if (isM3U8(data)) {
                 const hls = new Hls({ enableWorker: false });
-                setRefererPopup(data.referer, function () {
+                // setRefererPopup(data.referer, function () {
+                //     hls.loadSource(data.url);
+                //     hls.attachMedia(preview[0]);
+                // });
+                setRequestHeaders(data.requestHeaders, function () {
                     hls.loadSource(data.url);
                     hls.attachMedia(preview[0]);
                 });
@@ -174,11 +178,11 @@ function AddMedia(data, currentTab = true) {
                     }
                 });
             } else if (data.isPlay) {
-                setRefererPopup(data.referer, function () {
+                setRequestHeaders(data.requestHeaders, function () {
                     preview.attr("src", data.url);
                 });
             } else if (isPicture(data)) {
-                setRefererPopup(data.referer, function () {
+                setRequestHeaders(data.requestHeaders, function () {
                     data.html.find("#screenshots").show().attr("src", data.url);
                 });
                 return false;
@@ -222,8 +226,8 @@ function AddMedia(data, currentTab = true) {
     // 发送到Aria2
     data.html.find('#aria2').click(function () {
         const params = { out: data.downFileName };
-        if (data.referer) {
-            params.referer = data.referer;
+        if (data.requestHeaders?.referer) {
+            params.referer = data.requestHeaders.referer;
         }
         $.ajax({
             type: "POST",
@@ -296,12 +300,16 @@ function AddMedia(data, currentTab = true) {
     //解析m3u8
     data.html.find('#parsing').click(function () {
         chrome.tabs.get(G.tabId, function (tab) {
-            let url = `/${data.parsing}.html?url=${encodeURIComponent(data.url)}&title=${encodeURIComponent(data.title)}&tabid=${data.tabId == -1 ? G.tabId : data.tabId}`;
-            if (data.referer) {
-                url += `&referer=${encodeURIComponent(data.referer)}`;
-            } else {
-                url += `&initiator=${encodeURIComponent(data.initiator)}`;
+            let url = `/${data.parsing}.html?url=${encodeURIComponent(data.url)}&title=${encodeURIComponent(data.title)}&tabid=${data.tabId == -1 ? G.tabId : data.tabId}&initiator=${encodeURIComponent(data.initiator)}`;
+            // JSON.stringify(data.requestHeaders);
+            if (data.requestHeaders) {
+                url += `&requestHeaders=${encodeURIComponent(JSON.stringify(data.requestHeaders))}`;
             }
+            // if (data.requestHeaders?.referer) {
+            //     url += `&referer=${encodeURIComponent(data.requestHeaders.referer)}`;
+            // } else if (data.requestHeaders?.origin) {
+            //     url += `&origin=${encodeURIComponent(data.requestHeaders.origin)}`;
+            // }
             chrome.tabs.create({ url: url, index: tab.index + 1 });
         });
         return false;

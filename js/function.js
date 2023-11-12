@@ -39,6 +39,42 @@ function isEmpty(obj) {
         obj == " ")
 }
 
+// 修改请求头
+function setRequestHeaders(data = {}, callback) {
+    chrome.tabs.getCurrent(function (tabs) {
+        const rules = { removeRuleIds: [1] };
+        if (Object.keys(data).length) {
+            const requestHeaders = [];
+            for (let key in data) {
+                requestHeaders.push({
+                    "header": key,
+                    "operation": "set",
+                    "value": data[key]
+                });
+            }
+            rules.addRules = [{
+                "id": 1,
+                "action": {
+                    "type": "modifyHeaders",
+                    "requestHeaders": requestHeaders
+                },
+                "condition": {
+                    "resourceTypes": ["xmlhttprequest", "media", "image"]
+                }
+            }];
+            if (tabs) {
+                rules.removeRuleIds = [tabs.id]
+                rules.addRules[0].id = tabs.id;
+                rules.addRules[0].condition.tabIds = [tabs.id];
+            }
+        }
+        // console.log(rules);
+        chrome.declarativeNetRequest.updateSessionRules(rules, function () {
+            callback && callback();
+        });
+    });
+}
+
 // 修改请求头Referer
 function setReferer(referer, callback) {
     chrome.tabs.getCurrent(function (tabs) {
