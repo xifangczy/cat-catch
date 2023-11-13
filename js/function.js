@@ -254,11 +254,11 @@ function templates(text, data) {
     // 标签
     const tags = {
         "$url$": data.url,
-        "$referer$": data.referer ?? data.initiator,
+        "$referer$": data.requestHeaders?.referer ?? data.initiator,
         "$title$": data.title,
         "${url}": data.url ?? "",
-        "${referer}": data.referer ?? "",
-        "${initiator}": data.referer ? data.referer : data.initiator,
+        "${referer}": data.requestHeaders?.referer ?? "",
+        "${initiator}": data.requestHeaders?.referer ? data.requestHeaders.referer : data.initiator,
         "${webUrl}": data.webUrl ?? "",
         "${title}": data._title ?? data.title,
         "${now}": data.now,
