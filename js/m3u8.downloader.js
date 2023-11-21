@@ -65,9 +65,9 @@ class Downloader {
     stop(index = undefined) {
         if (index !== undefined) {
             this.controller[index].abort();
-        } else {
-            this.controller.forEach(controller => { controller.abort() });
+            return;
         }
+        this.controller.forEach(controller => { controller.abort() });
     }
     /**
      * 检查对象是否错误列表内
@@ -165,12 +165,17 @@ class Downloader {
     downloader(fragment = null) {
         // 是否直接下载对象
         const directDownload = !!fragment;
+
         // 不存在下载对象 从提取fragments
         fragment ??= this.fragments[this.index++];
-        this.emit('start', fragment, this.index);
         this.state = 'running';
+
+        // 停止下载控制器
         const controller = new AbortController();
-        this.controller[this.index] = controller;
+        const stopFlag = this.controller.push(controller) - 1;
+
+        // 下载前触发事件
+        this.emit('start', fragment, stopFlag);
         fetch(fragment.url, { signal: controller.signal })
             .then(response => {
                 if (!response.ok) {
