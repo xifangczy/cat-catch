@@ -19,7 +19,7 @@ class Downloader {
         this.bufferize = 0;              // 已下载buffer大小
         this.duration = 0;               // 已下载时长
         this.pushIndex = 0;              // 推送顺序下载索引
-        this.controller = new AbortController();
+        this.controller = [];
     }
     /**
      * 设置监听
@@ -62,8 +62,12 @@ class Downloader {
     /**
      * 停止下载
      */
-    stop() {
-        this.controller.abort();
+    stop(index = undefined) {
+        if (index !== undefined) {
+            this.controller[index].abort();
+        } else {
+            this.controller.forEach(controller => { controller.abort() });
+        }
     }
     /**
      * 检查对象是否错误列表内
@@ -163,9 +167,11 @@ class Downloader {
         const directDownload = !!fragment;
         // 不存在下载对象 从提取fragments
         fragment ??= this.fragments[this.index++];
-        this.emit('start', fragment);
+        this.emit('start', fragment, this.index);
         this.state = 'running';
-        fetch(fragment.url, { signal: this.controller.signal })
+        const controller = new AbortController();
+        this.controller[this.index] = controller;
+        fetch(fragment.url, { signal: controller.signal })
             .then(response => {
                 if (!response.ok) {
                     throw new Error(response.status);
