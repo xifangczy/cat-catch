@@ -172,10 +172,12 @@ class Downloader {
 
         // 停止下载控制器
         const controller = new AbortController();
-        const stopFlag = this.controller.push(controller) - 1;
+        this.controller[fragment.index] = controller;
 
         // 下载前触发事件
-        this.emit('start', fragment, stopFlag);
+        this.emit('start', fragment);
+
+        // 开始下载
         fetch(fragment.url, { signal: controller.signal })
             .then(response => {
                 if (!response.ok) {
