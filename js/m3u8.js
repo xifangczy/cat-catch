@@ -254,7 +254,7 @@ hls.on(Hls.Events.ERROR, function (event, data) {
         hls.stopLoad();
     }
     $("#loading").show();
-    $("#loading .optionBox").html(`解析或播放m3u8文件中有错误, 详细错误信息查看控制台`);
+    $("#loading .optionBox").html(`解析或播放m3u8文件中有错误, 详细错误信息查看控制台<button id="setRequestHeadersError">设置请求头</button>`);
     // // 出错 如果正在录制中 自动点击下载录制按钮
     // if (recorder) {
     //     $("#recorder").click();
@@ -290,7 +290,7 @@ hls.on(Hls.Events.ERROR, function (event, data) {
         let href = window.location.href;
         if (!Object.keys(requestHeaders).length && _initiator) {
             href += "&requestHeaders=" + encodeURIComponent(JSON.stringify({ "Referer": _initiator }));
-            $("#loading .optionBox").append(`<p><a href="${href}">添加请求头重新尝试</a></p>`);
+            $("#loading .optionBox").append(`<p><a href="${href}">添加请求头重新尝试</a></p> <button id="setRequestHeadersError">设置请求头</button>`);
         }
         if (!autoReferer) {
             window.location.href = href + "&autoReferer=1";
@@ -893,6 +893,16 @@ $("#tsAddArg").click(function () {
     const arg = window.prompt("需要添加的参数", m3u8Arg ?? "");
     if (arg != null) {
         window.location.href += "&tsAddArg=" + encodeURIComponent(arg);
+    }
+});
+// 设置请求头
+// $("#setRequestHeaders, #setRequestHeadersError").click(function () {
+$(document).on("click", "#setRequestHeaders, #setRequestHeadersError", function () {
+    const arg = window.prompt("需要添加的参数", JSON.stringify(requestHeaders));
+    if (arg != null) {
+        params.delete("requestHeaders");
+        params.append("requestHeaders", arg);
+        window.location.href = window.location.origin + window.location.pathname + "?" + params.toString();
     }
 });
 /**************************** 下载TS文件 ****************************/
