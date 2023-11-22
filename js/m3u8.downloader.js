@@ -183,7 +183,31 @@ class Downloader {
                 if (!response.ok) {
                     throw new Error(response.status);
                 }
-                return response.arrayBuffer();
+                const reader = response.body.getReader();
+                const contentLength = response.headers.get('content-length');
+                let receivedLength = 0;
+                let chunks = [];
+                const pump = () => {
+                    return reader.read().then(({ value, done }) => {
+                        if (done) {
+                            this.emit('itemProgress', fragment, true);
+                            const allChunks = new Uint8Array(receivedLength);
+                            let position = 0;
+                            for (const chunk of chunks) {
+                                allChunks.set(chunk, position);
+                                position += chunk.length;
+                            }
+                            return allChunks.buffer;
+                        }
+                        chunks.push(value);
+                        receivedLength += value.length;
+                        this.emit('itemProgress', fragment, false, receivedLength, contentLength, (receivedLength / contentLength * 100).toFixed(2) + "%");
+
+                        return pump();
+                    });
+                }
+                return pump();
+                // return response.arrayBuffer();
             })
             .then(buffer => {
                 this.emit('rawBuffer', buffer);
@@ -224,10 +248,10 @@ class Downloader {
             }).catch((error) => {
                 if (error.name == 'AbortError') {
                     this.state = 'abort';
-                    this.emit('stop', error);
+                    this.emit('stop', fragment, error);
                     return;
                 }
-                this.emit('downloadError', error, fragment);
+                this.emit('downloadError', fragment, error);
                 // 储存下载错误切片
                 !this.errorList.has(fragment) && this.errorList.add(fragment);
             });

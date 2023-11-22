@@ -156,7 +156,7 @@ button,
   display: block;
   text-overflow: ellipsis;
   word-break: break-all;
-  color: rgb(26, 115, 232);
+  color: var(--text2-color);
 }
 .block {
   border-bottom: solid 1px rgba(0, 0, 0, 0.06);
@@ -200,7 +200,7 @@ textarea {
   width: 145px;
 }
 #tips input {
-  color: rgb(26, 115, 232);
+  color: var(--text2-color);
 }
 .keyUrl {
   width: 1034px;
@@ -245,7 +245,7 @@ textarea {
 .progress {
   width: 0px;
   height: 100%;
-  background-color: rgb(26, 115, 232);
+  background-color: var(--text2-color);
   border-radius: 3px;
 }
 #fileSize,
@@ -402,4 +402,18 @@ a.json-placeholder {
 }
 a.json-placeholder:hover {
   text-decoration: underline;
+}
+#downList a {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  color: var(--text2-color);
+}
+#downList {
+  overflow: scroll;
+  height: 50vh;
+  text-align: left;
+  display: none;
+  width: 100%;
 }

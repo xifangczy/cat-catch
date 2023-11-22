@@ -895,6 +895,11 @@ $("#tsAddArg").click(function () {
         window.location.href += "&tsAddArg=" + encodeURIComponent(arg);
     }
 });
+// 下载进度
+$("#downProgress").click(function () {
+    $("#media_file").hide();
+    $("#downList").show();
+});
 // 设置请求头
 // $("#setRequestHeaders, #setRequestHeadersError").click(function () {
 $(document).on("click", "#setRequestHeaders, #setRequestHeadersError", function () {
@@ -989,6 +994,37 @@ function downloadNew(start = 0, end = _fragments.length) {
     // 切片下载器
     const down = new Downloader(_fragments, parseInt($("#thread").val()));
 
+    $("#media_file").hide();
+    const $downList = $("#downList");
+    $downList.html("").show();
+    down.on('start', function (fragment) {
+        if ($(`#downItem${fragment.index}`).length) {
+            return;
+        }
+        const html = $(`<div id="downItem${fragment.index}">
+            <a href="${fragment.url}" target="_blank">${fragment.url}</a>
+            <div class="itemProgress">
+            <span>进度：</span>
+            <span class="percentage">0%</span>
+            <button data-action="stop">停止下载</button>
+            </div>
+        </div>`);
+        html.find("button").click(function () {
+            if ($(this).data("action") == "stop") {
+                down.stop(fragment.index);
+                down.downloader();  // 停止当前下载器 重新开一个下载器保持线程数量
+                $(this).html("重新下载");
+                html.find(".percentage").html("0%");
+                $(this).data("action", "start");
+            } else {
+                down.downloader(fragment);
+                $(this).html("停止下载");
+                $(this).data("action", "stop");
+            }
+        });
+        $downList.append(html);
+    });
+
     // 解密函数
     down.setDecrypt(function (buffer, fragment) {
         return new Promise(function (resolve, reject) {
@@ -1047,7 +1083,7 @@ function downloadNew(start = 0, end = _fragments.length) {
         });
     }
     // 下载错误
-    down.on('downloadError', function (error, fragment) {
+    down.on('downloadError', function (fragment, error) {
         console.log(error);
         if ($("#errorTsList").is(':hidden')) {
             $("#ForceDownload").show();
@@ -1085,6 +1121,14 @@ function downloadNew(start = 0, end = _fragments.length) {
         transmuxer = undefined;
         transmuxerheadEncode = undefined;
     });
+    // 全部下载完成
+    down.on('itemProgress', function (fragment, state, receivedLength, contentLength, percentage) {
+        if (!state) {
+            $(`#downItem${fragment.index} .percentage`).html(percentage);
+        } else {
+            $(`#downItem${fragment.index} button`).remove();
+        }
+    });
     if (fileStream) {
         down.on('sequentialPush', function (buffer) {
             fileStream.write(new Uint8Array(buffer));
@@ -1093,7 +1137,7 @@ function downloadNew(start = 0, end = _fragments.length) {
     down.on('error', function (error) {
         console.log(error);
     });
-    down.on('stop', function (error) {
+    down.on('stop', function (fragment, error) {
         console.log(error);
     });
     // 开始下载
@@ -1488,6 +1532,8 @@ function timeToIndex(time) {
 }
 // 写入ts链接
 function writeText(text) {
+    $("#media_file").show();
+    $("#downList").hide();
     if (typeof text == "object") {
         let url = [];
         for (let key in text) {

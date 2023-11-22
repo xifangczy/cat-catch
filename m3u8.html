@@ -81,6 +81,7 @@
         <div class="block" id="textarea">
           <textarea rows="50" cols="169" id="media_file" spellcheck="false" data-type="link"
             class="width100">切片文件载入中....</textarea>
+          <div id="downList">等待下载...</div>
           <video id="video" class="hide" controls></video>
         </div>
 
@@ -90,6 +91,7 @@
             <button id="originalM3U8">原始m3u8</button>
             <!-- <button id="localFile">本地m3u8</button> -->
             <button id="getTs">ts列表</button>
+            <button id="downProgress">下载进度</button>
             <button id="tsAddArg">设置ts参数</button>
             <button id="setRequestHeaders">设置请求头</button>
             <button id="play" data-switch="on">播放</button>
@@ -118,7 +120,8 @@
             <label class="m3u8checkbox textColor">只要音频<input type="checkbox" id="onlyAudio" save="change" /></label>
             <label class="m3u8checkbox textColor">另存为<input type="checkbox" id="saveAs" save="change" /></label>
             <label class="m3u8checkbox textColor">跳过解密<input type="checkbox" id="skipDecrypt" save="change" /></label>
-            <label class="m3u8checkbox textColor">测试<input type="checkbox" id="test" save="change" /></label>
+            <label class="m3u8checkbox textColor">测试<input type="checkbox" id="test" save="change"
+                checked="checked" /></label>
             <div class="rangeDown textColor">
               下载范围
               <div class="merge">
