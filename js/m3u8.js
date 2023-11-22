@@ -849,7 +849,8 @@ $("#mergeTs").click(async function () {
     // 流式下载
     if ($("#StreamSaver").prop("checked")) {
         fileStream = createStreamSaver(_fragments[0].url);
-        streamDownload(start, end);
+        // streamDownload(start, end);
+        downloadNew(start, end + 1)
         $("#ffmpeg").prop("checked", false);
         $("#saveAs").prop("checked", false);
         $("#stopStream").show();
@@ -1115,8 +1116,12 @@ function downloadNew(start = 0, end = _fragments.length) {
     });
     // 全部下载完成
     down.on('allCompleted', function (buffer) {
-        !fileStream && mergeTsNew(down);
-
+        if (fileStream) {
+            fileStream.close();
+            fileStream = undefined;
+        } else {
+            mergeTsNew(down);
+        }
         transmuxer?.off && transmuxer.off('data');
         transmuxer = undefined;
         transmuxerheadEncode = undefined;
