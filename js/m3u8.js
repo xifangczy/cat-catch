@@ -850,7 +850,7 @@ $("#mergeTs").click(async function () {
     if ($("#StreamSaver").prop("checked")) {
         fileStream = createStreamSaver(_fragments[0].url);
         // streamDownload(start, end);
-        downloadNew(start, end + 1)
+        $("#test").prop("checked") ? downloadNew(start, end + 1) : downloadTs(start, end);
         $("#ffmpeg").prop("checked", false);
         $("#saveAs").prop("checked", false);
         $("#stopStream").show();
