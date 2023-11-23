@@ -1124,9 +1124,9 @@ function downloadNew(start = 0, end = _fragments.length) {
         $("#errorDownload").hide(); // 重下所有失败项
     });
     // 全部下载完成
-    down.on('itemProgress', function (fragment, state, receivedLength, contentLength, percentage) {
+    down.on('itemProgress', function (fragment, state, receivedLength, contentLength) {
         if (!state) {
-            $(`#downItem${fragment.index} .percentage`).html(percentage);
+            $(`#downItem${fragment.index} .percentage`).html((receivedLength / contentLength * 100).toFixed(2) + "%");
         } else {
             $(`#downItem${fragment.index} button`).remove();
         }

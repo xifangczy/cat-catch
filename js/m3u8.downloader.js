@@ -208,7 +208,7 @@ class Downloader {
                         }
                         chunks.push(value);
                         receivedLength += value.length;
-                        this.emit('itemProgress', fragment, false, receivedLength, contentLength, (receivedLength / contentLength * 100).toFixed(2) + "%");
+                        this.emit('itemProgress', fragment, false, receivedLength, contentLength);
 
                         return pump();
                     });
