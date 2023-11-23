@@ -860,7 +860,7 @@ $("#mergeTs").click(async function () {
 });
 // 强制下载
 $("#ForceDownload").click(function () {
-    mergeTs();
+    !$("#test").prop("checked") && mergeTs();
 });
 // 停止下载流
 $("#stopStream").click(function () {
@@ -873,6 +873,7 @@ $("#stopStream").click(function () {
 });
 // 重新下载
 $("#errorDownload").click(function () {
+    if ($("#test").prop("checked")) { return; }
     $("#errorTsList button").each(function (index) {
         let button = this;
         setTimeout(() => {
@@ -1085,31 +1086,24 @@ function downloadNew(start = 0, end = _fragments.length) {
     }
     // 下载错误
     down.on('downloadError', function (fragment, error) {
-        console.log(error);
-        if ($("#errorTsList").is(':hidden')) {
-            $("#ForceDownload").show();
-            $("#errorDownload").show();
-            $("#errorTsList").show();
+        console.log(fragment, error, down.isErrorItem(fragment));
+
+        $("#ForceDownload").show(); // 强制下载
+        $("#errorDownload").show(); // 重下所有失败项
+
+        const $dom = $(`#downItem${fragment.index}`);
+        $dom.find(".percentage").html("下载失败...");
+        $button = $dom.find("button");
+        $button.html("重新下载").data("action", "start");
+        if (down.isErrorItem(fragment)) {
+            const count = parseInt($button.data("count")) + 1;
+            $button.data("count", count).html(`重新下载(${count})`);
+        } else {
+            $button.data("count", 0);
         }
-        if (down.isErrorObj(fragment)) {
-            const errorObj = $("#errorId" + fragment.index).find("button");
-            errorObj.html("下载失败...重试");
-            buttonState(errorObj, true);
-            return;
-        }
-        const html = $(`<p id="errorId${fragment.index}">${fragment.url} <button data-id="${fragment.index}">重新下载</button></p>`);
-        html.find("button").click(function () {
-            buttonState(this, false);
-            $(this).html("正在重新下载...");
-            down.downloader(fragment);
-        });
-        $('#errorTsList').append(html);
     });
     // 切片下载完成
     down.on('completed', function (buffer, fragment) {
-        if (down.isErrorObj(fragment)) {
-            $("#errorId" + fragment.index).remove();
-        }
         $progress.html(`${down.success}/${down.total}`);
         $fileSize.html("已下载:" + byteToSize(down.bufferize));
         // $fileDuration.html("已下载视频长度:" + secToTime(down.duration));
@@ -1125,6 +1119,9 @@ function downloadNew(start = 0, end = _fragments.length) {
         transmuxer?.off && transmuxer.off('data');
         transmuxer = undefined;
         transmuxerheadEncode = undefined;
+
+        $("#ForceDownload").hide(); // 强制下载
+        $("#errorDownload").hide(); // 重下所有失败项
     });
     // 全部下载完成
     down.on('itemProgress', function (fragment, state, receivedLength, contentLength, percentage) {
@@ -1147,6 +1144,22 @@ function downloadNew(start = 0, end = _fragments.length) {
     });
     // 开始下载
     down.start(start, end);
+
+    // 强制下载
+    $("#ForceDownload").click(function () {
+        $("#test").prop("checked") && mergeTsNew(down);
+    });
+
+    // 重新下载
+    $("#errorDownload").click(function () {
+        if (!$("#test").prop("checked")) { return; }
+        down.errorItem.forEach(function (fragment) {
+            const button = $(`#downItem${fragment.index} button`);
+            setTimeout(() => {
+                button.click();
+            }, fragment.index * 233);
+        });
+    });
 }
 // 下载ts出现错误
 function downloadTsError(index) {

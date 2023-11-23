@@ -15,11 +15,11 @@ class Downloader {
         this.buffer = [];                // 储存的buffer
         this.state = 'waiting';          // 下载器状态 waiting running done abort
         this.success = 0;                // 成功下载数量
-        this.errorList = new WeakSet();  // 下载错误的列表
+        this.errorList = new Set();      // 下载错误的列表
         this.bufferize = 0;              // 已下载buffer大小
         this.duration = 0;               // 已下载时长
         this.pushIndex = 0;              // 推送顺序下载索引
-        this.controller = [];
+        this.controller = [];            // 储存中断控制器
     }
     /**
      * 设置监听
@@ -60,7 +60,8 @@ class Downloader {
         this.transcode = callback;
     }
     /**
-     * 停止下载
+     * 停止下载 没有目标 停止所有线程
+     * @param {number} index 停止下载目标
      */
     stop(index = undefined) {
         if (index !== undefined) {
@@ -74,8 +75,14 @@ class Downloader {
      * @param {object} fragment 切片对象
      * @returns {boolean}
      */
-    isErrorObj(fragment) {
+    isErrorItem(fragment) {
         return this.errorList.has(fragment);
+    }
+    /**
+     * 返回所有错误列表
+     */
+    get errorItem() {
+        return this.errorList;
     }
     /**
      * 按照顺序推送buffer数据
