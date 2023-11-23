@@ -251,6 +251,9 @@ hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
 hls.on(Hls.Events.ERROR, function (event, data) {
     console.log(data);
     if (data.type == "mediaError" && data.details == "fragParsingError") {
+        if (data.error.message == "No ADTS header found in AAC PES") {
+            $("#tips").append("<b>可能是AES-128-ECB加密资源,暂不支持解密.请使用第三方合并软件...</b>");
+        }
         hls.stopLoad();
     }
     $("#loading").show();
@@ -1146,12 +1149,12 @@ function downloadNew(start = 0, end = _fragments.length) {
     down.start(start, end);
 
     // 强制下载
-    $("#ForceDownload").click(function () {
+    $("#ForceDownload").off("click").click(function () {
         $("#test").prop("checked") && mergeTsNew(down);
     });
 
     // 重新下载
-    $("#errorDownload").click(function () {
+    $("#errorDownload").off("click").click(function () {
         if (!$("#test").prop("checked")) { return; }
         down.errorItem.forEach(function (fragment) {
             const button = $(`#downItem${fragment.index} button`);

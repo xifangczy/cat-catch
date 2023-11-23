@@ -412,8 +412,9 @@ a.json-placeholder:hover {
 }
 #downList {
   overflow: scroll;
-  height: 50vh;
+  height: 60vh;
   text-align: left;
   display: none;
   width: 100%;
+  border: solid 1px var(--text-color);
 }
