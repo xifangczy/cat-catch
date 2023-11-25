@@ -158,10 +158,15 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
     console.log(data);
     $("#m3u8").show(); $("#loading").hide();
     let more = false;
+
     // 多个视频
-    if (data.levels.length > 1) {
-        $("#more_m3u8").show();
+    if (data.levels.length + data.audioTracks.length + data.subtitleTracks.length >= 2) {
         more = true;
+    }
+
+    // 多个视频
+    if (more && data.levels.length) {
+        $("#more_m3u8").show();
         for (let item of data.levels) {
             const [name, url] = getNewUrl(item);
             const html = `<div class="block">
@@ -172,9 +177,8 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
         }
     }
     // 多个音频
-    if (data.audioTracks.length >= 1) {
+    if (more && data.audioTracks.length) {
         $("#more_audio").show();
-        more = true;
         for (let item of data.audioTracks) {
             // 音频信息没有m3u8文件 使用groupId去寻找
             if (item.url == "") {
@@ -195,9 +199,8 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
         }
     }
     // 多个字幕
-    if (data.subtitleTracks.length >= 1) {
+    if (more && data.subtitleTracks.length) {
         $("#more_subtitle").show();
-        more = true;
         for (let item of data.subtitleTracks) {
             const [name, url] = getNewUrl(item);
             const html = `<div class="block">
