@@ -173,6 +173,9 @@ class Downloader {
         // 是否直接下载对象
         const directDownload = !!fragment;
 
+        // 非直接下载对象 从this.fragments获取下一条资源 若不存在跳出
+        if (!directDownload && !this.fragments[this.index]) { return; }
+
         // 不存在下载对象 从提取fragments
         fragment ??= this.fragments[this.index++];
         this.state = 'running';
@@ -193,7 +196,7 @@ class Downloader {
                 const reader = response.body.getReader();
                 const contentLength = response.headers.get('content-length');
                 let receivedLength = 0;
-                let chunks = [];
+                const chunks = [];
                 const pump = () => {
                     return reader.read().then(({ value, done }) => {
                         if (done) {
