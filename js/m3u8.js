@@ -155,7 +155,7 @@ hls.on(Hls.Events.MANIFEST_LOADED, function (event, data) {
 
 // 监听 MANIFEST_PARSED m3u8解析完成
 hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
-    // console.log(data);
+    console.log(data);
     $("#m3u8").show(); $("#loading").hide();
     let more = false;
     // 多个视频
@@ -172,7 +172,7 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
         }
     }
     // 多个音频
-    if (data.audioTracks.length > 1) {
+    if (data.audioTracks.length >= 1) {
         $("#more_audio").show();
         more = true;
         for (let item of data.audioTracks) {
@@ -188,14 +188,14 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
             }
             const [name, url] = getNewUrl(item);
             const html = `<div class="block">
-                    <div>${item.name ? item.name : ""} | ${item.lang ? item.lang : ""}</div>
+                    <div>${item.name ? item.name : ""} | ${item.lang ? item.lang : ""} | ${item.groupId ? item.groupId : ""}</div>
                     <a href="${url}">${name}</a>
                 </div>`;
             $("#next_audio").append(html);
         }
     }
     // 多个字幕
-    if (data.subtitleTracks.length > 1) {
+    if (data.subtitleTracks.length >= 1) {
         $("#more_subtitle").show();
         more = true;
         for (let item of data.subtitleTracks) {
@@ -1018,13 +1018,11 @@ function downloadNew(start = 0, end = _fragments.length) {
             if ($(this).data("action") == "stop") {
                 down.stop(fragment.index);
                 down.downloader();  // 停止当前下载器 重新开一个下载器保持线程数量
-                $(this).html("重新下载");
+                $(this).html("重新下载").data("action", "start");
                 html.find(".percentage").html("0%");
-                $(this).data("action", "start");
             } else {
                 down.downloader(fragment);
-                $(this).html("停止下载");
-                $(this).data("action", "stop");
+                $(this).html("停止下载").data("action", "stop");
             }
         });
         $downList.append(html);
@@ -1128,9 +1126,9 @@ function downloadNew(start = 0, end = _fragments.length) {
     });
     // 全部下载完成
     down.on('itemProgress', function (fragment, state, receivedLength, contentLength) {
-        if (!state) {
-            $(`#downItem${fragment.index} .percentage`).html((receivedLength / contentLength * 100).toFixed(2) + "%");
-        } else {
+        $(`#downItem${fragment.index} .percentage`).html((receivedLength / contentLength * 100).toFixed(2) + "%");
+        if (state) {
+            $(`#downItem${fragment.index} .percentage`).html("下载完成");
             $(`#downItem${fragment.index} button`).remove();
         }
     });
