@@ -22,4 +22,19 @@ if (typeof (browser) == "object") {
     chrome.windows.onFocusChanged.addListener = (listener, obj) => {
         browser.windows.onFocusChanged.addListener(listener);
     };
+
+    browser.runtime.onInstalled.addListener(({ reason }) => {
+        if (reason == "install") {
+            browser.tabs.create({ url: "privacy.html" });
+        }
+    });
+
+    if (typeof jQuery != "undefined") {
+        $('#firefoxYes').click(function () {
+            window.close();
+        });
+        $('#firefoxUninstallSelf').click(function () {
+            browser.management.uninstallSelf();
+        });
+    }
 }
