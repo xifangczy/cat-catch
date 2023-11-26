@@ -23,7 +23,7 @@ setRequestHeaders(requestHeaders, () => { awaitG(init); });
 
 // 默认设置
 const allOption = {
-    thread: 32,
+    thread: 16,
     mp4: false,
     onlyAudio: false,
     saveAs: false,
@@ -159,7 +159,7 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
     $("#m3u8").show(); $("#loading").hide();
     let more = false;
 
-    // 多个视频
+    // 多条资源
     if (data.levels.length + data.audioTracks.length + data.subtitleTracks.length >= 2) {
         more = true;
     }
@@ -578,6 +578,7 @@ $("#play").click(function () {
         $("#video").show();
         hls.attachMedia($("#video")[0]);
         $("#media_file").hide();
+        $("#downList").hide();
         $(this).html("关闭播放").data("switch", "off");
         hls.on(Hls.Events.MEDIA_ATTACHED, function () {
             video.play();
