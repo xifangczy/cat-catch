@@ -1115,6 +1115,7 @@ function downloadNew(start = 0, end = _fragments.length) {
     });
     // 全部下载完成
     down.on('allCompleted', function (buffer) {
+        if (recorder) { return; }
         if (fileStream) {
             fileStream.close();
             fileStream = undefined;
