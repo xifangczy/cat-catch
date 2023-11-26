@@ -202,6 +202,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
         G[key] = newValue;
     }
 });
+
 // 扩展升级，清空本地储存
 chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason == "update") {
