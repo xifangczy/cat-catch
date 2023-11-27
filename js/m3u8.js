@@ -23,7 +23,7 @@ setRequestHeaders(requestHeaders, () => { awaitG(init); });
 
 // 默认设置
 const allOption = {
-    thread: 16,
+    thread: 6,
     mp4: false,
     onlyAudio: false,
     saveAs: false,
