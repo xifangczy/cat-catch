@@ -1197,11 +1197,17 @@ function mergeTsNew(down) {
     // ffmpeg 转码
     if ($("#ffmpeg").prop("checked")) {
         if (fileBlob.size < 2147483648) {
+            let title = GetFileName(_title ?? _m3u8Url);
+            if (ext != "mp4" && ext != "mp3") {
+                title = title + ".mp4";
+            } else {
+                title = title + "." + ext;
+            }
             chrome.runtime.sendMessage({
                 Message: "catCatchFFmpeg",
                 action: $("#onlyAudio").prop("checked") ? "onlyAudio" : "transcode",
                 media: [{ data: URL.createObjectURL(fileBlob), name: `memory${new Date().getTime()}.${ext}` }],
-                title: `${GetFileName(_m3u8Url)}`,
+                title: title,
                 name: "memory" + new Date().getTime() + "." + ext
             });
             buttonState("#mergeTs", true);
