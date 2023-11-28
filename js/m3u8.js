@@ -1110,6 +1110,12 @@ function downloadNew(start = 0, end = _fragments.length) {
     });
     // 切片下载完成
     down.on('completed', function (buffer, fragment) {
+        if (recorder) {
+            $progress.html(`等待直播数据中...`);
+            downDuration += fragment.duration;
+            $fileDuration.html("录制时长:" + secToTime(downDuration));
+            return;
+        }
         $progress.html(`${down.success}/${down.total}`);
         $fileSize.html("已下载:" + byteToSize(down.bufferize));
         // $fileDuration.html("已下载视频长度:" + secToTime(down.duration));
