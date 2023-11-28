@@ -1209,9 +1209,12 @@ function mergeTsNew(down) {
     } else {
         fileName = GetFileName(_m3u8Url);
     }
+    // 删除目录
+    fileName = fileName.split("/");
+    fileName = fileName.length > 1 ? fileName.pop() : fileName.join("");
     // 删除后缀
     if (/\.[a-zA-Z0-9]{1,4}$/.test(fileName)) {
-        fileName = fileName.split(".")
+        fileName = fileName.split(".");
         fileName.pop();
         fileName = fileName.join(".");
     }
