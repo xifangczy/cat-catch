@@ -5,6 +5,7 @@ let _m3u8Url = params.get("url");
 const _requestHeaders = params.get("requestHeaders");
 const _initiator = params.get("initiator");
 const _title = params.get("title");
+const _fileName = params.get("filename");
 let tsAddArg = params.get("tsAddArg");
 let autoReferer = params.get("autoReferer");
 const tabId = parseInt(params.get("tabid"));
@@ -1194,20 +1195,34 @@ function mergeTsNew(down) {
     ext = ext ? ext : "ts";
     ext = down.transcode ? "mp4" : ext;
 
+    let fileName = "";
+    if ($('#customFilename').val()) {
+        fileName = $('#customFilename').val().trim();
+    } else if (_fileName) {
+        fileName = _fileName;
+    } else {
+        fileName = GetFileName(_m3u8Url);
+    }
+    // 删除后缀
+    if (/\.[a-zA-Z0-9]{1,4}$/.test(fileName)) {
+        fileName = fileName.split(".")
+        fileName.pop();
+        fileName = fileName.join(".");
+    }
+
     // ffmpeg 转码
     if ($("#ffmpeg").prop("checked")) {
         if (fileBlob.size < 2147483648) {
-            let title = GetFileName(_title ?? _m3u8Url);
             if (ext != "mp4" && ext != "mp3") {
-                title = title + ".mp4";
+                fileName = fileName + ".mp4";
             } else {
-                title = title + "." + ext;
+                fileName = fileName + "." + ext;
             }
             chrome.runtime.sendMessage({
                 Message: "catCatchFFmpeg",
                 action: $("#onlyAudio").prop("checked") ? "onlyAudio" : "transcode",
                 media: [{ data: URL.createObjectURL(fileBlob), name: `memory${new Date().getTime()}.${ext}` }],
-                title: title,
+                title: fileName,
                 name: "memory" + new Date().getTime() + "." + ext
             });
             buttonState("#mergeTs", true);
@@ -1221,7 +1236,7 @@ function mergeTsNew(down) {
 
     chrome.downloads.download({
         url: URL.createObjectURL(fileBlob),
-        filename: `${GetFileName(_m3u8Url)}.${ext}`,
+        filename: fileName = fileName + "." + ext,
         saveAs: $("#saveAs").prop("checked")
     }, function (downloadId) { downId = downloadId });
     buttonState("#mergeTs", true);

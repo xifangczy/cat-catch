@@ -300,7 +300,7 @@ function AddMedia(data, currentTab = true) {
     //解析m3u8
     data.html.find('#parsing').click(function () {
         chrome.tabs.get(G.tabId, function (tab) {
-            let url = `/${data.parsing}.html?url=${encodeURIComponent(data.url)}&title=${encodeURIComponent(data.title)}&tabid=${data.tabId == -1 ? G.tabId : data.tabId}&initiator=${encodeURIComponent(data.initiator)}`;
+            let url = `/${data.parsing}.html?url=${encodeURIComponent(data.url)}&title=${encodeURIComponent(data.title)}&filename=${encodeURIComponent(data.downFileName)}&tabid=${data.tabId == -1 ? G.tabId : data.tabId}&initiator=${encodeURIComponent(data.initiator)}`;
             if (data.requestHeaders) {
                 url += `&requestHeaders=${encodeURIComponent(JSON.stringify(data.requestHeaders))}`;
             }
