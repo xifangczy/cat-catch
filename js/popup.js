@@ -226,7 +226,7 @@ function AddMedia(data, currentTab = true) {
     // 发送到Aria2
     data.html.find('#aria2').click(function () {
         const params = { out: data.downFileName };
-        if (data.requestHeaders?.referer) {
+        if (G.enableAria2RpcReferer && data.requestHeaders?.referer) {
             params.referer = data.requestHeaders.referer;
         }
         $.ajax({
