@@ -1,6 +1,7 @@
 class Downloader {
     constructor(fragments = [], thread = 16) {
         this.fragments = fragments;      // 切片列表
+        this.allFragments = fragments;   // 储存所有原始切片列表
         this.thread = thread;            // 线程数
         this.events = {};                // events
         this.decrypt = null;             // 解密函数
@@ -289,6 +290,7 @@ class Downloader {
     destroy() {
         this.stop();
         this._fragments = [];
+        this.allFragments = [];
         this.thread = 32;
         this.events = {};
         this.decrypt = null;
