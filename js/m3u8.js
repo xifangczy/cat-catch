@@ -999,6 +999,11 @@ function downloadTs(start = 0, end = _fragments.length - 1, errorObj = undefined
     }, 10);
 }
 
+/**
+ * 调用新下载器的方法
+ * @param {number} start 下载范围 开始索引
+ * @param {number} end 下载范围 结束索引
+ */
 function downloadNew(start = 0, end = _fragments.length) {
 
     // 避免重复下载
@@ -1006,8 +1011,6 @@ function downloadNew(start = 0, end = _fragments.length) {
 
     // 切片下载器
     const down = new Downloader(_fragments, parseInt($("#thread").val()));
-
-    $("#media_file").hide();
 
     // 解密函数
     down.setDecrypt(function (buffer, fragment) {
@@ -1160,6 +1163,7 @@ function downloadNew(start = 0, end = _fragments.length) {
         });
         tempDOM.append(html);
     });
+    $("#media_file").hide();
     $("#downList").html("").show().append(tempDOM);
 
     // 强制下载
