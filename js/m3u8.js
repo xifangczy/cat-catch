@@ -1009,31 +1009,6 @@ function downloadNew(start = 0, end = _fragments.length) {
 
     $("#media_file").hide();
 
-    const tempDOM = $("<div>");
-    down.fragments.forEach((fragment) => {
-        const html = $(`<div id="downItem${fragment.index}">
-            <a href="${fragment.url}" target="_blank">${fragment.url}</a>
-            <div class="itemProgress">
-            <span>进度：</span>
-            <span class="percentage">待下载</span>
-            <button data-action="stop">停止下载</button>
-            </div>
-        </div>`);
-        html.find("button").click(function () {
-            html.find(".percentage").removeClass('error');
-            if ($(this).data("action") == "stop") {
-                down.stop(fragment.index);
-                down.downloader();  // 停止当前下载器 重新开一个下载器保持线程数量
-                $(this).html("重新下载").data("action", "start");
-            } else {
-                down.downloader(fragment);
-                $(this).html("停止下载").data("action", "stop");
-            }
-        });
-        tempDOM.append(html);
-    });
-    $("#downList").html("").show().append(tempDOM);
-
     // 解密函数
     down.setDecrypt(function (buffer, fragment) {
         return new Promise(function (resolve, reject) {
@@ -1160,6 +1135,32 @@ function downloadNew(start = 0, end = _fragments.length) {
     });
     // 开始下载
     down.start(start, end);
+
+    // 单项进度
+    const tempDOM = $("<div>");
+    down.fragments.forEach((fragment) => {
+        const html = $(`<div id="downItem${fragment.index}">
+            <a href="${fragment.url}" target="_blank">${fragment.url}</a>
+            <div class="itemProgress">
+            <span>进度：</span>
+            <span class="percentage">待下载</span>
+            <button data-action="stop">停止下载</button>
+            </div>
+        </div>`);
+        html.find("button").click(function () {
+            html.find(".percentage").removeClass('error');
+            if ($(this).data("action") == "stop") {
+                down.stop(fragment.index);
+                down.downloader();  // 停止当前下载器 重新开一个下载器保持线程数量
+                $(this).html("重新下载").data("action", "start");
+            } else {
+                down.downloader(fragment);
+                $(this).html("停止下载").data("action", "stop");
+            }
+        });
+        tempDOM.append(html);
+    });
+    $("#downList").html("").show().append(tempDOM);
 
     // 强制下载
     $("#ForceDownload").off("click").click(function () {
