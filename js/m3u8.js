@@ -1020,11 +1020,11 @@ function downloadNew(start = 0, end = _fragments.length) {
             </div>
         </div>`);
         html.find("button").click(function () {
+            html.find(".percentage").removeClass('error');
             if ($(this).data("action") == "stop") {
                 down.stop(fragment.index);
                 down.downloader();  // 停止当前下载器 重新开一个下载器保持线程数量
                 $(this).html("重新下载").data("action", "start");
-                html.find(".percentage").html("0%");
             } else {
                 down.downloader(fragment);
                 $(this).html("停止下载").data("action", "stop");
@@ -1099,7 +1099,7 @@ function downloadNew(start = 0, end = _fragments.length) {
         $("#errorDownload").show(); // 重下所有失败项
 
         const $dom = $(`#downItem${fragment.index}`);
-        $dom.find(".percentage").html("下载失败...");
+        $dom.find(".percentage").addClass('error').html("下载失败...");
         $button = $dom.find("button");
         $button.html("重新下载").data("action", "start");
         if (down.isErrorItem(fragment)) {

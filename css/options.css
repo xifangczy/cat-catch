@@ -10,6 +10,9 @@ body {
 .wrapper input {
   margin-right: 10px;
 }
+.error {
+  color: var(--text-error-color);
+}
 h1 {
   font-size: 1.125em;
   font-weight: normal;

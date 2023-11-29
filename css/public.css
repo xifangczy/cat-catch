@@ -4,6 +4,7 @@
   --background-color-opacity: #ffffffea;
   --background-color-two: #f5f5f5;
   --text-color: #000;
+  --text-error-color: #ff0000;
   --text2-color: rgb(26, 115, 232);
   --link-color: #3079ed;
 
@@ -125,6 +126,7 @@ button:active {
     --background-color-opacity: #0f172aea;
     --background-color-two: #1e293b;
     --text-color: #fff;
+    --text-error-color: #ff0000;
     --text2-color: #fff;
     --link-color: #94a3b8;
 
