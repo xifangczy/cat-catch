@@ -70,6 +70,7 @@ class Downloader {
             return;
         }
         this.controller.forEach(controller => { controller.abort() });
+        this.state = 'abort';
     }
     /**
      * 检查对象是否错误列表内
@@ -258,7 +259,6 @@ class Downloader {
                 }
             }).catch((error) => {
                 if (error.name == 'AbortError') {
-                    // this.state = 'abort';
                     this.emit('stop', fragment, error);
                     return;
                 }
