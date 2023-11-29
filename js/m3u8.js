@@ -45,7 +45,6 @@ const initData = new Map(); // 储存map的url
 const decryptor = new AESDecryptor(); // 解密工具 来自hls.js 分离出来的
 let skipDecrypt = false; // 是否跳过解密
 /* 下载相关 */
-// const down = new FragmentDownloader();
 let downId = 0; // 下载id
 let stopDownload = false; // 停止下载flag
 let fileSize = 0; // 文件大小
@@ -256,7 +255,7 @@ hls.on(Hls.Events.ERROR, function (event, data) {
     console.log(data);
     if (data.type == "mediaError" && data.details == "fragParsingError") {
         if (data.error.message == "No ADTS header found in AAC PES") {
-            $("#tips").append("<b>可能是AES-128-ECB加密资源,暂不支持解密.请使用第三方合并软件...</b>");
+            $("#tips").append("<b>找不到ADTS头 可能是AES-128-ECB加密资源,暂不支持解密.请使用第三方合并软件...</b>");
         }
         hls.stopLoad();
     }
@@ -1001,21 +1000,22 @@ function downloadTs(start = 0, end = _fragments.length - 1, errorObj = undefined
 }
 
 function downloadNew(start = 0, end = _fragments.length) {
+
+    // 避免重复下载
+    buttonState("#mergeTs", false);
+
     // 切片下载器
     const down = new Downloader(_fragments, parseInt($("#thread").val()));
 
     $("#media_file").hide();
-    const $downList = $("#downList");
-    $downList.html("").show();
-    down.on('start', function (fragment) {
-        if ($(`#downItem${fragment.index}`).length) {
-            return;
-        }
+
+    const tempDOM = $("<div>");
+    down.fragments.forEach((fragment) => {
         const html = $(`<div id="downItem${fragment.index}">
             <a href="${fragment.url}" target="_blank">${fragment.url}</a>
             <div class="itemProgress">
             <span>进度：</span>
-            <span class="percentage">0%</span>
+            <span class="percentage">待下载</span>
             <button data-action="stop">停止下载</button>
             </div>
         </div>`);
@@ -1030,8 +1030,9 @@ function downloadNew(start = 0, end = _fragments.length) {
                 $(this).html("停止下载").data("action", "stop");
             }
         });
-        $downList.append(html);
+        tempDOM.append(html);
     });
+    $("#downList").html("").show().append(tempDOM);
 
     // 解密函数
     down.setDecrypt(function (buffer, fragment) {
@@ -1135,8 +1136,10 @@ function downloadNew(start = 0, end = _fragments.length) {
 
         $("#ForceDownload").hide(); // 强制下载
         $("#errorDownload").hide(); // 重下所有失败项
+
+        buttonState("#mergeTs", true);
     });
-    // 全部下载完成
+    // 单个项目下载进度
     down.on('itemProgress', function (fragment, state, receivedLength, contentLength) {
         $(`#downItem${fragment.index} .percentage`).html((receivedLength / contentLength * 100).toFixed(2) + "%");
         if (state) {

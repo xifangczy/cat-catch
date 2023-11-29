@@ -257,7 +257,7 @@ class Downloader {
                 }
             }).catch((error) => {
                 if (error.name == 'AbortError') {
-                    this.state = 'abort';
+                    // this.state = 'abort';
                     this.emit('stop', fragment, error);
                     return;
                 }
