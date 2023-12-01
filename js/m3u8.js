@@ -10,6 +10,7 @@ let tsAddArg = params.get("tsAddArg");
 let autoReferer = params.get("autoReferer");
 const tabId = parseInt(params.get("tabid"));
 const key = params.get("key");
+const _tabid = params.get("tabid");
 
 // 修改当前标签下的所有xhr的Referer 修改完成 运行init函数
 let requestHeaders = {};
@@ -68,11 +69,19 @@ const $fileSize = $("#fileSize");
 const $progress = $("#progress");
 const $fileDuration = $("#fileDuration");
 const $m3u8dlArg = $("#m3u8dlArg");
+let pageDOM = null;
 
 /**
  * 初始化函数，界面默认配置 loadSource载入 m3u8 url
  */
 function init() {
+    // 获取页面DOM
+    if (_tabid) {
+        chrome.tabs.sendMessage(parseInt(_tabid), { Message: "getPage" }, { frameId: 0 }, function (result) {
+            if (chrome.runtime.lastError) { return; }
+            pageDOM = new DOMParser().parseFromString(result, 'text/html');
+        });
+    }
     // 自定义CSS
     $(`<style>${G.css}</style>`).appendTo("head");
 
@@ -596,7 +605,8 @@ $("#m3u8DL").click(function () {
         alert("blob地址无法调用m3u8DL下载");
         return;
     }
-    const m3u8dlArg = $m3u8dlArg.val();
+    const m3u8dlArg = getM3u8DlArg();
+    $m3u8dlArg.val(m3u8dlArg);
     navigator.clipboard.writeText(m3u8dlArg);
     const m3u8dl = 'm3u8dl://' + Base64.encode(m3u8dlArg);
     if (m3u8dl.length >= 2046) {
@@ -606,11 +616,13 @@ $("#m3u8DL").click(function () {
 });
 // 复制m3u8DL命令
 $("#copyM3U8dl").click(function () {
-    const m3u8dlArg = $m3u8dlArg.val();
+    const m3u8dlArg = getM3u8DlArg();
+    $m3u8dlArg.val(m3u8dlArg);
     navigator.clipboard.writeText(m3u8dlArg);
 });
-// m3u8DL参数设置
+// 显示m3u8DL命令
 $("#setM3u8dl").click(function () {
+    $m3u8dlArg.val(getM3u8DlArg());
     $m3u8dlArg.slideToggle();
 });
 // 设置载入参数
@@ -1548,6 +1560,7 @@ function getM3u8DlArg() {
         referer: requestHeaders.referer,
         initiator: requestHeaders.referer ?? _initiator
     }
+    data.pageDOM = pageDOM ?? undefined;
     m3u8dlArg = templates(m3u8dlArg, data);
 
     if (!addParam) { return m3u8dlArg; }
