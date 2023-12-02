@@ -42,18 +42,11 @@ function isEmpty(obj) {
 // 修改请求头
 function setRequestHeaders(data = {}, callback = undefined) {
     chrome.tabs.getCurrent(function (tabs) {
-        const rules = { removeRuleIds: [1] };
+        const rules = { removeRuleIds: [tabs ? tabs.id : 1] };
         if (Object.keys(data).length) {
-            const requestHeaders = [];
-            for (let key in data) {
-                requestHeaders.push({
-                    "header": key,
-                    "operation": "set",
-                    "value": data[key]
-                });
-            }
+            const requestHeaders = Object.keys(data).map(key => ({ header: key, operation: "set", value: data[key] }));
             rules.addRules = [{
-                "id": 1,
+                "id": tabs ? tabs.id : 1,
                 "action": {
                     "type": "modifyHeaders",
                     "requestHeaders": requestHeaders
@@ -63,8 +56,6 @@ function setRequestHeaders(data = {}, callback = undefined) {
                 }
             }];
             if (tabs) {
-                rules.removeRuleIds = [tabs.id]
-                rules.addRules[0].id = tabs.id;
                 rules.addRules[0].condition.tabIds = [tabs.id];
             }
         }
