@@ -1028,10 +1028,11 @@ function downloadNew(start = 0, end = _fragments.length) {
     down.setDecrypt(function (buffer, fragment) {
         return new Promise(function (resolve, reject) {
             // 如果存在MAP切片 把MAP整合进buffer
-            if (fragment.initSegment && fragment.initSegment.data) {
-                const initLength = fragment.initSegment.data.byteLength;
+            if (fragment.initSegment) {
+                const initSegmentData = initData.get(fragment.initSegment.url);
+                const initLength = initSegmentData.byteLength;
                 const newData = new Uint8Array(initLength + buffer.byteLength);
-                newData.set(fragment.initSegment.data, 0);
+                newData.set(new Uint8Array(initSegmentData), 0);
                 newData.set(new Uint8Array(buffer), initLength);
                 buffer = newData.buffer;
             }
