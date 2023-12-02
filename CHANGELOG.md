@@ -6,9 +6,11 @@
 
 [Fixed] 特殊字符造成无法下载的问题 #253
 
+[Fixed] m3u8 解析器 没有解析出全部嵌套 m3u8 的 bug #265
+
 [Added] firefox 增加 privacy 协议页面 第一次安装显示
 
-[Added] 增加 Aria2 Rpc 协议下载
+[Added] 增加 Aria2 Rpc 协议下载 感谢 @aar0u
 
 [Changed] 重写录制脚本
 
