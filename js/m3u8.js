@@ -121,7 +121,7 @@ function init() {
                 return;
             }
             if (referer != "") {
-                setReferer(referer);
+                setRequestHeaders({ referer: referer });
             }
             if (!m3u8Text.includes("#EXTM3U")) {
                 // ts列表链接 转 m3u8
@@ -1211,6 +1211,8 @@ function downloadTsError(index) {
 }
 // 合并下载
 function mergeTsNew(down) {
+    $progress.html("正在合并...");
+
     // 创建Blob
     const fileBlob = new Blob(down.buffer, { type: down.transcode ? "video/mp4" : "video/MP2T" });
 

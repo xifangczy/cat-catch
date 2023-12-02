@@ -40,7 +40,7 @@ function isEmpty(obj) {
 }
 
 // 修改请求头
-function setRequestHeaders(data = {}, callback) {
+function setRequestHeaders(data = {}, callback = undefined) {
     chrome.tabs.getCurrent(function (tabs) {
         const rules = { removeRuleIds: [1] };
         if (Object.keys(data).length) {
@@ -74,65 +74,6 @@ function setRequestHeaders(data = {}, callback) {
         });
     });
 }
-
-// 修改请求头Referer
-function setReferer(referer, callback) {
-    chrome.tabs.getCurrent(function (tabs) {
-        const rules = { removeRuleIds: [tabs.id] };
-        if (referer) {
-            rules.addRules = [{
-                "id": tabs.id,
-                "action": {
-                    "type": "modifyHeaders",
-                    "requestHeaders": [{
-                        "header": "Referer",
-                        "operation": "set",
-                        "value": referer
-                    }]
-                },
-                "condition": {
-                    "tabIds": [tabs.id],
-                    "resourceTypes": ["xmlhttprequest"]
-                }
-            }];
-        }
-        chrome.declarativeNetRequest.updateSessionRules(rules, function () {
-            callback && callback();
-        });
-    });
-}
-function setRefererPopup(referer, callback) {
-    const rules = { removeRuleIds: [1] };
-    if (referer) {
-        rules.addRules = [{
-            "id": 1,
-            "action": {
-                "type": "modifyHeaders",
-                "requestHeaders": [{
-                    "header": "Referer",
-                    "operation": "set",
-                    "value": referer
-                }]
-            },
-            "condition": {
-                "resourceTypes": ["xmlhttprequest", "media", "image"]
-            }
-        }];
-    }
-    chrome.declarativeNetRequest.updateSessionRules(rules, function () {
-        callback && callback();
-    });
-}
-function deleteReferer(callback) {
-    chrome.tabs.getCurrent(function (tabs) {
-        chrome.declarativeNetRequest.updateSessionRules({
-            removeRuleIds: [tabs.id]
-        }, function () {
-            callback && callback();
-        });
-    });
-}
-
 
 function awaitG(callback, sec = 0) {
     const timer = setInterval(() => {

@@ -1,10 +1,20 @@
 // url 参数解析
 const params = new URL(location.href).searchParams;
 const _url = params.get("url");
-const _referer = params.get("referer");
+// const _referer = params.get("referer");
+const _requestHeaders = params.get("requestHeaders");
 const _title = params.get("title");
-// 修改当前标签下的所有xhr的Referer
-_referer && setReferer(_referer);
+
+// 修改当前标签下的所有xhr的requestHeaders
+let requestHeaders = {};
+if (_requestHeaders) {
+    try {
+        requestHeaders = JSON.parse(_requestHeaders);
+    } catch (e) {
+        requestHeaders = {};
+    }
+}
+setRequestHeaders(requestHeaders, () => { awaitG(init); });
 
 var mpdJson = {}; // 解析器json结果
 var mpdXml = {}; // 解析器xml结果
@@ -18,10 +28,8 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     }
 });
 
-$(function () {
-    awaitG(function () {
-        $(`<style>${G.css}</style>`).appendTo("head");
-    });
+function init() {
+    $(`<style>${G.css}</style>`).appendTo("head");
     if (_url) {
         fetch(_url)
             .then(response => response.text())
@@ -84,7 +92,7 @@ $(function () {
             chrome.tabs.create({ url: "m3u8.html?getId=" + tabs.id });
         });
     });
-});
+}
 
 function parseMPD() {
     $("#loading").hide(); $("#main").show();

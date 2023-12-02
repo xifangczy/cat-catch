@@ -1,14 +1,22 @@
 // url 参数解析
 const params = new URL(location.href).searchParams;
 var _url = params.get("url");
-const _referer = params.get("referer");
-// 修改当前标签下的所有xhr的Referer
-_referer && setReferer(_referer);
+// const _referer = params.get("referer");
+const _requestHeaders = params.get("requestHeaders");
 
-$(function () {
-    awaitG(function () {
-        $(`<style>${G.css}</style>`).appendTo("head");
-    });
+// 修改当前标签下的所有xhr的requestHeaders
+let requestHeaders = {};
+if (_requestHeaders) {
+    try {
+        requestHeaders = JSON.parse(_requestHeaders);
+    } catch (e) {
+        requestHeaders = {};
+    }
+}
+setRequestHeaders(requestHeaders, () => { awaitG(init); });
+
+function init() {
+    $(`<style>${G.css}</style>`).appendTo("head");
     var jsonContent = "";
     var options = {
         collapsed: true,
@@ -81,4 +89,4 @@ $(function () {
         }
         renderJson();
     });
-});
+}

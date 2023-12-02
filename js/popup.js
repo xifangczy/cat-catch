@@ -139,10 +139,6 @@ function AddMedia(data, currentTab = true) {
             mediaInfo.data("state", true);
             if (isM3U8(data)) {
                 const hls = new Hls({ enableWorker: false });
-                // setRefererPopup(data.referer, function () {
-                //     hls.loadSource(data.url);
-                //     hls.attachMedia(preview[0]);
-                // });
                 setRequestHeaders(data.requestHeaders, function () {
                     hls.loadSource(data.url);
                     hls.attachMedia(preview[0]);
