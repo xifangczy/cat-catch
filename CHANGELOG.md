@@ -1,5 +1,25 @@
 ## 更新说明
 
+### 2.4.7
+
+[Fixed] 缓存捕获 延迟获取标题 #241
+
+[Fixed] 特殊字符造成无法下载的问题 #253
+
+[Added] firefox 增加 privacy 协议页面 第一次安装显示
+
+[Added] 增加 Aria2 Rpc 协议下载
+
+[Changed] 重写录制脚本
+
+[Changed] 增强深度搜索
+
+[Changed] m3u8 解析器 现在可以自定义头属性
+
+[Changed] m3u8 解析器 最大下载线程调整为 6
+
+[Changed] m3u8 解析器 默认开启新下载器
+
 ### 2.4.6
 
 [Fixed] 缓存捕获 多个视频问题 #239
