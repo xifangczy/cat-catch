@@ -270,28 +270,6 @@ hls.on(Hls.Events.ERROR, function (event, data) {
     }
     $("#loading").show();
     $("#loading .optionBox").html(`解析或播放m3u8文件中有错误, 详细错误信息查看控制台<button id="setRequestHeadersError">设置请求头</button>`);
-    // // 出错 如果正在录制中 自动点击下载录制按钮
-    // if (recorder) {
-    //     $("#recorder").click();
-    //     autoReferer = true;
-    // }
-    // if (!_initiator && !_referer) {
-    //     autoReferer = true;
-    // }
-    // // 尝试添加删除referer
-    // if (data.type == "networkError" && data.details != "keyLoadError") {
-    //     let href = window.location.href;
-    //     if (_referer) {
-    //         href = href.replace("&referer=", "&initiator=");
-    //         $("#loading .optionBox").append(`<p><a href="${href}">删除Referer重新尝试</a></p>`);
-    //     } else if (_initiator) {
-    //         href = href.replace("&initiator=", "&referer=");
-    //         $("#loading .optionBox").append(`<p><a href="${href}">添加Referer重新尝试</a></p>`);
-    //     }
-    //     if (!autoReferer) {
-    //         window.location.href = href + "&autoReferer=1";
-    //     }
-    // }
 
     // 出错 如果正在录制中 自动点击下载录制按钮
     if (recorder) {
@@ -302,12 +280,14 @@ hls.on(Hls.Events.ERROR, function (event, data) {
 
     // 尝试添加 / 删除请求头
     if (data.type == "networkError" && data.details != "keyLoadError") {
-        let href = window.location.href;
-        if (!Object.keys(requestHeaders).length && _initiator) {
-            href += "&requestHeaders=" + encodeURIComponent(JSON.stringify({ "Referer": _initiator }));
-            $("#loading .optionBox").append(`<p><a href="${href}">添加请求头重新尝试</a></p> <button id="setRequestHeadersError">设置请求头</button>`);
+        if (requestHeaders.referer) {
+            params.delete("requestHeaders");
+        } else if (_initiator) {
+            params.delete("requestHeaders");
+            params.append("requestHeaders", JSON.stringify({ "referer": _initiator }));
         }
-        if (!autoReferer) {
+        const href = window.location.origin + window.location.pathname + "?" + params.toString();
+        if (!autoReferer && window.location.href != href) {
             window.location.href = href + "&autoReferer=1";
         }
     }
