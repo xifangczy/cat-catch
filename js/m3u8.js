@@ -13,14 +13,7 @@ const key = params.get("key");
 const _tabid = params.get("tabid");
 
 // 修改当前标签下的所有xhr的Referer 修改完成 运行init函数
-let requestHeaders = {};
-if (_requestHeaders) {
-    try {
-        requestHeaders = JSON.parse(_requestHeaders);
-    } catch (e) {
-        requestHeaders = {};
-    }
-}
+let requestHeaders = JSONparse(_requestHeaders);
 setRequestHeaders(requestHeaders, () => { awaitG(init); });
 
 // 默认设置

@@ -11,14 +11,7 @@ const title = params.get("title");
 // const fileFlag = params.get("fileFlag");
 
 // 修改当前标签下的所有xhr的Referer
-let requestHeaders = {};
-if (_requestHeaders) {
-    try {
-        requestHeaders = JSON.parse(_requestHeaders);
-    } catch (e) {
-        requestHeaders = {};
-    }
-}
+let requestHeaders = JSONparse(_requestHeaders);
 if (!requestHeaders.referer) {
     requestHeaders.referer = _initiator;
 }

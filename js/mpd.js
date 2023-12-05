@@ -6,14 +6,7 @@ const _requestHeaders = params.get("requestHeaders");
 const _title = params.get("title");
 
 // 修改当前标签下的所有xhr的requestHeaders
-let requestHeaders = {};
-if (_requestHeaders) {
-    try {
-        requestHeaders = JSON.parse(_requestHeaders);
-    } catch (e) {
-        requestHeaders = {};
-    }
-}
+let requestHeaders = JSONparse(_requestHeaders);
 setRequestHeaders(requestHeaders, () => { awaitG(init); });
 
 var mpdJson = {}; // 解析器json结果

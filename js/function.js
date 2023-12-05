@@ -242,3 +242,17 @@ const filePatch = {
         return buffer.buffer;
     }
 }
+/**
+ * 解析json字符串 解析错误返回默认值
+ * @param {string} str json字符串
+ * @param {object} error 解析错误返回的默认值
+ * @returns {object} 返回解析后的对象
+ */
+function JSONparse(str, error = {}) {
+    if (!str) { return error; }
+    try {
+        return JSON.parse(str);
+    } catch (e) {
+        return error;
+    }
+}
