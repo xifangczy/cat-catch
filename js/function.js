@@ -148,15 +148,15 @@ function templatesFunction(text, action, data) {
                 text = text.toLowerCase();
             } else if (arg[0] == "upperCase") {
                 text = text.toUpperCase();
+            } else if (arg[0] == "trim") {
+                text = text.trim();
             }
         } else if (action == "find") {
             text = "";
             if (data.pageDOM) {
                 try {
                     text = data.pageDOM.querySelector(arg[0]).innerHTML;
-                } catch (e) {
-                    console.log(e);
-                }
+                } catch (e) { text = ""; }
             }
         } else {
             text = ""; break;
