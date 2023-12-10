@@ -166,12 +166,6 @@ function templatesFunction(text, action, data) {
 }
 function templates(text, data) {
     if (isEmpty(text)) { return ""; }
-    // 日期
-    const date = new Date();
-    data.days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][date.getDay()];
-    data.now = Date.now();
-    data.fullDate = `${date.getFullYear()}-${appendZero(date.getMonth() + 1)}-${appendZero(date.getDate())}`;
-    data.time = `${appendZero(date.getHours())}'${appendZero(date.getMinutes())}'${appendZero(date.getSeconds())}`;
     // fullFileName
     data.fullFileName = new URL(data.url).pathname.split("/").pop();
     // fileName
@@ -183,34 +177,39 @@ function templates(text, data) {
         data.ext = data.fullFileName.split(".");
         data.ext = data.ext.length == 1 ? "" : data.ext[data.ext.length - 1];
     }
-    // 标签
-    const tags = {
-        "$url$": data.url,
-        "$referer$": data.requestHeaders?.referer ?? data.initiator,
-        "$title$": data.title,
-        "${url}": data.url ?? "",
-        "${referer}": data.requestHeaders?.referer ?? "",
-        "${initiator}": data.requestHeaders?.referer ? data.requestHeaders.referer : data.initiator,
-        "${webUrl}": data.webUrl ?? "",
-        "${title}": data._title ?? data.title,
-        "${now}": data.now,
-        "${year}": date.getFullYear(),
-        "${month}": appendZero(date.getMonth() + 1),
-        "${date}": appendZero(date.getDate()),
-        "${day}": data.days,
-        "${hours}": appendZero(date.getHours()),
-        "${minutes}": appendZero(date.getMinutes()),
-        "${seconds}": appendZero(date.getSeconds()),
-        "${fullDate}": data.fullDate,
-        "${time}": data.time,
-        "${fullFileName}": data.fullFileName ? data.fullFileName : "",
-        "${fileName}": data.fileName ? data.fileName : "",
-        "${ext}": data.ext ? data.ext : "",
-        "${mobileUserAgent}": G.MobileUserAgent,
-        "${userAgent}": G.userAgent ? G.userAgent : navigator.userAgent,
+    const date = new Date();
+    data = {
+        // 资源信息
+        url: data.url ?? "",
+        referer: data.requestHeaders?.referer ?? "",
+        initiator: data.requestHeaders?.referer ? data.requestHeaders.referer : data.initiator,
+        webUrl: data.webUrl ?? "",
+        title: data._title ?? data.title,
+
+        // 时间相关
+        year: date.getFullYear(),
+        month: appendZero(date.getMonth() + 1),
+        date: appendZero(date.getDate()),
+        day: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][date.getDay()],
+        fullDate: `${date.getFullYear()}-${appendZero(date.getMonth() + 1)}-${appendZero(date.getDate())}`,
+        time: `${appendZero(date.getHours())}'${appendZero(date.getMinutes())}'${appendZero(date.getSeconds())}`,
+        hours: appendZero(date.getHours()),
+        minutes: appendZero(date.getMinutes()),
+        seconds: appendZero(date.getSeconds()),
+        now: Date.now(),
+
+        // 文件名
+        fullFileName: data.fullFileName ? data.fullFileName : "",
+        fileName: data.fileName ? data.fileName : "",
+        ext: data.ext ?? "",
+
+        // 全局变量
+        mobileUserAgent: G.MobileUserAgent,
+        userAgent: G.userAgent ? G.userAgent : navigator.userAgent,
     }
-    for (let key in tags) {
-        text = text.replaceAll(key, tags[key]);
+    // 开始替换
+    for (let key in data) {
+        text = text.replaceAll('${' + key + '}', data[key]);
     }
     //函数支持
     text = text.replace(reTemplates, function (original, tag, action) {
