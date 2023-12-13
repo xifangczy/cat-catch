@@ -225,15 +225,20 @@ function AddMedia(data, currentTab = true) {
         if (G.enableAria2RpcReferer && data.requestHeaders?.referer) {
             params.referer = data.requestHeaders.referer;
         }
+        const json = {
+            "jsonrpc": "2.0",
+            "id": "id" + new Date().getTime(),
+            "method": "aria2.addUri",
+            "params": []
+        };
+        if(G.aria2RpcToken){
+            json.params.push(`token:${G.aria2RpcToken}`);
+        }
+        json.params.push([data.url], params);
         $.ajax({
             type: "POST",
             url: G.aria2Rpc,
-            data: JSON.stringify({
-                "jsonrpc": "2.0",
-                "id": "id1",
-                "method": "aria2.addUri",
-                "params": [[data.url], params]
-            }),
+            data: JSON.stringify(json),
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (data) {
