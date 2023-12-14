@@ -1533,7 +1533,7 @@ function getM3u8DlArg() {
     const data = {
         url: _m3u8Url,
         title: _title,
-        referer: requestHeaders.referer,
+        requestHeaders: {referer: requestHeaders.referer},
         initiator: requestHeaders.referer ?? _initiator
     }
     data.pageDOM = pageDOM ?? undefined;

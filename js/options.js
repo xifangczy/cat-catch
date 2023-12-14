@@ -169,7 +169,7 @@ $("#allDisable, #allEnable").bind("click", function () {
 function testTag() {
     const data = {
         url: $("#url").val(),
-        referer: $("#referer").val(),
+        requestHeaders : {referer: $("#referer").val()},
         initiator: $("#initiator").val(),
         webUrl: $("#webUrl").val(),
         title: $("#title").val(),
