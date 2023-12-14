@@ -185,6 +185,7 @@ function templates(text, data) {
         initiator: data.requestHeaders?.referer ? data.requestHeaders.referer : data.initiator,
         webUrl: data.webUrl ?? "",
         title: data._title ?? data.title,
+        pageDOM: data.pageDOM,
 
         // 时间相关
         year: date.getFullYear(),
