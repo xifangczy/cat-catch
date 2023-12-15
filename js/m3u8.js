@@ -1160,11 +1160,11 @@ function downloadNew(start = 0, end = _fragments.length) {
     // 重新下载
     $("#errorDownload").off("click").click(function () {
         if (!$("#test").prop("checked")) { return; }
-        down.errorItem.forEach(function (fragment) {
+        down.errorItem.forEach(function (fragment, index) {
             const button = $(`#downItem${fragment.index} button`);
             setTimeout(() => {
                 button.click();
-            }, fragment.index * 233);
+            }, index * 233);
         });
     });
 }
