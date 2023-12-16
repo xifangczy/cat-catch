@@ -263,8 +263,13 @@ class Downloader {
                     return;
                 }
                 this.emit('downloadError', fragment, error);
+
                 // 储存下载错误切片
                 !this.errorList.has(fragment) && this.errorList.add(fragment);
+
+                if (!directDownload && this.index < this.fragments.length) {
+                    this.downloader();
+                }
             });
     }
     /**
