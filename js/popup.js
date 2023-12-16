@@ -225,33 +225,11 @@ function AddMedia(data, currentTab = true) {
     });
     // 发送到Aria2
     data.html.find('#aria2').click(function () {
-        const params = { out: data.downFileName };
-        if (G.enableAria2RpcReferer && data.requestHeaders?.referer) {
-            params.referer = data.requestHeaders.referer;
-        }
-        const json = {
-            "jsonrpc": "2.0",
-            "id": "id" + new Date().getTime(),
-            "method": "aria2.addUri",
-            "params": []
-        };
-        if (G.aria2RpcToken) {
-            json.params.push(`token:${G.aria2RpcToken}`);
-        }
-        json.params.push([data.url], params);
-        $.ajax({
-            type: "POST",
-            url: G.aria2Rpc,
-            data: JSON.stringify(json),
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function (data) {
-                Tips("已发送到 Aria2: " + JSON.stringify(data), 2000);
-            },
-            error: function (errMsg) {
-                Tips("发送到 Aria2 失败", 2000);
-                console.log(errMsg);
-            }
+        aria2AddUri(data, function (data) {
+            Tips("已发送到 Aria2: " + JSON.stringify(data), 2000);
+        }, function (errMsg) {
+            Tips("发送到 Aria2 失败", 2000);
+            console.log(errMsg);
         });
         return false;
     });
@@ -394,13 +372,21 @@ $('#DownFile').click(function () {
     if (checkedData.length >= 10 && !confirm("共 " + checkedData.length + "个文件，是否确认下载?")) {
         return;
     }
+    if (G.enableAria2Rpc) {
+        Tips("Aria2 正在提交任务", 2000);
+        checkedData.forEach(function (data) {
+            aria2AddUri(data);
+        });
+        Tips("Aria2 提交完毕", 2000);
+        return;
+    }
     checkedData.forEach(function (data) {
         setTimeout(function () {
             chrome.downloads.download({
                 url: data.url,
                 filename: data.downFileName
             }, function (id) { downData[id] = data; });
-        }, 500);
+        }, 233);
     });
 });
 // 合并下载
@@ -754,4 +740,39 @@ function getAllData() {
     data.push(...allData.get(true).values());
     data.push(...allData.get(false).values());
     return data;
+}
+/**
+ * ari2a RPC发送一套资源
+ * @param {object} data 资源对象
+ * @param {Function} success 成功运行函数
+ * @param {Function} error 失败运行函数
+ */
+function aria2AddUri(data, success, error) {
+    const json = {
+        "jsonrpc": "2.0",
+        "id": "cat-catch-" + data.requestId,
+        "method": "aria2.addUri",
+        "params": []
+    };
+    if (G.aria2RpcToken) {
+        json.params.push(`token:${G.aria2RpcToken}`);
+    }
+    const params = { out: data.downFileName };
+    if (G.enableAria2RpcReferer && data.requestHeaders?.referer) {
+        params.referer = data.requestHeaders.referer;
+    }
+    json.params.push([data.url], params);
+    $.ajax({
+        type: "POST",
+        url: G.aria2Rpc,
+        data: JSON.stringify(json),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function (data) {
+            success && success(data);
+        },
+        error: function (errMsg) {
+            error && error(errMsg);
+        }
+    });
 }
