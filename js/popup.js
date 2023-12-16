@@ -86,6 +86,10 @@ function AddMedia(data, currentTab = true) {
     }
     data.isPlay = isPlay(data);
 
+    if (allData.get(currentTab).has(data.requestId)) {
+        data.requestId = data.requestId + "_" + Date.now().toString();
+    }
+
     //添加html
     data.html = $(`
         <div class="panel">
@@ -231,7 +235,7 @@ function AddMedia(data, currentTab = true) {
             "method": "aria2.addUri",
             "params": []
         };
-        if(G.aria2RpcToken){
+        if (G.aria2RpcToken) {
             json.params.push(`token:${G.aria2RpcToken}`);
         }
         json.params.push([data.url], params);
