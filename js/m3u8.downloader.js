@@ -247,11 +247,6 @@ class Downloader {
 
                 this.emit('completed', buffer, fragment);
 
-                // 下载下一个切片
-                if (!directDownload && this.index < this.fragments.length) {
-                    this.downloader();
-                    return;
-                }
                 // 下载完成
                 if (this.success == this.fragments.length) {
                     this.state = 'done';
@@ -266,7 +261,8 @@ class Downloader {
 
                 // 储存下载错误切片
                 !this.errorList.has(fragment) && this.errorList.add(fragment);
-
+            }).finally(() => {
+                // 下载下一个切片
                 if (!directDownload && this.index < this.fragments.length) {
                     this.downloader();
                 }
