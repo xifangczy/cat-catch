@@ -504,18 +504,23 @@ chrome.downloads.onChanged.addListener(function (downloadDelta) {
 $(".openDir").click(function () {
     downId ? chrome.downloads.show(downId) : chrome.downloads.showDefaultFolder();
 });
-// 下载显示的内容
+// 下载ts列表
 $("#downText").click(function () {
-    let text = $("#media_file").val().replace(/\n\n/g, "\n");
-    text = encodeURIComponent(text);
-    let type = $("#media_file").data("type");
-    let downType = "data:text/plain,";
-    let filename = GetFileName(_m3u8Url) + '.txt';
-    if (type == "m3u8") {
-        downType = "data:application/vnd.apple.mpegurl,";
-        filename = GetFile(_m3u8Url);
-    }
-    text = downType + text;
+    // let text = $("#media_file").val().replace(/\n\n/g, "\n");
+    // text = encodeURIComponent(text);
+    // let type = $("#media_file").data("type");
+    // let downType = "data:text/plain,";
+    // let filename = GetFileName(_m3u8Url) + '.txt';
+    // if (type == "m3u8") {
+    //     downType = "data:application/vnd.apple.mpegurl,";
+    //     filename = GetFile(_m3u8Url);
+    // }
+
+    const filename = GetFileName(_m3u8Url) + '.txt';
+    let text = "data:text/plain,";
+    _fragments.forEach(function (item) {
+        text += item.url + "\n";
+    });
     if (G.isFirefox) {
         downloadDataURL(text, filename);
         return;
@@ -1081,9 +1086,10 @@ function downloadNew(start = 0, end = _fragments.length) {
             $fileDuration.html("录制时长:" + secToTime(downDuration));
             return;
         }
+        // $(`#downItem${fragment.index}`).remove();
         $progress.html(`${down.success}/${down.total}`);
         $fileSize.html("已下载:" + byteToSize(down.bufferize));
-        // $fileDuration.html("已下载视频长度:" + secToTime(down.duration));
+        $fileDuration.html("已下载视频长度:" + secToTime(down.duration));
     });
     // 全部下载完成
     down.on('allCompleted', function (buffer) {
