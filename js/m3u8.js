@@ -1234,9 +1234,10 @@ function mergeTsNew(down) {
             $progress.html("已发送给在线ffmpeg");
             return;
         }
-        buttonState("#mergeTs", true);
-        $progress.html("视频大于2G 无法使用在线ffmpeg");
-        return;
+        $progress.html("文件大于2G 无法使用在线ffmpeg, 正在下载合并文件, 文件较大请耐心等待...");
+        // buttonState("#mergeTs", true);
+        // $progress.html("视频大于2G 无法使用在线ffmpeg");
+        // return;
     }
 
     chrome.downloads.download({
@@ -1533,7 +1534,7 @@ function getM3u8DlArg() {
     const data = {
         url: _m3u8Url,
         title: _title,
-        requestHeaders: {referer: requestHeaders.referer},
+        requestHeaders: { referer: requestHeaders.referer },
         initiator: requestHeaders.referer ?? _initiator
     }
     data.pageDOM = pageDOM ?? undefined;
