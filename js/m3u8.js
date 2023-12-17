@@ -110,7 +110,11 @@ function init() {
             let m3u8Url = $("#m3u8Url").val().trim();
             let referer = $("#referer").val().trim();
             if (m3u8Url != "") {
-                chrome.tabs.update({ url: "m3u8.html?url=" + encodeURIComponent(m3u8Url) + "&referer=" + referer });
+                let url = "m3u8.html?url=" + encodeURIComponent(m3u8Url);
+                if (referer) {
+                    url += "&requestHeaders=" + encodeURIComponent(JSON.stringify({ referer: referer }));
+                }
+                chrome.tabs.update({ url: url });
                 return;
             }
             if (referer != "") {
@@ -220,7 +224,7 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
     }
     function getNewUrl(item) {
         const url = encodeURIComponent(item.uri ?? item.url);
-        const referer = requestHeaders.referer ? "&referer=" + encodeURIComponent(requestHeaders.referer) : "&initiator=" + (_initiator ? encodeURIComponent(_initiator) : "");
+        const referer = requestHeaders.referer ? "&requestHeaders=" + encodeURIComponent(JSON.stringify(requestHeaders)) : "&initiator=" + (_initiator ? encodeURIComponent(_initiator) : "");
         const title = _title ? encodeURIComponent(_title) : "";
         const name = GetFile(item.uri ?? item.url);
         let newUrl = `/m3u8.html?url=${url}${referer}`;

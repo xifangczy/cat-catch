@@ -38,7 +38,7 @@ function init() {
             let url = $("#mpdUrl").val().trim();;
             url = "mpd.html?url=" + encodeURIComponent(url);
             let referer = $("#referer").val().trim();;
-            if (referer) { url += "&referer=" + referer; }
+            if (referer) { url += "&requestHeaders=" + JSON.stringify({ referer: referer }); }
             chrome.tabs.update({ url: url });
         });
     }
