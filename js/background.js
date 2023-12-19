@@ -385,11 +385,11 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         chrome.tabs.query({}, function (tabs) {
             for (let item of tabs) {
                 if (item.url == Message.href) {
-                    findMedia({ url: Message.url, tabId: item.id, extraExt: Message.extraExt, mime: Message.mime, requestId: Message.requestId }, true, true);
+                    findMedia({ url: Message.url, tabId: item.id, extraExt: Message.extraExt, mime: Message.mime, requestId: Message.requestId, requestHeaders: Message.requestHeaders }, true, true);
                     return true;
                 }
             }
-            findMedia({ url: Message.url, tabId: -1, extraExt: Message.extraExt, mime: Message.mime, requestId: Message.requestId, initiator: Message.href }, true, true);
+            findMedia({ url: Message.url, tabId: -1, extraExt: Message.extraExt, mime: Message.mime, requestId: Message.requestId, initiator: Message.href, requestHeaders: Message.requestHeaders }, true, true);
         });
         sendResponse("ok");
         return true;

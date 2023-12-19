@@ -191,7 +191,7 @@
                 href: event.data.href ?? event.source.location.href,
                 extraExt: event.data.ext,
                 mime: event.data.mime,
-                referer: event.data.referer,
+                requestHeaders: { referer: event.data.referer },
                 requestId: event.data.requestId
             });
         }
