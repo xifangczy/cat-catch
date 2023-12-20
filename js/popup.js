@@ -758,8 +758,13 @@ function aria2AddUri(data, success, error) {
         json.params.push(`token:${G.aria2RpcToken}`);
     }
     const params = { out: data.downFileName };
-    if (G.enableAria2RpcReferer && data.requestHeaders?.referer) {
-        params.referer = data.requestHeaders.referer;
+    if (G.enableAria2RpcReferer) {
+        if (data.requestHeaders?.referer) {
+            params.referer = data.requestHeaders.referer;
+        }
+        if (data.cookie) {
+            params.cookie = data.cookie;
+        }
     }
     json.params.push([data.url], params);
     $.ajax({
