@@ -177,6 +177,11 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
     }
     chrome.tabs.get(data.tabId, async function (webInfo) {
         if (chrome.runtime.lastError) { return; }
+        // requestHeaders 中cookie 单独列出来
+        if (data.requestHeaders?.cookie) {
+            data.cookie = data.requestHeaders.cookie;
+            data.requestHeaders.cookie = undefined;
+        }
         const info = {
             name: name,
             url: data.url,
@@ -188,8 +193,8 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
             requestId: data.requestId ?? Date.now().toString(),
             extraExt: data.extraExt,
             initiator: data.initiator,
-            // referer: data.referer,
             requestHeaders: data.requestHeaders,
+            cookie: data.cookie,
             cacheURL: { host: urlParsing.host, search: urlParsing.search, pathname: urlParsing.pathname }
         };
         // 不存在 initiator 和 referer 使用web url代替initiator
@@ -580,9 +585,10 @@ function getRequestHeaders(data) {
         item.name = item.name.toLowerCase();
         if (item.name == "referer") {
             header.referer = item.value.toLowerCase();
-        }
-        if (item.name == "origin") {
+        } else if (item.name == "origin") {
             header.origin = item.value.toLowerCase();
+        } else if (item.name == "cookie") {
+            header.cookie = item.value.toLowerCase();
         }
     }
     if (Object.keys(header).length) {

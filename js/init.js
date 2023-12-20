@@ -126,7 +126,7 @@ const reFilename = /filename="?([^"]+)"?/;
 const reRange = /([\d]+)-([\d]+)\/([\d]+)/;
 const reStringModify = /['\\:\*\?"<\/>\|~]/g;
 // const reYoutube = /&(range|rbuf|rn|cver|altitags|pot|fallback_count|sq)=[^&]*/g;
-const reTemplates = /\$\{(fullFileName|fileName|ext|title|referer|url|now|fullDate|time|initiator|webUrl|userAgent|page) ?\| ?([^}]+)\}/g;
+const reTemplates = /\$\{(fullFileName|fileName|ext|title|referer|url|now|fullDate|time|initiator|webUrl|userAgent|page|cookie) ?\| ?([^}]+)\}/g;
 
 // 防抖
 let debounce = undefined;
