@@ -161,7 +161,7 @@ hls.on(Hls.Events.MANIFEST_LOADED, function (event, data) {
 
 // 监听 MANIFEST_PARSED m3u8解析完成
 hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
-    console.log(data);
+    // console.log(data);
     $("#m3u8").show(); $("#loading").hide();
     let more = false;
 
@@ -799,7 +799,7 @@ $("#mergeTs").click(async function () {
             customKey = HexStringToArrayBuffer(customKey);
         } else if (customKey.length == 24 && customKey.slice(-2) == "==") {
             customKey = Base64ToArrayBuffer(customKey);
-            console.log(customKey);
+            // console.log(customKey);
         } else if (/^http[s]*:\/\/.+/i.test(customKey)) {
             let flag = false;
             await $.ajax({
@@ -1066,7 +1066,7 @@ function downloadNew(start = 0, end = _fragments.length) {
     }
     // 下载错误
     down.on('downloadError', function (fragment, error) {
-        console.log(fragment, error, down.isErrorItem(fragment));
+        // console.log(fragment, error, down.isErrorItem(fragment));
 
         $("#ForceDownload").show(); // 强制下载
         $("#errorDownload").show(); // 重下所有失败项

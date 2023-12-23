@@ -222,12 +222,12 @@ class Downloader {
                 // return response.arrayBuffer();
             })
             .then(buffer => {
-                this.emit('rawBuffer', buffer);
+                this.emit('rawBuffer', buffer, fragment);
                 // 存在解密函数 调用解密函数 否则直接返回buffer
                 return this.decrypt ? this.decrypt(buffer, fragment) : buffer;
             })
             .then(buffer => {
-                this.emit('decryptedData', buffer);
+                this.emit('decryptedData', buffer, fragment);
                 // 存在转码函数 调用转码函数 否则直接返回buffer
                 return this.transcode ? this.transcode(buffer, fragment.index == 0) : buffer;
             })
