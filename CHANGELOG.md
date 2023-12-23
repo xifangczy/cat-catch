@@ -1,5 +1,19 @@
 ## 更新说明
 
+### 2.4.8
+
+[Fixed] 修复 m3u8 新下载器 ${referer} 标签问题 #272
+
+[Fixed] 修复 m3u8 新下载器 全部重新下载 bug #274
+
+[Fixed] 修复 m3u8 新下载器 下载失败丢失线程 #276
+
+[Fixed] 修复 m3u8 新下载器 勾选 ffmpeg 转码 下载超过 2G 大小 不会强制下载
+
+[Changed] 完善 Aria2 Rpc 协议 增加密钥 和 cookie 支持
+
+[Added] 增加${cookie}标签 如果资源存在 cookie
+
 ### 2.4.7
 
 [Fixed] 缓存捕获 延迟获取标题 #241
