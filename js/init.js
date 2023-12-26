@@ -158,6 +158,22 @@ function InitOptions() {
             try { reg = new RegExp(item.regex, item.type) } catch (e) { item.state = false; }
             return { regex: reg, ext: item.ext, blackList: item.blackList, state: item.state }
         });
+
+        // 兼容旧配置
+        if (items.copyM3U8 == '$url$') {
+            items.copyM3U8 = '${url}';
+            chrome.storage.sync.set({ copyM3U8: '${url}' });
+        }
+        if (items.copyMPD.includes('$url$')) {
+            items.copyMPD = '${url}';
+            items.copyMPD = items.copyMPD.replaceAll('$url$', '${url}').replaceAll('$referer$', '${referer}').replaceAll('$title$', '${title}');
+            chrome.storage.sync.set({ copyMPD: '${url}' });
+        }
+        if (items.copyOther == '$url$') {
+            items.copyOther = '${url}';
+            chrome.storage.sync.set({ copyOther: '${url}' });
+        }
+
         G = { ...items, ...G };
 
         const icon = { path: G.enable ? "/img/icon.png" : "/img/icon-disable.png" };

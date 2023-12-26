@@ -196,7 +196,8 @@ class Downloader {
                     throw new Error(response.status);
                 }
                 const reader = response.body.getReader();
-                const contentLength = response.headers.get('content-length');
+                let contentLength = response.headers.get('content-length');
+                contentLength = contentLength ? parseInt(contentLength) : 0;
                 let receivedLength = 0;
                 const chunks = [];
                 const pump = () => {
