@@ -160,18 +160,17 @@ function InitOptions() {
         });
 
         // 兼容旧配置
-        if (items.copyM3U8 == '$url$') {
-            items.copyM3U8 = '${url}';
-            chrome.storage.sync.set({ copyM3U8: '${url}' });
+        if (items.copyM3U8.includes('$url$')) {
+            items.copyM3U8 = items.copyM3U8.replaceAll('$url$', '${url}').replaceAll('$referer$', '${referer}').replaceAll('$title$', '${title}');
+            chrome.storage.sync.set({ copyM3U8: items.copyOther });
         }
         if (items.copyMPD.includes('$url$')) {
-            items.copyMPD = '${url}';
             items.copyMPD = items.copyMPD.replaceAll('$url$', '${url}').replaceAll('$referer$', '${referer}').replaceAll('$title$', '${title}');
-            chrome.storage.sync.set({ copyMPD: '${url}' });
+            chrome.storage.sync.set({ copyMPD: items.copyOther });
         }
-        if (items.copyOther == '$url$') {
-            items.copyOther = '${url}';
-            chrome.storage.sync.set({ copyOther: '${url}' });
+        if (items.copyOther.includes('$url$')) {
+            items.copyOther = items.copyOther.replaceAll('$url$', '${url}').replaceAll('$referer$', '${referer}').replaceAll('$title$', '${title}');
+            chrome.storage.sync.set({ copyOther: items.copyOther });
         }
 
         G = { ...items, ...G };
