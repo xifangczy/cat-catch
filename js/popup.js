@@ -258,7 +258,7 @@ function AddMedia(data, currentTab = true) {
         //     catDownload(data, "&fileFlag=" + flag);
         //     return false;
         // }
-        if (data.parsing) {
+        if (G.m3u8AutoDown && data.parsing) {
             data.html.find('#parsing').click();
             return false;
         }

@@ -1252,7 +1252,8 @@ function mergeTsNew(down) {
                 action: $("#onlyAudio").prop("checked") ? "onlyAudio" : "transcode",
                 media: [{ data: URL.createObjectURL(fileBlob), name: `memory${new Date().getTime()}.${ext}` }],
                 title: fileName,
-                name: "memory" + new Date().getTime() + "." + ext
+                name: "memory" + new Date().getTime() + "." + ext,
+                active: !autoDown
             });
             buttonState("#mergeTs", true);
             $progress.html("已发送给在线ffmpeg");

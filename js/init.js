@@ -86,6 +86,7 @@ G.OptionLists = {
     enableAria2Rpc: false,
     enableAria2RpcReferer: true,
     aria2RpcToken: "",
+    m3u8AutoDown: false,
 };
 // 本地储存的配置
 G.LocalVar = {

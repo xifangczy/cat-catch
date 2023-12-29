@@ -218,7 +218,8 @@
                 title: title,
                 url: event.data.href ?? event.source.location.href,
                 extra: event.data.extra,
-                tabId: event.data.tabId
+                tabId: event.data.tabId,
+                active: event.data.active ?? true,
             });
         }
         if (event.data.action == "catCatchFFmpegResult") {

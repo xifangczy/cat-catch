@@ -404,7 +404,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         const data = { Message: "ffmpeg", action: Message.action, media: Message.media, title: Message.title, url: Message.url, extra: Message.extra, tabId: Message.tabId };
         chrome.tabs.query({ url: ffmpeg.url }, function (tabs) {
             if (chrome.runtime.lastError || !tabs.length) {
-                chrome.tabs.create({ url: ffmpeg.url }, function (tab) {
+                chrome.tabs.create({ url: ffmpeg.url, active: Message.active ?? true }, function (tab) {
                     ffmpeg.tab = tab.id;
                     ffmpeg.data = data;
                 });
