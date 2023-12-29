@@ -11,6 +11,7 @@ let autoReferer = params.get("autoReferer");
 const tabId = parseInt(params.get("tabid"));
 const key = params.get("key");
 const _tabid = params.get("tabid");
+let autoDown = params.get("autoDown");
 
 // 修改当前标签下的所有xhr的Referer 修改完成 运行init函数
 let requestHeaders = JSONparse(_requestHeaders);
@@ -218,6 +219,7 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
     }
     // 有下一级m3u8 停止解析
     if (more) {
+        autoDown && highlight();
         $("#m3u8").hide();
         $("button").hide();
         return;
@@ -258,6 +260,10 @@ hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
 
 // 监听 ERROR m3u8解析错误
 hls.on(Hls.Events.ERROR, function (event, data) {
+    if (autoDown) {
+        highlight();
+        autoDown = false;
+    }
     console.log(data);
     if (data.type == "mediaError" && data.details == "fragParsingError") {
         if (data.error.message == "No ADTS header found in AAC PES") {
@@ -428,10 +434,7 @@ function parseTs(data) {
 
     writeText(_fragments);   // 写入ts链接到textarea
     $("#count").append("共 " + _fragments.length + " 个文件" + "，总时长: " + secToTime(data.totalduration));
-    if (data.live) {
-        $("#recorder").show();
-        $("#count").html("直播HLS");
-    }
+
     isEncrypted && $("#count").append(" (加密HLS)");
     if (_m3u8Content.includes("#EXT-X-KEY:METHOD=SAMPLE-AES-CTR")) {
         $("#count").append(' <b>使用SAMPLE-AES-CTR加密的资源, 目前无法处理.</b>');
@@ -442,6 +445,17 @@ function parseTs(data) {
     $("#rangeStart").val(1);
     $("#rangeEnd").val(_fragments.length);
     $m3u8dlArg.val(getM3u8DlArg());
+
+    if (data.live) {
+        if (autoDown) {
+            highlight();
+            autoDown = false;
+        }
+        $("#recorder").show();
+        $("#count").html("直播HLS");
+    } else if (autoDown) {
+        $("#mergeTs").click();
+    }
 
     if (tabId && tabId != -1) {
         chrome.webNavigation.getAllFrames({ tabId: tabId }, function (frames) {
@@ -1780,4 +1794,10 @@ function addBashUrl(baseUrl, m3u8Text) {
         m3u8Text += m3u8_split[key] + "\n";
     }
     return m3u8Text;
+}
+
+function highlight() {
+    chrome.tabs.getCurrent(function name(params) {
+        chrome.tabs.highlight({ tabs: params.index });
+    });
 }

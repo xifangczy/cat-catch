@@ -258,6 +258,10 @@ function AddMedia(data, currentTab = true) {
         //     catDownload(data, "&fileFlag=" + flag);
         //     return false;
         // }
+        if (data.parsing) {
+            data.html.find('#parsing').click();
+            return false;
+        }
         chrome.downloads.download({
             url: data.url,
             filename: data.downFileName,
@@ -281,13 +285,16 @@ function AddMedia(data, currentTab = true) {
         return false;
     });
     //解析m3u8
-    data.html.find('#parsing').click(function () {
+    data.html.find('#parsing').click(function (e) {
         chrome.tabs.get(G.tabId, function (tab) {
             let url = `/${data.parsing}.html?url=${encodeURIComponent(data.url)}&title=${encodeURIComponent(data.title)}&filename=${encodeURIComponent(data.downFileName)}&tabid=${data.tabId == -1 ? G.tabId : data.tabId}&initiator=${encodeURIComponent(data.initiator)}&tabid=${encodeURIComponent(tab.id)}`;
             if (data.requestHeaders) {
                 url += `&requestHeaders=${encodeURIComponent(JSON.stringify(data.requestHeaders))}`;
             }
-            chrome.tabs.create({ url: url, index: tab.index + 1 });
+            if (e.isTrigger) {
+                url += `&autoDown=1`;
+            }
+            chrome.tabs.create({ url: url, index: tab.index + 1, active: !e.isTrigger });
         });
         return false;
     });
