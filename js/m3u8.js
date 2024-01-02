@@ -407,7 +407,8 @@ function parseTs(data) {
             encrypted: data.fragments[i].encrypted,
             duration: data.fragments[i].duration,
             initSegment: initSegment,
-            sn: data.fragments[i].sn
+            sn: data.fragments[i].sn,
+            cc: data.fragments[i].cc,
         });
     }
 

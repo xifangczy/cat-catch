@@ -167,7 +167,11 @@ function templatesFunction(text, action, data) {
 function templates(text, data) {
     if (isEmpty(text)) { return ""; }
     // fullFileName
-    data.fullFileName = new URL(data.url).pathname.split("/").pop();
+    try {
+        data.fullFileName = new URL(data.url).pathname.split("/").pop();
+    } catch (e) {
+        data.fullFileName = 'NULL';
+    }
     // fileName
     data.fileName = data.fullFileName.split(".");
     data.fileName.length > 1 && data.fileName.pop();
