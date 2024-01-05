@@ -100,7 +100,7 @@ function init() {
     // 解码 切片URL参数
     if (tsAddArg != null) {
         tsAddArg = decodeURIComponent(tsAddArg);
-        $("#tsAddArg").html("还原ts参数");
+        $("#tsAddArg").html("还原get参数");
     }
 
     if (isEmpty(_m3u8Url)) {
