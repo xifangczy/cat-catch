@@ -225,10 +225,7 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
     }
     // 有下一级m3u8 停止解析
     if (more) {
-        if (autoDown) {
-            highlight();
-            autoDown = false;
-        }
+        autoDown && highlight();
         $("#m3u8").hide();
         $("button").hide();
         return;
@@ -269,10 +266,7 @@ hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
 
 // 监听 ERROR m3u8解析错误
 hls.on(Hls.Events.ERROR, function (event, data) {
-    if (autoDown) {
-        highlight();
-        autoDown = false;
-    }
+    autoDown && highlight();
     console.log(data);
     if (data.type == "mediaError" && data.details == "fragParsingError") {
         if (data.error.message == "No ADTS header found in AAC PES") {
@@ -457,10 +451,7 @@ function parseTs(data) {
     $m3u8dlArg.val(getM3u8DlArg());
 
     if (data.live) {
-        if (autoDown) {
-            highlight();
-            autoDown = false;
-        }
+        autoDown && highlight();
         $("#recorder").show();
         $("#count").html("直播HLS");
     } else if (autoDown) {
@@ -1810,6 +1801,7 @@ function addBashUrl(baseUrl, m3u8Text) {
 }
 
 function highlight() {
+    autoDown = false;
     chrome.tabs.getCurrent(function name(params) {
         chrome.tabs.highlight({ tabs: params.index });
     });
