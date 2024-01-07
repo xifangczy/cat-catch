@@ -225,7 +225,10 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
     }
     // 有下一级m3u8 停止解析
     if (more) {
-        autoDown && highlight();
+        if (autoDown) {
+            highlight();
+            autoDown = false;
+        }
         $("#m3u8").hide();
         $("button").hide();
         return;
