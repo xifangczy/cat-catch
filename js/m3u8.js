@@ -12,10 +12,16 @@ const tabId = parseInt(params.get("tabid"));
 const key = params.get("key");
 const _tabid = params.get("tabid");
 let autoDown = params.get("autoDown");
+let currentTabId = 0;
 
 // 修改当前标签下的所有xhr的Referer 修改完成 运行init函数
 let requestHeaders = JSONparse(_requestHeaders);
-setRequestHeaders(requestHeaders, () => { awaitG(init); });
+setRequestHeaders(requestHeaders, () => {
+    chrome.tabs.getCurrent(function (tab) {
+        currentTabId = tab.id;
+        awaitG(init);
+    });
+});
 
 // 默认设置
 const allOption = {
@@ -1254,7 +1260,9 @@ function mergeTsNew(down) {
                 media: [{ data: URL.createObjectURL(fileBlob), name: `memory${new Date().getTime()}.${ext}` }],
                 title: fileName,
                 name: "memory" + new Date().getTime() + "." + ext,
-                active: !autoDown
+                active: !autoDown,
+                autoClose: !!autoDown,
+                tabId: currentTabId,
             });
             buttonState("#mergeTs", true);
             $progress.html("已发送给在线ffmpeg");
@@ -1803,3 +1811,13 @@ function highlight() {
         chrome.tabs.highlight({ tabs: params.index });
     });
 }
+
+// 接受 catCatchFFmpegResult
+chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
+    if (!Message.Message || Message.Message != "catCatchFFmpegResult" || Message.state != "ok" || !Message.use || currentTabId == 0 || Message.tabId != currentTabId) { return; }
+    if (Message.use == "close") {
+        setTimeout(() => {
+            window.close();
+        }, Math.ceil(Math.random() * 500));
+    }
+});

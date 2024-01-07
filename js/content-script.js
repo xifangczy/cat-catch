@@ -142,7 +142,10 @@
                 return true;
             }
             for (let item of Message.media) {
-                loadBlob({ action: Message.action, type: item.type ?? "video", data: item.data, title: Message.title, name: item.name, extra: Message.extra, tabId: Message.tabId });
+                const data = { ...Message, ...item };
+                data.type = item.type ?? "video";
+                // loadBlob({ action: Message.action, type: item.type ?? "video", data: item.data, title: Message.title, name: item.name, extra: Message.extra, tabId: Message.tabId });
+                loadBlob(data);
             }
             sendResponse("ok");
             return true;
@@ -220,11 +223,12 @@
                 extra: event.data.extra,
                 tabId: event.data.tabId,
                 active: event.data.active ?? true,
+                autoClose: event.data.autoClose ?? false,
             });
         }
         if (event.data.action == "catCatchFFmpegResult") {
             if (!event.data.state || !event.data.tabId) { return; }
-            chrome.runtime.sendMessage({ Message: "catCatchFFmpegResult", state: event.data.state, tabId: event.data.tabId });
+            chrome.runtime.sendMessage({ Message: "catCatchFFmpegResult", ...event.data });
         }
         if (event.data.action == "catCatchToBackground") {
             delete event.data.action;
