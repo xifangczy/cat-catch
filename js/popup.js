@@ -594,14 +594,23 @@ const interval = setInterval(function () {
 // 按钮状态更新
 function updateButton() {
     chrome.runtime.sendMessage({ Message: "getButtonState", tabId: G.tabId }, function (state) {
-        $("#MobileUserAgent").html(state.MobileUserAgent ? "关闭模拟" : "模拟手机");
-        $("#AutoDown").html(state.AutoDown ? "关闭下载" : "自动下载");
-        $("#search").html(state.search ? "关闭搜索" : "深度搜索");
-        $("#catch").html(state.catch ? "关闭捕获" : "缓存捕获");
-        $("#recorder").html(state.recorder ? "关闭录制" : "视频录制");
-        $("#recorder2").html(state.recorder2 ? "关闭屏幕捕捉" : "屏幕捕捉");
-        $("#webrtc").html(state.webrtc ? "关闭webRTC捕捉" : "webRTC捕捉");
-        $("#enable").html(state.enable ? "暂停" : "启用");
+        for (let key in state) {
+            const $DOM = $(`#${key}`);
+            if (key == "MobileUserAgent") {
+                $DOM.html(state.MobileUserAgent ? "关闭模拟" : "模拟手机");
+                continue;
+            }
+            if (key == "AutoDown") {
+                $DOM.html(state.AutoDown ? "关闭下载" : "自动下载");
+                continue;
+            }
+            if (key == "enable") {
+                $DOM.html(state.enable ? "暂停" : "启用");
+                continue;
+            }
+            const script = G.scriptList.get(key + ".js");
+            $DOM.html(state[key] ? script.off : script.name);
+        }
     });
 }
 /* 格式判断 */
