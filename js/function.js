@@ -8,8 +8,8 @@ function secToTime(sec) {
     let min = ((sec % 3600) / 60) | 0;
     sec = (sec % 60) | 0;
     let time = hour > 0 ? hour + ":" : "";
-    time += appendZero(min) + ":";
-    time += appendZero(sec);
+    time += min.toString().padStart(2, '0') + ":";
+    time += sec.toString().padStart(2, '0');
     return time;
 }
 // 字节转换成大小

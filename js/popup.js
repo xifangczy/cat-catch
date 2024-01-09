@@ -509,7 +509,7 @@ $("#AutoDown").click(function () {
     });
 });
 // 深度搜索 缓存捕捉 注入脚本
-$("#search, #catch, #recorder, #recorder2").click(function () {
+$("[type='script']").click(function () {
     chrome.runtime.sendMessage({ Message: "script", tabId: G.tabId, script: this.id + ".js" }, function () {
         G.refreshClear && $('#Clear').click();
         updateButton();
@@ -517,10 +517,7 @@ $("#search, #catch, #recorder, #recorder2").click(function () {
 });
 // 102以上开启 捕获按钮/注入脚本
 if (G.version >= 102) {
-    $("#search").show();
-    $("#catch").show();
-    $("#recorder").show();
-    $("#recorder2").show();
+    $("[type='script']").show();
 }
 // Firefox 关闭画中画 全屏 修复右边滚动条遮挡
 if (G.isFirefox) {
@@ -603,6 +600,7 @@ function updateButton() {
         $("#catch").html(state.catch ? "关闭捕获" : "缓存捕获");
         $("#recorder").html(state.recorder ? "关闭录制" : "视频录制");
         $("#recorder2").html(state.recorder2 ? "关闭屏幕捕捉" : "屏幕捕捉");
+        $("#webrtc").html(state.webrtc ? "关闭webRTC捕捉" : "webRTC捕捉");
         $("#enable").html(state.enable ? "暂停" : "启用");
     });
 }
