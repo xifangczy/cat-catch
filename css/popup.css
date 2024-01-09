@@ -149,19 +149,19 @@ button,
   z-index: 9999;
 }
 .more button {
-  margin-left: 0.5rem;
+  margin-left: 0.1rem;
   font-size: 12px;
 }
-#filter{
+#filter {
   flex-wrap: wrap;
 }
-#filter #regular button{
+#filter #regular button {
   margin-left: 0px;
 }
-#filter #regular input{
+#filter #regular input {
   width: 98%;
 }
-#filter .regular{
+#filter .regular {
   margin-left: 5px;
 }
 #filter #ext {
@@ -185,7 +185,7 @@ button,
   cursor: pointer;
   margin: auto;
 }
-.flex-end{
+.flex-end {
   justify-content: flex-end;
 }
 #otherOptions {
