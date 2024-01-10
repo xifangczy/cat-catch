@@ -127,7 +127,9 @@
             recorderObj = new MediaStream(track);
         }
         recorder = new MediaRecorder(recorderObj, option);
-        recorder.ondataavailable = event => chunks.push(event.data);
+        recorder.ondataavailable = event => {
+            chunks.push(event.data)
+        };
         recorder.onstop = () => {
             recorderTime = 0;
             clearInterval(recorderTimeer);
@@ -146,7 +148,7 @@
             }, 1000);
             buttonState(false);
         }
-        recorder.start();
+        recorder.start(60000);
     });
 
     // 停止录制
