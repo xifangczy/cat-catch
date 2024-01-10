@@ -11,6 +11,7 @@
     <div id="tips"></div>
     <div id="time"></div>
     录制编码: <select id="mimeTypeList" style="max-width: 200px;"></select>
+    <label><input type="checkbox" id="autoSave1"} ${checkboxStyle}>1小时保存一次</label>
     <div>
         <button id="start" ${buttonStyle}>开始录制</button>
         <button id="stop" ${buttonStyle}>停止录制</button>
@@ -101,6 +102,9 @@
         let recorderTime = 0;
         let recorderTimeer = undefined;
         let chunks = [];
+        if (recorderObj instanceof MediaStreamTrack) {
+            recorderObj = new MediaStream([recorderObj]);
+        }
         recorder = new MediaRecorder(recorderObj, option);
         recorder.ondataavailable = event => chunks.push(event.data);
         recorder.onstop = () => {
@@ -137,6 +141,19 @@
         }
     });
 
+    let autoSave1Timer = null;
+    CatCatch.querySelector("#autoSave1").addEventListener('click', function () {
+        clearInterval(autoSave1Timer);
+        if (CatCatch.querySelector("#autoSave1").checked) {
+            autoSave1Timer = setInterval(function () {
+                if (recorder) {
+                    recorder.stop();
+                    recorder.start();
+                }
+            }, 3600000);
+        }
+    });
+
     let recorder = undefined;
     let recorderObj = undefined;
     const _RTCPeerConnection = window.RTCPeerConnection;
@@ -144,6 +161,7 @@
         const pc = new _RTCPeerConnection(...args);
         const _addTrack = pc.addTrack.bind(pc);
         pc.addTrack = function (...trackArgs) {
+            console.error(trackArgs);
             const track = trackArgs[0];
             if (track.kind === 'video') {
                 recorderObj = trackArgs[1];
@@ -161,8 +179,27 @@
             return _addStream(stream);
         }
 
+        // TODO 暂时只支持video
+        const _addTransceiver = pc.addTransceiver.bind(pc);
+        pc.addTransceiver = function (trackOrKind, ...rest) {
+            const transceiver = _addTransceiver(trackOrKind, ...rest);
+            if (trackOrKind instanceof MediaStreamTrack) {
+                if (trackOrKind.kind === 'video') {
+                    recorderObj = trackOrKind;
+                    $tips.innerHTML = "视频流已添加";
+                }
+            } else if (typeof trackOrKind === 'string') {
+                if (trackOrKind === 'video') {
+                    recorderObj = transceiver.receiver.track;
+                    $tips.innerHTML = "视频流已添加";
+                }
+            }
+            return transceiver;
+        }
+
         return pc;
     };
+    window.webkitRTCPeerConnection = window.RTCPeerConnection;
     window.RTCPeerConnection.prototype = _RTCPeerConnection.prototype;
 
     // #region 移动逻辑
@@ -203,4 +240,10 @@
         time += sec.toString().padStart(2, '0');
         return time;
     }
+
+    // 防止网页意外关闭跳转
+    window.addEventListener('beforeunload', function (e) {
+        recorder && recorder.stop();
+        return true;
+    });
 })();
