@@ -228,6 +228,7 @@
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
     }
 
     // 秒转换成时间
