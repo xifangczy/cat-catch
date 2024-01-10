@@ -1,6 +1,6 @@
 (function () {
     console.log("webrtc.js Start");
-    if (document.getElementById("catCatchWebRTC")) { console.log(123); return; }
+    if (document.getElementById("catCatchWebRTC")) { return; }
 
     const buttonStyle = 'style="border:solid 1px #000;margin:2px;padding:2px;background:#fff;border-radius:4px;border:solid 1px #c7c7c780;color:#000;"';
     const checkboxStyle = 'style="-webkit-appearance: auto;"';
@@ -8,7 +8,7 @@
     const CatCatch = document.createElement("div");
     CatCatch.setAttribute("id", "CatCatchCatch");
     CatCatch.innerHTML = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAAKlBMVEUAAADLlROxbBlRAD16GS5oAjWWQiOCIytgADidUx/95gHqwwTx0gDZqwT6kfLuAAAACnRSTlMA/vUejV7kuzi8za0PswAAANpJREFUGNNjwA1YSxkYTEqhnKZLLi6F1w0gnKA1shdvHYNxdq1atWobjLMKCOAyC3etlVrUAOH4HtNZmLgoAMKpXX37zO1FwcZAwMDguGq1zKpFmTNnzqx0Bpp2WvrU7ttn9py+I8JgLn1R8Pad22vurNkjwsBReHv33junzuyRnOnMwNCSeFH27K5dq1SNgcZxFMnuWrNq1W5VkNntihdv7ToteGcT0C7mIkE1qbWCYjJnM4CqEoWKdoslChXuUgXJqIcLebiphSgCZRhaPDhcDFhdmUMCGIgEAFA+Uc02aZg9AAAAAElFTkSuQmCC" style="-webkit-user-drag: none;width: 20px;">
-    <div id="tips"></div>
+    <div id="tips">正在等待视频流...</div>
     <div id="time"></div>
     录制编码: <select id="mimeTypeList" style="max-width: 200px;"></select>
     <label><input type="checkbox" id="autoSave1"} ${checkboxStyle}>1小时保存一次</label>
@@ -39,7 +39,6 @@
         line-height: 20px;`;
     document.getElementsByTagName('html')[0].appendChild(CatCatch);
     const $tips = CatCatch.querySelector("#tips");
-    $tips.innerHTML = "正在等待视频流...";
 
     // 关闭
     CatCatch.querySelector("#close").addEventListener('click', function (event) {

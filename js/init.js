@@ -114,7 +114,7 @@ G.scriptList.set("search.js", { key: "search", refresh: true, allFrames: true, w
 G.scriptList.set("catch.js", { key: "catch", refresh: true, allFrames: true, world: "MAIN", name: "缓存捕捉", off: "关闭捕捉", tabId: new Set() });
 G.scriptList.set("recorder.js", { key: "recorder", refresh: false, allFrames: true, world: "MAIN", name: "视频录制", off: "关闭录制", tabId: new Set() });
 G.scriptList.set("recorder2.js", { key: "recorder2", refresh: false, allFrames: false, world: "ISOLATED", name: "屏幕捕捉", off: "关闭捕捉", tabId: new Set() });
-G.scriptList.set("webrtc.js", { key: "webrtc", refresh: true, allFrames: true, world: "MAIN", name: "webRTC录制", off: "关闭录制", tabId: new Set() });
+G.scriptList.set("webrtc.js", { key: "webrtc", refresh: true, allFrames: true, world: "MAIN", name: "录制webRTC", off: "关闭录制", tabId: new Set() });
 
 // ffmpeg
 const ffmpeg = {
