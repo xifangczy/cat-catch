@@ -172,6 +172,7 @@ class Downloader {
      * @param {object} fragment 重新下载的对象
      */
     downloader(fragment = null) {
+        if (this.state === 'abort') { return; }
         // 是否直接下载对象
         const directDownload = !!fragment;
 
