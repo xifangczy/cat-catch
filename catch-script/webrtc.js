@@ -102,8 +102,14 @@
         let recorderTime = 0;
         let recorderTimeer = undefined;
         let chunks = [];
-        if (recorderObj instanceof MediaStreamTrack) {
-            recorderObj = new MediaStream([recorderObj]);
+        if (recorderObj instanceof Object) {
+            const track = [];
+            for (let key in recorderObj) {
+                if (recorderObj[key] instanceof MediaStreamTrack) {
+                    track.push(recorderObj[key]);
+                }
+            }
+            recorderObj = new MediaStream(track);
         }
         recorder = new MediaRecorder(recorderObj, option);
         recorder.ondataavailable = event => chunks.push(event.data);
@@ -161,7 +167,6 @@
         const pc = new _RTCPeerConnection(...args);
         const _addTrack = pc.addTrack.bind(pc);
         pc.addTrack = function (...trackArgs) {
-            console.error(trackArgs);
             const track = trackArgs[0];
             if (track.kind === 'video') {
                 recorderObj = trackArgs[1];
@@ -179,20 +184,16 @@
             return _addStream(stream);
         }
 
-        // TODO 暂时只支持video
         const _addTransceiver = pc.addTransceiver.bind(pc);
         pc.addTransceiver = function (trackOrKind, ...rest) {
+            recorderObj = {};
             const transceiver = _addTransceiver(trackOrKind, ...rest);
             if (trackOrKind instanceof MediaStreamTrack) {
-                if (trackOrKind.kind === 'video') {
-                    recorderObj = trackOrKind;
-                    $tips.innerHTML = "视频流已添加";
-                }
+                recorderObj[trackOrKind.kind] = trackOrKind;
+                $tips.innerHTML = `${trackOrKind.kind}流已添加`;
             } else if (typeof trackOrKind === 'string') {
-                if (trackOrKind === 'video') {
-                    recorderObj = transceiver.receiver.track;
-                    $tips.innerHTML = "视频流已添加";
-                }
+                recorderObj[trackOrKind] = transceiver.receiver.track;
+                $tips.innerHTML = `${trackOrKind}流已添加`;
             }
             return transceiver;
         }
