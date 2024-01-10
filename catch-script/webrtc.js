@@ -217,7 +217,12 @@
             }
             return transceiver;
         }
-
+        pc.oniceconnectionstatechange = function (event) {
+            if (pc.iceConnectionState === 'disconnected' && recorder?.state === 'recording') {
+                recorder.stop();
+                $tips.innerHTML = "连接已断开，录制已停止";
+            }
+        }
         return pc;
     };
     window.webkitRTCPeerConnection = window.RTCPeerConnection;
