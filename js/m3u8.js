@@ -1024,15 +1024,6 @@ function downloadNew(start = 0, end = _fragments.length) {
     // 解密函数
     down.setDecrypt(function (buffer, fragment) {
         return new Promise(function (resolve, reject) {
-            // 如果存在MAP切片 把MAP整合进buffer
-            if (fragment.initSegment) {
-                const initSegmentData = initData.get(fragment.initSegment.url);
-                const initLength = initSegmentData.byteLength;
-                const newData = new Uint8Array(initLength + buffer.byteLength);
-                newData.set(new Uint8Array(initSegmentData), 0);
-                newData.set(new Uint8Array(buffer), initLength);
-                buffer = newData.buffer;
-            }
             // 跳过解密 录制模式 切片不存在加密 跳过解密 直接返回
             if (skipDecrypt || recorder || !fragment.encrypted) {
                 resolve(buffer);
@@ -1050,6 +1041,16 @@ function downloadNew(start = 0, end = _fragments.length) {
                 console.log(e);
                 reject(e);
                 return;
+            }
+            // 如果存在MAP切片 把MAP整合进buffer
+            // MAP切片不需要解密
+            if (fragment.initSegment) {
+                const initSegmentData = initData.get(fragment.initSegment.url);
+                const initLength = initSegmentData.byteLength;
+                const newData = new Uint8Array(initLength + buffer.byteLength);
+                newData.set(new Uint8Array(initSegmentData), 0);
+                newData.set(new Uint8Array(buffer), initLength);
+                buffer = newData.buffer;
             }
             resolve(buffer);
         });
