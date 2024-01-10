@@ -6,7 +6,6 @@
     const checkboxStyle = 'style="-webkit-appearance: auto;"';
 
     const CatCatch = document.createElement("div");
-    CatCatch.setAttribute("id", "CatCatchCatch");
     CatCatch.innerHTML = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAAKlBMVEUAAADLlROxbBlRAD16GS5oAjWWQiOCIytgADidUx/95gHqwwTx0gDZqwT6kfLuAAAACnRSTlMA/vUejV7kuzi8za0PswAAANpJREFUGNNjwA1YSxkYTEqhnKZLLi6F1w0gnKA1shdvHYNxdq1atWobjLMKCOAyC3etlVrUAOH4HtNZmLgoAMKpXX37zO1FwcZAwMDguGq1zKpFmTNnzqx0Bpp2WvrU7ttn9py+I8JgLn1R8Pad22vurNkjwsBReHv33junzuyRnOnMwNCSeFH27K5dq1SNgcZxFMnuWrNq1W5VkNntihdv7ToteGcT0C7mIkE1qbWCYjJnM4CqEoWKdoslChXuUgXJqIcLebiphSgCZRhaPDhcDFhdmUMCGIgEAFA+Uc02aZg9AAAAAElFTkSuQmCC" style="-webkit-user-drag: none;width: 20px;">
     <div id="tips">正在等待视频流...</div>
     <div id="time"></div>
@@ -37,8 +36,25 @@
         justify-content: space-evenly;
         flex-direction: column;
         line-height: 20px;`;
-    document.getElementsByTagName('html')[0].appendChild(CatCatch);
+
+    // 创建 Shadow DOM 放入CatCatch
+    const divShadow = document.createElement('div');
+    divShadow.setAttribute("id", "catCatchWebRTC");
+    const shadowRoot = divShadow.attachShadow({ mode: 'closed' });
+    shadowRoot.appendChild(CatCatch);
+    // 页面插入Shadow DOM
+    document.getElementsByTagName('html')[0].appendChild(divShadow);
+
     const $tips = CatCatch.querySelector("#tips");
+
+    // 开始 结束 按钮切换
+    const $start = CatCatch.querySelector("#start");
+    const $stop = CatCatch.querySelector("#stop");
+    function buttonState(state = true) {
+        $start.style.display = state ? 'inline' : 'none';
+        $stop.style.display = state ? 'none' : 'inline';
+    }
+    buttonState();
 
     // 关闭
     CatCatch.querySelector("#close").addEventListener('click', function (event) {
@@ -101,7 +117,7 @@
         let recorderTime = 0;
         let recorderTimeer = undefined;
         let chunks = [];
-        if (recorderObj instanceof Object) {
+        if (!recorderObj instanceof MediaStream) {
             const track = [];
             for (let key in recorderObj) {
                 if (recorderObj[key] instanceof MediaStreamTrack) {
@@ -118,14 +134,17 @@
             $time.innerHTML = "";
             $tips.innerHTML = "已停止录制!";
             download(chunks);
+            buttonState();
         }
         recorder.onstart = () => {
             chunks = [];
             $tips.innerHTML = "录制中...";
+            $time.innerHTML = "00:00";
             recorderTimeer = setInterval(function () {
                 recorderTime++;
                 $time.innerHTML = secToTime(recorderTime);
             }, 1000);
+            buttonState(false);
         }
         recorder.start();
     });

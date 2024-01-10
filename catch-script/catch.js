@@ -50,7 +50,15 @@
         justify-content: space-evenly;
         flex-direction: column;
         line-height: 20px;`;
-    document.getElementsByTagName('html')[0].appendChild(CatCatch);
+
+    // 创建 Shadow DOM 放入CatCatch
+    const divShadow = document.createElement('div');
+    divShadow.setAttribute("id", "catCatchWebRTC");
+    const shadowRoot = divShadow.attachShadow({ mode: 'closed' });
+    shadowRoot.appendChild(CatCatch);
+    // 页面插入Shadow DOM
+    document.getElementsByTagName('html')[0].appendChild(divShadow);
+
     const tips = CatCatch.querySelector("#tips");
 
     CatCatch.querySelector("#autoDown").addEventListener('change', function (event) {

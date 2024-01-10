@@ -6,7 +6,7 @@
     const checkboxStyle = 'style="-webkit-appearance: auto;"';
 
     const CatCatch = document.createElement("div");
-    CatCatch.setAttribute("id", "CatCatchCatch");
+    CatCatch.setAttribute("id", "catCatchRecorder");
     CatCatch.innerHTML = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAAKlBMVEUAAADLlROxbBlRAD16GS5oAjWWQiOCIytgADidUx/95gHqwwTx0gDZqwT6kfLuAAAACnRSTlMA/vUejV7kuzi8za0PswAAANpJREFUGNNjwA1YSxkYTEqhnKZLLi6F1w0gnKA1shdvHYNxdq1atWobjLMKCOAyC3etlVrUAOH4HtNZmLgoAMKpXX37zO1FwcZAwMDguGq1zKpFmTNnzqx0Bpp2WvrU7ttn9py+I8JgLn1R8Pad22vurNkjwsBReHv33junzuyRnOnMwNCSeFH27K5dq1SNgcZxFMnuWrNq1W5VkNntihdv7ToteGcT0C7mIkE1qbWCYjJnM4CqEoWKdoslChXuUgXJqIcLebiphSgCZRhaPDhcDFhdmUMCGIgEAFA+Uc02aZg9AAAAAElFTkSuQmCC" style="-webkit-user-drag: none;width: 20px;">
     <div id="tips"></div>
     选择视频: <select id="videoList" style="max-width: 200px;"></select>
@@ -37,7 +37,14 @@
         justify-content: space-evenly;
         flex-direction: column;
         line-height: 20px;`;
-    document.getElementsByTagName('html')[0].appendChild(CatCatch);
+
+    // 创建 Shadow DOM 放入CatCatch
+    const divShadow = document.createElement('div');
+    divShadow.setAttribute("id", "catCatchWebRTC");
+    const shadowRoot = divShadow.attachShadow({ mode: 'closed' });
+    shadowRoot.appendChild(CatCatch);
+    // 页面插入Shadow DOM
+    document.getElementsByTagName('html')[0].appendChild(divShadow);
 
     const $tips = CatCatch.querySelector("#tips");
     const $videoList = CatCatch.querySelector("#videoList");
