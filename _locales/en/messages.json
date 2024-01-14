@@ -154,5 +154,8 @@
   },
   "noData": {
     "message": "No Fish"
+  },
+  "regularFilterPlaceholder": {
+    "message": "Regular expression filter, match resource URL, press Enter to confirm"
   }
 }

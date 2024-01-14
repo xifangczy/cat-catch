@@ -154,5 +154,8 @@
   },
   "noData": {
     "message": "还没闻到味儿~"
+  },
+  "regularFilterPlaceholder": {
+    "message": "正则筛选 匹配资源url 回车确认"
   }
 }
