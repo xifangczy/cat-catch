@@ -1,5 +1,9 @@
 // 简写翻译函数
-const i18n = chrome.i18n.getMessage;
+const i18n = new Proxy(chrome.i18n.getMessage, {
+    get: function (target, key) {
+        return chrome.i18n.getMessage(key);
+    }
+});
 // 全局变量
 var G = {};
 G.initSyncComplete = false;

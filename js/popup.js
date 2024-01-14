@@ -531,7 +531,7 @@ $("[go]").click(function () {
 // 暂停 启用
 $("#enable").click(function () {
     chrome.runtime.sendMessage({ Message: "enable" }, function (state) {
-        $("#enable").html(state ? i18n("pause") : i18n("enable"));
+        $("#enable").html(state ? i18n.pause : i18n.enable);
     });
 });
 // 一些需要等待G变量加载完整的操作
@@ -546,7 +546,7 @@ const interval = setInterval(function () {
     // 填充数据
     chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getData", tabId: G.tabId }, function (data) {
         if (!data || data === "OK") {
-            $tips.html(i18n("noData"));
+            $tips.html(i18n.noData);
             return;
         }
         currentCount = data.length;
@@ -598,15 +598,15 @@ function updateButton() {
         for (let key in state) {
             const $DOM = $(`#${key}`);
             if (key == "MobileUserAgent") {
-                $DOM.html(state.MobileUserAgent ? i18n("closeSimulation") : i18n("simulateMobile"));
+                $DOM.html(state.MobileUserAgent ? i18n.closeSimulation : i18n.simulateMobile);
                 continue;
             }
             if (key == "AutoDown") {
-                $DOM.html(state.AutoDown ? i18n("closeSimulation") : i18n("autoDownload"));
+                $DOM.html(state.AutoDown ? i18n.closeSimulation : i18n.autoDownload);
                 continue;
             }
             if (key == "enable") {
-                $DOM.html(state.enable ? i18n("pause") : i18n("enable"));
+                $DOM.html(state.enable ? i18n.pause : i18n.enable);
                 continue;
             }
             const script = G.scriptList.get(key + ".js");
@@ -695,7 +695,7 @@ function Tips(text, delay = 200) {
 * 如果标签是其他设置 隐藏底部按钮
 */
 function UItoggle() {
-    getData().size > 0 ? $tips.hide() : $tips.show().html(i18n("noData"));
+    getData().size > 0 ? $tips.hide() : $tips.show().html(i18n.noData);
     $currentCount.text(currentCount ? `[${currentCount}]` : "");
     $allCount.text(allCount ? `[${allCount}]` : "");
     if ($('.TabShow').attr("id") == "otherOptions") {
