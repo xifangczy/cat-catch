@@ -1,0 +1,158 @@
+{
+  "confirm": {
+    "message": "Confirm"
+  },
+  "currentPage": {
+    "message": "Current Page"
+  },
+  "otherPage": {
+    "message": "Other Page"
+  },
+  "otherFeatures": {
+    "message": "Other Features"
+  },
+  "mediaControl": {
+    "message": "Media Control"
+  },
+  "loadingData": {
+    "message": "Loading Data..."
+  },
+  "selectWebpage": {
+    "message": "Select Webpage:"
+  },
+  "selectMedia": {
+    "message": "Select Media:"
+  },
+  "noMediaDetected": {
+    "message": "No Media Detected on Webpage"
+  },
+  "noControllableMediaDetected": {
+    "message": "No Controllable Media Detected"
+  },
+  "multiplier": {
+    "message": "Multiplier:"
+  },
+  "speedPlayback": {
+    "message": "Speed Playback"
+  },
+  "play": {
+    "message": "Play"
+  },
+  "pictureInPicture": {
+    "message": "Picture in Picture"
+  },
+  "fullscreen": {
+    "message": "Fullscreen"
+  },
+  "screenshot": {
+    "message": "Screenshot"
+  },
+  "loop": {
+    "message": "Loop"
+  },
+  "mute": {
+    "message": "Mute"
+  },
+  "volume": {
+    "message": "Volume"
+  },
+  "functionEntry": {
+    "message": "Function Entry"
+  },
+  "downloader": {
+    "message": "Downloader"
+  },
+  "m3u8Parser": {
+    "message": "M3U8 Parser"
+  },
+  "mpdParser": {
+    "message": "MPD Parser"
+  },
+  "jsonFormatter": {
+    "message": "JSON Formatter"
+  },
+  "expandAll": {
+    "message": "Expand All"
+  },
+  "expandPlayable": {
+    "message": "Expand Playable"
+  },
+  "expandSelected": {
+    "message": "Expand Selected"
+  },
+  "collapseAll": {
+    "message": "Collapse All"
+  },
+  "videoRecording": {
+    "message": "Video Recording"
+  },
+  "closeRecording": {
+    "message": "Close Recording"
+  },
+  "recordWebRTC": {
+    "message": "Record WebRTC"
+  },
+  "screenCapture": {
+    "message": "Screen Capture"
+  },
+  "simulateMobile": {
+    "message": "Simulate Mobile"
+  },
+  "autoDownload": {
+    "message": "Auto Download"
+  },
+  "onlineMerge": {
+    "message": "Online Merge"
+  },
+  "download": {
+    "message": "Download"
+  },
+  "copy": {
+    "message": "Copy"
+  },
+  "selectAll": {
+    "message": "Select All"
+  },
+  "invertSelection": {
+    "message": "Invert Selection"
+  },
+  "filter": {
+    "message": "Filter"
+  },
+  "clear": {
+    "message": "Clear"
+  },
+  "deepSearch": {
+    "message": "Deep Search"
+  },
+  "closeSearch": {
+    "message": "Close Search"
+  },
+  "cacheCapture": {
+    "message": "Cache Capture"
+  },
+  "closeCapture": {
+    "message": "Close Capture"
+  },
+  "moreFeatures": {
+    "message": "More Features"
+  },
+  "pause": {
+    "message": "Pause"
+  },
+  "settings": {
+    "message": "Settings"
+  },
+  "closeSimulation": {
+    "message": "Close Simulation"
+  },
+  "closeDownload": {
+    "message": "Close Download"
+  },
+  "enable": {
+    "message": "Enable"
+  },
+  "noData": {
+    "message": "No Fish"
+  }
+}

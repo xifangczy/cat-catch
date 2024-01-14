@@ -13,101 +13,106 @@
 <body>
   <div class="Tabs">
     <div id="currentTab" class="TabButton Active">
-      当前页面
+      <span data-i18n-outer="currentPage"></span>
       <div id="quantity"></div>
     </div>
     <div id="allTab" class="TabButton">
-      其他页面
+      <span data-i18n-outer="otherPage"></span>
       <div id="quantity"></div>
     </div>
     <div id="otherTab" class="TabButton">
-      媒体控制 / 其他功能
+      <span data-i18n-outer="otherPage"></span> / <span data-i18n-outer="mediaControl"></span>
     </div>
   </div>
-  <div id="Tips">数据载入中...</div>
+  <div id="Tips" data-i18n="loadingData">
+  </div>
   <div id="TipsFixed">~</div>
   <div id="mediaList" class="container hide TabShow"></div>
   <div id="allMediaList" class="container hide"></div>
   <div id="otherOptions" class="container hide">
-    <div class="otherTips">媒体控制</div>
+    <div class="otherTips" data-i18n="mediaControl"></div>
     <div class="flexRow">
-      <b class="nowrap">选择网页:</b>
+      <b class="nowrap" data-i18n="selectWebpage"></b>
       <select id="videoTabIndex">
-        <option value="-1" id="videoTabTips">未检测到有媒体的网页</option>
+        <option value="-1" id="videoTabTips" data-i18n="noMediaDetected"></option>
       </select>
     </div>
     <div class="flexRow">
-      <b class="nowrap">选择媒体:</b>
+      <b class="nowrap" data-i18n="selectMedia"></b>
       <select id="videoIndex">
-        <option value="-1" id="videoIndexTips">未检测到可操控媒体</option>
+        <option value="-1" id="videoIndexTips" data-i18n="noControllableMediaDetected"></option>
       </select>
     </div>
     <div id="PlayControl" class="textColor">
-      倍数:<input id="playbackRate" type="number" value="2" min="0.1" max="16" step="1" />
-      <button id="speed" class="button2">倍速播放</button>
-      <button id="control" data-switch="play">播放</button>
-      <button id="pip" class="firefoxHide">画中画</button>
-      <button id="fullScreen" class="firefoxHide">全屏</button>
-      <button id="screenshot" data-switch="play">截图</button>
+      <span data-i18n-outer="multiplier"></span><input id="playbackRate" type="number" value="2" min="0.1" max="16"
+        step="1" />
+      <button id="speed" class="button2" data-i18n="speedPlayback"></button>
+      <button id="control" data-switch="play" data-i18n="play"></button>
+      <button id="pip" class="firefoxHide" data-i18n="pictureInPicture"></button>
+      <button id="fullScreen" class="firefoxHide" data-i18n="fullscreen"></button>
+      <button id="screenshot" data-switch="play" data-i18n="screenshot"></button>
       <label class="flexColumn loop">
-        <div>循环</div><input type="checkbox" id="loop">
+        <div data-i18n="loop"></div><input type="checkbox" id="loop">
       </label>
       <label class="flexColumn muted">
-        <div>静音</div><input type="checkbox" id="muted">
+        <div data-i18n="mute"></div><input type="checkbox" id="muted">
       </label>
       <div class="flexColumn">
-        <div>音 量</div><input type="range" id="volume" class="volume" min="0" max="1" value="1" step="0.01" />
+        <div data-i18n="volume"></div><input type="range" id="volume" class="volume" min="0" max="1" value="1"
+          step="0.01" />
       </div>
       <div class="flexColumn width100">
         <div id="timeShow"></div><input type="range" id="time" class="width100" min="0" max="100" value="0" step="1" />
       </div>
     </div>
     <div class="line"></div>
-    <div class="otherTips">功能入口</div>
+    <div class="otherTips" data-i18n="functionEntry"></div>
     <div class="otherFeat flexRow">
-      <button go="download.html" class="button2">下载器</button>
-      <button go="m3u8.html" class="button2">M3U8解析器</button>
-      <button go="mpd.html" class="button2">MPD解析器</button>
-      <button go="json.html" class="button2">JSON格式化</button>
+      <button go="download.html" class="button2" data-i18n="downloader"></button>
+      <button go="m3u8.html" class="button2" data-i18n="m3u8Parser"></button>
+      <button go="mpd.html" class="button2" data-i18n="mpdParser"></button>
+      <button go="json.html" class="button2" data-i18n="jsonFormatter"></button>
       <button go="https://ffmpeg.bmmmd.com/" class="button2">FFmpeg</button>
     </div>
   </div>
   <div id="filter" class="more">
     <span id="regular" class="width100 regular">
-      <input type="text" placeholder="正则筛选 匹配资源url 回车确认"><button id="regularFilter" class="hide">确认</button>
+      <input type="text" placeholder="正则筛选 匹配资源url 回车确认"><button id="regularFilter" class="hide"
+        data-i18n="confirm"></button>
     </span>
     <div id="ext"></div>
   </div>
   <div id="features" class="more flex-end">
-    <button id="unfoldAll">展开全部</button>
-    <button id="unfoldPlay">展开可播放</button>
-    <button id="unfoldFilter">展开所选</button>
-    <button id="fold">关闭展开</button>
-    <button class="button2" id="recorder" type="script" class="hide">视频录制</button>
-    <button class="button2" id="webrtc" type="script" class="hide">录制webRTC</button>
-    <button class="button2" id="recorder2" type="script" class="hide">屏幕捕捉</button>
-    <button id="MobileUserAgent" class="button2">模拟手机</button>
-    <button id="AutoDown" class="button2">自动下载</button>
+    <button id="unfoldAll" data-i18n="expandAll"></button>
+    <button id="unfoldPlay" data-i18n="expandPlayable"></button>
+    <button id="unfoldFilter" data-i18n="expandSelected"></button>
+    <button id="fold" data-i18n="collapseAll"></button>
+    <button class="button2" id="recorder" type="script" class="hide" data-i18n="videoRecording"></button>
+    <button class="button2" id="webrtc" type="script" class="hide" data-i18n="recordWebRTC"></button>
+    <button class="button2" id="recorder2" type="script" class="hide" data-i18n="screenCapture"></button>
+    <button id="MobileUserAgent" class="button2" data-i18n="simulateMobile"></button>
+    <button id="AutoDown" class="button2" data-i18n="autoDownload"></button>
   </div>
   <div id="down">
-    <button id="mergeDown" class="button2 hide">在线合并</button>
-    <button id="DownFile">下载</button>
-    <button id="AllCopy">复制</button>
-    <button id="AllSelect">全选</button>
-    <button id="ReSelect">反选</button>
-    <button id="openFilter" panel="filter">筛选</button>
-    <button id="Clear">清空</button>
-    <button id="search" class="button2 hide" type="script">深度搜索</button>
-    <button id="catch" class="button2 hide" type="script">缓存捕捉</button>
-    <button id="more" class="button2" panel="features">更多功能</button>
-    <button id="enable" class="button2">暂停</button>
-    <button id="Options" go="options.html" class="button2">设置</button>
+    <button id="mergeDown" class="button2 hide" data-i18n="onlineMerge"></button>
+    <button id="DownFile" data-i18n="download"></button>
+    <button id="AllCopy" data-i18n="copy"></button>
+    <button id="AllSelect" data-i18n="selectAll"></button>
+    <button id="ReSelect" data-i18n="invertSelection"></button>
+    <button id="openFilter" panel="filter" data-i18n="filter"></button>
+    <button id="Clear" data-i18n="clear"></button>
+    <button id="search" class="button2 hide" type="script" data-i18n="deepSearch"></button>
+    <button id="catch" class="button2 hide" type="script" data-i18n="cacheCapture"></button>
+    <button id="more" class="button2" panel="features" data-i18n="moreFeatures"></button>
+    <button id="enable" class="button2" data-i18n="pause"></button>
+    <button id="Options" go="options.html" class="button2" data-i18n="settings"></button>
   </div>
   <script src="lib/base64.js"></script>
   <script src="js/popup.js"></script>
   <script src="js/media-control.js"></script>
   <script src="lib/jquery.qrcode.min.js"></script>
   <script src="lib/hls.min.js"></script>
+  <script src="js/i18n.js"></script>
 </body>
 
 </html>

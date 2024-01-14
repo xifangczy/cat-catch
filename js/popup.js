@@ -524,10 +524,6 @@ if (G.isFirefox) {
     $("body").addClass("fixFirefoxRight");
     $(".firefoxHide").each(function () { $(this).hide(); });
 }
-// 解决浏览器字体设置超过16px按钮变高遮挡一条资源
-if ($down[0].offsetHeight > 30) {
-    $(".container").css("margin-bottom", ($down[0].offsetHeight + 2) + "px");
-}
 // 跳转页面
 $("[go]").click(function () {
     chrome.tabs.create({ url: this.getAttribute("go") });
@@ -535,7 +531,7 @@ $("[go]").click(function () {
 // 暂停 启用
 $("#enable").click(function () {
     chrome.runtime.sendMessage({ Message: "enable" }, function (state) {
-        $("#enable").html(state ? "暂停" : "启用");
+        $("#enable").html(state ? i18n("pause") : i18n("enable"));
     });
 });
 // 一些需要等待G变量加载完整的操作
@@ -550,7 +546,7 @@ const interval = setInterval(function () {
     // 填充数据
     chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getData", tabId: G.tabId }, function (data) {
         if (!data || data === "OK") {
-            $tips.html("还没闻到味儿~");
+            $tips.html(i18n("noData"));
             return;
         }
         currentCount = data.length;
@@ -588,6 +584,11 @@ const interval = setInterval(function () {
     $("#playbackRate").val(G.playbackRate);
 
     $(`<style>${G.css}</style>`).appendTo("head");
+
+    // 解决浏览器字体设置超过16px按钮变高遮挡一条资源
+    if ($down[0].offsetHeight > 30) {
+        $(".container").css("margin-bottom", ($down[0].offsetHeight + 2) + "px");
+    }
 }, 4);
 /********************绑定事件END********************/
 
@@ -597,15 +598,15 @@ function updateButton() {
         for (let key in state) {
             const $DOM = $(`#${key}`);
             if (key == "MobileUserAgent") {
-                $DOM.html(state.MobileUserAgent ? "关闭模拟" : "模拟手机");
+                $DOM.html(state.MobileUserAgent ? i18n("closeSimulation") : i18n("simulateMobile"));
                 continue;
             }
             if (key == "AutoDown") {
-                $DOM.html(state.AutoDown ? "关闭下载" : "自动下载");
+                $DOM.html(state.AutoDown ? i18n("closeSimulation") : i18n("autoDownload"));
                 continue;
             }
             if (key == "enable") {
-                $DOM.html(state.enable ? "暂停" : "启用");
+                $DOM.html(state.enable ? i18n("pause") : i18n("enable"));
                 continue;
             }
             const script = G.scriptList.get(key + ".js");
@@ -694,7 +695,7 @@ function Tips(text, delay = 200) {
 * 如果标签是其他设置 隐藏底部按钮
 */
 function UItoggle() {
-    getData().size > 0 ? $tips.hide() : $tips.show().html("还没闻到味儿~");
+    getData().size > 0 ? $tips.hide() : $tips.show().html(i18n("noData"));
     $currentCount.text(currentCount ? `[${currentCount}]` : "");
     $allCount.text(allCount ? `[${allCount}]` : "");
     if ($('.TabShow').attr("id") == "otherOptions") {

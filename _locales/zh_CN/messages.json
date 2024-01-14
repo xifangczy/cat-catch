@@ -1,0 +1,158 @@
+{
+  "confirm": {
+    "message": "确认"
+  },
+  "currentPage": {
+    "message": "当前页面"
+  },
+  "otherPage": {
+    "message": "其他页面"
+  },
+  "otherFeatures": {
+    "message": "其他功能"
+  },
+  "mediaControl": {
+    "message": "媒体控制"
+  },
+  "loadingData": {
+    "message": "数据载入中..."
+  },
+  "selectWebpage": {
+    "message": "选择页面:"
+  },
+  "selectMedia": {
+    "message": "选择媒体:"
+  },
+  "noMediaDetected": {
+    "message": "未检测到有媒体的网页"
+  },
+  "noControllableMediaDetected": {
+    "message": "未检测到可操控媒体"
+  },
+  "multiplier": {
+    "message": "倍数:"
+  },
+  "speedPlayback": {
+    "message": "倍速播放"
+  },
+  "play": {
+    "message": "播放"
+  },
+  "pictureInPicture": {
+    "message": "画中画"
+  },
+  "fullscreen": {
+    "message": "全屏"
+  },
+  "screenshot": {
+    "message": "截图"
+  },
+  "loop": {
+    "message": "循环"
+  },
+  "mute": {
+    "message": "静音"
+  },
+  "volume": {
+    "message": "音 量"
+  },
+  "functionEntry": {
+    "message": "功能入口"
+  },
+  "downloader": {
+    "message": "下载器"
+  },
+  "m3u8Parser": {
+    "message": "M3U8解析器"
+  },
+  "mpdParser": {
+    "message": "MPD解析器"
+  },
+  "jsonFormatter": {
+    "message": "JSON格式化"
+  },
+  "expandAll": {
+    "message": "展开全部"
+  },
+  "expandPlayable": {
+    "message": "展开可播放"
+  },
+  "expandSelected": {
+    "message": "展开所选"
+  },
+  "collapseAll": {
+    "message": "关闭展开"
+  },
+  "videoRecording": {
+    "message": "视频录制"
+  },
+  "closeRecording": {
+    "message": "关闭录制"
+  },
+  "recordWebRTC": {
+    "message": "录制webRTC"
+  },
+  "screenCapture": {
+    "message": "屏幕捕捉"
+  },
+  "simulateMobile": {
+    "message": "模拟手机"
+  },
+  "autoDownload": {
+    "message": "自动下载"
+  },
+  "onlineMerge": {
+    "message": "在线合并"
+  },
+  "download": {
+    "message": "下载"
+  },
+  "copy": {
+    "message": "复制"
+  },
+  "selectAll": {
+    "message": "全选"
+  },
+  "invertSelection": {
+    "message": "反选"
+  },
+  "filter": {
+    "message": "筛选"
+  },
+  "clear": {
+    "message": "清空"
+  },
+  "deepSearch": {
+    "message": "深度搜索"
+  },
+  "closeSearch": {
+    "message": "关闭搜索"
+  },
+  "cacheCapture": {
+    "message": "缓存捕捉"
+  },
+  "closeCapture": {
+    "message": "关闭捕捉"
+  },
+  "moreFeatures": {
+    "message": "更多功能"
+  },
+  "pause": {
+    "message": "暂停"
+  },
+  "settings": {
+    "message": "设置"
+  },
+  "closeSimulation": {
+    "message": "关闭模拟"
+  },
+  "closeDownload": {
+    "message": "关闭下载"
+  },
+  "enable": {
+    "message": "启用"
+  },
+  "noData": {
+    "message": "还没闻到味儿~"
+  }
+}

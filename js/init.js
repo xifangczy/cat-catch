@@ -1,3 +1,5 @@
+// 简写翻译函数
+const i18n = chrome.i18n.getMessage;
 // 全局变量
 var G = {};
 G.initSyncComplete = false;
@@ -110,11 +112,11 @@ if (navigator.userAgent.includes("Chrome/")) {
 
 // 脚本列表
 G.scriptList = new Map();
-G.scriptList.set("search.js", { key: "search", refresh: true, allFrames: true, world: "MAIN", name: "深度搜索", off: "关闭搜索", tabId: new Set() });
-G.scriptList.set("catch.js", { key: "catch", refresh: true, allFrames: true, world: "MAIN", name: "缓存捕捉", off: "关闭捕捉", tabId: new Set() });
-G.scriptList.set("recorder.js", { key: "recorder", refresh: false, allFrames: true, world: "MAIN", name: "视频录制", off: "关闭录制", tabId: new Set() });
-G.scriptList.set("recorder2.js", { key: "recorder2", refresh: false, allFrames: false, world: "ISOLATED", name: "屏幕捕捉", off: "关闭捕捉", tabId: new Set() });
-G.scriptList.set("webrtc.js", { key: "webrtc", refresh: true, allFrames: true, world: "MAIN", name: "录制webRTC", off: "关闭录制", tabId: new Set() });
+G.scriptList.set("search.js", { key: "search", refresh: true, allFrames: true, world: "MAIN", name: i18n("deepSearch"), off: i18n("closeSearch"), tabId: new Set() });
+G.scriptList.set("catch.js", { key: "catch", refresh: true, allFrames: true, world: "MAIN", name: i18n("cacheCapture"), off: i18n("closeCapture"), tabId: new Set() });
+G.scriptList.set("recorder.js", { key: "recorder", refresh: false, allFrames: true, world: "MAIN", name: i18n("videoRecording"), off: i18n("closeRecording"), tabId: new Set() });
+G.scriptList.set("recorder2.js", { key: "recorder2", refresh: false, allFrames: false, world: "ISOLATED", name: i18n("screenCapture"), off: i18n("closeCapture"), tabId: new Set() });
+G.scriptList.set("webrtc.js", { key: "webrtc", refresh: true, allFrames: true, world: "MAIN", name: i18n("recordWebRTC"), off: i18n("closeRecording"), tabId: new Set() });
 
 // ffmpeg
 const ffmpeg = {
