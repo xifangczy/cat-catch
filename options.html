@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>猫抓 设置</title>
+  <title>titleOption</title>
   <link rel="stylesheet" type="text/css" href="css/public.css" media="all" />
   <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
   <script src="lib/jquery.min.js"></script>
@@ -14,105 +14,111 @@
 <body>
   <div class="wrapper">
     <section>
-      <h1 class="optionsTitle">抓取后缀</h1>
+      <h1 class="optionsTitle" data-i18n="suffix"></h1>
       <div class="optionBox">
-        <span class="explain">填写不含"."的后缀, 不过滤大小填0</span>
+        <span class="explain" data-i18n="suffixTip"></span>
         <table id="extList">
           <tr>
-            <th>扩展名</th>
-            <th>过滤大小</th>
-            <th>启用</th>
-            <th>删除</th>
+            <th data-i18n="extensionName"></th>
+            <th data-i18n="filterSize"></th>
+            <th data-i18n="enable"></th>
+            <th data-i18n="delete"></th>
           </tr>
         </table>
         <div class="flex-end">
-          <button type="button" id="AddExt" class="button2">添加后缀</button>
-          <button type="button" id="ResetExt" data-reset="Ext">重置后缀设置</button>
-          <button type="button" id="allDisable" data-switch="Ext">全部禁用</button>
-          <button type="button" id="allEnable" data-switch="Ext">全部启用</button>
+          <button type="button" id="AddExt" class="button2" data-i18n="addSuffix"></button>
+          <button type="button" id="ResetExt" data-reset="Ext" data-i18n="resetSuffixSettings"></button>
+          <button type="button" id="allDisable" data-switch="Ext" data-i18n="disableAll"></button>
+          <button type="button" id="allEnable" data-switch="Ext" data-i18n="enableAll"></button>
         </div>
       </div>
     </section>
 
     <section>
-      <h1 class="optionsTitle">抓取类型</h1>
+      <h1 class="optionsTitle" data-i18n="type"></h1>
       <div class="optionBox">
-        <span class="explain">填入正确的content-type类型, 不过滤大小填0</span>
+        <span class="explain" data-i18n="typeTip"></span>
         <table id="typeList">
           <tr>
-            <th>类型</th>
-            <th>过滤大小</th>
-            <th>启用</th>
-            <th>删除</th>
+            <th data-i18n="type"></th>
+            <th data-i18n="filterSize"></th>
+            <th data-i18n="enable"></th>
+            <th data-i18n="delete"></th>
           </tr>
         </table>
         <div class="flex-end">
-          <button type="button" id="AddType" class="button2">添加类型</button>
-          <button type="button" id="ResetType" data-reset="Type">重置类型设置</button>
-          <button type="button" id="allDisable" data-switch="Type">全部禁用</button>
-          <button type="button" id="allEnable" data-switch="Type">全部启用</button>
+          <button type="button" id="AddType" class="button2" data-i18n="addType"></button>
+          <button type="button" id="ResetType" data-reset="Type" data-i18n="resetTypeSettings"></button>
+          <button type="button" id="allDisable" data-switch="Type" data-i18n="disableAll"></button>
+          <button type="button" id="allEnable" data-switch="Type" data-i18n="enableAll"></button>
         </div>
       </div>
     </section>
 
     <section>
       <h1 class="optionsTitle">
-        <img src="img/regex.png" style="width: 18px" />正则匹配 / 屏蔽资源
+        <img src="img/regex.png" style="width: 18px" /><span data-i18n-outer="regexMatch"></span> / <span
+          data-i18n-outer="blockResource"></span>
       </h1>
       <div class="optionBox">
-        <span class="explain"><b>屏蔽资源</b> 屏蔽不想出现的资源</span><br>
-        <span class="explain"><b>标志</b> i: 忽略大小写, g: 全局搜索。也可为空。</span><br>
-        <span class="explain"><b>扩展</b> 为获取到的URL指定一个扩展名, 可留空，会自动截取扩展名(很多文件并不存在扩展名)</span><br>
-        <span class="explain"><b>提示</b> 正则表达式占用资源较高, 非必要谨慎使用</span><br><br>
+        <span class="explain"><b data-i18n="blockResource"></b>
+          <p data-i18n-outer="blockResourceTip"></p>
+        </span><br>
+        <span class="explain"><b data-i18n="flag"></b>
+
+        </span><br>
+        <span class="explain"><b data-i18n="suffix"></b>
+          <p data-i18n-outer="regexSuffixTip"></p>
+        </span><br>
+        <span class="explain"><b data-i18n="regexTip"></b></span><br><br>
         <table id="regexList">
           <tr>
-            <th>标志</th>
-            <th>正则表达式</th>
-            <th>扩展</th>
-            <th>屏蔽资源</th>
-            <th>启用</th>
-            <th>删除</th>
+            <th data-i18n="flag"></th>
+            <th data-i18n="regexExpression"></th>
+            <th data-i18n="suffix"></th>
+            <th data-i18n="blockResource"></th>
+            <th data-i18n="enable"></th>
+            <th data-i18n="delete"></th>
           </tr>
         </table>
         <div class="flex-end">
-          <button type="button" id="AddRegex" class="button2">添加正则</button>
-          <button type="button" id="ResetRegex" data-reset="Regex">重置正则设置</button>
-          <button type="button" id="allDisable" data-switch="Regex">全部禁用</button>
-          <button type="button" id="allEnable" data-switch="Regex">全部启用</button>
+          <button type="button" id="AddRegex" class="button2" data-i18n="addRegex"></button>
+          <button type="button" id="ResetRegex" data-reset="Regex" data-i18n="resetRegexSettings"></button>
+          <button type="button" id="allDisable" data-switch="Regex" data-i18n="disableAll"></button>
+          <button type="button" id="allEnable" data-switch="Regex" data-i18n="enableAll"></button>
         </div>
-        <span style="font-weight: bold; font-size: 15px">正则测试</span><br />
-        <span>要匹配的URL:</span><br />
+        <span style="font-weight: bold; font-size: 15px" data-i18n="regexTest"></span><br />
+        <span data-i18n="urlToMatch"></span><br />
         <input type="text" id="testUrl" style="width: 590px" /><br />
-        <span>正则表达式:</span><br />
+        <span data-i18n="regexTest"></span><br />
         <input type="text" id="testRegex" style="width: 590px" /><br />
-        <span>标识符:</span><br />
+        <span data-i18n="flag"></span><br />
         <input type="text" id="testFlag" style="width: 20px" value="ig" />
-        结果: <span style="color: #ff0000" id="testResult">不匹配</span>
+        结果: <span style="color: #ff0000" id="testResult" data-i18n="noMatch"></span>
       </div>
     </section>
 
     <section>
-      <h1 class="optionsTitle">
-        复制选项
-      </h1>
+      <h1 class="optionsTitle" data-i18n="copy"></h1>
       <div class="optionBox">
         <span class="explain">
-          为方便使用第三方应用，自定义复制按钮写入剪贴板的内容。<br />
-          <a href="https://o2bmm.gitbook.io/cat-catch/docs/settings#keywords" target="_blank">猫抓替换关键词列表</a><br /><br />
+          <p data-i18n-outer="copyTip"></p><br />
+          <a href="https://o2bmm.gitbook.io/cat-catch/docs/settings#keywords" target="_blank"
+            data-i18n="replaceKeywordList"></a><br /><br />
           <div class="item">
-            <div>HLS m3u8文件</div>
+            <div>HLS m3u8</div>
             <textarea id="copyM3U8" save="input" type="text" class="width100"></textarea>
           </div>
           <div class="item" style="margin-top: 10px;">
-            <div>DASH mpb文件</div>
+            <div>DASH mpb</div>
             <textarea id="copyMPD" save="input" type="text" class="width100"></textarea>
           </div>
           <div class="item" style="margin-top: 10px;">
-            <div>其他文件</div>
+            <div data-i18n="otherFiles"></div>
             <textarea id="copyOther" save="input" type="text" class="width100"></textarea>
           </div>
           <div class="flex-end">
-            <button type="button" id="ResetCopy">重置复制设置</button>
+            <button type="button" id="ResetCopy" data-i18n="resetCopySettings"></button>
           </div>
       </div>
     </section>
@@ -122,12 +128,14 @@
         Aria2 RPC
       </h1>
       <div class="optionBox">
-        <span class="explain">非常优秀的下载工具 使用方法查看
-          <a href="https://aria2.github.io/manual/en/html/aria2c.html#rpc-interface" target="_blank">用户文档</a>
+        <span class="explain">
+          <p data-i18n-outer="aria2Tip"></p>
+          <a href="https://aria2.github.io/manual/en/html/aria2c.html#rpc-interface" target="_blank"
+            data-i18n="documentation"></a>
         </span>
         <div class="list">
           <div class="item">
-            <div>启用 Aria2 RPC</div>
+            <div><span data-i18n-outer="enable"></span> Aria2 RPC</div>
             <div class="switch">
               <label class="switchLabel switchRadius">
                 <input type="checkbox" id="enableAria2Rpc" save="click" class="switchInput" />
@@ -136,7 +144,7 @@
             </div>
           </div>
           <div class="item">
-            <div>自动设置Referer cookie参数</div>
+            <div data-i18n="autoSetRefererCookieParams"></div>
             <div class="switch">
               <label class="switchLabel switchRadius">
                 <input type="checkbox" id="enableAria2RpcReferer" save="click" class="switchInput" />
@@ -145,11 +153,11 @@
             </div>
           </div>
           <div class="item">
-            <div>密钥</div>
+            <div data-i18n="secretKey"></div>
             <input id="aria2RpcToken" save="input" type="text" class="width100"></input>
           </div>
           <div class="item">
-            <div>Aira2 RPC 地址</div>
+            <div>Aira2 RPC <span data-i18n-outer="address"></span></div>
             <input id="aria2Rpc" save="input" type="text" class="width100"></input>
           </div>
         </div>
@@ -159,13 +167,14 @@
     <section>
       <h1 class="optionsTitle"><a href="https://github.com/nilaoda/N_m3u8DL-CLI" target="_blank">N_m3u8DL-CLI</a></h1>
       <div class="optionBox" id="m3u8dlOption">
-        <span class="explain">非常优秀的m3u8 mpd第三方下载工具 使用方法查看
-          <a href="https://o2bmm.gitbook.io/cat-catch/docs/m3u8dl" target="_blank">用户文档</a>
+        <span class="explain">
+          <p data-i18n-outer="m3u8DLTips"></p>
+          <a href="https://o2bmm.gitbook.io/cat-catch/docs/m3u8dl" target="_blank" data-i18n="documentation"></a>
         </span>
         <div class="list">
           <div class="item">
-            <div>调用<a href="https://github.com/nilaoda/N_m3u8DL-CLI" target="_blank">N_m3u8DL-CLI</a>的m3u8dl://协议下载m3u8
-              和 mpd</div>
+            <div><span data-i18n-outer="invoke"> </span><a href="https://github.com/nilaoda/N_m3u8DL-CLI"
+                target="_blank">N_m3u8DL-CLI</a> m3u8dl:// <span data-i18n-outer="download"></span> m3u8 / mpd</div>
             <div class="switch">
               <label class="switchLabel switchRadius">
                 <input type="checkbox" id="m3u8dl" save="click" class="switchInput" />
@@ -175,46 +184,46 @@
           </div>
           <div class="item">
             <div style="margin-bottom: 5px;margin-top: 5px;">
-              <a href="https://o2bmm.gitbook.io/cat-catch/docs/settings#keywords" target="_blank">猫抓替换关键词列表</a>
+              <a href="https://o2bmm.gitbook.io/cat-catch/docs/settings#keywords" target="_blank"
+                data-i18n="replaceKeywordList"></a>
               <a href="https://nilaoda.github.io/N_m3u8DL-CLI/Advanced.html" target="_blank"
-                style="margin-left: 10px;">N_m3u8DL-CLI 参数</a>
-              <p>参数设置</p>
+                style="margin-left: 10px;">N_m3u8DL-CLI <span data-i18n-outer="parameter"></span></a>
+              <p data-i18n="parameterSetting"></p>
             </div>
             <textarea id="m3u8dlArg" save="input" type="text" class="width100 break-all" rows="3"></textarea>
           </div>
           <div class="flex-end">
-            <button type="button" id="ResetM3u8dl">重置参数设置</button>
+            <button type="button" id="ResetM3u8dl" data-i18n="resetParameterSetting"></button>
           </div>
         </div>
       </div>
     </section>
 
     <section>
-      <h1 class="optionsTitle">替换标签</h1>
+      <h1 class="optionsTitle" data-i18n="replaceTags"></h1>
       <div class="optionBox" id="tag">
-        <span class="explain">
-          用于N_m3u8DL-CLI 和 复制选项 的标签设置和测试
-        </span>
+        <span class="explain"></span>
         <div style="margin-bottom: 5px;">
-          <a href="https://o2bmm.gitbook.io/cat-catch/docs/settings#keywords" target="_blank">猫抓替换关键词列表</a>
+          <a href="https://o2bmm.gitbook.io/cat-catch/docs/settings#keywords" target="_blank"
+            data-i18n="replaceKeywordList"></a>
         </div>
         <div class="list">
           <div class="item">
-            <div>自定义保存文件名</div>
+            <div data-i18n="customSaveFileName"></div>
             <textarea id="downFileName" save="input" type="text" class="width100"></textarea>
           </div>
           <div class="item">
-            <div>标签 ${userAgent} 留空默认为当前浏览器 User Agent</div>
+            <div>${userAgent} <span data-i18n-outer="userAgentTip"></span></div>
             <textarea id="userAgent" save="input" type="text" class="width100"></textarea>
           </div>
           <div class="item">
-            <div>标签 ${mobileUserAgent} / 模拟手机User Agent</div>
+            <div>${mobileUserAgent} / <span data-i18n-outer="simulateMobile"></span>User Agent</div>
             <textarea id="MobileUserAgent" save="input" type="text" class="width100"></textarea>
           </div>
           <div id="testTag" class="hide break-all">
             <div class="item">
               <div>
-                <p>测试</p>
+                <p data-i18n="test"></p>
               </div>
               <textarea id="testTextarea" type="text" class="width100 break-all"
                 rows="3">${url} ${referer|exists:'--headers "Referer:*"'} ${url|regexp:"(https?://[^?]*)"|replace:"http://","https://"|to:base64}</textarea>
@@ -223,26 +232,24 @@
             ${referer}<input type="text" class="width100" value="https://bmmmd.com/" id="referer">
             ${initiator}<input type="text" class="width100" value="https://bmmmd.com" id="initiator">
             ${webUrl}<input type="text" class="width100" value="https://bmmmd.com/test.html" id="webUrl">
-            ${title}<input type="text" class="width100" value="测试视频" id="title">
-            替换后:<br><span id="tagTestResult"></span>
+            ${title}<input type="text" class="width100" value="test Video" id="title">
+            <span data-i18n-outer="result"></span>:<br><span id="tagTestResult"></span>
           </div>
           <div class="flex-end">
-            <button type="button" id="showTestTag">测试</button>
-            <button type="button" id="ResetTag">重置标签设置</button>
+            <button type="button" id="showTestTag" data-i18n="test"></button>
+            <button type="button" id="ResetTag" data-i18n="resetTagSettings"></button>
           </div>
         </div>
       </div>
     </section>
 
     <section>
-      <h1 class="optionsTitle">下载器</h1>
+      <h1 class="optionsTitle" data-i18n="downloader"></h1>
       <div class="optionBox" id="downOption">
-        <span class="explain">
-          如果检测到资源下载失败, 自动启用下载器再次尝试下载.
-        </span>
+        <span class="explain" data-i18n="downloaderTip"></span>
         <div class="list">
           <div class="item">
-            <div>始终不启用猫抓下载器</div>
+            <div data-i18n="alwaysDisableCatCatcher"></div>
             <div class="switch">
               <label class="switchLabel switchRadius">
                 <input type="checkbox" id="catDownload" save="click" class="switchInput" />
@@ -252,7 +259,7 @@
           </div>
 
           <div class="item">
-            <div>下载完自动关闭页面</div>
+            <div data-i18n="autoClosePageAfterDownload"></div>
             <div class="switch">
               <label class="switchLabel switchRadius">
                 <input type="checkbox" id="downAutoClose" save="click" class="switchInput" />
@@ -262,7 +269,7 @@
           </div>
 
           <div class="item">
-            <div>后台打开下载器页面</div>
+            <div data-i18n="openDownloaderPageInBackground"></div>
             <div class="switch">
               <label class="switchLabel switchRadius">
                 <input type="checkbox" id="downActive" save="click" class="switchInput" />
@@ -275,11 +282,12 @@
     </section>
 
     <section>
-      <h1 class="optionsTitle">m3u8解析器</h1>
+      <h1 class="optionsTitle" data-i18n="m3u8Parser"></h1>
       <div class="optionBox" id="m3u8Option">
         <div class="list">
           <div class="item">
-            <div>扩展页点击 下载按钮<img src="img/download.png" style="width: 18px"> 立即开始合并下载(测试)</div>
+            <div><img src="img/download.png" style="width: 18px"> <span data-i18n-outer="autoDownM3u8Tip"></span>(<span
+                data-i18n-outer="test"></span>)</div>
             <div class="switch">
               <label class="switchLabel switchRadius">
                 <input type="checkbox" id="m3u8AutoDown" save="click" class="switchInput" />
@@ -292,18 +300,19 @@
     </section>
 
     <section>
-      <h1 class="optionsTitle">其他设置</h1>
+      <h1 class="optionsTitle" data-i18n="otherSettings"></h1>
       <div class="optionBox" id="OtherOption">
         <div class="list otherOption">
           <div class="item">
             <div>
-              使用本地播放器调用协议打开视频预览 <select id="PlayerTemplate" class="select"></select>
+              <span data-i18n-outer="previewMode"></span> <select id="PlayerTemplate" class="select"></select>
             </div>
-            <input id="Player" save="input" type="text" class="width100" placeholder="留空为不启用 默认使用popup页面预览视频" />
+            <input id="Player" save="input" type="text" class="width100"
+              data-i18n-placeholder="previewModePlaceholder" />
           </div>
 
           <div class="item">
-            <div>使用自定义文件名保存文件(默认为网页标题)</div>
+            <div data-i18n="customFilenameOption"></div>
             <div class="switch">
               <label class="switchLabel switchRadius">
                 <input type="checkbox" save="click" id="TitleName" class="switchInput" />
@@ -313,7 +322,7 @@
           </div>
 
           <div class="item">
-            <div>下载时选择保存目录</div>
+            <div data-i18n="saveAsOption"></div>
             <div class="switch">
               <label class="switchLabel switchRadius">
                 <input type="checkbox" id="saveAs" save="click" class="switchInput" />
@@ -323,7 +332,7 @@
           </div>
 
           <div class="item">
-            <div>显示网站图标</div>
+            <div data-i18n="iconOption"></div>
             <div class="switch">
               <label class="switchLabel switchRadius">
                 <input type="checkbox" save="click" id="ShowWebIco" class="switchInput" />
@@ -333,18 +342,18 @@
           </div>
 
           <div class="item">
-            <div>刷新、跳转到新页面 清空当前标签抓取的数据</div>
+            <div data-i18n="clearOption"></div>
             <div class="switch">
               <select id="autoClearMode" class="select" save="select">
-                <option value="0">不清空</option>
-                <option value="1">正常清理</option>
-                <option value="2">更频繁</option>
+                <option value="0" data-i18n="doNotClear"></option>
+                <option value="1" data-i18n="normalClear"></option>
+                <option value="2" data-i18n="moreFrequent"></option>
               </select>
             </div>
           </div>
 
           <div class="item">
-            <div>排除重复的资源 (资源过多会占用大量CPU)</div>
+            <div data-i18n="excludeDuplicateResources"></div>
             <div class="switch">
               <label class="switchLabel switchRadius">
                 <input type="checkbox" id="checkDuplicates" save="click" class="switchInput" />
@@ -355,13 +364,13 @@
 
         </div>
         <div class="flex-end">
-          <button type="button" id="ResetOption">重置其他设置</button>
+          <button type="button" id="ResetOption" data-i18n="resetOtherSettings"></button>
         </div>
       </div>
     </section>
 
     <section>
-      <h1 class="optionsTitle">自定义CSS</h1>
+      <h1 class="optionsTitle" data-i18n="customCSS"></h1>
       <div class="optionBox">
         <div class="item">
           <textarea id="css" save="input" type="text" class="width100" rows="10"></textarea>
@@ -370,27 +379,27 @@
     </section>
 
     <section>
-      <h1 class="optionsTitle">操作</h1>
+      <h1 class="optionsTitle" data-i18n="operation"></h1>
       <div class="optionBox">
         <div class="flex-end" style="justify-content: center">
           <input id="importOptionsFile" type="file" class="hide" />
-          <button type="button" id="exportOptions">导出设置</button>
-          <button type="button" id="importOptions">导入配置</button>
-          <button type="button" id="ClearData">清空抓取的数据</button>
-          <button type="button" id="ResetAllOption">重置所有设置</button>
-          <button type="button" id="extensionReload">重启扩展</button>
+          <button type="button" id="exportOptions" data-i18n="exportSettings"></button>
+          <button type="button" id="importOptions" data-i18n="importConfiguration"></button>
+          <button type="button" id="ClearData" data-i18n="clearCapturedData"></button>
+          <button type="button" id="ResetAllOption" data-i18n="resetAllSettings"></button>
+          <button type="button" id="extensionReload" data-i18n="restartExtension"></button>
         </div>
       </div>
     </section>
 
     <section>
-      <h1 class="optionsTitle">关于</h1>
+      <h1 class="optionsTitle" data-i18n="about"></h1>
       <div class="optionBox">
         <div class="item">
           <div id="version"></div>
         </div>
         <div class="item">
-          文档说明:
+          <span data-i18n-outer="documentation"></span>:
           <a href="https://o2bmm.gitbook.io/cat-catch/" target="_blank">
             https://o2bmm.gitbook.io/cat-catch/</a>
         </div>
@@ -405,6 +414,7 @@
 
   <script src="lib/base64.js"></script>
   <script src="js/options.js"></script>
+  <script src="js/i18n.js"></script>
 </body>
 
 </html>

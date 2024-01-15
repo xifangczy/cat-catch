@@ -1,4 +1,10 @@
 {
+  "catCatch": {
+    "message": "cat-catch"
+  },
+  "description": {
+    "message": "Web media sniffing tool"
+  },
   "confirm": {
     "message": "Confirm"
   },
@@ -152,10 +158,256 @@
   "enable": {
     "message": "Enable"
   },
+  "disable": {
+    "message": "Disable"
+  },
   "noData": {
     "message": "No Fish"
   },
   "regularFilterPlaceholder": {
     "message": "Regular expression filter, match resource URL, press Enter to confirm"
+  },
+  "option": {
+    "message": "Option"
+  },
+  "titleOption": {
+    "message": "cat-catch Option"
+  },
+  "suffix": {
+    "message": "Suffix"
+  },
+  "suffixTip": {
+    "message": "Fill in the suffix that does not contain '.', if no size filtering is needed, fill in 0."
+  },
+  "extensionName": {
+    "message": "Extension Name"
+  },
+  "filterSize": {
+    "message": "Filter Size"
+  },
+  "delete": {
+    "message": "Delete"
+  },
+  "addSuffix": {
+    "message": "Add Suffix"
+  },
+  "extension": {
+    "message": "Extension"
+  },
+  "resetSuffixSettings": {
+    "message": "Reset Suffix Settings"
+  },
+  "disableAll": {
+    "message": "Disable All"
+  },
+  "enableAll": {
+    "message": "Enable All"
+  },
+  "type": {
+    "message": "Type"
+  },
+  "addType": {
+    "message": "Add Type"
+  },
+  "resetTypeSettings": {
+    "message": "Reset Type Settings"
+  },
+  "typeTip": {
+    "message": "Enter the correct content-type, if no size filtering is needed, fill in 0."
+  },
+  "regexMatch": {
+    "message": "Regex Match"
+  },
+  "blockResource": {
+    "message": "Block Resource"
+  },
+  "alert": {
+    "message": "Alert"
+  },
+  "regexExpression": {
+    "message": "Regex Expression"
+  },
+  "addRegex": {
+    "message": "Add Regex"
+  },
+  "resetRegexSettings": {
+    "message": "Reset Regex Settings"
+  },
+  "regexTest": {
+    "message": "Regex Test"
+  },
+  "urlToMatch": {
+    "message": "URL to Match"
+  },
+  "flag": {
+    "message": "Flag"
+  },
+  "result": {
+    "message": "Result"
+  },
+  "match": {
+    "message": "Match"
+  },
+  "noMatch": {
+    "message": "No Match"
+  },
+  "blockResourceTip": {
+    "message": "Block the resources you do not want to appear"
+  },
+  "flagTip": {
+    "message": "i: ignore case, g: global search. It can also be left blank"
+  },
+  "regexSuffixTip": {
+    "message": "Assign a suffix to the obtained URL. It can be left blank, and the suffix will be automatically truncated (many files do not have a suffix)"
+  },
+  "regexTip": {
+    "message": "Regular expressions consume a lot of resources, use them carefully if not necessary"
+  },
+  "copyTip": {
+    "message": "For the convenience of using third-party applications, customize the content written to the clipboard by the copy button"
+  },
+  "replaceKeywordList": {
+    "message": "Replace the Keyword List"
+  },
+  "otherFiles": {
+    "message": "Other Files"
+  },
+  "resetCopySettings": {
+    "message": "Reset Copy Settings"
+  },
+  "autoSetRefererCookieParams": {
+    "message": "Automatically Set Referer and Cookie Parameters"
+  },
+  "secretKey": {
+    "message": "Secret Key"
+  },
+  "address": {
+    "message": "Address"
+  },
+  "documentation": {
+    "message": "Documentation"
+  },
+  "aria2Tip": {
+    "message": "An excellent download tool, see how to use"
+  },
+  "m3u8DLTips": {
+    "message": "An excellent third-party m3u8 and mpd download tool, see how to use"
+  },
+  "invoke": {
+    "message": "Invoke"
+  },
+  "parameter": {
+    "message": "Parameter"
+  },
+  "parameterSetting": {
+    "message": "Parameter Setting"
+  },
+  "resetParameterSetting": {
+    "message": "Reset Parameter Setting"
+  },
+  "test": {
+    "message": "Test"
+  },
+  "replaceTags": {
+    "message": "Replace Tags"
+  },
+  "customSaveFileName": {
+    "message": "Custom Save File Name"
+  },
+  "resetTagSettings": {
+    "message": "Reset Tag Settings"
+  },
+  "userAgentTip": {
+    "message": "Default to the current browser's User Agent"
+  },
+  "alwaysDisableCatCatcher": {
+    "message": "Always Disable Cat-Catch Downloader"
+  },
+  "autoClosePageAfterDownload": {
+    "message": "Automatically Close Page After Download"
+  },
+  "openDownloaderPageInBackground": {
+    "message": "Open Downloader Page in Background"
+  },
+  "downloaderTip": {
+    "message": "If the resource download fails, automatically enable the downloader to try again."
+  },
+  "autoDownM3u8Tip": {
+    "message": "Click the 'Download' button on the extension page to immediately start merging and downloading"
+  },
+  "otherSettings": {
+    "message": "Other Settings"
+  },
+  "resetOtherSettings": {
+    "message": "Reset Other Settings"
+  },
+  "previewMode": {
+    "message": "Use the local player's call protocol to open video previews"
+  },
+  "previewModePlaceholder": {
+    "message": "Leave it blank to disable it. The default is to use the popup page to preview the video"
+  },
+  "customFilenameOption": {
+    "message": "Use a custom filename to save the file (the default is the webpage title)"
+  },
+  "saveAsOption": {
+    "message": "Choose the save directory when downloading"
+  },
+  "iconOption": {
+    "message": "Display the website icon"
+  },
+  "clearOption": {
+    "message": "Refresh, navigate to a new page, and clear the data captured by the current tab"
+  },
+  "doNotClear": {
+    "message": "Do Not Clear"
+  },
+  "normalClear": {
+    "message": "Normal Clear"
+  },
+  "moreFrequent": {
+    "message": "More Frequent"
+  },
+  "excludeDuplicateResources": {
+    "message": "Exclude duplicate resources (too many resources will consume a lot of CPU)"
+  },
+  "customCSS": {
+    "message": "Custom CSS"
+  },
+  "operation": {
+    "message": "Operation"
+  },
+  "exportSettings": {
+    "message": "Export Settings"
+  },
+  "importConfiguration": {
+    "message": "Import Configuration"
+  },
+  "clearCapturedData": {
+    "message": "Clear Captured Data"
+  },
+  "resetAllSettings": {
+    "message": "Reset All Settings"
+  },
+  "restartExtension": {
+    "message": "Restart Extension"
+  },
+  "about": {
+    "message": "About"
+  },
+  "confirmReset": {
+    "message": "Are you sure you want to reset?"
+  },
+  "invokeProtocolTemplate": {
+    "message": "Invoke Protocol Template"
+  },
+  "customVLCProtocol": {
+    "message": "Custom VLC Protocol vlc://"
+  },
+  "systemShare": {
+    "message": "System Share"
+  },
+  "default": {
+    "message": "Default"
   }
 }

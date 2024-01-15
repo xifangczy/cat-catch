@@ -1,4 +1,10 @@
 {
+  "catCatch": {
+    "message": "猫抓"
+  },
+  "description": {
+    "message": "网页媒体嗅探工具"
+  },
   "confirm": {
     "message": "确认"
   },
@@ -152,10 +158,256 @@
   "enable": {
     "message": "启用"
   },
+  "disable": {
+    "message": "禁用"
+  },
   "noData": {
     "message": "还没闻到味儿~"
   },
   "regularFilterPlaceholder": {
     "message": "正则筛选 匹配资源url 回车确认"
+  },
+  "option": {
+    "message": "选项"
+  },
+  "titleOption": {
+    "message": "猫抓 设置"
+  },
+  "suffix": {
+    "message": "后缀"
+  },
+  "suffixTip": {
+    "message": "填写不含'.'的后缀, 不过滤大小填0"
+  },
+  "extensionName": {
+    "message": "扩展名"
+  },
+  "filterSize": {
+    "message": "过滤大小"
+  },
+  "delete": {
+    "message": "删除"
+  },
+  "addSuffix": {
+    "message": "添加后缀"
+  },
+  "extension": {
+    "message": "扩展"
+  },
+  "resetSuffixSettings": {
+    "message": "重置后缀设置"
+  },
+  "disableAll": {
+    "message": "全部禁用"
+  },
+  "enableAll": {
+    "message": "全部启用"
+  },
+  "type": {
+    "message": "类型"
+  },
+  "addType": {
+    "message": "添加类型"
+  },
+  "resetTypeSettings": {
+    "message": "重置类型设置"
+  },
+  "typeTip": {
+    "message": "填入正确的content-type类型, 不过滤大小填0"
+  },
+  "regexMatch": {
+    "message": "正则匹配"
+  },
+  "blockResource": {
+    "message": "屏蔽资源"
+  },
+  "alert": {
+    "message": "提示"
+  },
+  "regexExpression": {
+    "message": "正则表达式"
+  },
+  "addRegex": {
+    "message": "添加正则"
+  },
+  "resetRegexSettings": {
+    "message": "重置正则设置"
+  },
+  "regexTest": {
+    "message": "正则测试"
+  },
+  "urlToMatch": {
+    "message": "要匹配的URL"
+  },
+  "flag": {
+    "message": "标识符"
+  },
+  "result": {
+    "message": "结果"
+  },
+  "match": {
+    "message": "匹配"
+  },
+  "noMatch": {
+    "message": "不匹配"
+  },
+  "blockResourceTip": {
+    "message": "屏蔽不想出现的资源"
+  },
+  "flagTip": {
+    "message": "i: 忽略大小写, g: 全局搜索。也可为空。"
+  },
+  "regexSuffixTip": {
+    "message": "为获取到的URL指定一个后缀名, 可留空，会自动截取后缀名(很多文件并不存在后缀名)"
+  },
+  "regexTip": {
+    "message": "正则表达式占用资源较高, 非必要谨慎使用"
+  },
+  "copyTip": {
+    "message": "为方便使用第三方应用，自定义复制按钮写入剪贴板的内容。"
+  },
+  "replaceKeywordList": {
+    "message": "替换关键词列表"
+  },
+  "otherFiles": {
+    "message": "其他文件"
+  },
+  "resetCopySettings": {
+    "message": "重置复制设置"
+  },
+  "autoSetRefererCookieParams": {
+    "message": "自动设置Referer cookie参数"
+  },
+  "secretKey": {
+    "message": "密钥"
+  },
+  "address": {
+    "message": "地址"
+  },
+  "documentation": {
+    "message": "文档"
+  },
+  "aria2Tip": {
+    "message": "非常优秀的下载工具 使用方法查看"
+  },
+  "m3u8DLTips": {
+    "message": "非常优秀的m3u8 mpd第三方下载工具 使用方法查看"
+  },
+  "invoke": {
+    "message": "调用"
+  },
+  "parameter": {
+    "message": "参数"
+  },
+  "parameterSetting": {
+    "message": "参数设置"
+  },
+  "resetParameterSetting": {
+    "message": "重置参数设置"
+  },
+  "test": {
+    "message": "测试"
+  },
+  "replaceTags": {
+    "message": "替换标签"
+  },
+  "customSaveFileName": {
+    "message": "自定义保存文件名"
+  },
+  "resetTagSettings": {
+    "message": "重置标签设置"
+  },
+  "userAgentTip": {
+    "message": "留空默认为当前浏览器 User Agent"
+  },
+  "alwaysDisableCatCatcher": {
+    "message": "始终不启用猫抓下载器"
+  },
+  "autoClosePageAfterDownload": {
+    "message": "下载完自动关闭页面"
+  },
+  "openDownloaderPageInBackground": {
+    "message": "后台打开下载器页面"
+  },
+  "downloaderTip": {
+    "message": "如果检测到资源下载失败, 自动启用下载器再次尝试下载."
+  },
+  "autoDownM3u8Tip": {
+    "message": "扩展页点击 下载按钮 立即开始合并下载"
+  },
+  "otherSettings": {
+    "message": "其他设置"
+  },
+  "resetOtherSettings": {
+    "message": "重置其他设置"
+  },
+  "previewMode": {
+    "message": "使用本地播放器调用协议打开视频预览"
+  },
+  "previewModePlaceholder": {
+    "message": "留空为不启用 默认使用popup页面预览视频"
+  },
+  "customFilenameOption": {
+    "message": "使用自定义文件名保存文件(默认为网页标题)"
+  },
+  "saveAsOption": {
+    "message": "下载时选择保存目录"
+  },
+  "iconOption": {
+    "message": "显示网站图标"
+  },
+  "clearOption": {
+    "message": "刷新、跳转到新页面 清空当前标签抓取的数据"
+  },
+  "doNotClear": {
+    "message": "不清空"
+  },
+  "normalClear": {
+    "message": "正常清理"
+  },
+  "moreFrequent": {
+    "message": "更频繁"
+  },
+  "excludeDuplicateResources": {
+    "message": "排除重复的资源 (资源过多会占用大量CPU)"
+  },
+  "customCSS": {
+    "message": "自定义CSS"
+  },
+  "operation": {
+    "message": "操作"
+  },
+  "exportSettings": {
+    "message": "导出设置"
+  },
+  "importConfiguration": {
+    "message": "导入配置"
+  },
+  "clearCapturedData": {
+    "message": "清空抓取的数据"
+  },
+  "resetAllSettings": {
+    "message": "重置所有设置"
+  },
+  "restartExtension": {
+    "message": "重启扩展"
+  },
+  "about": {
+    "message": "关于"
+  },
+  "confirmReset": {
+    "message": "确认重置吗？"
+  },
+  "invokeProtocolTemplate": {
+    "message": "调用协议模板"
+  },
+  "customVLCProtocol": {
+    "message": "自定义VLC协议 vlc://"
+  },
+  "systemShare": {
+    "message": "系统分享"
+  },
+  "default": {
+    "message": "默认"
   }
 }

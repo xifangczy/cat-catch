@@ -38,18 +38,18 @@ $("#AddRegex").bind("click", function () {
     $("#regexList").append(Gethtml("Regex", { type: "ig", state: true }));
     $("#regexList [name=text]").last().focus();
 });
-$("#version").html("猫抓 v" + chrome.runtime.getManifest().version);
+$("#version").html(i18n.catCatch + " v" + chrome.runtime.getManifest().version);
 
 // 自定义播放调用模板
 playerList = new Map();
-playerList.set("tips", { name: "调用协议模板", template: "" });
-playerList.set("default", { name: "默认 / 不启用", template: "" });
+playerList.set("tips", { name: i18n.invokeProtocolTemplate, template: "" });
+playerList.set("default", { name: i18n.default + " / " + i18n.disable, template: "" });
 playerList.set("potplayer", { name: "PotPlayer", template: "potplayer://${url}" });
-playerList.set("mxPlayerAd", { name: "安卓 MX Player 免费版", template: "intent:${url}#Intent;package=com.mxtech.videoplayer.ad;end" });
-playerList.set("mxPlayerPro", { name: "安卓 MX Player Pro", template: "intent:${url}#Intent;package=com.mxtech.videoplayer.pro;end" });
-playerList.set("vlc", { name: "安卓 vlc", template: "intent:${url}#Intent;package=org.videolan.vlc;end" });
-playerList.set("vlcCustom", { name: "自定义VLC协议 vlc://", template: "vlc://${url}" });
-playerList.set("shareApi", { name: "系统分享", template: "${shareApi}" });
+playerList.set("mxPlayerAd", { name: "Android MX Player Free", template: "intent:${url}#Intent;package=com.mxtech.videoplayer.ad;end" });
+playerList.set("mxPlayerPro", { name: "Android MX Player Pro", template: "intent:${url}#Intent;package=com.mxtech.videoplayer.pro;end" });
+playerList.set("vlc", { name: "Android vlc", template: "intent:${url}#Intent;package=org.videolan.vlc;end" });
+playerList.set("vlcCustom", { name: i18n.customVLCProtocol + " vlc://", template: "vlc://${url}" });
+playerList.set("shareApi", { name: i18n.systemShare, template: "${shareApi}" });
 playerList.forEach(function (item, key) {
     $("#PlayerTemplate").append(`<option value="${key}">${item.name}</option>`);
 });
@@ -59,16 +59,16 @@ function Gethtml(Type, Param = new Object()) {
     let html = "";
     switch (Type) {
         case "Ext":
-            html = `<td><input type="text" value="${Param.ext ? Param.ext : ""}" name="text" placeholder="后缀名" class="ext"></td>`
-            html += `<td><input type="number" placeholder="大小限制" value="${Param.size ? Param.size : 0}" class="size" name="size">KB</td>`
+            html = `<td><input type="text" value="${Param.ext ? Param.ext : ""}" name="text" placeholder="${i18n.suffix}" class="ext"></td>`
+            html += `<td><input type="number" value="${Param.size ? Param.size : 0}" class="size" name="size">KB</td>`
             break;
         case "Type":
-            html = `<td><input type="text" value="${Param.type ? Param.type : ""}" name="text" placeholder="类型" class="type"></td>`
-            html += `<td><input type="number" placeholder="大小限制" value="${Param.size ? Param.size : 0}" class="size" name="size">KB</td>`
+            html = `<td><input type="text" value="${Param.type ? Param.type : ""}" name="text" placeholder="${i18n.type}" class="type"></td>`
+            html += `<td><input type="number" value="${Param.size ? Param.size : 0}" class="size" name="size">KB</td>`
             break;
         case "Regex":
             html = `<td><input type="text" value="${Param.type ? Param.type : ""}" name="type" class="regexType"></td>`
-            html += `<td><input type="text" value="${Param.regex ? Param.regex : ""}" placeholder="正则表达式" name="regex" class="regex"></td>`
+            html += `<td><input type="text" value="${Param.regex ? Param.regex : ""}" placeholder="${i18n.regexExpression}" name="regex" class="regex"></td>`
             html += `<td><input type="text" value="${Param.ext ? Param.ext : ""}" name="regexExt" class="regexExt"></td>`
             html += `<td>
             <div class="switch">
@@ -187,7 +187,7 @@ $("#testTag input, #testTextarea").on("input", function () {
 });
 //重置后缀 重置类型 重置正则
 $("#ResetExt, #ResetType, #ResetRegex").bind("click", function () {
-    if (confirm("确认重置吗？")) {
+    if (confirm(i18n.confirmReset)) {
         const Option = $(this).data("reset");
         chrome.storage.sync.set({ [Option]: G.OptionLists[Option] });
         location.reload();
@@ -195,7 +195,7 @@ $("#ResetExt, #ResetType, #ResetRegex").bind("click", function () {
 });
 //重置其他设置
 $("#ResetOption").bind("click", function () {
-    if (confirm("确认重置吗？")) {
+    if (confirm(i18n.confirmReset)) {
         $("#OtherOption input, #OtherOption textarea").each(function () {
             const Option = this.id;
             chrome.storage.sync.set({ [Option]: G.OptionLists[Option] });
@@ -205,7 +205,7 @@ $("#ResetOption").bind("click", function () {
 });
 // m3u8DL 参数设置
 $("#ResetM3u8dl").bind("click", function () {
-    if (confirm("确认重置吗？")) {
+    if (confirm(i18n.confirmReset)) {
         $("#m3u8dlOption textarea, #m3u8dlOption input").each(function () {
             const Option = this.id;
             chrome.storage.sync.set({ [Option]: G.OptionLists[Option] });
@@ -215,7 +215,7 @@ $("#ResetM3u8dl").bind("click", function () {
 });
 // 重设标签
 $("#ResetTag").bind("click", function () {
-    if (confirm("确认重置吗？")) {
+    if (confirm(i18n.confirmReset)) {
         ["userAgent", "MobileUserAgent", "downFileName"].forEach(function (id) {
             chrome.storage.sync.set({ [id]: G.OptionLists[id] });
         })
@@ -224,7 +224,7 @@ $("#ResetTag").bind("click", function () {
 });
 //重置复制选项
 $("#ResetCopy").bind("click", function () {
-    if (confirm("确认重置吗？")) {
+    if (confirm(i18n.confirmReset)) {
         chrome.storage.sync.set({ copyM3U8: G.OptionLists.copyM3U8 });
         chrome.storage.sync.set({ copyMPD: G.OptionLists.copyMPD });
         chrome.storage.sync.set({ copyOther: G.OptionLists.copyOther });
@@ -234,7 +234,7 @@ $("#ResetCopy").bind("click", function () {
 //清空数据 重置所有设置
 $("#ClearData, #ResetAllOption").bind("click", function () {
     if (this.id == "ResetAllOption") {
-        if (confirm("确认重置所有设置吗？")) {
+        if (confirm(i18n.confirmReset)) {
             chrome.storage.sync.clear();
             InitOptions();
         } else {
@@ -255,7 +255,7 @@ $("#testRegex, #testUrl").keyup(function () {
     const testRegex = $("#testRegex").val();
     const testFlag = $("#testFlag").val();
     if (testUrl == "" || testRegex == "") {
-        $("#testResult").html("不匹配");
+        $("#testResult").html(i18n.noMatch);
         return;
     }
     let regex;
@@ -267,10 +267,10 @@ $("#testRegex, #testUrl").keyup(function () {
     }
     const result = regex.exec(testUrl);
     if (result == null) {
-        $("#testResult").html("不匹配");
+        $("#testResult").html(i18n.noMatch);
         return;
     }
-    $("#testResult").html("匹配")
+    $("#testResult").html(i18n.match)
     for (let i = 1; i < result.length; i++) {
         if (result[i] != "") {
             $("#testResult").append(
