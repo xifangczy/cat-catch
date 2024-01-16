@@ -173,6 +173,18 @@
   "titleOption": {
     "message": "猫抓 设置"
   },
+  "titleDownload": {
+    "message": "猫抓 下载器"
+  },
+  "titleM3U8": {
+    "message": "猫抓 M3U8解析器"
+  },
+  "titleJson": {
+    "message": "猫抓 json格式化"
+  },
+  "titledash": {
+    "message": "猫抓 dash解析器"
+  },
   "suffix": {
     "message": "后缀"
   },
@@ -409,5 +421,20 @@
   },
   "default": {
     "message": "默认"
+  },
+  "goBack": {
+    "message": "返回上一页"
+  },
+  "openDir": {
+    "message": "打开下载目录"
+  },
+  "sendFfmpeg": {
+    "message": "发送到在线ffmpeg"
+  },
+  "autoCloserDownload": {
+    "message": "下载完自动关闭页面"
+  },
+  "openInBgDownload": {
+    "message": "后台打开下载器页面"
   }
 }

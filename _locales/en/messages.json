@@ -173,6 +173,18 @@
   "titleOption": {
     "message": "cat-catch Option"
   },
+  "titleDownload": {
+    "message": "cat-catch Download"
+  },
+  "titleM3U8": {
+    "message": "cat-catch m3u8 Parser"
+  },
+  "titleJson": {
+    "message": "cat-catch json formatter"
+  },
+  "titledash": {
+    "message": "cat-catch Dash Parser"
+  },
   "suffix": {
     "message": "Suffix"
   },
@@ -409,5 +421,20 @@
   },
   "default": {
     "message": "Default"
+  },
+  "goBack": {
+    "message": "Go Back"
+  },
+  "openDir": {
+    "message": "Open Download Directory"
+  },
+  "sendFfmpeg": {
+    "message": "Send to Online ffmpeg"
+  },
+  "autoCloserDownload": {
+    "message": "Automatically Close Page After Download"
+  },
+  "openInBgDownload": {
+    "message": "Open Downloader Page in Background"
   }
 }
