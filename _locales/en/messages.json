@@ -68,6 +68,9 @@
   "downloader": {
     "message": "Downloader"
   },
+  "parser": {
+    "message": "Parser"
+  },
   "m3u8Parser": {
     "message": "M3U8 Parser"
   },
@@ -428,6 +431,9 @@
   "openDir": {
     "message": "Open Download Directory"
   },
+  "downloadDir": {
+    "message": "Download Directory"
+  },
   "sendFfmpeg": {
     "message": "Send to Online ffmpeg"
   },
@@ -436,5 +442,199 @@
   },
   "openInBgDownload": {
     "message": "Open Downloader Page in Background"
+  },
+  "m3u8Placeholder": {
+    "message": "Enter m3u8 content or ts fragment list."
+  },
+  "m3u8Url": {
+    "message": "m3u8 URL"
+  },
+  "nextLevel": {
+    "message": "Next Level File"
+  },
+  "nextLevelTip": {
+    "message": "This M3U8 file nests multiple M3U8 files."
+  },
+  "multipleAudios": {
+    "message": "Multiple Audios"
+  },
+  "multipleAudiosTip": {
+    "message": "This M3U8 file nests multiple audios"
+  },
+  "multipleSubtitles": {
+    "message": "Multiple Subtitles"
+  },
+  "multipleSubtitlesTip": {
+    "message": "This M3U8 file nests multiple subtitles."
+  },
+  "possibleKey": {
+    "message": "Found a possible key"
+  },
+  "loading": {
+    "message": "Loading..."
+  },
+  "waitDownload": {
+    "message": "Waiting for download..."
+  },
+  "downloadSegmentList": {
+    "message": "Download Segment List"
+  },
+  "originalM3u8": {
+    "message": "Original M3U8"
+  },
+  "localM3u8": {
+    "message": "Local M3U8"
+  },
+  "segmentList": {
+    "message": "Segment List"
+  },
+  "downloadProgress": {
+    "message": "Download Progress"
+  },
+  "getParameters": {
+    "message": "GET Parameters"
+  },
+  "restoreGetParameters": {
+    "message": "Restore GET Parameters"
+  },
+  "requestHeaders": {
+    "message": "Request Headers"
+  },
+  "setRequestHeaders": {
+    "message": "Set request headers."
+  },
+  "invokeM3u8DL": {
+    "message": "Invoke M3U8DL"
+  },
+  "copyCommand": {
+    "message": "Copy Command"
+  },
+  "showCommand": {
+    "message": "Show Command"
+  },
+  "addSettingParameters": {
+    "message": "Add Setting Parameters"
+  },
+  "customKeyPlaceholder": {
+    "message": "Customize the key in hexadecimal or base64, or the key address"
+  },
+  "uploadKey": {
+    "message": "Upload key."
+  },
+  "downloadThreads": {
+    "message": "Download Threads"
+  },
+  "ffmpegTranscoding": {
+    "message": "FFmpeg Transcoding"
+  },
+  "mp4Format": {
+    "message": "MP4 Format"
+  },
+  "downloadWhileSaving": {
+    "message": "Download While Saving"
+  },
+  "audioOnly": {
+    "message": "Audio Only"
+  },
+  "saveAs": {
+    "message": "Save As"
+  },
+  "skipDecryption": {
+    "message": "Skip Decryption"
+  },
+  "newDownloader": {
+    "message": "New Downloader"
+  },
+  "downloadRange": {
+    "message": "Download Range"
+  },
+  "recordLive": {
+    "message": "Record Live"
+  },
+  "mergeDownloads": {
+    "message": "Merge Downloads"
+  },
+  "redownloadFailedItems": {
+    "message": "Redownload Failed Items"
+  },
+  "downloadExistingData": {
+    "message": "Download Existing Data"
+  },
+  "stopDownload": {
+    "message": "Stop Download"
+  },
+  "start": {
+    "message": "Start"
+  },
+  "end": {
+    "message": "End"
+  },
+  "resolution": {
+    "message": "Resolution"
+  },
+  "bitrate": {
+    "message": "Bitrate"
+  },
+  "ADTSerror": {
+    "message": "Cannot find the ADTS header. It may be an AES-128-ECB encrypted resource, which is not currently supported for decryption. Please use third-party merging software."
+  },
+  "m3u8Error": {
+    "message": "There are errors in parsing or playing the M3U8 file, check the console for detailed error information找不到ADTS头 可能是AES-128-ECB加密资源,暂不支持解密.请使用第三方合并软件..."
+  },
+  "noAudio": {
+    "message": "No Audio"
+  },
+  "noVideo": {
+    "message": "No Video"
+  },
+  "hevcTip": {
+    "message": "HEVC/H.265 encoded TS files are only supported for online ffmpeg transcoding"
+  },
+  "m3u8Info": {
+    "message": "A total of $num$ file, with a total duration of $time$.",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      },
+      "time": {
+        "content": "$2"
+      }
+    }
+  },
+  "encryptedHLS": {
+    "message": "Encrypted HLS"
+  },
+  "encryptedSAMPLE": {
+    "message": "Resources encrypted with SAMPLE-AES-CTR cannot be handled at the moment."
+  },
+  "liveHLS": {
+    "message": "Live HLS"
+  },
+  "keyAddress": {
+    "message": "Key Address"
+  },
+  "key": {
+    "message": "Key"
+  },
+  "encryptionAlgorithm": {
+    "message": "Encryption Algorithm"
+  },
+  "keyDownloadFailed": {
+    "message": "Key Download Failed"
+  },
+  "savePrompt": {
+    "message": "Saved to disk, please check the downloaded content in the browser."
+  },
+  "close": {
+    "message": "Close"
+  },
+  "blobM3u8DLError": {
+    "message": "Blob URLs cannot invoke M3U8DL for download"
+  },
+  "M3U8DLparameterLong": {
+    "message": "The M3U8DL parameter is too long."
+  },
+  "runningCannotChangeSettings": {
+    "message": "Running, Cannot Change Settings"
   }
 }

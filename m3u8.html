@@ -17,61 +17,57 @@
   <div class="m3u8_wrapper wrapper1080">
 
     <section id="loading">
-      <div class="optionBox">
-        文件载入中...
-      </div>
+      <div class="optionBox" data-i18n="loading"></div>
     </section>
 
     <section id="m3u8Custom" class="hide">
-      <h1 class="optionsTitle">猫抓 M3U8解析器</h1>
+      <h1 class="optionsTitle" data-i18n="titleM3U8"></h1>
       <div class="optionBox">
-        <span class="explain">请输入m3u8内容</span>
-        <textarea rows="50" cols="160" id="m3u8Text" spellcheck="false" data-type="link" placeholder="输入m3u8内容 或 ts碎片列表"
-          class="width100"></textarea>
+        <textarea rows="50" cols="160" id="m3u8Text" spellcheck="false" data-type="link"
+          data-i18n-placeholder="m3u8Placeholder" class="width100"></textarea>
         <input type="text" id="baseUrl" placeholder="BaseURL" class="fullInput" />
         <div class="line"></div>
-        <span class="explain">或 输入m3u8的url</span>
         <input type="text" id="m3u8Url" placeholder="m3u8 URL" class="fullInput" />
         <div class="line"></div>
-        <input type="text" id="referer" placeholder="请求头 Referer" class="fullInput" />
-        <button id="parse" type="button">解析</button>
+        <input type="text" id="referer" placeholder="Referer" class="fullInput" />
+        <button id="parse" type="button" data-i18n="parser"></button>
       </div>
     </section>
 
     <section id="more_m3u8" class="hide">
-      <h1 class="optionsTitle">下一级文件</h1>
-      <span class="explain">该m3u8文件中嵌套多个m3u8文件</span>
+      <h1 class="optionsTitle" data-i18n="nextLevel"></h1>
+      <span class="explain" data-i18n="nextLevelTip"></span>
       <div class="optionBox">
         <div id="next_m3u8"></div>
       </div>
     </section>
     <section id="more_audio" class="hide">
-      <h1 class="optionsTitle">多个音频</h1>
-      <span class="explain">该m3u8文件中嵌套多个音频</span>
+      <h1 class="optionsTitle" data-i18n="multipleAudios"></h1>
+      <span class="explain" data-i18n="multipleAudiosTip"></span>
       <div class="optionBox">
         <div id="next_audio"></div>
       </div>
     </section>
     <section id="more_subtitle" class="hide">
-      <h1 class="optionsTitle">多个字幕</h1>
-      <span class="explain">该m3u8文件中嵌套多个字幕</span>
+      <h1 class="optionsTitle" data-i18n="multipleSubtitles"></h1>
+      <span class="explain" data-i18n="multipleSubtitlesTip"></span>
       <div class="optionBox">
         <div id="next_subtitle"></div>
       </div>
     </section>
 
     <section id="m3u8" class="hide">
-      <h1 class="optionsTitle">猫抓 m3u8解析器</h1>
+      <h1 class="optionsTitle" data-i18n="titleM3U8"></h1>
       <span class="explain" id="key"></span>
       <div class="optionBox">
         <div class="block">
-          m3u8文件地址
+          <p data-i18n-outer="m3u8Url"></p>
           <p><a id="m3u8_url"></a></p>
         </div>
 
         <div class="block" id="tips"></div>
         <div class="block hide" id="maybeKey"><select class="m3u8Key select">
-            <option value="tips">寻找到疑似密钥</option>
+            <option value="tips" data-i18n="possibleKey"></option>
           </select></div>
 
         <div class="videoInfo flex">
@@ -79,61 +75,80 @@
           <div id="info"></div>
         </div>
         <div class="block" id="textarea">
-          <textarea rows="50" cols="169" id="media_file" spellcheck="false" data-type="link"
-            class="width100">切片文件载入中....</textarea>
-          <div id="downList">等待下载...</div>
+          <textarea rows="50" cols="169" id="media_file" spellcheck="false" data-type="link" class="width100"
+            data-i18n="loading"></textarea>
+          <div id="downList" data-i18n="waitDownload"></div>
           <video id="video" class="hide" controls></video>
         </div>
 
         <div class="block" id="button">
           <div class="merge">
-            <button id="downText">下载切片列表</button>
-            <button id="originalM3U8">原始m3u8</button>
-            <button id="localFile" class="hide">本地m3u8</button>
-            <button id="getTs">切片列表</button>
-            <button id="downProgress">下载进度</button>
-            <button id="tsAddArg">get参数</button>
-            <button id="setRequestHeaders">请求头</button>
-            <button id="play" data-switch="on">播放</button>
-            <button id="m3u8DL" class="button2">调用m3u8DL下载</button>
-            <button id="copyM3U8dl" class="hide">复制命令</button>
-            <button id="setM3u8dl">显示命令</button>
-            <label class="m3u8checkbox textColor">载入设置参数<input type="checkbox" id="addParam" save="change" /></label>
-            <button class="openDir hide">下载目录</button>
+            <button id="downText" data-i18n="downloadSegmentList"></button>
+            <button id="originalM3U8" data-i18n="originalM3u8"></button>
+            <button id="localFile" class="hide" data-i18n="localM3u8"></button>
+            <button id="getTs" data-i18n="segmentList"></button>
+            <button id="downProgress" data-i18n="downloadProgress"></button>
+            <button id="tsAddArg" data-i18n="getParameters"></button>
+            <button id="setRequestHeaders" data-i18n="requestHeaders"></button>
+            <button id="play" data-switch="on" data-i18n="play"></button>
+            <button id="m3u8DL" class="button2" data-i18n="invokeM3u8DL"></button>
+            <button id="copyM3U8dl" class="hide" data-i18n="copyCommand"></button>
+            <button id="setM3u8dl" data-i18n="showCommand"></button>
+            <label class="m3u8checkbox textColor">
+              <p data-i18n-outer="addSettingParameters"></p><input type="checkbox" id="addParam" save="change" />
+            </label>
+            <button class="openDir hide" data-i18n="downloadDir"></button>
           </div>
           <textarea id="m3u8dlArg" type="text" class="m3u8dlArg hide"></textarea>
           <div class="line"></div>
           <div class="merge customKey">
-            <input type="text" id="customFilename" spellcheck="false" placeholder="自定义 保存文件名" size="30" />
-            <input type="text" id="customKey" spellcheck="false" placeholder="自定义 密钥 16进制 或 base64 或 密钥地址" size="60" />
-            <input type="text" id="customIV" spellcheck="false" placeholder="自定义 偏移量 IV" size="30" />
-            <button id="uploadKey">上传Key</button>
+            <input type="text" id="customFilename" spellcheck="false" data-i18n-placeholder="customSaveFileName"
+              size="30" />
+            <input type="text" id="customKey" spellcheck="false" data-i18n-placeholder="customKeyPlaceholder"
+              size="60" />
+            <input type="text" id="customIV" spellcheck="false" placeholder="IV" size="30" />
+            <button id="uploadKey" data-i18n="uploadKey"></button>
             <input id="uploadKeyFile" type="file" class="hide" />
           </div>
           <div class="merge" id="mergeDown">
-            <div id="threadDiv" class="textColor">下载线程 <input type="number" value="6" id="thread" spellcheck="false"
-                style="width: 35px;" step="1" min="1" max="256" save="change" /></div>
-            <label class="m3u8checkbox textColor">ffmpeg转码<input type="checkbox" id="ffmpeg" save="change" /></label>
-            <label class="m3u8checkbox textColor">mp4格式<input type="checkbox" id="mp4" save="change" /></label>
-            <label class="m3u8checkbox textColor firefoxHide">边下边存<input type="checkbox" id="StreamSaver"
-                save="change" /></label>
-            <label class="m3u8checkbox textColor">只要音频<input type="checkbox" id="onlyAudio" save="change" /></label>
-            <label class="m3u8checkbox textColor">另存为<input type="checkbox" id="saveAs" save="change" /></label>
-            <label class="m3u8checkbox textColor">跳过解密<input type="checkbox" id="skipDecrypt" save="change" /></label>
-            <label class="m3u8checkbox textColor">新下载器<input type="checkbox" id="test" save="change"
-                checked="checked" /></label>
+            <div id="threadDiv" class="textColor">
+              <p data-i18n-outer="downloadThreads"></p> <input type="number" value="6" id="thread" spellcheck="false"
+                style="width: 35px;" step="1" min="1" max="256" save="change" />
+            </div>
+            <label class="m3u8checkbox textColor">
+              <p data-i18n-outer="ffmpegTranscoding"></p><input type="checkbox" id="ffmpeg" save="change" />
+            </label>
+            <label class="m3u8checkbox textColor">
+              <p data-i18n-outer="mp4Format"></p><input type="checkbox" id="mp4" save="change" />
+            </label>
+            <label class="m3u8checkbox textColor firefoxHide">
+              <p data-i18n-outer="downloadWhileSaving"></p><input type="checkbox" id="StreamSaver" save="change" />
+            </label>
+            <label class="m3u8checkbox textColor">
+              <p data-i18n-outer="audioOnly"></p><input type="checkbox" id="onlyAudio" save="change" />
+            </label>
+            <label class="m3u8checkbox textColor">
+              <p data-i18n-outer="saveAs"></p><input type="checkbox" id="saveAs" save="change" />
+            </label>
+            <label class="m3u8checkbox textColor">
+              <p data-i18n-outer="skipDecryption"></p><input type="checkbox" id="skipDecrypt" save="change" />
+            </label>
+            <label class="m3u8checkbox textColor">
+              <p data-i18n-outer="newDownloader"></p><input type="checkbox" id="test" save="change" checked="checked" />
+            </label>
             <div class="rangeDown textColor">
-              下载范围
+              <p data-i18n-outer="downloadRange"></p>
               <div class="merge">
-                <input type="text" id="rangeStart" spellcheck="false" placeholder="开始" />
-                <input type="text" id="rangeEnd" spellcheck="false" placeholder="结束" />
+                <input type="text" id="rangeStart" spellcheck="false" data-i18n-placeholder="start" />
+                <input type="text" id="rangeEnd" spellcheck="false" data-i18n-placeholder="end" />
               </div>
             </div>
-            <button id="recorder" class="button2 hide" data-switch="on" data-switch="on">录制直播</button>
-            <button id="mergeTs" class="button2">合并下载</button>
-            <button id="errorDownload" class="hide button2">重下失败项</button>
-            <button id="ForceDownload" class="hide button2">下载已有数据</button>
-            <button id="stopStream" class="hide button2">停止下载</button>
+            <button id="recorder" class="button2 hide" data-switch="on" data-switch="on"
+              data-i18n="recordLive"></button>
+            <button id="mergeTs" class="button2" data-i18n="mergeDownloads"></button>
+            <button id="errorDownload" class="hide button2" data-i18n="redownloadFailedItems"></button>
+            <button id="ForceDownload" class="hide button2" data-i18n="downloadExistingData"></button>
+            <button id="stopStream" class="hide button2" data-i18n="stopDownload"></button>
           </div>
           <div style="display: flex; margin-top: 10px;">
             <div id="progress"></div>

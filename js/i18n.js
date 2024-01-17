@@ -7,4 +7,10 @@ document.querySelectorAll('[data-i18n-outer]').forEach(function (element) {
 document.querySelectorAll('[data-i18n-placeholder]').forEach(function (element) {
     element.setAttribute('placeholder', i18n(element.dataset.i18nPlaceholder));
 });
-document.title = i18n(document.title);
+
+(function () {
+    const title = i18n(document.title);
+    if (title) {
+        document.title = title;
+    }
+})();

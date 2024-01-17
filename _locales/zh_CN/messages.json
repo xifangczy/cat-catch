@@ -68,6 +68,9 @@
   "downloader": {
     "message": "下载器"
   },
+  "parser": {
+    "message": "解析"
+  },
   "m3u8Parser": {
     "message": "M3U8解析器"
   },
@@ -428,6 +431,9 @@
   "openDir": {
     "message": "打开下载目录"
   },
+  "downloadDir": {
+    "message": "打载目录"
+  },
   "sendFfmpeg": {
     "message": "发送到在线ffmpeg"
   },
@@ -436,5 +442,199 @@
   },
   "openInBgDownload": {
     "message": "后台打开下载器页面"
+  },
+  "m3u8Placeholder": {
+    "message": "输入m3u8内容 或 ts碎片列表."
+  },
+  "m3u8Url": {
+    "message": "m3u8地址"
+  },
+  "nextLevel": {
+    "message": "下一级文件"
+  },
+  "nextLevelTip": {
+    "message": "该m3u8文件中嵌套多个m3u8文件"
+  },
+  "multipleAudios": {
+    "message": "多个音频"
+  },
+  "multipleAudiosTip": {
+    "message": "该m3u8文件中嵌套多个音频"
+  },
+  "multipleSubtitles": {
+    "message": "多个字幕"
+  },
+  "multipleSubtitlesTip": {
+    "message": "该m3u8文件中嵌套多个字幕"
+  },
+  "possibleKey": {
+    "message": "寻找到疑似密钥"
+  },
+  "loading": {
+    "message": "载入中..."
+  },
+  "waitDownload": {
+    "message": "等待下载..."
+  },
+  "downloadSegmentList": {
+    "message": "下载切片列表"
+  },
+  "originalM3u8": {
+    "message": "原始m3u8"
+  },
+  "localM3u8": {
+    "message": "本地m3u8"
+  },
+  "segmentList": {
+    "message": "切片列表"
+  },
+  "downloadProgress": {
+    "message": "下载进度"
+  },
+  "getParameters": {
+    "message": "get参数"
+  },
+  "restoreGetParameters": {
+    "message": "还原get参数"
+  },
+  "requestHeaders": {
+    "message": "请求头"
+  },
+  "setRequestHeaders": {
+    "message": "设置请求头"
+  },
+  "invokeM3u8DL": {
+    "message": "调用m3u8DL"
+  },
+  "copyCommand": {
+    "message": "复制命令"
+  },
+  "showCommand": {
+    "message": "显示命令"
+  },
+  "addSettingParameters": {
+    "message": "加入设置参数"
+  },
+  "customKeyPlaceholder": {
+    "message": "自定义 密钥 16进制 或 base64 或 密钥地址"
+  },
+  "uploadKey": {
+    "message": "上传密钥"
+  },
+  "downloadThreads": {
+    "message": "下载线程"
+  },
+  "ffmpegTranscoding": {
+    "message": "ffmpeg 转码"
+  },
+  "mp4Format": {
+    "message": "mp4格式"
+  },
+  "downloadWhileSaving": {
+    "message": "边下边存"
+  },
+  "audioOnly": {
+    "message": "只要音频"
+  },
+  "saveAs": {
+    "message": "另存为"
+  },
+  "skipDecryption": {
+    "message": "跳过解密"
+  },
+  "newDownloader": {
+    "message": "新下载器"
+  },
+  "downloadRange": {
+    "message": "下载范围"
+  },
+  "recordLive": {
+    "message": "录制直播"
+  },
+  "mergeDownloads": {
+    "message": "合并下载"
+  },
+  "redownloadFailedItems": {
+    "message": "重下失败项"
+  },
+  "downloadExistingData": {
+    "message": "下载已有数据"
+  },
+  "stopDownload": {
+    "message": "停止下载"
+  },
+  "start": {
+    "message": "开始"
+  },
+  "end": {
+    "message": "结束"
+  },
+  "resolution": {
+    "message": "分辨率"
+  },
+  "bitrate": {
+    "message": "码率"
+  },
+  "ADTSerror": {
+    "message": "找不到ADTS头 可能是AES-128-ECB加密资源,暂不支持解密.请使用第三方合并软件..."
+  },
+  "m3u8Error": {
+    "message": "解析或播放m3u8文件中有错误, 详细错误信息查看控制台"
+  },
+  "noAudio": {
+    "message": "无音频"
+  },
+  "noVideo": {
+    "message": "无视频"
+  },
+  "hevcTip": {
+    "message": "HEVC/H.265编码ts文件 只支持在线ffmpeg转码"
+  },
+  "m3u8Info": {
+    "message": "共 $num$ 个文件, 总时长 $time$",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      },
+      "time": {
+        "content": "$2"
+      }
+    }
+  },
+  "encryptedHLS": {
+    "message": "加密HLS"
+  },
+  "encryptedSAMPLE": {
+    "message": "使用SAMPLE-AES-CTR加密的资源, 目前无法处理."
+  },
+  "liveHLS": {
+    "message": "直播HLS"
+  },
+  "keyAddress": {
+    "message": "密钥地址"
+  },
+  "key": {
+    "message": "密钥"
+  },
+  "encryptionAlgorithm": {
+    "message": "加密算法"
+  },
+  "keyDownloadFailed": {
+    "message": "密钥下载失败"
+  },
+  "savePrompt": {
+    "message": "已保存到硬盘, 请查看浏览器已下载内容"
+  },
+  "close": {
+    "message": "关闭"
+  },
+  "blobM3u8DLError": {
+    "message": "blob地址无法调用m3u8DL下载"
+  },
+  "M3U8DLparameterLong": {
+    "message": "m3u8dl参数太长,可能导致无法唤醒m3u8DL, 请手动复制到m3u8DL下载"
+  },
+  "runningCannotChangeSettings": {
+    "message": "正在运行, 不能更改设置"
   }
 }

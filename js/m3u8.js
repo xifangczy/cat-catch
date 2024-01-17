@@ -106,7 +106,7 @@ function init() {
     // 解码 切片URL参数
     if (tsAddArg != null) {
         tsAddArg = decodeURIComponent(tsAddArg);
-        $("#tsAddArg").html("还原get参数");
+        $("#tsAddArg").html(i18n.restoreGetParameters);
     }
 
     if (isEmpty(_m3u8Url)) {
@@ -183,7 +183,7 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
         for (let item of data.levels) {
             const [name, url] = getNewUrl(item);
             const html = `<div class="block">
-                    <div>${item.attrs.RESOLUTION ? "分辨率:" + item.attrs.RESOLUTION : ""}${item.attrs.BANDWIDTH ? " | 码率:" + (parseInt(item.attrs.BANDWIDTH / 1000) + " Kbps") : ""}</div>
+                    <div>${item.attrs.RESOLUTION ? i18n.resolution + ":" + item.attrs.RESOLUTION : ""}${item.attrs.BANDWIDTH ? " | " + i18n.bitrate + ":" + (parseInt(item.attrs.BANDWIDTH / 1000) + " Kbps") : ""}</div>
                     <a href="${url}">${name}</a>
                 </div>`;
             $("#next_m3u8").append(html);
@@ -270,12 +270,12 @@ hls.on(Hls.Events.ERROR, function (event, data) {
     console.log(data);
     if (data.type == "mediaError" && data.details == "fragParsingError") {
         if (data.error.message == "No ADTS header found in AAC PES") {
-            $("#tips").append("<b>找不到ADTS头 可能是AES-128-ECB加密资源,暂不支持解密.请使用第三方合并软件...</b>");
+            $("#tips").append("<b>" + i18n.ADTSerror + "</b>");
         }
         hls.stopLoad();
     }
     $("#loading").show();
-    $("#loading .optionBox").html(`解析或播放m3u8文件中有错误, 详细错误信息查看控制台<button id="setRequestHeadersError">设置请求头</button>`);
+    $("#loading .optionBox").html(`${i18n.m3u8Error}<button id="setRequestHeadersError">${i18n.setRequestHeaders}</button>`);
 
     // 出错 如果正在录制中 自动点击下载录制按钮
     if (recorder) {
@@ -306,13 +306,13 @@ hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
     if (data.tracks && info.html() == "") {
         if (data.tracks.audiovideo) {
             if (data.tracks.audiovideo?.metadata) {
-                info.append(" 分辨率: " + data.tracks.audiovideo.metadata.width + "x" + data.tracks.audiovideo.metadata.height);
+                info.append(` ${i18n.resolution}:${data.tracks.audiovideo.metadata.width} x ${data.tracks.audiovideo.metadata.height}`);
             }
             return;
         }
-        !data.tracks.audio && info.append(" (无音频)");
+        !data.tracks.audio && info.append(` (${i18n.noAudio})`);
         if (!data.tracks.video) {
-            info.append(" (无视频)");
+            info.append(` (${i18n.noVideo})`);
             // 下载第一个切片 判断是否H265编码
             fetch(_fragments[0].url).then(response => response.arrayBuffer())
                 .then(function (data) {
@@ -323,7 +323,7 @@ hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
                         if (data[i] == 0x47 && data[i + 1] != 0x40) {
                             // 0x24 H.265
                             if (data[i + 17] == 0x24) {
-                                info.html(info.html().replace("无视频", "<b>HEVC/H.265编码ts文件 只支持在线ffmpeg转码</b>"));
+                                info.html(info.html().replace(i18n.noVideo, "<b>" + i18n.hevcTip + "</b>"));
                                 $("#mp4").prop("checked", false);
                             }
                             return;
@@ -334,7 +334,7 @@ hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
                 });
         }
         if (data.tracks.video?.metadata) {
-            info.append(" 分辨率: " + data.tracks.video.metadata.width + "x" + data.tracks.video.metadata.height);
+            info.append(` ${i18n.resolution}:${data.tracks.video.metadata.width} x ${data.tracks.video.metadata.height}`);
         }
     }
 });
@@ -399,7 +399,7 @@ function parseTs(data) {
                 .then(function (buffer) {
                     initData.set(data.fragments[i].initSegment.url, buffer);
                 }).catch(function (error) { console.log(error); });
-            $("#tips").append('初始化片段(EXT-X-MAP): <input type="text" class="keyUrl" value="' + data.fragments[i].initSegment.url + '" spellcheck="false" readonly="readonly">');
+            $("#tips").append('EXT-X-MAP: <input type="text" class="keyUrl" value="' + data.fragments[i].initSegment.url + '" spellcheck="false" readonly="readonly">');
         }
         if (data.live && data.fragments[i].initSegment && tsBuffer.length == 0) {
             initSegment = data.fragments[i].initSegment;
@@ -437,11 +437,11 @@ function parseTs(data) {
     }
 
     writeText(_fragments);   // 写入ts链接到textarea
-    $("#count").append("共 " + _fragments.length + " 个文件" + "，总时长: " + secToTime(data.totalduration));
+    $("#count").append(i18n("m3u8Info", [_fragments.length, secToTime(data.totalduration)]));
 
-    isEncrypted && $("#count").append(" (加密HLS)");
+    isEncrypted && $("#count").append(` (${i18n.encryptedHLS})`);
     if (_m3u8Content.includes("#EXT-X-KEY:METHOD=SAMPLE-AES-CTR")) {
-        $("#count").append(' <b>使用SAMPLE-AES-CTR加密的资源, 目前无法处理.</b>');
+        $("#count").append(' <b>' + i18n.encryptedSAMPLE + '</b>');
     }
     // 范围下载所需数据
     $("#rangeStart").attr("max", _fragments.length);
@@ -453,7 +453,7 @@ function parseTs(data) {
     if (data.live) {
         autoDown && highlight();
         $("#recorder").show();
-        $("#count").html("直播HLS");
+        $("#count").html(i18n.liveHLS);
     } else if (autoDown) {
         $("#mergeTs").click();
     }
@@ -478,20 +478,20 @@ function parseTs(data) {
         });
     }
     function showKeyInfo(buffer, decryptdata, i) {
-        $("#tips").append('密钥地址(KeyURL): <input type="text" value="' + decryptdata.uri + '" spellcheck="false" readonly="readonly" class="keyUrl">');
+        $("#tips").append(i18n.keyAddress + ': <input type="text" value="' + decryptdata.uri + '" spellcheck="false" readonly="readonly" class="keyUrl">');
         if (buffer) {
             $("#tips").append(`
                     <div class="key flex">
-                        <div class="method">加密算法(Method): <input type="text" value="${decryptdata.method ? decryptdata.method : "NONE"}" spellcheck="false" readonly="readonly"></div>
-                        <div>密钥(Hex): <input type="text" value="${ArrayBufferToHexString(buffer)}" spellcheck="false" readonly="readonly"></div>
-                        <div>密钥(Base64): <input type="text" value="${ArrayBufferToBase64(buffer)}" spellcheck="false" readonly="readonly"></div>
+                        <div class="method">${i18n.encryptionAlgorithm}(Method): <input type="text" value="${decryptdata.method ? decryptdata.method : "NONE"}" spellcheck="false" readonly="readonly"></div>
+                        <div>${i18n.key}(Hex): <input type="text" value="${ArrayBufferToHexString(buffer)}" spellcheck="false" readonly="readonly"></div>
+                        <div>${i18n.key}(Base64): <input type="text" value="${ArrayBufferToBase64(buffer)}" spellcheck="false" readonly="readonly"></div>
                     </div>
                 `);
         } else {
             $("#tips").append(`
                     <div class="key flex">
                         <div class="method">加密算法(Method): <input type="text" value="${decryptdata.method ? decryptdata.method : "NONE"}" spellcheck="false" readonly="readonly"></div>
-                        <div>密钥(Hex): <input type="text" value="密钥下载失败" spellcheck="false" readonly="readonly"></div>
+                        <div>${i18n.key}(Hex): <input type="text" value="${i18n.keyDownloadFailed}" spellcheck="false" readonly="readonly"></div>
                     </div>
                 `);
         }
@@ -516,7 +516,7 @@ let progressTimer = setInterval(() => {
 chrome.downloads.onChanged.addListener(function (downloadDelta) {
     if (!downloadDelta.state) { return; }
     if (downloadDelta.state.current == "complete" && downId != 0) {
-        $progress.html("已保存到硬盘, 请查看浏览器已下载内容");
+        $progress.html(i18n.SavePrompt);
     }
 });
 // 打开目录
@@ -585,7 +585,7 @@ $("#play").click(function () {
         hls.attachMedia($("#video")[0]);
         $("#media_file").hide();
         $("#downList").hide();
-        $(this).html("关闭播放").data("switch", "off");
+        $(this).html(i18n.close).data("switch", "off");
         hls.on(Hls.Events.MEDIA_ATTACHED, function () {
             video.play();
         });
@@ -594,12 +594,12 @@ $("#play").click(function () {
     $("#video").hide();
     hls.detachMedia($("#video")[0]);
     $("#media_file").show();
-    $(this).html("播放").data("switch", "on");
+    $(this).html(i18n.play).data("switch", "on");
 });
 // 调用m3u8DL下载
 $("#m3u8DL").click(function () {
     if (_m3u8Url.startsWith("blob:")) {
-        alert("blob地址无法调用m3u8DL下载");
+        alert(i18n.blobM3u8DLError);
         return;
     }
     const m3u8dlArg = getM3u8DlArg();
@@ -607,7 +607,7 @@ $("#m3u8DL").click(function () {
     navigator.clipboard.writeText(m3u8dlArg);
     const m3u8dl = 'm3u8dl://' + Base64.encode(m3u8dlArg);
     if (m3u8dl.length >= 2046) {
-        alert("m3u8dl参数太长,可能导致无法唤醒m3u8DL, 请手动复制到m3u8DL下载");
+        alert(i18n.M3U8DLparameterLong);
     }
     chrome.tabs.update({ url: m3u8dl });
 });
@@ -636,7 +636,7 @@ $("input").keyup(function () {
 $("#onlyAudio").on("change", function () {
     if (transmuxer) {
         $(this).prop("checked", !$(this).prop("checked"));
-        alert("已启用转码, 无法更改此设置");
+        alert(i18n.runningCannotChangeSettings);
         return;
     }
     if ($(this).prop("checked") && !$("#mp4").prop("checked") && !$("#ffmpeg").prop("checked")) {
@@ -646,7 +646,7 @@ $("#onlyAudio").on("change", function () {
 $("#mp4").on("change", function () {
     if (transmuxer) {
         $(this).prop("checked", !$(this).prop("checked"));
-        alert("已启用转码, 无法更改此设置");
+        alert(i18n.runningCannotChangeSettings);
         return;
     }
     $("#ffmpeg").prop("checked") && $("#ffmpeg").click();
@@ -657,7 +657,7 @@ $("#mp4").on("change", function () {
 $("#StreamSaver").on("change", function () {
     if (transmuxer) {
         $(this).prop("checked", !$(this).prop("checked"));
-        alert("已启用转码, 无法更改此设置");
+        alert(i18n.runningCannotChangeSettings);
         return;
     }
     if ($(this).prop("checked")) {
@@ -669,7 +669,7 @@ $("#StreamSaver").on("change", function () {
 $("#ffmpeg").on("change", function () {
     if (transmuxer) {
         $(this).prop("checked", !$(this).prop("checked"));
-        alert("已启用转码, 无法更改此设置");
+        alert(i18n.runningCannotChangeSettings);
         return;
     }
     if ($(this).prop("checked")) {
