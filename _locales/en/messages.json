@@ -718,5 +718,26 @@
   },
   "fileRetrievalFailed": {
     "message": "File Retrieval Failed"
+  },
+  "selectVideo": {
+    "message": "Select Video"
+  },
+  "extractSlices": {
+    "message": "Extract Slices"
+  },
+  "convertToM3U8": {
+    "message": "Convert to M3U8 Parsing"
+  },
+  "selectAudio": {
+    "message": "Select Audio"
+  },
+  "audio": {
+    "message": "Audio"
+  },
+  "video": {
+    "message": "Video"
+  },
+  "DRMerror": {
+    "message": "The media has DRM protection, please use third-party tools for download"
   }
 }

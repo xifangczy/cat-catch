@@ -718,5 +718,26 @@
   },
   "fileRetrievalFailed": {
     "message": "文件获取失败"
+  },
+  "selectVideo": {
+    "message": "选择视频"
+  },
+  "extractSlices": {
+    "message": "提取切片"
+  },
+  "convertToM3U8": {
+    "message": "转为m3u8解析"
+  },
+  "selectAudio": {
+    "message": "选择音频"
+  },
+  "audio": {
+    "message": "音频"
+  },
+  "video": {
+    "message": "视频"
+  },
+  "DRMerror": {
+    "message": "媒体有DRM保护, 请使用第三方工具下载."
   }
 }

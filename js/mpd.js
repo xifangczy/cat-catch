@@ -94,7 +94,7 @@ function parseMPD() {
     console.log(mpdJson);
     if (mpdXml.find("contentprotection").length > 0) {
         $("#loading").show();
-        $("#loading .optionBox").html("媒体有DRM保护, 可能无法下载和播放. 暂无加密分析以及解密功能, 请复制mpd文件地址, 使用第三方工具下载.");
+        $("#loading .optionBox").html(i18n.DRMerror);
     }
     for (let key in mpdJson.playlists) {
         $("#mpdVideoLists").append(`<option value='${key}'>${mpdJson.playlists[key].attributes.NAME
@@ -130,15 +130,15 @@ function showSegment(type, index) {
         textarea += items.segments[key].resolvedUri + "\n\n";
     }
     $("#media_file").html(textarea);
-    $("#count").html("共 " + items.segments.length + " 个文件" + "，总时长: " + secToTime(mpdJson.duration));
+    $("#count").html(i18n("m3u8Info", [items.segments.length, secToTime(mpdJson.duration)]));
     items.segments.length > 0 && $("#tips").html('initialization: <input type="text" value="' + items.segments[0].map.resolvedUri + '" spellcheck="false" readonly="readonly" class="width100">');
     $("#info").html(getInfo(type));
 }
 
 function getInfo(type = "audio") {
     if (type == "audio") {
-        return "音频: " + $("#mpdAudioLists").find("option:selected").text();
+        return i18n.audio + ": " + $("#mpdAudioLists").find("option:selected").text();
     } else {
-        return "视频: " + $("#mpdVideoLists").find("option:selected").text();
+        return i18n.video + ": " + $("#mpdVideoLists").find("option:selected").text();
     }
 }
