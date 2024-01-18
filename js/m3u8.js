@@ -661,7 +661,7 @@ $("#StreamSaver").on("change", function () {
         return;
     }
     if ($(this).prop("checked")) {
-        $progress.html("边下边存功能<br><b>不支持ffmpeg在线转换格式</b> <b>不支持错误切片重下</b> <b>不支持另存为</b>");
+        $progress.html(`<b>${i18n.streamSaverTip}</b>`);
         $("#ffmpeg").prop("checked") && $("#ffmpeg").click();
         $("#saveAs").prop("checked", false);
     }
@@ -759,13 +759,13 @@ $("#recorder").click(function () {
             fileStream = createStreamSaver(_fragments[0].url);
         }
 
-        $(this).html(fileStream ? "停止下载" : "下载录制").data("switch", "off");
-        $progress.html(`等待直播数据中...`);
+        $(this).html(fileStream ? i18n.stopDownload : i18n.download).data("switch", "off");
+        $progress.html(i18n.waitingForLiveData);
         return;
     }
-    stopDownload = '停止录制';
+    stopDownload = i18n.stopRecording;
     recorder = false;
-    $(this).html("录制直播").data("switch", "on");
+    $(this).html(i18n.recordLive).data("switch", "on");
     if (fileStream) {
         fileStream.close();
         buttonState("#mergeTs", true);
@@ -796,15 +796,15 @@ $("#mergeTs").click(async function () {
     }
     // 检查序号
     if (start == -1 || end == -1) {
-        $progress.html(`<b>序号错误</b>`);
+        $progress.html(`<b>${i18n.sNumError}</b>`);
         return;
     }
     if (start > end) {
-        $progress.html(`<b>开始序号不能大于结束序号</b>`);
+        $progress.html(`<b>${i18n.startGTend}</b>`);
         return;
     }
     if (start > _fragments.length - 1 || end > _fragments.length - 1) {
-        $progress.html(`<b>序号最大不能超过${_fragments.length}</b>`);
+        $progress.html(`<b>${i18n("sNumMax", _fragments.length)}</b>`);
         return;
     }
     /* 设定自定义密钥和IV */
@@ -828,11 +828,11 @@ $("#mergeTs").click(async function () {
                 $m3u8dlArg.val(getM3u8DlArg());
             });
             if (flag) {
-                $progress.html(`<b>密钥下载失败</b>`);
+                $progress.html(`<b>${i18n.keyDownloadFailed}</b>`);
                 return;
             }
         } else {
-            $progress.html(`<b>密钥不正确</b>`);
+            $progress.html(`<b>${i18n.incorrectKey}</b>`);
             return;
         }
         for (let i in _fragments) {
@@ -881,7 +881,7 @@ $("#ForceDownload").click(function () {
 // 停止下载流
 $("#stopStream").click(function () {
     if (fileStream) {
-        stopDownload = "停止下载流";
+        stopDownload = i18n.stopDownload;
         fileStream.close();
         $("#stopStream").hide();
         buttonState("#mergeTs", true);
@@ -908,7 +908,7 @@ $("#tsAddArg").click(function () {
     if (m3u8Arg) {
         m3u8Arg = m3u8Arg[1];
     }
-    const arg = window.prompt("需要添加的参数", m3u8Arg ?? "");
+    const arg = window.prompt(i18n.addParameters, m3u8Arg ?? "");
     if (arg != null) {
         window.location.href += "&tsAddArg=" + encodeURIComponent(arg);
     }
@@ -921,7 +921,7 @@ $("#downProgress").click(function () {
 // 设置请求头
 // $("#setRequestHeaders, #setRequestHeadersError").click(function () {
 $(document).on("click", "#setRequestHeaders, #setRequestHeadersError", function () {
-    const arg = window.prompt("需要添加的参数", JSON.stringify(requestHeaders));
+    const arg = window.prompt(i18n.addParameters, JSON.stringify(requestHeaders));
     if (arg != null) {
         params.delete("requestHeaders");
         params.append("requestHeaders", arg);
@@ -1038,7 +1038,7 @@ function downloadNew(start = 0, end = _fragments.length) {
                 const iv = fragment.decryptdata.iv ?? new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fragment.sn]);
                 buffer = decryptor.decrypt(buffer, 0, iv.buffer, true);
             } catch (e) {
-                $progress.html("解密错误" + e);
+                $progress.html(i18n.decryptionError + e);
                 down.stop();
                 buttonState("#mergeTs", true);
                 console.log(e);
@@ -1086,12 +1086,12 @@ function downloadNew(start = 0, end = _fragments.length) {
         $("#errorDownload").show(); // 重下所有失败项
 
         const $dom = $(`#downItem${fragment.index}`);
-        $dom.find(".percentage").addClass('error').html("下载失败...");
+        $dom.find(".percentage").addClass('error').html(i18n.downloadFailed);
         $button = $dom.find("button");
-        $button.html("重新下载").data("action", "start");
+        $button.html(i18n.retryDownload).data("action", "start");
         if (down.isErrorItem(fragment)) {
             const count = parseInt($button.data("count")) + 1;
-            $button.data("count", count).html(`重新下载(${count})`);
+            $button.data("count", count).html(`${i18n.retryDownload}(${count})`);
         } else {
             $button.data("count", 0);
         }
@@ -1099,15 +1099,15 @@ function downloadNew(start = 0, end = _fragments.length) {
     // 切片下载完成
     down.on('completed', function (buffer, fragment) {
         if (recorder) {
-            $progress.html(`等待直播数据中...`);
+            $progress.html(i18n.waitingForLiveData);
             downDuration += fragment.duration;
-            $fileDuration.html("录制时长:" + secToTime(downDuration));
+            $fileDuration.html(i18n.recordingDuration + ":" + secToTime(downDuration));
             return;
         }
         // $(`#downItem${fragment.index}`).remove();
         $progress.html(`${down.success}/${down.total}`);
-        $fileSize.html("已下载:" + byteToSize(down.bufferize));
-        $fileDuration.html("已下载视频长度:" + secToTime(down.duration));
+        $fileSize.html(i18n.downloaded + ":" + byteToSize(down.bufferize));
+        $fileDuration.html(i18n.downloadedVideoLength + ":" + secToTime(down.duration));
     });
     // 全部下载完成
     down.on('allCompleted', function (buffer) {
@@ -1131,7 +1131,7 @@ function downloadNew(start = 0, end = _fragments.length) {
     down.on('itemProgress', function (fragment, state, receivedLength, contentLength) {
         $(`#downItem${fragment.index} .percentage`).html((receivedLength / contentLength * 100).toFixed(2) + "%");
         if (state) {
-            $(`#downItem${fragment.index} .percentage`).html("下载完成");
+            $(`#downItem${fragment.index} .percentage`).html(i18n.downloadComplete);
             $(`#downItem${fragment.index} button`).remove();
         }
     });
@@ -1155,9 +1155,9 @@ function downloadNew(start = 0, end = _fragments.length) {
         const html = $(`<div id="downItem${fragment.index}">
             <a href="${fragment.url}" target="_blank">${fragment.url}</a>
             <div class="itemProgress">
-            <span>进度：</span>
-            <span class="percentage">待下载</span>
-            <button data-action="stop">停止下载</button>
+            <span>${i18n.downloadProgress}: </span>
+            <span class="percentage">${i18n.waitDownload}</span>
+            <button data-action="stop">${i18n.stopDownload}</button>
             </div>
         </div>`);
         html.find("button").click(function () {
@@ -1165,10 +1165,10 @@ function downloadNew(start = 0, end = _fragments.length) {
             if ($(this).data("action") == "stop") {
                 down.stop(fragment.index);
                 down.downloader();  // 停止当前下载器 重新开一个下载器保持线程数量
-                $(this).html("重新下载").data("action", "start");
+                $(this).html(i18n.retryDownload).data("action", "start");
             } else {
                 down.downloader(fragment);
-                $(this).html("停止下载").data("action", "stop");
+                $(this).html(i18n.stopDownload).data("action", "stop");
             }
         });
         tempDOM.append(html);
@@ -1207,17 +1207,17 @@ function downloadTsError(index) {
         $("#errorDownload").show();
         $("#errorTsList").show();
     }
-    let html = $(`<p id="errorId${index}">${_fragments[index].url} <button data-id="${index}">重新下载</button></p>`);
+    let html = $(`<p id="errorId${index}">${_fragments[index].url} <button data-id="${index}">${i18n.retryDownload}</button></p>`);
     html.find("button").click(function () {
         buttonState(this, false);
-        $(this).html("正在重新下载...");
+        $(this).html(i18n.retryingDownload);
         downloadTs(index, index, html);
     });
     $('#errorTsList').append(html);
 }
 // 合并下载
 function mergeTsNew(down) {
-    $progress.html("正在合并...");
+    $progress.html(i18n.merging);
 
     // 创建Blob
     const fileBlob = new Blob(down.buffer, { type: down.transcode ? "video/mp4" : "video/MP2T" });
@@ -1266,10 +1266,10 @@ function mergeTsNew(down) {
                 tabId: currentTabId,
             });
             buttonState("#mergeTs", true);
-            $progress.html("已发送给在线ffmpeg");
+            $progress.html(i18n.sendFfmpeg);
             return;
         }
-        $progress.html("文件大于2G 无法使用在线ffmpeg, 正在下载合并文件, 文件较大请耐心等待...");
+        $progress.html(i18n("fileTooLarge", ["2G"]));
         // buttonState("#mergeTs", true);
         // $progress.html("视频大于2G 无法使用在线ffmpeg");
         // return;
@@ -1319,10 +1319,10 @@ function mergeTs() {
                 name: "memory" + new Date().getTime() + "." + ext
             });
             buttonState("#mergeTs", true);
-            $progress.html("已发送给在线ffmpeg");
+            $progress.html(i18n.sendFfmpeg);
             return;
         } else {
-            $progress.html("视频大于2G 无法使用在线ffmpeg");
+            $progress.html(i18n("fileTooLarge", ["2G"]));
         }
     }
 
@@ -1437,7 +1437,7 @@ function streamDownload(start = 0, end = _fragments.length - 1) {
                     transmuxer.off('data');
                     transmuxer = undefined;
                 }
-                $progress.html("合并已完成, 等待浏览器下载完成...");
+                $progress.html(i18n.savePrompt);
                 $("#stopStream").hide();
                 buttonState("#mergeTs", true);
             }
@@ -1449,7 +1449,7 @@ function streamDownload(start = 0, end = _fragments.length - 1) {
             if (downSet.mp4) {
                 // 如果编码已经开始 但没有任何headEncode 转码错误 取消
                 if (transmuxerStatus && !transmuxerheadEncode) {
-                    stopDownload = "格式转换错误, 请取消mp4转换, 重新下载.";
+                    stopDownload = i18n.formatConversionError;
                     return;
                 }
                 transmuxerStatus = true;
@@ -1481,7 +1481,7 @@ function streamDownload(start = 0, end = _fragments.length - 1) {
                 downList[currentIndex].data = tsDecrypt(buffer, downList[currentIndex].index);
                 if (recorder) {
                     downDuration += downList[currentIndex].duration;
-                    $fileDuration.html("录制时长:" + secToTime(downDuration));
+                    $fileDuration.html(i18n.recordingDuration + ":" + secToTime(downDuration));
                     return;
                 }
                 $progress.html(`${++downCurrentTs}/${downTotalTs}`);
@@ -1509,7 +1509,7 @@ function tsDecrypt(responseData, index) {
     try {
         decryptor.expandKey(_fragments[index].decryptdata.keyContent);
     } catch (e) {
-        stopDownload = "密钥类型错误";
+        stopDownload = i18n.incorrectKey;
         buttonState("#mergeTs", true);
         console.log(e);
         return;
@@ -1518,7 +1518,7 @@ function tsDecrypt(responseData, index) {
         let iv = _fragments[index].decryptdata.iv ?? new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, index]);
         return decryptor.decrypt(responseData, 0, iv.buffer, true);
     } catch (e) {
-        stopDownload = "解密失败，无法解密.";
+        stopDownload = i18n.decryptionError;
         buttonState("#mergeTs", true);
         console.log(e);
     }
@@ -1555,7 +1555,7 @@ window.onunload = function () {
 }
 window.onbeforeunload = function (event) {
     if (fileStream) {
-        event.returnValue = `正在推流, 关闭后停止下载...`;
+        event.returnValue = i18n.streamOnbeforeunload;
     }
 }
 function getM3u8DlArg() {

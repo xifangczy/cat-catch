@@ -636,5 +636,75 @@
   },
   "runningCannotChangeSettings": {
     "message": "Running, Cannot Change Settings"
+  },
+  "streamSaverTip": {
+    "message": "The function of 'download while saving' does not support ffmpeg online format conversion, does not support re-downloading erroneous slices, and does not support 'save as'."
+  },
+  "stopRecording": {
+    "message": "Stop Recording"
+  },
+  "waitingForLiveData": {
+    "message": "Waiting for Live Data"
+  },
+  "sNumError": {
+    "message": "Serial Number Error"
+  },
+  "startGTend": {
+    "message": "Start Number Cannot Be Greater Than End Number"
+  },
+  "sNumMax": {
+    "message": "Serial Number Cannot Exceed $num$",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      }
+    }
+  },
+  "incorrectKey": {
+    "message": "Incorrect Key"
+  },
+  "addParameters": {
+    "message": "Add Parameters"
+  },
+  "decryptionError": {
+    "message": "Decryption Error"
+  },
+  "downloadFailed": {
+    "message": "Download Failed"
+  },
+  "retryDownload": {
+    "message": "Retry Download"
+  },
+  "recordingDuration": {
+    "message": "Recording Duration"
+  },
+  "downloaded": {
+    "message": "Downloaded"
+  },
+  "downloadedVideoLength": {
+    "message": "Downloaded Video Length"
+  },
+  "downloadComplete": {
+    "message": "Download Complete"
+  },
+  "retryingDownload": {
+    "message": "Retrying Download"
+  },
+  "merging": {
+    "message": "Merging"
+  },
+  "fileTooLarge": {
+    "message": "File Too Large, File larger than $size$",
+    "placeholders": {
+      "size": {
+        "content": "$1"
+      }
+    }
+  },
+  "formatConversionError": {
+    "message": "Format Conversion Error"
+  },
+  "streamOnbeforeunload": {
+    "message": "Streaming is in progress, the download will stop after closing"
   }
 }

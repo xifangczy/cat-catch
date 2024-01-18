@@ -636,5 +636,75 @@
   },
   "runningCannotChangeSettings": {
     "message": "正在运行, 不能更改设置"
+  },
+  "streamSaverTip": {
+    "message": "边下边存功能 不支持ffmpeg在线转换格式 不支持错误切片重下 不支持另存为"
+  },
+  "stopRecording": {
+    "message": "停止录制"
+  },
+  "waitingForLiveData": {
+    "message": "等待直播数据"
+  },
+  "sNumError": {
+    "message": "序号错误"
+  },
+  "startGTend": {
+    "message": "开始序号不能大于结束序号"
+  },
+  "sNumMax": {
+    "message": "序号最大不能超过 $num$",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      }
+    }
+  },
+  "incorrectKey": {
+    "message": "密钥不正确"
+  },
+  "addParameters": {
+    "message": "添加参数"
+  },
+  "decryptionError": {
+    "message": "解密错误"
+  },
+  "downloadFailed": {
+    "message": "下载失败"
+  },
+  "retryDownload": {
+    "message": "重新下载"
+  },
+  "recordingDuration": {
+    "message": "录制时长"
+  },
+  "downloaded": {
+    "message": "已下载"
+  },
+  "downloadedVideoLength": {
+    "message": "已下载视频长度"
+  },
+  "downloadComplete": {
+    "message": "下载完成"
+  },
+  "retryingDownload": {
+    "message": "正在重新下载"
+  },
+  "merging": {
+    "message": "合并中"
+  },
+  "fileTooLarge": {
+    "message": "文件大于$size$ 无法使用在线ffmpeg, 正在下载合并文件, 文件较大请耐心等待",
+    "placeholders": {
+      "size": {
+        "content": "$1"
+      }
+    }
+  },
+  "formatConversionError": {
+    "message": "格式转换错误, 请取消mp4转换, 重新下载."
+  },
+  "streamOnbeforeunload": {
+    "message": "正在推流, 关闭后停止下载..."
   }
 }
