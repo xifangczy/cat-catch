@@ -7,16 +7,16 @@
   },
   "browser_action": {
     "default_icon": "img/icon.png",
-    "default_title": "还没闻到味儿~",
+    "default_title": "__MSG_noData__",
     "default_popup": "popup.html"
   },
-  "description": "网页媒体嗅探工具",
+  "description": "__MSG_description__",
   "icons": {
     "64": "img/icon.png",
     "128": "img/icon128.png"
   },
   "manifest_version": 2,
-  "name": "猫抓",
+  "name": "__MSG_catCatch__",
   "homepage_url": "https://github.com/xifangczy/cat-catch",
   "options_ui": {
     "page": "options.html",
@@ -38,19 +38,19 @@
   "commands": {
     "_execute_browser_action": {},
     "enable": {
-      "description": "暂停 / 启用"
+      "description": "__MSG_pause__ / __MSG_enable__"
     },
     "auto_down": {
-      "description": "自动下载"
+      "description": "__MSG_autoDownload__"
     },
     "catch": {
-      "description": "缓存捕捉"
+      "description": "__MSG_cacheCapture__"
     },
     "m3u8": {
-      "description": "m3u8解析器"
+      "description": "__MSG_m3u8Parser__"
     },
     "clear": {
-      "description": "清空当前标签数据"
+      "description": "__MSG_clear__"
     }
   },
   "browser_specific_settings": {
