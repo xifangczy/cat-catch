@@ -4,6 +4,13 @@
 
     // 启用开关
     let enable = true;
+    let language = navigator.language.replace("-", "_");
+    if (!window.CatCatchI18n.languages.includes(language)) {
+        language = language.split("_")[0];
+        if (!window.CatCatchI18n.languages.includes(language)) {
+            language = "en";
+        }
+    }
 
     const buttonStyle = 'style="border:solid 1px #000;margin:2px;padding:2px;background:#fff;border-radius:4px;border:solid 1px #c7c7c780;color:#000;"';
     const checkboxStyle = 'style="-webkit-appearance: auto;"';
@@ -12,20 +19,20 @@
     CatCatch.setAttribute("id", "CatCatchCatch");
     CatCatch.innerHTML = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAAKlBMVEUAAADLlROxbBlRAD16GS5oAjWWQiOCIytgADidUx/95gHqwwTx0gDZqwT6kfLuAAAACnRSTlMA/vUejV7kuzi8za0PswAAANpJREFUGNNjwA1YSxkYTEqhnKZLLi6F1w0gnKA1shdvHYNxdq1atWobjLMKCOAyC3etlVrUAOH4HtNZmLgoAMKpXX37zO1FwcZAwMDguGq1zKpFmTNnzqx0Bpp2WvrU7ttn9py+I8JgLn1R8Pad22vurNkjwsBReHv33junzuyRnOnMwNCSeFH27K5dq1SNgcZxFMnuWrNq1W5VkNntihdv7ToteGcT0C7mIkE1qbWCYjJnM4CqEoWKdoslChXuUgXJqIcLebiphSgCZRhaPDhcDFhdmUMCGIgEAFA+Uc02aZg9AAAAAElFTkSuQmCC" style="-webkit-user-drag: none;width: 20px;">
     <div id="tips"></div>
-    <button id="download" ${buttonStyle}>下载已捕获的数据</button>
-    <button id="clean" ${buttonStyle}>删除已捕获数据</button>
-    <button id="restart" ${buttonStyle}>从头捕获</button>
-    <div><button id="hide" ${buttonStyle}>隐藏</button><button id="close" ${buttonStyle}>关闭</button></div>
-    <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown")} ${checkboxStyle}>完成捕获自动下载</label>
-    <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg")} ${checkboxStyle}>使用ffmpeg合并</label>
+    <button id="download" ${buttonStyle} data-i18n="downloadCapturedData">下载已捕获的数据</button>
+    <button id="clean" ${buttonStyle} data-i18n="deleteCapturedData">删除已捕获数据</button>
+    <button id="restart" ${buttonStyle} data-i18n="capturedBeginning">从头捕获</button>
+    <div><button id="hide" ${buttonStyle} data-i18n="hide">隐藏</button><button id="close" ${buttonStyle} data-i18n="close">关闭</button></div>
+    <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown")} ${checkboxStyle}><span data-i18n="automaticDownload">完成捕获自动下载</span></label>
+    <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg")} ${checkboxStyle}><span data-i18n="ffmpeg">使用ffmpeg合并</span></label>
     <details>
-        <summary>文件名设置</summary>
-        <div style="font-weight:bold;">文件名: </div><div id="fileName"></div>
-        <div style="font-weight:bold;">表达式: </div><div id="selector">未设置</div>
-        <div style="font-weight:bold;">正则: </div><div id="regular">未设置</div>
-        <button id="setSelector" ${buttonStyle}>表达式提取</button>
-        <button id="setRegular" ${buttonStyle}>正则提取</button>
-        <button id="setFileName" ${buttonStyle}>手动填写</button>
+        <summary data-i18n="fileName" id="summary">文件名设置</summary>
+        <div style="font-weight:bold;"><span data-i18n="fileName">文件名</span>: </div><div id="fileName"></div>
+        <div style="font-weight:bold;"><span data-i18n="selector">表达式</span>: </div><div id="selector">Null</div>
+        <div style="font-weight:bold;"><span data-i18n="regular">正则</span>: </div><div id="regular">Null</div>
+        <button id="setSelector" ${buttonStyle} data-i18n="usingSelector">表达式提取</button>
+        <button id="setRegular" ${buttonStyle} data-i18n="usingRegular">正则提取</button>
+        <button id="setFileName" ${buttonStyle} data-i18n="customize">手动填写</button>
     </details>
     <details>
     <summary>test</summary>
@@ -53,7 +60,6 @@
 
     // 创建 Shadow DOM 放入CatCatch
     const divShadow = document.createElement('div');
-    divShadow.setAttribute("id", "catCatchWebRTC");
     const shadowRoot = divShadow.attachShadow({ mode: 'closed' });
     shadowRoot.appendChild(CatCatch);
     // 页面插入Shadow DOM
@@ -70,11 +76,11 @@
     const $clean = CatCatch.querySelector("#clean");
     $clean.addEventListener('click', function (event) {
         clearCache();
-        $clean.innerHTML = "清理完成!";
-        setTimeout(() => { $clean.innerHTML = "清理缓存"; }, 1000);
+        $clean.innerHTML = i18n("cleanupCompleted", "清理完成!");
+        setTimeout(() => { $clean.innerHTML = i18n("clearCache", "清理缓存"); }, 1000);
     });
     CatCatch.querySelector("#download").addEventListener('click', function (event) {
-        if (isComplete || window.confirm("提前下载可能会造成数据混乱.确认？")) {
+        if (isComplete || window.confirm(i18n("downloadConfirmation", "提前下载可能会造成数据混乱.确认？"))) {
             catchDownload();
         }
     });
@@ -94,21 +100,22 @@
         });
     });
     CatCatch.querySelector("#setFileName").addEventListener('click', function (event) {
-        setFileName = window.prompt("输入文件名, 不包含扩展名", setFileName ?? "");
+        setFileName = window.prompt(i18n("fileName", i18n("fileName", "输入文件名, 不包含扩展名")), setFileName ?? "");
         getFileName();
     });
     CatCatch.querySelector("#test").addEventListener('click', function (event) {
         console.log(catchMedia);
         console.log(bufferList);
     });
+    CatCatch.querySelector("#summary").addEventListener('click', getFileName);
 
     // 文件名设置
     let setFileName = null;
     const fileName = CatCatch.querySelector("#fileName");
     const selector = CatCatch.querySelector("#selector");
-    selector.innerHTML = localStorage.getItem("CatCatchCatch_selector") ?? "未设置";
+    selector.innerHTML = localStorage.getItem("CatCatchCatch_selector") ?? "Null";
     CatCatch.querySelector("#setSelector").addEventListener('click', function (event) {
-        const result = window.prompt("文件名获取Selector表达式", localStorage.getItem("CatCatchCatch_selector") ?? "");
+        const result = window.prompt("Selector", localStorage.getItem("CatCatchCatch_selector") ?? "");
         if (result == null) { return; }
         if (result == "") { clearFileName("selector"); return; }
         const title = document.querySelector(result);
@@ -117,13 +124,13 @@
             localStorage.setItem("CatCatchCatch_selector", result);
             getFileName();
         } else {
-            clearFileName("selector", "表达式错误, 无法获取或内容为空!");
+            clearFileName("selector", i18n("fileNameError", "表达式错误, 无法获取或内容为空!"));
         }
     });
     const regular = CatCatch.querySelector("#regular");
-    regular.innerHTML = localStorage.getItem("CatCatchCatch_regular") ?? "未设置";
+    regular.innerHTML = localStorage.getItem("CatCatchCatch_regular") ?? "Null";
     CatCatch.querySelector("#setRegular").addEventListener('click', function (event) {
-        let result = window.prompt("文件名获取正则", localStorage.getItem("CatCatchCatch_regular") ?? "");
+        let result = window.prompt(i18n("regular", "文件名获取正则"), localStorage.getItem("CatCatchCatch_regular") ?? "");
         if (result == null) { return; }
         if (result == "") { clearFileName("regular"); return; }
         try {
@@ -131,7 +138,7 @@
             regular.innerHTML = stringModify(result);
             localStorage.setItem("CatCatchCatch_regular", result);
             getFileName();
-        } catch (e) { clearFileName("regular", "正则表达式错误"); console.log(e); }
+        } catch (e) { clearFileName("regular", i18n("fileNameError", "正则表达式错误")); console.log(e); }
     });
 
     // 操作按钮
@@ -150,7 +157,7 @@
         });
     });
 
-    tips.innerHTML = "等待视频播放";
+    tips.innerHTML = i18n("waiting", "等待视频播放");
     let catchMedia = [];
     let bufferList = {};
     let mediaSize = 0;
@@ -159,7 +166,7 @@
     window.MediaSource.prototype.addSourceBuffer = function (mimeType) {
         // 标题获取
         setTimeout(() => { getFileName(); }, 2000);
-        tips.innerHTML = "捕获数据中...";
+        tips.innerHTML = i18n("capturingData", "捕获数据中...");
         const sourceBuffer = _AddSourceBuffer.call(this, mimeType);
         const _appendBuffer = sourceBuffer.appendBuffer;
         const type = mimeType.split("/").shift() + (++index);
@@ -168,7 +175,7 @@
         sourceBuffer.appendBuffer = function (data) {
             if (enable) {
                 mediaSize += data.byteLength;
-                tips.innerHTML = "捕获数据中: " + byteToSize(mediaSize);
+                tips.innerHTML = i18n("capturingData", "捕获数据中...") + ": " + byteToSize(mediaSize);
                 bufferList[type].push(data);
             }
             _appendBuffer.call(this, data);
@@ -183,7 +190,7 @@
     window.MediaSource.prototype.endOfStream = function () {
         if (enable) {
             isComplete = true;
-            tips.innerHTML = "捕获完成";
+            tips.innerHTML = i18n("captureCompleted", "捕获完成");
             localStorage.getItem("CatCatchCatch_autoDown") == "checked" && catchDownload();
         }
         _endOfStream.call(this);
@@ -195,7 +202,7 @@
     // 下载资源
     function catchDownload() {
         if (catchMedia.length == 0) {
-            alert("没抓到有效数据");
+            alert(i18n("noData", "没抓到有效数据"));
             return;
         }
         // catchMedia 预处理 解决 从头捕获 文件头重复 临时解决办法
@@ -230,12 +237,12 @@
         }
         if (isComplete) {
             clearCache(true);
-            tips.innerHTML = "下载完毕...";
+            tips.innerHTML = i18n("downloadCompleted", "下载完毕...");
         }
     }
     function clearFileName(obj = "selector", warning = "") {
         localStorage.removeItem("CatCatchCatch_" + obj);
-        (obj == "selector" ? selector : regular).innerHTML = "未设置";
+        (obj == "selector" ? selector : regular).innerHTML = i18n("notSet", "未设置");
         getFileName();
         warning && alert(warning);
     }
@@ -306,5 +313,19 @@
                 '~': '_'
             }[m];
         });
+    }
+
+    // i18n
+    if (window.CatCatchI18n) {
+        CatCatch.querySelectorAll('[data-i18n]').forEach(function (element) {
+            element.innerHTML = window.CatCatchI18n[element.dataset.i18n][language];
+        });
+        CatCatch.querySelectorAll('[data-i18n-outer]').forEach(function (element) {
+            element.outerHTML = window.CatCatchI18n[element.dataset.i18nOuter][language];
+        });
+    }
+    function i18n(key, original = "") {
+        if (!window.CatCatchI18n) { return original };
+        return window.CatCatchI18n[key][language];
     }
 })();
