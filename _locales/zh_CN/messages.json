@@ -794,5 +794,14 @@
   },
   "exit": {
     "message": "退出"
+  },
+  "unknownSize": {
+    "message": "未知大小"
+  },
+  "saving": {
+    "message": "正在保存"
+  },
+  "saveFailed": {
+    "message": "保存失败"
   }
 }

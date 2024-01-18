@@ -50,7 +50,7 @@ function startDownload(tabId) {
 
     // 使用ajax下载文件
     $("#downfile").show();
-    $downFilepProgress.html("后台下载中...");
+    // $downFilepProgress.html("后台下载中...");
     let fileTotal = 0;
     let progress = undefined;
     let timer = setInterval(() => {
@@ -73,15 +73,15 @@ function startDownload(tabId) {
                     $downFilepProgress.html(byteToSize(evt.loaded) + " / " + fileTotal + " " + progress);
                     $progress.css("width", progress);
                 } else {
-                    $downFilepProgress.html("未知大小...");
+                    $downFilepProgress.html(i18n.unknownSize);
                     $progress.css("width", "100%");
                 }
             });
             return xhr;
         }
     }).fail(function (result) {
-        document.title = "下载失败...";
-        $downFilepProgress.html("下载失败... " + JSON.stringify(result));
+        document.title = i18n.downloadFailed;
+        $downFilepProgress.html(i18n.downloadFailed + JSON.stringify(result));
     }).done(function (result) {
         try {
             // if (fileFlag) {
@@ -97,8 +97,8 @@ function startDownload(tabId) {
                 sendFile("popupAddMedia");
                 return;
             }
-            $downFilepProgress.html("正在保存到硬盘...");
-            document.title = "正在保存到硬盘...";
+            $downFilepProgress.html(i18n.saving);
+            document.title = i18n.saving;
             chrome.downloads.download({
                 url: blobUrl,
                 filename: stringModify(_fileName),
@@ -107,7 +107,7 @@ function startDownload(tabId) {
                 downId = downloadId;
             });
         } catch (e) {
-            $downFilepProgress.html("保存到磁盘失败... " + e);
+            $downFilepProgress.html(i18n.saveFailed + e);
         }
     });
 
@@ -115,8 +115,8 @@ function startDownload(tabId) {
     chrome.downloads.onChanged.addListener(function (downloadDelta) {
         if (!downloadDelta.state) { return; }
         if (downloadDelta.state.current == "complete" && downId != 0) {
-            document.title = "下载完成!";
-            $downFilepProgress.html("已保存到硬盘, 请查看浏览器已下载内容");
+            document.title = i18n.downloadComplete;
+            $downFilepProgress.html(i18n.savePrompt);
             if ($("#autoClose").prop("checked")) {
                 setTimeout(() => {
                     window.close();
@@ -177,7 +177,7 @@ function startDownload(tabId) {
     }
     chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         if (!Message.Message || Message.Message != "catCatchFFmpegResult" || Message.state != "ok" || tabId == 0 || Message.tabId != tabId) { return; }
-        $downFilepProgress.html("已发送到在线ffmpeg");
+        $downFilepProgress.html(i18n.sendFfmpeg);
         if (Message.state == "ok" && $("#autoClose").prop("checked")) {
             setTimeout(() => {
                 window.close();

@@ -114,7 +114,7 @@
     "message": "Auto Download"
   },
   "onlineMerge": {
-    "message": "Online Merge"
+    "message": "Merge"
   },
   "download": {
     "message": "Download"
@@ -438,7 +438,7 @@
     "message": "Go Back"
   },
   "openDir": {
-    "message": "Open Download Directory"
+    "message": "Open Directory"
   },
   "downloadDir": {
     "message": "Download Directory"
@@ -794,5 +794,14 @@
   },
   "exit": {
     "message": "Exit"
+  },
+  "unknownSize": {
+    "message": "Unknown size"
+  },
+  "saving": {
+    "message": "Saving"
+  },
+  "saveFailed": {
+    "message": "Save failed"
   }
 }
