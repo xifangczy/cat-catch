@@ -362,6 +362,9 @@
   "previewModePlaceholder": {
     "message": "留空为不启用 默认使用popup页面预览视频"
   },
+  "preview": {
+    "message": "视频"
+  },
   "customFilenameOption": {
     "message": "使用自定义文件名保存文件(默认为网页标题)"
   },
@@ -572,6 +575,9 @@
   "resolution": {
     "message": "分辨率"
   },
+  "duration": {
+    "message": "时长"
+  },
   "bitrate": {
     "message": "码率"
   },
@@ -589,6 +595,9 @@
   },
   "hevcTip": {
     "message": "HEVC/H.265编码ts文件 只支持在线ffmpeg转码"
+  },
+  "hevcPreviewTip": {
+    "message": "HEVC/H.265编码ts文件 不支持预览"
   },
   "m3u8Info": {
     "message": "共 $num$ 个文件, 总时长 $time$",
@@ -739,5 +748,42 @@
   },
   "DRMerror": {
     "message": "媒体有DRM保护, 请使用第三方工具下载."
+  },
+  "regexTitle": {
+    "message": "正则表达式匹配 或 来自深度搜索"
+  },
+  "downloadWithRequestHeader": {
+    "message": "携带请求头参数下载"
+  },
+  "m3u8Playlist": {
+    "message": "m3u8播放列表"
+  },
+  "copiedToClipboard": {
+    "message": "已复制到剪贴板"
+  },
+  "hasSent": {
+    "message": "已发送"
+  },
+  "sendFailed": {
+    "message": "发送失败"
+  },
+  "confirmDownload": {
+    "message": "共 $num$ 个文件，是否确认下载?",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmLoading": {
+    "message": "共 $num$ 条资源，是否取消加载?",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      }
+    }
+  },
+  "waitingForMedia": {
+    "message": "等待接收媒体文件...请勿关闭本页面..."
   }
 }

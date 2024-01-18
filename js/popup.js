@@ -96,14 +96,14 @@ function AddMedia(data, currentTab = true) {
             <div class="panel-heading">
                 <input type="checkbox" class="DownCheck" checked/>
                 ${G.ShowWebIco ? `<img class="favicon ${!data.favIconUrl ? "faviconFlag" : ""}" requestId="${data.requestId}" src="${data.favIconUrl}"/>` : ""}
-                <img src="img/regex.png" class="favicon regex ${data.isRegex ? "" : "hide"}" title="正则表达式匹配 或 来自深度搜索"/>
+                <img src="img/regex.png" class="favicon regex ${data.isRegex ? "" : "hide"}" title="${i18n.regexTitle}"/>
                 <span class="name ${data.parsing || data.isRegex || data.tabId == -1 ? "bold" : ""}">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
-                <img src="img/copy.png" class="icon copy" id="copy" title="复制地址"/>
-                <img src="img/parsing.png" class="icon parsing ${data.parsing ? "" : "hide"}" id="parsing" data-type="${data.parsing}" title="解析"/>
-                <img src="img/play.png" class="icon play ${data.isPlay ? "" : "hide"}" id="play" title="预览"/>
-                <img src="img/download.png" class="icon download" id="download" title="下载"/>
-                <img src="img/aria2.png" class="icon aria2 ${G.enableAria2Rpc ? "" : "hide"}"" id="aria2" title="发送到 Aria2"/>
+                <img src="img/copy.png" class="icon copy" id="copy" title="${i18n.copy}"/>
+                <img src="img/parsing.png" class="icon parsing ${data.parsing ? "" : "hide"}" id="parsing" data-type="${data.parsing}" title="${i18n.parser}"/>
+                <img src="img/play.png" class="icon play ${data.isPlay ? "" : "hide"}" id="play" title="${i18n.preview}"/>
+                <img src="img/download.png" class="icon download" id="download" title="${i18n.download}"/>
+                <img src="img/aria2.png" class="icon aria2 ${G.enableAria2Rpc ? "" : "hide"}"" id="aria2" title="Aria2"/>
             </div>
             <div class="url hide">
                 <div id="mediaInfo" data-state="false">
@@ -111,8 +111,8 @@ function AddMedia(data, currentTab = true) {
                     ${data.type ? `<br><b>MIME:</b>  ${data.type}` : ""}
                 </div>
                 <div class="moreButton">
-                    <div id="qrcode"><img src="img/qrcode.png" class="icon qrcode" title="显示资源地址二维码"/></div>
-                    <div id="catDown"><img src="img/cat-down.png" class="icon cat-down" title="携带请求头参数下载"/></div>
+                    <div id="qrcode"><img src="img/qrcode.png" class="icon qrcode" title="QR Code"/></div>
+                    <div id="catDown"><img src="img/cat-down.png" class="icon cat-down" title="${i18n.downloadWithRequestHeader}"/></div>
                 </div>
                 <a href="${data.url}" target="_blank" download="${data.downFileName}">${data.url}</a>
                 <br>
@@ -149,9 +149,9 @@ function AddMedia(data, currentTab = true) {
                 });
                 hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
                     if (data.tracks && !data.tracks.audiovideo) {
-                        !data.tracks.audio && mediaInfo.append("<br><b>无音频</b>");
+                        !data.tracks.audio && mediaInfo.append(`<br><b>${i18n.noAudio}</b>`);
                         if (!data.tracks.video) {
-                            mediaInfo.append("<br><b>无视频</b>");
+                            mediaInfo.append(`<br><b>${i18n.noVideo}</b>`);
                             fetch(hls.levels[0].details.fragments[0].url).then(response => response.arrayBuffer())
                                 .then(function (data) {
                                     data = new Uint8Array(data);
@@ -161,7 +161,7 @@ function AddMedia(data, currentTab = true) {
                                         if (data[i] == 0x47 && data[i + 1] != 0x40) {
                                             // 0x24 H.265
                                             if (data[i + 17] == 0x24) {
-                                                mediaInfo.html(mediaInfo.html().replace("无视频", "HEVC/H.265编码ts文件 不支持预览"));
+                                                mediaInfo.html(mediaInfo.html().replace(i18n.noVideo, i18n.hevcPreviewTip));
                                             }
                                             return;
                                         }
@@ -173,8 +173,8 @@ function AddMedia(data, currentTab = true) {
                     }
                 });
                 hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
-                    if (data.levels.length > 1 && !mediaInfo.text().includes("m3u8播放列表")) {
-                        mediaInfo.append("<br><b>m3u8播放列表</b>");
+                    if (data.levels.length > 1 && !mediaInfo.text().includes(i18n.m3u8Playlist)) {
+                        mediaInfo.append(`<br><b>${i18n.m3u8Playlist}</b>`);
                     }
                 });
             } else if (data.isPlay) {
@@ -193,10 +193,10 @@ function AddMedia(data, currentTab = true) {
                 preview.show();
                 if (this.duration && this.duration != Infinity) {
                     data.duration = this.duration;
-                    mediaInfo.append("<br><b>时长:</b> " + secToTime(this.duration));
+                    mediaInfo.append(`<br><b>${i18n.duration}:</b> ` + secToTime(this.duration));
                 }
                 if (this.videoHeight && this.videoWidth) {
-                    mediaInfo.append("<br><b>分辨率:</b> " + this.videoWidth + "x" + this.videoHeight);
+                    mediaInfo.append(`<br><b>${i18n.resolution}:</b> ` + this.videoWidth + "x" + this.videoHeight);
                     data.videoWidth = this.videoWidth;
                     data.videoHeight = this.videoHeight;
                 }
@@ -220,15 +220,15 @@ function AddMedia(data, currentTab = true) {
     data.html.find('#copy').click(function () {
         const text = copyLink(data);
         navigator.clipboard.writeText(text);
-        Tips("已复制到剪贴板");
+        Tips(i18n.copiedToClipboard);
         return false;
     });
     // 发送到Aria2
     data.html.find('#aria2').click(function () {
         aria2AddUri(data, function (data) {
-            Tips("已发送到 Aria2: " + JSON.stringify(data), 2000);
+            Tips(i18n.hasSent + JSON.stringify(data), 2000);
         }, function (errMsg) {
-            Tips("发送到 Aria2 失败", 2000);
+            Tips(i18n.sendFailed, 2000);
             console.log(errMsg);
         });
         return false;
@@ -241,7 +241,7 @@ function AddMedia(data, currentTab = true) {
                 let url = 'm3u8dl://' + Base64.encode(m3u8dlArg);
                 if (url.length >= 2046) {
                     navigator.clipboard.writeText(m3u8dlArg);
-                    Tips("m3u8dl参数太长无法唤醒m3u8DL程序, 请手动粘贴下载。", 2000);
+                    Tips(i18n.M3U8DLparameterLong, 2000);
                     return false;
                 }
                 if (G.isFirefox) {
@@ -251,7 +251,7 @@ function AddMedia(data, currentTab = true) {
                 chrome.tabs.update({ url: url });
                 return false;
             }
-            Tips("blob地址无法调用m3u8DL下载", 1500);
+            Tips(i18n.blobM3u8DLError, 1500);
         }
         // const flag = specialFile(data);
         // if (flag) {
@@ -376,15 +376,14 @@ $('#allTab').click(function () {
 // 下载选中文件
 $('#DownFile').click(function () {
     const [checkedData, maxSize] = getCheckedData();
-    if (checkedData.length >= 10 && !confirm("共 " + checkedData.length + "个文件，是否确认下载?")) {
+    if (checkedData.length >= 10 && !confirm(i18n("confirmDownload", [checkedData.length]))) {
         return;
     }
     if (G.enableAria2Rpc) {
-        Tips("Aria2 正在提交任务", 2000);
+        Tips(i18n.hasSent, 2000);
         checkedData.forEach(function (data) {
             aria2AddUri(data);
         });
-        Tips("Aria2 提交完毕", 2000);
         return;
     }
     checkedData.forEach(function (data) {
@@ -402,7 +401,7 @@ $('#mergeDown').click(function () {
     chrome.runtime.sendMessage({
         Message: "catCatchFFmpeg",
         action: "openFFmpeg",
-        extra: "等待接收媒体文件...请勿关闭本页面...猫抓下载器 页面可查看下载进度..."
+        extra: i18n.waitingForMedia
     });
     checkedData.forEach(function (data) {
         catDownload(data, "&autosend=1&autoClose=1&title=" + data._title);
@@ -417,7 +416,7 @@ $('#AllCopy').click(function () {
         }
     });
     navigator.clipboard.writeText(url.join("\n"));
-    Tips("已复制到剪贴板");
+    Tips(i18n.copiedToClipboard);
 });
 // 全选 反选
 $('#AllSelect, #ReSelect').click(function () {
@@ -550,7 +549,7 @@ const interval = setInterval(function () {
             return;
         }
         currentCount = data.length;
-        if (currentCount >= 500 && confirm(`共 ${currentCount} 条资源, 是否取消加载?`)) {
+        if (currentCount >= 500 && confirm(i18n("confirmLoading", [currentCount]))) {
             $mediaList.append($current);
             UItoggle();
             return;
