@@ -4,8 +4,8 @@
 
     // 启用开关
     let enable = true;
+    let language = navigator.language.replace("-", "_");
     if (window.CatCatchI18n) {
-        let language = navigator.language.replace("-", "_");
         if (!window.CatCatchI18n.languages.includes(language)) {
             language = language.split("_")[0];
             if (!window.CatCatchI18n.languages.includes(language)) {
