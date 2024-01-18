@@ -588,6 +588,10 @@ const interval = setInterval(function () {
     if ($down[0].offsetHeight > 30) {
         $(".container").css("margin-bottom", ($down[0].offsetHeight + 2) + "px");
     }
+    const observer = new MutationObserver(() => {
+        $(".container").css("margin-bottom", ($down[0].offsetHeight + 2) + "px");
+    });
+    observer.observe($down[0], { childList: true, subtree: true });
 }, 4);
 /********************绑定事件END********************/
 
