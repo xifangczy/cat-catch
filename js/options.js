@@ -113,7 +113,7 @@ function Gethtml(Type, Param = new Object()) {
                 GetText = GetText.trim();
                 const test = GetText.split("/");
                 if (test.length != 2 || isEmpty(test[0]) || isEmpty(test[1])) {
-                    alert("抓取类型格式错误，请检查");
+                    alert(i18n.addTypeError);
                     return true;
                 }
             });

@@ -24,10 +24,10 @@
     "message": "Loading Data..."
   },
   "selectWebpage": {
-    "message": "Select Webpage:"
+    "message": "Webpage:"
   },
   "selectMedia": {
-    "message": "Select Media:"
+    "message": "Media:"
   },
   "noMediaDetected": {
     "message": "No Media Detected on Webpage"
@@ -43,6 +43,9 @@
   },
   "play": {
     "message": "Play"
+  },
+  "normalPlay": {
+    "message": "Normal Playback"
   },
   "pictureInPicture": {
     "message": "Picture in Picture"
@@ -132,19 +135,19 @@
     "message": "Clear"
   },
   "deepSearch": {
-    "message": "Deep Search"
+    "message": "Search"
   },
   "closeSearch": {
     "message": "Close Search"
   },
   "cacheCapture": {
-    "message": "Cache Capture"
+    "message": "Capture"
   },
   "closeCapture": {
     "message": "Close Capture"
   },
   "moreFeatures": {
-    "message": "More Features"
+    "message": "More"
   },
   "pause": {
     "message": "Pause"
@@ -229,6 +232,9 @@
   },
   "typeTip": {
     "message": "Enter the correct content-type, if no size filtering is needed, fill in 0."
+  },
+  "addTypeError": {
+    "message": "The format of the capture type is incorrect, please check"
   },
   "regexMatch": {
     "message": "Regex Match"
@@ -420,7 +426,7 @@
     "message": "Invoke Protocol Template"
   },
   "customVLCProtocol": {
-    "message": "Custom VLC Protocol vlc://"
+    "message": "Custom VLC Protocol"
   },
   "systemShare": {
     "message": "System Share"
@@ -785,5 +791,8 @@
   },
   "waitingForMedia": {
     "message": "Waiting to receive media files... Please do not close this page."
+  },
+  "exit": {
+    "message": "Exit"
   }
 }

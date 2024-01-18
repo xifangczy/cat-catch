@@ -62,8 +62,8 @@
                 $("#timeShow").html(secToTime(state.currentTime) + " / " + secToTime(state.duration));
                 $("#time").val(state.time);
             }
-            state.paused ? $("#control").html("播放").data("switch", "play") : $("#control").html("暂停").data("switch", "pause");
-            state.speed == 1 ? $("#speed").html("倍数播放").data("switch", "speed") : $("#speed").html("正常播放").data("switch", "normal");
+            state.paused ? $("#control").html(i18n.play).data("switch", "play") : $("#control").html(i18n.pause).data("switch", "pause");
+            state.speed == 1 ? $("#speed").html(i18n.speedPlayback).data("switch", "speed") : $("#speed").html(i18n.normalPlay).data("switch", "normal");
             $("#loop").prop("checked", state.loop);
             $("#muted").prop("checked", state.muted);
             if (setSpeed && state.speed != 1) {
@@ -149,7 +149,7 @@
         if (_index < 0 || _tabId < 0) { return; }
         chrome.tabs.sendMessage(_tabId, { Message: "pip", index: _index }, function (state) {
             if (chrome.runtime.lastError) { return; }
-            state.state ? $("#pip").html("退出") : $("#pip").html("画中画");
+            state.state ? $("#pip").html(i18n.exit) : $("#pip").html(i18n.pictureInPicture);
         });
     });
     // 全屏

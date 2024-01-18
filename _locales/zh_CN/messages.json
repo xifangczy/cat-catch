@@ -44,6 +44,9 @@
   "play": {
     "message": "播放"
   },
+  "normalPlay": {
+    "message": "正常播放"
+  },
   "pictureInPicture": {
     "message": "画中画"
   },
@@ -229,6 +232,9 @@
   },
   "typeTip": {
     "message": "填入正确的content-type类型, 不过滤大小填0"
+  },
+  "addTypeError": {
+    "message": "抓取类型格式错误，请检查"
   },
   "regexMatch": {
     "message": "正则匹配"
@@ -420,7 +426,7 @@
     "message": "调用协议模板"
   },
   "customVLCProtocol": {
-    "message": "自定义VLC协议 vlc://"
+    "message": "自定义VLC协议"
   },
   "systemShare": {
     "message": "系统分享"
@@ -785,5 +791,8 @@
   },
   "waitingForMedia": {
     "message": "等待接收媒体文件...请勿关闭本页面..."
+  },
+  "exit": {
+    "message": "退出"
   }
 }
