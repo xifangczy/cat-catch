@@ -706,5 +706,17 @@
   },
   "streamOnbeforeunload": {
     "message": "正在推流, 关闭后停止下载..."
+  },
+  "fileLoading": {
+    "message": "文件载入中"
+  },
+  "expandAllNodes": {
+    "message": "展开所有节点"
+  },
+  "collapseAllNodes": {
+    "message": "折叠所有节点"
+  },
+  "fileRetrievalFailed": {
+    "message": "文件获取失败"
   }
 }

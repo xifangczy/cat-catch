@@ -42,7 +42,7 @@ function init() {
             dataType: "text",
         }).fail(function (result) {
             console.log(result);
-            $('#json-renderer').html("json文件获取失败");
+            $('#json-renderer').html(i18n.fileRetrievalFailed);
             $("#collapsed").hide();
         }).done(function (result) {
             // console.log(result);
@@ -76,9 +76,9 @@ function init() {
     $("#collapsed").click(function () {
         options.collapsed = !options.collapsed;
         if (options.collapsed) {
-            collapsed.innerHTML = "展开所有节点";
+            collapsed.innerHTML = i18n.expandAllNodes;
         } else {
-            collapsed.innerHTML = "折叠所有节点";
+            collapsed.innerHTML = i18n.collapseAllNodes;
         }
         renderJson();
     });

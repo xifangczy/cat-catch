@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>猫抓 JSON格式化</title>
+  <title>titleJson</title>
   <link rel="stylesheet" type="text/css" href="css/public.css" media="all" />
   <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
   <script src="lib/jquery.min.js"></script>
@@ -18,25 +18,24 @@
   <div class="wrapper1024">
 
     <section id="jsonCustom" class="hide">
-      <h1 class="optionsTitle">猫抓 JSON格式化</h1>
+      <h1 class="optionsTitle" data-i18n="titleJson"></h1>
       <div class="optionBox">
-        <span class="explain">请输入json内容</span>
-        <textarea rows="50" cols="160" id="jsonText" spellcheck="false" data-type="link"
-          placeholder="输入需要格式化的json内容"></textarea>
+        <span class="explain">json</span>
+        <textarea rows="50" cols="160" id="jsonText" spellcheck="false" data-type="link"></textarea>
         <div class="line"></div>
-        <span class="explain">或 输入json的URL</span>
+        <span class="explain">json url</span>
         <input type="text" id="jsonUrl" placeholder="jsonURL" class="fullInput" />
-        <button id="format" type="button">格式化</button>
+        <button id="format" type="button" data-i18n="jsonFormatter"></button>
       </div>
     </section>
 
     <section id="main">
-      <h1 class="optionsTitle">猫抓 JSON格式化</h1>
+      <h1 class="optionsTitle" data-i18n="titleJson"></h1>
       <div class="optionBox">
         <div class="block">
-          <pre id="json-renderer">json 文件载入中...</pre>
+          <pre id="json-renderer" data-i18n="fileLoading"></pre>
         </div>
-        <button id="collapsed">展开所有节点</button>
+        <button id="collapsed" data-i18n="expandAllNodes"></button>
       </div>
     </section>
   </div>

@@ -706,5 +706,17 @@
   },
   "streamOnbeforeunload": {
     "message": "Streaming is in progress, the download will stop after closing"
+  },
+  "fileLoading": {
+    "message": "File Loading"
+  },
+  "expandAllNodes": {
+    "message": "Expand all JSON nodes"
+  },
+  "collapseAllNodes": {
+    "message": "Collapse all JSON nodes"
+  },
+  "fileRetrievalFailed": {
+    "message": "File Retrieval Failed"
   }
 }
