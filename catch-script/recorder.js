@@ -2,6 +2,17 @@
     console.log("recorder.js Start");
     if (document.getElementById("catCatchRecorder")) { return; }
 
+    // let language = "en";
+    let language = navigator.language.replace("-", "_");
+    if (window.CatCatchI18n) {
+        if (!window.CatCatchI18n.languages.includes(language)) {
+            language = language.split("_")[0];
+            if (!window.CatCatchI18n.languages.includes(language)) {
+                language = "en";
+            }
+        }
+    }
+
     const buttonStyle = 'style="border:solid 1px #000;margin:2px;padding:2px;background:#fff;border-radius:4px;border:solid 1px #c7c7c780;color:#000;"';
     const checkboxStyle = 'style="-webkit-appearance: auto;"';
 
@@ -9,15 +20,15 @@
     CatCatch.setAttribute("id", "catCatchRecorder");
     CatCatch.innerHTML = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAAKlBMVEUAAADLlROxbBlRAD16GS5oAjWWQiOCIytgADidUx/95gHqwwTx0gDZqwT6kfLuAAAACnRSTlMA/vUejV7kuzi8za0PswAAANpJREFUGNNjwA1YSxkYTEqhnKZLLi6F1w0gnKA1shdvHYNxdq1atWobjLMKCOAyC3etlVrUAOH4HtNZmLgoAMKpXX37zO1FwcZAwMDguGq1zKpFmTNnzqx0Bpp2WvrU7ttn9py+I8JgLn1R8Pad22vurNkjwsBReHv33junzuyRnOnMwNCSeFH27K5dq1SNgcZxFMnuWrNq1W5VkNntihdv7ToteGcT0C7mIkE1qbWCYjJnM4CqEoWKdoslChXuUgXJqIcLebiphSgCZRhaPDhcDFhdmUMCGIgEAFA+Uc02aZg9AAAAAElFTkSuQmCC" style="-webkit-user-drag: none;width: 20px;">
     <div id="tips"></div>
-    选择视频: <select id="videoList" style="max-width: 200px;"></select>
-    录制编码: <select id="mimeTypeList" style="max-width: 200px;"></select>
-    <label><input type="checkbox" id="ffmpeg"} ${checkboxStyle}>使用ffmpeg转码</label>
+    <span data-i18n="selectVideo">选择视频</span> <select id="videoList" style="max-width: 200px;"></select>
+    <span data-i18n="recordEncoding">录制编码</span> <select id="mimeTypeList" style="max-width: 200px;"></select>
+    <label><input type="checkbox" id="ffmpeg"} ${checkboxStyle}><span data-i18n="ffmpeg">使用ffmpeg转码</span></label>
     <div>
-        <button id="getVideo" ${buttonStyle}>读取视频</button>
-        <button id="start" ${buttonStyle}>开始录制</button>
-        <button id="stop" ${buttonStyle}>停止录制</button>
-        <button id="hide" ${buttonStyle}>隐藏</button>
-        <button id="close" ${buttonStyle}>关闭</button>
+        <button id="getVideo" ${buttonStyle} data-i18n="readVideo">读取视频</button>
+        <button id="start" ${buttonStyle} data-i18n="startRecording">开始录制</button>
+        <button id="stop" ${buttonStyle} data-i18n="stopRecording">停止录制</button>
+        <button id="hide" ${buttonStyle} data-i18n="hide">隐藏</button>
+        <button id="close" ${buttonStyle} data-i18n="close">关闭</button>
     </div>`;
     CatCatch.style = `
         position: fixed;
@@ -40,7 +51,6 @@
 
     // 创建 Shadow DOM 放入CatCatch
     const divShadow = document.createElement('div');
-    // divShadow.setAttribute("id", "catCatchWebRTC");
     const shadowRoot = divShadow.attachShadow({ mode: 'closed' });
     shadowRoot.appendChild(CatCatch);
     // 页面插入Shadow DOM
@@ -52,7 +62,7 @@
     const $start = CatCatch.querySelector("#start");
     const $stop = CatCatch.querySelector("#stop");
     let videoList = [];
-    $tips.innerHTML = "没有检测到视频, 请重新读取";
+    $tips.innerHTML = i18n("noVideoDetected", "没有检测到视频, 请重新读取");
     let recorder = {};
     let option = { mimeType: 'video/webm;codecs=vp9,opus' };
 
@@ -99,14 +109,14 @@
 
         $mimeTypeList.addEventListener('change', function (event) {
             if (recorder && recorder.state && recorder.state === 'recording') {
-                $tips.innerHTML = "录制中不能更改编码";
+                $tips.innerHTML = i18n("recording", "视频录制中");
                 return;
             }
             if (MediaRecorder.isTypeSupported(event.target.value)) {
                 option.mimeType = event.target.value;
-                $tips.innerHTML = "已选择编码：" + event.target.value;
+                $tips.innerHTML = event.target.value;
             } else {
-                $tips.innerHTML = "不支持此格式";
+                $tips.innerHTML = i18n("formatNotSupported", "不支持此格式");
             }
         });
     }
@@ -124,7 +134,7 @@
                 $videoList.options.add(new Option(src, index));
             }
         });
-        $tips.innerHTML = videoList.length ? "请点击开始录制" : "没有检测到视频, 请重新读取";
+        $tips.innerHTML = videoList.length ? i18n("clickToStartRecording", "请点击开始录制") : i18n("noVideoDetected", "没有检测到视频, 请重新读取");
     }
     CatCatch.querySelector("#getVideo").addEventListener('click', getVideo);
     CatCatch.querySelector("#stop").addEventListener('click', function () {
@@ -134,7 +144,7 @@
 
     CatCatch.querySelector("#start").addEventListener('click', function (event) {
         if (!MediaRecorder.isTypeSupported(option.mimeType)) {
-            $tips.innerHTML = "不支持录制此格式";
+            $tips.innerHTML = i18n("formatNotSupported", "不支持此格式");
             return;
         }
         init();
@@ -150,7 +160,7 @@
                         media: [{ data: URL.createObjectURL(event.data), type: option.mimeType }],
                         title: document.title.trim()
                     });
-                    $tips.innerHTML = "已推送到ffmpeg";
+                    $tips.innerHTML = i18n("clickToStartRecording", "请点击开始录制");
                     return;
                 }
                 const a = document.createElement('a');
@@ -158,20 +168,20 @@
                 a.download = `${document.title}`;
                 a.click();
                 a.remove();
-                $tips.innerHTML = "下载完成";
+                $tips.innerHTML = i18n("downloadCompleted", "下载完成");;
             }
             recorder.onstart = function (event) {
                 $stop.style.display = 'inline';
                 $start.style.display = 'none';
-                $tips.innerHTML = "正在录制";
+                $tips.innerHTML = i18n("recording", "视频录制中");
             }
             recorder.onstop = function (event) {
-                $tips.innerHTML = "已停止录制";
+                $tips.innerHTML = i18n("stopRecording", "停止录制");
                 init();
             }
             recorder.onerror = function (event) {
                 init();
-                $tips.innerHTML = "录制失败<br>详情看控制台信息";
+                $tips.innerHTML = i18n("recordingFailed", "录制失败");;
                 console.log(event);
             };
             recorder.start();
@@ -180,11 +190,11 @@
                 if (recorder.state === 'recording') {
                     $stop.style.display = 'inline';
                     $start.style.display = 'none';
-                    $tips.innerHTML = "正在录制";
+                    $tips.innerHTML = i18n("recording", "视频录制中");
                 }
             }, 500);
         } else {
-            $tips.innerHTML = "请确认视频是否存在";
+            $tips.innerHTML = i18n("noVideoDetected", "请确认视频是否存在");
         }
     });
 
@@ -203,4 +213,18 @@
         });
     });
     // #endregion 移动逻辑
+
+    // i18n
+    if (window.CatCatchI18n) {
+        CatCatch.querySelectorAll('[data-i18n]').forEach(function (element) {
+            element.innerHTML = window.CatCatchI18n[element.dataset.i18n][language];
+        });
+        CatCatch.querySelectorAll('[data-i18n-outer]').forEach(function (element) {
+            element.outerHTML = window.CatCatchI18n[element.dataset.i18nOuter][language];
+        });
+    }
+    function i18n(key, original = "") {
+        if (!window.CatCatchI18n) { return original };
+        return window.CatCatchI18n[key][language];
+    }
 })();

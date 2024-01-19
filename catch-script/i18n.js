@@ -95,5 +95,57 @@ window.CatCatchI18n = {
     downloadCompleted: {
         en: "Download completed",
         zh: "下载完毕"
+    },
+    selectVideo: {
+        en: "Select Video",
+        zh: "选择视频"
+    },
+    recordEncoding: {
+        en: "Record Encoding",
+        zh: "录制编码"
+    },
+    readVideo: {
+        en: "Read Video",
+        zh: "读取视频"
+    },
+    startRecording: {
+        en: "Start Recording",
+        zh: "开始录制"
+    },
+    stopRecording: {
+        en: "Stop Recording",
+        zh: "停止录制"
+    },
+    noVideoDetected: {
+        en: "No video detected, Please read again",
+        zh: "没有检测到视频, 请重新读取"
+    },
+    recording: {
+        en: "Recording",
+        zh: "视频录制中"
+    },
+    formatNotSupported: {
+        en: "Format not supported",
+        zh: "不支持此格式"
+    },
+    clickToStartRecording: {
+        en: "Click to start recording",
+        zh: "请点击开始录制"
+    },
+    sentToFfmpeg: {
+        en: "Click to start recording",
+        zh: "请点击开始录制"
+    },
+    recordingFailed: {
+        en: "Recording failed",
+        zh: "录制失败"
+    },
+    scriptNotSupported: {
+        en: "This script is not supported",
+        zh: "当前网页不支持此脚本"
+    },
+    dragWindow: {
+        en: "Drag window",
+        zh: "拖动窗口"
     }
 };

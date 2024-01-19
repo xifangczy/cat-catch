@@ -39,7 +39,6 @@
 
     // 创建 Shadow DOM 放入CatCatch
     const divShadow = document.createElement('div');
-    // divShadow.setAttribute("id", "catCatchWebRTC");
     const shadowRoot = divShadow.attachShadow({ mode: 'closed' });
     shadowRoot.appendChild(CatCatch);
     // 页面插入Shadow DOM
