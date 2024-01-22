@@ -584,15 +584,12 @@ const interval = setInterval(function () {
 
     $(`<style>${G.css}</style>`).appendTo("head");
 
-    // 解决浏览器字体设置超过16px按钮变高遮挡一条资源
-    if ($down[0].offsetHeight > 30) {
-        $(".container").css("margin-bottom", ($down[0].offsetHeight + 2) + "px");
-    }
+    $(".container").css("margin-bottom", ($down[0].offsetHeight + 2) + "px");
     const observer = new MutationObserver(() => {
         $(".container").css("margin-bottom", ($down[0].offsetHeight + 2) + "px");
     });
-    observer.observe($down[0], { childList: true, subtree: true });
-}, 4);
+    observer.observe($down[0], { childList: true, subtree: true, attributes: true });
+}, 0);
 /********************绑定事件END********************/
 
 // 按钮状态更新
