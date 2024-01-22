@@ -486,7 +486,7 @@
     "message": "Waiting for download..."
   },
   "downloadSegmentList": {
-    "message": "Download Segment List"
+    "message": "Download list"
   },
   "originalM3u8": {
     "message": "Original M3U8"
@@ -495,7 +495,7 @@
     "message": "Local M3U8"
   },
   "segmentList": {
-    "message": "Segment List"
+    "message": "Segment"
   },
   "downloadProgress": {
     "message": "Download Progress"
@@ -528,19 +528,19 @@
     "message": "Customize the key in hexadecimal or base64, or the key address"
   },
   "uploadKey": {
-    "message": "Upload key."
+    "message": "Upload key"
   },
   "downloadThreads": {
-    "message": "Download Threads"
+    "message": "Threads"
   },
   "ffmpegTranscoding": {
-    "message": "FFmpeg Transcoding"
+    "message": "FFmpeg transcod"
   },
   "mp4Format": {
-    "message": "MP4 Format"
+    "message": "MP4"
   },
   "downloadWhileSaving": {
-    "message": "Download While Saving"
+    "message": "Stream download"
   },
   "audioOnly": {
     "message": "Audio Only"
@@ -632,7 +632,7 @@
     "message": "Key"
   },
   "encryptionAlgorithm": {
-    "message": "Encryption Algorithm"
+    "message": "Method"
   },
   "keyDownloadFailed": {
     "message": "Key Download Failed"
