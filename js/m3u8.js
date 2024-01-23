@@ -481,19 +481,17 @@ function parseTs(data) {
         $("#tips").append(i18n.keyAddress + ': <input type="text" value="' + decryptdata.uri + '" spellcheck="false" readonly="readonly" class="keyUrl">');
         if (buffer) {
             $("#tips").append(`
-                    <div class="key flex">
-                        <div class="method">${i18n.encryptionAlgorithm}(Method): <input type="text" value="${decryptdata.method ? decryptdata.method : "NONE"}" spellcheck="false" readonly="readonly"></div>
-                        <div>${i18n.key}(Hex): <input type="text" value="${ArrayBufferToHexString(buffer)}" spellcheck="false" readonly="readonly"></div>
-                        <div>${i18n.key}(Base64): <input type="text" value="${ArrayBufferToBase64(buffer)}" spellcheck="false" readonly="readonly"></div>
-                    </div>
-                `);
+                <div class="key flex">
+                    <div class="method">${i18n.encryptionAlgorithm}: <input type="text" value="${decryptdata.method ? decryptdata.method : "NONE"}" spellcheck="false" readonly="readonly"></div>
+                    <div>${i18n.key}(Hex): <input type="text" value="${ArrayBufferToHexString(buffer)}" spellcheck="false" readonly="readonly"></div>
+                    <div>${i18n.key}(Base64): <input type="text" value="${ArrayBufferToBase64(buffer)}" spellcheck="false" readonly="readonly"></div>
+                </div>`);
         } else {
             $("#tips").append(`
-                    <div class="key flex">
-                        <div class="method">加密算法(Method): <input type="text" value="${decryptdata.method ? decryptdata.method : "NONE"}" spellcheck="false" readonly="readonly"></div>
-                        <div>${i18n.key}(Hex): <input type="text" value="${i18n.keyDownloadFailed}" spellcheck="false" readonly="readonly"></div>
-                    </div>
-                `);
+                <div class="key flex">
+                    <div class="method">${i18n.encryptionAlgorithm}: <input type="text" value="${decryptdata.method ? decryptdata.method : "NONE"}" spellcheck="false" readonly="readonly"></div>
+                    <div>${i18n.key}(Hex): <input type="text" value="${i18n.keyDownloadFailed}" spellcheck="false" readonly="readonly"></div>
+                </div>`);
         }
         // 如果是默认iv 则不显示
         let iv = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i + 1]).toString();
@@ -1014,6 +1012,9 @@ function downloadTs(start = 0, end = _fragments.length - 1, errorObj = undefined
  * @param {number} end 下载范围 结束索引
  */
 function downloadNew(start = 0, end = _fragments.length) {
+
+    $("#video").hide();
+    hls.detachMedia($("#video")[0]);
 
     // 避免重复下载
     buttonState("#mergeTs", false);
