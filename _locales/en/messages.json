@@ -459,7 +459,7 @@
     "message": "m3u8 URL"
   },
   "nextLevel": {
-    "message": "Next Level File"
+    "message": "Next Level"
   },
   "nextLevelTip": {
     "message": "This M3U8 file nests multiple M3U8 files."
@@ -558,7 +558,7 @@
     "message": "Download Range"
   },
   "recordLive": {
-    "message": "Record Live"
+    "message": "Record"
   },
   "mergeDownloads": {
     "message": "Merge Downloads"
