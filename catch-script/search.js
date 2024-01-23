@@ -184,7 +184,7 @@
     // Array.prototype.slice
     const _slice = Array.prototype.slice;
     Array.prototype.slice = function (start, end) {
-        let data = _slice.apply(this, arguments);
+        const data = _slice.apply(this, arguments);
         if (end == 16 && this.length == 32) {
             for (let item of data) {
                 if (typeof item != "number" || item > 255) { return data; }
@@ -195,6 +195,23 @@
     }
     Array.prototype.slice.toString = function () {
         return _slice.toString();
+    }
+
+    // Int8Array.prototype.subarray
+    const _subarray = Int8Array.prototype.subarray;
+    Int8Array.prototype.subarray = function (start, end) {
+        const data = _subarray.apply(this, arguments);
+        if (start == 0 && end == 16 && (this.length == 32 || this.length == 31)) {
+            const uint8 = new Uint8Array(data);
+            for (let item of uint8) {
+                if (typeof item != "number" || item > 255) { return data; }
+            }
+            postData({ action: "catCatchAddKey", key: uint8.buffer, href: location.href, ext: "key" });
+        }
+        return data;
+    }
+    Int8Array.prototype.subarray.toString = function () {
+        return _subarray.toString();
     }
 
     // window.btoa / window.atob
