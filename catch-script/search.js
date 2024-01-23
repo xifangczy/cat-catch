@@ -201,7 +201,7 @@
     const _subarray = Int8Array.prototype.subarray;
     Int8Array.prototype.subarray = function (start, end) {
         const data = _subarray.apply(this, arguments);
-        if (start == 0 && end == 16 && (this.length == 32 || this.length == 31)) {
+        if (data.byteLength == 16) {
             const uint8 = new Uint8Array(data);
             for (let item of uint8) {
                 if (typeof item != "number" || item > 255) { return data; }
