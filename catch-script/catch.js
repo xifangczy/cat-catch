@@ -201,6 +201,17 @@
         return _endOfStream.toString();
     }
 
+    const _toString = Function.prototype.toString;
+    Function.prototype.toString = function () {
+        if (this === window.MediaSource.prototype.addSourceBuffer) {
+            return _toString.call(_AddSourceBuffer);
+        }
+        if (this === window.MediaSource.prototype.endOfStream) {
+            return _toString.call(_endOfStream);
+        }
+        return _toString.call(this);
+    };
+
     // 下载资源
     function catchDownload() {
         if (catchMedia.length == 0) {
