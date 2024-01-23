@@ -591,7 +591,7 @@
     "message": "Cannot find the ADTS header. It may be an AES-128-ECB encrypted resource, which is not currently supported for decryption. Please use third-party merging software."
   },
   "m3u8Error": {
-    "message": "There are errors in parsing or playing the M3U8 file, check the console for detailed error information找不到ADTS头 可能是AES-128-ECB加密资源,暂不支持解密.请使用第三方合并软件..."
+    "message": "There are errors in parsing or playing the M3U8 file, check the console for detailed error information"
   },
   "noAudio": {
     "message": "No Audio"
