@@ -221,6 +221,7 @@
         // catchMedia 预处理 解决 从头捕获 文件头重复 临时解决办法
         if (CatCatch.querySelector("#checkHead").checked) {
             for (let key in catchMedia) {
+                if (!catchMedia[key].bufferList) { continue; }
                 const data = new Uint8Array(catchMedia[key].bufferList[1]);
                 if (data[4] == 0x66 && data[5] == 0x74 && data[6] == 0x79 && data[7] == 0x70) {
                     catchMedia[key].bufferList.shift();
