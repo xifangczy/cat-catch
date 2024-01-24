@@ -303,8 +303,19 @@
         return _escape.toString();
     }
 
+    // Uint8Array
+    const _Uint8Array = Uint8Array;
+    window.Uint8Array = new Proxy(_Uint8Array, {
+        construct(target, args) {
+            if ((Array.isArray(args[0]) || args[0] instanceof ArrayBuffer) && args[0].length === 16) {
+                postData({ action: "catCatchAddKey", key: args[0], href: location.href, ext: "key" });
+            }
+            return new target(...args);
+        }
+    });
+
     function isUrl(str) {
-        return reIsUrl.test(str);
+        return (str.startsWith("http://") || str.startsWith("https://"));
     }
     function isFullM3u8(text) {
         let tsLists = text.split("\n");
