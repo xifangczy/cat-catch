@@ -307,7 +307,9 @@
     const _Uint8Array = Uint8Array;
     window.Uint8Array = new Proxy(_Uint8Array, {
         construct(target, args) {
-            if ((Array.isArray(args[0]) || args[0] instanceof ArrayBuffer) && args[0].length === 16) {
+            const isArray = Array.isArray(args[0]) && args[0].length === 16;
+            const isArrayBuffer = args[0] instanceof ArrayBuffer && args[0].byteLength === 16;
+            if (isArray || isArrayBuffer) {
                 postData({ action: "catCatchAddKey", key: args[0], href: location.href, ext: "key" });
             }
             return new target(...args);
