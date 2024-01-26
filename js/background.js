@@ -40,6 +40,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 // 保存requestHeaders
 chrome.webRequest.onSendHeaders.addListener(
     function (data) {
+        if (G && !G.enable) { return; }
         const requestHeaders = getRequestHeaders(data);
         requestHeaders && G.requestHeaders.set(data.requestId, requestHeaders);
     }, { urls: ["<all_urls>"] }, ['requestHeaders',
