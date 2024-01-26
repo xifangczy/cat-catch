@@ -18,11 +18,9 @@ if (!requestHeaders.referer) {
 setRequestHeaders(requestHeaders, () => { awaitG(start); });
 
 function start() {
-    awaitG(function () {
-        $("#autoClose").prop("checked", autoClose ? true : G.downAutoClose);
-        $("#downActive").prop("checked", G.downActive);
-        $(`<style>${G.css}</style>`).appendTo("head");
-    });
+    $("#autoClose").prop("checked", autoClose ? true : G.downAutoClose);
+    $("#downActive").prop("checked", G.downActive);
+    $(`<style>${G.css}</style>`).appendTo("head");
 
     chrome.tabs.getCurrent(function (tab) {
         startDownload(tab.id);
