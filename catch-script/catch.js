@@ -94,7 +94,9 @@
         CatCatch.style.display = "none";
         window.postMessage({ action: "catCatchToBackground", Message: "script", script: "catch.js", refresh: false });
     });
+    let restartFlag = false;
     CatCatch.querySelector("#restart").addEventListener('click', function (event) {
+        restartFlag = true;
         clearCache();
         document.querySelectorAll("video").forEach(function (element) {
             element.currentTime = 0;
@@ -219,7 +221,7 @@
             return;
         }
         // catchMedia 预处理 解决 从头捕获 文件头重复 临时解决办法
-        if (CatCatch.querySelector("#checkHead").checked) {
+        if (CatCatch.querySelector("#checkHead").checked && restartFlag) {
             for (let key in catchMedia) {
                 if (!catchMedia[key].bufferList) { continue; }
                 const data = new Uint8Array(catchMedia[key].bufferList[1]);
