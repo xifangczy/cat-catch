@@ -269,6 +269,7 @@
         if (all) {
             catchMedia = [];
             bufferList = {};
+            restartFlag = false;
             return;
         }
         for (let key in catchMedia) {
