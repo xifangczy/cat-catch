@@ -38,7 +38,7 @@
     </details>
     <details>
     <summary>test</summary>
-        <label><input type="checkbox" id="checkHead" ${checkboxStyle} checked>清理多余头部数据</label>
+        <label><input type="checkbox" id="checkHead" ${checkboxStyle}>清理多余头部数据</label>
         <button id="test" ${buttonStyle}>test</button>
     </details>`;
     CatCatch.style = `
@@ -221,7 +221,7 @@
             return;
         }
         // catchMedia 预处理 解决 从头捕获 文件头重复 临时解决办法
-        if (CatCatch.querySelector("#checkHead").checked && restartFlag) {
+        if (CatCatch.querySelector("#checkHead").checked || restartFlag) {
             for (let key in catchMedia) {
                 if (!catchMedia[key].bufferList) { continue; }
                 const data = new Uint8Array(catchMedia[key].bufferList[1]);
