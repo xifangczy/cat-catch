@@ -121,33 +121,23 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         return;
     }
 
-    let header = {};
-    if (!isRegex) {
-        header = getResponseHeadersValue(data);
-        // 通过视频范围计算完整视频大小
-        if (header.range) {
-            const size = header.range.match(reRange);
-            if (size) {
-                header.size = parseInt(header.size * (size[3] / (size[2] - size[1])));
-            }
-        }
-    }
+    !isRegex && getResponseHeadersValue(data);
 
     //检查后缀
     if (!isRegex && !filter && ext != undefined) {
-        filter = CheckExtension(ext, header.size);
+        filter = CheckExtension(ext, data.header.size);
         if (filter == "break") { return; }
     }
 
     //检查类型
-    if (!isRegex && !filter && header.type != undefined) {
-        filter = CheckType(header.type, header.size);
+    if (!isRegex && !filter && data.header.type != undefined) {
+        filter = CheckType(data.header.type, data.header.size);
         if (filter == "break") { return; }
     }
 
     //查找附件
-    if (!isRegex && !filter && header.attachment != undefined) {
-        const res = header.attachment.match(reFilename);
+    if (!isRegex && !filter && data.header.attachment != undefined) {
+        const res = data.header.attachment.match(reFilename);
         if (res && res[1]) {
             [name, ext] = fileNameParse(decodeURIComponent(res[1]));
             filter = CheckExtension(ext, 0);
@@ -186,9 +176,9 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         const info = {
             name: name,
             url: data.url,
-            size: header.size,
+            size: data.header.size,
             ext: ext,
-            type: data.mime ?? header.type,
+            type: data.mime ?? data.header.type,
             tabId: data.tabId,
             isRegex: isRegex,
             requestId: data.requestId ?? Date.now().toString(),
@@ -589,20 +579,25 @@ function fileNameParse(pathname) {
 }
 //获取Header属性的值
 function getResponseHeadersValue(data) {
-    const header = {};
-    if (data.responseHeaders == undefined || data.responseHeaders.length == 0) { return header; }
+    data.header = {};
+    if (data.responseHeaders == undefined || data.responseHeaders.length == 0) { return; }
     for (let item of data.responseHeaders) {
         switch (item.name.toLowerCase()) {
-            case "content-length": header.size = item.value; break;
-            case "content-type": header.type = item.value.split(";")[0].toLowerCase(); break;
-            case "content-disposition": header.attachment = item.value; break;
-            case "content-range": header.range = item.value; break;
+            case "content-length": data.header.size = item.value; break;
+            case "content-type": data.header.type = item.value.split(";")[0].toLowerCase(); break;
+            case "content-disposition": data.header.attachment = item.value; break;
+            case "content-range": data.header.range = item.value; break;
         }
-        if (Object.keys(header).length == 4) {
-            return header;
+        if (Object.keys(data.header).length == 4) {
+            break;
         }
     }
-    return header;
+    if (data.header.range) {
+        const size = data.header.range.match(reRange);
+        if (size) {
+            data.header.size = parseInt(data.header.size * (size[3] / (size[2] - size[1])));
+        }
+    }
 }
 function getRequestHeaders(data) {
     if (data.requestHeaders == undefined || data.requestHeaders.length == 0) { return false; }
