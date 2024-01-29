@@ -125,29 +125,29 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
     if (!isRegex) {
         header = getResponseHeadersValue(data);
         // 通过视频范围计算完整视频大小
-        if (header["range"]) {
-            const size = header["range"].match(reRange);
+        if (header.range) {
+            const size = header.range.match(reRange);
             if (size) {
-                header["size"] = parseInt(header["size"] * (size[3] / (size[2] - size[1])));
+                header.size = parseInt(header.size * (size[3] / (size[2] - size[1])));
             }
         }
     }
 
     //检查后缀
     if (!isRegex && !filter && ext != undefined) {
-        filter = CheckExtension(ext, header["size"]);
+        filter = CheckExtension(ext, header.size);
         if (filter == "break") { return; }
     }
 
     //检查类型
-    if (!isRegex && !filter && header["type"] != undefined) {
-        filter = CheckType(header["type"], header["size"]);
+    if (!isRegex && !filter && header.type != undefined) {
+        filter = CheckType(header.type, header.size);
         if (filter == "break") { return; }
     }
 
     //查找附件
-    if (!isRegex && !filter && header["attachment"] != undefined) {
-        const res = header["attachment"].match(reFilename);
+    if (!isRegex && !filter && header.attachment != undefined) {
+        const res = header.attachment.match(reFilename);
         if (res && res[1]) {
             [name, ext] = fileNameParse(decodeURIComponent(res[1]));
             filter = CheckExtension(ext, 0);
@@ -186,9 +186,9 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         const info = {
             name: name,
             url: data.url,
-            size: header["size"],
+            size: header.size,
             ext: ext,
-            type: data.mime ?? header["type"],
+            type: data.mime ?? header.type,
             tabId: data.tabId,
             isRegex: isRegex,
             requestId: data.requestId ?? Date.now().toString(),
@@ -589,14 +589,17 @@ function fileNameParse(pathname) {
 }
 //获取Header属性的值
 function getResponseHeadersValue(data) {
-    const header = new Array();
+    const header = {};
     if (data.responseHeaders == undefined || data.responseHeaders.length == 0) { return header; }
     for (let item of data.responseHeaders) {
         switch (item.name.toLowerCase()) {
-            case "content-length": header["size"] = item.value; break;
-            case "content-type": header["type"] = item.value.split(";")[0].toLowerCase(); break;
-            case "content-disposition": header["attachment"] = item.value; break;
-            case "content-range": header["range"] = item.value; break;
+            case "content-length": header.size = item.value; break;
+            case "content-type": header.type = item.value.split(";")[0].toLowerCase(); break;
+            case "content-disposition": header.attachment = item.value; break;
+            case "content-range": header.range = item.value; break;
+        }
+        if (Object.keys(header).length == 4) {
+            return header;
         }
     }
     return header;
