@@ -125,18 +125,18 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
 
     //检查后缀
     if (!isRegex && !filter && ext != undefined) {
-        filter = CheckExtension(ext, data.header.size);
+        filter = CheckExtension(ext, data.header?.size);
         if (filter == "break") { return; }
     }
 
     //检查类型
-    if (!isRegex && !filter && data.header.type != undefined) {
-        filter = CheckType(data.header.type, data.header.size);
+    if (!isRegex && !filter && data.header?.type != undefined) {
+        filter = CheckType(data.header.type, data.header?.size);
         if (filter == "break") { return; }
     }
 
     //查找附件
-    if (!isRegex && !filter && data.header.attachment != undefined) {
+    if (!isRegex && !filter && data.header?.attachment != undefined) {
         const res = data.header.attachment.match(reFilename);
         if (res && res[1]) {
             [name, ext] = fileNameParse(decodeURIComponent(res[1]));
@@ -176,9 +176,9 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         const info = {
             name: name,
             url: data.url,
-            size: data.header.size,
+            size: data.header?.size,
             ext: ext,
-            type: data.mime ?? data.header.type,
+            type: data.mime ?? data.header?.type,
             tabId: data.tabId,
             isRegex: isRegex,
             requestId: data.requestId ?? Date.now().toString(),
@@ -582,20 +582,19 @@ function getResponseHeadersValue(data) {
     data.header = {};
     if (data.responseHeaders == undefined || data.responseHeaders.length == 0) { return; }
     for (let item of data.responseHeaders) {
-        switch (item.name.toLowerCase()) {
-            case "content-length": data.header.size = item.value; break;
+        item.name = item.name.toLowerCase();
+        if (!item.name.startsWith('content-')) { continue; }
+        switch (item.name) {
+            case "content-length": data.header.size ??= parseInt(item.value); break;
             case "content-type": data.header.type = item.value.split(";")[0].toLowerCase(); break;
             case "content-disposition": data.header.attachment = item.value; break;
-            case "content-range": data.header.range = item.value; break;
-        }
-        if (Object.keys(data.header).length == 4) {
-            break;
-        }
-    }
-    if (data.header.range) {
-        const size = data.header.range.match(reRange);
-        if (size) {
-            data.header.size = parseInt(data.header.size * (size[3] / (size[2] - size[1])));
+            case "content-range":
+                // 存在range使用range修正 文件大小size的值
+                const size = item.value.split('/')[1];
+                if (size !== '*') {
+                    data.header.size = parseInt(size);
+                }
+                break;
         }
     }
 }
