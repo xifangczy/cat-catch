@@ -4,7 +4,7 @@
   },
   "action": {
     "default_icon": "img/icon.png",
-    "default_title": "__MSG_noData__",
+    "default_title": "__MSG_catCatch__",
     "default_popup": "popup.html"
   },
   "description": "__MSG_description__",
