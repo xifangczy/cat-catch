@@ -121,37 +121,39 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         return;
     }
 
-    !isRegex && getResponseHeadersValue(data);
-
-    //检查后缀
-    if (!isRegex && !filter && ext != undefined) {
-        filter = CheckExtension(ext, data.header?.size);
-        if (filter == "break") { return; }
-    }
-
-    //检查类型
-    if (!isRegex && !filter && data.header?.type != undefined) {
-        filter = CheckType(data.header.type, data.header?.size);
-        if (filter == "break") { return; }
-    }
-
-    //查找附件
-    if (!isRegex && !filter && data.header?.attachment != undefined) {
-        const res = data.header.attachment.match(reFilename);
-        if (res && res[1]) {
-            [name, ext] = fileNameParse(decodeURIComponent(res[1]));
-            filter = CheckExtension(ext, 0);
+    // 非正则匹配
+    if (!isRegex) {
+        // 获取头部信息
+        data.header = getResponseHeadersValue(data);
+        //检查后缀
+        if (!filter && ext != undefined) {
+            filter = CheckExtension(ext, data.header?.size);
             if (filter == "break") { return; }
         }
-    }
-
-    //放过类型为media的资源
-    if (!isRegex && data.type == "media") {
-        filter = true;
+        //检查类型
+        if (!filter && data.header?.type != undefined) {
+            filter = CheckType(data.header.type, data.header?.size);
+            if (filter == "break") { return; }
+        }
+        //查找附件
+        if (!filter && data.header?.attachment != undefined) {
+            const res = data.header.attachment.match(reFilename);
+            if (res && res[1]) {
+                [name, ext] = fileNameParse(decodeURIComponent(res[1]));
+                filter = CheckExtension(ext, 0);
+                if (filter == "break") { return; }
+            }
+        }
+        //放过类型为media的资源
+        if (data.type == "media") {
+            filter = true;
+        }
     }
 
     if (!filter) { return; }
 
+    // 谜之原因 获取得资源 tabId可能为 -1 firefox中则正常
+    // 检查是 -1 使用当前激活标签得tabID
     data.tabId = data.tabId == -1 ? G.tabId : data.tabId;
 
     cacheData[data.tabId] ??= [];
@@ -579,24 +581,24 @@ function fileNameParse(pathname) {
 }
 //获取Header属性的值
 function getResponseHeadersValue(data) {
-    data.header = {};
-    if (data.responseHeaders == undefined || data.responseHeaders.length == 0) { return; }
+    const header = {};
+    if (data.responseHeaders == undefined || data.responseHeaders.length == 0) { return header; }
     for (let item of data.responseHeaders) {
         item.name = item.name.toLowerCase();
-        if (!item.name.startsWith('content-')) { continue; }
-        switch (item.name) {
-            case "content-length": data.header.size ??= parseInt(item.value); break;
-            case "content-type": data.header.type = item.value.split(";")[0].toLowerCase(); break;
-            case "content-disposition": data.header.attachment = item.value; break;
-            case "content-range":
-                // 存在range使用range修正 文件大小size的值
-                const size = item.value.split('/')[1];
-                if (size !== '*') {
-                    data.header.size = parseInt(size);
-                }
-                break;
+        if (item.name == "content-length") {
+            header.size ??= parseInt(item.value);
+        } else if (item.name == "content-type") {
+            header.type = item.value.split(";")[0].toLowerCase();
+        } else if (item.name == "content-disposition") {
+            header.attachment = item.value;
+        } else if (item.name == "content-range") {
+            let size = item.value.split('/')[1];
+            if (size !== '*') {
+                header.size = parseInt(size);
+            }
         }
     }
+    return header;
 }
 function getRequestHeaders(data) {
     if (data.requestHeaders == undefined || data.requestHeaders.length == 0) { return false; }
