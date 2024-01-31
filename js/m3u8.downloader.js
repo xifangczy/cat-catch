@@ -1,5 +1,5 @@
 class Downloader {
-    constructor(fragments = [], thread = 16) {
+    constructor(fragments = [], thread = 6) {
         this.fragments = fragments;      // 切片列表
         this.allFragments = fragments;   // 储存所有原始切片列表
         this.thread = thread;            // 线程数
@@ -197,14 +197,13 @@ class Downloader {
                     throw new Error(response.status);
                 }
                 const reader = response.body.getReader();
-                let contentLength = response.headers.get('content-length');
-                contentLength = contentLength ? parseInt(contentLength) : 0;
+                let contentLength = parseInt(response.headers.get('content-length')) || 0;
                 let receivedLength = 0;
                 const chunks = [];
                 const pump = () => {
                     return reader.read().then(({ value, done }) => {
                         if (done) {
-                            this.emit('itemProgress', fragment, true);
+                            this.emit('itemProgress', fragment, done);
                             const allChunks = new Uint8Array(receivedLength);
                             let position = 0;
                             for (const chunk of chunks) {
@@ -215,7 +214,7 @@ class Downloader {
                         }
                         chunks.push(value);
                         receivedLength += value.length;
-                        this.emit('itemProgress', fragment, false, receivedLength, contentLength);
+                        this.emit('itemProgress', fragment, done, receivedLength, contentLength);
 
                         return pump();
                     });
@@ -276,6 +275,11 @@ class Downloader {
      * @param {number} end 下载范围 结束索引
      */
     start(start = 0, end = this.fragments.length) {
+        // 检查下载器状态
+        if (this.state == 'running') {
+            this.emit('error', 'state running');
+            return;
+        }
         // 从下载范围内 切出需要下载的部分
         if (!this.range(start, end)) {
             return;
@@ -294,7 +298,7 @@ class Downloader {
         this.stop();
         this._fragments = [];
         this.allFragments = [];
-        this.thread = 32;
+        this.thread = 6;
         this.events = {};
         this.decrypt = null;
         this.transcode = null;
