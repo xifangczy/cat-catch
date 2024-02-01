@@ -197,30 +197,27 @@ class Downloader {
                     throw new Error(response.status);
                 }
                 const reader = response.body.getReader();
-                let contentLength = parseInt(response.headers.get('content-length')) || 0;
+                const contentLength = parseInt(response.headers.get('content-length')) || 0;
                 let receivedLength = 0;
                 const chunks = [];
-                const pump = () => {
-                    return reader.read().then(({ value, done }) => {
-                        if (done) {
-                            this.emit('itemProgress', fragment, done);
-                            const allChunks = new Uint8Array(receivedLength);
-                            let position = 0;
-                            for (const chunk of chunks) {
-                                allChunks.set(chunk, position);
-                                position += chunk.length;
-                            }
-                            return allChunks.buffer;
-                        }
+                const pump = async () => {
+                    while (true) {
+                        const { value, done } = await reader.read();
+                        if (done) { break; }
                         chunks.push(value);
                         receivedLength += value.length;
-                        this.emit('itemProgress', fragment, done, receivedLength, contentLength);
-
-                        return pump();
-                    });
+                        this.emit('itemProgress', fragment, false, receivedLength, contentLength);
+                    }
+                    const allChunks = new Uint8Array(receivedLength);
+                    let position = 0;
+                    for (const chunk of chunks) {
+                        allChunks.set(chunk, position);
+                        position += chunk.length;
+                    }
+                    this.emit('itemProgress', fragment, true);
+                    return allChunks.buffer;
                 }
                 return pump();
-                // return response.arrayBuffer();
             })
             .then(buffer => {
                 this.emit('rawBuffer', buffer, fragment);
@@ -254,6 +251,7 @@ class Downloader {
                     this.emit('allCompleted', this.buffer, this.fragments);
                 }
             }).catch((error) => {
+                console.log(error);
                 if (error.name == 'AbortError') {
                     this.emit('stop', fragment, error);
                     return;
