@@ -255,10 +255,10 @@
     "message": "Reset Regex Settings"
   },
   "regexTest": {
-    "message": "Regex Test"
+    "message": "Regex test"
   },
-  "urlToMatch": {
-    "message": "URL to Match"
+  "regex": {
+    "message": "regex"
   },
   "flag": {
     "message": "Flag"

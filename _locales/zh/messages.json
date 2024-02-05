@@ -257,8 +257,8 @@
   "regexTest": {
     "message": "正则测试"
   },
-  "urlToMatch": {
-    "message": "要匹配的URL"
+  "regex": {
+    "message": "正则"
   },
   "flag": {
     "message": "标识符"
