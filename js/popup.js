@@ -615,11 +615,11 @@ function updateButton() {
     });
 }
 /* 格式判断 */
+const isMediaExt = (ext) => ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'm4a', '3gp', 'mpeg', 'mov', 'm4s', 'aac'].includes(ext);
 function isPlay(data) {
     if (G.Player && !isJSON(data) && !isPicture(data)) { return true; }
-    const extArray = ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'm4a', '3gp', 'mpeg', 'mov', 'm4s', 'aac'];
     const typeArray = ['video/ogg', 'video/mp4', 'video/webm', 'audio/ogg', 'audio/mp3', 'audio/wav', 'audio/m4a', 'video/3gp', 'video/mpeg', 'video/mov'];
-    return extArray.includes(data.ext) || typeArray.includes(data.type) || isM3U8(data);
+    return isMediaExt(data.ext) || typeArray.includes(data.type) || isM3U8(data);
 }
 function isM3U8(data) {
     return (data.ext == "m3u8" ||
@@ -717,7 +717,7 @@ function UItoggle() {
 // 检查是否符合条件 更改 合并下载 按钮状态
 function mergeDownButtonCheck(data) {
     if (!data.type) {
-        return ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'm4a', '3gp', 'mpeg', 'mov', 'm4s', 'aac'].includes(data.ext);
+        return isMediaExt(data.ext);
     }
     return data.type.startsWith("video") || data.type.startsWith("audio") || data.type.endsWith("octet-stream");
 }
