@@ -1129,8 +1129,12 @@ function downloadNew(start = 0, end = _fragments.length) {
         buttonState("#mergeTs", true);
     });
     // 单个项目下载进度
+    let lastEmitted = Date.now();
     down.on('itemProgress', function (fragment, state, receivedLength, contentLength) {
-        $(`#downItem${fragment.index} .percentage`).html((receivedLength / contentLength * 100).toFixed(2) + "%");
+        if (Date.now() - lastEmitted >= 100) {
+            $(`#downItem${fragment.index} .percentage`).html((receivedLength / contentLength * 100).toFixed(2) + "%");
+            lastEmitted = Date.now();
+        }
         if (state) {
             $(`#downItem${fragment.index} .percentage`).html(i18n.downloadComplete);
             $(`#downItem${fragment.index} button`).remove();
@@ -1147,8 +1151,6 @@ function downloadNew(start = 0, end = _fragments.length) {
     down.on('stop', function (fragment, error) {
         console.log(error);
     });
-    // 开始下载
-    down.start(start, end);
 
     // 单项进度
     const tempDOM = $("<div>");
@@ -1176,6 +1178,9 @@ function downloadNew(start = 0, end = _fragments.length) {
     });
     $("#media_file").hide();
     $("#downList").html("").show().append(tempDOM);
+
+    // 开始下载
+    down.start(start, end);
 
     // 强制下载
     $("#ForceDownload").off("click").click(function () {
