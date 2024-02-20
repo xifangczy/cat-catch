@@ -419,7 +419,7 @@ $('#AllCopy').click(function () {
     Tips(i18n.copiedToClipboard);
 });
 // 全选 反选
-$('#AllSelect, #ReSelect').click(function () {
+$('#AllSelect, #invertSelection').click(function () {
     const checked = this.id == "AllSelect";
     getData().forEach(function (data) {
         data.checked = checked ? checked : !data.checked;
