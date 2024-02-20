@@ -1131,13 +1131,14 @@ function downloadNew(start = 0, end = _fragments.length) {
     // 单个项目下载进度
     let lastEmitted = Date.now();
     down.on('itemProgress', function (fragment, state, receivedLength, contentLength) {
-        if (Date.now() - lastEmitted >= 100) {
-            $(`#downItem${fragment.index} .percentage`).html((receivedLength / contentLength * 100).toFixed(2) + "%");
-            lastEmitted = Date.now();
-        }
         if (state) {
             $(`#downItem${fragment.index} .percentage`).html(i18n.downloadComplete);
             $(`#downItem${fragment.index} button`).remove();
+            return;
+        }
+        if (Date.now() - lastEmitted >= 100) {
+            $(`#downItem${fragment.index} .percentage`).html((receivedLength / contentLength * 100).toFixed(2) + "%");
+            lastEmitted = Date.now();
         }
     });
     if (fileStream) {
