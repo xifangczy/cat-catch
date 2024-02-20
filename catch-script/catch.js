@@ -27,6 +27,7 @@
     <div><button id="hide" ${buttonStyle} data-i18n="hide">隐藏</button><button id="close" ${buttonStyle} data-i18n="close">关闭</button></div>
     <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown")} ${checkboxStyle}><span data-i18n="automaticDownload">完成捕获自动下载</span></label>
     <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg")} ${checkboxStyle}><span data-i18n="ffmpeg">使用ffmpeg合并</span></label>
+    <label><input type="checkbox" id="checkHead" ${checkboxStyle}>清理多余头部数据</label>
     <details>
         <summary data-i18n="fileName" id="summary">文件名设置</summary>
         <div style="font-weight:bold;"><span data-i18n="fileName">文件名</span>: </div><div id="fileName"></div>
@@ -38,7 +39,6 @@
     </details>
     <details>
     <summary>test</summary>
-        <label><input type="checkbox" id="checkHead" ${checkboxStyle}>清理多余头部数据</label>
         <button id="test" ${buttonStyle}>test</button>
     </details>`;
     CatCatch.style = `
