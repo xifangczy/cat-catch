@@ -1137,7 +1137,7 @@ function downloadNew(start = 0, end = _fragments.length) {
             return;
         }
         if (Date.now() - lastEmitted >= 100) {
-            $(`#downItem${fragment.index} .percentage`).html((receivedLength / contentLength * 100).toFixed(2) + "%");
+            downItemPercentageDOM[fragment.index].html((receivedLength / contentLength * 100).toFixed(2) + "%");
             lastEmitted = Date.now();
         }
     });
@@ -1154,6 +1154,7 @@ function downloadNew(start = 0, end = _fragments.length) {
     });
 
     // 单项进度
+    let downItemPercentageDOM = [];
     const tempDOM = $("<div>");
     down.fragments.forEach((fragment) => {
         const html = $(`<div id="downItem${fragment.index}">
@@ -1164,6 +1165,10 @@ function downloadNew(start = 0, end = _fragments.length) {
             <button data-action="stop">${i18n.stopDownload}</button>
             </div>
         </div>`);
+
+        // 保存进程 DOM 更新下载进度提升性能
+        downItemPercentageDOM[fragment.index] = html.find(".percentage");
+
         html.find("button").click(function () {
             html.find(".percentage").removeClass('error');
             if ($(this).data("action") == "stop") {
