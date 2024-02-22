@@ -10,6 +10,9 @@
         newIframe.contentWindow.document.write("<script>(window.catCatchLOG=function(){console.log(...arguments);})();</script>");
         window.console.log = newIframe.contentWindow.catCatchLOG;
     }
+    // 防止 window.postMessage 被劫持
+    const _postMessage = window.postMessage;
+
     console.log("start search.js");
     const filter = new Set();
     const reKeyURL = /URI="(.*)"/;
@@ -287,6 +290,12 @@
             if (instance.byteLength == 16) {
                 postData({ action: "catCatchAddKey", key: instance.buffer, href: location.href, ext: "key" });
             }
+            if (instance.byteLength == 256 || instance.byteLength == 128) {
+                const _buffer = isRepeatedExpansion(instance.buffer, 16);
+                if (_buffer) {
+                    postData({ action: "catCatchAddKey", key: _buffer, href: location.href, ext: "key" });
+                }
+            }
             return instance;
         }
     });
@@ -398,14 +407,15 @@
         return text;
     }
     function postData(data) {
-        let key = data.url ? data.url : data.key;
-        if (key instanceof ArrayBuffer || key instanceof Array) {
-            key = ArrayToBase64(key);
+        let value = data.url ? data.url : data.key;
+        if (value instanceof ArrayBuffer || value instanceof Array) {
+            data.key = ArrayToBase64(value);
+            value = data.key;
         }
-        if (filter.has(key)) { return false; }
-        filter.add(key);
+        if (filter.has(value)) { return false; }
+        filter.add(value);
         data.requestId = Date.now().toString() + filter.size;
-        window.postMessage(data);
+        _postMessage(data);
     }
     function ArrayToBase64(data) {
         try {
@@ -421,5 +431,18 @@
         } catch (e) {
             return false;
         }
+    }
+    function isRepeatedExpansion(array, expansionLength) {
+        let _buffer = new Uint8Array(expansionLength);
+        array = new Uint8Array(array);
+        for (let i = 0; i < expansionLength; i++) {
+            _buffer[i] = array[i];
+            for (let j = i + expansionLength; j < array.byteLength; j += expansionLength) {
+                if (array[i] !== array[j]) {
+                    return false;
+                }
+            }
+        }
+        return _buffer.buffer;
     }
 })();
