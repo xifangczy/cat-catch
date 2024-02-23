@@ -477,7 +477,7 @@
     "message": "This M3U8 file nests multiple subtitles."
   },
   "possibleKey": {
-    "message": "Found a possible key"
+    "message": "Found possible keys"
   },
   "loading": {
     "message": "Loading..."
