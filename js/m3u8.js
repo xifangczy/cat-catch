@@ -45,6 +45,7 @@ const keyContent = new Map(); // 储存key的内容
 const initData = new Map(); // 储存map的url
 const decryptor = new AESDecryptor(); // 解密工具 来自hls.js 分离出来的
 let skipDecrypt = false; // 是否跳过解密
+let possibleKeys = new Set();
 /* 下载相关 */
 let downId = 0; // 下载id
 let stopDownload = false; // 停止下载flag
@@ -466,6 +467,8 @@ function parseTs(data) {
                     if (chrome.runtime.lastError || !result || result.length == 0) { return; }
                     const maybeKey = $("#maybeKey select");
                     for (let item of result) {
+                        if (possibleKeys.has(item)) { continue; }
+                        possibleKeys.add(item);
                         maybeKey.append(`<option value="${item}">${item}</option>`);
                     }
                     $("#maybeKey").show();
