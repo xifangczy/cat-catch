@@ -732,7 +732,7 @@ $("#uploadKeyFile").change(function () {
     let fileReader = new FileReader();
     fileReader.onload = function () {
         if (this.result.byteLength != 16) {
-            $progress.html(`<b>Key文件不正确</b>`);
+            $progress.html(`<b>${i18n.incorrectKey}</b>`);
             return;
         }
         $("#customKey").val(ArrayBufferToBase64(this.result));
