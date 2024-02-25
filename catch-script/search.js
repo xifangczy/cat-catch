@@ -325,6 +325,19 @@
         }
     });
 
+    // Array join
+    const _arrayJoin = Array.prototype.join;
+    Array.prototype.join = function () {
+        const data = _arrayJoin.apply(this, arguments);
+        if (data.substring(0, 7).toUpperCase() == "#EXTM3U") {
+            isFullM3u8(data) && toUrl(data);
+        }
+        return data;
+    }
+    Array.prototype.join.toString = function () {
+        return _arrayJoin.toString();
+    }
+
     function isUrl(str) {
         return (str.startsWith("http://") || str.startsWith("https://"));
     }
