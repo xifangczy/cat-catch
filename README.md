@@ -1,3 +1,5 @@
+<p align="center">[中文](README.md) | [English](README_en.md)</p>
+
 # 📑简介
 猫抓(cat-catch) 资源嗅探扩展，能够帮你筛选列出当前页面的资源。
 
