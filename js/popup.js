@@ -259,7 +259,8 @@ function AddMedia(data, currentTab = true) {
         //     return false;
         // }
         if (G.m3u8AutoDown && data.parsing == "m3u8") {
-            data.html.find('#parsing').click();
+            // data.html.find('#parsing').click();
+            openM3u8Parser(data, {autoDown: true});
             return false;
         }
         chrome.downloads.download({
@@ -286,16 +287,7 @@ function AddMedia(data, currentTab = true) {
     });
     //解析m3u8
     data.html.find('#parsing').click(function (e) {
-        chrome.tabs.get(G.tabId, function (tab) {
-            let url = `/${data.parsing}.html?url=${encodeURIComponent(data.url)}&title=${encodeURIComponent(data.title)}&filename=${encodeURIComponent(data.downFileName)}&tabid=${data.tabId == -1 ? G.tabId : data.tabId}&initiator=${encodeURIComponent(data.initiator)}&tabid=${encodeURIComponent(tab.id)}`;
-            if (data.requestHeaders) {
-                url += `&requestHeaders=${encodeURIComponent(JSON.stringify(data.requestHeaders))}`;
-            }
-            if (e.isTrigger) {
-                url += `&autoDown=1`;
-            }
-            chrome.tabs.create({ url: url, index: tab.index + 1, active: !e.isTrigger });
-        });
+        openM3u8Parser(data);
         return false;
     });
     // 多选框 创建checked属性 值和checked状态绑定
@@ -396,13 +388,20 @@ $('#DownFile').click(function () {
     });
 });
 // 合并下载
-$('#mergeDown').click(function () {
+$mergeDown.click(function () {
     const [checkedData, maxSize] = getCheckedData();
     chrome.runtime.sendMessage({
         Message: "catCatchFFmpeg",
         action: "openFFmpeg",
         extra: i18n.waitingForMedia
     });
+    // 都是m3u8 自动合并并发送到ffmpeg
+    if(checkedData.every(data => isM3U8(data))){
+        checkedData.forEach(function (data) {
+            openM3u8Parser(data,{autoDown:true, popupAddMedia:true});
+        });
+        return true;
+    }
     checkedData.forEach(function (data) {
         catDownload(data, "&autosend=1&autoClose=1&title=" + data._title);
     });
@@ -424,6 +423,7 @@ $('#AllSelect, #invertSelection').click(function () {
     getData().forEach(function (data) {
         data.checked = checked ? checked : !data.checked;
     });
+    mergeDownButton();
 });
 // unfoldAll展开全部  unfoldPlay展开可播放 unfoldFilter展开选中的 fold关闭展开
 $('#unfoldAll, #unfoldPlay, #unfoldFilter, #fold').click(function () {
@@ -723,11 +723,13 @@ function mergeDownButtonCheck(data) {
 }
 function mergeDownButton() {
     const [checkedData, maxSize] = getCheckedData();
-    if (checkedData.length == 2 && checkedData.every(mergeDownButtonCheck) && maxSize < 2147483648) {
-        $mergeDown.show();
+    if(checkedData.length != 2 || maxSize > 2147483648){
+        $mergeDown.hide();
         return;
     }
-    $mergeDown.hide();
+    if(checkedData.every(mergeDownButtonCheck) || checkedData.every(data => isM3U8(data))){
+        $mergeDown.show();
+    }
 }
 // 获取当前标签 所有选择的文件
 function getCheckedData() {
@@ -794,5 +796,26 @@ function aria2AddUri(data, success, error) {
         error: function (errMsg) {
             error && error(errMsg);
         }
+    });
+}
+
+/**
+ * 打开m3u8解析器
+ * @param {Object} data 资源对象
+ * @param {Boolean} autoDown 是否自动下载
+ */
+function openM3u8Parser(data, {autoDown, popupAddMedia} = {}) {
+    chrome.tabs.get(G.tabId, function (tab) {
+        let url = `/${data.parsing}.html?url=${encodeURIComponent(data.url)}&title=${encodeURIComponent(data.title)}&filename=${encodeURIComponent(data.downFileName)}&tabid=${data.tabId == -1 ? G.tabId : data.tabId}&initiator=${encodeURIComponent(data.initiator)}&tabid=${encodeURIComponent(tab.id)}`;
+        if (data.requestHeaders) {
+            url += `&requestHeaders=${encodeURIComponent(JSON.stringify(data.requestHeaders))}`;
+        }
+        if (autoDown) {
+            url += `&autoDown=1`;
+        }
+        if (popupAddMedia) {
+            url += `&popupAddMedia=1`;
+        }
+        chrome.tabs.create({ url: url, index: tab.index + 1, active: !(autoDown || popupAddMedia) });
     });
 }

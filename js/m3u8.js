@@ -12,6 +12,7 @@ const tabId = parseInt(params.get("tabid"));
 const key = params.get("key");
 const _tabid = params.get("tabid");
 let autoDown = params.get("autoDown");
+const popupAddMedia = params.get("popupAddMedia");
 let currentTabId = 0;
 
 // 修改当前标签下的所有xhr的Referer 修改完成 运行init函数
@@ -399,6 +400,7 @@ function parseTs(data) {
                 .then(response => response.arrayBuffer())
                 .then(function (buffer) {
                     initData.set(data.fragments[i].initSegment.url, buffer);
+                    autoDown && $("#mergeTs").click();
                 }).catch(function (error) { console.log(error); });
             $("#tips").append('EXT-X-MAP: <input type="text" class="keyUrl" value="' + data.fragments[i].initSegment.url + '" spellcheck="false" readonly="readonly">');
         }
@@ -455,7 +457,8 @@ function parseTs(data) {
         autoDown && highlight();
         $("#recorder").show();
         $("#count").html(i18n.liveHLS);
-    } else if (autoDown) {
+    }
+    if(_fragments.some(fragment => fragment.initSegment) && autoDown){
         $("#mergeTs").click();
     }
 
@@ -1031,7 +1034,7 @@ function downloadNew(start = 0, end = _fragments.length) {
             // 跳过解密 录制模式 切片不存在加密 跳过解密 直接返回
             if (skipDecrypt || recorder || !fragment.encrypted) {
                 if (fragment.initSegment) {
-                    buffer = addInitSegmentData(buffer, fragment.initSegment.url);
+                    buffer = addInitSegmentData(buffer, fragment.initSegment);
                 }
                 resolve(buffer);
                 return;
@@ -1052,7 +1055,7 @@ function downloadNew(start = 0, end = _fragments.length) {
             // 如果存在MAP切片 把MAP整合进buffer
             // MAP切片不需要解密
             if (fragment.initSegment) {
-                buffer = addInitSegmentData(buffer, fragment.initSegment.url);
+                buffer = addInitSegmentData(buffer, fragment.initSegment);
             }
             resolve(buffer);
         });
@@ -1207,8 +1210,11 @@ function downloadNew(start = 0, end = _fragments.length) {
         });
     });
 }
-function addInitSegmentData(buffer, url) {
-    const initSegmentData = initData.get(url);
+function addInitSegmentData(buffer, initSegment) {
+    let initSegmentData = initData.get(initSegment.url);
+    if(!initSegmentData && initSegment.data){
+        initSegmentData = initSegment.data.buffer;
+    }
     const initLength = initSegmentData.byteLength;
     const newData = new Uint8Array(initLength + buffer.byteLength);
     newData.set(new Uint8Array(initSegmentData), 0);
@@ -1270,9 +1276,13 @@ function mergeTsNew(down) {
             } else {
                 fileName = fileName + "." + ext;
             }
+            let action = $("#onlyAudio").prop("checked") ? "onlyAudio" : "transcode";
+            if(popupAddMedia){
+                action = "popupAddMedia";
+            }
             chrome.runtime.sendMessage({
                 Message: "catCatchFFmpeg",
-                action: $("#onlyAudio").prop("checked") ? "onlyAudio" : "transcode",
+                action: action,
                 media: [{ data: URL.createObjectURL(fileBlob), name: `memory${new Date().getTime()}.${ext}` }],
                 title: fileName,
                 name: "memory" + new Date().getTime() + "." + ext,
