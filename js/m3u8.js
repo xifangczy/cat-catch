@@ -13,6 +13,7 @@ const key = params.get("key");
 const _tabid = params.get("tabid");
 let autoDown = params.get("autoDown");
 const popupAddMedia = params.get("popupAddMedia");
+const addMedia = params.get("addMedia");
 let currentTabId = 0;
 
 // 修改当前标签下的所有xhr的Referer 修改完成 运行init函数
@@ -183,11 +184,17 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
     if (more && data.levels.length) {
         $("#more_m3u8").show();
         for (let item of data.levels) {
-            const [name, url] = getNewUrl(item);
-            const html = `<div class="block">
+            let [name, url] = getNewUrl(item);
+            const html = $(`<div class="block">
                     <div>${item.attrs.RESOLUTION ? i18n.resolution + ":" + item.attrs.RESOLUTION : ""}${item.attrs.BANDWIDTH ? " | " + i18n.bitrate + ":" + (parseInt(item.attrs.BANDWIDTH / 1000) + " Kbps") : ""}</div>
                     <a href="${url}">${name}</a>
-                </div>`;
+                    <button type="button">${i18n.sendFfmpeg}</button>
+                </div>`);
+            html.find("button").click(function(){
+                url += `&autoDown=1`;
+                url += `&addMedia=1`;
+                chrome.tabs.create({ url: url, index: currentTabId + 1, active: false });
+            });
             $("#next_m3u8").append(html);
         }
     }
@@ -205,11 +212,17 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
                     }
                 }
             }
-            const [name, url] = getNewUrl(item);
-            const html = `<div class="block">
+            let [name, url] = getNewUrl(item);
+            const html = $(`<div class="block">
                     <div>${item.name ? item.name : ""} | ${item.lang ? item.lang : ""} | ${item.groupId ? item.groupId : ""}</div>
                     <a href="${url}">${name}</a>
-                </div>`;
+                    <button type="button">${i18n.sendFfmpeg}</button>
+                </div>`);
+            html.find("button").click(function(){
+                url += `&autoDown=1`;
+                url += `&addMedia=1`;
+                chrome.tabs.create({ url: url, index: currentTabId + 1, active: false });
+            });
             $("#next_audio").append(html);
         }
     }
@@ -229,7 +242,7 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
     if (more) {
         autoDown && highlight();
         $("#m3u8").hide();
-        $("button").hide();
+        // $("button").hide();
         return;
     }
     function getNewUrl(item) {
@@ -1279,6 +1292,8 @@ function mergeTsNew(down) {
             let action = $("#onlyAudio").prop("checked") ? "onlyAudio" : "transcode";
             if(popupAddMedia){
                 action = "popupAddMedia";
+            }else if(addMedia){
+                action = "addMedia";
             }
             chrome.runtime.sendMessage({
                 Message: "catCatchFFmpeg",
