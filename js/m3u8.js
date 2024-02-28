@@ -471,7 +471,7 @@ function parseTs(data) {
         $("#recorder").show();
         $("#count").html(i18n.liveHLS);
     }
-    if(_fragments.some(fragment => fragment.initSegment) && autoDown){
+    if(!_fragments.some(fragment => fragment.initSegment) && autoDown){
         $("#mergeTs").click();
     }
 
