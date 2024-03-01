@@ -12,14 +12,17 @@ const tabId = parseInt(params.get("tabid"));
 const key = params.get("key");
 const _tabid = params.get("tabid");
 let autoDown = params.get("autoDown");
+const autoClose = params.get("autoClose");
 const popupAddMedia = params.get("popupAddMedia");
 const addMedia = params.get("addMedia");
 let currentTabId = 0;
+let currentIndex = 0;
 
 // 修改当前标签下的所有xhr的Referer 修改完成 运行init函数
 let requestHeaders = JSONparse(_requestHeaders);
 setRequestHeaders(requestHeaders, () => {
     chrome.tabs.getCurrent(function (tab) {
+        currentIndex = tab.index;
         currentTabId = tab.id;
         awaitG(init);
     });
@@ -73,6 +76,7 @@ const $progress = $("#progress");
 const $fileDuration = $("#fileDuration");
 const $m3u8dlArg = $("#m3u8dlArg");
 let pageDOM = null;
+const $media_file = $("#media_file");
 
 /**
  * 初始化函数，界面默认配置 loadSource载入 m3u8 url
@@ -188,12 +192,12 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
             const html = $(`<div class="block">
                     <div>${item.attrs.RESOLUTION ? i18n.resolution + ":" + item.attrs.RESOLUTION : ""}${item.attrs.BANDWIDTH ? " | " + i18n.bitrate + ":" + (parseInt(item.attrs.BANDWIDTH / 1000) + " Kbps") : ""}</div>
                     <a href="${url}">${name}</a>
-                    <button type="button">${i18n.sendFfmpeg}</button>
+                    <button class="sendFfmpeg" type="button">${i18n.sendFfmpeg}</button>
                 </div>`);
-            html.find("button").click(function(){
-                url += `&autoDown=1`;
-                url += `&addMedia=1`;
-                chrome.tabs.create({ url: url, index: currentTabId + 1, active: false });
+            html.find(".sendFfmpeg").click(function(){
+                let newUrl = url + `&autoDown=1`;
+                newUrl += `&addMedia=1`;
+                chrome.tabs.create({ url: newUrl, index: currentIndex + 1 });
             });
             $("#next_m3u8").append(html);
         }
@@ -216,12 +220,12 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
             const html = $(`<div class="block">
                     <div>${item.name ? item.name : ""} | ${item.lang ? item.lang : ""} | ${item.groupId ? item.groupId : ""}</div>
                     <a href="${url}">${name}</a>
-                    <button type="button">${i18n.sendFfmpeg}</button>
+                    <button class="sendFfmpeg" type="button">${i18n.sendFfmpeg}</button>
                 </div>`);
-            html.find("button").click(function(){
-                url += `&autoDown=1`;
-                url += `&addMedia=1`;
-                chrome.tabs.create({ url: url, index: currentTabId + 1, active: false });
+            html.find(".sendFfmpeg").click(function(){
+                let newUrl = url + `&autoDown=1`;
+                newUrl += `&addMedia=1`;
+                chrome.tabs.create({ url: newUrl, index: currentIndex + 1 });
             });
             $("#next_audio").append(html);
         }
@@ -542,9 +546,9 @@ $(".openDir").click(function () {
 });
 // 下载ts列表
 $("#downText").click(function () {
-    // let text = $("#media_file").val().replace(/\n\n/g, "\n");
+    // let text = $media_file.val().replace(/\n\n/g, "\n");
     // text = encodeURIComponent(text);
-    // let type = $("#media_file").data("type");
+    // let type = $media_file.data("type");
     // let downType = "data:text/plain,";
     // let filename = GetFileName(_m3u8Url) + '.txt';
     // if (type == "m3u8") {
@@ -600,7 +604,7 @@ $("#play").click(function () {
     if ($(this).data("switch") == "on") {
         $("#video").show();
         hls.attachMedia($("#video")[0]);
-        $("#media_file").hide();
+        $media_file.hide();
         $("#downList").hide();
         $(this).html(i18n.close).data("switch", "off");
         hls.on(Hls.Events.MEDIA_ATTACHED, function () {
@@ -610,7 +614,7 @@ $("#play").click(function () {
     }
     $("#video").hide();
     hls.detachMedia($("#video")[0]);
-    $("#media_file").show();
+    $media_file.show();
     $(this).html(i18n.play).data("switch", "on");
 });
 // 调用m3u8DL下载
@@ -932,7 +936,7 @@ $("#tsAddArg").click(function () {
 });
 // 下载进度
 $("#downProgress").click(function () {
-    $("#media_file").hide();
+    $media_file.hide();
     $("#downList").show();
 });
 // 设置请求头
@@ -945,6 +949,10 @@ $(document).on("click", "#setRequestHeaders, #setRequestHeadersError", function 
         window.location.href = window.location.origin + window.location.pathname + "?" + params.toString();
     }
 });
+
+// 下载完毕自动关闭页面选项
+autoClose && $("#autoClose").prop("checked", true);
+
 /**************************** 下载TS文件 ****************************/
 // start 开始下载的索引
 // end 结束下载的索引
@@ -1201,7 +1209,7 @@ function downloadNew(start = 0, end = _fragments.length) {
         });
         tempDOM.append(html);
     });
-    $("#media_file").hide();
+    $media_file.hide();
     $("#downList").html("").show().append(tempDOM);
 
     // 开始下载
@@ -1302,7 +1310,7 @@ function mergeTsNew(down) {
                 title: fileName,
                 name: "memory" + new Date().getTime() + "." + ext,
                 active: !autoDown,
-                autoClose: !!autoDown,
+                autoClose: $("#autoClose").prop("checked"),
                 tabId: currentTabId,
             });
             buttonState("#mergeTs", true);
@@ -1659,19 +1667,19 @@ function timeToIndex(time) {
 }
 // 写入ts链接
 function writeText(text) {
-    $("#media_file").show();
+    $media_file.show();
     $("#downList").hide();
     if (typeof text == "object") {
         let url = [];
         for (let key in text) {
             url.push(text[key].url + "\n");
         }
-        $("#media_file").val(url.join("\n"));
-        $("#media_file").data("type", "link");
+        $media_file.val(url.join("\n"));
+        $media_file.data("type", "link");
         return;
     }
-    $("#media_file").val(text);
-    $("#media_file").data("type", "m3u8");
+    $media_file.val(text);
+    $media_file.data("type", "m3u8");
 }
 // 获取文件名
 function GetFile(str) {
