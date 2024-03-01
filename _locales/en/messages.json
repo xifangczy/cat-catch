@@ -518,8 +518,8 @@
   "copyCommand": {
     "message": "Copy Command"
   },
-  "showCommand": {
-    "message": "Show Command"
+  "previewCommand": {
+    "message": "Preview Command"
   },
   "addSettingParameters": {
     "message": "Add Setting Parameters"

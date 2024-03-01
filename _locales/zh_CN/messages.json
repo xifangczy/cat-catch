@@ -518,8 +518,8 @@
   "copyCommand": {
     "message": "复制命令"
   },
-  "showCommand": {
-    "message": "显示命令"
+  "previewCommand": {
+    "message": "预览命令"
   },
   "addSettingParameters": {
     "message": "加入设置参数"
