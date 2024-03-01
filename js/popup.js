@@ -260,7 +260,7 @@ function AddMedia(data, currentTab = true) {
         // }
         if (G.m3u8AutoDown && data.parsing == "m3u8") {
             // data.html.find('#parsing').click();
-            openM3u8Parser(data, {autoDown: true});
+            openM3u8Parser(data, {autoDown: true, autoClose: true});
             return false;
         }
         chrome.downloads.download({
@@ -398,7 +398,7 @@ $mergeDown.click(function () {
     // 都是m3u8 自动合并并发送到ffmpeg
     if(checkedData.every(data => isM3U8(data))){
         checkedData.forEach(function (data) {
-            openM3u8Parser(data,{autoDown:true, popupAddMedia:true});
+            openM3u8Parser(data,{autoDown:true, popupAddMedia:true, autoClose:true});
         });
         return true;
     }
@@ -804,7 +804,7 @@ function aria2AddUri(data, success, error) {
  * @param {Object} data 资源对象
  * @param {Boolean} autoDown 是否自动下载
  */
-function openM3u8Parser(data, {autoDown, popupAddMedia} = {}) {
+function openM3u8Parser(data, {autoDown, popupAddMedia, autoClose} = {}) {
     chrome.tabs.get(G.tabId, function (tab) {
         let url = `/${data.parsing}.html?url=${encodeURIComponent(data.url)}&title=${encodeURIComponent(data.title)}&filename=${encodeURIComponent(data.downFileName)}&tabid=${data.tabId == -1 ? G.tabId : data.tabId}&initiator=${encodeURIComponent(data.initiator)}&tabid=${encodeURIComponent(tab.id)}`;
         if (data.requestHeaders) {
@@ -815,6 +815,9 @@ function openM3u8Parser(data, {autoDown, popupAddMedia} = {}) {
         }
         if (popupAddMedia) {
             url += `&popupAddMedia=1`;
+        }
+        if (autoClose) {
+            url += `&autoClose=1`;
         }
         chrome.tabs.create({ url: url, index: tab.index + 1, active: !(autoDown || popupAddMedia) });
     });
