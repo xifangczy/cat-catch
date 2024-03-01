@@ -205,7 +205,7 @@
     Int8Array.prototype.subarray = function (start, end) {
         const data = _subarray.apply(this, arguments);
         if (data.byteLength == 16) {
-            const uint8 = new Uint8Array(data);
+            const uint8 = new _Uint8Array(data);
             for (let item of uint8) {
                 if (typeof item != "number" || item > 255) { return data; }
             }
@@ -312,16 +312,37 @@
         return _escape.toString();
     }
 
+    // findTypedArray
+    const findTypedArray = (target, args) =>{
+        const isArray = Array.isArray(args[0]) && args[0].length === 16;
+        const isArrayBuffer = args[0] instanceof ArrayBuffer && args[0].byteLength === 16;
+        const instance = new target(...args);
+        if (isArray || isArrayBuffer) {
+            postData({ action: "catCatchAddKey", key: args[0], href: location.href, ext: "key" });
+        }else if(instance.buffer.byteLength === 16){
+            postData({ action: "catCatchAddKey", key: instance.buffer, href: location.href, ext: "key" });
+        }
+        return instance;
+    }
     // Uint8Array
     const _Uint8Array = Uint8Array;
     window.Uint8Array = new Proxy(_Uint8Array, {
         construct(target, args) {
-            const isArray = Array.isArray(args[0]) && args[0].length === 16;
-            const isArrayBuffer = args[0] instanceof ArrayBuffer && args[0].byteLength === 16;
-            if (isArray || isArrayBuffer) {
-                postData({ action: "catCatchAddKey", key: args[0], href: location.href, ext: "key" });
-            }
-            return new target(...args);
+            return findTypedArray(target, args);
+        }
+    });
+    // Uint16Array
+    const _Uint16Array = Uint16Array;
+    window.Uint16Array = new Proxy(_Uint16Array, {
+        construct(target, args) {
+            return findTypedArray(target, args);
+        }
+    });
+    // Uint32Array
+    const _Uint32Array = Uint32Array;
+    window.Uint32Array = new Proxy(_Uint32Array, {
+        construct(target, args) {
+            return findTypedArray(target, args);
         }
     });
 
@@ -415,7 +436,7 @@
         }
         if (!isM3U8) { return false; }
         if (text.substring(0, 7).toLowerCase() == "base64,") {
-            return window.atob(text.substring(7));
+            return _atob(text.substring(7));
         }
         return text;
     }
@@ -432,22 +453,22 @@
     }
     function ArrayToBase64(data) {
         try {
-            let bytes = new Uint8Array(data);
+            let bytes = new _Uint8Array(data);
             let binary = "";
             for (let i = 0; i < bytes.byteLength; i++) {
-                binary += String.fromCharCode(bytes[i]);
+                binary += _fromCharCode(bytes[i]);
             }
             if (typeof _btoa == "function") {
                 return _btoa(binary);
             }
-            return btoa(binary);
+            return _btoa(binary);
         } catch (e) {
             return false;
         }
     }
     function isRepeatedExpansion(array, expansionLength) {
-        let _buffer = new Uint8Array(expansionLength);
-        array = new Uint8Array(array);
+        let _buffer = new _Uint8Array(expansionLength);
+        array = new _Uint8Array(array);
         for (let i = 0; i < expansionLength; i++) {
             _buffer[i] = array[i];
             for (let j = i + expansionLength; j < array.byteLength; j += expansionLength) {
