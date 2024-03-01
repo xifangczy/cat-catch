@@ -365,6 +365,10 @@ function parseTs(data) {
     _fragments.splice(0);   // 清空 防止直播HLS无限添加
     /* 获取 m3u8文件原始内容 MANIFEST_PARSED也能获取但偶尔会为空(BUG?) 放在LEVEL_LOADED获取更安全*/
     _m3u8Content = data.m3u8;
+
+    // #EXT-X-DISCONTINUITY
+    let discontinuity = {start:0, cc:0 };
+    data.endCC != 0 && $("#cc").show();
     for (let i in data.fragments) {
         /*
         * 少部分网站下载ts必须带有参数才能正常下载
@@ -423,6 +427,13 @@ function parseTs(data) {
         }
         if (data.live && data.fragments[i].initSegment && tsBuffer.length == 0) {
             initSegment = data.fragments[i].initSegment;
+        }
+
+        // #EXT-X-DISCONTINUITY
+        if(data.fragments[i].cc != discontinuity.cc){
+            $('#cc').append(`<option value="${+discontinuity.start + 1}-${i}">playlist: ${data.fragments[i].cc}</option>`);
+            discontinuity.cc = data.fragments[i].cc;
+            discontinuity.start = i;
         }
         _fragments.push({
             url: data.fragments[i].url,
@@ -953,6 +964,13 @@ $(document).on("click", "#setRequestHeaders, #setRequestHeadersError", function 
 
 // 下载完毕自动关闭页面选项
 autoClose && $("#autoClose").prop("checked", true);
+
+// #EXT-X-DISCONTINUITY 范围选择
+$('#cc').change(function () {
+    const range = this.value.split("-");
+    $("#rangeStart").val(+range[0]);
+    $("#rangeEnd").val(+range[1]);
+});
 
 /**************************** 下载TS文件 ****************************/
 // start 开始下载的索引
