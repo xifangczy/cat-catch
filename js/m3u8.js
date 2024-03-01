@@ -536,8 +536,9 @@ let progressTimer = setInterval(() => {
 // 监听下载事件 修改提示
 chrome.downloads.onChanged.addListener(function (downloadDelta) {
     if (!downloadDelta.state) { return; }
-    if (downloadDelta.state.current == "complete" && downId != 0) {
-        $progress.html(i18n.SavePrompt);
+    if (downloadDelta.state.current == "complete") {
+        downId != 0 && $progress.html(i18n.SavePrompt);
+        $("#autoClose").prop("checked") && window.close();
     }
 });
 // 打开目录
