@@ -1199,6 +1199,9 @@ function downloadNew(start = 0, end = _fragments.length) {
         console.log(error);
     });
 
+    // 开始下载
+    down.start(start, end);
+
     // 单项进度
     let downItemPercentageDOM = [];
     const tempDOM = $("<div>");
@@ -1230,9 +1233,6 @@ function downloadNew(start = 0, end = _fragments.length) {
     });
     $media_file.hide();
     $("#downList").html("").show().append(tempDOM);
-
-    // 开始下载
-    down.start(start, end);
 
     // 强制下载
     $("#ForceDownload").off("click").click(function () {
