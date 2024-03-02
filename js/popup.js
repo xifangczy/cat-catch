@@ -546,6 +546,7 @@ const interval = setInterval(function () {
     chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getData", tabId: G.tabId }, function (data) {
         if (!data || data === "OK") {
             $tips.html(i18n.noData);
+            $tips.attr("data-i18n", "noData");
             return;
         }
         currentCount = data.length;
