@@ -194,7 +194,7 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
                     <a href="${url}">${name}</a>
                     <button class="sendFfmpeg" type="button">${i18n.sendFfmpeg}</button>
                 </div>`);
-            html.find(".sendFfmpeg").click(function(){
+            html.find(".sendFfmpeg").click(function () {
                 let newUrl = url + `&autoDown=1`;
                 newUrl += `&addMedia=1`;
                 chrome.tabs.create({ url: newUrl, index: currentIndex + 1 });
@@ -222,7 +222,7 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
                     <a href="${url}">${name}</a>
                     <button class="sendFfmpeg" type="button">${i18n.sendFfmpeg}</button>
                 </div>`);
-            html.find(".sendFfmpeg").click(function(){
+            html.find(".sendFfmpeg").click(function () {
                 let newUrl = url + `&autoDown=1`;
                 newUrl += `&addMedia=1`;
                 chrome.tabs.create({ url: newUrl, index: currentIndex + 1 });
@@ -367,7 +367,7 @@ function parseTs(data) {
     _m3u8Content = data.m3u8;
 
     // #EXT-X-DISCONTINUITY
-    let discontinuity = {start:0, cc:0 };
+    let discontinuity = { start: 0, cc: 0 };
     data.endCC && $("#cc").show();
     for (let i in data.fragments) {
         /*
@@ -430,7 +430,7 @@ function parseTs(data) {
         }
 
         // #EXT-X-DISCONTINUITY
-        if(data.fragments[i].cc != discontinuity.cc){
+        if (data.fragments[i].cc != discontinuity.cc) {
             $('#cc').append(`<option value="${+discontinuity.start + 1}-${i}">playlist: ${data.fragments[i].cc}</option>`);
             discontinuity.cc = data.fragments[i].cc;
             discontinuity.start = i;
@@ -486,7 +486,7 @@ function parseTs(data) {
         $("#recorder").show();
         $("#count").html(i18n.liveHLS);
     }
-    if(!_fragments.some(fragment => fragment.initSegment) && autoDown){
+    if (!_fragments.some(fragment => fragment.initSegment) && autoDown) {
         $("#mergeTs").click();
     }
 
@@ -1252,7 +1252,7 @@ function downloadNew(start = 0, end = _fragments.length) {
 }
 function addInitSegmentData(buffer, initSegment) {
     let initSegmentData = initData.get(initSegment.url);
-    if(!initSegmentData && initSegment.data){
+    if (!initSegmentData && initSegment.data) {
         initSegmentData = initSegment.data.buffer;
     }
     const initLength = initSegmentData.byteLength;
@@ -1317,9 +1317,9 @@ function mergeTsNew(down) {
                 fileName = fileName + "." + ext;
             }
             let action = $("#onlyAudio").prop("checked") ? "onlyAudio" : "transcode";
-            if(popupAddMedia){
+            if (popupAddMedia) {
                 action = "popupAddMedia";
-            }else if(addMedia){
+            } else if (addMedia) {
                 action = "addMedia";
             }
             chrome.runtime.sendMessage({
