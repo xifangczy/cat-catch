@@ -1,0 +1,807 @@
+{
+  "catCatch": {
+    "message": "貓抓"
+  },
+  "description": {
+    "message": "網頁媒體嗅探工具"
+  },
+  "confirm": {
+    "message": "確認"
+  },
+  "currentPage": {
+    "message": "當前頁面"
+  },
+  "otherPage": {
+    "message": "其他頁面"
+  },
+  "otherFeatures": {
+    "message": "其他功能"
+  },
+  "mediaControl": {
+    "message": "媒體控制"
+  },
+  "loadingData": {
+    "message": "資料載入..."
+  },
+  "selectWebpage": {
+    "message": "選擇頁面:"
+  },
+  "selectMedia": {
+    "message": "選擇媒體:"
+  },
+  "noMediaDetected": {
+    "message": "未偵測到有媒體的網頁"
+  },
+  "noControllableMediaDetected": {
+    "message": "未偵測到可操控媒體"
+  },
+  "multiplier": {
+    "message": "倍數:"
+  },
+  "speedPlayback": {
+    "message": "倍速播放"
+  },
+  "play": {
+    "message": "播放"
+  },
+  "normalPlay": {
+    "message": "正常播放"
+  },
+  "pictureInPicture": {
+    "message": "畫中畫"
+  },
+  "fullscreen": {
+    "message": "全螢幕"
+  },
+  "screenshot": {
+    "message": "截圖"
+  },
+  "loop": {
+    "message": "循環"
+  },
+  "mute": {
+    "message": "靜音"
+  },
+  "volume": {
+    "message": "音 量"
+  },
+  "functionEntry": {
+    "message": "功能入口"
+  },
+  "downloader": {
+    "message": "下載器"
+  },
+  "parser": {
+    "message": "解析"
+  },
+  "m3u8Parser": {
+    "message": "M3U8解析器"
+  },
+  "mpdParser": {
+    "message": "MPD解析器"
+  },
+  "jsonFormatter": {
+    "message": "JSON格式化"
+  },
+  "expandAll": {
+    "message": "展開全部"
+  },
+  "expandPlayable": {
+    "message": "展開可播放"
+  },
+  "expandSelected": {
+    "message": "展開所選"
+  },
+  "collapseAll": {
+    "message": "關閉展開"
+  },
+  "videoRecording": {
+    "message": "錄影"
+  },
+  "closeRecording": {
+    "message": "關閉錄製"
+  },
+  "recordWebRTC": {
+    "message": "錄製webRTC"
+  },
+  "screenCapture": {
+    "message": "螢幕捕捉"
+  },
+  "simulateMobile": {
+    "message": "模擬手機"
+  },
+  "autoDownload": {
+    "message": "自動下載"
+  },
+  "onlineMerge": {
+    "message": "線上合併"
+  },
+  "download": {
+    "message": "下載"
+  },
+  "copy": {
+    "message": "複製"
+  },
+  "selectAll": {
+    "message": "全選"
+  },
+  "invertSelection": {
+    "message": "反選"
+  },
+  "filter": {
+    "message": "篩選"
+  },
+  "clear": {
+    "message": "清空"
+  },
+  "deepSearch": {
+    "message": "深度搜尋"
+  },
+  "closeSearch": {
+    "message": "關閉搜尋"
+  },
+  "cacheCapture": {
+    "message": "快取捕捉"
+  },
+  "closeCapture": {
+    "message": "關閉捕捉"
+  },
+  "moreFeatures": {
+    "message": "更多功能"
+  },
+  "pause": {
+    "message": "暫停"
+  },
+  "settings": {
+    "message": "設定"
+  },
+  "closeSimulation": {
+    "message": "關閉模擬"
+  },
+  "closeDownload": {
+    "message": "關閉下載"
+  },
+  "enable": {
+    "message": "啟用"
+  },
+  "disable": {
+    "message": "禁用"
+  },
+  "noData": {
+    "message": "還沒聞到味兒~"
+  },
+  "regularFilterPlaceholder": {
+    "message": "正規篩選 匹配資源url 回車確認"
+  },
+  "option": {
+    "message": "選項"
+  },
+  "titleOption": {
+    "message": "貓抓 設定"
+  },
+  "titleDownload": {
+    "message": "貓抓 下載器"
+  },
+  "titleM3U8": {
+    "message": "貓抓 M3U8解析器"
+  },
+  "titleJson": {
+    "message": "貓抓 json格式化"
+  },
+  "titledash": {
+    "message": "貓抓 dash解析器"
+  },
+  "suffix": {
+    "message": "後綴"
+  },
+  "suffixTip": {
+    "message": "填入不含'.'的字尾, 不過濾大小填0"
+  },
+  "extensionName": {
+    "message": "副檔名"
+  },
+  "filterSize": {
+    "message": "過濾大小"
+  },
+  "delete": {
+    "message": "刪除"
+  },
+  "addSuffix": {
+    "message": "新增後綴"
+  },
+  "extension": {
+    "message": "擴充"
+  },
+  "resetSuffixSettings": {
+    "message": "重設後綴設定"
+  },
+  "disableAll": {
+    "message": "全部停用"
+  },
+  "enableAll": {
+    "message": "全部啟用"
+  },
+  "type": {
+    "message": "類型"
+  },
+  "addType": {
+    "message": "新增類型"
+  },
+  "resetTypeSettings": {
+    "message": "重設類型設定"
+  },
+  "typeTip": {
+    "message": "填入正確的content-type型別, 不過濾大小填0"
+  },
+  "addTypeError": {
+    "message": "抓取類型格式錯誤，請檢查"
+  },
+  "regexMatch": {
+    "message": "正規符合"
+  },
+  "blockResource": {
+    "message": "屏蔽資源"
+  },
+  "alert": {
+    "message": "提示"
+  },
+  "regexExpression": {
+    "message": "正規表示式"
+  },
+  "addRegex": {
+    "message": "新增正規則"
+  },
+  "resetRegexSettings": {
+    "message": "重置正規設定"
+  },
+  "regexTest": {
+    "message": "正規測試"
+  },
+  "regex": {
+    "message": "正規"
+  },
+  "flag": {
+    "message": "識別字"
+  },
+  "result": {
+    "message": "結果"
+  },
+  "match": {
+    "message": "匹配"
+  },
+  "noMatch": {
+    "message": "不匹配"
+  },
+  "blockResourceTip": {
+    "message": "封鎖不想出現的資源"
+  },
+  "flagTip": {
+    "message": "i: 忽略大小寫, g: 全域搜尋。也可為空。"
+  },
+  "regexSuffixTip": {
+    "message": "為取得到的URL指定一個後綴名, 可留空，會自動截取後綴名(很多檔案並不存在後綴名)"
+  },
+  "regexTip": {
+    "message": "正規表示式佔用資源較高, 非必要謹慎使用"
+  },
+  "copyTip": {
+    "message": "為方便使用第三方應用，自訂複製按鈕寫入剪貼簿的內容。"
+  },
+  "replaceKeywordList": {
+    "message": "替換關鍵字清單"
+  },
+  "otherFiles": {
+    "message": "其他文件"
+  },
+  "resetCopySettings": {
+    "message": "重設複製設定"
+  },
+  "autoSetRefererCookieParams": {
+    "message": "自動設定Referer cookie參數"
+  },
+  "secretKey": {
+    "message": "金鑰"
+  },
+  "address": {
+    "message": "地址"
+  },
+  "documentation": {
+    "message": "文檔"
+  },
+  "aria2Tip": {
+    "message": "非常優秀的下載工具 使用方法檢視"
+  },
+  "m3u8DLTips": {
+    "message": "非常優秀的m3u8 mpd第三方下載工具 使用方法查看"
+  },
+  "invoke": {
+    "message": "呼叫"
+  },
+  "parameter": {
+    "message": "參數"
+  },
+  "parameterSetting": {
+    "message": "參數設定"
+  },
+  "resetParameterSetting": {
+    "message": "重設參數設定"
+  },
+  "test": {
+    "message": "測試"
+  },
+  "replaceTags": {
+    "message": "替換標籤"
+  },
+  "customSaveFileName": {
+    "message": "自訂儲存檔案名稱"
+  },
+  "resetTagSettings": {
+    "message": "重設標籤設定"
+  },
+  "userAgentTip": {
+    "message": "留空預設為目前瀏覽器 User Agent"
+  },
+  "alwaysDisableCatCatcher": {
+    "message": "永遠不啟用貓抓下載器"
+  },
+  "autoClosePageAfterDownload": {
+    "message": "下載完自動關閉頁面"
+  },
+  "openDownloaderPageInBackground": {
+    "message": "後台開啟下載器頁面"
+  },
+  "downloaderTip": {
+    "message": "如果偵測到資源下載失敗, 自動啟用下載器再次嘗試下載."
+  },
+  "autoDownM3u8Tip": {
+    "message": "擴充頁點擊 下載按鈕 立即開始合併下載"
+  },
+  "otherSettings": {
+    "message": "其他設定"
+  },
+  "resetOtherSettings": {
+    "message": "重設其他設定"
+  },
+  "previewMode": {
+    "message": "使用本機播放器呼叫協定開啟影片預覽"
+  },
+  "previewModePlaceholder": {
+    "message": "留空為不啟用 預設使用popup頁面預覽影片"
+  },
+  "preview": {
+    "message": "影片"
+  },
+  "customFilenameOption": {
+    "message": "使用自訂檔案名稱儲存檔案(預設為網頁標題)"
+  },
+  "saveAsOption": {
+    "message": "下載時選擇儲存目錄"
+  },
+  "iconOption": {
+    "message": "顯示網站圖示"
+  },
+  "clearOption": {
+    "message": "刷新、跳到新頁面 清空目前標籤抓取的資料"
+  },
+  "doNotClear": {
+    "message": "不清空"
+  },
+  "normalClear": {
+    "message": "正常清理"
+  },
+  "moreFrequent": {
+    "message": "更頻繁"
+  },
+  "excludeDuplicateResources": {
+    "message": "排除重複的資源 (資源過多會佔用大量CPU)"
+  },
+  "customCSS": {
+    "message": "自訂CSS"
+  },
+  "operation": {
+    "message": "操作"
+  },
+  "exportSettings": {
+    "message": "匯出設定"
+  },
+  "importConfiguration": {
+    "message": "導入配置"
+  },
+  "clearCapturedData": {
+    "message": "清空抓取的資料"
+  },
+  "resetAllSettings": {
+    "message": "重置所有設定"
+  },
+  "restartExtension": {
+    "message": "重啟擴充"
+  },
+  "about": {
+    "message": "關於"
+  },
+  "confirmReset": {
+    "message": "確認重設嗎？"
+  },
+  "invokeProtocolTemplate": {
+    "message": "呼叫協定範本"
+  },
+  "customVLCProtocol": {
+    "message": "自訂VLC協定"
+  },
+  "systemShare": {
+    "message": "系統分享"
+  },
+  "default": {
+    "message": "預設"
+  },
+  "goBack": {
+    "message": "返回上一頁"
+  },
+  "openDir": {
+    "message": "開啟下載目錄"
+  },
+  "downloadDir": {
+    "message": "打載目錄"
+  },
+  "sendFfmpeg": {
+    "message": "發送到線上ffmpeg"
+  },
+  "autoCloserDownload": {
+    "message": "下載完自動關閉頁面"
+  },
+  "openInBgDownload": {
+    "message": "後台開啟下載器頁面"
+  },
+  "m3u8Placeholder": {
+    "message": "輸入m3u8內容 或 ts碎片列表."
+  },
+  "m3u8Url": {
+    "message": "m3u8位址"
+  },
+  "nextLevel": {
+    "message": "下一級檔案"
+  },
+  "nextLevelTip": {
+    "message": "該m3u8檔中嵌套多個m3u8檔"
+  },
+  "multipleAudios": {
+    "message": "多個音訊"
+  },
+  "multipleAudiosTip": {
+    "message": "該m3u8檔中嵌套多個音訊"
+  },
+  "multipleSubtitles": {
+    "message": "多個字幕"
+  },
+  "multipleSubtitlesTip": {
+    "message": "該m3u8檔中嵌套多個字幕"
+  },
+  "possibleKey": {
+    "message": "尋找到疑似金鑰"
+  },
+  "loading": {
+    "message": "載入中..."
+  },
+  "waitDownload": {
+    "message": "等待下載..."
+  },
+  "downloadSegmentList": {
+    "message": "下載切片清單"
+  },
+  "originalM3u8": {
+    "message": "原始m3u8"
+  },
+  "localM3u8": {
+    "message": "本地m3u8"
+  },
+  "segmentList": {
+    "message": "切片清單"
+  },
+  "downloadProgress": {
+    "message": "下載進度"
+  },
+  "getParameters": {
+    "message": "get參數"
+  },
+  "restoreGetParameters": {
+    "message": "還原get參數"
+  },
+  "requestHeaders": {
+    "message": "請求頭"
+  },
+  "setRequestHeaders": {
+    "message": "設定請求頭"
+  },
+  "invokeM3u8DL": {
+    "message": "呼叫m3u8DL"
+  },
+  "copyCommand": {
+    "message": "複製指令"
+  },
+  "previewCommand": {
+    "message": "預覽指令"
+  },
+  "addSettingParameters": {
+    "message": "加入設定參數"
+  },
+  "customKeyPlaceholder": {
+    "message": "自訂 金鑰 16進位 或 base64 或 金鑰位址"
+  },
+  "uploadKey": {
+    "message": "上傳金鑰"
+  },
+  "downloadThreads": {
+    "message": "下載執行緒"
+  },
+  "ffmpegTranscoding": {
+    "message": "ffmpeg 轉碼"
+  },
+  "mp4Format": {
+    "message": "mp4格式"
+  },
+  "downloadWhileSaving": {
+    "message": "邊下邊存"
+  },
+  "audioOnly": {
+    "message": "只要音訊"
+  },
+  "saveAs": {
+    "message": "另存為"
+  },
+  "skipDecryption": {
+    "message": "跳過解密"
+  },
+  "newDownloader": {
+    "message": "新下載器"
+  },
+  "downloadRange": {
+    "message": "下載範圍"
+  },
+  "recordLive": {
+    "message": "錄音直播"
+  },
+  "mergeDownloads": {
+    "message": "合併下載"
+  },
+  "redownloadFailedItems": {
+    "message": "重下失敗項目"
+  },
+  "downloadExistingData": {
+    "message": "下載已有資料"
+  },
+  "stopDownload": {
+    "message": "停止下載"
+  },
+  "start": {
+    "message": "開始"
+  },
+  "end": {
+    "message": "結束"
+  },
+  "resolution": {
+    "message": "解析度"
+  },
+  "duration": {
+    "message": "長度"
+  },
+  "bitrate": {
+    "message": "碼率"
+  },
+  "ADTSerror": {
+    "message": "找不到ADTS頭 可能是AES-128-ECB加密資源,暫不支援解密.請使用第三方合併軟體..."
+  },
+  "m3u8Error": {
+    "message": "解析或播放m3u8檔案中有錯誤, 詳細錯誤訊息檢視控制台"
+  },
+  "noAudio": {
+    "message": "無音訊"
+  },
+  "noVideo": {
+    "message": "無視訊"
+  },
+  "hevcTip": {
+    "message": "HEVC/H.265編碼ts檔案 只支援線上ffmpeg轉碼"
+  },
+  "hevcPreviewTip": {
+    "message": "HEVC/H.265編碼ts檔案 不支援預覽"
+  },
+  "m3u8Info": {
+    "message": "共 $num$ 個檔案, 總長度 $time$",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      },
+      "time": {
+        "content": "$2"
+      }
+    }
+  },
+  "encryptedHLS": {
+    "message": "加密HLS"
+  },
+  "encryptedSAMPLE": {
+    "message": "使用SAMPLE-AES-CTR加密的資源, 目前無法處理."
+  },
+  "liveHLS": {
+    "message": "直播HLS"
+  },
+  "keyAddress": {
+    "message": "金鑰位址"
+  },
+  "key": {
+    "message": "金鑰"
+  },
+  "encryptionAlgorithm": {
+    "message": "加密演算法"
+  },
+  "keyDownloadFailed": {
+    "message": "金鑰下載失敗"
+  },
+  "savePrompt": {
+    "message": "已儲存至硬碟, 請檢視瀏覽器已下載內容"
+  },
+  "close": {
+    "message": "關閉"
+  },
+  "blobM3u8DLError": {
+    "message": "blob位址無法呼叫m3u8DL下載"
+  },
+  "M3U8DLparameterLong": {
+    "message": "m3u8dl參數太長,可能導致無法喚醒m3u8DL, 請手動複製到m3u8DL下載"
+  },
+  "runningCannotChangeSettings": {
+    "message": "正在運作, 不能更改設定"
+  },
+  "streamSaverTip": {
+    "message": "邊下邊存功能 不支援ffmpeg線上轉換格式 不支援錯誤切片重下 不支援另存為"
+  },
+  "stopRecording": {
+    "message": "停止錄製"
+  },
+  "waitingForLiveData": {
+    "message": "等待直播資料"
+  },
+  "sNumError": {
+    "message": "序號錯誤"
+  },
+  "startGTend": {
+    "message": "開始序號不能大於結束序號"
+  },
+  "sNumMax": {
+    "message": "序號最大不能超過 $num$",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      }
+    }
+  },
+  "incorrectKey": {
+    "message": "金鑰不正確"
+  },
+  "addParameters": {
+    "message": "新增參數"
+  },
+  "decryptionError": {
+    "message": "解密錯誤"
+  },
+  "downloadFailed": {
+    "message": "下載失敗"
+  },
+  "retryDownload": {
+    "message": "重新下載"
+  },
+  "recordingDuration": {
+    "message": "錄製時間"
+  },
+  "downloaded": {
+    "message": "已下載"
+  },
+  "downloadedVideoLength": {
+    "message": "已下載影片長度"
+  },
+  "downloadComplete": {
+    "message": "下載完成"
+  },
+  "retryingDownload": {
+    "message": "正在重新下載"
+  },
+  "merging": {
+    "message": "合併中"
+  },
+  "fileTooLarge": {
+    "message": "檔案大於$size$ 無法使用線上ffmpeg, 正在下載合併檔案, 檔案較大請耐心等待",
+    "placeholders": {
+      "size": {
+        "content": "$1"
+      }
+    }
+  },
+  "formatConversionError": {
+    "message": "格式轉換錯誤, 請取消mp4轉換, 重新下載."
+  },
+  "streamOnbeforeunload": {
+    "message": "正在推流, 關閉後停止下載..."
+  },
+  "fileLoading": {
+    "message": "檔案載入"
+  },
+  "expandAllNodes": {
+    "message": "展開所有節點"
+  },
+  "collapseAllNodes": {
+    "message": "折疊所有節點"
+  },
+  "fileRetrievalFailed": {
+    "message": "文件取得失敗"
+  },
+  "selectVideo": {
+    "message": "選擇影片"
+  },
+  "extractSlices": {
+    "message": "提取切片"
+  },
+  "convertToM3U8": {
+    "message": "轉為m3u8解析"
+  },
+  "selectAudio": {
+    "message": "選擇音訊"
+  },
+  "audio": {
+    "message": "音訊"
+  },
+  "video": {
+    "message": "影片"
+  },
+  "DRMerror": {
+    "message": "媒體有DRM保護, 請使用第三方工具下載."
+  },
+  "regexTitle": {
+    "message": "正規表示式匹配 或 來自深度搜尋"
+  },
+  "downloadWithRequestHeader": {
+    "message": "攜帶請求頭參數下載"
+  },
+  "m3u8Playlist": {
+    "message": "m3u8播放清單"
+  },
+  "copiedToClipboard": {
+    "message": "已複製到剪貼簿"
+  },
+  "hasSent": {
+    "message": "已發送"
+  },
+  "sendFailed": {
+    "message": "發送失敗"
+  },
+  "confirmDownload": {
+    "message": "共 $num$ 個文件，是否確認下載?",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmLoading": {
+    "message": "共 $num$ 個資源，是否取消載入?",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      }
+    }
+  },
+  "waitingForMedia": {
+    "message": "等待接收媒體檔案...請勿關閉本頁..."
+  },
+  "exit": {
+    "message": "退出"
+  },
+  "unknownSize": {
+    "message": "未知大小"
+  },
+  "saving": {
+    "message": "正在儲存"
+  },
+  "saveFailed": {
+    "message": "儲存失敗"
+  }
+}
