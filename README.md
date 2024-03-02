@@ -16,6 +16,9 @@ https://addons.mozilla.org/addon/cat-catch/ 😂需非国区IP访问
 # 📒用户文档
 https://o2bmm.gitbook.io/cat-catch/
 
+# 🌏翻译
+[![gitlocalized ](https://gitlocalize.com/repo/9392/whole_project/badge.svg)](https://gitlocalize.com/repo/9392?utm_source=badge)
+
 # 📘Chrome/Edge等Chromium内核浏览器 源码加载方法
 1. https://github.com/xifangczy/cat-catch/releases 下载 Source code 并解压。
 2. 扩展管理页面 打开 "开发者模式"。

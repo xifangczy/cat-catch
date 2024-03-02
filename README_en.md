@@ -13,8 +13,11 @@ https://addons.mozilla.org/addon/cat-catch/ 😂Non-China IP required for access
 
 💔Cat-Catch is open source, anyone can download, modify, and list it in the app store. There are already quite a few fake Cat-Catch extensions listed with added ad codes, please pay attention to your data security. All installation URLs are subject to github and user documentation.
 
-# Documentation
+# 📒Documentation
 https://o2bmm.gitbook.io/cat-catch/
+
+# 🌏Translations
+[![gitlocalized ](https://gitlocalize.com/repo/9392/whole_project/badge.svg)](https://gitlocalize.com/repo/9392?utm_source=badge)
 
 # 📘Source code loading method for Chrome/Edge and other Chromium core browsers
 1. Download the Source code from https://github.com/xifangczy/cat-catch/releases and unzip it.
