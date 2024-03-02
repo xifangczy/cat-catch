@@ -368,7 +368,7 @@ function parseTs(data) {
 
     // #EXT-X-DISCONTINUITY
     let discontinuity = {start:0, cc:0 };
-    data.endCC != 0 && $("#cc").show();
+    data.endCC && $("#cc").show();
     for (let i in data.fragments) {
         /*
         * 少部分网站下载ts必须带有参数才能正常下载
@@ -718,7 +718,7 @@ $("#rangeStart, #rangeEnd, #thread").on("wheel", function (event) {
     let number = $(this).val();
     number = parseInt(number ? number : 1);
     number = event.originalEvent.wheelDelta < 0 ? number - 1 : number + 1;
-    if (number < $(this).attr("min") || number > $(this).attr("max")) {
+    if (number < 1 || number > $(this).attr("max")) {
         return false;
     }
     $(this).val(number);
