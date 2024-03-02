@@ -23,7 +23,7 @@
     <section id="m3u8Custom" class="hide">
       <h1 class="optionsTitle" data-i18n="titleM3U8"></h1>
       <div class="optionBox">
-        <textarea rows="50" cols="160" id="m3u8Text" spellcheck="false" data-type="link"
+        <textarea id="m3u8Text" spellcheck="false" data-type="link"
           data-i18n-placeholder="m3u8Placeholder" class="width100"></textarea>
         <input type="text" id="baseUrl" placeholder="BaseURL" class="fullInput" />
         <div class="line"></div>
@@ -75,7 +75,7 @@
           <div id="info"></div>
         </div>
         <div class="block" id="textarea">
-          <textarea rows="30" cols="169" id="media_file" spellcheck="false" data-type="link" class="width100"
+          <textarea id="media_file" spellcheck="false" data-type="link" class="width100"
             data-i18n="loading"></textarea>
           <div id="downList" data-i18n="waitDownload"></div>
           <video id="video" class="hide" controls></video>
@@ -141,13 +141,13 @@
             </label>
             <div class="rangeDown textColor">
               <p data-i18n-outer="downloadRange"></p>
+              <select id="cc" class="hide">
+                <option disabled selected hidden>playlist</option>
+              </select>
               <div class="merge">
                 <input type="text" id="rangeStart" spellcheck="false" data-i18n-placeholder="start" />
                 <input type="text" id="rangeEnd" spellcheck="false" data-i18n-placeholder="end" />
               </div>
-              <select id="cc" class="hide">
-                <option disabled selected hidden>playlist</option>
-              </select>
             </div>
             <button id="recorder" class="button2 hide" data-switch="on" data-switch="on"
               data-i18n="recordLive"></button>

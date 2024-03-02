@@ -191,6 +191,9 @@ textarea {
 #media_file {
   word-break: break-all;
 }
+#media_file, #jsonText, #m3u8Text{
+  height: 55vh;
+}
 /* #media_file {
   font-size: 12px;
   font-family: "Microsoft YaHei", "Helvetica", "Arial", sans-serif;
