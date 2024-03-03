@@ -17,7 +17,7 @@ https://addons.mozilla.org/addon/cat-catch/ 😂Non-China IP required for access
 https://o2bmm.gitbook.io/cat-catch/
 
 # 🌏Translations
-[![gitlocalized ](https://gitlocalize.com/repo/9392/whole_project/badge.svg)](https://gitlocalize.com/repo/9392?utm_source=badge)
+[![gitlocalized ](https://gitlocalize.com/repo/9392/whole_project/badge.svg)](https://gitlocalize.com/repo/9392?utm_source=badge){target="_blank"}
 
 # 📘Source code loading method for Chrome/Edge and other Chromium core browsers
 1. Download the Source code from https://github.com/xifangczy/cat-catch/releases and unzip it.
