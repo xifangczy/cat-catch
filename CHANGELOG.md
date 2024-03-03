@@ -1,5 +1,15 @@
 ## 更新说明
 
+### 2.5.1
+
+[Added] 多语言 增加繁体中文
+
+[Fixed] 修复 深度搜索 死循环 bug
+
+[Fixed] 兼容低版本 chromium 缺少 API 导致扩展无法使用
+
+[Changed] popup 页面 现在能合并两个 m3u8 文件
+
 ### 2.5.0
 
 [Added] 多语言支持
