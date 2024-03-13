@@ -1,5 +1,5 @@
 // 低版本chrome manifest v3协议 会有 getMessage 函数不存在的bug
-if(chrome.i18n.getMessage === undefined){
+if (chrome.i18n.getMessage === undefined) {
     chrome.i18n.getMessage = (key) => key;
     fetch(chrome.runtime.getURL("_locales/zh/messages.json")).then(res => res.json()).then(data => {
         chrome.i18n.getMessage = (key) => data[key].messages;
@@ -100,6 +100,7 @@ G.OptionLists = {
     enableAria2RpcReferer: true,
     aria2RpcToken: "",
     m3u8AutoDown: false,
+    badgeNumber: true,
 };
 // 本地储存的配置
 G.LocalVar = {

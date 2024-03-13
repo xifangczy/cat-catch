@@ -803,5 +803,8 @@
   },
   "saveFailed": {
     "message": "保存失败"
+  },
+  "badgeNumber": {
+    "message": "图标上显示数字角标"
   }
 }

@@ -803,5 +803,8 @@
   },
   "saveFailed": {
     "message": "Save failed"
+  },
+  "badgeNumber": {
+    "message": "Show icon badge prompt"
   }
 }

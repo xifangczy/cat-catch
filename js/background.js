@@ -214,6 +214,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
             }
             if (chrome.runtime.lastError) { return; }
         });
+
         // 储存数据
         cacheData[info.tabId] ??= [];
         cacheData[info.tabId].push(info);
@@ -623,7 +624,7 @@ function SetIcon(obj) {
     if (obj.number == 0 || obj.number == undefined) {
         chrome.action.setBadgeText({ text: "", tabId: obj.tabId }, function () { if (chrome.runtime.lastError) { return; } });
         // chrome.action.setTitle({ title: "还没闻到味儿~", tabId: obj.tabId }, function () { if (chrome.runtime.lastError) { return; } });
-    } else {
+    } else if (G.badgeNumber) {
         obj.number = obj.number > 99 ? "99+" : obj.number.toString();
         chrome.action.setBadgeText({ text: obj.number, tabId: obj.tabId }, function () { if (chrome.runtime.lastError) { return; } });
         // chrome.action.setTitle({ title: "抓到 " + obj.number + " 条鱼", tabId: obj.tabId }, function () { if (chrome.runtime.lastError) { return; } });
