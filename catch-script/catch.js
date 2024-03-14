@@ -165,53 +165,90 @@
     let bufferList = {};
     let mediaSize = 0;
     let index = 0;
+
+    // const _AddSourceBuffer = window.MediaSource.prototype.addSourceBuffer;
+    // window.MediaSource.prototype.addSourceBuffer = function (mimeType) {
+    //     // 标题获取
+    //     setTimeout(() => { getFileName(); }, 2000);
+    //     tips.innerHTML = i18n("capturingData", "捕获数据中...");
+    //     const sourceBuffer = _AddSourceBuffer.call(this, mimeType);
+    //     const _appendBuffer = sourceBuffer.appendBuffer;
+    //     const type = mimeType.split("/").shift() + (++index);
+    //     bufferList[type] = [];
+    //     catchMedia.push({ mimeType, bufferList: bufferList[type] });
+    //     sourceBuffer.appendBuffer = function (data) {
+    //         if (enable) {
+    //             mediaSize += data.byteLength;
+    //             tips.innerHTML = i18n("capturingData", "捕获数据中...") + ": " + byteToSize(mediaSize);
+    //             bufferList[type].push(data);
+    //         }
+    //         _appendBuffer.call(this, data);
+    //     }
+    //     return sourceBuffer;
+    // }
+    // window.MediaSource.prototype.addSourceBuffer.toString = function () {
+    //     return _AddSourceBuffer.toString();
+    // }
+
     const _AddSourceBuffer = window.MediaSource.prototype.addSourceBuffer;
-    window.MediaSource.prototype.addSourceBuffer = function (mimeType) {
-        // 标题获取
-        setTimeout(() => { getFileName(); }, 2000);
-        tips.innerHTML = i18n("capturingData", "捕获数据中...");
-        const sourceBuffer = _AddSourceBuffer.call(this, mimeType);
-        const _appendBuffer = sourceBuffer.appendBuffer;
-        const type = mimeType.split("/").shift() + (++index);
-        bufferList[type] = [];
-        catchMedia.push({ mimeType, bufferList: bufferList[type] });
-        sourceBuffer.appendBuffer = function (data) {
-            if (enable) {
-                mediaSize += data.byteLength;
-                tips.innerHTML = i18n("capturingData", "捕获数据中...") + ": " + byteToSize(mediaSize);
-                bufferList[type].push(data);
-            }
-            _appendBuffer.call(this, data);
+    window.MediaSource.prototype.addSourceBuffer = new Proxy(_AddSourceBuffer, {
+        apply: function (target, thisArg, argumentsList) {
+            const result = Reflect.apply(target, thisArg, argumentsList);
+            // 标题获取
+            setTimeout(() => { getFileName(); }, 2000);
+            tips.innerHTML = i18n("capturingData", "捕获数据中...");
+            const type = argumentsList[0].split("/").shift() + (++index);
+            bufferList[type] = [];
+            catchMedia.push({ mimeType: argumentsList[0], bufferList: bufferList[type] });
+            result.appendBuffer = new Proxy(result.appendBuffer, {
+                apply: function (target, thisArg, argumentsList) {
+                    Reflect.apply(target, thisArg, argumentsList);
+                    if (enable) {
+                        mediaSize += argumentsList[0].byteLength;
+                        tips.innerHTML = i18n("capturingData", "捕获数据中...") + ": " + byteToSize(mediaSize);
+                        bufferList[type].push(argumentsList[0]);
+                    }
+                }
+            });
+            return result;
         }
-        return sourceBuffer;
-    }
-    window.MediaSource.prototype.addSourceBuffer.toString = function () {
-        return _AddSourceBuffer.toString();
-    }
+    });
+
+    // const _endOfStream = window.MediaSource.prototype.endOfStream;
+    // window.MediaSource.prototype.endOfStream = function () {
+    //     if (enable) {
+    //         isComplete = true;
+    //         tips.innerHTML = i18n("captureCompleted", "捕获完成");
+    //         localStorage.getItem("CatCatchCatch_autoDown") == "checked" && catchDownload();
+    //     }
+    //     _endOfStream.call(this);
+    // }
+    // window.MediaSource.prototype.endOfStream.toString = function () {
+    //     return _endOfStream.toString();
+    // }
 
     const _endOfStream = window.MediaSource.prototype.endOfStream;
-    window.MediaSource.prototype.endOfStream = function () {
-        if (enable) {
-            isComplete = true;
-            tips.innerHTML = i18n("captureCompleted", "捕获完成");
-            localStorage.getItem("CatCatchCatch_autoDown") == "checked" && catchDownload();
+    window.MediaSource.prototype.endOfStream = new Proxy(_endOfStream, {
+        apply: function (target, thisArg, argumentsList) {
+            Reflect.apply(target, thisArg, argumentsList);
+            if (enable) {
+                isComplete = true;
+                tips.innerHTML = i18n("captureCompleted", "捕获完成");
+                localStorage.getItem("CatCatchCatch_autoDown") == "checked" && catchDownload();
+            }
         }
-        _endOfStream.call(this);
-    }
-    window.MediaSource.prototype.endOfStream.toString = function () {
-        return _endOfStream.toString();
-    }
+    });
 
-    const _toString = Function.prototype.toString;
-    Function.prototype.toString = function () {
-        if (this === window.MediaSource.prototype.addSourceBuffer) {
-            return _toString.call(_AddSourceBuffer);
-        }
-        if (this === window.MediaSource.prototype.endOfStream) {
-            return _toString.call(_endOfStream);
-        }
-        return _toString.call(this);
-    };
+    // const _toString = Function.prototype.toString;
+    // Function.prototype.toString = function () {
+    //     if (this === window.MediaSource.prototype.addSourceBuffer) {
+    //         return _toString.call(_AddSourceBuffer);
+    //     }
+    //     if (this === window.MediaSource.prototype.endOfStream) {
+    //         return _toString.call(_endOfStream);
+    //     }
+    //     return _toString.call(this);
+    // };
 
     // 下载资源
     function catchDownload() {
