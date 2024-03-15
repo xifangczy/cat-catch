@@ -147,5 +147,9 @@ window.CatCatchI18n = {
     dragWindow: {
         en: "Drag window",
         zh: "拖动窗口"
+    },
+    autoToBuffered: {
+        en: "Automatically jump to buffer",
+        zh: "自动跳转到缓冲尾"
     }
 };
