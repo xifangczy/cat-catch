@@ -132,6 +132,7 @@ input.regex {
   cursor: pointer;
 }
 button,
+.button,
 .button2 {
   padding: calc(0.5em - 1px) 1em;
   margin: 5px 5px 5px 5px;
@@ -184,14 +185,16 @@ textarea {
 #textarea {
   text-align: center;
 }
-#textarea video {
+.m3u8_wrapper video {
   max-height: 80vh;
   max-width: 100%;
 }
 #media_file {
   word-break: break-all;
 }
-#media_file, #jsonText, #m3u8Text{
+#media_file,
+#jsonText,
+#m3u8Text {
   height: 55vh;
 }
 /* #media_file {
@@ -291,9 +294,9 @@ textarea {
 .customKey input {
   margin-right: 5px;
 }
-.wrapper .button {
+/* .wrapper .button {
   margin-top: 5px;
-}
+} */
 .rangeDown {
   display: flex;
   flex-direction: column;

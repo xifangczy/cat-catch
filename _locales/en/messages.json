@@ -806,5 +806,8 @@
   },
   "badgeNumber": {
     "message": "Show icon badge prompt"
+  },
+  "viewSlices": {
+    "message": "View all slices and download progress"
   }
 }

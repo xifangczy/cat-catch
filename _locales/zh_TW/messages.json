@@ -806,5 +806,8 @@
   },
   "badgeNumber": {
     "message": "圖示上顯示數字角標"
+  },
+  "viewSlices": {
+    "message": "查看所有切片和下載進度"
   }
 }

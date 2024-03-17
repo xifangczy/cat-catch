@@ -55,21 +55,25 @@ a:visited {
   color: var(--link-color);
 }
 button,
+.button,
 .button2 {
   border-radius: 4px;
   cursor: pointer;
   margin: 0 0 3px 0;
   user-select: none;
 }
-button {
+button,
+.button {
   background: var(--button-color);
   border: var(--button-border);
   color: var(--button-text-color);
 }
-button:hover {
+button:hover,
+.button:hover {
   background: var(--button-hover-color);
 }
-button:active {
+button:active,
+.button:active {
   background: var(--button-active-color);
 }
 .button2 {

@@ -806,5 +806,8 @@
   },
   "badgeNumber": {
     "message": "图标上显示数字角标"
+  },
+  "viewSlices": {
+    "message": "查看所有切片和下载进度"
   }
 }

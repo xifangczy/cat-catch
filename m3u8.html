@@ -23,8 +23,8 @@
     <section id="m3u8Custom" class="hide">
       <h1 class="optionsTitle" data-i18n="titleM3U8"></h1>
       <div class="optionBox">
-        <textarea id="m3u8Text" spellcheck="false" data-type="link"
-          data-i18n-placeholder="m3u8Placeholder" class="width100"></textarea>
+        <textarea id="m3u8Text" spellcheck="false" data-type="link" data-i18n-placeholder="m3u8Placeholder"
+          class="width100"></textarea>
         <input type="text" id="baseUrl" placeholder="BaseURL" class="fullInput" />
         <div class="line"></div>
         <input type="text" id="m3u8Url" placeholder="m3u8 URL" class="fullInput" />
@@ -75,19 +75,23 @@
           <div id="info"></div>
         </div>
         <div class="block" id="textarea">
-          <textarea id="media_file" spellcheck="false" data-type="link" class="width100"
-            data-i18n="loading"></textarea>
-          <div id="downList" data-i18n="waitDownload"></div>
-          <video id="video" class="hide" controls></video>
+          <details>
+            <summary data-i18n="viewSlices" class="button"></summary>
+            <textarea id="media_file" spellcheck="false" data-type="link" class="width100"
+              data-i18n="loading"></textarea>
+            <div id="downList" data-i18n="waitDownload"></div>
+            <div class="merge">
+              <button id="downText" data-i18n="downloadSegmentList"></button>
+              <button id="originalM3U8" data-i18n="originalM3u8"></button>
+              <button id="localFile" class="hide" data-i18n="localM3u8"></button>
+              <button id="downProgress" data-i18n="downloadProgress"></button>
+              <button id="getTs" data-i18n="segmentList"></button>
+            </div>
+          </details>
         </div>
-
+        <video id="video" class="hide" controls></video>
         <div class="block" id="button">
           <div class="merge">
-            <button id="downText" data-i18n="downloadSegmentList"></button>
-            <button id="originalM3U8" data-i18n="originalM3u8"></button>
-            <button id="localFile" class="hide" data-i18n="localM3u8"></button>
-            <button id="getTs" data-i18n="segmentList"></button>
-            <button id="downProgress" data-i18n="downloadProgress"></button>
             <button id="tsAddArg" data-i18n="getParameters"></button>
             <button id="setRequestHeaders" data-i18n="requestHeaders"></button>
             <button id="play" data-switch="on" data-i18n="play"></button>
