@@ -122,7 +122,7 @@
             video.addEventListener("progress", function (event) {
                 const bufferedEnd = video.buffered.end(0);
                 if ($autoToBuffered.checked && bufferedEnd < video.duration) {
-                    video.currentTime = bufferedEnd - 10;
+                    video.currentTime = bufferedEnd - 5;
                 }
             });
             video.addEventListener("ended", function (event) {
