@@ -287,7 +287,7 @@
                     return;
                 }
             });
-            if (instance.byteLength == 16) {
+            if (instance.byteLength == 16 && instance.buffer.byteLength == 16) {
                 postData({ action: "catCatchAddKey", key: instance.buffer, href: location.href, ext: "key" });
             }
             if (instance.byteLength == 256 || instance.byteLength == 128) {
@@ -313,13 +313,13 @@
     }
 
     // findTypedArray
-    const findTypedArray = (target, args) =>{
+    const findTypedArray = (target, args) => {
         const isArray = Array.isArray(args[0]) && args[0].length === 16;
         const isArrayBuffer = args[0] instanceof ArrayBuffer && args[0].byteLength === 16;
         const instance = new target(...args);
         if (isArray || isArrayBuffer) {
             postData({ action: "catCatchAddKey", key: args[0], href: location.href, ext: "key" });
-        }else if(instance.buffer.byteLength === 16){
+        } else if (instance.buffer.byteLength === 16) {
             postData({ action: "catCatchAddKey", key: instance.buffer, href: location.href, ext: "key" });
         }
         return instance;
@@ -443,6 +443,7 @@
     function postData(data) {
         let value = data.url ? data.url : data.key;
         if (value instanceof ArrayBuffer || value instanceof Array) {
+            if (value.byteLength == 0) { return; }
             data.key = ArrayToBase64(value);
             value = data.key;
         }
