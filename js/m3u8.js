@@ -38,6 +38,7 @@ const allOption = {
     StreamSaver: false,
     ffmpeg: true,
     addParam: false,
+    fold: false,
 };
 let _m3u8Content;   // 储存m3u8文件内容
 /* m3u8 解析工具 */
@@ -99,10 +100,15 @@ function init() {
     chrome.storage.local.get(allOption, function (items) {
         for (let key in items) {
             allOption[key] = items[key];
+            if (key == "fold") {
+                items[key] ? $("details").attr("open", "") : $("details").removeAttr("open");
+                continue;
+            }
+            const $dom = $(`#${key}`);
             if (typeof items[key] == "boolean") {
-                $(`#${key}`).prop("checked", items[key]);
+                $dom.length && $dom.prop("checked", items[key]);
             } else {
-                $(`#${key}`).val(items[key]);
+                $dom.length && $dom.val(items[key]);
             }
         }
     });
@@ -970,6 +976,12 @@ $('#cc').change(function () {
     const range = this.value.split("-");
     $("#rangeStart").val(+range[0]);
     $("#rangeEnd").val(+range[1]);
+});
+
+// 折叠
+$("details summary").click(function () {
+    allOption.fold = !$("details")[0].open;
+    chrome.storage.local.set(allOption);
 });
 
 /**************************** 下载TS文件 ****************************/
