@@ -115,8 +115,12 @@
 
 
     // 自动跳转到缓冲节点
+    let autoToBufferedFlag = true;
     const $autoToBuffered = CatCatch.querySelector("#autoToBuffered");
-    document.addEventListener("DOMContentLoaded", () => {
+    $autoToBuffered.addEventListener('click', function (event) {
+        if (!autoToBufferedFlag) { return; }
+        autoToBufferedFlag = false;
+
         const videos = document.querySelectorAll("video");
         for (let video of videos) {
             video.addEventListener("progress", function (event) {
