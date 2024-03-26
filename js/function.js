@@ -186,6 +186,7 @@ function templates(text, data) {
         // 资源信息
         url: data.url ?? "",
         referer: data.requestHeaders?.referer ?? "",
+        origin: data.requestHeaders?.origin ?? "",
         initiator: data.requestHeaders?.referer ? data.requestHeaders.referer : data.initiator,
         webUrl: data.webUrl ?? "",
         title: data._title ?? data.title,
