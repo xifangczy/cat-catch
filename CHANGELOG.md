@@ -394,7 +394,7 @@
 
 [Added] popup 页面和 m3u8 页面可以在线预览 m3u8
 
-[Added] json 查看工具，和 m3u8 解析器一样在 popoup 页面显示图标进入
+[Added] json 查看工具，和 m3u8 解析器一样在 popup 页面显示图标进入
 
 [Fixed] 无数 BUG
 
