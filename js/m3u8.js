@@ -38,7 +38,7 @@ const allOption = {
     StreamSaver: false,
     ffmpeg: true,
     addParam: false,
-    fold: false,
+    fold: true,
 };
 let _m3u8Content;   // 储存m3u8文件内容
 /* m3u8 解析工具 */

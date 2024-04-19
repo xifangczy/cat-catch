@@ -191,7 +191,7 @@ function templates(text, data) {
         webUrl: data.webUrl ?? "",
         title: data._title ?? data.title,
         pageDOM: data.pageDOM,
-        cookie: data.cookie,
+        cookie: data.cookie ?? "",
 
         // 时间相关
         year: date.getFullYear(),
