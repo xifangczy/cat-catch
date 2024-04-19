@@ -265,7 +265,7 @@ function AddMedia(data, currentTab = true) {
         }
         chrome.downloads.download({
             url: data.url,
-            filename: data.downFileName,
+            filename: stringModify(data.downFileName),
             saveAs: G.saveAs
         }, function (id) { downData[id] = data; });
         return false;
@@ -382,7 +382,7 @@ $('#DownFile').click(function () {
         setTimeout(function () {
             chrome.downloads.download({
                 url: data.url,
-                filename: data.downFileName
+                filename: stringModify(data.downFileName)
             }, function (id) { downData[id] = data; });
         }, 233);
     });
