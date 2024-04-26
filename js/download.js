@@ -60,6 +60,7 @@ function startDownload(tabId) {
     }, 500);
     $.ajax({
         url: _url,
+        cache: false,
         xhrFields: { responseType: "blob" },
         xhr: function () {
             let xhr = new XMLHttpRequest();
@@ -75,6 +76,21 @@ function startDownload(tabId) {
                     $progress.css("width", "100%");
                 }
             });
+
+            // 某些网站需要传输 range
+            let getStatusTimer = setInterval(() => {
+                if (xhr.readyState < 3) { return; }
+                clearInterval(getStatusTimer);
+                if (xhr.status != 200 && !requestHeaders.range) {
+                    requestHeaders.range = "bytes=0-";
+                    params.delete("requestHeaders");
+                    params.append("requestHeaders", JSON.stringify(requestHeaders));
+                    const href = window.location.origin + window.location.pathname + "?" + params.toString();
+                    chrome.tabs.create({ url: href });
+                    window.close();
+                }
+            }, 100);
+
             return xhr;
         }
     }).fail(function (result) {
