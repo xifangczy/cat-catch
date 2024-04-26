@@ -164,6 +164,9 @@ function InitOptions() {
     });
     // 读取sync配置数据 交给全局变量G
     chrome.storage.sync.get(G.OptionLists, function (items) {
+        if (chrome.runtime.lastError) {
+            items = G.OptionLists;
+        }
         // Ext的Array转为Map类型
         items.Ext = new Map(items.Ext.map(item => [item.ext, item]));
         // Type的Array转为Map类型

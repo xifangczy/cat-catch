@@ -1,5 +1,8 @@
 ////////////////////// 填充数据 //////////////////////
 chrome.storage.sync.get(G.OptionLists, function (items) {
+    if (chrome.runtime.lastError) {
+        items = G.OptionLists;
+    }
     if (items.Ext === undefined || items.Type === undefined || items.Regex === undefined) {
         location.reload();
     }
