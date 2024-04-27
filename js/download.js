@@ -58,6 +58,7 @@ function startDownload(tabId) {
             return;
         }
     }, 500);
+
     $.ajax({
         url: _url,
         cache: false,
@@ -79,15 +80,14 @@ function startDownload(tabId) {
 
             // 某些网站需要传输 range
             let getStatusTimer = setInterval(() => {
-                if (xhr.readyState < 3) { return; }
+                if (xhr.readyState != 4) { return; }
                 clearInterval(getStatusTimer);
                 if (xhr.status != 200 && !requestHeaders.range) {
                     requestHeaders.range = "bytes=0-";
                     params.delete("requestHeaders");
                     params.append("requestHeaders", JSON.stringify(requestHeaders));
                     const href = window.location.origin + window.location.pathname + "?" + params.toString();
-                    chrome.tabs.create({ url: href });
-                    window.close();
+                    window.location.href = href;
                 }
             }, 100);
 
@@ -98,12 +98,6 @@ function startDownload(tabId) {
         $downFilepProgress.html(i18n.downloadFailed + JSON.stringify(result));
     }).done(function (result) {
         try {
-            // if (fileFlag) {
-            //     const type = result.type;
-            //     buffer = await result.arrayBuffer();
-            //     result = filePatch[fileFlag](buffer);
-            //     result = new Blob([result], { type: type });
-            // }
             blobUrl = URL.createObjectURL(result);
             $("#ffmpeg").show();
             // 自动发送到ffmpeg
