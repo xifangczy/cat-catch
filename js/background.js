@@ -212,6 +212,9 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
                     filename: downDir + info.name
                 });
             }
+            if (G.send2local) {
+                try { send2local("catch", info, info.tabId); } catch (e) { console.log(e); }
+            }
             if (chrome.runtime.lastError) { return; }
         });
 
@@ -422,6 +425,12 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             }
             chrome.tabs.sendMessage(tabs[0].id, data);
         });
+        sendResponse("ok");
+        return true;
+    }
+    // 发送数据到本地
+    if (Message.Message == "send2local" && G.send2local) {
+        try { send2local(Message.action, Message.data, Message.tabId); } catch (e) { console.log(e); }
         sendResponse("ok");
         return true;
     }

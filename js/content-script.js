@@ -204,6 +204,11 @@
             }
             if (!key || _key.includes(key)) { return; }
             _key.push(key);
+            chrome.runtime.sendMessage({
+                Message: "send2local",
+                action: "addKey",
+                data: key,
+            });
         }
         if (event.data.action == "catCatchFFmpeg") {
             if (!event.data.use ||

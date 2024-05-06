@@ -101,6 +101,8 @@ G.OptionLists = {
     aria2RpcToken: "",
     m3u8AutoDown: false,
     badgeNumber: true,
+    send2local: false,
+    send2localURL: "http://127.0.0.1:8000/",
 };
 // 本地储存的配置
 G.LocalVar = {
@@ -326,4 +328,15 @@ function stringModify(str) {
             '~': '_'
         }[m];
     });
+}
+
+// 发送到本地接口
+async function send2local(action, data, tabId = 0) {
+    fetch(G.send2localURL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify({ action: action, data: data, tabId: tabId })
+    }).catch(() => { });
 }

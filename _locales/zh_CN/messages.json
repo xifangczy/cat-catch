@@ -809,5 +809,8 @@
   },
   "viewSlices": {
     "message": "查看所有切片和下载进度"
+  },
+  "send2local": {
+    "message": "数据发送"
   }
 }
