@@ -92,6 +92,9 @@
             CATCH_SEARCH_DEBUG && console.log(this);
             if (this.status != 200) { return; }
             // 查找疑似key
+            if (this.responseType == "arraybuffer" && this.response?.byteLength && this.response.byteLength == 32) {
+                console.log(this.response);
+            }
             if (this.responseType == "arraybuffer" && this.response?.byteLength && this.response.byteLength == 16) {
                 postData({ action: "catCatchAddKey", key: this.response, href: location.href, ext: "key" });
             }
@@ -242,6 +245,9 @@
         }
         if (data.substring(0, 7).toUpperCase() == "#EXTM3U" && isFullM3u8(data)) {
             toUrl(data);
+        }
+        if (data.endsWith("</MPD>")) {
+            toUrl(data, "mpd");
         }
         return data;
     }
@@ -416,6 +422,7 @@
             ext == "mpd" ||
             ext == "mp4" ||
             ext == "mp3" ||
+            ext == "flv" ||
             ext == "key"
         ) { return ext; }
         return false;
