@@ -7,6 +7,7 @@
   <link rel="stylesheet" type="text/css" href="css/public.css" media="all" />
   <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
   <script src="lib/jquery.min.js"></script>
+  <script src="lib/StreamSaver.js"></script>
   <script src="js/init.js"></script>
   <script src="js/firefox.js"></script>
   <script src="js/function.js"></script>
@@ -20,6 +21,8 @@
         <input type="text" id="url" placeholder="URL" class="fullInput" />
         <input type="text" id="referer" placeholder="referer" class="fullInput" />
         <button id="getURL_btn" type="button" data-i18n="download"></button>
+        <label class="textColor"><input type="checkbox" id="downStream"><span
+            data-i18n-outer="downloadWhileSaving"></span></label>
       </div>
     </section>
     <section id="downfile" class="hide">
@@ -32,10 +35,11 @@
         <button id="historyBack" type="button" data-i18n="goBack"></button>
         <button class="openDir button2" data-i18n="openDir"></button>
         <button id="ffmpeg" class="button2 hide" data-i18n="sendFfmpeg"></button>
+        <button id="stopDownload" class="button2 hide" data-i18n="stopDownload"></button>
         <label class="textColor"><input type="checkbox" id="autoClose"><span
             data-i18n-outer="autoCloserDownload"></span></label>
-        <label class="textColor"><input type="checkbox" id="downActive"><span
-            data-i18n-outer="openInBgDownload"></span></label>
+        <!-- <label class="textColor"><input type="checkbox" id="downActive"><span
+            data-i18n-outer="openInBgDownload"></span></label> -->
       </div>
     </section>
   </div>

@@ -95,6 +95,7 @@ G.OptionLists = {
     enable: true,
     downActive: false,
     downAutoClose: false,
+    downStream: false,
     aria2Rpc: "http://localhost:6800/jsonrpc",
     enableAria2Rpc: false,
     enableAria2RpcReferer: true,
