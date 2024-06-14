@@ -21,6 +21,7 @@ setRequestHeaders(requestHeaders, () => { awaitG(start); });
 function start() {
     $("#autoClose").prop("checked", autoClose ? true : G.downAutoClose);
     $("#downActive").prop("checked", G.downActive);
+    $("#downStream").prop("checked", G.downStream);
     $(`<style>${G.css}</style>`).appendTo("head");
 
     chrome.tabs.getCurrent(function (tab) {
