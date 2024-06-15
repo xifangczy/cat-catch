@@ -23,6 +23,8 @@ function start() {
     $("#downActive").prop("checked", G.downActive);
     $("#downStream").prop("checked", G.downStream);
     $(`<style>${G.css}</style>`).appendTo("head");
+    // 流式下载服务端
+    streamSaver.mitm = "https://stream.bmmmd.com/mitm.html";
 
     chrome.tabs.getCurrent(function (tab) {
         startDownload(tab.id);
@@ -48,63 +50,86 @@ function startDownload(tabId) {
         });
         return;
     }
+    $("#downfile").show();
 
     const $downFilepProgress = $("#downFilepProgress");
     const $progress = $(".progress");
 
-    // 使用ajax下载文件
-    $("#downfile").show();
-    // $downFilepProgress.html("后台下载中...");
-    let fileTotal = 0;
-    let progress = undefined;
-    let timer = setInterval(() => {
-        document.title = progress;
-        if (progress == "100%" || progress == Infinity) {
-            clearInterval(timer);
+    // 标题 显示 进度
+    let timer = Date.now();
+    function setTitleProgress(progress) {
+        if (Date.now() - timer >= 500) {
+            document.title = progress;
+            timer = Date.now();
+        }
+    }
+
+    // 是否边下边存
+    let fileStream = null;
+    const filename = _fileName ? stringModify(_fileName) : getUrlFileName(_url);
+    if ((downStream || G.downStream) && !autosend) {
+        fileStream = streamSaver.createWriteStream(filename).getWriter();
+    }
+    // 开始下载
+    $("#stopDownload").show();
+    const controller = new AbortController();
+    fetch(_url, {
+        signal: controller.signal,
+        headers: new Headers({
+            'Cache-Control': 'no-cache'
+        })
+    }).then(response => {
+        if (!response.ok) {
+            // 某些网站需要传输 range
+            if (!requestHeaders.range) {
+                requestHeaders.range = "bytes=0-";
+                params.set("requestHeaders", JSON.stringify(requestHeaders));
+                const href = window.location.origin + window.location.pathname + "?" + params.toString();
+                window.location.href = href;
+                return;
+            }
+            $downFilepProgress.html(response.status);
+            console.error(response);
+            fileStream && fileStream.close();
+            throw new Error(response.status);
+        }
+        const reader = response.body.getReader();
+        const contentLength = parseInt(response.headers.get('content-length')) || 0;
+        const contentType = response.headers.get('content-type') ?? 'video/mp4';
+        const contentLengthTotal = byteToSize(contentLength);
+        let receivedLength = 0;
+        const chunks = [];
+        const pump = async () => {
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) { break; }
+                fileStream ? fileStream.write(new Uint8Array(value)) : chunks.push(value);
+                receivedLength += value.length;
+                const progress = (receivedLength / contentLength * 100).toFixed(2) + "%";
+                setTitleProgress(progress);
+                $downFilepProgress.html(byteToSize(receivedLength) + " / " + contentLengthTotal + " " + progress);
+                $progress.css("width", progress);
+            }
+            $downFilepProgress.html(i18n.downloadComplete);
+            if (!fileStream) {
+                let position = 0;
+                const allChunks = new Uint8Array(receivedLength);
+                for (const chunk of chunks) {
+                    allChunks.set(chunk, position);
+                    position += chunk.length;
+                }
+                return new Blob([allChunks], { type: contentType });
+            }
+            fileStream.close();
+        }
+        return pump();
+    }).then(blob => {
+        if (fileStream) {
+            fileStream = null;
             return;
         }
-    }, 500);
-
-    !(downStream || G.downStream) || autosend ? $.ajax({
-        url: _url,
-        cache: false,
-        xhrFields: { responseType: "blob" },
-        xhr: function () {
-            let xhr = new XMLHttpRequest();
-            xhr.addEventListener("progress", function (evt) {
-                progress = Math.round(evt.loaded / evt.total * 10000) / 100.00;
-                if (progress != Infinity) {
-                    fileTotal = fileTotal ? fileTotal : byteToSize(evt.total);
-                    progress = progress + "%";
-                    $downFilepProgress.html(byteToSize(evt.loaded) + " / " + fileTotal + " " + progress);
-                    $progress.css("width", progress);
-                } else {
-                    $downFilepProgress.html(i18n.unknownSize);
-                    $progress.css("width", "100%");
-                }
-            });
-
-            // 某些网站需要传输 range
-            let getStatusTimer = setInterval(() => {
-                if (xhr.readyState != 4) { return; }
-                clearInterval(getStatusTimer);
-                if (xhr.status != 200 && !requestHeaders.range) {
-                    requestHeaders.range = "bytes=0-";
-                    params.delete("requestHeaders");
-                    params.append("requestHeaders", JSON.stringify(requestHeaders));
-                    const href = window.location.origin + window.location.pathname + "?" + params.toString();
-                    window.location.href = href;
-                }
-            }, 100);
-
-            return xhr;
-        }
-    }).fail(function (result) {
-        document.title = i18n.downloadFailed;
-        $downFilepProgress.html(i18n.downloadFailed + JSON.stringify(result));
-    }).done(function (result) {
         try {
-            blobUrl = URL.createObjectURL(result);
+            blobUrl = URL.createObjectURL(blob);
             $("#ffmpeg").show();
             // 自动发送到ffmpeg
             if (autosend) {
@@ -115,7 +140,7 @@ function startDownload(tabId) {
             document.title = i18n.saving;
             chrome.downloads.download({
                 url: blobUrl,
-                filename: _fileName ? stringModify(_fileName) : getUrlFileName(_url),
+                filename: filename,
                 saveAs: G.saveAs
             }, function (downloadId) {
                 downId = downloadId;
@@ -123,7 +148,11 @@ function startDownload(tabId) {
         } catch (e) {
             $downFilepProgress.html(i18n.saveFailed + e);
         }
-    }) : streamDownload();
+    }).catch(error => {
+        document.title = i18n.downloadFailed;
+        $downFilepProgress.html(i18n.downloadFailed + " " + error);
+        console.error(error);
+    });
 
     // 监听下载事件 修改提示
     chrome.downloads.onChanged.addListener(function (downloadDelta) {
@@ -175,6 +204,18 @@ function startDownload(tabId) {
     $("#ffmpeg").click(function () {
         sendFile();
     });
+
+    // 停止下载
+    $("#stopDownload").click(function () {
+        if (fileStream) {
+            fileStream.close();
+            fileStream = null;
+        }
+        controller.abort();
+        $("#stopDownload").hide();
+    });
+
+
     function sendFile(action = "addMedia") {
         chrome.tabs.query({ url: ffmpeg.url }, function (tabs) {
             if (tabs.length && tabs[0].status != "complete") {
@@ -198,47 +239,6 @@ function startDownload(tabId) {
             }, Math.ceil(Math.random() * 999));
         }
     });
-
-    function streamDownload() {
-        streamSaver.mitm = "https://stream.bmmmd.com/mitm.html";
-        const fileStream = streamSaver.createWriteStream(getUrlFileName(_url)).getWriter();
-        const controller = new AbortController();
-        $("#stopDownload").show();
-        $("#stopDownload").off('click').click(function () {
-            fileStream && fileStream.close();
-            controller.abort();
-        });
-        fetch(_url, { signal: controller.signal })
-            .then(response => {
-                if (!response.ok) {
-                    $downFilepProgress.html(response.status);
-                    console.error(response);
-                    throw new Error(response.status);
-                }
-                const reader = response.body.getReader();
-                const contentLength = parseInt(response.headers.get('content-length')) || 0;
-                const contentLengthTotal = byteToSize(contentLength);
-                let receivedLength = 0;
-                const pump = async () => {
-                    while (true) {
-                        const { value, done } = await reader.read();
-                        if (done) { break; }
-                        fileStream.write(new Uint8Array(value));
-                        receivedLength += value.length;
-                        const progress = (receivedLength / contentLength * 100).toFixed(2) + "%";
-                        $downFilepProgress.html(byteToSize(receivedLength) + " / " + contentLengthTotal + " " + progress);
-                        $progress.css("width", progress);
-                    }
-                    $downFilepProgress.html(i18n.downloadComplete);
-                    fileStream && fileStream.close();
-                }
-                return pump();
-            }).catch((error) => {
-                $downFilepProgress.html(error);
-                console.error(error);
-                fileStream && fileStream.close();
-            });
-    }
     function getUrlFileName() {
         try {
             const pathname = new URL(_url).pathname;
