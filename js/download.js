@@ -32,10 +32,6 @@ function start() {
 }
 
 function startDownload(tabId) {
-    // 储存blob
-    let blobUrl = "";
-    // 下载的文件ID
-    let downId = 0;
     // 没有url 打开输入框
     if (!_url) {
         $("#getURL").show();
@@ -54,11 +50,13 @@ function startDownload(tabId) {
 
     const $downFilepProgress = $("#downFilepProgress");
     const $progress = $(".progress");
+    let blobUrl = "";   // 储存blob
+    let downId = 0; // 下载的文件ID
 
     // 标题 显示 进度
     let timer = Date.now();
-    function setTitleProgress(progress) {
-        if (Date.now() - timer >= 500) {
+    function setTitleProgress(progress, delay = 500) {
+        if (Date.now() - timer >= delay) {
             document.title = progress;
             timer = Date.now();
         }
@@ -95,8 +93,8 @@ function startDownload(tabId) {
         }
         const reader = response.body.getReader();
         const contentLength = parseInt(response.headers.get('content-length')) || 0;
+        const contentLengthFormat = byteToSize(contentLength);
         const contentType = response.headers.get('content-type') ?? 'video/mp4';
-        const contentLengthTotal = byteToSize(contentLength);
         let receivedLength = 0;
         const chunks = [];
         const pump = async () => {
@@ -105,10 +103,16 @@ function startDownload(tabId) {
                 if (done) { break; }
                 fileStream ? fileStream.write(new Uint8Array(value)) : chunks.push(value);
                 receivedLength += value.length;
-                const progress = (receivedLength / contentLength * 100).toFixed(2) + "%";
-                setTitleProgress(progress);
-                $downFilepProgress.html(byteToSize(receivedLength) + " / " + contentLengthTotal + " " + progress);
-                $progress.css("width", progress);
+                const receivedLengthFormat = byteToSize(receivedLength);
+                if (contentLength) {
+                    const progress = (receivedLength / contentLength * 100).toFixed(2) + "%";
+                    setTitleProgress(progress);
+                    $downFilepProgress.html(receivedLengthFormat + " / " + contentLengthFormat + " " + progress);
+                    $progress.css("width", progress);
+                } else {
+                    $downFilepProgress.html(receivedLengthFormat);
+                    setTitleProgress(receivedLengthFormat);
+                }
             }
             $downFilepProgress.html(i18n.downloadComplete);
             if (!fileStream) {
@@ -236,4 +240,12 @@ function startDownload(tabId) {
             return "NULL";
         }
     }
+    // 刷新/关闭页面 检查边下边存
+    window.addEventListener('beforeunload', function (e) {
+        if (fileStream) {
+            e.preventDefault();
+            e.returnValue = i18n.streamOnbeforeunload;
+            fileStream.close();
+        }
+    });
 }
