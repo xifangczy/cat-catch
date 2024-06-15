@@ -124,6 +124,7 @@ function startDownload(tabId) {
         }
         return pump();
     }).then(blob => {
+        $("#stopDownload").hide();
         if (fileStream) {
             fileStream = null;
             return;
@@ -152,6 +153,7 @@ function startDownload(tabId) {
         document.title = i18n.downloadFailed;
         $downFilepProgress.html(i18n.downloadFailed + " " + error);
         console.error(error);
+        $("#stopDownload").hide();
     });
 
     // 监听下载事件 修改提示
@@ -185,20 +187,6 @@ function startDownload(tabId) {
         }
         chrome.downloads.showDefaultFolder();
     });
-
-    // 下载完成关闭本页面
-    // $("#autoClose").click(function () {
-    //     chrome.storage.sync.set({
-    //         downAutoClose: $("#autoClose").prop("checked")
-    //     });
-    // });
-
-    // 不跳转到下载器页面
-    // $("#downActive").click(function () {
-    //     chrome.storage.sync.set({
-    //         downActive: $("#downActive").prop("checked")
-    //     });
-    // });
 
     // 发送到在线ffmpeg
     $("#ffmpeg").click(function () {
