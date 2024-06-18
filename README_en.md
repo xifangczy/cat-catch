@@ -36,6 +36,9 @@ For full functionality, use version 104 or above.
 # 🤚🏻Disclaimer
 The extension is a universal sniffing tool and has the same functionality as the browser DevTools, it does not decrypt any specific website. The extension is not responsible for any content downloaded by the user, please be aware of the permissions and copyrights of the downloaded resources.
 
+# 🔒Privacy Policy
+The extension will not collect any personal information and does not contain any trackers.
+
 # 💖Acknowledgements
 - [hls.js](https://github.com/video-dev/hls.js)
 - [jQuery](https://github.com/jquery/jquery)

@@ -36,6 +36,9 @@ https://o2bmm.gitbook.io/cat-catch/
 # 🤚🏻免责
 扩展是通用嗅探工具和浏览器DevTools功能一致，没有针对任何一家网站进行解密操作，用户下载任何内容与扩展无关，请注意下载资源的权限和版权。
 
+# 🔒隐私政策
+扩展不会收集任何个人信息，不包含任何跟踪器。
+
 # 💖鸣谢
 - [hls.js](https://github.com/video-dev/hls.js)
 - [jQuery](https://github.com/jquery/jquery)
