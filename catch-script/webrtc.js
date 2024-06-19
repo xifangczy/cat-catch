@@ -2,21 +2,31 @@
     console.log("webrtc.js Start");
     if (document.getElementById("catCatchWebRTC")) { return; }
 
+    // 多语言
+    let language = navigator.language.replace("-", "_");
+    if (window.CatCatchI18n) {
+        if (!window.CatCatchI18n.languages.includes(language)) {
+            language = language.split("_")[0];
+            if (!window.CatCatchI18n.languages.includes(language)) {
+                language = "en";
+            }
+        }
+    }
+
     const buttonStyle = 'style="border:solid 1px #000;margin:2px;padding:2px;background:#fff;border-radius:4px;border:solid 1px #c7c7c780;color:#000;"';
     const checkboxStyle = 'style="-webkit-appearance: auto;"';
-
     const CatCatch = document.createElement("div");
     CatCatch.innerHTML = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAAKlBMVEUAAADLlROxbBlRAD16GS5oAjWWQiOCIytgADidUx/95gHqwwTx0gDZqwT6kfLuAAAACnRSTlMA/vUejV7kuzi8za0PswAAANpJREFUGNNjwA1YSxkYTEqhnKZLLi6F1w0gnKA1shdvHYNxdq1atWobjLMKCOAyC3etlVrUAOH4HtNZmLgoAMKpXX37zO1FwcZAwMDguGq1zKpFmTNnzqx0Bpp2WvrU7ttn9py+I8JgLn1R8Pad22vurNkjwsBReHv33junzuyRnOnMwNCSeFH27K5dq1SNgcZxFMnuWrNq1W5VkNntihdv7ToteGcT0C7mIkE1qbWCYjJnM4CqEoWKdoslChXuUgXJqIcLebiphSgCZRhaPDhcDFhdmUMCGIgEAFA+Uc02aZg9AAAAAElFTkSuQmCC" style="-webkit-user-drag: none;width: 20px;">
-    <div id="tips">正在等待视频流...</div>
+    <div id="tips" data-i18n="waiting">正在等待视频流..."</div>
     <div id="time"></div>
-    录制编码: <select id="mimeTypeList" style="max-width: 200px;"></select>
-    <label><input type="checkbox" id="autoSave1"} ${checkboxStyle}>1小时保存一次</label>
+    ${i18n("recordEncoding", "录制编码")}: <select id="mimeTypeList" style="max-width: 200px;"></select>
+    <label><input type="checkbox" id="autoSave1"} ${checkboxStyle} data-i18n="save1hour">1小时保存一次</label>
     <div>
-        <button id="start" ${buttonStyle}>开始录制</button>
-        <button id="stop" ${buttonStyle}>停止录制</button>
-        <button id="save" ${buttonStyle}>保存</button>
-        <button id="hide" ${buttonStyle}>隐藏</button>
-        <button id="close" ${buttonStyle}>关闭</button>
+        <button id="start" ${buttonStyle} data-i18n="startRecording">开始录制</button>
+        <button id="stop" ${buttonStyle} data-i18n="stopRecording">停止录制</button>
+        <button id="save" ${buttonStyle} data-i18n="save">保存</button>
+        <button id="hide" ${buttonStyle} data-i18n="hide">隐藏</button>
+        <button id="close" ${buttonStyle} data-i18n="close">关闭</button>
     </div>`;
     CatCatch.style = `
         position: fixed;
@@ -44,16 +54,21 @@
     // 页面插入Shadow DOM
     document.getElementsByTagName('html')[0].appendChild(divShadow);
 
+    // 提示
     const $tips = CatCatch.querySelector("#tips");
+    const tips = (text) => {
+        $tips.innerHTML = text;
+    }
 
     // 开始 结束 按钮切换
     const $start = CatCatch.querySelector("#start");
     const $stop = CatCatch.querySelector("#stop");
-    function buttonState(state = true) {
+    const buttonState = (state = true) => {
         $start.style.display = state ? 'inline' : 'none';
         $stop.style.display = state ? 'none' : 'inline';
     }
-    buttonState();
+    $start.style.display = 'inline';
+    $stop.style.display = 'none';
 
     // 关闭
     CatCatch.querySelector("#close").addEventListener('click', function (event) {
@@ -66,6 +81,10 @@
     CatCatch.querySelector("#hide").addEventListener('click', function (event) {
         CatCatch.style.display = "none";
     });
+
+    /* 核心变量 */
+    let recorder = null;    // 录制器
+    let mediaStream = null;    // 媒体流
 
     // #region 编码选择
     let option = { mimeType: 'video/webm;codecs=vp9,opus' };
@@ -94,38 +113,33 @@
     option.mimeType = supportedVideos[0];
     $mimeTypeList.addEventListener('change', function (event) {
         if (recorder && recorder.state && recorder.state === 'recording') {
-            $tips.innerHTML = "录制中不能更改编码";
+            tips(i18n("recordingChangeEncoding", "录制中不能更改编码"));
             return;
         }
         if (MediaRecorder.isTypeSupported(event.target.value)) {
             option.mimeType = event.target.value;
-            $tips.innerHTML = "已选择编码：" + event.target.value;
+            tips(`${i18n("recordEncoding", "录制编码")}:` + event.target.value);
         } else {
-            $tips.innerHTML = "不支持此格式";
+            tips(i18n("formatNotSupported", "不支持此格式"));
         }
     });
     // #endregion 编码选择
 
-    // 开始录制
+    // 录制
     $time = CatCatch.querySelector("#time");
     CatCatch.querySelector("#start").addEventListener('click', function () {
-        if (!recorderObj) {
-            $tips.innerHTML = "不存在录制对象!!!";
+        if (!mediaStream) {
+            tips(i18n("streamEmpty", "媒体流为空"));
+            return;
+        }
+        if (!mediaStream instanceof MediaStream) {
+            tips(i18n("notStream", "非媒体流对象"));
             return;
         }
         let recorderTime = 0;
         let recorderTimeer = undefined;
         let chunks = [];
-        if (!recorderObj instanceof MediaStream) {
-            const track = [];
-            for (let key in recorderObj) {
-                if (recorderObj[key] instanceof MediaStreamTrack) {
-                    track.push(recorderObj[key]);
-                }
-            }
-            recorderObj = new MediaStream(track);
-        }
-        recorder = new MediaRecorder(recorderObj, option);
+        recorder = new MediaRecorder(mediaStream, option);
         recorder.ondataavailable = event => {
             chunks.push(event.data)
         };
@@ -133,13 +147,13 @@
             recorderTime = 0;
             clearInterval(recorderTimeer);
             $time.innerHTML = "";
-            $tips.innerHTML = "已停止录制!";
+            tips(i18n("stopRecording", "已停止录制!"));
             download(chunks);
             buttonState();
         }
         recorder.onstart = () => {
             chunks = [];
-            $tips.innerHTML = "录制中...";
+            tips(i18n("recording", "视频录制中"));
             $time.innerHTML = "00:00";
             recorderTimeer = setInterval(function () {
                 recorderTime++;
@@ -149,7 +163,6 @@
         }
         recorder.start(60000);
     });
-
     // 停止录制
     CatCatch.querySelector("#stop").addEventListener('click', function () {
         if (recorder) {
@@ -157,7 +170,6 @@
             recorder = undefined;
         }
     });
-
     // 保存
     CatCatch.querySelector("#save").addEventListener('click', function () {
         if (recorder) {
@@ -165,7 +177,7 @@
             recorder.start();
         }
     });
-
+    // 每1小时 保存一次
     let autoSave1Timer = null;
     CatCatch.querySelector("#autoSave1").addEventListener('click', function () {
         clearInterval(autoSave1Timer);
@@ -179,53 +191,32 @@
         }
     });
 
-    let recorder = undefined;
-    let recorderObj = undefined;
-    const _RTCPeerConnection = window.RTCPeerConnection;
-    window.RTCPeerConnection = function (...args) {
-        const pc = new _RTCPeerConnection(...args);
-        const _addTrack = pc.addTrack.bind(pc);
-        pc.addTrack = function (...trackArgs) {
-            const track = trackArgs[0];
-            if (track.kind === 'video') {
-                recorderObj = trackArgs[1];
-                $tips.innerHTML = "视频流已添加";
-            }
-            return _addTrack(...trackArgs);
-        };
-
-        const _addStream = pc.addStream.bind(pc);
-        pc.addStream = function (stream) {
-            if (stream.getVideoTracks().length > 0) {
-                recorderObj = stream;
-                $tips.innerHTML = "视频流已添加";
-            }
-            return _addStream(stream);
+    // 获取webRTC流
+    window.RTCPeerConnection = new Proxy(window.RTCPeerConnection, {
+        construct(target, args) {
+            const pc = new target(...args);
+            mediaStream = new MediaStream();
+            pc.addEventListener('track', (event) => {
+                const track = event.track;
+                if (track.kind === 'video' || track.kind === 'audio') {
+                    mediaStream.addTrack(track);
+                    tips(`${track.kind} ${i18n("streamAdded", "流已添加")}`);
+                    const hasVideo = mediaStream.getVideoTracks().length > 0;
+                    const hasAudio = mediaStream.getAudioTracks().length > 0;
+                    if (hasVideo && hasAudio) {
+                        tips(i18n("videoAndAudio", "已包含音频和视频流"));
+                    }
+                }
+            });
+            pc.addEventListener('iceconnectionstatechange', (event) => {
+                if (pc.iceConnectionState === 'disconnected' && recorder?.state === 'recording') {
+                    recorder.stop();
+                    tips(i18n("stopRecording", "连接已断开，录制已停止"));
+                }
+            });
+            return pc;
         }
-
-        const _addTransceiver = pc.addTransceiver.bind(pc);
-        pc.addTransceiver = function (trackOrKind, ...rest) {
-            recorderObj = {};
-            const transceiver = _addTransceiver(trackOrKind, ...rest);
-            if (trackOrKind instanceof MediaStreamTrack) {
-                recorderObj[trackOrKind.kind] = trackOrKind;
-                $tips.innerHTML = `${trackOrKind.kind}流已添加`;
-            } else if (typeof trackOrKind === 'string') {
-                recorderObj[trackOrKind] = transceiver.receiver.track;
-                $tips.innerHTML = `${trackOrKind}流已添加`;
-            }
-            return transceiver;
-        }
-        pc.oniceconnectionstatechange = function (event) {
-            if (pc.iceConnectionState === 'disconnected' && recorder?.state === 'recording') {
-                recorder.stop();
-                $tips.innerHTML = "连接已断开，录制已停止";
-            }
-        }
-        return pc;
-    };
-    window.webkitRTCPeerConnection = window.RTCPeerConnection;
-    window.RTCPeerConnection.prototype = _RTCPeerConnection.prototype;
+    });
 
     // #region 移动逻辑
     let x, y;
@@ -249,7 +240,7 @@
         const a = document.createElement('a');
         a.style.display = 'none';
         a.href = url;
-        a.download = 'recorded-video.webm';
+        a.download = 'recorded-video.mp4';
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -272,4 +263,18 @@
         recorder && recorder.stop();
         return true;
     });
+
+    // i18n
+    if (window.CatCatchI18n) {
+        CatCatch.querySelectorAll('[data-i18n]').forEach(function (element) {
+            element.innerHTML = window.CatCatchI18n[element.dataset.i18n][language];
+        });
+        CatCatch.querySelectorAll('[data-i18n-outer]').forEach(function (element) {
+            element.outerHTML = window.CatCatchI18n[element.dataset.i18nOuter][language];
+        });
+    }
+    function i18n(key, original = "") {
+        if (!window.CatCatchI18n) { return original };
+        return window.CatCatchI18n[key][language];
+    }
 })();

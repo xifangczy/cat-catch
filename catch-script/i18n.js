@@ -20,6 +20,10 @@ window.CatCatchI18n = {
         en: "Close",
         zh: "关闭"
     },
+    save: {
+        en: "Save",
+        zh: "保存"
+    },
     automaticDownload: {
         en: "Automatic download",
         zh: "完成捕获自动下载"
@@ -151,5 +155,33 @@ window.CatCatchI18n = {
     autoToBuffered: {
         en: "Automatically jump to buffer",
         zh: "自动跳转到缓冲尾"
+    },
+    save1hour: {
+        en: "Save once every hour",
+        zh: "1小时保存一次"
+    },
+    recordingChangeEncoding: {
+        en: "Cannot change encoding during recording",
+        zh: "录制中不能更改编码"
+    },
+    streamEmpty: {
+        en: "Media stream is empty",
+        zh: "媒体流为空"
+    },
+    notStream: {
+        en: "Not a media stream object",
+        zh: "非媒体流对象"
+    },
+    notStream: {
+        en: "Not a media stream object",
+        zh: "非媒体流对象"
+    },
+    streamAdded: {
+        en: "Stream added",
+        zh: "流已添加"
+    },
+    videoAndAudio: {
+        en: "Includes both audio and video streams",
+        zh: "已包含音频和视频流"
     }
 };
