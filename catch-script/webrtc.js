@@ -220,7 +220,7 @@
 
     // #region 移动逻辑
     let x, y;
-    function move(event) {
+    const move = (event) => {
         CatCatch.style.left = event.pageX - x + 'px';
         CatCatch.style.top = event.pageY - y + 'px';
     }
