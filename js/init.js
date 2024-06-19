@@ -38,7 +38,6 @@ G.OptionLists = {
         { "ext": "wma", "size": 0, "state": true },
         { "ext": "wav", "size": 0, "state": true },
         { "ext": "m4a", "size": 0, "state": true },
-        { "ext": "letv", "size": 0, "state": true },
         { "ext": "ts", "size": 0, "state": false },
         { "ext": "webm", "size": 0, "state": true },
         { "ext": "ogg", "size": 0, "state": true },
