@@ -109,7 +109,7 @@
 
         $mimeTypeList.addEventListener('change', function (event) {
             if (recorder && recorder.state && recorder.state === 'recording') {
-                $tips.innerHTML = i18n("recording", "视频录制中");
+                $tips.innerHTML = i18n("recordingChangeEncoding", "录制中不能更改编码");
                 return;
             }
             if (MediaRecorder.isTypeSupported(event.target.value)) {
