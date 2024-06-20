@@ -54,13 +54,22 @@ function startDownload(tabId) {
     let downId = 0; // 下载的文件ID
 
     // 标题 显示 进度
-    let timer = Date.now();
-    function setTitleProgress(progress, delay = 500) {
-        if (Date.now() - timer >= delay) {
+    let timer = null;
+    let lastUpdate = 0;
+    const setProgressText = (progress, html) => {
+        const now = Date.now();
+        html && $downFilepProgress.html(progress);
+        if (now - lastUpdate >= 500) {
             document.title = progress;
-            timer = Date.now();
+            lastUpdate = now;
         }
+        timer && clearInterval(timer);
+        timer = setInterval(() => {
+            document.title = progress;
+            lastUpdate = Date.now();
+        }, 500);
     }
+
 
     // 是否边下边存
     let fileStream = null;
@@ -106,15 +115,14 @@ function startDownload(tabId) {
                 const receivedLengthFormat = byteToSize(receivedLength);
                 if (contentLength) {
                     const progress = (receivedLength / contentLength * 100).toFixed(2) + "%";
-                    setTitleProgress(progress);
+                    setProgressText(progress);
                     $downFilepProgress.html(receivedLengthFormat + " / " + contentLengthFormat + " " + progress);
                     $progress.css("width", progress);
                 } else {
-                    $downFilepProgress.html(receivedLengthFormat);
-                    setTitleProgress(receivedLengthFormat);
+                    setProgressText(receivedLengthFormat, true);
                 }
             }
-            $downFilepProgress.html(i18n.downloadComplete);
+            setProgressText(i18n.downloadComplete, true);
             if (!fileStream) {
                 let position = 0;
                 const allChunks = new Uint8Array(receivedLength);
@@ -130,6 +138,7 @@ function startDownload(tabId) {
     }).then(blob => {
         $("#stopDownload").hide();
         if (fileStream) {
+            setProgressText(i18n.downloadComplete, true);
             fileStream = null;
             return;
         }
@@ -138,23 +147,25 @@ function startDownload(tabId) {
             $("#ffmpeg").show();
             // 自动发送到ffmpeg
             if (autosend) {
+                setProgressText(i18n.sendFfmpeg, true);
                 sendFile("popupAddMedia");
                 return;
             }
-            $downFilepProgress.html(i18n.saving);
-            document.title = i18n.saving;
+            setProgressText(i18n.saving, true);
             chrome.downloads.download({
                 url: blobUrl,
                 filename: filename,
                 saveAs: G.saveAs
             }, function (downloadId) {
+                setProgressText(i18n.downloadComplete, true);
                 downId = downloadId;
             });
         } catch (e) {
             $downFilepProgress.html(i18n.saveFailed + e);
+            setProgressText(i18n.saveFailed);
         }
     }).catch(error => {
-        document.title = i18n.downloadFailed;
+        setProgressText(i18n.downloadFailed);
         $downFilepProgress.html(i18n.downloadFailed + " " + error);
         console.error(error);
         $("#stopDownload").hide();
