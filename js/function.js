@@ -103,15 +103,21 @@ function templatesFunction(text, action, data) {
     text = isEmpty(text) ? "" : text.toString();
     action = splitString(action, "|");
     for (let item of action) {
-        // 不使用 split(":") 方法 参数中 arg 可能包含 ":" 字符
-        const temp = item.indexOf(":");
-        if (temp == -1) { return ""; }
-        let action = item.slice(0, temp).trim();
-        let arg = item.slice(temp + 1).trim().split(",");
-        arg = arg.map(item => {
-            return item.trim().replace(/^['"]|['"]$/g, "");
-        });
+        let action = item.trim();   // 函数
+        let arg = [];   //参数
+        // 查找 ":" 区分函数与参数
+        const colon = item.indexOf(":");
+        if (colon != -1) {
+            action = item.slice(0, colon).trim();
+            arg = splitString(item.slice(colon + 1).trim(), ",").map(item => {
+                return item.trim().replace(/^['"]|['"]$/g, "");
+            });
+        }
+        // 字符串不允许为空 除非 exists find 函数
         if (isEmpty(text) && action != "exists" && action != "find") { return "" };
+        // 参数不能为空 除非 filter 函数
+        if (arg.length == 0 && action != "filter") { return "" }
+
         if (action == "slice") {
             text = text.slice(...arg);
         } else if (action == "replace") {
@@ -119,8 +125,7 @@ function templatesFunction(text, action, data) {
         } else if (action == "replaceAll") {
             text = text.replaceAll(...arg);
         } else if (action == "regexp") {
-            arg = new RegExp(...arg);
-            const result = text.match(arg);
+            const result = text.match(new RegExp(...arg));
             text = "";
             if (result && result.length >= 2) {
                 for (let i = 1; i < result.length; i++) {
