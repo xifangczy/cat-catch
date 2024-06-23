@@ -150,6 +150,8 @@ function templatesFunction(text, action, data) {
                 text = text.toUpperCase();
             } else if (arg[0] == "trim") {
                 text = text.trim();
+            } else if (arg[0] == "filter") {
+                text = stringModify(text.trim());
             }
         } else if (action == "find") {
             text = "";
@@ -158,6 +160,8 @@ function templatesFunction(text, action, data) {
                     text = data.pageDOM.querySelector(arg[0]).innerHTML;
                 } catch (e) { text = ""; }
             }
+        } else if (action == "filter") {
+            text = stringModify(text, arg[0]);
         } else {
             text = ""; break;
         }

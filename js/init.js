@@ -142,7 +142,7 @@ const ffmpeg = {
 const reProtocol = /^[\w]+:\/\/.+/i;
 const reFilename = /filename="?([^"]+)"?/;
 // const reRange = /([\d]+)-([\d]+)\/([\d]+)/;
-const reStringModify = /['\\:\*\?"<\/>\|~]/g;
+const reStringModify = /[<>:"\/\\|?*~]/g;
 // const reYoutube = /&(range|rbuf|rn|cver|altitags|pot|fallback_count|sq)=[^&]*/g;
 const reTemplates = /\$\{(fullFileName|fileName|ext|title|referer|url|now|fullDate|time|initiator|webUrl|userAgent|page|cookie) ?\| ?([^}]+)\}/g;
 
@@ -309,24 +309,23 @@ function clearRedundant() {
 }
 
 // 替换掉不允许的文件名称字符
-function stringModify(str) {
+function stringModify(str, text) {
     if (!str) { return str; }
     reStringModify.lastIndex = 0;
     str = str.replaceAll(/\u200B/g, "").replaceAll(/\u200C/g, "").replaceAll(/\u200D/g, "");
-    return str.replace(reStringModify, function (m) {
-        return {
-            "'": '&#39;',
-            '\\': '&#92;',
-            '/': '&#47;',
-            ':': '&#58;',
-            '*': '&#42;',
-            '?': '&#63;',
-            '"': '&quot;',
+    return str.replace(reStringModify, function (match) {
+        return text || {
             '<': '&lt;',
             '>': '&gt;',
-            '|': '&#124;',
+            ':': '&colon;',
+            '"': '&quot;',
+            '/': '&sol;',
+            '\\': '&bsol;',
+            '|': '&vert;',
+            '?': '&quest;',
+            '*': '&ast;',
             '~': '_'
-        }[m];
+        }[match];
     });
 }
 
