@@ -223,14 +223,23 @@ function templates(text, data) {
         mobileUserAgent: G.MobileUserAgent,
         userAgent: G.userAgent ? G.userAgent : navigator.userAgent,
     }
-    // 开始替换
-    for (let key in data) {
-        text = text.replaceAll('${' + key + '}', data[key]);
-    }
-    //函数支持
+    // // 开始替换
+    // for (let key in data) {
+    //     text = text.replaceAll('${' + key + '}', data[key]);
+    // }
+    // //函数支持
+    // text = text.replace(reTemplates, function (original, tag, action) {
+    //     return templatesFunction(data[tag], action, data);
+    // });
+
     text = text.replace(reTemplates, function (original, tag, action) {
-        return templatesFunction(data[tag], action, data);
+        tag = tag.trim();
+        if (action) {
+            return templatesFunction(data[tag], action.trim(), data);
+        }
+        return data[tag] ?? original;
     });
+
     return text;
 }
 // 从url中获取文件名
