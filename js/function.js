@@ -116,7 +116,7 @@ function templatesFunction(text, action, data) {
         // 字符串不允许为空 除非 exists find 函数
         if (isEmpty(text) && action != "exists" && action != "find") { return "" };
         // 参数不能为空 除非 filter 函数
-        if (arg.length == 0 && action != "filter") { return "" }
+        if (arg.length == 0 && action != "filter") { return text }
 
         if (action == "slice") {
             text = text.slice(...arg);
@@ -167,8 +167,6 @@ function templatesFunction(text, action, data) {
             }
         } else if (action == "filter") {
             text = stringModify(text, arg[0]);
-        } else {
-            text = ""; break;
         }
     }
     return text;
