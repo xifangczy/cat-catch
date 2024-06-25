@@ -12,6 +12,10 @@ window.CatCatchI18n = {
         en: "Capture from the beginning",
         zh: "从头捕获"
     },
+    alwaysCapturedBeginning: {
+        en: "Always Capture from the beginning",
+        zh: "始终从头捕获"
+    },
     hide: {
         en: "Hide",
         zh: "隐藏"

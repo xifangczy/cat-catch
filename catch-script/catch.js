@@ -27,6 +27,7 @@
     <div><button id="hide" ${buttonStyle} data-i18n="hide">隐藏</button><button id="close" ${buttonStyle} data-i18n="close">关闭</button></div>
     <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown")} ${checkboxStyle}><span data-i18n="automaticDownload">完成捕获自动下载</span></label>
     <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg")} ${checkboxStyle}><span data-i18n="ffmpeg">使用ffmpeg合并</span></label>
+    <label><input type="checkbox" id="restartAlways" ${localStorage.getItem("CatCatchCatch_restart")} ${checkboxStyle}><span data-i18n="alwaysCapturedBeginning">始终从头捕获</span>(beta)</label>
     <label><input type="checkbox" id="autoToBuffered" ${checkboxStyle}><span data-i18n="autoToBuffered">自动跳转缓冲尾</span></label>
     <label><input type="checkbox" id="checkHead" ${checkboxStyle}>清理多余头部数据</label>
     <details>
@@ -76,6 +77,9 @@
     CatCatch.querySelector("#ffmpeg").addEventListener('change', function (event) {
         localStorage.setItem("CatCatchCatch_ffmpeg", this.checked ? "checked" : "");
     });
+    CatCatch.querySelector("#restartAlways").addEventListener('change', function (event) {
+        localStorage.setItem("CatCatchCatch_restart", this.checked ? "checked" : "");
+    });
     const $clean = CatCatch.querySelector("#clean");
     $clean.addEventListener('click', function (event) {
         clearCache();
@@ -113,7 +117,6 @@
     });
     CatCatch.querySelector("#summary").addEventListener('click', getFileName);
 
-
     // 自动跳转到缓冲节点
     let autoToBufferedFlag = true;
     const $autoToBuffered = CatCatch.querySelector("#autoToBuffered");
@@ -134,6 +137,26 @@
             });
         }
     });
+
+    //  始终从头捕获
+    if (localStorage.getItem("CatCatchCatch_restart") == "checked") {
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('video').forEach(resetVideoPlayback);
+            // 监控 DOM
+            const observer = new MutationObserver(mutations => {
+                mutations.forEach(mutation => {
+                    mutation.addedNodes.forEach(node => {
+                        if (node.tagName === 'VIDEO') {
+                            resetVideoPlayback(node);
+                        } else if (node.querySelectorAll) {
+                            node.querySelectorAll('video').forEach(resetVideoPlayback);
+                        }
+                    });
+                });
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
+        });
+    }
 
     // 文件名设置
     let setFileName = null;
@@ -339,6 +362,19 @@
                 '|': '&#124;',
                 '~': '_'
             }[m];
+        });
+    }
+
+    // 从头播放
+    function resetVideoPlayback(video) {
+        video.currentTime = 0;
+        video.addEventListener('play', () => {
+            if (!video.isResetCatCatch) {
+                video.isResetCatCatch = true;
+                video.currentTime = 0;
+                CatCatch.querySelector("#checkHead").checked = true;
+                clearCache();
+            }
         });
     }
 
