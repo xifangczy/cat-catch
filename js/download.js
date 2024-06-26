@@ -220,6 +220,12 @@ function startDownload(tabId) {
         $("#stopDownload").hide();
     });
 
+    // 不跳转到下载器页面
+    $("#downActive").click(function () {
+        chrome.storage.sync.set({
+            downActive: $("#downActive").prop("checked")
+        });
+    });
 
     function sendFile(action = "addMedia") {
         chrome.tabs.query({ url: ffmpeg.url }, function (tabs) {
