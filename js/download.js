@@ -78,6 +78,7 @@ function startDownload(tabId) {
         fileStream = streamSaver.createWriteStream(filename).getWriter();
     }
     // 开始下载
+    let receivedLength = 0; // 已下载大小
     $("#stopDownload").show();
     const controller = new AbortController();
     fetch(_url, {
@@ -97,14 +98,12 @@ function startDownload(tabId) {
             }
             $downFilepProgress.html(response.status);
             console.error(response);
-            fileStream && fileStream.close();
-            throw new Error(response.status);
+            throw new Error(response.statusText + " " + response.status);
         }
         const reader = response.body.getReader();
         const contentLength = parseInt(response.headers.get('content-length')) || 0;
         const contentLengthFormat = byteToSize(contentLength);
         const contentType = response.headers.get('content-type') ?? 'video/mp4';
-        let receivedLength = 0;
         const chunks = [];
         const pump = async () => {
             while (true) {
@@ -165,6 +164,9 @@ function startDownload(tabId) {
             setProgressText(i18n.saveFailed);
         }
     }).catch(error => {
+        if (fileStream) {
+            receivedLength ? fileStream.close() : fileStream.abort();
+        }
         setProgressText(i18n.downloadFailed);
         $downFilepProgress.html(i18n.downloadFailed + " " + error);
         console.error(error);
