@@ -20,7 +20,7 @@ setRequestHeaders(requestHeaders, () => { awaitG(start); });
 
 function start() {
     $("#autoClose").prop("checked", autoClose ? true : G.downAutoClose);
-    $("#downActive").prop("checked", G.downActive);
+    // $("#downActive").prop("checked", G.downActive);
     $("#downStream").prop("checked", G.downStream);
     $(`<style>${G.css}</style>`).appendTo("head");
     // 流式下载服务端
@@ -164,6 +164,7 @@ function startDownload(tabId) {
             setProgressText(i18n.saveFailed);
         }
     }).catch(error => {
+        highlight();
         if (fileStream) {
             receivedLength ? fileStream.close() : fileStream.abort();
         }
@@ -220,13 +221,11 @@ function startDownload(tabId) {
         $("#stopDownload").hide();
     });
 
-    // 不跳转到下载器页面
-    $("#downActive").click(function () {
-        chrome.storage.sync.set({
-            downActive: $("#downActive").prop("checked")
+    function highlight() {
+        chrome.tabs.getCurrent(function name(params) {
+            chrome.tabs.highlight({ tabs: params.index });
         });
-    });
-
+    }
     function sendFile(action = "addMedia") {
         chrome.tabs.query({ url: ffmpeg.url }, function (tabs) {
             if (tabs.length && tabs[0].status != "complete") {

@@ -92,7 +92,7 @@ G.OptionLists = {
     css: "",
     checkDuplicates: true,
     enable: true,
-    downActive: false,
+    downActive: true,
     downAutoClose: false,
     downStream: false,
     aria2Rpc: "http://localhost:6800/jsonrpc",
