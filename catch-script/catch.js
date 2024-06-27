@@ -367,7 +367,14 @@
 
     // 从头播放
     function resetVideoPlayback(video) {
-        video.currentTime = 0;
+        const timer = setInterval(() => {
+            if (!video.paused) {
+                video.currentTime = 0;
+                CatCatch.querySelector("#checkHead").checked = true;
+                clearCache();
+                clearInterval(timer);
+            }
+        });
         video.addEventListener('play', () => {
             if (!video.isResetCatCatch) {
                 video.isResetCatCatch = true;
