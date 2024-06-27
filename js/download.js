@@ -167,6 +167,7 @@ function startDownload(tabId) {
         highlight();
         if (fileStream) {
             receivedLength ? fileStream.close() : fileStream.abort();
+            fileStream = null;
         }
         setProgressText(i18n.downloadFailed);
         $downFilepProgress.html(i18n.downloadFailed + " " + error);
