@@ -99,7 +99,7 @@ G.OptionLists = {
     enableAria2Rpc: false,
     enableAria2RpcReferer: true,
     aria2RpcToken: "",
-    m3u8AutoDown: false,
+    m3u8AutoDown: true,
     badgeNumber: true,
     send2local: false,
     send2localURL: "http://127.0.0.1:8000/",
