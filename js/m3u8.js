@@ -14,9 +14,13 @@ const _tabid = params.get("tabid");
 let autoDown = params.get("autoDown");
 const autoClose = params.get("autoClose");
 const popupAddMedia = params.get("popupAddMedia");
-const addMedia = params.get("addMedia");
+// const addFile = params.get("addFile");
 let currentTabId = 0;
 let currentIndex = 0;
+
+const _ffmpeg = params.get("ffmpeg");
+const _quantity = params.get("quantity");
+const _taskId = params.get("taskId");
 
 // 修改当前标签下的所有xhr的Referer 修改完成 运行init函数
 let requestHeaders = JSONparse(_requestHeaders);
@@ -202,7 +206,7 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
                 </div>`);
             html.find(".sendFfmpeg").click(function () {
                 let newUrl = url + `&autoDown=1`;
-                newUrl += `&addMedia=1`;
+                newUrl += `&ffmpeg=addFile`;
                 chrome.tabs.create({ url: newUrl, index: currentIndex + 1 });
             });
             $("#next_m3u8").append(html);
@@ -230,7 +234,7 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
                 </div>`);
             html.find(".sendFfmpeg").click(function () {
                 let newUrl = url + `&autoDown=1`;
-                newUrl += `&addMedia=1`;
+                newUrl += `&ffmpeg=addFile`;
                 chrome.tabs.create({ url: newUrl, index: currentIndex + 1 });
             });
             $("#next_audio").append(html);
@@ -1330,21 +1334,26 @@ function mergeTsNew(down) {
                 fileName = fileName + "." + ext;
             }
             let action = $("#onlyAudio").prop("checked") ? "onlyAudio" : "transcode";
-            if (popupAddMedia) {
-                action = "popupAddMedia";
-            } else if (addMedia) {
-                action = "addMedia";
+            if (_ffmpeg) {
+                action = _ffmpeg;
             }
-            chrome.runtime.sendMessage({
+            const data = {
                 Message: "catCatchFFmpeg",
                 action: action,
-                media: [{ data: URL.createObjectURL(fileBlob), name: `memory${new Date().getTime()}.${ext}` }],
+                files: [{ data: URL.createObjectURL(fileBlob), name: `memory${new Date().getTime()}.${ext}` }],
                 title: fileName,
+                output: fileName,
                 name: "memory" + new Date().getTime() + "." + ext,
                 active: !autoDown,
-                autoClose: $("#autoClose").prop("checked"),
                 tabId: currentTabId,
-            });
+            };
+            if (_quantity) {
+                data.quantity = parseInt(_quantity);
+            }
+            if (_taskId) {
+                data.taskId = _taskId;
+            }
+            chrome.runtime.sendMessage(data);
             buttonState("#mergeTs", true);
             $progress.html(i18n.sendFfmpeg);
             return;
@@ -1903,12 +1912,10 @@ function autoMerge() {
     }, 1000);
 }
 
-// 接受 catCatchFFmpegResult
+// 接收 catCatchFFmpegResult
 chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
-    if (!Message.Message || Message.Message != "catCatchFFmpegResult" || Message.state != "ok" || !Message.use || currentTabId == 0 || Message.tabId != currentTabId) { return; }
-    if (Message.use == "close") {
-        setTimeout(() => {
-            window.close();
-        }, Math.ceil(Math.random() * 500));
-    }
+    if (!Message.Message || Message.Message != "catCatchFFmpegResult" || Message.state != "ok" || currentTabId == 0 || Message.tabId != currentTabId) { return; }
+    setTimeout(() => {
+        $("#autoClose").prop("checked") && window.close();
+    }, Math.ceil(Math.random() * 500));
 });

@@ -271,7 +271,14 @@
                 const type = mime.split('/')[0];
                 media.push({ data: URL.createObjectURL(fileBlob), type: type });
             }
-            window.postMessage({ action: "catCatchFFmpeg", use: "merge", media: media, title: fileName.innerHTML.trim() });
+            window.postMessage({
+                action: "catCatchFFmpeg",
+                use: "catchMerge",
+                files: media,
+                title: fileName.innerHTML.trim(),
+                output: fileName.innerHTML.trim(),
+                quantity: media.length
+            });
         } else {
             const a = document.createElement('a');
             for (let item of catchMedia) {
@@ -307,7 +314,7 @@
         }
         for (let key in catchMedia) {
             catchMedia[key].bufferList.splice(1);
-            mediaSize += catchMedia[key].bufferList[0].byteLength;
+            mediaSize += catchMedia[key].bufferList[0]?.byteLength;
         }
     }
     function byteToSize(byte) {

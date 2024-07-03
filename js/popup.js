@@ -253,13 +253,7 @@ function AddMedia(data, currentTab = true) {
             }
             Tips(i18n.blobM3u8DLError, 1500);
         }
-        // const flag = specialFile(data);
-        // if (flag) {
-        //     catDownload(data, "&fileFlag=" + flag);
-        //     return false;
-        // }
         if (G.m3u8AutoDown && data.parsing == "m3u8") {
-            // data.html.find('#parsing').click();
             openM3u8Parser(data, { autoDown: true, autoClose: true });
             return false;
         }
@@ -352,7 +346,6 @@ $(".Tabs .TabButton").click(function () {
 // 其他页面
 $('#allTab').click(function () {
     !allCount && chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getAllData" }, function (data) {
-        // console.log(data);
         if (!data) { return; }
         for (let key in data) {
             if (key == G.tabId) { continue; }
@@ -395,15 +388,18 @@ $mergeDown.click(function () {
         action: "openFFmpeg",
         extra: i18n.waitingForMedia
     });
+    const taskId = Date.parse(new Date());
     // 都是m3u8 自动合并并发送到ffmpeg
     if (checkedData.every(data => isM3U8(data))) {
         checkedData.forEach(function (data) {
-            openM3u8Parser(data, { autoDown: true, popupAddMedia: true, autoClose: true });
+            // openM3u8Parser(data, { autoDown: true, popupAddMedia: true, autoClose: true });
+            openM3u8Parser(data, { ffmpeg: "merge", quantity: checkedData.length, taskId: taskId, autoDown: true, autoClose: true });
         });
         return true;
     }
     checkedData.forEach(function (data) {
-        catDownload(data, "&autosend=1&autoClose=1&title=" + data._title);
+        // catDownload(data, "&autosend=1&autoClose=1&title=" + data._title);
+        catDownload(data, `&ffmpeg=merge&quantity=${checkedData.length}&title=${data._title}&taskId=${taskId}`);
     });
 });
 // 复制选中文件
@@ -805,21 +801,27 @@ function aria2AddUri(data, success, error) {
  * @param {Object} data 资源对象
  * @param {Boolean} autoDown 是否自动下载
  */
-function openM3u8Parser(data, { autoDown, popupAddMedia, autoClose } = {}) {
+function openM3u8Parser(data, { ffmpeg, quantity, taskId, autoDown, autoClose } = {}) {
     chrome.tabs.get(G.tabId, function (tab) {
         let url = `/${data.parsing}.html?url=${encodeURIComponent(data.url)}&title=${encodeURIComponent(data.title)}&filename=${encodeURIComponent(data.downFileName)}&tabid=${data.tabId == -1 ? G.tabId : data.tabId}&initiator=${encodeURIComponent(data.initiator)}&tabid=${encodeURIComponent(tab.id)}`;
         if (data.requestHeaders) {
             url += `&requestHeaders=${encodeURIComponent(JSON.stringify(data.requestHeaders))}`;
         }
+        if (ffmpeg) {
+            url += `&ffmpeg=${ffmpeg}`;
+        }
+        if (quantity) {
+            url += `&quantity=${quantity}`;
+        }
+        if (taskId) {
+            url += `&taskId=${taskId}`;
+        }
         if (autoDown) {
             url += `&autoDown=1`;
-        }
-        if (popupAddMedia) {
-            url += `&popupAddMedia=1`;
         }
         if (autoClose) {
             url += `&autoClose=1`;
         }
-        chrome.tabs.create({ url: url, index: tab.index + 1, active: !(autoDown || popupAddMedia) });
+        chrome.tabs.create({ url: url, index: tab.index + 1, active: !autoDown });
     });
 }

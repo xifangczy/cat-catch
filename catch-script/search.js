@@ -98,6 +98,10 @@
             if (this.responseType == "arraybuffer" && this.response?.byteLength && this.response.byteLength == 16) {
                 postData({ action: "catCatchAddKey", key: this.response, href: location.href, ext: "key" });
             }
+            if (typeof this.response == "object") {
+                findMedia(this.response);
+                return;
+            }
             if (this.response == "" || typeof this.response != "string") { return; }
             if (this.response.substring(0, 17).toLowerCase() == "data:application/") {
                 const text = getDataM3U8(this.response.substring(17));
@@ -380,7 +384,7 @@
     function getBashUrl(url) {
         let bashUrl = url.split("/");
         bashUrl.pop();
-        return bashUrl.join("/") + "/";
+        return bashUrl._arrayJoin("/") + "/";
     }
     function addBashUrl(baseUrl, m3u8Text) {
         let m3u8_split = m3u8Text.split("\n");

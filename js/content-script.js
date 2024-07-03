@@ -136,15 +136,14 @@
             return true;
         }
         if (Message.Message == "ffmpeg") {
-            if (Message.media == undefined) {
-                window.postMessage({ action: Message.action, title: Message.title, extra: Message.extra, tabId: Message.tabId });
+            if (!Message.files) {
+                window.postMessage(Message);
                 sendResponse("ok");
                 return true;
             }
-            for (let item of Message.media) {
+            for (let item of Message.files) {
                 const data = { ...Message, ...item };
                 data.type = item.type ?? "video";
-                // loadBlob({ action: Message.action, type: item.type ?? "video", data: item.data, title: Message.title, name: item.name, extra: Message.extra, tabId: Message.tabId });
                 loadBlob(data);
             }
             sendResponse("ok");
@@ -212,23 +211,20 @@
         }
         if (event.data.action == "catCatchFFmpeg") {
             if (!event.data.use ||
-                !event.data.media ||
-                !event.data.media instanceof Array ||
-                event.data.media.length == 0
+                !event.data.files ||
+                !event.data.files instanceof Array ||
+                event.data.files.length == 0
             ) { return; }
-            let title = event.data.title ?? document.title ?? new Date().getTime().toString();
-            title = title.replaceAll('"', "").replaceAll("'", "").replaceAll(" ", "");
-            chrome.runtime.sendMessage({
+            event.data.title = event.data.title ?? document.title ?? new Date().getTime().toString();
+            event.data.title = event.data.title.replaceAll('"', "").replaceAll("'", "").replaceAll(" ", "");
+            let data = {
                 Message: event.data.action,
                 action: event.data.use,
-                media: event.data.media,
-                title: title,
+                files: event.data.files,
                 url: event.data.href ?? event.source.location.href,
-                extra: event.data.extra,
-                tabId: event.data.tabId,
-                active: event.data.active ?? true,
-                autoClose: event.data.autoClose ?? false,
-            });
+            };
+            data = { ...event.data, ...data };
+            chrome.runtime.sendMessage(data);
         }
         if (event.data.action == "catCatchFFmpegResult") {
             if (!event.data.state || !event.data.tabId) { return; }

@@ -5,11 +5,14 @@ const _url = params.get("url");
 const _initiator = params.get("initiator");
 const _requestHeaders = params.get("requestHeaders");
 const _fileName = params.get("filename");
-const autosend = params.get("autosend");
-const autoClose = params.get("autoClose");
+// const autosend = params.get("autosend");
+// const autoClose = params.get("autoClose");
 const downStream = params.get("downStream");
 const title = params.get("title");
 // const fileFlag = params.get("fileFlag");
+const _ffmpeg = params.get("ffmpeg");
+const _quantity = params.get("quantity");
+const _taskId = params.get("taskId");
 
 // 修改当前标签下的所有xhr的Referer
 let requestHeaders = JSONparse(_requestHeaders);
@@ -19,7 +22,7 @@ if (!requestHeaders.referer && _initiator) {
 setRequestHeaders(requestHeaders, () => { awaitG(start); });
 
 function start() {
-    $("#autoClose").prop("checked", autoClose ? true : G.downAutoClose);
+    $("#autoClose").prop("checked", G.downAutoClose);
     // $("#downActive").prop("checked", G.downActive);
     $("#downStream").prop("checked", G.downStream);
     $(`<style>${G.css}</style>`).appendTo("head");
@@ -74,7 +77,7 @@ function startDownload(tabId) {
     // 是否边下边存
     let fileStream = null;
     const filename = _fileName ? stringModify(_fileName) : getUrlFileName(_url);
-    if ((downStream || G.downStream) && !autosend) {
+    if ((downStream || G.downStream) && !_ffmpeg) {
         fileStream = streamSaver.createWriteStream(filename).getWriter();
     }
     // 开始下载
@@ -145,9 +148,9 @@ function startDownload(tabId) {
             blobUrl = URL.createObjectURL(blob);
             $("#ffmpeg").show();
             // 自动发送到ffmpeg
-            if (autosend) {
+            if (_ffmpeg) {
                 setProgressText(i18n.sendFfmpeg, true);
-                sendFile("popupAddMedia");
+                sendFile("merge");
                 return;
             }
             setProgressText(i18n.saving, true);
@@ -227,28 +230,34 @@ function startDownload(tabId) {
             chrome.tabs.highlight({ tabs: params.index });
         });
     }
-    function sendFile(action = "addMedia") {
+    function sendFile(action = "addFile") {
         chrome.tabs.query({ url: ffmpeg.url }, function (tabs) {
             if (tabs.length && tabs[0].status != "complete") {
                 setTimeout(() => { sendFile(action); }, 500);
             }
-            chrome.runtime.sendMessage({
+            const data = {
                 Message: "catCatchFFmpeg",
                 action: action,
-                media: [{ data: blobUrl, name: getUrlFileName(_url) }],
+                files: [{ data: blobUrl, name: getUrlFileName(_url) }],
                 title: title,
-                tabId: tabId
-            });
+                tabId: tabId,
+                taskId: _taskId ?? tabId
+            };
+            if (_quantity) {
+                data.quantity = parseInt(_quantity);
+            }
+            if (_taskId) {
+                data.taskId = _taskId;
+            }
+            chrome.runtime.sendMessage(data);
         });
     }
     chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         if (!Message.Message || Message.Message != "catCatchFFmpegResult" || Message.state != "ok" || tabId == 0 || Message.tabId != tabId) { return; }
         $downFilepProgress.html(i18n.sendFfmpeg);
-        if (Message.state == "ok" && $("#autoClose").prop("checked")) {
-            setTimeout(() => {
-                window.close();
-            }, Math.ceil(Math.random() * 999));
-        }
+        setTimeout(() => {
+            $("#autoClose").prop("checked") && window.close();
+        }, Math.ceil(Math.random() * 999));
     });
     function getUrlFileName() {
         try {

@@ -135,6 +135,7 @@ G.scriptList.set("webrtc.js", { key: "webrtc", refresh: true, allFrames: true, w
 // ffmpeg
 const ffmpeg = {
     tab: 0,
+    version: 1,
     url: "https://ffmpeg.bmmmd.com/",
 }
 
