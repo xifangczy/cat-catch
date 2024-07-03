@@ -233,7 +233,10 @@ function startDownload(tabId) {
     function sendFile(action = "addFile") {
         chrome.tabs.query({ url: ffmpeg.url }, function (tabs) {
             if (tabs.length && tabs[0].status != "complete") {
-                setTimeout(() => { sendFile(action); }, 500);
+                setTimeout(() => {
+                    sendFile(action);
+                }, 500);
+                return;
             }
             const data = {
                 Message: "catCatchFFmpeg",
