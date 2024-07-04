@@ -1,26 +1,29 @@
 // url 参数解析
 const params = new URL(location.href).searchParams;
-let _m3u8Url = params.get("url");
-// const _referer = params.get("referer");
-const _requestHeaders = params.get("requestHeaders");
-const _initiator = params.get("initiator");
-const _title = params.get("title");
-const _fileName = params.get("filename");
-let tsAddArg = params.get("tsAddArg");
-let autoReferer = params.get("autoReferer");
-const tabId = parseInt(params.get("tabid"));
-const key = params.get("key");
-const _tabid = params.get("tabid");
-let autoDown = params.get("autoDown");
-const autoClose = params.get("autoClose");
-const popupAddMedia = params.get("popupAddMedia");
-// const addFile = params.get("addFile");
-let currentTabId = 0;
-let currentIndex = 0;
+let _m3u8Url = params.get("url");   // m3u8的url地址
+const _requestHeaders = params.get("requestHeaders");   // 自定义请求头
+const _initiator = params.get("initiator"); // referer 备用
+const _title = params.get("title"); // 来源网页标题
+const _fileName = params.get("filename");   // 自定义文件名
+let tsAddArg = params.get("tsAddArg");  // 自定义 切片参数
+let autoReferer = params.get("autoReferer");    // 是否已经自动调整 referer
+const tabId = parseInt(params.get("tabid"));    // 资源所在的标签页ID 用来获取密钥
+const key = params.get("key");  // 自定义密钥
+let autoDown = params.get("autoDown");  //是否自动下载
+const autoClose = params.get("autoClose");  // 下载完是否关闭页面
 
-const _ffmpeg = params.get("ffmpeg");
-const _quantity = params.get("quantity");
-const _taskId = params.get("taskId");
+let currentTabId = 0;   // 本页面tab Id
+let currentIndex = 0;   // 本页面Index
+
+/*
+*   popup 合并多个m3u8 需要提交以下参数 ffmpeg才能判断文件是否添加完毕
+*   _ffmpeg 参数为ffmpeg动作 例如: "merge"为合并
+*   _quantity: m3u8数量
+*   _taskId: 唯一任务ID
+**/
+const _ffmpeg = params.get("ffmpeg");   // 是否发送到 ffmpeg
+const _quantity = params.get("quantity");   // 同时下载的总数
+const _taskId = params.get("taskId");   // 任务id
 
 // 修改当前标签下的所有xhr的Referer 修改完成 运行init函数
 let requestHeaders = JSONparse(_requestHeaders);
@@ -55,41 +58,44 @@ const keyContent = new Map(); // 储存key的内容
 const initData = new Map(); // 储存map的url
 const decryptor = new AESDecryptor(); // 解密工具 来自hls.js 分离出来的
 let skipDecrypt = false; // 是否跳过解密
-let possibleKeys = new Set();
-/* 下载相关 */
-let downId = 0; // 下载id
+let possibleKeys = new Set();   // 储存疑似 密钥
+let downId = 0; // chrome下载api 回调id
+
+/* 以下参数 新下载器已弃用 */
 let stopDownload = false; // 停止下载flag
-let fileSize = 0; // 文件大小
 let downDuration = 0; // 下载媒体得时长
 let downCurrentTs = 0;    // 当前进度
 let downTotalTs = 0;  // 需要下载的文件数量
 let tsBuffer = []; // ts内容缓存
 const errorTsList = []; // 下载错误ts序号列表
+
 let fileStream = undefined; // 流式下载文件输出流
-const downSet = {};   // 下载设置
+const downSet = {};   // 下载时 储存设置
+
 /* 录制相关 */
 let recorder = false; // 开关
-let recorderIndex = 0;  // 下载索引
+let recorderIndex = 0;  // 下载索引 新下载器已弃用
 let recorderLast = "";  // 最后下载的url
+
 /* mp4 转码工具 */
 let transmuxer = undefined;
-let transmuxerStatus = false;
-let transmuxerheadEncode = undefined;
+let transmuxerStatus = false;   // 新下载器已弃用
+let transmuxerheadEncode = undefined;   // 新下载器已弃用
 /* DOM */
-const $fileSize = $("#fileSize");
-const $progress = $("#progress");
-const $fileDuration = $("#fileDuration");
-const $m3u8dlArg = $("#m3u8dlArg");
-let pageDOM = null;
-const $media_file = $("#media_file");
+const $fileSize = $("#fileSize");   // 下载文件大小 进度
+const $progress = $("#progress");   // 下载进度
+const $fileDuration = $("#fileDuration");   // 下载总时长
+const $m3u8dlArg = $("#m3u8dlArg"); // m3u8DL 参数
+let pageDOM = null; // m3u8 来源页面DOM 用于标签系统${pageDOM}
+const $media_file = $("#media_file");   // 切片列表
 
 /**
  * 初始化函数，界面默认配置 loadSource载入 m3u8 url
  */
 function init() {
     // 获取页面DOM
-    if (_tabid) {
-        chrome.tabs.sendMessage(parseInt(_tabid), { Message: "getPage" }, { frameId: 0 }, function (result) {
+    if (tabId && tabId != -1) {
+        chrome.tabs.sendMessage(parseInt(tabId), { Message: "getPage" }, { frameId: 0 }, function (result) {
             if (chrome.runtime.lastError) { return; }
             pageDOM = new DOMParser().parseFromString(result, 'text/html');
         });
@@ -178,7 +184,7 @@ function init() {
     }
 }
 
-// 监听 MANIFEST_PARSED 装载解析的m3u8 URL
+// 监听 MANIFEST_LOADED 装载解析的m3u8 URL
 hls.on(Hls.Events.MANIFEST_LOADED, function (event, data) {
     $("#m3u8_url").attr("href", data.url).html(data.url);
 });
@@ -296,12 +302,22 @@ hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
 // 监听 ERROR m3u8解析错误
 hls.on(Hls.Events.ERROR, function (event, data) {
     autoDown && highlight();
-    console.log(data);
+    console.log(data.error);
     if (data.type == "mediaError" && data.details == "fragParsingError") {
         if (data.error.message == "No ADTS header found in AAC PES") {
             $("#tips").append("<b>" + i18n.ADTSerror + "</b>");
+            hls.stopLoad();
         }
-        hls.stopLoad();
+        if (data.error.message == "Unsupported HEVC in M2TS found") {
+            $("#mp4").prop("checked", false);
+            $(".videoInfo #info").html("<b>" + i18n.hevcTip + "</b>");
+            hls.skipTheError = true;
+        }
+        $("#play").hide();
+        return;
+    }
+    if (data.type == "otherError" && data.error.message.includes("remux") && hls.skipTheError) {
+        return;
     }
     $("#loading").show();
     $("#loading .optionBox").html(`${i18n.m3u8Error}<button id="setRequestHeadersError">${i18n.setRequestHeaders}</button>`);
@@ -340,28 +356,6 @@ hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
             return;
         }
         !data.tracks.audio && info.append(` (${i18n.noAudio})`);
-        if (!data.tracks.video) {
-            info.append(` (${i18n.noVideo})`);
-            // 下载第一个切片 判断是否H265编码
-            fetch(_fragments[0].url).then(response => response.arrayBuffer())
-                .then(function (data) {
-                    data = new Uint8Array(data);
-                    // 非ts文件 或 已加密
-                    if (data[0] != 0x47 || data[1] != 0x40) { return; }
-                    for (let i = 0; i < data.length; i++) {
-                        if (data[i] == 0x47 && data[i + 1] != 0x40) {
-                            // 0x24 H.265
-                            if (data[i + 17] == 0x24) {
-                                info.html(info.html().replace(i18n.noVideo, "<b>" + i18n.hevcTip + "</b>"));
-                                $("#mp4").prop("checked", false);
-                            }
-                            return;
-                        }
-                    }
-                }).catch(function (error) {
-                    console.log(error);
-                });
-        }
         if (data.tracks.video?.metadata) {
             info.append(` ${i18n.resolution}:${data.tracks.video.metadata.width} x ${data.tracks.video.metadata.height}`);
         }
@@ -458,6 +452,7 @@ function parseTs(data) {
     }
 
     // 录制直播
+    /* 直播是持续更新的m3u8 recorderLast保存下载的最后一个url 以便下次更新时判断从哪个切片开始继续下载 */
     if (recorder) {
         if ($("#test").prop("checked")) {
             let indexLast = _fragments.findIndex((fragment) => {
@@ -569,16 +564,6 @@ $(".openDir").click(function () {
 });
 // 下载ts列表
 $("#downText").click(function () {
-    // let text = $media_file.val().replace(/\n\n/g, "\n");
-    // text = encodeURIComponent(text);
-    // let type = $media_file.data("type");
-    // let downType = "data:text/plain,";
-    // let filename = GetFileName(_m3u8Url) + '.txt';
-    // if (type == "m3u8") {
-    //     downType = "data:application/vnd.apple.mpegurl,";
-    //     filename = GetFile(_m3u8Url);
-    // }
-
     const filename = GetFileName(_m3u8Url) + '.txt';
     let text = "data:text/plain,";
     _fragments.forEach(function (item) {
@@ -998,6 +983,7 @@ function downloadTs(start = 0, end = _fragments.length - 1, errorObj = undefined
     let tsThread = _tsThread;  // 线程数量
     let index = start - 1; // 当前下载的索引
     downTotalTs = errorObj ? downTotalTs : end - start + 1;  // 需要下载的文件数量
+    let fileSize = 0;
     const tsInterval = setInterval(function () {
         // 停止下载flag
         if (stopDownload) {
@@ -1085,6 +1071,9 @@ function downloadNew(start = 0, end = _fragments.length) {
     // 切片下载器
     const down = new Downloader(_fragments, parseInt($("#thread").val()));
 
+    // 储存切片所需 DOM 提高性能
+    const itemDOM = new Map();
+
     // 解密函数
     down.setDecrypt(function (buffer, fragment) {
         return new Promise(function (resolve, reject) {
@@ -1133,25 +1122,22 @@ function downloadNew(start = 0, end = _fragments.length) {
             }
             tempBuffer = segment.data;
         });
-        down.setTranscode(function (buffer, isHead) {
-            return new Promise(function (resolve, reject) {
-                head = isHead;
-                transmuxer.push(new Uint8Array(buffer));
-                transmuxer.flush();
-                tempBuffer ? resolve(tempBuffer.buffer) : resolve(buffer);
-            });
+        down.setTranscode(async function (buffer, fragment) {
+            head = fragment.index == 0;
+            transmuxer.push(new Uint8Array(buffer));
+            transmuxer.flush();
+            return tempBuffer ? tempBuffer.buffer : buffer;
         });
     }
     // 下载错误
     down.on('downloadError', function (fragment, error) {
-        // console.log(fragment, error, down.isErrorItem(fragment));
-
         $("#ForceDownload").show(); // 强制下载
         $("#errorDownload").show(); // 重下所有失败项
 
-        const $dom = $(`#downItem${fragment.index}`);
-        $dom.find(".percentage").addClass('error').html(i18n.downloadFailed);
-        $button = $dom.find("button");
+        // const $dom = $(`#downItem${fragment.index}`);
+        // $dom.find(".percentage").addClass('error').html(i18n.downloadFailed);
+        itemDOM.get(fragment.index).percentage.addClass('error').html(i18n.downloadFailed);
+        $button = itemDOM.get(fragment.index).button;
         $button.html(i18n.retryDownload).data("action", "start");
         if (down.isErrorItem(fragment)) {
             const count = parseInt($button.data("count")) + 1;
@@ -1164,8 +1150,8 @@ function downloadNew(start = 0, end = _fragments.length) {
     down.on('completed', function (buffer, fragment) {
         if (recorder) {
             $progress.html(i18n.waitingForLiveData);
-            downDuration += fragment.duration;
-            $fileDuration.html(i18n.recordingDuration + ":" + secToTime(downDuration));
+            // downDuration += fragment.duration;
+            $fileDuration.html(i18n.recordingDuration + ":" + secToTime(down.duration));
             return;
         }
         // $(`#downItem${fragment.index}`).remove();
@@ -1184,7 +1170,6 @@ function downloadNew(start = 0, end = _fragments.length) {
         }
         transmuxer?.off && transmuxer.off('data');
         transmuxer = undefined;
-        transmuxerheadEncode = undefined;
 
         $("#ForceDownload").hide(); // 强制下载
         $("#errorDownload").hide(); // 重下所有失败项
@@ -1195,12 +1180,13 @@ function downloadNew(start = 0, end = _fragments.length) {
     let lastEmitted = Date.now();
     down.on('itemProgress', function (fragment, state, receivedLength, contentLength) {
         if (state) {
-            $(`#downItem${fragment.index} .percentage`).html(i18n.downloadComplete);
-            $(`#downItem${fragment.index} button`).remove();
+            itemDOM.get(fragment.index).percentage.html(i18n.downloadComplete);
+            itemDOM.get(fragment.index).button.remove();
+            // itemDOM.get(fragment.index).root.remove();
             return;
         }
         if (Date.now() - lastEmitted >= 100) {
-            downItemPercentageDOM[fragment.index].html((receivedLength / contentLength * 100).toFixed(2) + "%");
+            itemDOM.get(fragment.index).percentage.html((receivedLength / contentLength * 100).toFixed(2) + "%");
             lastEmitted = Date.now();
         }
     });
@@ -1220,7 +1206,6 @@ function downloadNew(start = 0, end = _fragments.length) {
     down.start(start, end);
 
     // 单项进度
-    let downItemPercentageDOM = [];
     const tempDOM = $("<div>");
     down.fragments.forEach((fragment) => {
         const html = $(`<div id="downItem${fragment.index}">
@@ -1232,10 +1217,16 @@ function downloadNew(start = 0, end = _fragments.length) {
             </div>
         </div>`);
 
-        // 保存进程 DOM 更新下载进度提升性能
-        downItemPercentageDOM[fragment.index] = html.find(".percentage");
+        const $button = html.find("button");
 
-        html.find("button").click(function () {
+        // 保存进程 DOM 更新下载进度提升性能
+        itemDOM.set(fragment.index, {
+            root: html,
+            percentage: html.find(".percentage"),
+            button: $button,
+        });
+
+        $button.click(function () {
             html.find(".percentage").removeClass('error');
             if ($(this).data("action") == "stop") {
                 down.stop(fragment.index);
@@ -1614,7 +1605,6 @@ function tsDecrypt(responseData, index) {
 }
 // 初始化下载变量
 function initDownload() {
-    fileSize = 0;   // 初始化已下载大小
     $fileSize.html("");
     downDuration = 0;   // 初始化时长
     $fileDuration.html("");
@@ -1635,7 +1625,7 @@ function initDownload() {
 
 // 流式下载
 function createStreamSaver(url) {
-    streamSaver.mitm = "https://stream.bmmmd.com/mitm.html";
+    streamSaver.mitm = streamSaverConfig.url;
     const ext = $("#mp4").prop("checked") ? "mp4" : GetExt(url);
     return streamSaver.createWriteStream(`${GetFileName(url)}.${ext}`).getWriter();
 }

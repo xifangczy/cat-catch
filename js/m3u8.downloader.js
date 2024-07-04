@@ -227,7 +227,7 @@ class Downloader {
             .then(buffer => {
                 this.emit('decryptedData', buffer, fragment);
                 // 存在转码函数 调用转码函数 否则直接返回buffer
-                return this.transcode ? this.transcode(buffer, fragment.index == 0) : buffer;
+                return this.transcode ? this.transcode(buffer, fragment) : buffer;
             })
             .then(buffer => {
                 // 储存解密/转码后的buffer
