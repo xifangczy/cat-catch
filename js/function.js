@@ -221,15 +221,6 @@ function templates(text, data) {
         mobileUserAgent: G.MobileUserAgent,
         userAgent: G.userAgent ? G.userAgent : navigator.userAgent,
     }
-    // // 开始替换
-    // for (let key in data) {
-    //     text = text.replaceAll('${' + key + '}', data[key]);
-    // }
-    // //函数支持
-    // text = text.replace(reTemplates, function (original, tag, action) {
-    //     return templatesFunction(data[tag], action, data);
-    // });
-
     text = text.replace(reTemplates, function (original, tag, action) {
         tag = tag.trim();
         if (action) {
@@ -245,24 +236,6 @@ function getUrlFileName(url) {
     let pathname = new URL(url).pathname;
     let filename = pathname.split("/").pop();
     return filename ? filename : "NULL";
-}
-
-// 判断文件是否需要修复
-function specialFile(data) {
-    if (data.cacheURL.host.includes("googlevideo.com") && data.cacheURL.pathname == "/videoplayback") {
-        return "youtube";
-    }
-    return "";
-}
-// 文件修复
-const filePatch = {
-    youtube: function (buffer) {
-        buffer = new Uint8Array(buffer);
-        if (buffer && buffer[0] == 0x14 && buffer[1] == 0x2F && buffer[2] == 0x08 && buffer[2] == 0x00) {
-            buffer = buffer.slice(25);
-        }
-        return buffer.buffer;
-    }
 }
 /**
  * 解析json字符串 解析错误返回默认值
