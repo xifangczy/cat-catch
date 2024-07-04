@@ -600,10 +600,10 @@
     "message": "无视频"
   },
   "hevcTip": {
-    "message": "HEVC/H.265编码ts文件 只支持在线ffmpeg转码"
+    "message": "HEVC/H.265编码切片文件 只支持在线ffmpeg转码"
   },
   "hevcPreviewTip": {
-    "message": "HEVC/H.265编码ts文件 不支持预览"
+    "message": "HEVC/H.265编码切片文件 不支持预览"
   },
   "m3u8Info": {
     "message": "共 $num$ 个文件, 总时长 $time$",

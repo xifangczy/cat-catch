@@ -600,10 +600,10 @@
     "message": "No Video"
   },
   "hevcTip": {
-    "message": "HEVC/H.265 encoded TS files are only supported for online ffmpeg transcoding"
+    "message": "HEVC/H.265 encoded fragment files are only supported for online ffmpeg transcoding"
   },
   "hevcPreviewTip": {
-    "message": "HEVC/H.265 encoded ts files are not supported for preview."
+    "message": "HEVC/H.265 encoded fragment files are not supported for preview."
   },
   "m3u8Info": {
     "message": "A total of $num$ file, with a total duration of $time$.",

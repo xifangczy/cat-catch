@@ -600,10 +600,10 @@
     "message": "無視訊"
   },
   "hevcTip": {
-    "message": "HEVC/H.265編碼ts檔案 只支援線上ffmpeg轉碼"
+    "message": "HEVC/H.265編碼切片檔案 只支援線上ffmpeg轉碼"
   },
   "hevcPreviewTip": {
-    "message": "HEVC/H.265編碼ts檔案 不支援預覽"
+    "message": "HEVC/H.265編碼切片檔案 不支援預覽"
   },
   "m3u8Info": {
     "message": "共 $num$ 個檔案, 總長度 $time$",
