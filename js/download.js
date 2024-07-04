@@ -27,7 +27,7 @@ function start() {
     $("#downStream").prop("checked", G.downStream);
     $(`<style>${G.css}</style>`).appendTo("head");
     // 流式下载服务端
-    streamSaver.mitm = "https://stream.bmmmd.com/mitm.html";
+    streamSaver.mitm = streamSaverConfig.url;
 
     chrome.tabs.getCurrent(function (tab) {
         startDownload(tab.id);
@@ -172,10 +172,15 @@ function startDownload(tabId) {
             receivedLength ? fileStream.close() : fileStream.abort();
             fileStream = null;
         }
-        setProgressText(i18n.downloadFailed);
-        $downFilepProgress.html(i18n.downloadFailed + " " + error);
-        console.error(error);
         $("#stopDownload").hide();
+        if (error.name === 'AbortError') {
+            setProgressText(i18n.stopDownload);
+            $downFilepProgress.html(i18n.stopDownload);
+        } else {
+            setProgressText(i18n.downloadFailed);
+            $downFilepProgress.html(i18n.downloadFailed + " " + error);
+            console.error(error);
+        }
     });
 
     // 监听下载事件 修改提示
@@ -231,7 +236,7 @@ function startDownload(tabId) {
         });
     }
     function sendFile(action = "addFile") {
-        chrome.tabs.query({ url: ffmpeg.url }, function (tabs) {
+        chrome.tabs.query({ url: ffmpegConfig.url }, function (tabs) {
             if (tabs.length && tabs[0].status != "complete") {
                 setTimeout(() => {
                     sendFile(action);

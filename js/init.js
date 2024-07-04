@@ -133,10 +133,14 @@ G.scriptList.set("recorder2.js", { key: "recorder2", refresh: false, allFrames: 
 G.scriptList.set("webrtc.js", { key: "webrtc", refresh: true, allFrames: true, world: "MAIN", name: i18n.recordWebRTC, off: i18n.closeRecording, i18n: true, tabId: new Set() });
 
 // ffmpeg
-const ffmpeg = {
+const ffmpegConfig = {
     tab: 0,
     version: 1,
     url: "https://ffmpeg.bmmmd.com/",
+}
+// streamSaver 边下边存
+const streamSaverConfig = {
+    url: "https://stream.bmmmd.com/mitm.html"
 }
 
 // 正则预编译
