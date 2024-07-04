@@ -141,6 +141,7 @@
                 sendResponse("ok");
                 return true;
             }
+            Message.quantity ??= Message.files.length;
             for (let item of Message.files) {
                 const data = { ...Message, ...item };
                 data.type = item.type ?? "video";
