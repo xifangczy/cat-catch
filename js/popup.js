@@ -254,7 +254,7 @@ function AddMedia(data, currentTab = true) {
             Tips(i18n.blobM3u8DLError, 1500);
         }
         if (G.m3u8AutoDown && data.parsing == "m3u8") {
-            openM3u8Parser(data, { autoDown: true, autoClose: true });
+            openParser(data, { autoDown: true, autoClose: true });
             return false;
         }
         chrome.downloads.download({
@@ -279,9 +279,9 @@ function AddMedia(data, currentTab = true) {
         chrome.tabs.update({ url: url });
         return false;
     });
-    //解析m3u8
+    //解析
     data.html.find('#parsing').click(function (e) {
-        openM3u8Parser(data);
+        openParser(data);
         return false;
     });
     // 多选框 创建checked属性 值和checked状态绑定
@@ -392,13 +392,11 @@ $mergeDown.click(function () {
     // 都是m3u8 自动合并并发送到ffmpeg
     if (checkedData.every(data => isM3U8(data))) {
         checkedData.forEach(function (data) {
-            // openM3u8Parser(data, { autoDown: true, popupAddMedia: true, autoClose: true });
-            openM3u8Parser(data, { ffmpeg: "merge", quantity: checkedData.length, taskId: taskId, autoDown: true, autoClose: true });
+            openParser(data, { ffmpeg: "merge", quantity: checkedData.length, taskId: taskId, autoDown: true, autoClose: true });
         });
         return true;
     }
     checkedData.forEach(function (data) {
-        // catDownload(data, "&autosend=1&autoClose=1&title=" + data._title);
         catDownload(data, `&ffmpeg=merge&quantity=${checkedData.length}&title=${data._title}&taskId=${taskId}`);
     });
 });
@@ -521,7 +519,11 @@ if (G.isFirefox) {
 }
 // 跳转页面
 $("[go]").click(function () {
-    chrome.tabs.create({ url: this.getAttribute("go") });
+    let url = this.getAttribute("go");
+    if (url == "ffmpegURL") {
+        url = ffmpegConfig.url;
+    }
+    chrome.tabs.create({ url: url });
 });
 // 暂停 启用
 $("#enable").click(function () {
@@ -797,31 +799,19 @@ function aria2AddUri(data, success, error) {
 }
 
 /**
- * 打开m3u8解析器
+ * 打开解析器
  * @param {Object} data 资源对象
- * @param {Boolean} autoDown 是否自动下载
+ * @param {Object} options 选项
  */
-function openM3u8Parser(data, { ffmpeg, quantity, taskId, autoDown, autoClose } = {}) {
+function openParser(data, options = {}) {
     chrome.tabs.get(G.tabId, function (tab) {
         let url = `/${data.parsing}.html?url=${encodeURIComponent(data.url)}&title=${encodeURIComponent(data.title)}&filename=${encodeURIComponent(data.downFileName)}&tabid=${data.tabId == -1 ? G.tabId : data.tabId}&initiator=${encodeURIComponent(data.initiator)}&tabid=${encodeURIComponent(tab.id)}`;
         if (data.requestHeaders) {
             url += `&requestHeaders=${encodeURIComponent(JSON.stringify(data.requestHeaders))}`;
         }
-        if (ffmpeg) {
-            url += `&ffmpeg=${ffmpeg}`;
+        for (const [key, value] of Object.entries(options)) {
+            url += `&${key}=${typeof value === 'boolean' ? 1 : value}`;
         }
-        if (quantity) {
-            url += `&quantity=${quantity}`;
-        }
-        if (taskId) {
-            url += `&taskId=${taskId}`;
-        }
-        if (autoDown) {
-            url += `&autoDown=1`;
-        }
-        if (autoClose) {
-            url += `&autoClose=1`;
-        }
-        chrome.tabs.create({ url: url, index: tab.index + 1, active: !autoDown });
+        chrome.tabs.create({ url: url, index: tab.index + 1, active: !options.autoDown });
     });
 }
