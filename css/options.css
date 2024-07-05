@@ -427,3 +427,8 @@ a.json-placeholder:hover {
   width: 100%;
   border: solid 1px var(--text-color);
 }
+#popupHeight,
+#popupWidth {
+  width: 3rem;
+  margin: 0 0.5rem 0 0.5rem;
+}

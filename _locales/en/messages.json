@@ -812,5 +812,11 @@
   },
   "send2local": {
     "message": "Data transmission"
+  },
+  "popup": {
+    "message": "Popup"
+  },
+  "defaultPopup": {
+    "message": "Default Popup Mode"
   }
 }

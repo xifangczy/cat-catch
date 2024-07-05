@@ -136,7 +136,10 @@ $("#PlayerTemplate").change(function () {
 //失去焦点 保存自动清理数 模拟手机User Agent 自定义播放调用模板
 let debounce2 = undefined;
 $("[save='input']").on("input", function () {
-    const val = $(this).val().trim();
+    let val = $(this).val().trim();
+    if (this.type == "number") {
+        val = parseInt(val);
+    }
     clearTimeout(debounce2);
     debounce2 = setTimeout(() => {
         chrome.storage.sync.set({ [this.id]: val });

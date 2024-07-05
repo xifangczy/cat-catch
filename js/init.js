@@ -103,6 +103,9 @@ G.OptionLists = {
     badgeNumber: true,
     send2local: false,
     send2localURL: "http://127.0.0.1:8000/",
+    popup: false,
+    popupHeight: 1080,
+    popupWidth: 1920,
 };
 // 本地储存的配置
 G.LocalVar = {

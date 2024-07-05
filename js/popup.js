@@ -1,3 +1,8 @@
+// 解析参数
+const params = new URL(location.href).searchParams;
+const _tabId = parseInt(params.get("tabId"));
+window.isPopup = _tabId ? true : false;
+
 // 当前页面
 const $mediaList = $('#mediaList');
 const $current = $("<div></div>");
@@ -58,7 +63,7 @@ function AddMedia(data, currentTab = true) {
     data.name = isEmpty(data.name) ? data.title + '.' + data.ext : decodeURIComponent(stringModify(data.name));
     //截取文件名长度
     let trimName = data.name;
-    if (data.name.length >= 50) {
+    if (data.name.length >= 50 && !isPopup) {
         trimName = trimName.substr(0, 25) + '...' + trimName.substr(-30);
     }
     //添加下载文件名
@@ -397,7 +402,12 @@ $mergeDown.click(function () {
         return true;
     }
     checkedData.forEach(function (data) {
-        catDownload(data, `&ffmpeg=merge&quantity=${checkedData.length}&title=${data._title}&taskId=${taskId}`);
+        catDownload(data, {
+            ffmpeg: "merge",
+            quantity: checkedData.length,
+            title: data._title,
+            taskId: taskId,
+        });
     });
 });
 // 复制选中文件
@@ -521,8 +531,10 @@ if (G.isFirefox) {
 $("[go]").click(function () {
     let url = this.getAttribute("go");
     if (url == "ffmpegURL") {
-        url = ffmpegConfig.url;
+        chrome.tabs.create({ url: ffmpegConfig.url })
+        return;
     }
+    // isPopup ? chrome.tabs.update({ url: url }) : chrome.tabs.create({ url: url });
     chrome.tabs.create({ url: url });
 });
 // 暂停 启用
@@ -531,10 +543,40 @@ $("#enable").click(function () {
         $("#enable").html(state ? i18n.pause : i18n.enable);
     });
 });
+// 弹出窗口
+$("#popup").click(function () {
+    chrome.tabs.query({ currentWindow: false, windowType: "popup", url: chrome.runtime.getURL("popup.html?tabId=") + "*" }, function (tabs) {
+        if (tabs.length) {
+            chrome.tabs.update(tabs[0].id, { url: `popup.html?tabId=${G.tabId}` });
+            chrome.windows.update(tabs[0].windowId, { focused: true });
+        } else {
+            chrome.windows.create({
+                url: `popup.html?tabId=${G.tabId}`,
+                type: "popup",
+                height: G.popupHeight ?? 1080,
+                width: G.popupWidth ?? 1920,
+            });
+        }
+        window.close();
+    });
+});
 // 一些需要等待G变量加载完整的操作
 const interval = setInterval(function () {
     if (!G.initSyncComplete || !G.initLocalComplete || !G.tabId) { return; }
     clearInterval(interval);
+
+    // 弹出模式 修改G.tabID为参数设定 设置css
+    if (isPopup) {
+        G.tabId = _tabId;
+        $("body").css("width", "100%"); // body 宽度100%
+        $("#popup").hide(); // 隐藏弹出按钮
+        $("#features").hide();  // 隐藏更多功能按钮
+        $("#down").append($("#features button")).css("justify-content", "center");  // 把更多功能内按钮移动到底部
+        $("#down button").css("margin-left", "5px");    // 按钮间隔
+    } else if (G.popup) {
+        $("#popup").click();    // 默认弹出模式
+    }
+
     // 获取页面DOM
     chrome.tabs.sendMessage(G.tabId, { Message: "getPage" }, { frameId: 0 }, function (result) {
         if (chrome.runtime.lastError) { return; }
@@ -588,6 +630,14 @@ const interval = setInterval(function () {
         $(".container").css("margin-bottom", ($down[0].offsetHeight + 2) + "px");
     });
     observer.observe($down[0], { childList: true, subtree: true, attributes: true });
+
+    // 记忆弹出窗口的大小
+    isPopup && chrome.windows.onBoundsChanged.addListener(function (window) {
+        chrome.storage.sync.set({
+            popupHeight: window.height,
+            popupWidth: window.width,
+        });
+    });
 }, 0);
 /********************绑定事件END********************/
 
@@ -665,23 +715,28 @@ function copyLink(data) {
     return templates(text, data);
 }
 // 携带referer 下载
-function catDownload(obj, extra = "") {
+function catDownload(obj, extra = {}) {
     let active = !G.downActive;
     if (extra) { active = false; }
     chrome.tabs.get(G.tabId, function (tab) {
-        chrome.tabs.create({
-            url: `/download.html?url=${encodeURIComponent(
-                obj.url
-            )}&requestHeaders=${encodeURIComponent(
-                JSON.stringify(obj.requestHeaders)
-            )}&filename=${encodeURIComponent(
-                obj.downFileName
-            )}&initiator=${encodeURIComponent(
-                obj.initiator
-            )}${extra}`,
+        const arg = {
+            url: `/download.html?${new URLSearchParams({
+                url: obj.url,
+                requestHeaders: JSON.stringify(obj.requestHeaders),
+                filename: obj.downFileName,
+                initiator: obj.initiator,
+                ...extra
+            })}`,
             index: tab.index + 1,
             active: active
-        });
+        };
+        // if (isPopup && !Object.keys(extra).length) {
+        //     delete arg.index;
+        //     chrome.tabs.update(arg);
+        // } else {
+        //     chrome.tabs.create(arg);
+        // }
+        chrome.tabs.create(arg);
     });
 }
 // 提示
@@ -805,13 +860,23 @@ function aria2AddUri(data, success, error) {
  */
 function openParser(data, options = {}) {
     chrome.tabs.get(G.tabId, function (tab) {
-        let url = `/${data.parsing}.html?url=${encodeURIComponent(data.url)}&title=${encodeURIComponent(data.title)}&filename=${encodeURIComponent(data.downFileName)}&tabid=${data.tabId == -1 ? G.tabId : data.tabId}&initiator=${encodeURIComponent(data.initiator)}&tabid=${encodeURIComponent(tab.id)}`;
-        if (data.requestHeaders) {
-            url += `&requestHeaders=${encodeURIComponent(JSON.stringify(data.requestHeaders))}`;
-        }
-        for (const [key, value] of Object.entries(options)) {
-            url += `&${key}=${typeof value === 'boolean' ? 1 : value}`;
-        }
+        const url = `/${data.parsing}.html?${new URLSearchParams({
+            url: data.url,
+            title: data.title,
+            filename: data.downFileName,
+            tabid: data.tabId == -1 ? G.tabId : data.tabId,
+            initiator: data.initiator,
+            tabid: tab.id,
+            requestHeaders: data.requestHeaders ? JSON.stringify(data.requestHeaders) : undefined,
+            ...Object.fromEntries(Object.entries(options).map(([key, value]) => [key, typeof value === 'boolean' ? 1 : value])),
+        })}`
+
+        // 弹出模式 当前页面打开
+        // if (isPopup) {
+        //     chrome.tabs.update({ url: url });
+        // } else {
+        //     chrome.tabs.create({ url: url, index: tab.index + 1, active: !options.autoDown });
+        // }
         chrome.tabs.create({ url: url, index: tab.index + 1, active: !options.autoDown });
     });
 }

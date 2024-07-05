@@ -812,5 +812,11 @@
   },
   "send2local": {
     "message": "數據發送"
+  },
+  "popup": {
+    "message": "彈出"
+  },
+  "defaultPopup": {
+    "message": "默認彈出模式"
   }
 }
