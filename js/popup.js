@@ -152,29 +152,10 @@ function AddMedia(data, currentTab = true) {
                     hls.loadSource(data.url);
                     hls.attachMedia(preview[0]);
                 });
-                hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
-                    if (data.tracks && !data.tracks.audiovideo) {
-                        !data.tracks.audio && mediaInfo.append(`<br><b>${i18n.noAudio}</b>`);
-                        if (!data.tracks.video) {
-                            mediaInfo.append(`<br><b>${i18n.noVideo}</b>`);
-                            fetch(hls.levels[0].details.fragments[0].url).then(response => response.arrayBuffer())
-                                .then(function (data) {
-                                    data = new Uint8Array(data);
-                                    // 非ts文件 或 已加密
-                                    if (data[0] != 0x47 || data[1] != 0x40) { return; }
-                                    for (let i = 0; i < data.length; i++) {
-                                        if (data[i] == 0x47 && data[i + 1] != 0x40) {
-                                            // 0x24 H.265
-                                            if (data[i + 17] == 0x24) {
-                                                mediaInfo.html(mediaInfo.html().replace(i18n.noVideo, i18n.hevcPreviewTip));
-                                            }
-                                            return;
-                                        }
-                                    }
-                                }).catch(function (error) {
-                                    console.log(error);
-                                });
-                        }
+                hls.on(Hls.Events.ERROR, function (event, data) {
+                    if (data.error.message == "Unsupported HEVC in M2TS found") {
+                        hls.stopLoad();
+                        mediaInfo.append(`<br><b>${i18n.hevcPreviewTip}</b>`);
                     }
                 });
                 hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
