@@ -106,7 +106,7 @@ G.OptionLists = {
     popup: false,
     popupHeight: 1080,
     popupWidth: 1920,
-    invoke: true,
+    invoke: false,
     protocolParameter: "m3u8dl://${url}",
 };
 // 本地储存的配置
