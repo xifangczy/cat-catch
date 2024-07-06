@@ -223,8 +223,8 @@ function AddMedia(data, currentTab = true) {
     data.html.find('#download').click(function () {
         if (G.m3u8dl && (isM3U8(data) || isMPD(data))) {
             if (!data.url.startsWith("blob:")) {
-                let m3u8dlArg = templates(G.m3u8dlArg, data);
-                let url = 'm3u8dl://' + Base64.encode(m3u8dlArg);
+                const m3u8dlArg = templates(G.m3u8dlArg, data);
+                const url = 'm3u8dl://' + (G.m3u8dlBase64 ? Base64.encode(m3u8dlArg) : m3u8dlArg);
                 if (url.length >= 2046) {
                     navigator.clipboard.writeText(m3u8dlArg);
                     Tips(i18n.M3U8DLparameterLong, 2000);

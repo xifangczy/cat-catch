@@ -818,5 +818,8 @@
   },
   "defaultPopup": {
     "message": "Default Popup Mode"
+  },
+  "m3u8dlBase64": {
+    "message": "Base64 encoding transmission"
   }
 }
