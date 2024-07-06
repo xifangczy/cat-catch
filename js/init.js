@@ -80,7 +80,6 @@ G.OptionLists = {
     MobileUserAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1",
     m3u8dl: false,
     m3u8dlArg: `"\${url}" --workDir "%USERPROFILE%\\Downloads\\m3u8dl" --saveName "\${title}_\${now}" --enableDelAfterDone \${referer|exists:'--headers "Referer:*"'}`,
-    m3u8dlBase64: true,
     playbackRate: 2,
     copyM3U8: "${url}",
     copyMPD: "${url}",
@@ -107,6 +106,8 @@ G.OptionLists = {
     popup: false,
     popupHeight: 1080,
     popupWidth: 1920,
+    invoke: true,
+    protocolParameter: "m3u8dl://${url}",
 };
 // 本地储存的配置
 G.LocalVar = {

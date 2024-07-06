@@ -181,4 +181,7 @@ button:active,
   img.aria2 {
     content: url(../img/aria2-dark.png);
   }
+  img.invoke {
+    content: url(../img/invoke-dark.png);
+  }
 }

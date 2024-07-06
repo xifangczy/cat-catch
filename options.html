@@ -13,6 +13,8 @@
 
 <body>
   <div class="wrapper">
+
+    <!-- 抓取后缀 -->
     <section>
       <h1 class="optionsTitle" data-i18n="suffix"></h1>
       <div class="optionBox">
@@ -34,6 +36,7 @@
       </div>
     </section>
 
+    <!-- 抓取类型 -->
     <section>
       <h1 class="optionsTitle" data-i18n="type"></h1>
       <div class="optionBox">
@@ -55,6 +58,7 @@
       </div>
     </section>
 
+    <!-- 正则匹配 -->
     <section>
       <h1 class="optionsTitle">
         <img src="img/regex.png" style="width: 18px" /><span data-i18n-outer="regexMatch"></span> / <span
@@ -98,6 +102,7 @@
       </div>
     </section>
 
+    <!-- 复制选项 -->
     <section>
       <h1 class="optionsTitle" data-i18n="copy"></h1>
       <div class="optionBox">
@@ -123,6 +128,7 @@
       </div>
     </section>
 
+    <!-- Aria2 RPC -->
     <section>
       <h1 class="optionsTitle">
         Aria2 RPC
@@ -164,6 +170,7 @@
       </div>
     </section>
 
+    <!-- 发送数据 -->
     <section>
       <h1 class="optionsTitle">
         <p data-i18n-outer="send2local"></p>(beta)
@@ -192,6 +199,7 @@
       </div>
     </section>
 
+    <!-- m3u8DL -->
     <section>
       <h1 class="optionsTitle"><a href="https://github.com/nilaoda/N_m3u8DL-CLI" target="_blank">N_m3u8DL-CLI</a></h1>
       <div class="optionBox" id="m3u8dlOption">
@@ -206,15 +214,6 @@
             <div class="switch">
               <label class="switchLabel switchRadius">
                 <input type="checkbox" id="m3u8dl" save="click" class="switchInput" />
-                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
-              </label>
-            </div>
-          </div>
-          <div class="item">
-            <div data-i18n="m3u8dlBase64"></div>
-            <div class="switch">
-              <label class="switchLabel switchRadius">
-                <input type="checkbox" id="m3u8dlBase64" save="click" class="switchInput" />
                 <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
               </label>
             </div>
@@ -236,6 +235,31 @@
       </div>
     </section>
 
+    <!-- 第三方本地程序调用 -->
+    <section>
+      <h1 class="optionsTitle" data-i18n="invoke"></h1>
+      <div class="optionBox" id="invokeOption">
+        <div class="list">
+          <div class="item">
+            <div>调用第三方程序</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="invoke" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+          <div class="item">
+            <div>
+              <p data-i18n="parameterSetting"></p>
+            </div>
+            <textarea id="protocolParameter" save="input" type="text" class="width100 break-all" rows="3"></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 替换标签 -->
     <section>
       <h1 class="optionsTitle" data-i18n="replaceTags"></h1>
       <div class="optionBox" id="tag">
@@ -280,6 +304,7 @@
       </div>
     </section>
 
+    <!-- 下载器 -->
     <section>
       <h1 class="optionsTitle" data-i18n="downloader"></h1>
       <div class="optionBox" id="downOption">
@@ -328,6 +353,7 @@
       </div>
     </section>
 
+    <!-- 自动下载m3u8 -->
     <section>
       <h1 class="optionsTitle" data-i18n="m3u8Parser"></h1>
       <div class="optionBox" id="m3u8Option">
@@ -346,6 +372,7 @@
       </div>
     </section>
 
+    <!-- 其他设置 -->
     <section>
       <h1 class="optionsTitle" data-i18n="otherSettings"></h1>
       <div class="optionBox" id="OtherOption">
@@ -438,6 +465,7 @@
       </div>
     </section>
 
+    <!-- 自定义css -->
     <section>
       <h1 class="optionsTitle" data-i18n="customCSS"></h1>
       <div class="optionBox">
@@ -447,6 +475,7 @@
       </div>
     </section>
 
+    <!-- 操作按钮 -->
     <section>
       <h1 class="optionsTitle" data-i18n="operation"></h1>
       <div class="optionBox">
@@ -461,6 +490,7 @@
       </div>
     </section>
 
+    <!-- 关于 -->
     <section>
       <h1 class="optionsTitle" data-i18n="about"></h1>
       <div class="optionBox">

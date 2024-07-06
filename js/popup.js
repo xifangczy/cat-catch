@@ -109,6 +109,7 @@ function AddMedia(data, currentTab = true) {
                 <img src="img/play.png" class="icon play ${data.isPlay ? "" : "hide"}" id="play" title="${i18n.preview}"/>
                 <img src="img/download.png" class="icon download" id="download" title="${i18n.download}"/>
                 <img src="img/aria2.png" class="icon aria2 ${G.enableAria2Rpc ? "" : "hide"}"" id="aria2" title="Aria2"/>
+                <img src="img/invoke.png" class="icon invoke ${G.invoke ? "" : "hide"}"" id="invoke" title="${i18n.invoke}"/>
             </div>
             <div class="url hide">
                 <div id="mediaInfo" data-state="false">
@@ -224,7 +225,7 @@ function AddMedia(data, currentTab = true) {
         if (G.m3u8dl && (isM3U8(data) || isMPD(data))) {
             if (!data.url.startsWith("blob:")) {
                 const m3u8dlArg = templates(G.m3u8dlArg, data);
-                const url = 'm3u8dl://' + (G.m3u8dlBase64 ? Base64.encode(m3u8dlArg) : m3u8dlArg);
+                const url = 'm3u8dl://' + Base64.encode(m3u8dlArg);
                 if (url.length >= 2046) {
                     navigator.clipboard.writeText(m3u8dlArg);
                     Tips(i18n.M3U8DLparameterLong, 2000);
@@ -248,6 +249,16 @@ function AddMedia(data, currentTab = true) {
             filename: stringModify(data.downFileName),
             saveAs: G.saveAs
         }, function (id) { downData[id] = data; });
+        return false;
+    });
+    // 调用
+    data.html.find('#invoke').click(function () {
+        const url = templates(G.protocolParameter, data);
+        if (G.isFirefox) {
+            window.location.href = url;
+        } else {
+            chrome.tabs.update({ url: url });
+        }
         return false;
     });
     //播放

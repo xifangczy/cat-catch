@@ -818,8 +818,5 @@
   },
   "defaultPopup": {
     "message": "默认弹出模式"
-  },
-  "m3u8dlBase64": {
-    "message": "base64编码传递"
   }
 }
