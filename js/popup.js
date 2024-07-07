@@ -479,7 +479,7 @@ $("#regular input").bind('keypress', function (event) {
 // 清空数据
 $('#Clear').click(function () {
     chrome.runtime.sendMessage({ Message: "clearData", tabId: G.tabId, type: activeTab });
-    chrome.runtime.sendMessage({ Message: "ClearIcon", type: activeTab });
+    chrome.runtime.sendMessage({ Message: "ClearIcon", type: activeTab, tabId: G.tabId });
     if (activeTab) {
         currentCount = 0;
         $current.empty();

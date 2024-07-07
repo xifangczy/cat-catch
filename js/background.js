@@ -268,7 +268,11 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     // 图标设置
     if (Message.Message == "ClearIcon") {
         if (Message.type) {
-            G.tabId && SetIcon({ tabId: G.tabId });
+            if (Message.tabId) {
+                SetIcon({ tabId: Message.tabId });
+            } else if (G.tabId) {
+                SetIcon({ tabId: G.tabId });
+            }
         } else {
             SetIcon({ tips: false });
         }
