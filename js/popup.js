@@ -696,7 +696,6 @@ function isPicture(data) {
 }
 // 复制选项
 function copyLink(data) {
-    console.log(data.url);
     let text = data.url;
     if (data.parsing == "m3u8") {
         text = G.copyM3U8;
@@ -705,7 +704,6 @@ function copyLink(data) {
     } else {
         text = G.copyOther;
     }
-    console.log(templates(text, data));
     return templates(text, data);
 }
 // 携带referer 下载

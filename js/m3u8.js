@@ -12,14 +12,6 @@ const key = params.get("key");  // 自定义密钥
 let autoDown = params.get("autoDown");  //是否自动下载
 const autoClose = params.get("autoClose");  // 下载完是否关闭页面
 
-// 当前资源数据
-let _data = {
-    url: _m3u8Url,
-    title: _title,
-    requestHeaders: { referer: _requestHeaders.referer },
-    initiator: _requestHeaders.referer ?? _initiator
-};
-
 let currentTabId = 0;   // 本页面tab Id
 let currentIndex = 0;   // 本页面Index
 
@@ -34,21 +26,25 @@ const _quantity = params.get("quantity");   // 同时下载的总数
 const _taskId = params.get("taskId");   // 任务id
 
 // 修改当前标签下的所有xhr的Referer 修改完成 运行init函数
-let requestHeaders = JSONparse(_requestHeaders);
+const requestHeaders = JSONparse(_requestHeaders);
+// 当前资源数据
+let _data = {
+    url: _m3u8Url,
+    title: _title ?? "NULL",
+};
 setRequestHeaders(requestHeaders, () => {
     chrome.tabs.getCurrent(function (tab) {
         currentIndex = tab.index;
         currentTabId = tab.id;
         if (tabId && tabId != -1) {
             chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getData", tabId: tabId }, (data) => {
+                if (chrome.runtime.lastError) {
+                    awaitG(init);
+                    return;
+                }
                 if (data) {
                     data = data.find(item => item.url == _m3u8Url);
-                    if (data) {
-                        _data = data;
-                        // 也许请求头被更改
-                        _data.requestHeaders = { referer: _requestHeaders.referer };
-                        _data.initiator = _requestHeaders.referer ?? _initiator;
-                    }
+                    _data = data ?? _data;
                 }
                 awaitG(init);
             });
@@ -665,7 +661,7 @@ $("#m3u8DL").click(function () {
 });
 // 调用自定义协议
 $("#invoke").click(function () {
-    const url = templates(G.invokeText, _data);
+    const url = getTemplates(G.invokeText);
     chrome.tabs.update({ url: url });
 });
 // 复制m3u8DL命令
@@ -1664,6 +1660,14 @@ window.onbeforeunload = function (event) {
         event.returnValue = i18n.streamOnbeforeunload;
     }
 }
+function getTemplates(text) {
+    // 也许请求头被更改
+    if (Object.keys(requestHeaders).length) {
+        _data.requestHeaders = { ...requestHeaders };
+        _data.initiator = requestHeaders?.referer ?? _initiator;
+    }
+    return templates(text, _data);
+}
 function getM3u8DlArg() {
     let m3u8dlArg = G.m3u8dlArg;
     const addParam = $("#addParam").prop("checked");
@@ -1672,7 +1676,7 @@ function getM3u8DlArg() {
     if (customFilename && addParam) {
         m3u8dlArg = m3u8dlArg.replace(/--saveName "[^"]+"/g, `--saveName "${customFilename}"`);
     }
-    m3u8dlArg = templates(m3u8dlArg, _data);
+    m3u8dlArg = getTemplates(m3u8dlArg);
 
     if (!addParam) { return m3u8dlArg; }
 

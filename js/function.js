@@ -189,7 +189,7 @@ function templates(text, data) {
         data.ext = data.ext.length == 1 ? "" : data.ext[data.ext.length - 1];
     }
     const date = new Date();
-    data = {
+    let _data = {
         // 资源信息
         url: data.url ?? "",
         referer: data.requestHeaders?.referer ?? "",
@@ -221,12 +221,13 @@ function templates(text, data) {
         mobileUserAgent: G.MobileUserAgent,
         userAgent: G.userAgent ? G.userAgent : navigator.userAgent,
     }
+    _data = { ...data, ..._data };
     text = text.replace(reTemplates, function (original, tag, action) {
         tag = tag.trim();
         if (action) {
-            return templatesFunction(data[tag], action.trim(), data);
+            return templatesFunction(_data[tag], action.trim(), _data);
         }
-        return data[tag] ?? original;
+        return _data[tag] ?? original;
     });
 
     return text;
