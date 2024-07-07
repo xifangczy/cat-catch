@@ -253,7 +253,7 @@ function AddMedia(data, currentTab = true) {
     });
     // 调用
     data.html.find('#invoke').click(function () {
-        const url = templates(G.protocolParameter, data);
+        const url = templates(G.invokeText, data);
         if (G.isFirefox) {
             window.location.href = url;
         } else {
@@ -696,6 +696,7 @@ function isPicture(data) {
 }
 // 复制选项
 function copyLink(data) {
+    console.log(data.url);
     let text = data.url;
     if (data.parsing == "m3u8") {
         text = G.copyM3U8;
@@ -704,6 +705,7 @@ function copyLink(data) {
     } else {
         text = G.copyOther;
     }
+    console.log(templates(text, data));
     return templates(text, data);
 }
 // 携带referer 下载
@@ -722,12 +724,6 @@ function catDownload(obj, extra = {}) {
             index: tab.index + 1,
             active: active
         };
-        // if (isPopup && !Object.keys(extra).length) {
-        //     delete arg.index;
-        //     chrome.tabs.update(arg);
-        // } else {
-        //     chrome.tabs.create(arg);
-        // }
         chrome.tabs.create(arg);
     });
 }
@@ -862,13 +858,6 @@ function openParser(data, options = {}) {
             requestHeaders: data.requestHeaders ? JSON.stringify(data.requestHeaders) : undefined,
             ...Object.fromEntries(Object.entries(options).map(([key, value]) => [key, typeof value === 'boolean' ? 1 : value])),
         })}`
-
-        // 弹出模式 当前页面打开
-        // if (isPopup) {
-        //     chrome.tabs.update({ url: url });
-        // } else {
-        //     chrome.tabs.create({ url: url, index: tab.index + 1, active: !options.autoDown });
-        // }
         chrome.tabs.create({ url: url, index: tab.index + 1, active: !options.autoDown });
     });
 }

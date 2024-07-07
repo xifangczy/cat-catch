@@ -12,6 +12,14 @@ const key = params.get("key");  // 自定义密钥
 let autoDown = params.get("autoDown");  //是否自动下载
 const autoClose = params.get("autoClose");  // 下载完是否关闭页面
 
+// 当前资源数据
+let _data = {
+    url: _m3u8Url,
+    title: _title,
+    requestHeaders: { referer: _requestHeaders.referer },
+    initiator: _requestHeaders.referer ?? _initiator
+};
+
 let currentTabId = 0;   // 本页面tab Id
 let currentIndex = 0;   // 本页面Index
 
@@ -31,7 +39,22 @@ setRequestHeaders(requestHeaders, () => {
     chrome.tabs.getCurrent(function (tab) {
         currentIndex = tab.index;
         currentTabId = tab.id;
-        awaitG(init);
+        if (tabId && tabId != -1) {
+            chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getData", tabId: tabId }, (data) => {
+                if (data) {
+                    data = data.find(item => item.url == _m3u8Url);
+                    if (data) {
+                        _data = data;
+                        // 也许请求头被更改
+                        _data.requestHeaders = { referer: _requestHeaders.referer };
+                        _data.initiator = _requestHeaders.referer ?? _initiator;
+                    }
+                }
+                awaitG(init);
+            });
+        } else {
+            awaitG(init);
+        }
     });
 });
 
@@ -86,7 +109,7 @@ const $fileSize = $("#fileSize");   // 下载文件大小 进度
 const $progress = $("#progress");   // 下载进度
 const $fileDuration = $("#fileDuration");   // 下载总时长
 const $m3u8dlArg = $("#m3u8dlArg"); // m3u8DL 参数
-let pageDOM = null; // m3u8 来源页面DOM 用于标签系统${pageDOM}
+// let pageDOM = null; // m3u8 来源页面DOM 用于标签系统${pageDOM}
 const $media_file = $("#media_file");   // 切片列表
 
 /**
@@ -97,7 +120,7 @@ function init() {
     if (tabId && tabId != -1) {
         chrome.tabs.sendMessage(parseInt(tabId), { Message: "getPage" }, { frameId: 0 }, function (result) {
             if (chrome.runtime.lastError) { return; }
-            pageDOM = new DOMParser().parseFromString(result, 'text/html');
+            _data.pageDOM = new DOMParser().parseFromString(result, 'text/html');
         });
     }
     // 自定义CSS
@@ -640,6 +663,11 @@ $("#m3u8DL").click(function () {
     }
     chrome.tabs.update({ url: m3u8dl });
 });
+// 调用自定义协议
+$("#invoke").click(function () {
+    const url = templates(G.invokeText, _data);
+    chrome.tabs.update({ url: url });
+});
 // 复制m3u8DL命令
 $("#copyM3U8dl").click(function () {
     const m3u8dlArg = getM3u8DlArg();
@@ -948,7 +976,6 @@ $("#downProgress").click(function () {
     $("#downList").show();
 });
 // 设置请求头
-// $("#setRequestHeaders, #setRequestHeadersError").click(function () {
 $(document).on("click", "#setRequestHeaders, #setRequestHeadersError", function () {
     const arg = window.prompt(i18n.addParameters, JSON.stringify(requestHeaders));
     if (arg != null) {
@@ -1645,14 +1672,7 @@ function getM3u8DlArg() {
     if (customFilename && addParam) {
         m3u8dlArg = m3u8dlArg.replace(/--saveName "[^"]+"/g, `--saveName "${customFilename}"`);
     }
-    const data = {
-        url: _m3u8Url,
-        title: _title,
-        requestHeaders: { referer: requestHeaders.referer },
-        initiator: requestHeaders.referer ?? _initiator
-    }
-    data.pageDOM = pageDOM ?? undefined;
-    m3u8dlArg = templates(m3u8dlArg, data);
+    m3u8dlArg = templates(m3u8dlArg, _data);
 
     if (!addParam) { return m3u8dlArg; }
 
