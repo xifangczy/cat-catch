@@ -99,7 +99,7 @@ function AddMedia(data, currentTab = true) {
     data.html = $(`
         <div class="panel">
             <div class="panel-heading">
-                <input type="checkbox" class="DownCheck" checked/>
+                <input type="checkbox" class="DownCheck"/>
                 ${G.ShowWebIco ? `<img class="favicon ${!data.favIconUrl ? "faviconFlag" : ""}" requestId="${data.requestId}" src="${data.favIconUrl}"/>` : ""}
                 <img src="img/regex.png" class="favicon regex ${data.isRegex ? "" : "hide"}" title="${i18n.regexTitle}"/>
                 <span class="name ${data.parsing || data.isRegex || data.tabId == -1 ? "bold" : ""}">${trimName}</span>
@@ -152,6 +152,12 @@ function AddMedia(data, currentTab = true) {
                 setRequestHeaders(data.requestHeaders, function () {
                     hls.loadSource(data.url);
                     hls.attachMedia(preview[0]);
+                });
+                hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
+                    if (data.tracks && !data.tracks.audiovideo) {
+                        !data.tracks.audio && mediaInfo.append(`<br><b>${i18n.noAudio}</b>`);
+                        !data.tracks.video && mediaInfo.append(`<br><b>${i18n.noVideo}</b>`);
+                    }
                 });
                 hls.on(Hls.Events.ERROR, function (event, data) {
                     if (data.error.message == "Unsupported HEVC in M2TS found") {
@@ -254,6 +260,7 @@ function AddMedia(data, currentTab = true) {
     // 调用
     data.html.find('#invoke').click(function () {
         const url = templates(G.invokeText, data);
+        // console.log(url);
         if (G.isFirefox) {
             window.location.href = url;
         } else {
@@ -282,7 +289,7 @@ function AddMedia(data, currentTab = true) {
         return false;
     });
     // 多选框 创建checked属性 值和checked状态绑定
-    data._checked = true;
+    data._checked = false;
     data.html.find('input').click(function (event) {
         data._checked = this.checked;
         mergeDownButton();
@@ -562,7 +569,7 @@ const interval = setInterval(function () {
         G.tabId = _tabId;
         $("body").css("width", "100%"); // body 宽度100%
         $("#popup").hide(); // 隐藏弹出按钮
-        $("#features").hide();  // 隐藏更多功能按钮
+        $("#more").hide();  // 隐藏更多功能按钮
         $("#down").append($("#features button")).css("justify-content", "center");  // 把更多功能内按钮移动到底部
         $("#down button").css("margin-left", "5px");    // 按钮间隔
     } else if (G.popup) {
@@ -617,10 +624,8 @@ const interval = setInterval(function () {
 
     $(`<style>${G.css}</style>`).appendTo("head");
 
-    $(".container").css("margin-bottom", ($down[0].offsetHeight + 2) + "px");
-    const observer = new MutationObserver(() => {
-        $(".container").css("margin-bottom", ($down[0].offsetHeight + 2) + "px");
-    });
+    updateDownHeight();
+    const observer = new MutationObserver(updateDownHeight);
     observer.observe($down[0], { childList: true, subtree: true, attributes: true });
 
     // 记忆弹出窗口的大小
@@ -629,6 +634,7 @@ const interval = setInterval(function () {
             popupHeight: window.height,
             popupWidth: window.width,
         });
+        updateDownHeight();
     });
 }, 0);
 /********************绑定事件END********************/
@@ -858,4 +864,9 @@ function openParser(data, options = {}) {
         })}`
         chrome.tabs.create({ url: url, index: tab.index + 1, active: !options.autoDown });
     });
+}
+
+// 更新底部按钮高度
+function updateDownHeight() {
+    $(".container").css("margin-bottom", ($down[0].offsetHeight + 2) + "px");
 }

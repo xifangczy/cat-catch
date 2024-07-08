@@ -232,7 +232,7 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
             html.find(".sendFfmpeg").click(function () {
                 let newUrl = url + `&autoDown=1`;
                 newUrl += `&ffmpeg=addFile`;
-                chrome.tabs.create({ url: newUrl, index: currentIndex + 1 });
+                chrome.tabs.create({ url: newUrl, index: currentIndex + 1, active: false });
             });
             $("#next_m3u8").append(html);
         }
@@ -260,7 +260,7 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
             html.find(".sendFfmpeg").click(function () {
                 let newUrl = url + `&autoDown=1`;
                 newUrl += `&ffmpeg=addFile`;
-                chrome.tabs.create({ url: newUrl, index: currentIndex + 1 });
+                chrome.tabs.create({ url: newUrl, index: currentIndex + 1, active: false });
             });
             $("#next_audio").append(html);
         }
@@ -1340,7 +1340,7 @@ function mergeTsNew(down) {
     }
 
     // ffmpeg 转码
-    if ($("#ffmpeg").prop("checked")) {
+    if ($("#ffmpeg").prop("checked") || _ffmpeg) {
         if (fileBlob.size < 2147483648) {
             if (ext != "mp4" && ext != "mp3") {
                 fileName = fileName + ".mp4";

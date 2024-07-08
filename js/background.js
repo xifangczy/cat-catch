@@ -77,6 +77,9 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         return;
     }
     if (!G.enable) { return; }
+
+    data.getTime = Date.now();
+
     if (!isRegex && G.blackList.has(data.requestId)) {
         G.blackList.delete(data.requestId);
         return;
@@ -188,7 +191,8 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
             initiator: data.initiator,
             requestHeaders: data.requestHeaders,
             cookie: data.cookie,
-            cacheURL: { host: urlParsing.host, search: urlParsing.search, pathname: urlParsing.pathname }
+            cacheURL: { host: urlParsing.host, search: urlParsing.search, pathname: urlParsing.pathname },
+            getTime: data.getTime
         };
         // 不存在 initiator 和 referer 使用web url代替initiator
         if (info.initiator == undefined || info.initiator == "null") {
