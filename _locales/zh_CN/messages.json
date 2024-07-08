@@ -818,5 +818,8 @@
   },
   "defaultPopup": {
     "message": "默认弹出模式"
+  },
+  "invokeApp": {
+    "message": "调用程序"
   }
 }

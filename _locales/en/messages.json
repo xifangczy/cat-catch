@@ -818,5 +818,8 @@
   },
   "defaultPopup": {
     "message": "Default Popup Mode"
+  },
+  "invokeApp": {
+    "message": "Invoke application"
   }
 }
