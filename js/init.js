@@ -107,7 +107,7 @@ G.OptionLists = {
     popupHeight: 1080,
     popupWidth: 1920,
     invoke: false,
-    invokeText: "m3u8dl://${url}",
+    invokeText: `m3u8dlre://\${url} --save-dir "e:\\Users\\xifan\\Downloads" --del-after-done --save-name "\${title}_\${now}" --auto-select \${referer|exists:'-H "Referer: *"'}`,
     // m3u8解析器默认参数
     M3u8Thread: 6,
     M3u8Mp4: false,
