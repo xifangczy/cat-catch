@@ -135,7 +135,7 @@ function init() {
     $("#mp4").prop("checked", G.M3u8Mp4);
     $("#onlyAudio").prop("checked", G.M3u8OnlyAudio);
     $("#skipDecrypt").prop("checked", G.M3u8SkipDecrypt);
-    $("#streamSaver").prop("checked", G.M3u8StreamSaver);
+    $("#StreamSaver").prop("checked", G.M3u8StreamSaver);
     $("#ffmpeg").prop("checked", G.M3u8Ffmpeg);
     $("#autoClose").prop("checked", autoClose ? true : G.M3u8AutoClose);
 
