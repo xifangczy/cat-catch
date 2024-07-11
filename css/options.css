@@ -7,9 +7,9 @@ body {
   margin: 0 auto;
   width: 640px;
 }
-.wrapper input {
+/* .wrapper input {
   margin-left: 10px;
-}
+} */
 .error {
   color: var(--text-error-color);
 }
@@ -428,6 +428,11 @@ a.json-placeholder:hover {
   border: solid 1px var(--text-color);
 }
 .width3rem {
+  width: 3rem;
+}
+#popupHeight,
+#popupWidth {
+  margin-left: 10px;
   width: 3rem;
   margin: 0 0.5rem 0 0.5rem;
 }
