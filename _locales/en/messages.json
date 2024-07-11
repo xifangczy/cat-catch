@@ -354,7 +354,7 @@
     "message": "If the resource download fails, automatically enable the downloader to try again."
   },
   "autoDownM3u8Tip": {
-    "message": "Click the 'Download' button on the extension page to immediately start merging and downloading"
+    "message": "Click the download button and use the m3u8 parser to start merging and downloading immediately"
   },
   "otherSettings": {
     "message": "Other Settings"
@@ -375,7 +375,7 @@
     "message": "Use a custom filename to save the file (the default is the webpage title)"
   },
   "saveAsOption": {
-    "message": "Choose the save directory when downloading"
+    "message": "Choose the save directory after downloading"
   },
   "iconOption": {
     "message": "Display the website icon"

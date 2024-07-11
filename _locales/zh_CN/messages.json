@@ -354,7 +354,7 @@
     "message": "如果检测到资源下载失败, 自动启用下载器再次尝试下载."
   },
   "autoDownM3u8Tip": {
-    "message": "扩展页点击 下载按钮 立即开始合并下载"
+    "message": "点击 下载按钮 使用m3u8解析器立即开始合并下载"
   },
   "otherSettings": {
     "message": "其他设置"
@@ -375,7 +375,7 @@
     "message": "使用自定义文件名保存文件(默认为网页标题)"
   },
   "saveAsOption": {
-    "message": "下载时选择保存目录"
+    "message": "下载完选择保存目录"
   },
   "iconOption": {
     "message": "显示网站图标"

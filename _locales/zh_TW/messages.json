@@ -354,7 +354,7 @@
     "message": "如果偵測到資源下載失敗, 自動啟用下載器再次嘗試下載."
   },
   "autoDownM3u8Tip": {
-    "message": "擴充頁點擊 下載按鈕 立即開始合併下載"
+    "message": "點擊 下載按鈕 使用m3u8解析器立即開始合併下載"
   },
   "otherSettings": {
     "message": "其他設定"
@@ -375,7 +375,7 @@
     "message": "使用自訂檔案名稱儲存檔案(預設為網頁標題)"
   },
   "saveAsOption": {
-    "message": "下載時選擇儲存目錄"
+    "message": "下載完選擇儲存目錄"
   },
   "iconOption": {
     "message": "顯示網站圖示"
