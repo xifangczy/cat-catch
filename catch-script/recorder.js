@@ -150,7 +150,13 @@
         init();
         const index = $videoList.value;
         if (index && videoList[index]) {
-            const stream = videoList[index].captureStream();
+            let stream = null;
+            try {
+                stream = videoList[index].captureStream();
+            } catch (e) {
+                $tips.innerHTML = i18n("recordingNotSupported", "不支持录制");
+                return;
+            }
             recorder = new MediaRecorder(stream, option);
             recorder.ondataavailable = function (event) {
                 if (CatCatch.querySelector("#ffmpeg").checked) {

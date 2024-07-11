@@ -132,6 +132,10 @@ window.CatCatchI18n = {
         en: "Recording",
         zh: "视频录制中"
     },
+    recordingNotSupported: {
+        en: "recording Not Supported",
+        zh: "不支持录制"
+    },
     formatNotSupported: {
         en: "Format not supported",
         zh: "不支持此格式"
