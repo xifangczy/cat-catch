@@ -8,7 +8,7 @@ body {
   width: 640px;
 }
 .wrapper input {
-  margin-right: 10px;
+  margin-left: 10px;
 }
 .error {
   color: var(--text-error-color);
@@ -427,8 +427,7 @@ a.json-placeholder:hover {
   width: 100%;
   border: solid 1px var(--text-color);
 }
-#popupHeight,
-#popupWidth {
+.width3rem {
   width: 3rem;
   margin: 0 0.5rem 0 0.5rem;
 }
