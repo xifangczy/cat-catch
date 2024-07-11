@@ -56,13 +56,6 @@ setRequestHeaders(requestHeaders, () => {
 
 // 默认设置
 const allOption = {
-    thread: 6,
-    mp4: false,
-    onlyAudio: false,
-    saveAs: false,
-    skipDecrypt: false,
-    StreamSaver: false,
-    ffmpeg: true,
     addParam: false,
     fold: true,
 };
@@ -125,22 +118,26 @@ function init() {
     // 隐藏firefox 不支持的功能
     G.isFirefox && $(".firefoxHide").each(function () { $(this).hide(); });
 
-    // 读取配置并装载
+    // 读取本地配置并装载
     chrome.storage.local.get(allOption, function (items) {
         for (let key in items) {
-            allOption[key] = items[key];
             if (key == "fold") {
                 items[key] ? $("details").attr("open", "") : $("details").removeAttr("open");
                 continue;
             }
             const $dom = $(`#${key}`);
-            if (typeof items[key] == "boolean") {
-                $dom.length && $dom.prop("checked", items[key]);
-            } else {
-                $dom.length && $dom.val(items[key]);
-            }
+            $dom.length && $dom.prop("checked", items[key]);
         }
     });
+
+    // 转载默认配置
+    $("#thread").val(G.M3u8Thread);
+    $("#mp4").prop("checked", G.M3u8Mp4);
+    $("#onlyAudio").prop("checked", G.M3u8OnlyAudio);
+    $("#skipDecrypt").prop("checked", G.M3u8SkipDecrypt);
+    $("#streamSaver").prop("checked", G.M3u8StreamSaver);
+    $("#ffmpeg").prop("checked", G.M3u8Ffmpeg);
+    $("#autoClose").prop("checked", autoClose ? true : G.M3u8AutoClose);
 
     // 存在密钥参数 自动填写密钥
     key && $("#customKey").val(key);
@@ -201,6 +198,8 @@ function init() {
     } else {
         hls.loadSource(_m3u8Url);
     }
+
+    G.saveAs && $("#saveAs").prop("checked", true);
 }
 
 // 监听 MANIFEST_LOADED 装载解析的m3u8 URL
@@ -768,14 +767,6 @@ $("#rangeStart, #rangeEnd, #thread").keyup(function () {
 });
 // 储存设置
 $("[save='change']").on("change", function () {
-    // 有些选项存在互斥 需储存全部设置
-    allOption.thread = parseInt($("#thread").val());
-    allOption.mp4 = $("#mp4").prop("checked");
-    allOption.onlyAudio = $("#onlyAudio").prop("checked");
-    allOption.saveAs = $("#saveAs").prop("checked");
-    allOption.skipDecrypt = $("#skipDecrypt").prop("checked");
-    allOption.StreamSaver = $("#StreamSaver").prop("checked");
-    allOption.ffmpeg = $("#ffmpeg").prop("checked");
     allOption.addParam = $("#addParam").prop("checked");
     chrome.storage.local.set(allOption);
 });
@@ -980,9 +971,6 @@ $(document).on("click", "#setRequestHeaders, #setRequestHeadersError", function 
         window.location.href = window.location.origin + window.location.pathname + "?" + params.toString();
     }
 });
-
-// 下载完毕自动关闭页面选项
-autoClose && $("#autoClose").prop("checked", true);
 
 // #EXT-X-DISCONTINUITY 范围选择
 $('#cc').change(function () {

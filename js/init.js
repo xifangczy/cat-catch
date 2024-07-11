@@ -108,6 +108,14 @@ G.OptionLists = {
     popupWidth: 1920,
     invoke: false,
     invokeText: "m3u8dl://${url}",
+    // m3u8解析器默认参数
+    M3u8Thread: 6,
+    M3u8Mp4: false,
+    M3u8OnlyAudio: false,
+    M3u8SkipDecrypt: false,
+    M3u8StreamSaver: false,
+    M3u8Ffmpeg: true,
+    M3u8AutoClose: false,
 };
 // 本地储存的配置
 G.LocalVar = {

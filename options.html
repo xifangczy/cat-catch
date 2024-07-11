@@ -358,9 +358,9 @@
       <h1 class="optionsTitle" data-i18n="m3u8Parser"></h1>
       <div class="optionBox" id="m3u8Option">
         <div class="list">
+
           <div class="item">
-            <div><img src="img/download.png" style="width: 18px"> <span data-i18n-outer="autoDownM3u8Tip"></span>(<span
-                data-i18n-outer="test"></span>)</div>
+            <div><img src="img/download.png" style="width: 18px"> <span data-i18n-outer="autoDownM3u8Tip"></span></div>
             <div class="switch">
               <label class="switchLabel switchRadius">
                 <input type="checkbox" id="m3u8AutoDown" save="click" class="switchInput" />
@@ -368,6 +368,74 @@
               </label>
             </div>
           </div>
+
+          <div class="item">
+            <div data-i18n="downloadThreads"></div>
+            <div class="switch">
+              <input id="M3u8Thread" save="input" type="number" class="width3rem"></input>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="mp4Format"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="M3u8Mp4" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="audioOnly"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="M3u8OnlyAudio" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="skipDecryption"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="M3u8SkipDecrypt" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="downloadWhileSaving"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="M3u8StreamSaver" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="ffmpegTranscoding"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="M3u8Ffmpeg" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="autoClosePageAfterDownload"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="M3u8AutoClose" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
@@ -448,9 +516,9 @@
 
           <div class="item">
             <div data-i18n="defaultPopup"></div>
-            <input id="popupHeight" save="input" type="number"></input>
+            <input id="popupHeight" save="input" type="number" class="width3rem"></input>
             x
-            <input id="popupWidth" save="input" type="number"></input>
+            <input id="popupWidth" save="input" type="number" class="width3rem"></input>
             <div class="switch">
               <label class="switchLabel switchRadius">
                 <input type="checkbox" id="popup" save="click" class="switchInput" />
