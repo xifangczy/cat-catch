@@ -13,16 +13,19 @@
 
 <body>
   <div class="Tabs">
-    <div id="currentTab" class="TabButton Active">
+    <div id="currentTab" class="TabButton flex Active">
       <span data-i18n-outer="currentPage"></span>
       <div id="quantity"></div>
     </div>
-    <div id="allTab" class="TabButton">
+    <div id="allTab" class="TabButton flex">
       <span data-i18n-outer="otherPage"></span>
       <div id="quantity"></div>
     </div>
     <div id="otherTab" class="TabButton">
       <span data-i18n-outer="otherPage"></span> / <span data-i18n-outer="mediaControl"></span>
+    </div>
+    <div id="maybeKeyTab" class="TabButton hide">
+      <span data-i18n-outer="possibleKey"></span>
     </div>
   </div>
   <div id="Tips" data-i18n="loadingData">
@@ -76,6 +79,7 @@
       <button go="ffmpegURL" class="button2">FFmpeg</button>
     </div>
   </div>
+  <div id="maybeKey" class="container hide"></div>
   <div id="filter" class="more">
     <span id="regular" class="width100 regular">
       <input type="text" data-i18n-placeholder="regularFilterPlaceholder" /><button id="regularFilter" class="hide"

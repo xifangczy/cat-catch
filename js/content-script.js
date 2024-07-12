@@ -209,6 +209,11 @@
                 action: "addKey",
                 data: key,
             });
+            chrome.runtime.sendMessage({
+                Message: "popupAddKey",
+                data: key,
+                url: event.data.url,
+            });
         }
         if (event.data.action == "catCatchFFmpeg") {
             if (!event.data.use ||

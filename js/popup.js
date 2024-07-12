@@ -13,6 +13,8 @@ const $allMediaList = $('#allMediaList');
 const $all = $("<div></div>");
 const $allCount = $("#allTab #quantity");
 let allCount = 0;
+// 疑似密钥
+const $maybeKey = $("<div></div>");
 // 提示 操作按钮 DOM
 const $tips = $("#Tips");
 const $down = $("#down");
@@ -335,6 +337,29 @@ function AddMedia(data, currentTab = true) {
     return data.html;
 }
 
+function AddKey(key) {
+    const data = {};
+    data.html = $(`
+        <div class="panel">
+            <div class="panel-heading">
+                <span class="name bold">${key}</span>
+                <img src="img/copy.png" class="icon copy" id="copy" title="${i18n.copy}"/>
+            </div>
+            <div class="url hide">
+                Hex: ${base64ToHex(key)}
+            </div>
+        </div>`);
+    data.html.find('.panel-heading').click(function () {
+        data.html.find(".url").toggle();
+    });
+    data.html.find('.copy').click(function () {
+        navigator.clipboard.writeText(key);
+        Tips(i18n.copiedToClipboard);
+        return false;
+    });
+    return data.html;
+}
+
 /********************绑定事件********************/
 //标签切换
 $(".Tabs .TabButton").click(function () {
@@ -344,7 +369,6 @@ $(".Tabs .TabButton").click(function () {
     $(this).addClass("Active");
     $(".container").removeClass("TabShow").eq(index).addClass("TabShow");
     UItoggle();
-    // $("#filter, #scriptCatch, #unfold").hide();
     $("#filter, #unfold").hide();
 });
 // 其他页面
@@ -636,6 +660,40 @@ const interval = setInterval(function () {
         });
         updateDownHeight();
     });
+
+    // 疑似密钥
+    chrome.webNavigation.getAllFrames({ tabId: G.tabId }, function (frames) {
+        if (!frames) { return; }
+        for (let frame of frames) {
+            chrome.tabs.sendMessage(G.tabId, { Message: "getKey" }, { frameId: frame.frameId }, function (result) {
+                if (chrome.runtime.lastError || !result || result.length == 0) { return; }
+                $("#maybeKeyTab").show();
+                for (let key of result) {
+                    $maybeKey.append(AddKey(key));
+                }
+                $("#maybeKey").append($maybeKey);
+                UItoggle();
+            });
+        }
+    });
+    // 监听密钥
+    chrome.runtime.onMessage.addListener(function (data, sender, sendResponse) {
+        if (!data.Message || !data.data || data.Message != "popupAddKey") { return; }
+        $("#maybeKeyTab").show();
+        chrome.tabs.query({}, function (tabs) {
+            let tabId = -1;
+            for (let item of tabs) {
+                if (item.url == data.url) {
+                    tabId = item.id;
+                    break;
+                }
+            }
+            if (tabId == -1 || tabId == G.tabId) {
+                $maybeKey.append(AddKey(data.data));
+            }
+            !$("#maybeKey .panel").length && $("#maybeKey").append($maybeKey);
+        });
+    });
 }, 0);
 /********************绑定事件END********************/
 
@@ -744,7 +802,8 @@ function UItoggle() {
     getData().size > 0 ? $tips.hide() : $tips.show().html(i18n.noData);
     $currentCount.text(currentCount ? `[${currentCount}]` : "");
     $allCount.text(allCount ? `[${allCount}]` : "");
-    if ($('.TabShow').attr("id") == "otherOptions") {
+    const id = $('.TabShow').attr("id");
+    if (id == "otherOptions" || id == "maybeKey") {
         $tips.hide();
         $down.hide();
     } else if ($down.is(":hidden")) {
@@ -869,4 +928,17 @@ function openParser(data, options = {}) {
 // 更新底部按钮高度
 function updateDownHeight() {
     $(".container").css("margin-bottom", ($down[0].offsetHeight + 2) + "px");
+}
+
+function base64ToHex(base64) {
+    const binaryString = atob(base64);
+    let hexString = '';
+    for (let i = 0; i < binaryString.length; i++) {
+        let hex = binaryString.charCodeAt(i).toString(16);
+        if (hex.length === 1) {
+            hex = '0' + hex;
+        }
+        hexString += hex;
+    }
+    return hexString;
 }

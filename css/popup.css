@@ -103,13 +103,16 @@ button,
   border-radius: 5px 5px 0 0;
   cursor: pointer;
   width: 50%;
-  display: flex;
+  /* display: flex; */
   padding: 3px;
   margin: 1px 2px 0 2px;
   flex-direction: row;
   align-items: baseline;
   justify-content: center;
   user-select: none;
+}
+.flex {
+  display: flex;
 }
 .TabButton.Active {
   background-color: var(--background-color-two);
