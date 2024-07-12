@@ -49,6 +49,9 @@ chrome.downloads.onChanged.addListener(function (item) {
         delete downData[item.id];
     }
 });
+// 复选框状态 点击返回或者全选后 影响新加入的资源 复选框勾选状态
+let checkboxState = true;
+
 // 生成资源DOM
 function AddMedia(data, currentTab = true) {
     data._title = data.title;
@@ -291,7 +294,8 @@ function AddMedia(data, currentTab = true) {
         return false;
     });
     // 多选框 创建checked属性 值和checked状态绑定
-    data._checked = false;
+    data._checked = checkboxState;
+    data.html.find(".DownCheck").prop("checked", data._checked);
     data.html.find('input').click(function (event) {
         data._checked = this.checked;
         mergeDownButton();
@@ -446,6 +450,7 @@ $('#AllCopy').click(function () {
 });
 // 全选 反选
 $('#AllSelect, #invertSelection').click(function () {
+    checkboxState = !checkboxState;
     const checked = this.id == "AllSelect";
     getData().forEach(function (data) {
         data.checked = checked ? checked : !data.checked;
