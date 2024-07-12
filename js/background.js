@@ -422,7 +422,6 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // ffmpeg网页通信
     if (Message.Message == "catCatchFFmpeg") {
-        // const data = { Message: "ffmpeg", action: Message.action, media: Message.media, title: Message.title, url: Message.url, extra: Message.extra, tabId: Message.tabId ?? sender.tab.id, autoClose: Message.autoClose ?? false };
         const data = { ...Message, Message: "ffmpeg", tabId: Message.tabId ?? sender.tab.id, version: ffmpegConfig.version };
         chrome.tabs.query({ url: ffmpegConfig.url }, function (tabs) {
             if (chrome.runtime.lastError || !tabs.length) {
