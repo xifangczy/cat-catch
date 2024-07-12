@@ -452,6 +452,10 @@
         return text;
     }
     function postData(data) {
+        if (data.action == "catCatchAddKey") {
+            if (data.key == "AAAAAAAAAAAAAAAAAAAAAA==") { return; }
+            if (data.key instanceof ArrayBuffer && isArrayBufferAllZero(data.key)) { return; }
+        }
         let value = data.url ? data.url : data.key;
         if (value instanceof ArrayBuffer || value instanceof Array) {
             if (value.byteLength == 0) { return; }
@@ -490,5 +494,14 @@
             }
         }
         return _buffer.buffer;
+    }
+    function isArrayBufferAllZero(buffer) {
+        let view = new _Uint8Array(buffer);
+        for (let i = 0; i < view.length; i++) {
+            if (view[i] !== 0) {
+                return false;
+            }
+        }
+        return true;
     }
 })();
