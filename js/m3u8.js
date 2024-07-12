@@ -25,6 +25,8 @@ const _ffmpeg = params.get("ffmpeg");   // 是否发送到 ffmpeg
 const _quantity = params.get("quantity");   // 同时下载的总数
 const _taskId = params.get("taskId");   // 任务id
 
+let isSendFfmpeg = false;   // 是否发送到ffmpeg
+
 // 修改当前标签下的所有xhr的Referer 修改完成 运行init函数
 const requestHeaders = JSONparse(_requestHeaders);
 // 当前资源数据
@@ -509,6 +511,8 @@ function parseTs(data) {
         autoDown && highlight();
         $("#recorder").show();
         $("#count").html(i18n.liveHLS);
+    } else {
+        $("#sendFfmpeg").show();
     }
     if (!_fragments.some(fragment => fragment.initSegment) && autoDown) {
         $("#mergeTs").click();
@@ -985,6 +989,12 @@ $("details summary").click(function () {
     chrome.storage.local.set(allOption);
 });
 
+// 发送到在线ffmpeg
+$("#sendFfmpeg").click(function () {
+    isSendFfmpeg = true;
+    $("#mergeTs").click();
+});
+
 /**************************** 下载TS文件 ****************************/
 // start 开始下载的索引
 // end 结束下载的索引
@@ -1328,7 +1338,7 @@ function mergeTsNew(down) {
     }
 
     // ffmpeg 转码
-    if ($("#ffmpeg").prop("checked") || _ffmpeg) {
+    if ($("#ffmpeg").prop("checked") || _ffmpeg || isSendFfmpeg) {
         if (fileBlob.size < 2147483648) {
             if (ext != "mp4" && ext != "mp3") {
                 fileName = fileName + ".mp4";
@@ -1338,6 +1348,10 @@ function mergeTsNew(down) {
             let action = $("#onlyAudio").prop("checked") ? "onlyAudio" : "transcode";
             if (_ffmpeg) {
                 action = _ffmpeg;
+            }
+            if (isSendFfmpeg) {
+                action = "addFile";
+                isSendFfmpeg = false;
             }
             const data = {
                 Message: "catCatchFFmpeg",
@@ -1370,7 +1384,10 @@ function mergeTsNew(down) {
         url: URL.createObjectURL(fileBlob),
         filename: fileName = fileName + "." + ext,
         saveAs: $("#saveAs").prop("checked")
-    }, function (downloadId) { downId = downloadId });
+    }, function (downloadId) {
+        downId = downloadId;
+        $(".openDir").show();
+    });
     buttonState("#mergeTs", true);
 
     // 清空buffer
