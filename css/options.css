@@ -136,7 +136,7 @@ button,
 .button2 {
   padding: calc(0.5em - 1px) 1em;
   margin: 5px 5px 5px 5px;
-  font-size: 13px;
+  /* font-size: 13px; */
 }
 .flex-end {
   display: flex;

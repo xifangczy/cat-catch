@@ -7,8 +7,8 @@ a:hover {
 }
 body {
   font-family: arial, sans-serif;
-  font-size: 12px;
-  width: 550px;
+  font-size: 0.9rem;
+  width: 40rem;
   overflow-x: hidden;
   background: var(--background-color);
   margin: 0;
@@ -33,7 +33,7 @@ body {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  /* margin-right: 0.5rem; */
+  margin-right: 0.2rem;
 }
 .panel .url {
   padding: 5px;
@@ -41,8 +41,8 @@ body {
 .icon,
 .favicon {
   transition: all 0.1s;
-  width: 18px;
-  height: 18px;
+  width: 1.5rem;
+  height: 1.5rem;
   cursor: pointer;
 }
 .faviconFlag {
@@ -91,7 +91,7 @@ body {
 button,
 .button2 {
   padding: 3px 3px 3px 3px;
-  font-size: 12px;
+  font-size: 0.9rem;
 }
 .Tabs {
   display: flex;
@@ -124,8 +124,8 @@ button,
 }
 .DownCheck {
   margin: 0 2px 0 0;
-  width: 15px;
-  height: 15px;
+  width: 1.2rem;
+  height: 1.2rem;
   flex: 0 0 auto;
 }
 .TabShow {

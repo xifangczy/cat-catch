@@ -69,7 +69,7 @@ function AddMedia(data, currentTab = true) {
     //截取文件名长度
     let trimName = data.name;
     if (data.name.length >= 50 && !isPopup) {
-        trimName = trimName.substr(0, 25) + '...' + trimName.substr(-30);
+        trimName = trimName.substr(0, 20) + '...' + trimName.substr(-30);
     }
     //添加下载文件名
     Object.defineProperty(data, "pageDOM", {
