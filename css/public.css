@@ -182,6 +182,6 @@ button:active,
     content: url(../img/aria2-dark.png);
   }
   img.invoke {
-    content: url(../img/invoke-dark.png);
+    content: url(../img/invoke-dark.svg);
   }
 }

@@ -7,7 +7,7 @@ a:hover {
 }
 body {
   font-family: arial, sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   width: 40rem;
   overflow-x: hidden;
   background: var(--background-color);
@@ -91,7 +91,7 @@ body {
 button,
 .button2 {
   padding: 3px 3px 3px 3px;
-  font-size: 0.9rem;
+  /* font-size: 0.9rem; */
 }
 .Tabs {
   display: flex;
