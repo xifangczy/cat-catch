@@ -583,6 +583,8 @@ $("#popup").click(function () {
                 type: "popup",
                 height: G.popupHeight ?? 1080,
                 width: G.popupWidth ?? 1920,
+                top: G.popupTop ?? 0,
+                left: G.popupLeft ?? 0,
             });
         }
         window.close();
@@ -659,10 +661,11 @@ const interval = setInterval(function () {
 
     // 记忆弹出窗口的大小
     isPopup && chrome.windows.onBoundsChanged.addListener(function (window) {
-        // console.log(window);
         chrome.storage.sync.set({
             popupHeight: window.height,
             popupWidth: window.width,
+            popupTop: window.top,
+            popupLeft: window.left,
         });
         updateDownHeight();
     });

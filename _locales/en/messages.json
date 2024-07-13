@@ -212,9 +212,6 @@
   "extension": {
     "message": "Extension"
   },
-  "resetSuffixSettings": {
-    "message": "Reset Suffix Settings"
-  },
   "disableAll": {
     "message": "Disable All"
   },
@@ -226,9 +223,6 @@
   },
   "addType": {
     "message": "Add Type"
-  },
-  "resetTypeSettings": {
-    "message": "Reset Type Settings"
   },
   "typeTip": {
     "message": "Enter the correct content-type, if no size filtering is needed, fill in 0."
@@ -250,9 +244,6 @@
   },
   "addRegex": {
     "message": "Add Regex"
-  },
-  "resetRegexSettings": {
-    "message": "Reset Regex Settings"
   },
   "regexTest": {
     "message": "Regex test"
@@ -323,9 +314,6 @@
   "parameterSetting": {
     "message": "Parameter Setting"
   },
-  "resetParameterSetting": {
-    "message": "Reset Parameter Setting"
-  },
   "test": {
     "message": "Test"
   },
@@ -334,9 +322,6 @@
   },
   "customSaveFileName": {
     "message": "Custom Save File Name"
-  },
-  "resetTagSettings": {
-    "message": "Reset Tag Settings"
   },
   "userAgentTip": {
     "message": "Default to the current browser's User Agent"
@@ -409,6 +394,9 @@
   },
   "clearCapturedData": {
     "message": "Clear Captured Data"
+  },
+  "resetSettings": {
+    "message": "Reset Settings"
   },
   "resetAllSettings": {
     "message": "Reset All Settings"

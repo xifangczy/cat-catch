@@ -192,51 +192,29 @@ $("#testTag input, #testTextarea").on("input", function () {
     testTag();
 });
 //重置后缀 重置类型 重置正则
-$("#ResetExt, #ResetType, #ResetRegex").bind("click", function () {
+$("[data-reset]").bind("click", function () {
     if (confirm(i18n.confirmReset)) {
         const Option = $(this).data("reset");
-        chrome.storage.sync.set({ [Option]: G.OptionLists[Option] });
-        location.reload();
-    }
-});
-//重置其他设置
-$("#ResetOption").bind("click", function () {
-    if (confirm(i18n.confirmReset)) {
-        $("#OtherOption input, #OtherOption textarea").each(function () {
-            const Option = this.id;
-            chrome.storage.sync.set({ [Option]: G.OptionLists[Option] });
+        chrome.storage.sync.set({ [Option]: G.OptionLists[Option] }, () => {
+            location.reload();
         });
-        location.reload();
     }
 });
-// m3u8DL 参数设置
-$("#ResetM3u8dl").bind("click", function () {
+
+//重置设置
+$(".resetOption").click(function() {
     if (confirm(i18n.confirmReset)) {
-        $("#m3u8dlOption textarea, #m3u8dlOption input").each(function () {
-            const Option = this.id;
-            chrome.storage.sync.set({ [Option]: G.OptionLists[Option] });
+        const optionBox = $(this).closest('.optionBox');
+        const result = optionBox.find('[save]').toArray().reduce((acc, {id}) => {
+            acc[id] = G.OptionLists[id];
+            return acc;
+        }, {});
+        chrome.storage.sync.set(result, ()=>{
+            location.reload();
         });
-        location.reload();
     }
 });
-// 重设标签
-$("#ResetTag").bind("click", function () {
-    if (confirm(i18n.confirmReset)) {
-        ["userAgent", "MobileUserAgent", "downFileName"].forEach(function (id) {
-            chrome.storage.sync.set({ [id]: G.OptionLists[id] });
-        })
-        location.reload();
-    }
-});
-//重置复制选项
-$("#ResetCopy").bind("click", function () {
-    if (confirm(i18n.confirmReset)) {
-        chrome.storage.sync.set({ copyM3U8: G.OptionLists.copyM3U8 });
-        chrome.storage.sync.set({ copyMPD: G.OptionLists.copyMPD });
-        chrome.storage.sync.set({ copyOther: G.OptionLists.copyOther });
-        location.reload();
-    }
-});
+
 //清空数据 重置所有设置
 $("#ClearData, #ResetAllOption").bind("click", function () {
     if (this.id == "ResetAllOption") {

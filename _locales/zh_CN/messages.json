@@ -212,9 +212,6 @@
   "extension": {
     "message": "扩展"
   },
-  "resetSuffixSettings": {
-    "message": "重置后缀设置"
-  },
   "disableAll": {
     "message": "全部禁用"
   },
@@ -226,9 +223,6 @@
   },
   "addType": {
     "message": "添加类型"
-  },
-  "resetTypeSettings": {
-    "message": "重置类型设置"
   },
   "typeTip": {
     "message": "填入正确的content-type类型, 不过滤大小填0"
@@ -250,9 +244,6 @@
   },
   "addRegex": {
     "message": "添加正则"
-  },
-  "resetRegexSettings": {
-    "message": "重置正则设置"
   },
   "regexTest": {
     "message": "正则测试"
@@ -323,9 +314,6 @@
   "parameterSetting": {
     "message": "参数设置"
   },
-  "resetParameterSetting": {
-    "message": "重置参数设置"
-  },
   "test": {
     "message": "测试"
   },
@@ -334,9 +322,6 @@
   },
   "customSaveFileName": {
     "message": "自定义保存文件名"
-  },
-  "resetTagSettings": {
-    "message": "重置标签设置"
   },
   "userAgentTip": {
     "message": "留空默认为当前浏览器 User Agent"
@@ -409,6 +394,9 @@
   },
   "clearCapturedData": {
     "message": "清空抓取的数据"
+  },
+  "resetSettings": {
+    "message": "重置设置"
   },
   "resetAllSettings": {
     "message": "重置所有设置"

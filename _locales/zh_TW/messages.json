@@ -212,9 +212,6 @@
   "extension": {
     "message": "擴充"
   },
-  "resetSuffixSettings": {
-    "message": "重設後綴設定"
-  },
   "disableAll": {
     "message": "全部停用"
   },
@@ -226,9 +223,6 @@
   },
   "addType": {
     "message": "新增類型"
-  },
-  "resetTypeSettings": {
-    "message": "重設類型設定"
   },
   "typeTip": {
     "message": "填入正確的content-type型別, 不過濾大小填0"
@@ -250,9 +244,6 @@
   },
   "addRegex": {
     "message": "新增正規則"
-  },
-  "resetRegexSettings": {
-    "message": "重置正規設定"
   },
   "regexTest": {
     "message": "正規測試"
@@ -323,9 +314,6 @@
   "parameterSetting": {
     "message": "參數設定"
   },
-  "resetParameterSetting": {
-    "message": "重設參數設定"
-  },
   "test": {
     "message": "測試"
   },
@@ -334,9 +322,6 @@
   },
   "customSaveFileName": {
     "message": "自訂儲存檔案名稱"
-  },
-  "resetTagSettings": {
-    "message": "重設標籤設定"
   },
   "userAgentTip": {
     "message": "留空預設為目前瀏覽器 User Agent"
@@ -409,6 +394,9 @@
   },
   "clearCapturedData": {
     "message": "清空抓取的資料"
+  },
+  "resetSettings": {
+    "message": "重置設定"
   },
   "resetAllSettings": {
     "message": "重置所有設定"

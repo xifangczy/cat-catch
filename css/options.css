@@ -430,9 +430,6 @@ a.json-placeholder:hover {
 .width3rem {
   width: 3rem;
 }
-#popupHeight,
-#popupWidth {
-  margin-left: 10px;
-  width: 3rem;
-  margin: 0 0.5rem 0 0.5rem;
+.popupAttr{
+  margin-left: 0.5rem;
 }

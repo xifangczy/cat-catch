@@ -29,7 +29,7 @@
         </table>
         <div class="flex-end">
           <button type="button" id="AddExt" class="button2" data-i18n="addSuffix"></button>
-          <button type="button" id="ResetExt" data-reset="Ext" data-i18n="resetSuffixSettings"></button>
+          <button type="button" id="ResetExt" data-reset="Ext" data-i18n="resetSettings"></button>
           <button type="button" id="allDisable" data-switch="Ext" data-i18n="disableAll"></button>
           <button type="button" id="allEnable" data-switch="Ext" data-i18n="enableAll"></button>
         </div>
@@ -51,7 +51,7 @@
         </table>
         <div class="flex-end">
           <button type="button" id="AddType" class="button2" data-i18n="addType"></button>
-          <button type="button" id="ResetType" data-reset="Type" data-i18n="resetTypeSettings"></button>
+          <button type="button" id="ResetType" data-reset="Type" data-i18n="resetSettings"></button>
           <button type="button" id="allDisable" data-switch="Type" data-i18n="disableAll"></button>
           <button type="button" id="allEnable" data-switch="Type" data-i18n="enableAll"></button>
         </div>
@@ -87,7 +87,7 @@
         </table>
         <div class="flex-end">
           <button type="button" id="AddRegex" class="button2" data-i18n="addRegex"></button>
-          <button type="button" id="ResetRegex" data-reset="Regex" data-i18n="resetRegexSettings"></button>
+          <button type="button" id="ResetRegex" data-reset="Regex" data-i18n="resetSettings"></button>
           <button type="button" id="allDisable" data-switch="Regex" data-i18n="disableAll"></button>
           <button type="button" id="allEnable" data-switch="Regex" data-i18n="enableAll"></button>
         </div>
@@ -123,7 +123,7 @@
             <textarea id="copyOther" save="input" type="text" class="width100"></textarea>
           </div>
           <div class="flex-end">
-            <button type="button" id="ResetCopy" data-i18n="resetCopySettings"></button>
+            <button type="button" class="resetOption" data-i18n="resetSettings"></button>
           </div>
       </div>
     </section>
@@ -166,6 +166,9 @@
             <div>Aira2 RPC <span data-i18n-outer="address"></span></div>
             <input id="aria2Rpc" save="input" type="text" class="width100"></input>
           </div>
+          <div class="flex-end">
+            <button type="button" class="resetOption" data-i18n="resetSettings"></button>
+          </div>
         </div>
       </div>
     </section>
@@ -195,6 +198,9 @@
             <div><span data-i18n-outer="address"></span></div>
             <input id="send2localURL" save="input" type="text" class="width100"></input>
           </div>
+
+        <div class="flex-end">
+          <button type="button" class="resetOption" data-i18n="resetSettings"></button>
         </div>
       </div>
     </section>
@@ -229,7 +235,7 @@
             <textarea id="m3u8dlArg" save="input" type="text" class="width100 break-all" rows="3"></textarea>
           </div>
           <div class="flex-end">
-            <button type="button" id="ResetM3u8dl" data-i18n="resetParameterSetting"></button>
+            <button type="button" class="resetOption" data-i18n="resetSettings"></button>
           </div>
         </div>
       </div>
@@ -254,6 +260,9 @@
               <p data-i18n="parameterSetting"></p>
             </div>
             <textarea id="invokeText" save="input" type="text" class="width100 break-all" rows="3"></textarea>
+          </div>
+          <div class="flex-end">
+            <button type="button" class="resetOption" data-i18n="resetSettings"></button>
           </div>
         </div>
       </div>
@@ -298,7 +307,7 @@
           </div>
           <div class="flex-end">
             <button type="button" id="showTestTag" data-i18n="test"></button>
-            <button type="button" id="ResetTag" data-i18n="resetTagSettings"></button>
+            <button type="button" class="resetOption" data-i18n="resetSettings"></button>
           </div>
         </div>
       </div>
@@ -349,11 +358,15 @@
               </label>
             </div>
           </div>
+
+          <div class="flex-end">
+            <button type="button" class="resetOption" data-i18n="resetSettings"></button>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- 自动下载m3u8 -->
+    <!-- m3u8解析器 -->
     <section>
       <h1 class="optionsTitle" data-i18n="m3u8Parser"></h1>
       <div class="optionBox" id="m3u8Option">
@@ -436,6 +449,9 @@
             </div>
           </div>
 
+          <div class="flex-end">
+            <button type="button" class="resetOption" data-i18n="resetSettings"></button>
+          </div>
         </div>
       </div>
     </section>
@@ -516,9 +532,13 @@
 
           <div class="item">
             <div data-i18n="defaultPopup"></div>
-            <input id="popupHeight" save="input" type="number" class="width3rem"></input>
-            x
-            <input id="popupWidth" save="input" type="number" class="width3rem"></input>
+            <div class="popupAttr">
+              <span><input id="popupHeight" save="input" type="number" class="width3rem"></input></span>
+              x
+              <span><input id="popupWidth" save="input" type="number" class="width3rem"></input></span>
+              <span>Top: <input id="popupTop" save="input" type="number" class="width3rem"></input></span>
+              <span>Left: <input id="popupLeft" save="input" type="number" class="width3rem"></input></span>
+            </div>
             <div class="switch">
               <label class="switchLabel switchRadius">
                 <input type="checkbox" id="popup" save="click" class="switchInput" />
@@ -528,7 +548,7 @@
           </div>
         </div>
         <div class="flex-end">
-          <button type="button" id="ResetOption" data-i18n="resetOtherSettings"></button>
+          <button type="button" class="resetOption" data-i18n="resetSettings"></button>
         </div>
       </div>
     </section>
