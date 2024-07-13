@@ -659,6 +659,7 @@ const interval = setInterval(function () {
 
     // 记忆弹出窗口的大小
     isPopup && chrome.windows.onBoundsChanged.addListener(function (window) {
+        // console.log(window);
         chrome.storage.sync.set({
             popupHeight: window.height,
             popupWidth: window.width,

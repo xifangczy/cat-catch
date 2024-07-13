@@ -125,7 +125,6 @@ G.LocalVar = {
 };
 
 // 102版本以上 非Firefox 开启更多功能
-// G.isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
 G.isFirefox = false;
 G.version = 93;
 if (navigator.userAgent.includes("Chrome/")) {
@@ -157,12 +156,8 @@ const streamSaverConfig = {
 }
 
 // 正则预编译
-const reProtocol = /^[\w]+:\/\/.+/i;
 const reFilename = /filename="?([^"]+)"?/;
-// const reRange = /([\d]+)-([\d]+)\/([\d]+)/;
 const reStringModify = /[<>:"\/\\|?*~]/g;
-// const reYoutube = /&(range|rbuf|rn|cver|altitags|pot|fallback_count|sq)=[^&]*/g;
-// const reTemplates = /\$\{(fullFileName|fileName|ext|title|referer|url|now|fullDate|time|initiator|webUrl|userAgent|page|cookie)\ ?\|([^}]+)\}/g;
 const reTemplates = /\${([^}|]+)(?:\|([^}]+))?}/g;
 
 // 防抖
