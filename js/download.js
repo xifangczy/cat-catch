@@ -142,6 +142,9 @@ function startDownload(tabId) {
         if (fileStream) {
             setProgressText(i18n.downloadComplete, true);
             fileStream = null;
+            setTimeout(() => {
+                $("#autoClose").prop("checked") && window.close();
+            }, Math.ceil(Math.random() * 999));
             return;
         }
         try {
