@@ -124,6 +124,7 @@ function AddMedia(data, currentTab = true) {
                 <div class="moreButton">
                     <div id="qrcode"><img src="img/qrcode.png" class="icon qrcode" title="QR Code"/></div>
                     <div id="catDown"><img src="img/cat-down.png" class="icon cat-down" title="${i18n.downloadWithRequestHeader}"/></div>
+                    <div><img src="img/invoke.svg" class="icon invoke" title="${i18n.invoke}"/></div>
                 </div>
                 <a href="${data.url}" target="_blank" download="${data.downFileName}">${data.url}</a>
                 <br>
@@ -263,9 +264,8 @@ function AddMedia(data, currentTab = true) {
         return false;
     });
     // 调用
-    data.html.find('#invoke').click(function () {
+    data.html.find('.invoke').click(function () {
         const url = templates(G.invokeText, data);
-        // console.log(url);
         if (G.isFirefox) {
             window.location.href = url;
         } else {

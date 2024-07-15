@@ -61,7 +61,7 @@
     <!-- 正则匹配 -->
     <section>
       <h1 class="optionsTitle">
-        <img src="img/regex.png" style="width: 18px" /><span data-i18n-outer="regexMatch"></span> / <span
+        <img src="img/regex.png" style="width: 18px" class="regex"/><span data-i18n-outer="regexMatch"></span> / <span
           data-i18n-outer="blockResource"></span>
       </h1>
       <div class="optionBox">
@@ -104,7 +104,10 @@
 
     <!-- 复制选项 -->
     <section>
-      <h1 class="optionsTitle" data-i18n="copy"></h1>
+      <h1 class="optionsTitle">
+        <img src="img/copy.png" style="width: 18px" class="copy"/>
+        <p data-i18n-outer="copy"></p>
+      </h1>
       <div class="optionBox">
         <span class="explain">
           <p data-i18n-outer="copyTip"></p><br />
@@ -131,6 +134,7 @@
     <!-- Aria2 RPC -->
     <section>
       <h1 class="optionsTitle">
+        <img src="img/aria2.png" style="width: 18px" class="aria2"/>
         Aria2 RPC
       </h1>
       <div class="optionBox">
@@ -243,7 +247,10 @@
 
     <!-- 第三方本地程序调用 -->
     <section>
-      <h1 class="optionsTitle" data-i18n="invokeApp"></h1>
+      <h1 class="optionsTitle">
+        <img src="img/invoke.svg" style="width: 18px" class="invoke"/>
+        <p data-i18n-outer="invokeApp"></p>
+      </h1>
       <div class="optionBox" id="invokeOption">
         <div class="list">
           <div class="item">
@@ -368,12 +375,15 @@
 
     <!-- m3u8解析器 -->
     <section>
-      <h1 class="optionsTitle" data-i18n="m3u8Parser"></h1>
+      <h1 class="optionsTitle">
+        <img src="img/parsing.png" style="width: 18px" class="parsing"/>
+        <p data-i18n-outer="m3u8Parser"></p>
+      </h1>
       <div class="optionBox" id="m3u8Option">
         <div class="list">
 
           <div class="item">
-            <div><img src="img/download.png" style="width: 18px"> <span data-i18n-outer="autoDownM3u8Tip"></span></div>
+            <div><img src="img/download.png" style="width: 18px" class="download"> <span data-i18n-outer="autoDownM3u8Tip"></span></div>
             <div class="switch">
               <label class="switchLabel switchRadius">
                 <input type="checkbox" id="m3u8AutoDown" save="click" class="switchInput" />
