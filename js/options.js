@@ -7,14 +7,17 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
         location.reload();
     }
     $(`<style>${items.css}</style>`).appendTo("head");
+    const $extList = $("#extList");
     for (let key in items.Ext) {
-        $("#extList").append(Gethtml("Ext", { ext: items.Ext[key].ext, size: items.Ext[key].size, state: items.Ext[key].state }));
+        $extList.append(Gethtml("Ext", { ext: items.Ext[key].ext, size: items.Ext[key].size, state: items.Ext[key].state }));
     }
+    const $typeList = $("#typeList");
     for (let key in items.Type) {
-        $("#typeList").append(Gethtml("Type", { type: items.Type[key].type, size: items.Type[key].size, state: items.Type[key].state }));
+        $typeList.append(Gethtml("Type", { type: items.Type[key].type, size: items.Type[key].size, state: items.Type[key].state }));
     }
+    const $regexList = $("#regexList");
     for (let key in items.Regex) {
-        $("#regexList").append(Gethtml("Regex", { type: items.Regex[key].type, regex: items.Regex[key].regex, ext: items.Regex[key].ext, blackList: items.Regex[key].blackList, state: items.Regex[key].state }));
+        $regexList.append(Gethtml("Regex", { type: items.Regex[key].type, regex: items.Regex[key].regex, ext: items.Regex[key].ext, blackList: items.Regex[key].blackList, state: items.Regex[key].state }));
     }
     setTimeout(() => {
         for (let key in items) {
@@ -312,9 +315,10 @@ function Save(option, sec = 0) {
         if (option == "Ext") {
             let Ext = new Array();
             $("#extList tr").each(function () {
-                let GetText = $(this).find("[name=text]").val();
-                let GetSize = parseInt($(this).find("[name=size]").val());
-                let GetState = $(this).find("[name=state]").prop("checked");
+                const _this = $(this);
+                let GetText = _this.find("[name=text]").val();
+                let GetSize = parseInt(_this.find("[name=size]").val());
+                let GetState = _this.find("[name=state]").prop("checked");
                 if (isEmpty(GetText)) { return true; }
                 if (isEmpty(GetSize)) { GetSize = 0; }
                 Ext.push({ ext: GetText.toLowerCase(), size: GetSize, state: GetState });
@@ -325,9 +329,10 @@ function Save(option, sec = 0) {
         if (option == "Type") {
             let Type = new Array();
             $("#typeList tr").each(function () {
-                let GetText = $(this).find("[name=text]").val();
-                let GetSize = parseInt($(this).find("[name=size]").val());
-                let GetState = $(this).find("[name=state]").prop("checked");
+                const _this = $(this);
+                let GetText = _this.find("[name=text]").val();
+                let GetSize = parseInt(_this.find("[name=size]").val());
+                let GetState = _this.find("[name=state]").prop("checked");
                 if (isEmpty(GetText)) { return true; }
                 if (isEmpty(GetSize)) { GetSize = 0; }
                 GetText = GetText.trim();
@@ -342,11 +347,12 @@ function Save(option, sec = 0) {
         if (option == "Regex") {
             let Regex = new Array();
             $("#regexList tr").each(function () {
-                let GetType = $(this).find("[name=type]").val();
-                let GetRegex = $(this).find("[name=regex]").val();
-                let GetExt = $(this).find("[name=regexExt]").val()
-                let GetState = $(this).find("[name=state]").prop("checked");
-                let GetBlackList = $(this).find("[name=blackList]").prop("checked");
+                const _this = $(this);
+                let GetType = _this.find("[name=type]").val();
+                let GetRegex = _this.find("[name=regex]").val();
+                let GetExt = _this.find("[name=regexExt]").val()
+                let GetState = _this.find("[name=state]").prop("checked");
+                let GetBlackList = _this.find("[name=blackList]").prop("checked");
                 try {
                     new RegExp("", GetType);
                 } catch (e) {
