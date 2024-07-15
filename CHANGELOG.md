@@ -1,5 +1,25 @@
 ## 更新说明
 
+### 2.5.3
+
+[Added] 增加`弹出`模式 (以新窗口打开资源列表页面)
+
+[Added] 增加`调用本地程序`设置, 程序没有调用协议, 可以使用[URLProtocol](https://github.com/xifangczy/URLProtocol)帮助程序注册调用协议。具体使用方法查看 [调用本地协议](https://o2bmm.gitbook.io/cat-catch/docs/invoke)
+
+[Added] 下载器 增加`边下边存`选项 可以用来下载一些直播视频链接
+
+[Added] 现在使用`深度搜索` 或其他脚本得到的疑似密钥, 直接显示在popup页面 `疑似密钥` 标签内。
+
+[Changed] 重写 `录制webRTC` 脚本
+
+[Changed]  `m3u8解析器` `下载器`页面内更改设置不会被储存。所有设置更改统一到扩展设置页面。
+
+[Changed] 优化与ffmpeg网页端的通信, 避免多任务时的数据错乱。
+(请提前打开 [在线ffmpeg](https://ffmpeg.bmmmd.com/) ctrl+f5 刷新页面 避免页面缓存造成的问题)
+
+[Changed] 稍微增大一些按钮图标 不再训练大家的鼠标精准度🙄...如果你不喜欢想还原 设置-自定义css 填入 `body{font-size:12px;width:550px;}.icon,.favicon{width:18px;height:18px;}.DownCheck{width:15px;height:15px;}`
+
+
 ### 2.5.2
 
 [Added] 添加测试功能 数据发送 嗅探数据和密钥发送到指定地址
