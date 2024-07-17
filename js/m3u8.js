@@ -1653,7 +1653,7 @@ function initDownload() {
 
 // 流式下载
 function createStreamSaver(url) {
-    streamSaver.mitm = streamSaverConfig.url;
+    streamSaver.mitm = G.streamSaverConfig.url;
     const ext = $("#mp4").prop("checked") ? "mp4" : GetExt(url);
     return streamSaver.createWriteStream(`${GetFileName(url)}.${ext}`).getWriter();
 }

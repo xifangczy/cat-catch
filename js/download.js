@@ -27,7 +27,7 @@ function start() {
     $("#downStream").prop("checked", G.downStream);
     $(`<style>${G.css}</style>`).appendTo("head");
     // 流式下载服务端
-    streamSaver.mitm = streamSaverConfig.url;
+    streamSaver.mitm = G.streamSaverConfig.url;
 
     chrome.tabs.getCurrent(function (tab) {
         startDownload(tab.id);
@@ -239,7 +239,7 @@ function startDownload(tabId) {
         });
     }
     function sendFile(action = "addFile") {
-        chrome.tabs.query({ url: ffmpegConfig.url }, function (tabs) {
+        chrome.tabs.query({ url: G.ffmpegConfig.url }, function (tabs) {
             if (tabs.length && tabs[0].status != "complete") {
                 setTimeout(() => {
                     sendFile(action);

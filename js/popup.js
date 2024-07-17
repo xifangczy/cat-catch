@@ -559,7 +559,7 @@ if (G.isFirefox) {
 $("[go]").click(function () {
     let url = this.getAttribute("go");
     if (url == "ffmpegURL") {
-        chrome.tabs.create({ url: ffmpegConfig.url })
+        chrome.tabs.create({ url: G.ffmpegConfig.url })
         return;
     }
     // isPopup ? chrome.tabs.update({ url: url }) : chrome.tabs.create({ url: url });

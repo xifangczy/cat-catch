@@ -420,12 +420,12 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // ffmpeg网页通信
     if (Message.Message == "catCatchFFmpeg") {
-        const data = { ...Message, Message: "ffmpeg", tabId: Message.tabId ?? sender.tab.id, version: ffmpegConfig.version };
-        chrome.tabs.query({ url: ffmpegConfig.url }, function (tabs) {
+        const data = { ...Message, Message: "ffmpeg", tabId: Message.tabId ?? sender.tab.id, version: G.ffmpegConfig.version };
+        chrome.tabs.query({ url: G.ffmpegConfig.url }, function (tabs) {
             if (chrome.runtime.lastError || !tabs.length) {
-                chrome.tabs.create({ url: ffmpegConfig.url, active: Message.active ?? true }, function (tab) {
-                    ffmpegConfig.tab = tab.id;
-                    ffmpegConfig.data = data;
+                chrome.tabs.create({ url: G.ffmpegConfig.url, active: Message.active ?? true }, function (tab) {
+                    G.ffmpegConfig.tab = tab.id;
+                    G.ffmpegConfig.data = data;
                 });
                 return true;
             }
@@ -562,11 +562,11 @@ chrome.commands.onCommand.addListener(function (command) {
 });
 
 chrome.webNavigation.onCompleted.addListener(function (details) {
-    if (ffmpegConfig.tab && details.tabId == ffmpegConfig.tab) {
+    if (G.ffmpegConfig.tab && details.tabId == G.ffmpegConfig.tab) {
         setTimeout(() => {
-            chrome.tabs.sendMessage(details.tabId, ffmpegConfig.data);
-            ffmpegConfig.data = undefined;
-            ffmpegConfig.tab = 0;
+            chrome.tabs.sendMessage(details.tabId, G.ffmpegConfig.data);
+            G.ffmpegConfig.data = undefined;
+            G.ffmpegConfig.tab = 0;
         }, 500);
     }
 });
