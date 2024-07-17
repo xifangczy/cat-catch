@@ -18,15 +18,13 @@ chrome.runtime.onConnect.addListener(function (Port) {
     });
 });
 
-chrome.alarms.create("nowClear", { when: Date.now() + 3000 });  // 3秒后清理立即清理一次
-chrome.alarms.create("clear", { periodInMinutes: 60 }); // 60分钟清理一次冗余数据
 chrome.alarms.onAlarm.addListener(function (alarm) {
     if (alarm.name === "nowClear" || alarm.name === "clear") {
         clearRedundant();
         return;
     }
     if (alarm.name === "save") {
-        chrome.storage.local.set({ MediaData: cacheData });
+        (chrome.storage.session ?? chrome.storage.local).set({ MediaData: cacheData });
         return;
     }
 });
@@ -248,7 +246,7 @@ function save(tabId) {
     clearTimeout(debounce);
     debounceTime = Date.now();
     debounceCount = 0;
-    chrome.storage.local.set({ MediaData: cacheData }, function () {
+    (chrome.storage.session ?? chrome.storage.local).set({ MediaData: cacheData }, function () {
         chrome.runtime.lastError && console.log(chrome.runtime.lastError);
     });
     cacheData[tabId] && SetIcon({ number: cacheData[tabId].length, tabId: tabId });
@@ -261,7 +259,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         return true;
     }
     if (Message.Message == "pushData") {
-        chrome.storage.local.set({ MediaData: cacheData });
+        (chrome.storage.session ?? chrome.storage.local).set({ MediaData: cacheData });
         sendResponse("ok");
         return true;
     }
@@ -321,7 +319,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         } else {
             G.featAutoDownTabId.add(Message.tabId);
         }
-        chrome.storage.local.set({ featAutoDownTabId: Array.from(G.featAutoDownTabId) });
+        (chrome.storage.session ?? chrome.storage.local).set({ featAutoDownTabId: Array.from(G.featAutoDownTabId) });
         sendResponse("ok");
         return true;
     }
@@ -385,7 +383,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         // 当前标签
         if (Message.type) {
             delete cacheData[Message.tabId];
-            chrome.storage.local.set({ MediaData: cacheData });
+            (chrome.storage.session ?? chrome.storage.local).set({ MediaData: cacheData });
             clearRedundant();
             sendResponse("OK");
             return true;
@@ -395,7 +393,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             if (item == Message.tabId) { continue; }
             delete cacheData[item];
         }
-        chrome.storage.local.set({ MediaData: cacheData });
+        (chrome.storage.session ?? chrome.storage.local).set({ MediaData: cacheData });
         clearRedundant();
         sendResponse("OK");
         return true;
@@ -490,7 +488,7 @@ chrome.webNavigation.onCommitted.addListener(function (details) {
     // 刷新清理角标数
     if (details.frameId == 0 && (details.transitionType == "reload" || details.transitionType == "link") && G.autoClearMode == 1) {
         delete cacheData[details.tabId];
-        chrome.storage.local.set({ MediaData: cacheData });
+        (chrome.storage.session ?? chrome.storage.local).set({ MediaData: cacheData });
         SetIcon({ tabId: details.tabId });
     }
 
@@ -544,7 +542,7 @@ chrome.commands.onCommand.addListener(function (command) {
         } else {
             G.featAutoDownTabId.add(G.tabId);
         }
-        chrome.storage.local.set({ featAutoDownTabId: Array.from(G.featAutoDownTabId) });
+        (chrome.storage.session ?? chrome.storage.local).set({ featAutoDownTabId: Array.from(G.featAutoDownTabId) });
     } else if (command == "catch") {
         const scriptTabid = G.scriptList.get("catch.js").tabId;
         scriptTabid.has(G.tabId) ? scriptTabid.delete(G.tabId) : scriptTabid.add(G.tabId);
@@ -553,7 +551,7 @@ chrome.commands.onCommand.addListener(function (command) {
         chrome.tabs.create({ url: "m3u8.html" });
     } else if (command == "clear") {
         delete cacheData[G.tabId];
-        chrome.storage.local.set({ MediaData: cacheData });
+        (chrome.storage.session ?? chrome.storage.local).set({ MediaData: cacheData });
         clearRedundant();
         SetIcon({ tabId: G.tabId });
     } else if (command == "enable") {
@@ -652,7 +650,7 @@ function SetIcon(obj) {
 function mobileUserAgent(tabId, change = false) {
     if (change) {
         G.featMobileTabId.add(tabId);
-        chrome.storage.local.set({ featMobileTabId: Array.from(G.featMobileTabId) });
+        (chrome.storage.session ?? chrome.storage.local).set({ featMobileTabId: Array.from(G.featMobileTabId) });
         chrome.declarativeNetRequest.updateSessionRules({
             removeRuleIds: [tabId],
             addRules: [{
@@ -673,7 +671,7 @@ function mobileUserAgent(tabId, change = false) {
         });
         return true;
     }
-    G.featMobileTabId.delete(tabId) && chrome.storage.local.set({ featMobileTabId: Array.from(G.featMobileTabId) });
+    G.featMobileTabId.delete(tabId) && (chrome.storage.session ?? chrome.storage.local).set({ featMobileTabId: Array.from(G.featMobileTabId) });
     chrome.declarativeNetRequest.updateSessionRules({
         removeRuleIds: [tabId]
     });

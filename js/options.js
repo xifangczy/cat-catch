@@ -229,6 +229,7 @@ $("#ClearData, #ResetAllOption").bind("click", function () {
         }
     }
     chrome.storage.local.clear();
+    chrome.storage.session.clear();
     chrome.runtime.sendMessage({ Message: "ClearIcon" });
     location.reload();
 });

@@ -101,7 +101,7 @@
                 }
                 $("#videoTabIndex").val(_tabId);
                 setVideoTagTimer(); getVideoState(true); setVideoStateTimer();
-                chrome.storage.local.set({ mediaControl: { tabid: _tabId, index: _index } });
+                (chrome.storage.session ?? chrome.storage.local).set({ mediaControl: { tabid: _tabId, index: _index } });
             });
         });
         // setVideoTagTimer(); getVideoState(); setVideoStateTimer();
@@ -115,7 +115,7 @@
         } else {
             _index = parseInt($("#videoIndex").val());
         }
-        chrome.storage.local.set({ mediaControl: { tabid: _tabId, index: _index } });
+        (chrome.storage.session ?? chrome.storage.local).set({ mediaControl: { tabid: _tabId, index: _index } });
         getVideoState(true);
     });
     let wheelPlaybackRateTimeout;

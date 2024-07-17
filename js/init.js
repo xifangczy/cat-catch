@@ -173,7 +173,7 @@ InitOptions();
 // 初始变量
 function InitOptions() {
     // 断开重新连接后 立刻把local里MediaData数据交给cacheData
-    chrome.storage.local.get({ MediaData: {} }, function (items) {
+    (chrome.storage.session ?? chrome.storage.local).get({ MediaData: {} }, function (items) {
         if (items.MediaData.init) {
             cacheData = {};
             return;
@@ -218,7 +218,7 @@ function InitOptions() {
         G.initSyncComplete = true;
     });
     // 读取local配置数据 交给全局变量G
-    chrome.storage.local.get(G.LocalVar, function (items) {
+    (chrome.storage.session ?? chrome.storage.local).get(G.LocalVar, function (items) {
         items.featMobileTabId = new Set(items.featMobileTabId);
         items.featAutoDownTabId = new Set(items.featAutoDownTabId);
         G = { ...items, ...G };
@@ -260,7 +260,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 // 扩展升级，清空本地储存
 chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason == "update") {
-        chrome.storage.local.clear(function () {
+        (chrome.storage.session ?? chrome.storage.local).clear(function () {
             InitOptions();
         });
         chrome.alarms.create("nowClear", { when: Date.now() + 3000 });
@@ -270,25 +270,23 @@ chrome.runtime.onInstalled.addListener(function (details) {
 // 清理冗余数据
 function clearRedundant() {
     chrome.tabs.query({}, function (tabs) {
-        const allTabId = [];
-        for (let item of tabs) {
-            allTabId.push(item.id);
-        }
+        const allTabId = new Set(tabs.map(tab => tab.id));
+
         if (!cacheData.init) {
             // 清理 缓存数据
             let cacheDataFlag = false;
             for (let key in cacheData) {
-                if (!allTabId.includes(parseInt(key))) {
+                if (!allTabId.has(Number(key))) {
                     cacheDataFlag = true;
                     delete cacheData[key];
                 }
             }
-            cacheDataFlag && chrome.storage.local.set({ MediaData: cacheData });
+            cacheDataFlag && (chrome.storage.session ?? chrome.storage.local).set({ MediaData: cacheData });
         }
         // 清理脚本
         G.scriptList.forEach(function (scriptList) {
             scriptList.tabId.forEach(function (tabId) {
-                if (!allTabId.includes(tabId)) {
+                if (!allTabId.has(tabId)) {
                     scriptList.tabId.delete(tabId);
                 }
             });
@@ -300,7 +298,7 @@ function clearRedundant() {
         chrome.declarativeNetRequest.getSessionRules(function (rules) {
             let mobileFlag = false;
             for (let item of rules) {
-                if (!allTabId.includes(item.id)) {
+                if (!allTabId.has(item.id)) {
                     mobileFlag = true;
                     G.featMobileTabId.delete(item.id);
                     chrome.declarativeNetRequest.updateSessionRules({
@@ -308,17 +306,17 @@ function clearRedundant() {
                     });
                 }
             }
-            mobileFlag && chrome.storage.local.set({ featMobileTabId: Array.from(G.featMobileTabId) });
+            mobileFlag && (chrome.storage.session ?? chrome.storage.local).set({ featMobileTabId: Array.from(G.featMobileTabId) });
         });
         // 清理自动下载
         let autoDownFlag = false;
         G.featAutoDownTabId.forEach(function (tabId) {
-            if (!allTabId.includes(tabId)) {
+            if (!allTabId.has(tabId)) {
                 autoDownFlag = true;
                 G.featAutoDownTabId.delete(tabId);
             }
         });
-        autoDownFlag && chrome.storage.local.set({ featAutoDownTabId: Array.from(G.featAutoDownTabId) });
+        autoDownFlag && (chrome.storage.session ?? chrome.storage.local).set({ featAutoDownTabId: Array.from(G.featAutoDownTabId) });
     });
     // G.referer.clear();
     // G.blackList.clear();
