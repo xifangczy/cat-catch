@@ -68,7 +68,8 @@ G.OptionLists = {
         { "type": "application/mpegurl", "size": 0, "state": true },
         { "type": "application/octet-stream-m3u8", "size": 0, "state": true },
         { "type": "application/dash+xml", "size": 0, "state": true },
-        { "type": "application/m4s", "size": 0, "state": true }
+        { "type": "application/m4s", "size": 0, "state": true },
+        { "type": "video/iso.segment", "size": 0, "state": true },
     ],
     Regex: [
         { "type": "ig", "regex": "https://cache\\.video\\.[a-z]*\\.com/dash\\?tvid=.*", "ext": "json", "state": false },
@@ -260,8 +261,12 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 // 扩展升级，清空本地储存
 chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason == "update") {
-        (chrome.storage.session ?? chrome.storage.local).clear(function () {
-            InitOptions();
+        chrome.storage.local.clear(function () {
+            if(chrome.storage.session){
+                chrome.storage.session.clear(InitOptions);
+            }else{
+                InitOptions();
+            }
         });
         chrome.alarms.create("nowClear", { when: Date.now() + 3000 });
     }
