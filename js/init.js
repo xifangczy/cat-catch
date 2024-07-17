@@ -69,7 +69,6 @@ G.OptionLists = {
         { "type": "application/octet-stream-m3u8", "size": 0, "state": true },
         { "type": "application/dash+xml", "size": 0, "state": true },
         { "type": "application/m4s", "size": 0, "state": true },
-        { "type": "video/iso.segment", "size": 0, "state": true },
     ],
     Regex: [
         { "type": "ig", "regex": "https://cache\\.video\\.[a-z]*\\.com/dash\\?tvid=.*", "ext": "json", "state": false },
