@@ -14,6 +14,8 @@
 
 [Changed]  `m3u8解析器` `下载器`页面内更改设置不会被储存。所有设置更改统一到扩展设置页面。
 
+[Changed]  storage.local 更改为 storage.session 以减少IO错误导致扩展无法使用.(要求chrome 104以上)
+
 [Changed] 优化与ffmpeg网页端的通信, 避免多任务时的数据错乱。
 (请提前打开 [在线ffmpeg](https://ffmpeg.bmmmd.com/) ctrl+f5 刷新页面 避免页面缓存造成的问题)
 
