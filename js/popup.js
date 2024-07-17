@@ -660,7 +660,7 @@ const interval = setInterval(function () {
     observer.observe($down[0], { childList: true, subtree: true, attributes: true });
 
     // 记忆弹出窗口的大小
-    isPopup && chrome.windows.onBoundsChanged.addListener(function (window) {
+    (isPopup && !G.isFirefox) && chrome.windows.onBoundsChanged.addListener(function (window) {
         chrome.storage.sync.set({
             popupHeight: window.height,
             popupWidth: window.width,
