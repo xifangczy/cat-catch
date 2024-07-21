@@ -55,7 +55,7 @@
         #catCatchRecorderTitle {
             cursor: move;
             user-select: none;
-            width: 50%;
+            width: 45%;
         }
         #catCatchRecorderinnerCropArea {
             height: calc(100% - 20px);
@@ -72,7 +72,7 @@
             margin-right: 5px;
         }
         #videoBitrate, #audioBitrate {
-            width: 3rem;
+            width: 4rem;
         }
         .input-group label{
             width: 5rem;
@@ -202,7 +202,7 @@
         recorder.start();
         recorder.onstart = function (e) {
             buffer.slice(0);
-            catCatchRecorderStart.innerHTML = "停止录制";
+            catCatchRecorderStart.innerHTML = i18n("stopRecording");
             cat.classList.add("animation");
         }
         recorder.ondataavailable = function (e) {
@@ -218,29 +218,33 @@
             buffer.slice(0);
             stream.getTracks().forEach(track => track.stop());
             recorder = undefined;
-            catCatchRecorderStart.innerHTML = "开始录制";
+            catCatchRecorderStart.innerHTML = i18n("startRecording");
             cat.classList.remove("animation");
         }
     }
     function getElementOffset(el) {
-        let parentTop = el.offsetTop;
-        let parentLeft = el.offsetLeft;
-        let current = el.offsetParent;
-        while (current) {
-            parentTop += current.offsetTop;
-            parentLeft += current.offsetLeft
-            current = current.offsetParent;
-        }
-        return { top: parentTop, left: parentLeft };
+        const rect = el.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+        return { 
+            top: rect.top + scrollTop, 
+            left: rect.left + scrollLeft 
+        };
     }
 
     // i18n
     if (window.CatCatchI18n) {
         CatCatch.querySelectorAll('[data-i18n]').forEach(function (element) {
-            element.innerHTML = window.CatCatchI18n[element.dataset.i18n][language];
+            const translation = window.CatCatchI18n[element.dataset.i18n]?.[language];
+            if (translation) {
+                element.innerHTML = translation;
+            }
         });
         CatCatch.querySelectorAll('[data-i18n-outer]').forEach(function (element) {
-            element.outerHTML = window.CatCatchI18n[element.dataset.i18nOuter][language];
+            const outerTranslation = window.CatCatchI18n[ element.dataset.i18nOuter]?.[language];
+            if (outerTranslation) {
+                element.outerHTML = outerTranslation;
+            }
         });
     }
     function i18n(key, original = "") {
