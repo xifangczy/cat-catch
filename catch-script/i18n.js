@@ -193,11 +193,11 @@ window.CatCatchI18n = {
         zh: "已包含音频和视频流"
     },
     audioBits: {
-        en: "Audio bits",
-        zh: "音频码率"
+        en: "Audio bit(Kbit)",
+        zh: "音频码率(Kbit)"
     },
     videoBits: {
-        en: "Video bits",
-        zh: "视频码率"
+        en: "Video bits(Kbit)",
+        zh: "视频码率(Kbit)"
     }
 };

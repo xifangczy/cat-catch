@@ -7,6 +7,17 @@
         alert("当前网页不支持屏幕分享");
         return;
     }
+
+    let language = navigator.language.replace("-", "_");
+    if (window.CatCatchI18n) {
+        if (!window.CatCatchI18n.languages.includes(language)) {
+            language = language.split("_")[0];
+            if (!window.CatCatchI18n.languages.includes(language)) {
+                language = "en";
+            }
+        }
+    }
+
     // 添加style
     const style = document.createElement("style");
     style.innerHTML = `
@@ -15,7 +26,7 @@
             50% { outline: 4px solid red; }
             100% { outline: 4px solid rgb(26, 115, 232); }
         }
-        #catCatchRecorder2{
+        #catCatchRecorder2 {
             font-weight: bold;
             position: absolute;
             cursor: move;
@@ -30,7 +41,7 @@
             pointer-events: none;
             font-size: 10px;
         }
-        #catCatchRecorderHeader{
+        #catCatchRecorderHeader {
             background: rgb(26, 115, 232);
             color: white;
             text-align: center;
@@ -41,29 +52,61 @@
             align-items: center;
             pointer-events: auto;
         }
-        #catCatchRecorderTitle{
+        #catCatchRecorderTitle {
             cursor: move;
             user-select: none;
-            width: 66%;
+            width: 50%;
         }
-        #catCatchRecorderinnerCropArea{
+        #catCatchRecorderinnerCropArea {
             height: calc(100% - 20px);
             width: 100%;
         }
-        .animation{
+        .animation {
             animation: color-change 5s infinite;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+        }
+        .input-group label {
+            margin-right: 5px;
+        }
+        #videoBitrate, #audioBitrate {
+            width: 3rem;
+        }
+        .input-group label{
+            width: 5rem;
         }`;
-    document.getElementsByTagName('html')[0].appendChild(style);
+    // document.getElementsByTagName('html')[0].appendChild(style);
 
     // 添加div
     let cat = document.createElement("div");
     cat.setAttribute("id", "catCatchRecorder2");
     cat.innerHTML = `<div id="catCatchRecorderinnerCropArea"></div>
         <div id="catCatchRecorderHeader">
-            <div id="catCatchRecorderStart">开始录制</div>
-            <div id="catCatchRecorderTitle">拖动窗口</div>
-            <div id="catCatchRecorderClose">关闭窗口</div>
+            <div class="input-group">
+                <label for="videoBitrate" data-i18n="videoBits">视频码率 (kbps)</label>
+                <input type="number" id="videoBitrate" value="${localStorage.getItem("CatCatchRecorder2_videoBits") ?? 2500}">
+            </div>
+            <div class="input-group">
+                <label for="audioBitrate" data-i18n="audioBits">音频码率 (kbps)</label>
+                <input type="number" id="audioBitrate" value="${localStorage.getItem("CatCatchRecorder2_audioBits") ?? 128}">
+            </div>
+            <div id="catCatchRecorderStart" data-i18n="startRecording">开始录制</div>
+            <div id="catCatchRecorderTitle" data-i18n="dragWindow">拖动窗口</div>
+            <div id="catCatchRecorderClose" data-i18n="close">关闭</div>
         </div>`;
+
+    // 创建 Shadow DOM 放入CatCatch
+    const divShadow = document.createElement('div');
+    const shadowRoot = divShadow.attachShadow({ mode: 'open' });
+    shadowRoot.appendChild(cat);
+    shadowRoot.appendChild(style);
+    document.getElementsByTagName('html')[0].appendChild(divShadow);
+
+    // 事件绑定 音频 视频 码率
+    const videoBitrateInput = cat.querySelector("#videoBitrate");
+    const audioBitrateInput = cat.querySelector("#audioBitrate");
 
     // 事件绑定
     const catCatchRecorderStart = cat.querySelector("#catCatchRecorderStart");
@@ -102,7 +145,7 @@
             document.onpointermove = null;
         }
     }
-    document.getElementsByTagName('html')[0].appendChild(cat);
+    // document.getElementsByTagName('html')[0].appendChild(cat);
 
     // 初始化位置
     const video = document.querySelector("video");
@@ -129,11 +172,16 @@
     var recorder;
     async function startRecording() {
         const buffer = [];
-        let option = { mimeType: 'video/webm;codecs=vp8,opus' };
+        let option = {
+            mimeType: 'video/webm;codecs=vp8,opus',
+            videoBitsPerSecond: videoBitrateInput.value * 1000,
+            audioBitsPerSecond: audioBitrateInput.value * 1000
+        };
+
         if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')) {
-            option = { mimeType: 'video/webm;codecs=vp9,opus' };
+            option.mimeType = 'video/webm;codecs=vp9,opus';
         } else if (MediaRecorder.isTypeSupported('video/webm;codecs=h264')) {
-            option = { mimeType: 'video/webm;codecs=h264' };
+            option.mimeType = 'video/webm;codecs=h264';
         }
         const cropTarget = await CropTarget.fromElement(catCatchRecorderinnerCropArea);
         const stream = await navigator.mediaDevices
@@ -184,5 +232,19 @@
             current = current.offsetParent;
         }
         return { top: parentTop, left: parentLeft };
+    }
+
+    // i18n
+    if (window.CatCatchI18n) {
+        CatCatch.querySelectorAll('[data-i18n]').forEach(function (element) {
+            element.innerHTML = window.CatCatchI18n[element.dataset.i18n][language];
+        });
+        CatCatch.querySelectorAll('[data-i18n-outer]').forEach(function (element) {
+            element.outerHTML = window.CatCatchI18n[element.dataset.i18nOuter][language];
+        });
+    }
+    function i18n(key, original = "") {
+        if (!window.CatCatchI18n) { return original };
+        return window.CatCatchI18n[key][language];
     }
 })();
