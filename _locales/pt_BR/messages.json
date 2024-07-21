@@ -9,7 +9,7 @@
     "message": "Confirmar"
   },
   "currentPage": {
-    "message": "Pagina Atual"
+    "message": "Página Atual"
   },
   "otherPage": {
     "message": "Outra Página"
@@ -279,7 +279,7 @@
     "message": "Para maior comodidade de usar aplicativos de terceiros, personalize o conteúdo gravado na área de transferência pelo botão copiar"
   },
   "replaceKeywordList": {
-    "message": "Substituir a lista de palavras-chave"
+    "message": "Lista de Substitutos para Palavras-Chaves"
   },
   "otherFiles": {
     "message": "Outros Arquivos"
@@ -300,7 +300,7 @@
     "message": "Documentação"
   },
   "aria2Tip": {
-    "message": "Uma excelente ferramenta de download, veja como usar"
+    "message": "Uma excelente ferramenta de download, veja como usar com a"
   },
   "m3u8DLTips": {
     "message": "Uma excelente ferramenta de download de m3u8 e mpd de terceiros, veja como usar"
@@ -387,10 +387,10 @@
     "message": "Operação"
   },
   "exportSettings": {
-    "message": "Configurações de Exportação"
+    "message": "Exportar Configurações"
   },
   "importConfiguration": {
-    "message": "Configurações de Importação"
+    "message": "Importar Configurações"
   },
   "clearCapturedData": {
     "message": "Limpar Dados Capturados"
