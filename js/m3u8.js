@@ -1171,8 +1171,8 @@ function downloadNew(start = 0, end = _fragments.length) {
     down.on('completed', function (buffer, fragment) {
         if (recorder) {
             $progress.html(i18n.waitingForLiveData);
-            // downDuration += fragment.duration;
-            $fileDuration.html(i18n.recordingDuration + ":" + secToTime(down.duration));
+            downDuration += fragment.duration;
+            $fileDuration.html(i18n.recordingDuration + ":" + secToTime(downDuration));
             return;
         }
         // $(`#downItem${fragment.index}`).remove();
