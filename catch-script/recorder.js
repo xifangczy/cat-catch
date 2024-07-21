@@ -15,6 +15,7 @@
 
     const buttonStyle = 'style="border:solid 1px #000;margin:2px;padding:2px;background:#fff;border-radius:4px;border:solid 1px #c7c7c780;color:#000;"';
     const checkboxStyle = 'style="-webkit-appearance: auto;"';
+    const numberStyle = 'style="width: 5rem;"';
 
     const CatCatch = document.createElement("div");
     CatCatch.setAttribute("id", "catCatchRecorder");
@@ -22,7 +23,10 @@
     <div id="tips"></div>
     <span data-i18n="selectVideo">选择视频</span> <select id="videoList" style="max-width: 200px;"></select>
     <span data-i18n="recordEncoding">录制编码</span> <select id="mimeTypeList" style="max-width: 200px;"></select>
-    <label><input type="checkbox" id="ffmpeg"} ${checkboxStyle}><span data-i18n="ffmpeg">使用ffmpeg转码</span></label>
+    <label><input type="checkbox" id="ffmpeg" ${checkboxStyle}><span data-i18n="ffmpeg">使用ffmpeg转码</span></label>
+    <label><span data-i18n="audioBits">音频码率</span><input type="number" id="audioBits" ${numberStyle} value="${localStorage.getItem("CatCatchRecorder_audioBits") ?? 128}">Kbit</label>
+    <label><span data-i18n="videoBits">视频码率</span><input type="number" id="videoBits" ${numberStyle} value="${localStorage.getItem("CatCatchRecorder_videoBits") ?? 2500}">Kbit</label>
+
     <div>
         <button id="getVideo" ${buttonStyle} data-i18n="readVideo">读取视频</button>
         <button id="start" ${buttonStyle} data-i18n="startRecording">开始录制</button>
@@ -51,7 +55,7 @@
 
     // 创建 Shadow DOM 放入CatCatch
     const divShadow = document.createElement('div');
-    const shadowRoot = divShadow.attachShadow({ mode: 'closed' });
+    const shadowRoot = divShadow.attachShadow({ mode: 'open' });
     shadowRoot.appendChild(CatCatch);
     // 页面插入Shadow DOM
     document.getElementsByTagName('html')[0].appendChild(divShadow);
@@ -157,6 +161,14 @@
                 $tips.innerHTML = i18n("recordingNotSupported", "不支持录制");
                 return;
             }
+            // 码率
+            const audioBits = CatCatch.querySelector("#audioBits").value;
+            const videoBits = CatCatch.querySelector("#videoBits").value;
+            localStorage.setItem("CatCatchRecorder_audioBits", audioBits);
+            localStorage.setItem("CatCatchRecorder_videoBits", videoBits);
+            option.audioBitsPerSecond = audioBits * 1000;
+            option.videoBitsPerSecond = videoBits * 1000;
+            
             recorder = new MediaRecorder(stream, option);
             recorder.ondataavailable = function (event) {
                 if (CatCatch.querySelector("#ffmpeg").checked) {

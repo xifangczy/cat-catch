@@ -191,5 +191,13 @@ window.CatCatchI18n = {
     videoAndAudio: {
         en: "Includes both audio and video streams",
         zh: "已包含音频和视频流"
+    },
+    audioBits: {
+        en: "Audio bits",
+        zh: "音频码率"
+    },
+    videoBits: {
+        en: "Video bits",
+        zh: "视频码率"
     }
 };
