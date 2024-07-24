@@ -25,7 +25,7 @@
     <span data-i18n="recordEncoding">录制编码</span> <select id="mimeTypeList" style="max-width: 200px;"></select>
     <label><input type="checkbox" id="ffmpeg" ${checkboxStyle}><span data-i18n="ffmpeg">使用ffmpeg转码</span></label>
     <label><span data-i18n="audioBits">音频码率(Kbit)</span><input type="number" id="audioBits" ${numberStyle} value="${localStorage.getItem("CatCatchRecorder_audioBits") ?? 128}"></label>
-    <label><span data-i18n="videoBits">视频码率(Kbit)</span><input type="number" id="videoBits" ${numberStyle} value="${localStorage.getItem("CatCatchRecorder_videoBits") ?? 2500}"></label>
+    <label><span data-i18n="videoBits">视频码率(Kbit)</span><input type="number" id="videoBits" ${numberStyle} value="${localStorage.getItem("CatCatchRecorder_videoBits") ?? 5000}"></label>
 
     <div>
         <button id="getVideo" ${buttonStyle} data-i18n="readVideo">读取视频</button>

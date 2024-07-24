@@ -86,7 +86,7 @@
         <div id="catCatchRecorderHeader">
             <div class="input-group">
                 <label for="videoBitrate" data-i18n="videoBits">视频码率 (kbps)</label>
-                <input type="number" id="videoBitrate" value="${localStorage.getItem("CatCatchRecorder2_videoBits") ?? 2500}">
+                <input type="number" id="videoBitrate" value="${localStorage.getItem("CatCatchRecorder2_videoBits") ?? 5000}">
             </div>
             <div class="input-group">
                 <label for="audioBitrate" data-i18n="audioBits">音频码率 (kbps)</label>
