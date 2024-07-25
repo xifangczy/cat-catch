@@ -37,6 +37,13 @@
             <option value="128000">128 kbps</option>
             <option value="256000">256 kbps</option>
         </select>
+        <select id="frameRate">
+            <option value="0" data-i18n="frameRate">帧率</option>
+            <option value="25">25 FPS</option>
+            <option value="30">30 FPS</option>
+            <option value="60">60 FPS</option>
+            <option value="120">120 FPS</option>
+        </select>
     </label>
     <div>
         <button id="getVideo" ${buttonStyle} data-i18n="readVideo">读取视频</button>
@@ -167,7 +174,12 @@
         if (index && videoList[index]) {
             let stream = null;
             try {
-                stream = videoList[index].captureStream();
+                const frameRate = +CatCatch.querySelector("#frameRate").value;
+                if(frameRate){
+                    stream = videoList[index].captureStream(frameRate);
+                }else{
+                    stream = videoList[index].captureStream();
+                }
             } catch (e) {
                 $tips.innerHTML = i18n("recordingNotSupported", "不支持录制");
                 return;

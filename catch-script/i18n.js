@@ -145,8 +145,8 @@ window.CatCatchI18n = {
         zh: "请点击开始录制"
     },
     sentToFfmpeg: {
-        en: "Click to start recording",
-        zh: "请点击开始录制"
+        en: "Sent to ffmpeg",
+        zh: "发送到ffmpeg"
     },
     recordingFailed: {
         en: "Recording failed",
@@ -199,5 +199,9 @@ window.CatCatchI18n = {
     videoBits: {
         en: "Video bits",
         zh: "视频码率"
+    },
+    frameRate: {
+        en: "frame Rate",
+        zh: "帧率"
     }
 };
