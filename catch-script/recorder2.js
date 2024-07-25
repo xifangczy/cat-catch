@@ -77,7 +77,6 @@
         .input-group label{
             width: 5rem;
         }`;
-    // document.getElementsByTagName('html')[0].appendChild(style);
 
     // 添加div
     let cat = document.createElement("div");
@@ -85,12 +84,20 @@
     cat.innerHTML = `<div id="catCatchRecorderinnerCropArea"></div>
         <div id="catCatchRecorderHeader">
             <div class="input-group">
-                <label for="videoBitrate" data-i18n="videoBits">视频码率 (kbps)</label>
-                <input type="number" id="videoBitrate" value="${localStorage.getItem("CatCatchRecorder2_videoBits") ?? 5000}">
+                <select id="videoBits">
+                    <option value="2500000" data-i18n="videoBits">视频码率</option>
+                    <option value="2500000">2.5 Mbps</option>
+                    <option value="5000000">5 Mbps</option>
+                    <option value="8000000">8 Mbps</option>
+                    <option value="16000000">16 Mbps</option>
+                </select>
             </div>
             <div class="input-group">
-                <label for="audioBitrate" data-i18n="audioBits">音频码率 (kbps)</label>
-                <input type="number" id="audioBitrate" value="${localStorage.getItem("CatCatchRecorder2_audioBits") ?? 128}">
+                <select id="audioBits">
+                    <option value="128000" data-i18n="audioBits">视频码率</option>
+                    <option value="128000">128 kbps</option>
+                    <option value="256000">256 kbps</option>
+                </select>
             </div>
             <div id="catCatchRecorderStart" data-i18n="startRecording">开始录制</div>
             <div id="catCatchRecorderTitle" data-i18n="dragWindow">拖动窗口</div>
@@ -99,14 +106,10 @@
 
     // 创建 Shadow DOM 放入CatCatch
     const divShadow = document.createElement('div');
-    const shadowRoot = divShadow.attachShadow({ mode: 'open' });
+    const shadowRoot = divShadow.attachShadow({ mode: 'closed' });
     shadowRoot.appendChild(cat);
     shadowRoot.appendChild(style);
     document.getElementsByTagName('html')[0].appendChild(divShadow);
-
-    // 事件绑定 音频 视频 码率
-    const videoBitrateInput = cat.querySelector("#videoBitrate");
-    const audioBitrateInput = cat.querySelector("#audioBitrate");
 
     // 事件绑定
     const catCatchRecorderStart = cat.querySelector("#catCatchRecorderStart");
@@ -174,8 +177,8 @@
         const buffer = [];
         let option = {
             mimeType: 'video/webm;codecs=vp8,opus',
-            videoBitsPerSecond: videoBitrateInput.value * 1000,
-            audioBitsPerSecond: audioBitrateInput.value * 1000
+            videoBitsPerSecond: +cat.querySelector("#videoBits").value,
+            audioBitsPerSecond: +cat.querySelector("#audioBits").value
         };
 
         if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')) {

@@ -24,9 +24,20 @@
     <span data-i18n="selectVideo">选择视频</span> <select id="videoList" style="max-width: 200px;"></select>
     <span data-i18n="recordEncoding">录制编码</span> <select id="mimeTypeList" style="max-width: 200px;"></select>
     <label><input type="checkbox" id="ffmpeg" ${checkboxStyle}><span data-i18n="ffmpeg">使用ffmpeg转码</span></label>
-    <label><span data-i18n="audioBits">音频码率(Kbit)</span><input type="number" id="audioBits" ${numberStyle} value="${localStorage.getItem("CatCatchRecorder_audioBits") ?? 128}"></label>
-    <label><span data-i18n="videoBits">视频码率(Kbit)</span><input type="number" id="videoBits" ${numberStyle} value="${localStorage.getItem("CatCatchRecorder_videoBits") ?? 5000}"></label>
-
+    <label>
+        <select id="videoBits">
+            <option value="2500000" data-i18n="videoBits">视频码率</option>
+            <option value="2500000">2.5 Mbps</option>
+            <option value="5000000">5 Mbps</option>
+            <option value="8000000">8 Mbps</option>
+            <option value="16000000">16 Mbps</option>
+        </select>
+        <select id="audioBits">
+            <option value="128000" data-i18n="audioBits">视频码率</option>
+            <option value="128000">128 kbps</option>
+            <option value="256000">256 kbps</option>
+        </select>
+    </label>
     <div>
         <button id="getVideo" ${buttonStyle} data-i18n="readVideo">读取视频</button>
         <button id="start" ${buttonStyle} data-i18n="startRecording">开始录制</button>
@@ -55,7 +66,7 @@
 
     // 创建 Shadow DOM 放入CatCatch
     const divShadow = document.createElement('div');
-    const shadowRoot = divShadow.attachShadow({ mode: 'open' });
+    const shadowRoot = divShadow.attachShadow({ mode: 'closed' });
     shadowRoot.appendChild(CatCatch);
     // 页面插入Shadow DOM
     document.getElementsByTagName('html')[0].appendChild(divShadow);
@@ -162,12 +173,8 @@
                 return;
             }
             // 码率
-            const audioBits = CatCatch.querySelector("#audioBits").value;
-            const videoBits = CatCatch.querySelector("#videoBits").value;
-            localStorage.setItem("CatCatchRecorder_audioBits", audioBits);
-            localStorage.setItem("CatCatchRecorder_videoBits", videoBits);
-            option.audioBitsPerSecond = audioBits * 1000;
-            option.videoBitsPerSecond = videoBits * 1000;
+            option.audioBitsPerSecond = +CatCatch.querySelector("#audioBits").value;
+            option.videoBitsPerSecond = +CatCatch.querySelector("#videoBits").value;
             
             recorder = new MediaRecorder(stream, option);
             recorder.ondataavailable = function (event) {
