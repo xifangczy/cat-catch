@@ -16,7 +16,6 @@
     console.log("start search.js");
     const filter = new Set();
     const reKeyURL = /URI="(.*)"/;
-    // const reIsUrl = /^http[s]*:\/\/.+/i;
 
     // JSON.parse
     const _JSONparse = JSON.parse;

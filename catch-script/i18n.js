@@ -33,8 +33,8 @@ window.CatCatchI18n = {
         zh: "完成捕获自动下载"
     },
     ffmpeg: {
-        en: "Merge using ffmpeg",
-        zh: "使用ffmpeg合并"
+        en: "using ffmpeg",
+        zh: "使用ffmpeg"
     },
     fileName: {
         en: "File name",
