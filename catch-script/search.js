@@ -313,7 +313,7 @@
     // escape
     const _escape = window.escape;
     escape = function (str) {
-        if (str.length == 24 && str.substring(22, 24) == "==") {
+        if (str?.length && str.length == 24 && str.substring(22, 24) == "==") {
             postData({ action: "catCatchAddKey", key: str, href: location.href, ext: "base64Key" });
         }
         return _escape(str);
@@ -357,7 +357,7 @@
     });
 
     // Array join
-    const _arrayJoin = Array.prototype.join;
+    const _arrayJoin = Array.prototype._arrayJoin = Array.prototype.join;
     Array.prototype.join = function () {
         const data = _arrayJoin.apply(this, arguments);
         if (data.substring(0, 7).toUpperCase() == "#EXTM3U") {
