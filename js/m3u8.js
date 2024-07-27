@@ -657,7 +657,7 @@ $("#m3u8DL").click(function () {
     const m3u8dlArg = getM3u8DlArg();
     $m3u8dlArg.val(m3u8dlArg);
     navigator.clipboard.writeText(m3u8dlArg);
-    const m3u8dl = 'm3u8dl://' + Base64.encode(m3u8dlArg);
+    const m3u8dl = 'm3u8dl://' + ($("#m3u8dlRE").prop("checked") ? m3u8dlArg : Base64.encode(m3u8dlArg));
     if (m3u8dl.length >= 2046) {
         alert(i18n.M3U8DLparameterLong);
     }
@@ -1702,7 +1702,7 @@ function getM3u8DlREArg(){
     rangeStart = rangeStart.includes(":") ? rangeStart : rangeStart - 1;
     let rangeEnd = $("#rangeEnd").val();
     rangeEnd = rangeEnd.includes(":") ? rangeEnd : rangeEnd - 1;
-    if(rangeStart != 0 || rangeEnd != _fragments.length){
+    if(rangeStart != 0 || rangeEnd != _fragments.length - 1){
         m3u8dlArg += ` --custom-range "${rangeStart}-${rangeEnd}"`
     }
 
@@ -1717,8 +1717,8 @@ function getM3u8DlREArg(){
     m3u8dlArg += customIV ? ` --custom-hls-iv "${customIV}"` : "";
 
     // 只要音频
-    const onlyAudio = $("#onlyAudio").prop("checked");
-    m3u8dlArg += onlyAudio ? ` --drop-video all` : "";
+    // const onlyAudio = $("#onlyAudio").prop("checked");
+    // m3u8dlArg += onlyAudio ? ` --drop-video all` : "";
 
     return m3u8dlArg;
 }
