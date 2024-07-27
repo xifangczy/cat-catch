@@ -60,6 +60,7 @@ setRequestHeaders(requestHeaders, () => {
 const allOption = {
     addParam: false,
     fold: true,
+    m3u8dlRE: false,
 };
 let _m3u8Content;   // 储存m3u8文件内容
 /* m3u8 解析工具 */
@@ -682,6 +683,9 @@ $("#setM3u8dl").click(function () {
 $("#addParam").click(function () {
     $m3u8dlArg.val(getM3u8DlArg());
 });
+$("#m3u8dlRE").click(function () {
+    $m3u8dlArg.val(getM3u8DlArg());
+});
 $("input").click(function () {
     $m3u8dlArg.val(getM3u8DlArg());
 });
@@ -770,8 +774,9 @@ $("#rangeStart, #rangeEnd, #thread").keyup(function () {
     }
 });
 // 储存设置
-$("[save='change']").on("change", function () {
+$("#addParam, #m3u8dlRE").on("change", function () {
     allOption.addParam = $("#addParam").prop("checked");
+    allOption.m3u8dlRE = $("#m3u8dlRE").prop("checked");
     chrome.storage.local.set(allOption);
 });
 // 上传key
@@ -1673,7 +1678,52 @@ function getTemplates(text) {
     }
     return templates(text, _data);
 }
+function getM3u8DlREArg(){
+    let m3u8dlArg = G.m3u8dlArg;
+    const addParam = $("#addParam").prop("checked");    // 是否添加参数
+    const customFilename = $("#customFilename").val().trim();   // 自定义文件名
+    if (customFilename && addParam) {
+        m3u8dlArg = m3u8dlArg.replace(/--save-name "[^"]+"/g, `--save-name "${customFilename}"`);
+    }
+    m3u8dlArg = getTemplates(m3u8dlArg);
+    if (!addParam) { return m3u8dlArg; }
+
+    // 线程处理
+    const tsThread = $("#thread").val();  // 线程数量
+    const threadCountRegex = /(--thread-count\s+)\d+/;
+    if (m3u8dlArg.match(threadCountRegex)) {
+        m3u8dlArg = m3u8dlArg.replace(threadCountRegex, `\$1${tsThread}`);
+    }else{
+        m3u8dlArg += ` --thread-count ${tsThread}`;
+    }
+
+    // 范围处理
+    let rangeStart = $("#rangeStart").val();
+    rangeStart = rangeStart.includes(":") ? rangeStart : rangeStart - 1;
+    let rangeEnd = $("#rangeEnd").val();
+    rangeEnd = rangeEnd.includes(":") ? rangeEnd : rangeEnd - 1;
+    if(rangeStart != 0 || rangeEnd != _fragments.length){
+        m3u8dlArg += ` --custom-range "${rangeStart}-${rangeEnd}"`
+    }
+
+    // 自定义密钥
+    let customKey = $("#customKey").val().trim();  // 自定义密钥
+    if(customKey){
+        m3u8dlArg += ` --custom-hls-key "${customKey}"`;
+    }
+
+    // 自定义IV
+    const customIV = $("#customIV").val();  // 自定义IV
+    m3u8dlArg += customIV ? ` --custom-hls-iv "${customIV}"` : "";
+
+    // 只要音频
+    const onlyAudio = $("#onlyAudio").prop("checked");
+    m3u8dlArg += onlyAudio ? ` --drop-video all` : "";
+
+    return m3u8dlArg;
+}
 function getM3u8DlArg() {
+    if($("#m3u8dlRE").prop("checked")){ return getM3u8DlREArg(); }  // RE版本参数
     let m3u8dlArg = G.m3u8dlArg;
     const addParam = $("#addParam").prop("checked");
     // 自定义文件名
