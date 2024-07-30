@@ -451,7 +451,11 @@ $('#AllCopy').click(function () {
 // 全选 反选
 $('#AllSelect, #invertSelection').click(function () {
     checkboxState = !checkboxState;
-    const checked = this.id == "AllSelect";
+    let checked = false;
+    if(this.id == "AllSelect"){
+        checked = true;
+        checkboxState = true;
+    }
     getData().forEach(function (data) {
         data.checked = checked ? checked : !data.checked;
     });
