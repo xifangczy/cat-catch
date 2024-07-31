@@ -1,5 +1,16 @@
 ## 更新说明
 
+### 2.5.4
+
+[Added] m3u8DL 增加切换RE版本 (RE版 需[URLProtocol](https://github.com/xifangczy/URLProtocol))
+
+[Added] 录制相关脚本 增加码率设置
+
+[Fixed] 深度搜索 脚本错误导致无法使用
+
+[Fixed] m3u8解析器录制直播 录制时间显示错误
+
+
 ### 2.5.3
 
 [Added] 增加`弹出`模式 (以新窗口打开资源列表页面)
