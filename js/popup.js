@@ -237,7 +237,7 @@ function AddMedia(data, currentTab = true) {
         if (G.m3u8dl && (isM3U8(data) || isMPD(data))) {
             if (!data.url.startsWith("blob:")) {
                 const m3u8dlArg = templates(G.m3u8dlArg, data);
-                const url = 'm3u8dl://' + Base64.encode(m3u8dlArg);
+                const url = 'm3u8dl://' + (G.m3u8dl == 1 ? Base64.encode(m3u8dlArg) : m3u8dlArg);
                 if (url.length >= 2046) {
                     navigator.clipboard.writeText(m3u8dlArg);
                     Tips(i18n.M3U8DLparameterLong, 2000);

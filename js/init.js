@@ -78,7 +78,7 @@ G.OptionLists = {
     Player: "",
     ShowWebIco: true,
     MobileUserAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1",
-    m3u8dl: false,
+    m3u8dl: 0,
     m3u8dlArg: `"\${url}" --workDir "%USERPROFILE%\\Downloads\\m3u8dl" --saveName "\${title}_\${now}" --enableDelAfterDone \${referer|exists:'--headers "Referer:*"'}`,
     playbackRate: 2,
     copyM3U8: "${url}",
@@ -208,6 +208,10 @@ function InitOptions() {
         if (items.copyOther.includes('$url$')) {
             items.copyOther = items.copyOther.replaceAll('$url$', '${url}').replaceAll('$referer$', '${referer}').replaceAll('$title$', '${title}');
             chrome.storage.sync.set({ copyOther: items.copyOther });
+        }
+        if(typeof items.m3u8dl == 'boolean'){
+            items.m3u8dl = items.m3u8dl ? 1 : 0;
+            chrome.storage.sync.set({ m3u8dl: items.m3u8dl });
         }
 
         G = { ...items, ...G };

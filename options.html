@@ -211,33 +211,24 @@
 
     <!-- m3u8DL -->
     <section>
-      <h1 class="optionsTitle"><a href="https://github.com/nilaoda/N_m3u8DL-CLI" target="_blank">N_m3u8DL-CLI</a> / <a href="https://github.com/nilaoda/N_m3u8DL-RE" target="_blank">N_m3u8DL-RE</a></h1>
+      <h1 class="optionsTitle">URL Protocol m3u8dl</h1>
       <div class="optionBox" id="m3u8dlOption">
         <span class="explain">
+          <a href="https://github.com/nilaoda/N_m3u8DL-CLI" target="_blank">N_m3u8DL-CLI</a> / <a href="https://github.com/nilaoda/N_m3u8DL-RE" target="_blank">N_m3u8DL-RE</a>
           <p data-i18n-outer="m3u8DLTips"></p>
           <a href="https://o2bmm.gitbook.io/cat-catch/docs/m3u8dl" target="_blank" data-i18n="documentation"></a>
         </span>
         <div class="list">
           <div class="item">
-            <div><span data-i18n-outer="invoke"> </span><a href="https://github.com/nilaoda/N_m3u8DL-CLI" target="_blank">N_m3u8DL-CLI</a> or <a href="https://github.com/nilaoda/N_m3u8DL-RE" target="_blank">N_m3u8DL-RE</a>
-              m3u8dl:// <span data-i18n-outer="download"></span> m3u8 or mpd</div>
-            <div class="switch">
-              <label class="switchLabel switchRadius">
-                <input type="checkbox" id="m3u8dl" save="click" class="switchInput" />
-                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
-              </label>
+            <div><span data-i18n-outer="enable"></span> m3u8dl:// <span data-i18n-outer="download"></span> m3u8 or mpd</div>
+            <div class="switch m3u8DL">
+              <select id="m3u8dl" class="select" save="select">
+                <option value="0" data-i18n="disable"></option>
+                <option value="1">N_m3u8DL-CLI</option>
+                <option value="2">N_m3u8DL-RE</option>
+              </select>
             </div>
           </div>
-
-          <!-- <div class="item">
-            <div>N_m3u8DL-RE <p data-i18n-outer="parameter"></p></div>
-            <div class="switch">
-              <label class="switchLabel switchRadius">
-                <input type="checkbox" id="m3u8dlRE" save="click" class="switchInput" />
-                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
-              </label>
-            </div>
-          </div> -->
 
           <div class="item">
             <div style="margin-bottom: 5px;margin-top: 5px;">

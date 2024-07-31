@@ -657,7 +657,7 @@ $("#m3u8DL").click(function () {
     const m3u8dlArg = getM3u8DlArg();
     $m3u8dlArg.val(m3u8dlArg);
     navigator.clipboard.writeText(m3u8dlArg);
-    const m3u8dl = 'm3u8dl://' + ($("#m3u8dlRE").prop("checked") ? m3u8dlArg : Base64.encode(m3u8dlArg));
+    const m3u8dl = 'm3u8dl://' + (G.m3u8dl == 1 ? Base64.encode(m3u8dlArg) : m3u8dlArg);
     if (m3u8dl.length >= 2046) {
         alert(i18n.M3U8DLparameterLong);
     }
@@ -681,9 +681,6 @@ $("#setM3u8dl").click(function () {
 });
 // 设置载入参数
 $("#addParam").click(function () {
-    $m3u8dlArg.val(getM3u8DlArg());
-});
-$("#m3u8dlRE").click(function () {
     $m3u8dlArg.val(getM3u8DlArg());
 });
 $("input").click(function () {
@@ -774,9 +771,8 @@ $("#rangeStart, #rangeEnd, #thread").keyup(function () {
     }
 });
 // 储存设置
-$("#addParam, #m3u8dlRE").on("change", function () {
+$("#addParam").on("change", function () {
     allOption.addParam = $("#addParam").prop("checked");
-    allOption.m3u8dlRE = $("#m3u8dlRE").prop("checked");
     chrome.storage.local.set(allOption);
 });
 // 上传key
@@ -1723,7 +1719,8 @@ function getM3u8DlREArg(){
     return m3u8dlArg;
 }
 function getM3u8DlArg() {
-    if($("#m3u8dlRE").prop("checked")){ return getM3u8DlREArg(); }  // RE版本参数
+    if(G.m3u8dl == 2){ return getM3u8DlREArg(); }
+
     let m3u8dlArg = G.m3u8dlArg;
     const addParam = $("#addParam").prop("checked");
     // 自定义文件名

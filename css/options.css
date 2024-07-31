@@ -351,6 +351,12 @@ textarea {
   word-break: break-all;
   width: 100%;
 }
+.m3u8DL{
+  margin-right: 70px !important;
+}
+.m3u8DL #m3u8dl{
+  width: 8rem;
+}
 .break-all {
   word-break: break-all;
 }
