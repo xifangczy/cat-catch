@@ -1,0 +1,814 @@
+//上次翻译到第309行
+{
+  "catCatch": {
+    "message": "ネコの手"
+  },
+  "description": {
+    "message": "ウェブメディア探す TOOL"
+  },
+  "confirm": {
+    "message": "確認"
+  },
+  "currentPage": {
+    "message": "現在のページ"
+  },
+  "otherPage": {
+    "message": "他のページ"
+  },
+  "otherFeatures": {
+    "message": "その他の機能"
+  },
+  "mediaControl": {
+    "message": "メディアコントロール"
+  },
+  "loadingData": {
+    "message": "データ読み込み中..."
+  },
+  "selectWebpage": {
+    "message": "ページ選択："
+  },
+  "selectMedia": {
+    "message": "メディアファイルを選ぶ："
+  },
+  "noMediaDetected": {
+    "message": "メディアを含むウェブページが検出されなかった"
+  },
+  "noControllableMediaDetected": {
+    "message": "操作可能なメディアが検出されなかった"
+  },
+  "multiplier": {
+    "message": "倍数:"
+  },
+  "speedPlayback": {
+    "message": "倍速再生"
+  },
+  "play": {
+    "message": "再生"
+  },
+  "normalPlay": {
+    "message": "通常再生"
+  },
+  "pictureInPicture": {
+    "message": "ピクチャーインピクチャー"
+  },
+  "fullscreen": {
+    "message": "フルスクリーン"
+  },
+  "screenshot": {
+    "message": "スクリーンショット"
+  },
+  "loop": {
+    "message": "ループ"
+  },
+  "mute": {
+    "message": "ミュート"
+  },
+  "volume": {
+    "message": "ボリューム"
+  },
+  "functionEntry": {
+    "message": "機能の入り口"
+  },
+  "downloader": {
+    "message": "ダウンローダー"
+  },
+  "parser": {
+    "message": "ビデオリンクの中身を解析する"
+  },
+  "m3u8Parser": {
+    "message": "M3U8 解析ツール"
+  },
+  "mpdParser": {
+    "message": "MPD 解析ツール"
+  },
+  "jsonFormatter": {
+    "message": "JSON のフォーマット化"
+  },
+  "expandAll": {
+    "message": "すべて展開する"
+  },
+  "expandPlayable": {
+    "message": "展開可能"
+  },
+  "expandSelected": {
+    "message": "選択したものを展開する"
+  },
+  "collapseAll": {
+    "message": "展開を閉じる"
+  },
+  "videoRecording": {
+    "message": "ビデオ録画を開始する"
+  },
+  "closeRecording": {
+    "message": "録画を停止する"
+  },
+  "recordWebRTC": {
+    "message": "WebRTCの録画をする"
+  },
+  "screenCapture": {
+    "message": "画面キャプ"
+  },
+  "simulateMobile": {
+    "message": "スマホシミュ"
+  },
+  "autoDownload": {
+    "message": "自動ダウンロード"
+  },
+  "onlineMerge": {
+    "message": "オンライン結合"
+  },
+  "download": {
+    "message": "ダウンロード"
+  },
+  "copy": {
+    "message": "コピー"
+  },
+  "selectAll": {
+    "message": "すべて選択"
+  },
+  "invertSelection": {
+    "message": "選択解除"
+  },
+  "filter": {
+    "message": "ふるいける"
+  },
+  "clear": {
+    "message": "空にする"
+  },
+  "deepSearch": {
+    "message": "深層検索"
+  },
+  "closeSearch": {
+    "message": "検索を停止する"
+  },
+  "cacheCapture": {
+    "message": "キャッシュキャプチャー"
+  },
+  "closeCapture": {
+    "message": "キャプチャーオフ"
+  },
+  "moreFeatures": {
+    "message": "さらに機能"
+  },
+  "pause": {
+    "message": "一時停止"
+  },
+  "settings": {
+    "message": "設定"
+  },
+  "closeSimulation": {
+    "message": "シミュレーションを終了させる"
+  },
+  "closeDownload": {
+    "message": "ダウンロードを停止する"
+  },
+  "enable": {
+    "message": "有効にする"
+  },
+  "disable": {
+    "message": "無効にする"
+  },
+  "noData": {
+    "message": "まだ匂いがしない~"
+  },
+  "regularFilterPlaceholder": {
+    "message": "正規表現で筛选するリソースURLにマッチするEnterキーで確認する"
+  },
+  "option": {
+    "message": "オプション"
+  },
+  "titleOption": {
+    "message": "ネコの手 設定"
+  },
+  "titleDownload": {
+    "message": "ネコの手 ダウンローダー"
+  },
+  "titleM3U8": {
+    "message": "ネコの手 M3U8解析器"
+  },
+  "titleJson": {
+    "message": "ネコの手 JSONフォーマッタ"
+  },
+  "titledash": {
+    "message": "ネコの手 DASH解析器"
+  },
+  "suffix": {
+    "message": "接尾辞"
+  },
+  "suffixTip": {
+    "message": "点記号を含まない拡張子を入力し，ファイルサイズの筛选を行わずにゼロを入力してください"
+  },
+  "extensionName": {
+    "message": "拡張子"
+  },
+  "filterSize": {
+    "message": "開始時のファイルサイズ"
+  },
+  "delete": {
+    "message": "削除"
+  },
+  "addSuffix": {
+    "message": "サフィックスを追加する"
+  },
+  "extension": {
+    "message": "拡張子"
+  },
+  "disableAll": {
+    "message": "すべて無効にする"
+  },
+  "enableAll": {
+    "message": "すべて有効にする"
+  },
+  "type": {
+    "message": "タイプ"
+  },
+  "addType": {
+    "message": "タイプを追加する"
+  },
+  "typeTip": {
+    "message": "正しい content-type を入力し、ファイルサイズの筛选を行わずにゼロを入力してください"
+  },
+  "addTypeError": {
+    "message": "取得タイプのフォーマットエラーです。ご確認ください。"
+  },
+  "regexMatch": {
+    "message": "正規表現と一致する"
+  },
+  "blockResource": {
+    "message": "リソースを遮断する"
+  },
+  "alert": {
+    "message": "ヒント"
+  },
+  "regexExpression": {
+    "message": "正規表現"
+  },
+  "addRegex": {
+    "message": "正則を追加する"
+  },
+  "regexTest": {
+    "message": "正規表現テスト"
+  },
+  "regex": {
+    "message": "正規表現"
+  },
+  "flag": {
+    "message": "識別子"
+  },
+  "result": {
+    "message": "結果"
+  },
+  "match": {
+    "message": "一致"
+  },
+  "noMatch": {
+    "message": "一致しない"
+  },
+  "blockResourceTip": {
+    "message": "望まないリソースを遮断する"
+  },
+  "flagTip": {
+    "message": "i: 大文字小文字を区別しない, g: グローバル検索。空白でも可。"
+  },
+  "regexSuffixTip": {
+    "message": "取得したURLの接尾辞を指定します。空白のままでもかまいません。接尾辞は自動的に傍受されます（多くのファイルは接尾辞を持ちません）。"
+  },
+  "regexTip": {
+    "message": "正規表現はリソースを大量に消費するため、使用には注意が必要である。"
+  },
+  "copyTip": {
+    "message": "コピーボタンがクリップボードに書き込む内容をカスタマイズして、サードパーティーのアプリケーションで使いやすくする。"
+  },
+  "replaceKeywordList": {
+    "message": "キーワードリストの置換"
+  },
+  "otherFiles": {
+    "message": "その他の資料"
+  },
+  "resetCopySettings": {
+    "message": "コピー設定のリセット"
+  },
+  "autoSetRefererCookieParams": {
+    "message": "自動でReferer Cookieパラメーターを設定する"
+  },
+  "secretKey": {
+    "message": "鍵"
+  },
+  "address": {
+    "message": "ウェブサイトのアドレス"
+  },
+  "documentation": {
+    "message": "これは文書ですよ"
+  },
+  "aria2Tip": {
+    "message": "これは優れたダウンロードツールです 使い方 ドキュメントを見る"
+  },
+  "m3u8DLTips": {
+    "message": "これは非常に優秀なm3u8 MPDの第三者ダウンロードツールです。使用方法は文書を参照してください。"
+  },
+  "invoke": {
+    "message": "呼び出し"
+  },
+  "parameter": {
+    "message": "参数"
+  },
+  "parameterSetting": {
+    "message": "参数设置"
+  },
+  "test": {
+    "message": "测试"
+  },
+  "replaceTags": {
+    "message": "替换标签"
+  },
+  "customSaveFileName": {
+    "message": "自定义保存文件名"
+  },
+  "userAgentTip": {
+    "message": "留空默认为当前浏览器 User Agent"
+  },
+  "alwaysDisableCatCatcher": {
+    "message": "始终不启用猫抓下载器"
+  },
+  "autoClosePageAfterDownload": {
+    "message": "下载完自动关闭页面"
+  },
+  "openDownloaderPageInBackground": {
+    "message": "后台打开下载器页面"
+  },
+  "downloaderTip": {
+    "message": "如果检测到资源下载失败, 自动启用下载器再次尝试下载."
+  },
+  "autoDownM3u8Tip": {
+    "message": "点击 下载按钮 使用m3u8解析器立即开始合并下载"
+  },
+  "otherSettings": {
+    "message": "其他设置"
+  },
+  "resetOtherSettings": {
+    "message": "重置其他设置"
+  },
+  "previewMode": {
+    "message": "使用本地播放器调用协议打开视频预览"
+  },
+  "previewModePlaceholder": {
+    "message": "留空为不启用 默认使用popup页面预览视频"
+  },
+  "preview": {
+    "message": "视频"
+  },
+  "customFilenameOption": {
+    "message": "使用自定义文件名保存文件(默认为网页标题)"
+  },
+  "saveAsOption": {
+    "message": "下载完选择保存目录"
+  },
+  "iconOption": {
+    "message": "显示网站图标"
+  },
+  "clearOption": {
+    "message": "刷新、跳转到新页面 清空当前标签抓取的数据"
+  },
+  "doNotClear": {
+    "message": "不清空"
+  },
+  "normalClear": {
+    "message": "正常清理"
+  },
+  "moreFrequent": {
+    "message": "更频繁"
+  },
+  "excludeDuplicateResources": {
+    "message": "排除重复的资源 (资源过多会占用大量CPU)"
+  },
+  "customCSS": {
+    "message": "自定义CSS"
+  },
+  "operation": {
+    "message": "操作"
+  },
+  "exportSettings": {
+    "message": "导出设置"
+  },
+  "importConfiguration": {
+    "message": "导入配置"
+  },
+  "clearCapturedData": {
+    "message": "清空抓取的数据"
+  },
+  "resetSettings": {
+    "message": "重置设置"
+  },
+  "resetAllSettings": {
+    "message": "重置所有设置"
+  },
+  "restartExtension": {
+    "message": "重启扩展"
+  },
+  "about": {
+    "message": "关于"
+  },
+  "confirmReset": {
+    "message": "确认重置吗？"
+  },
+  "invokeProtocolTemplate": {
+    "message": "调用协议模板"
+  },
+  "customVLCProtocol": {
+    "message": "自定义VLC协议"
+  },
+  "systemShare": {
+    "message": "系统分享"
+  },
+  "default": {
+    "message": "默认"
+  },
+  "goBack": {
+    "message": "返回上一页"
+  },
+  "openDir": {
+    "message": "打开下载目录"
+  },
+  "downloadDir": {
+    "message": "打载目录"
+  },
+  "sendFfmpeg": {
+    "message": "发送到在线ffmpeg"
+  },
+  "autoCloserDownload": {
+    "message": "下载完自动关闭页面"
+  },
+  "openInBgDownload": {
+    "message": "后台打开下载器页面"
+  },
+  "m3u8Placeholder": {
+    "message": "输入m3u8内容 或 ts碎片列表."
+  },
+  "m3u8Url": {
+    "message": "m3u8地址"
+  },
+  "nextLevel": {
+    "message": "下一级文件"
+  },
+  "nextLevelTip": {
+    "message": "该m3u8文件中嵌套多个m3u8文件"
+  },
+  "multipleAudios": {
+    "message": "多个音频"
+  },
+  "multipleAudiosTip": {
+    "message": "该m3u8文件中嵌套多个音频"
+  },
+  "multipleSubtitles": {
+    "message": "多个字幕"
+  },
+  "multipleSubtitlesTip": {
+    "message": "该m3u8文件中嵌套多个字幕"
+  },
+  "possibleKey": {
+    "message": "寻找到疑似密钥"
+  },
+  "loading": {
+    "message": "载入中..."
+  },
+  "waitDownload": {
+    "message": "等待下载..."
+  },
+  "downloadSegmentList": {
+    "message": "下载切片列表"
+  },
+  "originalM3u8": {
+    "message": "原始m3u8"
+  },
+  "localM3u8": {
+    "message": "本地m3u8"
+  },
+  "segmentList": {
+    "message": "切片列表"
+  },
+  "downloadProgress": {
+    "message": "下载进度"
+  },
+  "getParameters": {
+    "message": "get参数"
+  },
+  "restoreGetParameters": {
+    "message": "还原get参数"
+  },
+  "requestHeaders": {
+    "message": "请求头"
+  },
+  "setRequestHeaders": {
+    "message": "设置请求头"
+  },
+  "invokeM3u8DL": {
+    "message": "调用m3u8DL"
+  },
+  "copyCommand": {
+    "message": "复制命令"
+  },
+  "previewCommand": {
+    "message": "预览命令"
+  },
+  "addSettingParameters": {
+    "message": "加入设置参数"
+  },
+  "customKeyPlaceholder": {
+    "message": "自定义 密钥 16进制 或 base64 或 密钥地址"
+  },
+  "uploadKey": {
+    "message": "上传密钥"
+  },
+  "downloadThreads": {
+    "message": "下载线程"
+  },
+  "ffmpegTranscoding": {
+    "message": "ffmpeg 转码"
+  },
+  "mp4Format": {
+    "message": "mp4格式"
+  },
+  "downloadWhileSaving": {
+    "message": "边下边存"
+  },
+  "audioOnly": {
+    "message": "只要音频"
+  },
+  "saveAs": {
+    "message": "另存为"
+  },
+  "skipDecryption": {
+    "message": "跳过解密"
+  },
+  "newDownloader": {
+    "message": "新下载器"
+  },
+  "downloadRange": {
+    "message": "下载范围"
+  },
+  "recordLive": {
+    "message": "录制直播"
+  },
+  "mergeDownloads": {
+    "message": "合并下载"
+  },
+  "redownloadFailedItems": {
+    "message": "重下失败项"
+  },
+  "downloadExistingData": {
+    "message": "下载已有数据"
+  },
+  "stopDownload": {
+    "message": "停止下载"
+  },
+  "start": {
+    "message": "开始"
+  },
+  "end": {
+    "message": "结束"
+  },
+  "resolution": {
+    "message": "分辨率"
+  },
+  "duration": {
+    "message": "时长"
+  },
+  "bitrate": {
+    "message": "码率"
+  },
+  "ADTSerror": {
+    "message": "找不到ADTS头 可能是AES-128-ECB加密资源,暂不支持解密.请使用第三方合并软件..."
+  },
+  "m3u8Error": {
+    "message": "解析或播放m3u8文件中有错误, 详细错误信息查看控制台"
+  },
+  "noAudio": {
+    "message": "无音频"
+  },
+  "noVideo": {
+    "message": "无视频"
+  },
+  "hevcTip": {
+    "message": "HEVC/H.265编码切片文件 只支持在线ffmpeg转码"
+  },
+  "hevcPreviewTip": {
+    "message": "HEVC/H.265编码切片文件 不支持预览"
+  },
+  "m3u8Info": {
+    "message": "共 $num$ 个文件, 总时长 $time$",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      },
+      "time": {
+        "content": "$2"
+      }
+    }
+  },
+  "encryptedHLS": {
+    "message": "加密HLS"
+  },
+  "encryptedSAMPLE": {
+    "message": "使用SAMPLE-AES-CTR加密的资源, 目前无法处理."
+  },
+  "liveHLS": {
+    "message": "直播HLS"
+  },
+  "keyAddress": {
+    "message": "密钥地址"
+  },
+  "key": {
+    "message": "密钥"
+  },
+  "encryptionAlgorithm": {
+    "message": "加密算法"
+  },
+  "keyDownloadFailed": {
+    "message": "密钥下载失败"
+  },
+  "savePrompt": {
+    "message": "已保存到硬盘, 请查看浏览器已下载内容"
+  },
+  "close": {
+    "message": "关闭"
+  },
+  "blobM3u8DLError": {
+    "message": "blob地址无法调用m3u8DL下载"
+  },
+  "M3U8DLparameterLong": {
+    "message": "m3u8dl参数太长,可能导致无法唤醒m3u8DL, 请手动复制到m3u8DL下载"
+  },
+  "runningCannotChangeSettings": {
+    "message": "正在运行, 不能更改设置"
+  },
+  "streamSaverTip": {
+    "message": "边下边存功能 不支持ffmpeg在线转换格式 不支持错误切片重下 不支持另存为"
+  },
+  "stopRecording": {
+    "message": "停止录制"
+  },
+  "waitingForLiveData": {
+    "message": "等待直播数据"
+  },
+  "sNumError": {
+    "message": "序号错误"
+  },
+  "startGTend": {
+    "message": "开始序号不能大于结束序号"
+  },
+  "sNumMax": {
+    "message": "序号最大不能超过 $num$",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      }
+    }
+  },
+  "incorrectKey": {
+    "message": "密钥不正确"
+  },
+  "addParameters": {
+    "message": "添加参数"
+  },
+  "decryptionError": {
+    "message": "解密错误"
+  },
+  "downloadFailed": {
+    "message": "下载失败"
+  },
+  "retryDownload": {
+    "message": "重新下载"
+  },
+  "recordingDuration": {
+    "message": "录制时长"
+  },
+  "downloaded": {
+    "message": "已下载"
+  },
+  "downloadedVideoLength": {
+    "message": "已下载视频长度"
+  },
+  "downloadComplete": {
+    "message": "下载完成"
+  },
+  "retryingDownload": {
+    "message": "正在重新下载"
+  },
+  "merging": {
+    "message": "合并中"
+  },
+  "fileTooLarge": {
+    "message": "文件大于$size$ 无法使用在线ffmpeg, 正在下载合并文件, 文件较大请耐心等待",
+    "placeholders": {
+      "size": {
+        "content": "$1"
+      }
+    }
+  },
+  "formatConversionError": {
+    "message": "格式转换错误, 请取消mp4转换, 重新下载."
+  },
+  "streamOnbeforeunload": {
+    "message": "正在推流, 关闭后停止下载..."
+  },
+  "fileLoading": {
+    "message": "文件载入中"
+  },
+  "expandAllNodes": {
+    "message": "展开所有节点"
+  },
+  "collapseAllNodes": {
+    "message": "折叠所有节点"
+  },
+  "fileRetrievalFailed": {
+    "message": "文件获取失败"
+  },
+  "selectVideo": {
+    "message": "选择视频"
+  },
+  "extractSlices": {
+    "message": "提取切片"
+  },
+  "convertToM3U8": {
+    "message": "转为m3u8解析"
+  },
+  "selectAudio": {
+    "message": "选择音频"
+  },
+  "audio": {
+    "message": "音频"
+  },
+  "video": {
+    "message": "视频"
+  },
+  "DRMerror": {
+    "message": "媒体有DRM保护, 请使用第三方工具下载."
+  },
+  "regexTitle": {
+    "message": "正则表达式匹配 或 来自深度搜索"
+  },
+  "downloadWithRequestHeader": {
+    "message": "携带请求头参数下载"
+  },
+  "m3u8Playlist": {
+    "message": "m3u8播放列表"
+  },
+  "copiedToClipboard": {
+    "message": "已复制到剪贴板"
+  },
+  "hasSent": {
+    "message": "已发送"
+  },
+  "sendFailed": {
+    "message": "发送失败"
+  },
+  "confirmDownload": {
+    "message": "共 $num$ 个文件，是否确认下载?",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmLoading": {
+    "message": "共 $num$ 条资源，是否取消加载?",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      }
+    }
+  },
+  "waitingForMedia": {
+    "message": "等待接收媒体文件...请勿关闭本页面..."
+  },
+  "exit": {
+    "message": "退出"
+  },
+  "unknownSize": {
+    "message": "未知大小"
+  },
+  "saving": {
+    "message": "正在保存"
+  },
+  "saveFailed": {
+    "message": "保存失败"
+  },
+  "badgeNumber": {
+    "message": "图标上显示数字角标"
+  },
+  "viewSlices": {
+    "message": "查看所有切片和下载进度"
+  },
+  "send2local": {
+    "message": "数据发送"
+  },
+  "popup": {
+    "message": "弹出"
+  },
+  "defaultPopup": {
+    "message": "默认弹出模式"
+  },
+  "invokeApp": {
+    "message": "调用程序"
+  }
+}
