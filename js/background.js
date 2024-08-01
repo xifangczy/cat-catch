@@ -342,15 +342,11 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         if (refresh) {
             chrome.tabs.reload(Message.tabId, { bypassCache: true });
         } else {
-            script.i18n && chrome.scripting.executeScript({
-                target: { tabId: Message.tabId, allFrames: script.allFrames },
-                files: ["catch-script/i18n.js"],
-                injectImmediately: true,
-                world: "MAIN"
-            });
+            const files = [`catch-script/${Message.script}`];
+            script.i18n && files.unshift("catch-script/i18n.js");
             chrome.scripting.executeScript({
                 target: { tabId: Message.tabId, allFrames: script.allFrames },
-                files: ["catch-script/" + Message.script],
+                files: files,
                 injectImmediately: true,
                 world: script.world
             });
@@ -499,15 +495,12 @@ chrome.webNavigation.onCommitted.addListener(function (details) {
     // catch-script 脚本
     G.scriptList.forEach(function (item, script) {
         if (!item.tabId.has(details.tabId) || !item.allFrames) { return true; }
-        item.i18n && chrome.scripting.executeScript({
-            target: { tabId: details.tabId, frameIds: [details.frameId] },
-            files: ["catch-script/i18n.js"],
-            injectImmediately: true,
-            world: "MAIN"
-        });
+
+        const files = [`catch-script/${script}`];
+        item.i18n && files.unshift("catch-script/i18n.js");
         chrome.scripting.executeScript({
             target: { tabId: details.tabId, frameIds: [details.frameId] },
-            files: [`catch-script/${script}`],
+            files: files,
             injectImmediately: true,
             world: item.world
         });

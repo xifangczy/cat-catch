@@ -205,7 +205,7 @@
         recorder.start();
         recorder.onstart = function (e) {
             buffer.slice(0);
-            catCatchRecorderStart.innerHTML = i18n("stopRecording");
+            catCatchRecorderStart.innerHTML = i18n("stopRecording", "停止录制");
             cat.classList.add("animation");
         }
         recorder.ondataavailable = function (e) {
@@ -221,7 +221,7 @@
             buffer.slice(0);
             stream.getTracks().forEach(track => track.stop());
             recorder = undefined;
-            catCatchRecorderStart.innerHTML = i18n("startRecording");
+            catCatchRecorderStart.innerHTML = i18n("startRecording", "开始录制");
             cat.classList.remove("animation");
         }
     }
