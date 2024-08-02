@@ -359,5 +359,5 @@ async function send2local(action, data, tabId = 0) {
             'Content-Type': 'application/json;charset=utf-8'
         },
         body: JSON.stringify({ action: action, data: data, tabId: tabId })
-    }).catch(() => { });
+    }).catch((e) => { console.log(e) });
 }
