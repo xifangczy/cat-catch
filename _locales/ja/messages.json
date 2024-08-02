@@ -177,19 +177,19 @@
     "message": "オプション"
   },
   "titleOption": {
-    "message": "ネコの手 設定"
+    "message": "cat-catch 設定"
   },
   "titleDownload": {
-    "message": "ネコの手 ダウンローダー"
+    "message": "cat-catch ダウンローダー"
   },
   "titleM3U8": {
-    "message": "ネコの手 M3U8解析器"
+    "message": "cat-catch M3U8解析器"
   },
   "titleJson": {
-    "message": "ネコの手 JSONフォーマッタ"
+    "message": "cat-catch JSONフォーマッタ"
   },
   "titledash": {
-    "message": "ネコの手 DASH解析器"
+    "message": "cat-catch DASH解析器"
   },
   "suffix": {
     "message": "接尾辞"
@@ -327,7 +327,7 @@
     "message": "何も入れない場合は、現在使っているブラウザが自動で選ばれます User Agent"
   },
   "alwaysDisableCatCatcher": {
-    "message": "（そのオプション）において、いつもネコの手ダウンロード機能を無効にする"
+    "message": "（そのオプション）において、いつも cat-catch ダウンロード機能を無効にする"
   },
   "autoClosePageAfterDownload": {
     "message": "ファイルのダウンロードが終了したら、ページが勝手に閉じる設定にする"
