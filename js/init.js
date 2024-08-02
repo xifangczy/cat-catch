@@ -118,6 +118,8 @@ G.OptionLists = {
     M3u8StreamSaver: false,
     M3u8Ffmpeg: true,
     M3u8AutoClose: false,
+    // 第三方服务地址
+    onlineServiceAddress: 0,
 };
 // 本地储存的配置
 G.LocalVar = {
@@ -150,11 +152,15 @@ G.scriptList.set("webrtc.js", { key: "webrtc", refresh: true, allFrames: true, w
 G.ffmpegConfig = {
     tab: 0,
     version: 1,
-    url: "https://ffmpeg.bmmmd.com/",
+    get url() {
+        return G.onlineServiceAddress == 0 ? "https://ffmpeg.bmmmd.com/" : "https://ffmpeg2.bmmmd.com/";
+    }
 }
 // streamSaver 边下边存
 G.streamSaverConfig = {
-    url: "https://stream.bmmmd.com/mitm.html"
+    get url() {
+        return G.onlineServiceAddress == 0 ? "https://stream.bmmmd.com/mitm.html" : "https://stream2.bmmmd.com/mitm.html";
+    }
 }
 
 // 正则预编译

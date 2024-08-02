@@ -5,7 +5,8 @@ body {
 }
 .wrapper {
   margin: 0 auto;
-  width: 640px;
+  /* width: 640px; */
+  width: 45rem;
 }
 /* .wrapper input {
   margin-left: 10px;
@@ -123,6 +124,9 @@ input.regex {
 .item .switch {
   margin-right: 50px;
 }
+.item .switchSelect{
+  margin-right: 85px;
+}
 .optionsTitle {
   margin-top: 20px;
 }
@@ -237,8 +241,8 @@ textarea {
 #PlayerTemplate {
   width: 200px;
 }
-#autoClearMode {
-  width: 100px;
+.select {
+  width: 8rem;
 }
 #errorTsList p {
   color: red;
@@ -354,9 +358,9 @@ textarea {
 .m3u8DL{
   margin-right: 70px !important;
 }
-.m3u8DL #m3u8dl{
+/* .m3u8DL #m3u8dl{
   width: 8rem;
-}
+} */
 .break-all {
   word-break: break-all;
 }

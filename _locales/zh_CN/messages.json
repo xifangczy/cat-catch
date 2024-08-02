@@ -809,5 +809,11 @@
   },
   "invokeApp": {
     "message": "调用程序"
+  },
+  "onlineServiceAddress": {
+    "message": "在线服务地址"
+  },
+  "withinChina": {
+    "message": "中国境内"
   }
 }

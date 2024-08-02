@@ -809,5 +809,11 @@
   },
   "invokeApp": {
     "message": "Invoke application"
+  },
+  "onlineServiceAddress": {
+    "message": "Online Service Address"
+  },
+  "withinChina": {
+    "message": "Within China"
   }
 }

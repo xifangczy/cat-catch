@@ -530,7 +530,7 @@
 
           <div class="item">
             <div data-i18n="clearOption"></div>
-            <div class="switch">
+            <div class="switch switchSelect">
               <select id="autoClearMode" class="select" save="select">
                 <option value="0" data-i18n="doNotClear"></option>
                 <option value="1" data-i18n="normalClear"></option>
@@ -546,6 +546,16 @@
                 <input type="checkbox" id="checkDuplicates" save="click" class="switchInput" />
                 <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
               </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="onlineServiceAddress"></div>
+            <div class="switch switchSelect">
+              <select id="onlineServiceAddress" class="select" save="select">
+                <option value="0" data-i18n="withinChina"></option>
+                <option value="1">cloudflare</option>
+              </select>
             </div>
           </div>
 
