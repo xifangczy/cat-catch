@@ -170,7 +170,7 @@ button:active,
     content: url(../img/play-dark.png);
   }
   img.download {
-    content: url(../img/download-dark.png);
+    content: url(../img/download-dark.svg);
   }
   img.qrcode {
     content: url(../img/qrcode-dark.png);

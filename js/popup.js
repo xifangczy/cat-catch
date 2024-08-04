@@ -112,7 +112,7 @@ function AddMedia(data, currentTab = true) {
                 <img src="img/copy.png" class="icon copy" id="copy" title="${i18n.copy}"/>
                 <img src="img/parsing.png" class="icon parsing ${data.parsing ? "" : "hide"}" id="parsing" data-type="${data.parsing}" title="${i18n.parser}"/>
                 <img src="img/play.png" class="icon play ${data.isPlay ? "" : "hide"}" id="play" title="${i18n.preview}"/>
-                <img src="img/download.png" class="icon download" id="download" title="${i18n.download}"/>
+                <img src="img/download.svg" class="icon download" id="download" title="${i18n.download}"/>
                 <img src="img/aria2.png" class="icon aria2 ${G.enableAria2Rpc ? "" : "hide"}"" id="aria2" title="Aria2"/>
                 <img src="img/invoke.svg" class="icon invoke ${G.invoke ? "" : "hide"}"" id="invoke" title="${i18n.invoke}"/>
             </div>

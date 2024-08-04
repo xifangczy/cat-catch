@@ -124,7 +124,7 @@ input.regex {
 .item .switch {
   margin-right: 50px;
 }
-.item .switchSelect{
+.item .switchSelect {
   margin-right: 85px;
 }
 .optionsTitle {
@@ -235,14 +235,14 @@ textarea {
   cursor: pointer;
   padding: 5px 10px;
 }
+.select {
+  width: 8rem;
+}
 .m3u8Key {
   width: 300px;
 }
 #PlayerTemplate {
   width: 200px;
-}
-.select {
-  width: 8rem;
 }
 #errorTsList p {
   color: red;
@@ -355,7 +355,7 @@ textarea {
   word-break: break-all;
   width: 100%;
 }
-.m3u8DL{
+.m3u8DL {
   margin-right: 70px !important;
 }
 /* .m3u8DL #m3u8dl{
@@ -440,6 +440,6 @@ a.json-placeholder:hover {
 .width3rem {
   width: 3rem;
 }
-.popupAttr{
+.popupAttr {
   margin-left: 0.5rem;
 }
