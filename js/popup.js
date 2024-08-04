@@ -452,7 +452,7 @@ $('#AllCopy').click(function () {
 $('#AllSelect, #invertSelection').click(function () {
     checkboxState = !checkboxState;
     let checked = false;
-    if(this.id == "AllSelect"){
+    if (this.id == "AllSelect") {
         checked = true;
         checkboxState = true;
     }

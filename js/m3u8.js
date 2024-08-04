@@ -1674,7 +1674,7 @@ function getTemplates(text) {
     }
     return templates(text, _data);
 }
-function getM3u8DlREArg(){
+function getM3u8DlREArg() {
     let m3u8dlArg = G.m3u8dlArg;
     const addParam = $("#addParam").prop("checked");    // 是否添加参数
     const customFilename = $("#customFilename").val().trim();   // 自定义文件名
@@ -1689,7 +1689,7 @@ function getM3u8DlREArg(){
     const threadCountRegex = /(--thread-count\s+)\d+/;
     if (m3u8dlArg.match(threadCountRegex)) {
         m3u8dlArg = m3u8dlArg.replace(threadCountRegex, `\$1${tsThread}`);
-    }else{
+    } else {
         m3u8dlArg += ` --thread-count ${tsThread}`;
     }
 
@@ -1698,13 +1698,13 @@ function getM3u8DlREArg(){
     rangeStart = rangeStart.includes(":") ? rangeStart : rangeStart - 1;
     let rangeEnd = $("#rangeEnd").val();
     rangeEnd = rangeEnd.includes(":") ? rangeEnd : rangeEnd - 1;
-    if(rangeStart != 0 || rangeEnd != _fragments.length - 1){
+    if (rangeStart != 0 || rangeEnd != _fragments.length - 1) {
         m3u8dlArg += ` --custom-range "${rangeStart}-${rangeEnd}"`
     }
 
     // 自定义密钥
     let customKey = $("#customKey").val().trim();  // 自定义密钥
-    if(customKey){
+    if (customKey) {
         m3u8dlArg += ` --custom-hls-key "${customKey}"`;
     }
 
@@ -1719,7 +1719,7 @@ function getM3u8DlREArg(){
     return m3u8dlArg;
 }
 function getM3u8DlArg() {
-    if(G.m3u8dl == 2){ return getM3u8DlREArg(); }
+    if (G.m3u8dl == 2) { return getM3u8DlREArg(); }
 
     let m3u8dlArg = G.m3u8dlArg;
     const addParam = $("#addParam").prop("checked");

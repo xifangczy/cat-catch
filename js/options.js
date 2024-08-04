@@ -205,14 +205,14 @@ $("[data-reset]").bind("click", function () {
 });
 
 //重置设置
-$(".resetOption").click(function() {
+$(".resetOption").click(function () {
     if (confirm(i18n.confirmReset)) {
         const optionBox = $(this).closest('.optionBox');
-        const result = optionBox.find('[save]').toArray().reduce((acc, {id}) => {
+        const result = optionBox.find('[save]').toArray().reduce((acc, { id }) => {
             acc[id] = G.OptionLists[id];
             return acc;
         }, {});
-        chrome.storage.sync.set(result, ()=>{
+        chrome.storage.sync.set(result, () => {
             location.reload();
         });
     }
