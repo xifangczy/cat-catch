@@ -41,6 +41,10 @@
                 return;
             }
         }
+        if (data instanceof ArrayBuffer && data.byteLength == 16) {
+            postData({ action: "catCatchAddKey", key: data, href: location.href, ext: "key" });
+            return;
+        }
         for (let key in data) {
             if (index != 0) { depth = 0; } index++;
             if (typeof data[key] == "object") {
@@ -355,8 +359,7 @@
         }
     });
 
-    // Array join
-    const _arrayJoin = Array.prototype._arrayJoin = Array.prototype.join;
+    const _arrayJoin = Array.prototype.join;
     Array.prototype.join = function () {
         const data = _arrayJoin.apply(this, arguments);
         if (data.substring(0, 7).toUpperCase() == "#EXTM3U") {
@@ -383,7 +386,8 @@
     function getBashUrl(url) {
         let bashUrl = url.split("/");
         bashUrl.pop();
-        return bashUrl._arrayJoin("/") + "/";
+        // return bashUrl._arrayJoin("/") + "/";
+        return bashUrl.join("/") + "/";
     }
     function addBashUrl(baseUrl, m3u8Text) {
         let m3u8_split = m3u8Text.split("\n");
