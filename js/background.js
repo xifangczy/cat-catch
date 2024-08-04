@@ -420,7 +420,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         chrome.tabs.query({ url: G.ffmpegConfig.url }, function (tabs) {
             if (chrome.runtime.lastError || !tabs.length) {
                 chrome.tabs.create({ url: G.ffmpegConfig.url, active: Message.active ?? true }, function (tab) {
-                    if(chrome.runtime.lastError){return;}
+                    if (chrome.runtime.lastError) { return; }
                     G.ffmpegConfig.tab = tab.id;
                     G.ffmpegConfig.data = data;
                 });
