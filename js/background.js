@@ -39,8 +39,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 chrome.webRequest.onSendHeaders.addListener(
     function (data) {
         if (G && !G.enable) { return; }
-        const requestHeaders = getRequestHeaders(data);
-        requestHeaders && G.requestHeaders.set(data.requestId, requestHeaders);
+        data.requestHeaders && G.requestHeaders.set(data.requestId, data.requestHeaders);
     }, { urls: ["<all_urls>"] }, ['requestHeaders',
         chrome.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS].filter(Boolean)
 );
@@ -50,7 +49,7 @@ chrome.webRequest.onResponseStarted.addListener(
         try {
             const requestHeaders = G.requestHeaders.get(data.requestId);
             if (requestHeaders) {
-                data.requestHeaders = requestHeaders;
+                data.allRequestHeaders = requestHeaders;
                 G.requestHeaders.delete(data.requestId);
             }
             findMedia(data);
@@ -171,6 +170,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
     }
     chrome.tabs.get(data.tabId, async function (webInfo) {
         if (chrome.runtime.lastError) { return; }
+        data.requestHeaders = getRequestHeaders(data);
         // requestHeaders 中cookie 单独列出来
         if (data.requestHeaders?.cookie) {
             data.cookie = data.requestHeaders.cookie;
@@ -215,7 +215,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
                 });
             }
             if (G.send2local) {
-                try { send2local("catch", info, info.tabId); } catch (e) { console.log(e); }
+                try { send2local("catch", { ...info, requestHeaders: data.allRequestHeaders }, info.tabId); } catch (e) { console.log(e); }
             }
             if (chrome.runtime.lastError) { return; }
         });
@@ -611,9 +611,9 @@ function getResponseHeadersValue(data) {
     return header;
 }
 function getRequestHeaders(data) {
-    if (data.requestHeaders == undefined || data.requestHeaders.length == 0) { return false; }
+    if (data.allRequestHeaders == undefined || data.allRequestHeaders.length == 0) { return false; }
     const header = {};
-    for (let item of data.requestHeaders) {
+    for (let item of data.allRequestHeaders) {
         item.name = item.name.toLowerCase();
         if (item.name == "referer") {
             header.referer = item.value.toLowerCase();
