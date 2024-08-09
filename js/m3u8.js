@@ -1337,50 +1337,58 @@ function mergeTsNew(down) {
         fileName.pop();
         fileName = fileName.join(".");
     }
-
-    // ffmpeg 转码
+    // 发送到ffmpeg
     if ($("#ffmpeg").prop("checked") || _ffmpeg || isSendFfmpeg) {
-        if (fileBlob.size < 2147483648) {
-            if (ext != "mp4" && ext != "mp3") {
-                fileName = fileName + ".mp4";
-            } else {
-                fileName = fileName + "." + ext;
-            }
-            let action = $("#onlyAudio").prop("checked") ? "onlyAudio" : "transcode";
-            if (_ffmpeg) {
-                action = _ffmpeg;
-            }
-            if (isSendFfmpeg) {
-                action = "addFile";
-                isSendFfmpeg = false;
-            }
-            const data = {
-                Message: "catCatchFFmpeg",
-                action: action,
-                files: [{ data: URL.createObjectURL(fileBlob), name: `memory${new Date().getTime()}.${ext}` }],
-                title: fileName,
-                output: fileName,
-                name: "memory" + new Date().getTime() + "." + ext,
-                active: !autoDown,
-                tabId: currentTabId,
-            };
-            if (_quantity) {
-                data.quantity = parseInt(_quantity);
-            }
-            if (_taskId) {
-                data.taskId = _taskId;
-            }
-            chrome.runtime.sendMessage(data);
-            buttonState("#mergeTs", true);
-            $progress.html(i18n.sendFfmpeg);
+        if (fileBlob.size > 2147483648) {
+            $progress.html(i18n("fileTooLarge", ["2G"]));
+            apiDownload(fileBlob, fileName, ext);
+            down.destroy();
             return;
         }
-        $progress.html(i18n("fileTooLarge", ["2G"]));
-        // buttonState("#mergeTs", true);
-        // $progress.html("视频大于2G 无法使用在线ffmpeg");
-        // return;
+        if (ext != "mp4" && ext != "mp3") {
+            fileName = fileName + ".mp4";
+        } else {
+            fileName = fileName + "." + ext;
+        }
+        let action = $("#onlyAudio").prop("checked") ? "onlyAudio" : "transcode";
+        if (_ffmpeg) {
+            action = _ffmpeg;
+        }
+        if (isSendFfmpeg) {
+            action = "addFile";
+            isSendFfmpeg = false;
+        }
+        const data = {
+            Message: "catCatchFFmpeg",
+            action: action,
+            files: [{ data: URL.createObjectURL(fileBlob), name: `memory${new Date().getTime()}.${ext}` }],
+            title: fileName,
+            output: fileName,
+            name: "memory" + new Date().getTime() + "." + ext,
+            active: !autoDown,
+            tabId: currentTabId,
+        };
+        if (_quantity) {
+            data.quantity = parseInt(_quantity);
+        }
+        if (_taskId) {
+            data.taskId = _taskId;
+        }
+        chrome.runtime.sendMessage(data, function (response) {
+            if (chrome.runtime.lastError) {
+                apiDownload(fileBlob, fileName, ext);
+                down.destroy();
+                return;
+            }
+            $progress.html(i18n.sendFfmpeg);
+            buttonState("#mergeTs", true);
+        });
+    } else {
+        apiDownload(fileBlob, fileName, ext);
+        down.destroy();
     }
-
+}
+function apiDownload(fileBlob, fileName, ext) {
     chrome.downloads.download({
         url: URL.createObjectURL(fileBlob),
         filename: fileName = fileName + "." + ext,
@@ -1388,12 +1396,10 @@ function mergeTsNew(down) {
     }, function (downloadId) {
         downId = downloadId;
         $(".openDir").show();
+        buttonState("#mergeTs", true);
     });
-    buttonState("#mergeTs", true);
-
-    // 清空buffer
-    down.destroy();
 }
+
 // 合并下载
 function mergeTs() {
     if (tsBuffer.length == 0 && down.buffer.length != 0) {
