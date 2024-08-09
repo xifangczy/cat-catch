@@ -1375,13 +1375,14 @@ function mergeTsNew(down) {
             data.taskId = _taskId;
         }
         chrome.runtime.sendMessage(data, function (response) {
-            if (chrome.runtime.lastError) {
-                apiDownload(fileBlob, fileName, ext);
-                down.destroy();
+            if (!chrome.runtime?.lastError && response && response == "ok") {
+                $progress.html(i18n.sendFfmpeg);
+                buttonState("#mergeTs", true);
                 return;
             }
-            $progress.html(i18n.sendFfmpeg);
-            buttonState("#mergeTs", true);
+            apiDownload(fileBlob, fileName, ext);
+            down.destroy();
+            return;
         });
     } else {
         apiDownload(fileBlob, fileName, ext);
