@@ -792,7 +792,7 @@ function catDownload(obj, extra = {}) {
             url: `/download.html?${new URLSearchParams({
                 url: obj.url,
                 requestHeaders: JSON.stringify(obj.requestHeaders),
-                filename: obj.downFileName,
+                filename: stringModify(obj.downFileName),
                 initiator: obj.initiator,
                 ...extra
             })}`,
@@ -927,7 +927,7 @@ function openParser(data, options = {}) {
         const url = `/${data.parsing}.html?${new URLSearchParams({
             url: data.url,
             title: data.title,
-            filename: data.downFileName,
+            filename: stringModify(data.downFileName),
             tabid: data.tabId == -1 ? G.tabId : data.tabId,
             initiator: data.initiator,
             tabid: tab.id,

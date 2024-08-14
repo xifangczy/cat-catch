@@ -1395,9 +1395,14 @@ function apiDownload(fileBlob, fileName, ext) {
         filename: fileName = fileName + "." + ext,
         saveAs: $("#saveAs").prop("checked")
     }, function (downloadId) {
-        downId = downloadId;
-        $(".openDir").show();
-        buttonState("#mergeTs", true);
+        if (downloadId) {
+            downId = downloadId;
+            $(".openDir").show();
+            buttonState("#mergeTs", true);
+        } else if (chrome.runtime?.lastError?.message && chrome.runtime.lastError.message == 'Invalid filename') {
+            apiDownload(fileBlob, stringModify(fileName), ext);
+            return;
+        }
     });
 }
 
