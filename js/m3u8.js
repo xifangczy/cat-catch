@@ -1188,6 +1188,13 @@ function downloadNew(start = 0, end = _fragments.length) {
             fileStream.close();
             fileStream = undefined;
         } else {
+            if ($("#ffmpeg").prop("checked") || _ffmpeg || isSendFfmpeg) {
+                chrome.runtime.sendMessage({
+                    Message: "catCatchFFmpeg",
+                    action: "openFFmpeg",
+                    extra: i18n.waitingForMedia
+                });
+            }
             mergeTsNew(down);
         }
         transmuxer?.off && transmuxer.off('data');
