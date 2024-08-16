@@ -422,7 +422,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
                 chrome.tabs.create({ url: G.ffmpegConfig.url, active: Message.active ?? true }, function (tab) {
                     if (chrome.runtime.lastError) { return; }
                     G.ffmpegConfig.tab = tab.id;
-                    G.ffmpegConfig.data = data;
+                    G.ffmpegConfig.cacheData.push(data);
                 });
                 return true;
             }
@@ -558,8 +558,10 @@ chrome.commands.onCommand.addListener(function (command) {
 chrome.webNavigation.onCompleted.addListener(function (details) {
     if (G.ffmpegConfig.tab && details.tabId == G.ffmpegConfig.tab) {
         setTimeout(() => {
-            chrome.tabs.sendMessage(details.tabId, G.ffmpegConfig.data);
-            G.ffmpegConfig.data = undefined;
+            G.ffmpegConfig.cacheData.forEach(data => {
+                chrome.tabs.sendMessage(details.tabId, data);
+            });
+            G.ffmpegConfig.cacheData = [];
             G.ffmpegConfig.tab = 0;
         }, 500);
     }

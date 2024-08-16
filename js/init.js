@@ -151,6 +151,7 @@ G.scriptList.set("webrtc.js", { key: "webrtc", refresh: true, allFrames: true, w
 // ffmpeg
 G.ffmpegConfig = {
     tab: 0,
+    cacheData: [],
     version: 1,
     get url() {
         return G.onlineServiceAddress == 0 ? "https://ffmpeg.bmmmd.com/" : "https://ffmpeg2.bmmmd.com/";
@@ -215,7 +216,7 @@ function InitOptions() {
             items.copyOther = items.copyOther.replaceAll('$url$', '${url}').replaceAll('$referer$', '${referer}').replaceAll('$title$', '${title}');
             chrome.storage.sync.set({ copyOther: items.copyOther });
         }
-        if(typeof items.m3u8dl == 'boolean'){
+        if (typeof items.m3u8dl == 'boolean') {
             items.m3u8dl = items.m3u8dl ? 1 : 0;
             chrome.storage.sync.set({ m3u8dl: items.m3u8dl });
         }
@@ -271,9 +272,9 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason == "update") {
         chrome.storage.local.clear(function () {
-            if(chrome.storage.session){
+            if (chrome.storage.session) {
                 chrome.storage.session.clear(InitOptions);
-            }else{
+            } else {
                 InitOptions();
             }
         });
