@@ -61,7 +61,7 @@
     <!-- 正则匹配 -->
     <section>
       <h1 class="optionsTitle">
-        <img src="img/regex.png" style="width: 18px" class="regex"/><span data-i18n-outer="regexMatch"></span> / <span
+        <img src="img/regex.png" style="width: 18px" class="regex" /><span data-i18n-outer="regexMatch"></span> / <span
           data-i18n-outer="blockResource"></span>
       </h1>
       <div class="optionBox">
@@ -105,7 +105,7 @@
     <!-- 复制选项 -->
     <section>
       <h1 class="optionsTitle">
-        <img src="img/copy.png" style="width: 18px" class="copy"/>
+        <img src="img/copy.png" style="width: 18px" class="copy" />
         <p data-i18n-outer="copy"></p>
       </h1>
       <div class="optionBox">
@@ -134,7 +134,7 @@
     <!-- Aria2 RPC -->
     <section>
       <h1 class="optionsTitle">
-        <img src="img/aria2.png" style="width: 18px" class="aria2"/>
+        <img src="img/aria2.png" style="width: 18px" class="aria2" />
         Aria2 RPC
       </h1>
       <div class="optionBox">
@@ -203,10 +203,10 @@
             <input id="send2localURL" save="input" type="text" class="width100"></input>
           </div>
 
-        <div class="flex-end">
-          <button type="button" class="resetOption" data-i18n="resetSettings"></button>
+          <div class="flex-end">
+            <button type="button" class="resetOption" data-i18n="resetSettings"></button>
+          </div>
         </div>
-      </div>
     </section>
 
     <!-- m3u8DL -->
@@ -214,13 +214,15 @@
       <h1 class="optionsTitle">URL Protocol m3u8dl</h1>
       <div class="optionBox" id="m3u8dlOption">
         <span class="explain">
-          <a href="https://github.com/nilaoda/N_m3u8DL-CLI" target="_blank">N_m3u8DL-CLI</a> / <a href="https://github.com/nilaoda/N_m3u8DL-RE" target="_blank">N_m3u8DL-RE</a>
+          <a href="https://github.com/nilaoda/N_m3u8DL-CLI" target="_blank">N_m3u8DL-CLI</a> / <a
+            href="https://github.com/nilaoda/N_m3u8DL-RE" target="_blank">N_m3u8DL-RE</a>
           <p data-i18n-outer="m3u8DLTips"></p>
           <a href="https://o2bmm.gitbook.io/cat-catch/docs/m3u8dl" target="_blank" data-i18n="documentation"></a>
         </span>
         <div class="list">
           <div class="item">
-            <div><span data-i18n-outer="enable"></span> m3u8dl:// <span data-i18n-outer="download"></span> m3u8 or mpd</div>
+            <div><span data-i18n-outer="enable"></span> m3u8dl:// <span data-i18n-outer="download"></span> m3u8 or mpd
+            </div>
             <div class="switch m3u8DL">
               <select id="m3u8dl" class="select" save="select">
                 <option value="0" data-i18n="disable"></option>
@@ -237,8 +239,8 @@
               <a href="https://nilaoda.github.io/N_m3u8DL-CLI/Advanced.html" target="_blank"
                 style="margin-left: 10px;">N_m3u8DL-CLI <span data-i18n-outer="parameter"></span></a>
 
-                <a href="https://github.com/nilaoda/N_m3u8DL-RE?tab=readme-ov-file#%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%82%E6%95%B0" target="_blank"
-                style="margin-left: 10px;">N_m3u8DL-RE <span data-i18n-outer="parameter"></span></a>
+              <a href="https://github.com/nilaoda/N_m3u8DL-RE?tab=readme-ov-file#%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%82%E6%95%B0"
+                target="_blank" style="margin-left: 10px;">N_m3u8DL-RE <span data-i18n-outer="parameter"></span></a>
 
               <p data-i18n="parameterSetting"></p>
             </div>
@@ -254,7 +256,7 @@
     <!-- 第三方本地程序调用 -->
     <section>
       <h1 class="optionsTitle">
-        <img src="img/invoke.svg" style="width: 18px" class="invoke"/>
+        <img src="img/invoke.svg" style="width: 18px" class="invoke" />
         <p data-i18n-outer="invokeApp"></p>
       </h1>
       <div class="optionBox" id="invokeOption">
@@ -329,7 +331,7 @@
     <!-- 下载器 -->
     <section>
       <h1 class="optionsTitle">
-        <img src="img/cat-down.png" style="width: 18px" class="cat-down"/>
+        <img src="img/cat-down.png" style="width: 18px" class="cat-down" />
         <p data-i18n-outer="downloader"></p>
       </h1>
       <div class="optionBox" id="downOption">
@@ -366,7 +368,7 @@
           </div>
 
           <div class="item">
-            <div data-i18n="downloadWhileSaving"></div>(beta)
+            <div data-i18n="downloadWhileSaving"></div>
             <div class="switch">
               <label class="switchLabel switchRadius">
                 <input type="checkbox" id="downStream" save="click" class="switchInput" />
@@ -385,14 +387,15 @@
     <!-- m3u8解析器 -->
     <section>
       <h1 class="optionsTitle">
-        <img src="img/parsing.png" style="width: 18px" class="parsing"/>
+        <img src="img/parsing.png" style="width: 18px" class="parsing" />
         <p data-i18n-outer="m3u8Parser"></p>
       </h1>
       <div class="optionBox" id="m3u8Option">
         <div class="list">
 
           <div class="item">
-            <div><img src="img/download.svg" style="width: 18px" class="download"> <span data-i18n-outer="autoDownM3u8Tip"></span></div>
+            <div><img src="img/download.svg" style="width: 18px" class="download"> <span
+                data-i18n-outer="autoDownM3u8Tip"></span></div>
             <div class="switch">
               <label class="switchLabel switchRadius">
                 <input type="checkbox" id="m3u8AutoDown" save="click" class="switchInput" />
