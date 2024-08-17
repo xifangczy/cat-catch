@@ -426,7 +426,12 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
                 });
                 return true;
             }
-            chrome.tabs.sendMessage(tabs[0].id, data);
+            if (tabs[0].status == "complete") {
+                chrome.tabs.sendMessage(tabs[0].id, data);
+            } else {
+                G.ffmpegConfig.tab = tabs[0].id;
+                G.ffmpegConfig.cacheData.push(data);
+            }
         });
         sendResponse("ok");
         return true;
