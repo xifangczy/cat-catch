@@ -787,7 +787,7 @@ function copyLink(data) {
 function catDownload(obj, extra = {}) {
     let active = !G.downActive;
     if (extra) { active = false; }
-    if (!extra.ffmpeg && !G.downStream && obj._size > 2147483648 && confirm(i18n("fileTooLargeStream", [obj.size]))) {
+    if (!extra.ffmpeg && !G.downStream && obj._size > 2147483648 && confirm(i18n("fileTooLargeStream", ["2G"]))) {
         extra.downStream = 1;
     }
     chrome.tabs.get(G.tabId, function (tab) {
