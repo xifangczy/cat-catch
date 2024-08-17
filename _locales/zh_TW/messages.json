@@ -704,6 +704,14 @@
       }
     }
   },
+  "fileTooLargeStream": {
+    "message": "文件大於 $size$ 是否啟用邊下邊存?",
+    "placeholders": {
+      "size": {
+        "content": "$1"
+      }
+    }
+  },
   "formatConversionError": {
     "message": "格式轉換錯誤, 請取消mp4轉換, 重新下載."
   },
