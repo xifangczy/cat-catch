@@ -54,7 +54,7 @@
     "message": "Tela Cheia"
   },
   "screenshot": {
-    "message": "Captura de Tela"
+    "message": "Capturar Tela"
   },
   "loop": {
     "message": "Repetir"
@@ -96,7 +96,7 @@
     "message": "Agrupar Todos"
   },
   "videoRecording": {
-    "message": "Gravação de Vídeo"
+    "message": "Gravar Vídeo"
   },
   "closeRecording": {
     "message": "Fechar Gravação"
@@ -105,7 +105,7 @@
     "message": "Gravar WebRTC"
   },
   "screenCapture": {
-    "message": "Captura de Tela"
+    "message": "Capturar Tela"
   },
   "simulateMobile": {
     "message": "Simular Celular"
@@ -300,7 +300,7 @@
     "message": "Documentação"
   },
   "aria2Tip": {
-    "message": "Uma excelente ferramenta de download, veja como usar com a"
+    "message": "Uma excelente ferramenta de download, veja como usar"
   },
   "m3u8DLTips": {
     "message": "Uma excelente ferramenta de download de m3u8 e mpd de terceiros, veja como usar"
@@ -354,7 +354,7 @@
     "message": "Deixe em branco para desativá-lo. O padrão é usar a página pop-up para visualizar o vídeo"
   },
   "preview": {
-    "message": "Visualização"
+    "message": "Exibição"
   },
   "customFilenameOption": {
     "message": "Usar um nome de arquivo personalizado para salvar o arquivo (o padrão é o título da página da web)"
@@ -375,7 +375,7 @@
     "message": "Limpar Normal"
   },
   "moreFrequent": {
-    "message": "Mais Frequente"
+    "message": "Mais Freqüente"
   },
   "excludeDuplicateResources": {
     "message": "Excluir recursos duplicados (consome muitos recursos da CPU)"
@@ -704,6 +704,14 @@
       }
     }
   },
+  "fileTooLargeStream": {
+    "message": "Arquivo maior que $size$, habilitar download da stream?",
+    "placeholders": {
+      "size": {
+        "content": "$1"
+      }
+    }
+  },
   "formatConversionError": {
     "message": "Erro de Conversão de Formato"
   },
@@ -802,12 +810,18 @@
     "message": "Transmissão de dados"
   },
   "popup": {
-    "message": "Popup"
+    "message": "Balão"
   },
   "defaultPopup": {
-    "message": "Modo Popup Padrão"
+    "message": "Modo Balão Padrão"
   },
   "invokeApp": {
     "message": "Invocar aplicativo"
+  },
+  "onlineServiceAddress": {
+    "message": "Endereço do Serviço Online"
+  },
+  "withinChina": {
+    "message": "Interior da China"
   }
 }
