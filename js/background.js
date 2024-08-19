@@ -214,11 +214,13 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
                     filename: downDir + info.name
                 });
             }
-            if (G.send2local) {
-                try { send2local("catch", { ...info, requestHeaders: data.allRequestHeaders }, info.tabId); } catch (e) { console.log(e); }
-            }
             if (chrome.runtime.lastError) { return; }
         });
+
+        // 数据发送
+        if (G.send2local) {
+            try { send2local("catch", { ...info, requestHeaders: data.allRequestHeaders }, info.tabId); } catch (e) { console.log(e); }
+        }
 
         // 储存数据
         cacheData[info.tabId] ??= [];
