@@ -14,6 +14,29 @@
         }
     }
 
+    // Trusted Types
+    let createHTML = (string) => {
+        try {
+            const fakeDiv = document.createElement('div');
+            fakeDiv.innerHTML = string;
+            document.body.removeChild(fakeDiv);
+            createHTML = (string) => string;
+        } catch (e) {
+            const policy = trustedTypes.createPolicy('catCatchPolicy', { createHTML: (s) => s });
+            createHTML = (string) => policy.createHTML(string);
+            const _innerHTML = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+            Object.defineProperty(Element.prototype, 'innerHTML', {
+                get: function () {
+                    return _innerHTML.get.call(this);
+                },
+                set: function (value) {
+                    _innerHTML.set.call(this, createHTML(value));
+                }
+            });
+        }
+    }
+    createHTML("<div></div>");
+
     const buttonStyle = 'style="border:solid 1px #000;margin:2px;padding:2px;background:#fff;border-radius:4px;border:solid 1px #c7c7c780;color:#000;"';
     const checkboxStyle = 'style="-webkit-appearance: auto;"';
 
