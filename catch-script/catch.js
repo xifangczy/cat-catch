@@ -26,9 +26,6 @@
             createHTML = (string) => policy.createHTML(string);
             const _innerHTML = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
             Object.defineProperty(Element.prototype, 'innerHTML', {
-                get: function () {
-                    return _innerHTML.get.call(this);
-                },
                 set: function (value) {
                     _innerHTML.set.call(this, createHTML(value));
                 }
