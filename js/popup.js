@@ -594,6 +594,11 @@ $("#popup").click(function () {
         window.close();
     });
 });
+$("#currentPage").click(function () {
+    chrome.tabs.query({ active: true, currentWindow: false }, function (tabs) {
+        chrome.tabs.update({ url: `popup.html?tabId=${tabs[0].id}` });
+    });
+});
 // 一些需要等待G变量加载完整的操作
 const interval = setInterval(function () {
     if (!G.initSyncComplete || !G.initLocalComplete || !G.tabId) { return; }
@@ -607,6 +612,7 @@ const interval = setInterval(function () {
         $("#more").hide();  // 隐藏更多功能按钮
         $("#down").append($("#features button")).css("justify-content", "center");  // 把更多功能内按钮移动到底部
         $("#down button").css("margin-left", "5px");    // 按钮间隔
+        $("#currentPage").show();
     } else if (G.popup) {
         $("#popup").click();    // 默认弹出模式
     }
