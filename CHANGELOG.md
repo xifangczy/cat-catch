@@ -1,15 +1,24 @@
 ## 更新说明
 
+### 2.5.5
+
+[Fixed] 修复一个严重 bug #483
+
+[Added] 在线 ffmpeg 提供服务器选择
+
+[Fixed] m3u8 解析器 文件名存在`|`字符 无法下载问题
+
+[Changed] 发送数据 提供完整请求头
+
 ### 2.5.4
 
-[Added] m3u8DL 增加切换RE版本 (RE版 需[URLProtocol](https://github.com/xifangczy/URLProtocol))
+[Added] m3u8DL 增加切换 RE 版本 (RE 版 需[URLProtocol](https://github.com/xifangczy/URLProtocol))
 
 [Added] 录制相关脚本 增加码率设置
 
 [Fixed] 深度搜索 脚本错误导致无法使用
 
-[Fixed] m3u8解析器录制直播 录制时间显示错误
-
+[Fixed] m3u8 解析器录制直播 录制时间显示错误
 
 ### 2.5.3
 
@@ -19,21 +28,20 @@
 
 [Added] 下载器 增加`边下边存`选项 可以用来下载一些直播视频链接
 
-[Added] 现在使用`深度搜索` 或其他脚本得到的疑似密钥, 直接显示在popup页面 `疑似密钥` 标签内。
+[Added] 现在使用`深度搜索` 或其他脚本得到的疑似密钥, 直接显示在 popup 页面 `疑似密钥` 标签内。
 
 [Added] 增加 葡萄牙语
 
 [Changed] 重写 `录制webRTC` 脚本
 
-[Changed]  `m3u8解析器` `下载器`页面内更改设置不会被储存。所有设置更改统一到扩展设置页面。
+[Changed] `m3u8解析器` `下载器`页面内更改设置不会被储存。所有设置更改统一到扩展设置页面。
 
-[Changed]  storage.local 更改为 storage.session 以减少IO错误导致扩展无法使用.(要求chrome 104以上)
+[Changed] storage.local 更改为 storage.session 以减少 IO 错误导致扩展无法使用.(要求 chrome 104 以上)
 
-[Changed] 优化与ffmpeg网页端的通信, 避免多任务时的数据错乱。
-(请提前打开 [在线ffmpeg](https://ffmpeg.bmmmd.com/) ctrl+f5 刷新页面 避免页面缓存造成的问题)
+[Changed] 优化与 ffmpeg 网页端的通信, 避免多任务时的数据错乱。
+(请提前打开 [在线 ffmpeg](https://ffmpeg.bmmmd.com/) ctrl+f5 刷新页面 避免页面缓存造成的问题)
 
-[Changed] 稍微增大一些按钮图标 不再训练大家的鼠标精准度🙄...如果你不喜欢想还原 设置-自定义css 填入 `body{font-size:12px;width:550px;}.icon,.favicon{width:18px;height:18px;}.DownCheck{width:15px;height:15px;}`
-
+[Changed] 稍微增大一些按钮图标 不再训练大家的鼠标精准度 🙄...如果你不喜欢想还原 设置-自定义 css 填入 `body{font-size:12px;width:550px;}.icon,.favicon{width:18px;height:18px;}.DownCheck{width:15px;height:15px;}`
 
 ### 2.5.2
 
