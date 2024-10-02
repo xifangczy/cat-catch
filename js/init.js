@@ -317,7 +317,7 @@ function clearRedundant() {
         chrome.declarativeNetRequest.getSessionRules(function (rules) {
             let mobileFlag = false;
             for (let item of rules) {
-                if (!item.id || !allTabId.has(item.id)) {
+                if (!allTabId.has(item.id)) {
                     mobileFlag = true;
                     G.featMobileTabId.delete(item.id);
                     chrome.declarativeNetRequest.updateSessionRules({
