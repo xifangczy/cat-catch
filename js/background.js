@@ -625,11 +625,11 @@ function getRequestHeaders(data) {
     for (let item of data.allRequestHeaders) {
         item.name = item.name.toLowerCase();
         if (item.name == "referer") {
-            header.referer = item.value.toLowerCase();
+            header.referer = item.value;
         } else if (item.name == "origin") {
-            header.origin = item.value.toLowerCase();
+            header.origin = item.value;
         } else if (item.name == "cookie") {
-            header.cookie = item.value.toLowerCase();
+            header.cookie = item.value;
         }
     }
     if (Object.keys(header).length) {
