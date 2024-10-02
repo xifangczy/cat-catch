@@ -42,25 +42,33 @@ function isEmpty(obj) {
 // 修改请求头
 function setRequestHeaders(data = {}, callback = undefined) {
     chrome.tabs.getCurrent(function (tabs) {
-        if (!tabs.id) { return; }
         const rules = { removeRuleIds: [tabs ? tabs.id : 1] };
         if (Object.keys(data).length) {
-            const requestHeaders = Object.keys(data).map(key => ({ header: key, operation: "set", value: data[key] }));
             rules.addRules = [{
                 "id": tabs ? tabs.id : 1,
+                "priority": tabs ? tabs.id : 1,
                 "action": {
                     "type": "modifyHeaders",
-                    "requestHeaders": requestHeaders
+                    "requestHeaders": Object.keys(data).map(key => ({ header: key, operation: "set", value: data[key] }))
                 },
                 "condition": {
-                    "resourceTypes": ["xmlhttprequest", "media", "image"]
+                    "resourceTypes": ["xmlhttprequest", "media", "image"],
                 }
             }];
             if (tabs) {
                 rules.addRules[0].condition.tabIds = [tabs.id];
+            } else {
+                // initiatorDomains 只支持 chrome 101+ firefox 113+
+                if (G.version < 101 || (G.isFirefox && G.version < 113)) {
+                    callback && callback();
+                    return;
+                }
+                const domain = G.isFirefox
+                    ? new URL(chrome.runtime.getURL("")).hostname
+                    : chrome.runtime.id;
+                rules.addRules[0].condition.initiatorDomains = [domain];
             }
         }
-        // console.log(rules);
         chrome.declarativeNetRequest.updateSessionRules(rules, function () {
             callback && callback();
         });

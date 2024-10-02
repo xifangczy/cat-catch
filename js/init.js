@@ -137,6 +137,10 @@ if (navigator.userAgent.includes("Chrome/")) {
         G.version = parseInt(version[1]);
     }
 } else if (navigator.userAgent.includes("Firefox/")) {
+    const version = navigator.userAgent.match(/Firefox\/([\d]+)/);
+    if (version && version[1]) {
+        G.version = parseInt(version[1]);
+    }
     G.isFirefox = true;
 }
 
@@ -313,7 +317,7 @@ function clearRedundant() {
         chrome.declarativeNetRequest.getSessionRules(function (rules) {
             let mobileFlag = false;
             for (let item of rules) {
-                if (!allTabId.has(item.id)) {
+                if (!item.id || !allTabId.has(item.id)) {
                     mobileFlag = true;
                     G.featMobileTabId.delete(item.id);
                     chrome.declarativeNetRequest.updateSessionRules({
