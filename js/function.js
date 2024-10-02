@@ -41,6 +41,7 @@ function isEmpty(obj) {
 
 // 修改请求头
 function setRequestHeaders(data = {}, callback = undefined) {
+    chrome.declarativeNetRequest.updateSessionRules({ removeRuleIds: [1] });
     chrome.tabs.getCurrent(function (tabs) {
         const rules = { removeRuleIds: [tabs ? tabs.id : 1] };
         if (Object.keys(data).length) {
