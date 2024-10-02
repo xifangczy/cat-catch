@@ -42,6 +42,7 @@ function isEmpty(obj) {
 // 修改请求头
 function setRequestHeaders(data = {}, callback = undefined) {
     chrome.tabs.getCurrent(function (tabs) {
+        if (!tabs.id) { return; }
         const rules = { removeRuleIds: [tabs ? tabs.id : 1] };
         if (Object.keys(data).length) {
             const requestHeaders = Object.keys(data).map(key => ({ header: key, operation: "set", value: data[key] }));
