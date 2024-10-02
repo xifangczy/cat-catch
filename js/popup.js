@@ -716,7 +716,7 @@ const interval = setInterval(function () {
 }, 0);
 /********************绑定事件END********************/
 window.addEventListener('unload', function () {
-    clearRedundant();
+    chrome.runtime.sendMessage(chrome.runtime.id, { Message: "clearRedundant" });
 });
 
 // 按钮状态更新
