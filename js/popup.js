@@ -403,14 +403,26 @@ $('#DownFile').click(function () {
         });
         return;
     }
-    checkedData.forEach(function (data) {
+    let index = 0;
+    for (let data of checkedData) {
+        if (G.m3u8dl && (isM3U8(data) || isMPD(data)) && !data.url.startsWith("blob:")) {
+            const m3u8dlArg = templates(G.m3u8dlArg, data);
+            const url = 'm3u8dl://' + (G.m3u8dl == 1 ? Base64.encode(m3u8dlArg) : m3u8dlArg);
+            chrome.tabs.create({ url: url });
+            continue;
+        }
+        if (G.m3u8AutoDown && data.parsing == "m3u8") {
+            openParser(data, { autoDown: true, autoClose: true });
+            continue;
+        }
+        index++;
         setTimeout(function () {
             chrome.downloads.download({
                 url: data.url,
                 filename: stringModify(data.downFileName)
             }, function (id) { downData[id] = data; });
-        }, 233);
-    });
+        }, index * 100);
+    };
 });
 // 合并下载
 $mergeDown.click(function () {
