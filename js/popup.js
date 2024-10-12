@@ -405,7 +405,7 @@ $('#DownFile').click(function () {
     }
     let index = 0;
     for (let data of checkedData) {
-        if (G.m3u8dl && (isM3U8(data) || isMPD(data)) && !data.url.startsWith("blob:")) {
+        if (G.m3u8dl && (data.parsing == "m3u8" || data.parsing == "mpd") && !data.url.startsWith("blob:")) {
             const m3u8dlArg = templates(G.m3u8dlArg, data);
             const url = 'm3u8dl://' + (G.m3u8dl == 1 ? Base64.encode(m3u8dlArg) : m3u8dlArg);
             chrome.tabs.create({ url: url });
