@@ -79,6 +79,7 @@ let downId = 0; // chrome下载api 回调id
 /* 以下参数 新下载器已弃用 */
 let stopDownload = false; // 停止下载flag
 let downDuration = 0; // 下载媒体得时长
+let downSize = 0;
 let downCurrentTs = 0;    // 当前进度
 let downTotalTs = 0;  // 需要下载的文件数量
 let tsBuffer = []; // ts内容缓存
@@ -1178,7 +1179,7 @@ function downloadNew(start = 0, end = _fragments.length) {
         }
         // $(`#downItem${fragment.index}`).remove();
         $progress.html(`${down.success}/${down.total}`);
-        $fileSize.html(i18n.downloaded + ":" + byteToSize(down.bufferize));
+        $fileSize.html(i18n.downloaded + ":" + byteToSize(down.buffersize));
         $fileDuration.html(i18n.downloadedVideoLength + ":" + secToTime(down.duration));
     });
     // 全部下载完成

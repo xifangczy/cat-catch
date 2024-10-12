@@ -17,7 +17,7 @@ class Downloader {
         this.state = 'waiting';          // 下载器状态 waiting running done abort
         this.success = 0;                // 成功下载数量
         this.errorList = new Set();      // 下载错误的列表
-        this.bufferize = 0;              // 已下载buffer大小
+        this.buffersize = 0;              // 已下载buffer大小
         this.duration = 0;               // 已下载时长
         this.pushIndex = 0;              // 推送顺序下载索引
         this.controller = [];            // 储存中断控制器
@@ -234,7 +234,7 @@ class Downloader {
                 this.buffer[fragment.index] = buffer;
                 // 成功数+1 累计buffer大小和视频时长
                 this.success++;
-                this.bufferize += buffer.byteLength;
+                this.buffersize += buffer.byteLength;
                 this.duration += fragment.duration;
 
                 // 下载对象来自错误列表 从错误列表内删除
