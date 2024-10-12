@@ -134,6 +134,7 @@ button,
 #down,
 .more {
   display: flex;
+  flex-wrap: wrap;
   position: fixed;
   width: 100%;
   z-index: 999;
