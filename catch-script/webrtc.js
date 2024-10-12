@@ -100,6 +100,7 @@
     /* 核心变量 */
     let recorder = null;    // 录制器
     let mediaStream = null;    // 媒体流
+    let autoSave1Timer = null;    // 1小时保存一次
 
     // #region 编码选择
     let option = { mimeType: 'video/webm;codecs=vp9,opus' };
@@ -166,6 +167,7 @@
         recorder.onstop = () => {
             recorderTime = 0;
             clearInterval(recorderTimeer);
+            clearInterval(autoSave1Timer);
             $time.innerHTML = "";
             tips(i18n("stopRecording", "已停止录制!"));
             download(chunks);
@@ -198,7 +200,6 @@
         }
     });
     // 每1小时 保存一次
-    let autoSave1Timer = null;
     CatCatch.querySelector("#autoSave1").addEventListener('click', function () {
         clearInterval(autoSave1Timer);
         if (CatCatch.querySelector("#autoSave1").checked) {
