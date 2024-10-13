@@ -324,7 +324,10 @@ hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
 // 监听 ERROR m3u8解析错误
 hls.on(Hls.Events.ERROR, function (event, data) {
     autoDown && highlight();
-    console.log(data.error);
+    console.log(data);
+    if (data.details == "bufferStalledError") {
+        hls.stopLoad();
+    }
     if (data.type == "mediaError" && data.details == "fragParsingError") {
         if (data.error.message == "No ADTS header found in AAC PES") {
             $("#tips").append("<b>" + i18n.ADTSerror + "</b>");
