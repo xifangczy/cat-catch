@@ -661,7 +661,7 @@ $("#m3u8DL").click(function () {
     const m3u8dlArg = getM3u8DlArg();
     $m3u8dlArg.val(m3u8dlArg);
     navigator.clipboard.writeText(m3u8dlArg);
-    const m3u8dl = 'm3u8dl://' + (G.m3u8dl == 1 ? Base64.encode(m3u8dlArg) : m3u8dlArg);
+    const m3u8dl = 'm3u8dl:' + (G.m3u8dl == 1 ? Base64.encode(m3u8dlArg) : m3u8dlArg);
     if (m3u8dl.length >= 2046) {
         alert(i18n.M3U8DLparameterLong);
     }
