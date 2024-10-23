@@ -184,7 +184,7 @@ function testTag() {
         title: $("#title").val(),
     }
     const result = templates($("#testTextarea").val() ?? "", data);
-    const m3u8dl = 'm3u8dl:' + Base64.encode(result);
+    const m3u8dl = 'm3u8dl:' + (G.m3u8dl == 1 ? Base64.encode(result) : result);
     $("#tagTestResult").html(`${result}<br><br><a href="${m3u8dl}" class="test_url">${m3u8dl}</a>`);
 }
 $("#showTestTag").bind("click", function () {
