@@ -630,6 +630,8 @@ function getRequestHeaders(data) {
             header.origin = item.value;
         } else if (item.name == "cookie") {
             header.cookie = item.value;
+        } else if (item.name == "authorization") {
+            header.authorization = item.value;
         }
     }
     if (Object.keys(header).length) {
