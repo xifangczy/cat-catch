@@ -38,6 +38,9 @@ if (_requestId) {
     });
 } else if (_requestHeaders) {
     requestHeaders = JSON.parse(_requestHeaders);
+    if (!requestHeaders.referer && _initiator) {
+        requestHeaders.referer = _initiator;
+    }
     setRequestHeaders(requestHeaders, () => { awaitG(start); });
 } else {
     awaitG(start);
