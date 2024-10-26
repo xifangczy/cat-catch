@@ -291,6 +291,18 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         return true;
     }
     Message.tabId = Message.tabId ?? G.tabId;
+    if (Message.Message == "getData" && Message.requestId) {
+        for (let item in cacheData) {
+            for (let data of cacheData[item]) {
+                if (data.requestId == Message.requestId) {
+                    sendResponse(data);
+                    return true;
+                }
+            }
+        }
+        sendResponse("error");
+        return true;
+    }
     if (Message.Message == "getData") {
         sendResponse(cacheData[Message.tabId]);
         return true;

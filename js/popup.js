@@ -815,7 +815,9 @@ function catDownload(obj, extra = {}) {
         const arg = {
             url: `/download.html?${new URLSearchParams({
                 url: obj.url,
-                requestHeaders: JSON.stringify(obj.requestHeaders),
+                // requestHeaders: JSON.stringify({ ...obj.requestHeaders, cookie: obj.cookie }),
+                requestId: obj.requestId,
+                // requestHeaders: JSON.stringify(obj.requestHeaders),
                 filename: stringModify(obj.downFileName),
                 initiator: obj.initiator,
                 ...extra
@@ -923,6 +925,9 @@ function aria2AddUri(data, success, error) {
         }
         if (data.cookie) {
             params.cookie = data.cookie;
+        }
+        if (data.requestHeaders?.authorization) {
+            params.header = ["Authorization: " + data.requestHeaders.authorization];
         }
     }
     json.params.push([data.url], params);

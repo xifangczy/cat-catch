@@ -13,13 +13,38 @@ const title = params.get("title");
 const _ffmpeg = params.get("ffmpeg");
 const _quantity = params.get("quantity");
 const _taskId = params.get("taskId");
+const _requestId = params.get("requestId");
 
 // 修改当前标签下的所有xhr的Referer
-let requestHeaders = JSONparse(_requestHeaders);
-if (!requestHeaders.referer && _initiator) {
-    requestHeaders.referer = _initiator;
+let requestHeaders = {};
+if (_requestId) {
+    chrome.runtime.sendMessage({ Message: "getData", requestId: _requestId }, function (data) {
+        if (data == "error") {
+            awaitG(start);
+            return;
+        }
+        requestHeaders = data.requestHeaders;
+        if (!data.referer && _initiator) {
+            requestHeaders.referer = _initiator;
+        }
+        if (data.cookie) {
+            requestHeaders.cookie = data.cookie;
+        }
+        if (_requestHeaders) {
+            const parsedHeaders = JSON.parse(_requestHeaders);
+            Object.assign(requestHeaders, parsedHeaders);
+        }
+        setRequestHeaders(requestHeaders, () => { awaitG(start); });
+    });
+} else if (_requestHeaders) {
+    requestHeaders = JSON.parse(_requestHeaders);
+    if (!requestHeaders.referer && _initiator) {
+        requestHeaders.referer = _initiator;
+    }
+    setRequestHeaders(requestHeaders, () => { awaitG(start); });
+} else {
+    awaitG(start);
 }
-setRequestHeaders(requestHeaders, () => { awaitG(start); });
 
 function start() {
     $("#autoClose").prop("checked", G.downAutoClose);
