@@ -24,9 +24,6 @@ if (_requestId) {
             return;
         }
         requestHeaders = data.requestHeaders;
-        if (!data.requestHeaders?.referer && _initiator) {
-            requestHeaders.referer = _initiator;
-        }
         if (data.cookie) {
             requestHeaders.cookie = data.cookie;
         }
@@ -34,13 +31,13 @@ if (_requestId) {
             const parsedHeaders = JSON.parse(_requestHeaders);
             Object.assign(requestHeaders, parsedHeaders);
         }
+        if (!requestHeaders.referer && _initiator) {
+            requestHeaders.referer = _initiator;
+        }
         setRequestHeaders(requestHeaders, () => { awaitG(start); });
     });
 } else if (_requestHeaders) {
     requestHeaders = JSON.parse(_requestHeaders);
-    if (!requestHeaders.referer && _initiator) {
-        requestHeaders.referer = _initiator;
-    }
     setRequestHeaders(requestHeaders, () => { awaitG(start); });
 } else {
     awaitG(start);
