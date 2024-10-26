@@ -920,14 +920,16 @@ function aria2AddUri(data, success, error) {
     }
     const params = { out: data.downFileName };
     if (G.enableAria2RpcReferer) {
+        params.header = [];
+        params.header.push(G.userAgent ? G.userAgent : navigator.userAgent);
         if (data.requestHeaders?.referer) {
-            params.referer = data.requestHeaders.referer;
+            params.header.push("Referer: " + data.requestHeaders.referer);
         }
         if (data.cookie) {
-            params.cookie = data.cookie;
+            params.header.push("Cookie: " + data.cookie);
         }
         if (data.requestHeaders?.authorization) {
-            params.header = ["Authorization: " + data.requestHeaders.authorization];
+            params.header.push("Authorization: " + data.requestHeaders.authorization);
         }
     }
     json.params.push([data.url], params);
