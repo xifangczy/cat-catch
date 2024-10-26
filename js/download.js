@@ -24,7 +24,7 @@ if (_requestId) {
             return;
         }
         requestHeaders = data.requestHeaders;
-        if (!data.referer && _initiator) {
+        if (!data.requestHeaders?.referer && _initiator) {
             requestHeaders.referer = _initiator;
         }
         if (data.cookie) {
