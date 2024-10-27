@@ -253,7 +253,7 @@ function AddMedia(data, currentTab = true) {
             Tips(i18n.blobM3u8DLError, 1500);
         }
         if (G.m3u8AutoDown && data.parsing == "m3u8") {
-            openParser(data, { autoDown: true, autoClose: true });
+            openParser(data, { autoDown: true });
             return false;
         }
         chrome.downloads.download({
