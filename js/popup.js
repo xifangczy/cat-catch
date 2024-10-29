@@ -453,9 +453,7 @@ $mergeDown.click(function () {
 $('#AllCopy').click(function () {
     const url = [];
     getData().forEach(function (data) {
-        if (data.checked) {
-            url.push(data.parsing ? copyLink(data) : data.url);
-        }
+        data.checked && url.push(copyLink(data));
     });
     navigator.clipboard.writeText(url.join("\n"));
     Tips(i18n.copiedToClipboard);
