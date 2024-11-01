@@ -11,7 +11,7 @@ setRequestHeaders(requestHeaders, () => { awaitG(init); });
 
 var mpdJson = {}; // 解析器json结果
 var mpdXml = {}; // 解析器xml结果
-var mpdContent; // mpd文件内容
+// var mpdContent; // mpd文件内容
 var m3u8Content = "";   //m3u8内容
 var mediaInfo = "" // 媒体文件信息
 
@@ -27,8 +27,9 @@ function init() {
         fetch(_url)
             .then(response => response.text())
             .then(function (text) {
-                mpdContent = text;
-                parseMPD(mpdContent);
+                // mpdContent = text;
+                // parseMPD(mpdContent);
+                parseMPD(text);
                 $("#mpd_url").html(_url).attr("href", _url);
             });
     } else {
@@ -87,15 +88,54 @@ function init() {
     });
 }
 
-function parseMPD() {
+// 加密类型
+function getEncryptionType(schemeIdUri) {
+    if (schemeIdUri.includes("edef8ba9-79d6-4ace-a3c8-27dcd51d21ed")) {
+        return "Widevine";
+    } else if (schemeIdUri.includes("9a04f079-9840-4286-ab92-e65be0885f95")) {
+        return "Microsoft PlayReady";
+    } else if (schemeIdUri.includes("94ce86fb-07ff-4f43-adb8-93d2fa968ca2")) {
+        return "Apple FairPlay";
+    } else {
+        return "Unknown";
+    }
+}
+// 判断DRM
+function isDRM(mpdContent) {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(mpdContent, "application/xml");
+    let drmInfo = new Map();
+    const contentProtections = xmlDoc.getElementsByTagName("ContentProtection");
+    for (let i = 0; i < contentProtections.length; i++) {
+        const protection = contentProtections[i];
+        const schemeIdUri = protection.getAttribute("schemeIdUri");
+        const pssh = protection.getElementsByTagName("cenc:pssh")[0];
+
+        if (schemeIdUri && pssh) {
+            if (!drmInfo.has(schemeIdUri)) {
+                drmInfo.set(schemeIdUri, pssh.textContent);
+            }
+        }
+    }
+    return Array.from(drmInfo.entries()).map(([schemeIdUri, pssh]) => ({
+        schemeIdUri,
+        pssh,
+        encryptionType: getEncryptionType(schemeIdUri)
+    }));
+}
+function parseMPD(mpdContent) {
     $("#loading").hide(); $("#main").show();
     mpdJson = mpdParser.parse(mpdContent, { manifestUri: _url });
-    mpdXml = $(mpdContent);
-    console.log(mpdJson);
-    if (mpdXml.find("contentprotection").length > 0) {
+
+    const drmInfo = isDRM(mpdContent);
+    if (drmInfo.length > 0) {
         $("#loading").show();
-        $("#loading .optionBox").html(i18n.DRMerror);
+        $("#loading .optionBox").html(`<b>${i18n.DRMerror}</b><br><br>`);
+        drmInfo.map(item => {
+            $("#loading .optionBox").append(`<b>${item.encryptionType}</b><p>${item.pssh}</p>`);
+        });
     }
+
     for (let key in mpdJson.playlists) {
         $("#mpdVideoLists").append(`<option value='${key}'>${mpdJson.playlists[key].attributes.NAME
             } | ${(mpdJson.playlists[key].attributes.BANDWIDTH / 1024).toFixed(1)
