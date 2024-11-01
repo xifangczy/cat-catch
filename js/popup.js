@@ -866,11 +866,13 @@ function mergeDownButtonCheck(data) {
 function mergeDownButton() {
     const [checkedData, maxSize] = getCheckedData();
     if (checkedData.length != 2 || maxSize > 2147483648) {
-        $mergeDown.hide();
+        // $mergeDown.hide();
+        $mergeDown.attr('disabled', true);
         return;
     }
     if (checkedData.every(mergeDownButtonCheck) || checkedData.every(data => isM3U8(data))) {
-        $mergeDown.show();
+        // $mergeDown.show();
+        $mergeDown.removeAttr('disabled');
     }
 }
 // 获取当前标签 所有选择的文件
