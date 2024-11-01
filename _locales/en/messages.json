@@ -126,7 +126,7 @@
     "message": "Select All"
   },
   "invertSelection": {
-    "message": "Invert Selection"
+    "message": "Toggle"
   },
   "filter": {
     "message": "Filter"
