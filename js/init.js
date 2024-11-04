@@ -79,7 +79,8 @@ G.OptionLists = {
     ShowWebIco: true,
     MobileUserAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1",
     m3u8dl: 0,
-    m3u8dlArg: `"\${url}" --workDir "%USERPROFILE%\\Downloads\\m3u8dl" --saveName "\${title}_\${now}" --enableDelAfterDone \${referer|exists:'--headers "Referer:*"'}`,
+    // m3u8dlArg: `"\${url}" --workDir "%USERPROFILE%\\Downloads\\m3u8dl" --saveName "\${title}_\${now}" --enableDelAfterDone \${referer|exists:'--headers "Referer:*"'}`,
+    m3u8dlArg: `"\${url}" --save-dir "%USERPROFILE%\\Downloads\\m3u8dl" --save-name "\${title}_\${now}" \${referer|exists:'-H "Referer:*"'} \${cookie|exists:'-H "Cookie:*"'} --no-log`,
     playbackRate: 2,
     copyM3U8: "${url}",
     copyMPD: "${url}",
@@ -354,6 +355,25 @@ function stringModify(str, text) {
             '"': '&quot;',
             '/': '&sol;',
             '\\': '&bsol;',
+            '|': '&vert;',
+            '?': '&quest;',
+            '*': '&ast;',
+            '~': '_'
+        }[match];
+    });
+}
+function filterFileName(str, text) {
+    if (!str) { return str; }
+    reStringModify.lastIndex = 0;
+    str = str.replaceAll(/\u200B/g, "").replaceAll(/\u200C/g, "").replaceAll(/\u200D/g, "");
+    return str.replace(reStringModify, function (match) {
+        return text || {
+            '<': '&lt;',
+            '>': '&gt;',
+            ':': '&colon;',
+            '"': '&quot;',
+            '/': '/',
+            '\\': '\\',
             '|': '&vert;',
             '?': '&quest;',
             '*': '&ast;',

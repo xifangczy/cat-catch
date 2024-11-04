@@ -1340,8 +1340,8 @@ function mergeTsNew(down) {
         fileName = GetFileName(_m3u8Url);
     }
     // 删除目录
-    fileName = fileName.split("/");
-    fileName = fileName.length > 1 ? fileName.pop() : fileName.join("");
+    // fileName = fileName.split("/");
+    // fileName = fileName.length > 1 ? fileName.pop() : fileName.join("");
     // 删除后缀
     if (/\.[a-zA-Z0-9]{1,4}$/.test(fileName)) {
         fileName = fileName.split(".");
@@ -1403,7 +1403,7 @@ function mergeTsNew(down) {
 function apiDownload(fileBlob, fileName, ext) {
     chrome.downloads.download({
         url: URL.createObjectURL(fileBlob),
-        filename: fileName = fileName + "." + ext,
+        filename: fileName + "." + ext,
         saveAs: $("#saveAs").prop("checked")
     }, function (downloadId) {
         if (downloadId) {

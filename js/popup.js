@@ -76,6 +76,7 @@ function AddMedia(data, currentTab = true) {
         get() { return pageDOM; }
     });
     data.downFileName = G.TitleName ? templates(G.downFileName, data) : data.name;
+    data.downFileName = filterFileName(data.downFileName);
     // 文件大小单位转换
     data._size = data.size;
     if (data.size) {
@@ -258,7 +259,7 @@ function AddMedia(data, currentTab = true) {
         }
         chrome.downloads.download({
             url: data.url,
-            filename: stringModify(data.downFileName),
+            filename: data.downFileName,
             saveAs: G.saveAs
         }, function (id) { downData[id] = data; });
         return false;
@@ -419,7 +420,7 @@ $('#DownFile').click(function () {
         setTimeout(function () {
             chrome.downloads.download({
                 url: data.url,
-                filename: stringModify(data.downFileName)
+                filename: data.downFileName
             }, function (id) { downData[id] = data; });
         }, index * 100);
     };
@@ -813,10 +814,8 @@ function catDownload(obj, extra = {}) {
         const arg = {
             url: `/download.html?${new URLSearchParams({
                 url: obj.url,
-                // requestHeaders: JSON.stringify({ ...obj.requestHeaders, cookie: obj.cookie }),
                 requestId: obj.requestId,
-                // requestHeaders: JSON.stringify(obj.requestHeaders),
-                filename: stringModify(obj.downFileName),
+                filename: obj.downFileName,
                 initiator: obj.initiator,
                 ...extra
             })}`,
@@ -958,7 +957,7 @@ function openParser(data, options = {}) {
         const url = `/${data.parsing}.html?${new URLSearchParams({
             url: data.url,
             title: data.title,
-            filename: stringModify(data.downFileName),
+            filename: data.downFileName,
             tabid: data.tabId == -1 ? G.tabId : data.tabId,
             initiator: data.initiator,
             tabid: tab.id,

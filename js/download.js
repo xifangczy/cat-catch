@@ -4,7 +4,7 @@ const _url = params.get("url");
 // const _referer = params.get("referer");
 const _initiator = params.get("initiator");
 const _requestHeaders = params.get("requestHeaders");
-const _fileName = params.get("filename");
+// const _fileName = params.get("filename");
 // const autosend = params.get("autosend");
 // const autoClose = params.get("autoClose");
 const downStream = params.get("downStream");
@@ -15,6 +15,8 @@ const _quantity = params.get("quantity");
 const _taskId = params.get("taskId");
 const _requestId = params.get("requestId");
 
+let _data = {};
+
 // 修改当前标签下的所有xhr的Referer
 let requestHeaders = {};
 if (_requestId) {
@@ -23,6 +25,7 @@ if (_requestId) {
             awaitG(start);
             return;
         }
+        _data = data;
         requestHeaders = data.requestHeaders;
         if (data.cookie) {
             requestHeaders.cookie = data.cookie;
@@ -101,7 +104,10 @@ function startDownload(tabId) {
 
     // 是否边下边存
     let fileStream = null;
-    const filename = _fileName ? stringModify(_fileName) : getUrlFileName(_url);
+    let filename = getUrlFileName(_url);
+    if (Object.keys(_data).length > 0 && G.TitleName) {
+        filename = templates(G.downFileName, _data);
+    }
     if ((downStream || G.downStream) && !_ffmpeg) {
         fileStream = streamSaver.createWriteStream(filename).getWriter();
     }
