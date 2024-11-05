@@ -853,7 +853,7 @@ function UItoggle() {
             this.classList.remove("faviconFlag");
         }
     });
-    if (getData().size >= 2) { mergeDownButton(); }
+    getData().size >= 2 ? mergeDownButton() : $mergeDown.attr('disabled', true);
 }
 // 检查是否符合条件 更改 合并下载 按钮状态
 function mergeDownButtonCheck(data) {

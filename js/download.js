@@ -106,6 +106,7 @@ function startDownload(tabId) {
     let fileStream = null;
     let filename = getUrlFileName(_url);
     if (Object.keys(_data).length > 0 && G.TitleName) {
+        _data.title = stringModify(_data.title);    // 防止标题中有路径分隔符 导致下载新建文件夹
         filename = templates(G.downFileName, _data);
     }
     if ((downStream || G.downStream) && !_ffmpeg) {

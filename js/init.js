@@ -172,6 +172,7 @@ G.streamSaverConfig = {
 // 正则预编译
 const reFilename = /filename="?([^"]+)"?/;
 const reStringModify = /[<>:"\/\\|?*~]/g;
+const reFilterFileName = /[<>:"|?*~]/g;
 const reTemplates = /\${([^}|]+)(?:\|([^}]+))?}/g;
 
 // 防抖
@@ -345,35 +346,19 @@ function clearRedundant() {
 // 替换掉不允许的文件名称字符
 function stringModify(str, text) {
     if (!str) { return str; }
-    reStringModify.lastIndex = 0;
-    str = str.replaceAll(/\u200B/g, "").replaceAll(/\u200C/g, "").replaceAll(/\u200D/g, "");
-    return str.replace(reStringModify, function (match) {
-        return text || {
-            '<': '&lt;',
-            '>': '&gt;',
-            ':': '&colon;',
-            '"': '&quot;',
-            '/': '&sol;',
-            '\\': '&bsol;',
-            '|': '&vert;',
-            '?': '&quest;',
-            '*': '&ast;',
-            '~': '_'
-        }[match];
-    });
+    str = filterFileName(str, text);
+    return str.replaceAll("\\", "&bsol;").replaceAll("/", "&sol;");
 }
 function filterFileName(str, text) {
     if (!str) { return str; }
-    reStringModify.lastIndex = 0;
+    reFilterFileName.lastIndex = 0;
     str = str.replaceAll(/\u200B/g, "").replaceAll(/\u200C/g, "").replaceAll(/\u200D/g, "");
-    return str.replace(reStringModify, function (match) {
+    return str.replace(reFilterFileName, function (match) {
         return text || {
             '<': '&lt;',
             '>': '&gt;',
             ':': '&colon;',
             '"': '&quot;',
-            '/': '/',
-            '\\': '\\',
             '|': '&vert;',
             '?': '&quest;',
             '*': '&ast;',
