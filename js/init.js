@@ -369,7 +369,7 @@ function filterFileName(str, text) {
     if (!str) { return str; }
     reFilterFileName.lastIndex = 0;
     str = str.replaceAll(/\u200B/g, "").replaceAll(/\u200C/g, "").replaceAll(/\u200D/g, "");
-    return str.replace(reFilterFileName, function (match) {
+    str = str.replace(reFilterFileName, function (match) {
         return text || {
             '<': '&lt;',
             '>': '&gt;',
@@ -381,6 +381,12 @@ function filterFileName(str, text) {
             '~': '_'
         }[match];
     });
+
+    // 如果最后一位是"." chrome.download 无法下载
+    if (str.endsWith(".")) {
+        str = str + "catCatch";
+    }
+    return str;
 }
 
 // 发送到本地接口

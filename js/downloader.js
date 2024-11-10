@@ -126,10 +126,22 @@ function start() {
         if (fragment.fileStream) {
             fragment.fileStream.write(new Uint8Array(value));
         }
+
         if (Date.now() - lastEmitted >= 100) {
-            const progress = (receivedLength / contentLength * 100).toFixed(2) + "%";
-            $dom.progress.css("width", progress);
-            $dom.progressText.html(`${byteToSize(receivedLength)} / ${byteToSize(contentLength)} ${progress}`);
+            if (contentLength) {
+                const progress = (receivedLength / contentLength * 100).toFixed(2) + "%";
+                $dom.progress.css("width", progress);
+                $dom.progress.html(progress);
+                $dom.progressText.html(`${byteToSize(receivedLength)} / ${byteToSize(contentLength)}`);
+            } else {
+                $dom.progressText.html(`${byteToSize(receivedLength)}`);
+            }
+            if (down.total == 1) {
+                const title = contentLength ?
+                    `${byteToSize(receivedLength)} / ${byteToSize(contentLength)}` :
+                    `${byteToSize(receivedLength)}`;
+                document.title = title;
+            }
             lastEmitted = Date.now();
         }
     });
@@ -155,7 +167,7 @@ function start() {
         // 直接下载
         chrome.downloads.download({
             url: blobUrl,
-            filename: fragment._filename,
+            filename: filterFileName(fragment._filename),
             saveAs: G.saveAs
         }, function (downloadId) {
             fragment.downId = downloadId;
@@ -178,7 +190,7 @@ function start() {
 
     down.on('start', function (fragment, options) {
         if (fragment.retry && fragment.retry == 'range') {
-            options.headers = { "Range": "bytes=0-" };
+            options.headers = { "Range": "bytes=0-", "Cache-Control": "no-cache" };
         }
     });
     // 全部停止下载
@@ -207,7 +219,6 @@ function start() {
     chrome.downloads.onChanged.addListener(function (downloadDelta) {
         if (!downloadDelta.state || downloadDelta.state.current != "complete") { return; }
         if (!down.fragments.some(item => item.downId == downloadDelta.id)) { return }
-        // document.title = `${down.success}/${down.total}`;
         if (down.success == down.total) {
             document.title = i18n.downloadComplete;
             if ($("#autoClose").prop("checked")) {

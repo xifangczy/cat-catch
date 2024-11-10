@@ -549,7 +549,12 @@ a.json-placeholder:hover {
 }
 .newDownload .downItem .progress-bar {
   margin-bottom: 0;
+  height: 20px;
 }
 .newDownload .downItem button {
   margin: 0;
+}
+.newDownload .downItem .progress {
+  color: var(--background-color-two);
+  text-align: center;
 }
