@@ -118,6 +118,7 @@ function start() {
         const $dom = itemDOM.get(fragment.index);
         if (state) {
             $dom.progress.css("width", "100%");
+            $dom.progress.html("100%");
             $dom.progressText.html(i18n.downloadComplete);
             $dom.button.html(i18n.sendFfmpeg);
             $dom.button.data("action", "sendFfmpeg");
@@ -190,7 +191,8 @@ function start() {
 
     down.on('start', function (fragment, options) {
         if (fragment.retry && fragment.retry == 'range') {
-            options.headers = { "Range": "bytes=0-", "Cache-Control": "no-cache" };
+            options.headers = { "Range": "bytes=0-" };
+            options.cache = "no-cache";
         }
     });
     // 全部停止下载
