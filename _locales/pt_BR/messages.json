@@ -823,5 +823,8 @@
   },
   "withinChina": {
     "message": "Interior da China"
+	  },
+  "dataFetchFailed": {
+    "message": "Falha na busca de dados"
   }
 }
