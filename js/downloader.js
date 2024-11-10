@@ -77,18 +77,19 @@ function start() {
             progressText: html.find("#downFilepProgress"),
             progress: html.find(".progress"),
             button: $button,
+            index: fragment.index,
         });
 
         $button.click(function () {
             const action = $(this).data("action");
             if (action == "stop") {
                 down.stop(fragment.index);
-                // down.downloader();  // 停止当前下载器 重新开一个下载器保持线程数量
                 $(this).html(i18n.retryDownload).data("action", "start");
                 if (fragment.fileStream) {
                     fragment.fileStream.abort();
                 }
             } else if (action == "start") {
+                down.state = "waiting";
                 down.downloader(fragment);
                 $(this).html(i18n.stopDownload).data("action", "stop");
             } else {
@@ -198,7 +199,12 @@ function start() {
     // 全部停止下载
     $("#stopDownload").click(function () {
         down.stop();
-        $(this).hide();
+        itemDOM.forEach((item) => {
+            if (item.button.data("action") == "stop") {
+                item.button.html(i18n.retryDownload).data("action", "start");
+                down.fragments[item.index].fileStream && down.fragments[item.index].fileStream.abort();
+            }
+        });
     });
 
     // 打开目录

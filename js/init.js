@@ -19,6 +19,8 @@ G.initLocalComplete = false;
 var cacheData = { init: true };
 G.blackList = new Set();
 G.requestHeaders = new Map();
+// 临时数据
+G.temp = new Map();
 // 当前tabID
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     if (tabs[0] && tabs[0].id) {
@@ -321,14 +323,6 @@ function clearRedundant() {
         chrome.declarativeNetRequest.getSessionRules(function (rules) {
             let mobileFlag = false;
             for (let item of rules) {
-                // if (!allTabId.has(item.id)) {
-                //     mobileFlag = true;
-                //     G.featMobileTabId.delete(item.id);
-                //     chrome.declarativeNetRequest.updateSessionRules({
-                //         removeRuleIds: [item.id]
-                //     });
-                // }
-
                 if (item.condition.tabIds) {
                     // 如果tabIds列表都不存在 则删除该条规则
                     if (!item.condition.tabIds.some(id => allTabId.has(id))) {
@@ -357,6 +351,7 @@ function clearRedundant() {
     });
     // G.referer.clear();
     // G.blackList.clear();
+    // G.temp.clear();
 }
 
 // 替换掉不允许的文件名称字符

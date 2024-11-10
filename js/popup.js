@@ -837,9 +837,12 @@ function catDownload(obj, extra = {}) {
 }
 function catDownload2(data, extra = {}) {
     if (!Array.isArray(data)) { data = [data]; }
+    chrome.runtime.sendMessage(chrome.runtime.id, { Message: "setTempData", data: data });
+
     if (!extra.ffmpeg && !G.downStream && data._size > 2147483648 && confirm(i18n("fileTooLargeStream", ["2G"]))) {
         extra.downStream = 1;
     }
+
     // 如果已经创建下载器页面 直接发送数据
     if (catDownloadCreateTabId) {
         const timer = setInterval(() => {

@@ -557,4 +557,5 @@ a.json-placeholder:hover {
 .newDownload .downItem .progress {
   color: var(--background-color-two);
   text-align: center;
+  transition: width 0.2s;
 }
