@@ -3,30 +3,36 @@ body {
   font-size: 13px;
   font-family: "Microsoft YaHei", "Helvetica", "Arial", sans-serif;
 }
+
 .wrapper {
   margin: 0 auto;
   /* width: 640px; */
   width: 45rem;
 }
+
 /* .wrapper input {
   margin-left: 10px;
 } */
 .error {
   color: var(--text-error-color);
 }
+
 h1 {
   font-size: 1.125em;
   font-weight: normal;
   margin: 0;
 }
+
 h2 {
   font-size: 1.125em;
   font-weight: normal;
   margin: 0;
 }
+
 p {
   margin: auto;
 }
+
 .optionBox {
   background: var(--optionBox-color);
   border-radius: 4px;
@@ -34,38 +40,47 @@ p {
   padding: 0.75em 1.25em;
   margin-top: 5px;
 }
+
 table {
   width: 100%;
   text-align: center;
 }
+
 input,
 textarea {
   padding: 5px 5px;
 }
+
 input.ext {
   width: 100px;
   text-align: center;
 }
+
 input.type {
   width: 200px;
   text-align: center;
 }
+
 input.size {
   width: 100px;
   text-align: center;
 }
+
 input.regexType {
   width: 20px;
   text-align: center;
 }
+
 input.regexExt {
   width: 35px;
   text-align: center;
 }
+
 input.regex {
   width: 320px;
   text-align: center;
 }
+
 /* input#OtherAutoClear {
   margin-left: 250px;
   width: 45px;
@@ -76,6 +91,7 @@ input.regex {
   width: 50px;
   margin: auto;
 }
+
 .switch .switchRound {
   position: relative;
   display: block;
@@ -84,6 +100,7 @@ input.regex {
   background-color: var(--switch-off-color);
   transition: all 0.2s ease-in-out;
 }
+
 .switch .switchRoundBtn {
   display: block;
   position: absolute;
@@ -95,23 +112,29 @@ input.regex {
   background-color: var(--switch-round-color);
   transition: all 0.2s ease-in-out;
 }
+
 .switch .switchInput {
   display: none;
 }
+
 .switch .switchInput:checked + .switchRound {
   background-color: var(--switch-on-color);
 }
+
 .switch .switchInput:checked + .switchRound > .switchRoundBtn {
   left: 29px;
 }
+
 .switch .switchRadius {
   border-radius: 50px;
 }
+
 /* 滑动开关 组件 END */
 .list {
   padding-left: 10px;
   padding-top: 5px;
 }
+
 .item {
   align-items: center;
   display: flex;
@@ -121,20 +144,25 @@ input.regex {
   align-items: flex-end;
   align-content: space-around;
 }
+
 .item .switch {
   margin-right: 50px;
 }
+
 .item .switchSelect {
   margin-right: 85px;
 }
+
 .optionsTitle {
   margin-top: 20px;
 }
+
 .RemoveButton {
   fill: var(--text-color);
   height: 20px;
   cursor: pointer;
 }
+
 button,
 .button,
 .button2 {
@@ -142,21 +170,26 @@ button,
   margin: 5px 5px 5px 5px;
   /* font-size: 13px; */
 }
+
 .flex-end {
   display: flex;
   justify-content: flex-end;
 }
+
 .explain {
   color: #6c6c6c;
 }
+
 #typeList,
 #extList {
   margin-top: 10px;
 }
+
 .otherOption .item {
   margin-bottom: 5px;
   min-height: 35px;
 }
+
 #m3u8_url,
 #mpd_url,
 .test_url {
@@ -166,41 +199,51 @@ button,
   word-break: break-all;
   color: var(--text2-color);
 }
+
 .block {
   border-bottom: solid 1px rgba(0, 0, 0, 0.06);
   padding-bottom: 5px;
   margin-bottom: 5px;
 }
+
 .m3u8_wrapper .block {
   border-bottom: 0px;
 }
+
 .wrapper1024 {
   margin: 0 auto;
   width: 1024px;
 }
+
 .wrapper1080 {
   margin: 0 auto;
   width: 1080px;
 }
+
 textarea {
   font-size: 12px;
   font-family: "Microsoft YaHei", "Helvetica", "Arial", sans-serif;
 }
+
 #textarea {
   text-align: center;
 }
+
 .m3u8_wrapper video {
   max-height: 80vh;
   max-width: 100%;
 }
+
 #media_file {
   word-break: break-all;
 }
+
 #media_file,
 #jsonText,
 #m3u8Text {
   height: 55vh;
 }
+
 /* #media_file {
   font-size: 12px;
   font-family: "Microsoft YaHei", "Helvetica", "Arial", sans-serif;
@@ -212,17 +255,21 @@ textarea {
 #formatStr {
   width: 145px;
 }
+
 #tips input {
   color: var(--text2-color);
 }
+
 .keyUrl {
   width: 1034px;
 }
+
 .fullInput {
   /* width: 975px; */
   width: 100%;
   margin: 5px 0 5px 0;
 }
+
 .select {
   appearance: none;
   background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIxMiIgZmlsbD0iIzVGNjM2OCI+PHBhdGggZD0iTTAgMGgyNEwxMiAxMnoiLz48L3N2Zz4=)
@@ -235,19 +282,24 @@ textarea {
   cursor: pointer;
   padding: 5px 10px;
 }
+
 .select {
   width: 8rem;
 }
+
 .m3u8Key {
   width: 300px;
 }
+
 #PlayerTemplate {
   width: 200px;
 }
+
 #errorTsList p {
   color: red;
   word-break: break-all;
 }
+
 .progress-bar {
   height: 15px;
   background-color: rgb(189, 193, 198);
@@ -255,33 +307,40 @@ textarea {
   margin: 3px;
   margin-bottom: 10px;
 }
+
 .progress {
   width: 0px;
   height: 100%;
   background-color: var(--text2-color);
   border-radius: 3px;
 }
+
 #fileSize,
 #fileDuration {
   margin-left: 20px;
 }
+
 .not-allowed {
   cursor: not-allowed;
   background-color: #ccc;
   color: #fff;
 }
+
 .not-allowed:hover {
   background: #ccc;
 }
+
 .not-allowed:active {
   background: #ccc;
 }
+
 #showM3u8Help {
   margin-left: 10px;
   margin-top: 1px;
   margin-right: 0px;
   padding: 2px;
 }
+
 .m3u8checkbox {
   display: flex;
   cursor: pointer;
@@ -289,15 +348,18 @@ textarea {
   user-select: none;
   margin: 0 5px 0 5px;
 }
+
 .merge {
   display: flex;
   justify-content: flex-start;
   margin-top: 5px;
   align-items: center;
 }
+
 .customKey input {
   margin-right: 5px;
 }
+
 /* .wrapper .button {
   margin-top: 5px;
 } */
@@ -307,9 +369,11 @@ textarea {
   align-items: center;
   margin-right: 10px;
 }
+
 .rangeDown .merge {
   margin-top: 0;
 }
+
 #rangeStart,
 #rangeEnd {
   width: 55px;
@@ -320,59 +384,74 @@ textarea {
   padding-top: 3px;
   padding-bottom: 3px;
 }
+
 #loading a {
   word-break: break-all;
 }
+
 #next_m3u8 a {
   word-break: break-all;
 }
+
 .key {
   align-items: flex-end;
 }
+
 .key div {
   display: flex;
   flex-direction: column;
   margin-right: 10px;
 }
+
 .key input {
   width: 265px;
 }
+
 .method input {
   width: 100px;
 }
+
 .offset {
   width: 256px;
 }
+
 .videoInfo div {
   margin-right: 5px;
 }
+
 .flex {
   display: flex;
 }
+
 .m3u8dlArg {
   margin-top: 10px;
   height: 100px;
   word-break: break-all;
   width: 100%;
 }
+
 .m3u8DL {
   margin-right: 70px !important;
 }
+
 /* .m3u8DL #m3u8dl{
   width: 8rem;
 } */
 .break-all {
   word-break: break-all;
 }
+
 /* MPD*/
 .dash .select {
   padding-right: 20px;
   margin-bottom: 10px;
 }
+
 /* JSON格式化 */
 .json-document {
   margin-top: 0px;
 }
+
 ul.json-dict,
 ol.json-array {
   list-style-type: none;
@@ -380,23 +459,28 @@ ol.json-array {
   border-left: 1px dotted #ccc;
   padding-left: 2em;
 }
+
 .json-string {
   color: #0b7500;
   word-break: break-all;
   white-space: break-spaces;
 }
+
 .json-literal {
   color: #1a01cc;
   font-weight: bold;
 }
+
 a.json-toggle {
   position: relative;
   color: inherit;
   text-decoration: none;
 }
+
 a.json-toggle:focus {
   outline: none;
 }
+
 a.json-toggle:before {
   font-size: 1.1em;
   color: #c0c0c0;
@@ -408,20 +492,25 @@ a.json-toggle:before {
   line-height: 1em;
   left: -1.2em;
 }
+
 a.json-toggle:hover:before {
   color: #aaa;
 }
+
 a.json-toggle.collapsed:before {
   transform: rotate(-90deg);
 }
+
 a.json-placeholder {
   color: #aaa;
   padding: 0 1em;
   text-decoration: none;
 }
+
 a.json-placeholder:hover {
   text-decoration: underline;
 }
+
 #downList a {
   white-space: nowrap;
   overflow: hidden;
@@ -429,6 +518,7 @@ a.json-placeholder:hover {
   display: block;
   color: var(--text2-color);
 }
+
 #downList {
   overflow: scroll;
   height: 60vh;
@@ -437,9 +527,29 @@ a.json-placeholder:hover {
   width: 100%;
   border: solid 1px var(--text-color);
 }
+
 .width3rem {
   width: 3rem;
 }
+
 .popupAttr {
   margin-left: 0.5rem;
+}
+
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.progress-wrapper {
+  flex: 1;
+}
+.newDownload .downItem {
+  margin-bottom: 1rem;
+}
+.newDownload .downItem .progress-bar {
+  margin-bottom: 0;
+}
+.newDownload .downItem button {
+  margin: 0;
 }

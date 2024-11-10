@@ -25,7 +25,7 @@ if (_requestId) {
             awaitG(start);
             return;
         }
-        _data = data;
+        _data = data = data[0];
         requestHeaders = data.requestHeaders;
         if (data.cookie) {
             requestHeaders.cookie = data.cookie;

@@ -441,14 +441,16 @@ $mergeDown.click(function () {
         });
         return true;
     }
-    checkedData.forEach(function (data) {
-        catDownload(data, {
-            ffmpeg: "merge",
-            quantity: checkedData.length,
-            title: data._title,
-            taskId: taskId,
+    G.testDownloader ?
+        catDownload(checkedData, { ffmpeg: "merge" }) :
+        checkedData.forEach(function (data) {
+            catDownload(data, {
+                ffmpeg: "merge",
+                quantity: checkedData.length,
+                title: data._title,
+                taskId: taskId,
+            });
         });
-    });
 });
 // 复制选中文件
 $('#AllCopy').click(function () {
@@ -803,8 +805,14 @@ function copyLink(data) {
     }
     return templates(text, data);
 }
-// 携带referer 下载
+
+// 猫抓下载器
+let catDownloadCreateTabId = 0;
 function catDownload(obj, extra = {}) {
+    if (G.testDownloader) {
+        catDownload2(obj, extra);
+        return;
+    }
     let active = !G.downActive;
     if (extra) { active = false; }
     if (!extra.ffmpeg && !G.downStream && obj._size > 2147483648 && confirm(i18n("fileTooLargeStream", ["2G"]))) {
@@ -814,8 +822,10 @@ function catDownload(obj, extra = {}) {
         const arg = {
             url: `/download.html?${new URLSearchParams({
                 url: obj.url,
+                // requestHeaders: JSON.stringify({ ...obj.requestHeaders, cookie: obj.cookie }),
                 requestId: obj.requestId,
-                filename: obj.downFileName,
+                // requestHeaders: JSON.stringify(obj.requestHeaders),
+                filename: stringModify(obj.downFileName),
                 initiator: obj.initiator,
                 ...extra
             })}`,
@@ -825,6 +835,45 @@ function catDownload(obj, extra = {}) {
         chrome.tabs.create(arg);
     });
 }
+function catDownload2(data, extra = {}) {
+    if (!Array.isArray(data)) { data = [data]; }
+    if (!extra.ffmpeg && !G.downStream && data._size > 2147483648 && confirm(i18n("fileTooLargeStream", ["2G"]))) {
+        extra.downStream = 1;
+    }
+    // 如果已经创建下载器页面 直接发送数据
+    if (catDownloadCreateTabId) {
+        const timer = setInterval(() => {
+            // 获取页面状态 非complete状态继续等待
+            chrome.tabs.get(catDownloadCreateTabId, function (tab) {
+                if (tab.status == "complete") {
+                    clearInterval(timer);
+                    chrome.tabs.sendMessage(catDownloadCreateTabId, { Message: "catDownload", data: data }, (response) => {
+                        if (chrome.runtime.lastError || !response || response != "OK") { createCatDownload(data, extra); }
+                    });
+                }
+            });
+        }, 233);
+        return;
+    }
+    createCatDownload(data, extra);
+}
+// 新建下载器标签
+function createCatDownload(data, extra) {
+    chrome.tabs.get(G.tabId, function (tab) {
+        const arg = {
+            url: `/downloader.html?${new URLSearchParams({
+                requestId: data.map(item => item.requestId).join(","),
+                ...extra
+            })}`,
+            index: tab.index + 1,
+            active: !G.downActive
+        };
+        chrome.tabs.create(arg, (tab) => {
+            catDownloadCreateTabId = tab.id;
+        });
+    });
+}
+
 // 提示
 function Tips(text, delay = 200) {
     $('#TipsFixed').html(text).fadeIn(500).delay(delay).fadeOut(500);

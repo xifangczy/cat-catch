@@ -121,6 +121,8 @@ G.OptionLists = {
     M3u8AutoClose: false,
     // 第三方服务地址
     onlineServiceAddress: 0,
+    // 新 猫抓下载器
+    testDownloader: true
 };
 // 本地储存的配置
 G.LocalVar = {
@@ -319,12 +321,26 @@ function clearRedundant() {
         chrome.declarativeNetRequest.getSessionRules(function (rules) {
             let mobileFlag = false;
             for (let item of rules) {
-                if (!allTabId.has(item.id)) {
-                    mobileFlag = true;
-                    G.featMobileTabId.delete(item.id);
-                    chrome.declarativeNetRequest.updateSessionRules({
-                        removeRuleIds: [item.id]
-                    });
+                // if (!allTabId.has(item.id)) {
+                //     mobileFlag = true;
+                //     G.featMobileTabId.delete(item.id);
+                //     chrome.declarativeNetRequest.updateSessionRules({
+                //         removeRuleIds: [item.id]
+                //     });
+                // }
+
+                if (item.condition.tabIds) {
+                    // 如果tabIds列表都不存在 则删除该条规则
+                    if (!item.condition.tabIds.some(id => allTabId.has(id))) {
+                        mobileFlag = true;
+                        item.condition.tabIds.forEach(id => G.featMobileTabId.delete(id));
+                        chrome.declarativeNetRequest.updateSessionRules({
+                            removeRuleIds: [item.id]
+                        });
+                    }
+                } else if (item.id == 1) {
+                    // 清理预览视频增加的请求头
+                    chrome.declarativeNetRequest.updateSessionRules({ removeRuleIds: [1] });
                 }
             }
             mobileFlag && (chrome.storage.session ?? chrome.storage.local).set({ featMobileTabId: Array.from(G.featMobileTabId) });

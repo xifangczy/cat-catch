@@ -168,6 +168,14 @@ class Downloader {
         return "";
     }
     /**
+     * 添加一条新资源
+     * @param {Object} fragment
+     */
+    push(fragment) {
+        fragment.index = this.fragments.length;
+        this.fragments.push(fragment);
+    }
+    /**
      * 下载器 使用fetch下载文件
      * @param {object} fragment 重新下载的对象
      */
@@ -179,25 +187,35 @@ class Downloader {
         // 非直接下载对象 从this.fragments获取下一条资源 若不存在跳出
         if (!directDownload && !this.fragments[this.index]) { return; }
 
+        // fragment是数字 直接从this.fragments获取
+        if (typeof fragment === 'number') {
+            fragment = this.fragments[fragment];
+        }
+
         // 不存在下载对象 从提取fragments
         fragment ??= this.fragments[this.index++];
         this.state = 'running';
 
+        // 资源已下载 跳过
+        // if (this.buffer[fragment.index]) { return; }
+
         // 停止下载控制器
         const controller = new AbortController();
         this.controller[fragment.index] = controller;
+        const options = { signal: controller.signal };
 
         // 下载前触发事件
-        this.emit('start', fragment);
+        this.emit('start', fragment, options);
 
         // 开始下载
-        fetch(fragment.url, { signal: controller.signal })
+        fetch(fragment.url, options)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(response.status);
                 }
                 const reader = response.body.getReader();
                 const contentLength = parseInt(response.headers.get('content-length')) || 0;
+                fragment.contentType = response.headers.get('content-type') ?? 'null';
                 let receivedLength = 0;
                 const chunks = [];
                 const pump = async () => {
@@ -206,7 +224,7 @@ class Downloader {
                         if (done) { break; }
                         chunks.push(value);
                         receivedLength += value.length;
-                        this.emit('itemProgress', fragment, false, receivedLength, contentLength);
+                        this.emit('itemProgress', fragment, false, receivedLength, contentLength, value);
                     }
                     const allChunks = new Uint8Array(receivedLength);
                     let position = 0;

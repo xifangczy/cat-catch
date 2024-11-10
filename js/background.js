@@ -292,6 +292,26 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     Message.tabId = Message.tabId ?? G.tabId;
     if (Message.Message == "getData" && Message.requestId) {
+
+        // 判断Message.requestId是否数组
+        if (!Array.isArray(Message.requestId)) {
+            Message.requestId = [Message.requestId];
+        }
+        const response = [];
+        for (let item in cacheData) {
+            for (let data of cacheData[item]) {
+                if (Message.requestId.includes(data.requestId)) {
+                    response.push(data);
+                }
+            }
+        }
+        if (response.length == 0) {
+            sendResponse("error");
+            return true;
+        }
+        sendResponse(response);
+        return true;
+
         for (let item in cacheData) {
             for (let data of cacheData[item]) {
                 if (data.requestId == Message.requestId) {
@@ -456,8 +476,6 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         sendResponse("ok");
         return true;
     }
-    sendResponse("Error");
-    return true;
 });
 
 // 选定标签 更新G.tabId

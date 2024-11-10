@@ -823,5 +823,8 @@
   },
   "withinChina": {
     "message": "Within China"
+  },
+  "dataFetchFailed": {
+    "message": "Data fetch failed"
   }
 }
