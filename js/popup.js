@@ -352,6 +352,8 @@ function AddKey(key) {
             </div>
             <div class="url hide">
                 Hex: ${base64ToHex(key)}
+                <br>
+                Base64: ${key}
             </div>
         </div>`);
     data.html.find('.panel-heading').click(function () {
