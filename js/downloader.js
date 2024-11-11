@@ -166,17 +166,16 @@ function start() {
 
         // 转为blob
         const blob = new Blob([buffer], { type: fragment.contentType });
-        const blobUrl = URL.createObjectURL(blob);
 
         // 发送到ffmpeg
         if (_ffmpeg) {
-            sendFile(_ffmpeg, blobUrl, fragment);
+            sendFile(_ffmpeg, blob, fragment);
             return;
         }
 
         // 直接下载
         chrome.downloads.download({
-            url: blobUrl,
+            url: URL.createObjectURL(blob),
             filename: filterFileName(fragment._filename),
             saveAs: G.saveAs
         }, function (downloadId) {
@@ -279,14 +278,13 @@ function start() {
 /**
  * 发送数据到在线FFmpeg
  * @param {String} action 发送类型
- * @param {Array|String} data 数据内容
+ * @param {ArrayBuffer|Blob} data 数据内容
  * @param {Object} fragment 数据对象
  */
 function sendFile(action, data, fragment) {
-    // 转 bloburl
+    // 转 blob
     if (data instanceof ArrayBuffer) {
-        const blob = new Blob([data], { type: fragment.contentType });
-        data = URL.createObjectURL(blob);
+        data = new Blob([data], { type: fragment.contentType });
     }
     chrome.tabs.query({ url: G.ffmpegConfig.url }, function (tabs) {
         if (tabs.length === 0) {
@@ -300,7 +298,7 @@ function sendFile(action, data, fragment) {
         const baseData = {
             Message: "catCatchFFmpeg",
             action: action,
-            files: [{ data: data, name: getUrlFileName(fragment.url) }],
+            files: [{ data: G.firefox ? data : URL.createObjectURL(data), name: getUrlFileName(fragment.url) }],
             title: stringModify(fragment.title),
             tabId: _tabId,
         };

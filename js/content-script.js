@@ -145,7 +145,11 @@
             for (let item of Message.files) {
                 const data = { ...Message, ...item };
                 data.type = item.type ?? "video";
-                loadBlob(data);
+                if (!data.data instanceof Blob && data.data.startsWith("blob:")) {
+                    loadBlob(data);
+                } else {
+                    window.postMessage(data);
+                }
             }
             sendResponse("ok");
             return true;
