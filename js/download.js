@@ -302,15 +302,7 @@ function startDownload(tabId) {
             $("#autoClose").prop("checked") && window.close();
         }, Math.ceil(Math.random() * 999));
     });
-    function getUrlFileName() {
-        try {
-            const pathname = new URL(_url).pathname;
-            const fileName = pathname.substring(pathname.lastIndexOf('/') + 1);
-            return fileName ? fileName : 'NULL';
-        } catch (error) {
-            return "NULL";
-        }
-    }
+
     // 刷新/关闭页面 检查边下边存
     window.addEventListener('beforeunload', function (e) {
         if (fileStream) {

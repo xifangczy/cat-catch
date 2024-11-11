@@ -314,21 +314,6 @@ function sendFile(action, data, fragment) {
 }
 
 /**
- * 获取url中的文件名
- * @param {String} url 
- * @returns {String} 返回文件命 为空则返回"NULL"
- */
-function getUrlFileName(url) {
-    try {
-        const pathname = new URL(url).pathname;
-        const fileName = pathname.substring(pathname.lastIndexOf('/') + 1);
-        return fileName ? fileName : 'NULL';
-    } catch (error) {
-        return "NULL";
-    }
-}
-
-/**
  * 设置请求头
  * @param {Array} data 请求头数据
  * @param {Function} callBack 回调函数
