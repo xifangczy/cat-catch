@@ -134,20 +134,9 @@ G.LocalVar = {
 };
 
 // 102版本以上 非Firefox 开启更多功能
-G.isFirefox = false;
-G.version = 93;
-if (navigator.userAgent.includes("Chrome/")) {
-    const version = navigator.userAgent.match(/Chrome\/([\d]+)/);
-    if (version && version[1]) {
-        G.version = parseInt(version[1]);
-    }
-} else if (navigator.userAgent.includes("Firefox/")) {
-    const version = navigator.userAgent.match(/Firefox\/([\d]+)/);
-    if (version && version[1]) {
-        G.version = parseInt(version[1]);
-    }
-    G.isFirefox = true;
-}
+G.isFirefox = (typeof browser == "object");
+G.version = navigator.userAgent.match(/(Chrome|Firefox)\/([\d]+)/);
+G.version = G.version && G.version[2] ? parseInt(G.version[2]) : 93;
 
 // 脚本列表
 G.scriptList = new Map();
@@ -234,7 +223,7 @@ function InitOptions() {
         G = { ...items, ...G };
 
         const icon = { path: G.enable ? "/img/icon.png" : "/img/icon-disable.png" };
-        G.isFirefox ? browser.browserAction.setIcon(icon) : chrome.action.setIcon(icon);
+        chrome.action.setIcon(icon);
 
         G.initSyncComplete = true;
     });

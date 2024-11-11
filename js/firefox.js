@@ -1,9 +1,5 @@
 // 兼容Firefox的manifest V2
 if (typeof (browser) == "object") {
-    chrome.action = browser.browserAction;
-    chrome.action.setBadgeText = browser.browserAction.setBadgeText;
-    chrome.action.setTitle = browser.browserAction.setTitle;
-
     function importScripts() {
         for (let script of arguments) {
             const js = document.createElement('script');
@@ -19,8 +15,9 @@ if (typeof (browser) == "object") {
     }
 
     // browser.windows.onFocusChanged.addListener 少一个参数
-    chrome.windows.onFocusChanged.addListener = (listener, obj) => {
-        browser.windows.onFocusChanged.addListener(listener);
+    const _onFocusChanged = chrome.windows.onFocusChanged.addListener;
+    chrome.windows.onFocusChanged.addListener = function (listener) {
+        _onFocusChanged(listener);
     };
 
     browser.runtime.onInstalled.addListener(({ reason }) => {

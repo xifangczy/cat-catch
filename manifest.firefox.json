@@ -5,7 +5,7 @@
       "js/background.js"
     ]
   },
-  "browser_action": {
+  "action": {
     "default_icon": "img/icon.png",
     "default_title": "__MSG_catCatch__",
     "default_popup": "popup.html"
@@ -15,7 +15,7 @@
     "64": "img/icon.png",
     "128": "img/icon128.png"
   },
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "__MSG_catCatch__",
   "homepage_url": "https://github.com/xifangczy/cat-catch",
   "options_ui": {
@@ -25,14 +25,11 @@
   "permissions": [
     "tabs",
     "webRequest",
-    "webRequestBlocking",
     "downloads",
     "storage",
     "webNavigation",
     "alarms",
     "scripting",
-    "*://*/*",
-    "<all_urls>",
     "declarativeNetRequest"
   ],
   "commands": {
@@ -59,6 +56,10 @@
       "strict_min_version": "113.0"
     }
   },
+  "host_permissions": [
+    "*://*/*",
+    "<all_urls>"
+  ],
   "content_scripts": [
     {
       "matches": [
@@ -73,7 +74,14 @@
     }
   ],
   "web_accessible_resources": [
-    "catch-script/*"
+    {
+      "resources": [
+        "catch-script/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
   ],
   "default_locale": "en",
   "version": "2.5.6"
