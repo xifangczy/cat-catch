@@ -251,10 +251,6 @@ function start() {
             sendResponse({ message: "OK", tabId: _tabId });
             return;
         }
-        if (Message.Message == "catDownloadPing") {
-            sendResponse({ message: "OK", tabId: _tabId });
-            return;
-        }
         // 在线ffmpeg返回结果 关闭窗口
         if (Message.Message != "catCatchFFmpegResult" || Message.state != "ok" || _tabId == 0 || Message.tabId != _tabId || down.success != down.total) { return; }
         setTimeout(() => {
@@ -283,39 +279,37 @@ function start() {
 /**
  * 发送数据到在线FFmpeg
  * @param {String} action 发送类型
- * @param {Array} buffer 数据内容
+ * @param {Array|String} data 数据内容
  * @param {Object} fragment 数据对象
  */
-function sendFile(action, blobUrl, fragment) {
+function sendFile(action, data, fragment) {
+    // 转 bloburl
+    if (data instanceof ArrayBuffer) {
+        const blob = new Blob([data], { type: fragment.contentType });
+        data = URL.createObjectURL(blob);
+    }
     chrome.tabs.query({ url: G.ffmpegConfig.url }, function (tabs) {
-        if (tabs.length && tabs[0].status != "complete") {
-            setTimeout(() => {
-                sendFile(action, blobUrl, fragment);
-            }, 500);
+        if (tabs.length === 0) {
+            chrome.tabs.create({ url: G.ffmpegConfig.url });
+            setTimeout(sendFile, 500, action, data, fragment);
+            return;
+        } else if (tabs[0].status !== "complete") {
+            setTimeout(sendFile, 233, action, data, fragment);
             return;
         }
-        let data = {};
-        if (action == "merge") {
-            data = {
-                Message: "catCatchFFmpeg",
-                action: action,
-                files: [{ data: blobUrl, name: getUrlFileName(fragment.url) }],
-                title: stringModify(fragment.title),
-                tabId: _tabId,
-                taskId: _taskId,
-                quantity: _data.length
-            };
+        const baseData = {
+            Message: "catCatchFFmpeg",
+            action: action,
+            files: [{ data: data, name: getUrlFileName(fragment.url) }],
+            title: stringModify(fragment.title),
+            tabId: _tabId,
+        };
+        if (action === "merge") {
+            baseData.taskId = _taskId;
+            baseData.quantity = _data.length;
         }
-        if (action == "addFile") {
-            data = {
-                Message: "catCatchFFmpeg",
-                action: action,
-                files: [{ data: blobUrl, name: getUrlFileName(fragment.url) }],
-                title: stringModify(fragment.title),
-                tabId: _tabId,
-            };
-        }
-        chrome.runtime.sendMessage(data);
+
+        chrome.runtime.sendMessage(baseData);
     });
 }
 
