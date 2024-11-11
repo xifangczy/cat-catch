@@ -298,7 +298,7 @@ function sendFile(action, data, fragment) {
         const baseData = {
             Message: "catCatchFFmpeg",
             action: action,
-            files: [{ data: G.firefox ? data : URL.createObjectURL(data), name: getUrlFileName(fragment.url) }],
+            files: [{ data: G.isFirefox ? data : URL.createObjectURL(data), name: getUrlFileName(fragment.url) }],
             title: stringModify(fragment.title),
             tabId: _tabId,
         };

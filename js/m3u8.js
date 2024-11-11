@@ -1372,7 +1372,7 @@ function mergeTsNew(down) {
         const data = {
             Message: "catCatchFFmpeg",
             action: action,
-            files: [{ data: G.firefox ? fileBlob : URL.createObjectURL(fileBlob), name: `memory${new Date().getTime()}.${ext}` }],
+            files: [{ data: G.isFirefox ? fileBlob : URL.createObjectURL(fileBlob), name: `memory${new Date().getTime()}.${ext}` }],
             title: fileName,
             output: fileName,
             name: "memory" + new Date().getTime() + "." + ext,

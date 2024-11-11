@@ -145,10 +145,10 @@
             for (let item of Message.files) {
                 const data = { ...Message, ...item };
                 data.type = item.type ?? "video";
-                if (!data.data instanceof Blob && data.data.startsWith("blob:")) {
-                    loadBlob(data);
-                } else {
+                if (data.data instanceof Blob) {
                     window.postMessage(data);
+                } else {
+                    loadBlob(data);
                 }
             }
             sendResponse("ok");
