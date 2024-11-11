@@ -855,7 +855,8 @@ function catDownload2(data, extra = {}) {
     }
     catDownloadIsProcessing = true;
     if (!Array.isArray(data)) { data = [data]; }
-    // 储存数据到临时变量
+
+    // 储存数据到临时变量 提高检索速度
     chrome.runtime.sendMessage(chrome.runtime.id, { Message: "setTempData", data: data });
 
     // 如果大于2G 询问是否使用流式下载
