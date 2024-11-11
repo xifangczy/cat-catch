@@ -569,7 +569,7 @@ $("[type='script']").click(function () {
 if (G.version >= 102) {
     $("[type='script']").show();
 }
-// Firefox 关闭画中画 全屏 修复右边滚动条遮挡
+// Firefox 关闭一些功能 修复右边滚动条遮挡
 if (G.isFirefox) {
     $("body").addClass("fixFirefoxRight");
     $(".firefoxHide").each(function () { $(this).hide(); });

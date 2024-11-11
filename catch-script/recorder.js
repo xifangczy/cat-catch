@@ -175,9 +175,9 @@
             let stream = null;
             try {
                 const frameRate = +CatCatch.querySelector("#frameRate").value;
-                if(frameRate){
+                if (frameRate) {
                     stream = videoList[index].captureStream(frameRate);
-                }else{
+                } else {
                     stream = videoList[index].captureStream();
                 }
             } catch (e) {
@@ -187,7 +187,7 @@
             // 码率
             option.audioBitsPerSecond = +CatCatch.querySelector("#audioBits").value;
             option.videoBitsPerSecond = +CatCatch.querySelector("#videoBits").value;
-            
+
             recorder = new MediaRecorder(stream, option);
             recorder.ondataavailable = function (event) {
                 if (CatCatch.querySelector("#ffmpeg").checked) {
