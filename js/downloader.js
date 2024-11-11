@@ -108,7 +108,7 @@ function start() {
         _formDownload = false;   // 重置表单提交标记
 
         // 流式下载处理
-        if ((_downStream || G.downStream || fragment?._size > 2147483648) && !_ffmpeg) {
+        if ((_downStream || G.downStream) && !_ffmpeg) {
             fragment.fileStream = streamSaver.createWriteStream(fragment._filename).getWriter();
         }
     }
@@ -234,16 +234,25 @@ function start() {
     chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         if (!Message.Message) { return; }
         // 添加下载任务
-        if (Message.Message == "catDownload" && Message.data && Array.isArray(Message.data) && !_ffmpeg) {
+        if (Message.Message == "catDownload" && Message.data && Array.isArray(Message.data)) {
+            // ffmpeg任务的下载器 不允许添加新任务
+            if (_ffmpeg) {
+                sendResponse({ message: "Error", tabId: _tabId });
+                return;
+            }
             setHeaders(Message.data, () => {
                 Message.data.forEach((fragment) => {
                     _data.push(fragment);
                     down.push(fragment);
                     addHtml(fragment);
-                    down.downloader(fragment.index);
+                    down.state != "running" && down.downloader(fragment.index);
                 });
             });
-            sendResponse("OK");
+            sendResponse({ message: "OK", tabId: _tabId });
+            return;
+        }
+        if (Message.Message == "catDownloadPing") {
+            sendResponse({ message: "OK", tabId: _tabId });
             return;
         }
         // 在线ffmpeg返回结果 关闭窗口

@@ -206,7 +206,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
             return;
         }
         // 发送到popup 并检查自动下载
-        chrome.runtime.sendMessage(info, function () {
+        chrome.runtime.sendMessage({ Message: "popupAddData", data: info }, function () {
             if (G.featAutoDownTabId.size > 0 && G.featAutoDownTabId.has(info.tabId)) {
                 const downDir = info.title == "NULL" ? "CatCatch/" : stringModify(info.title) + "/";
                 chrome.downloads.download({

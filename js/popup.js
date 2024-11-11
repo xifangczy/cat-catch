@@ -655,20 +655,43 @@ const interval = setInterval(function () {
         UItoggle();
     });
     // 监听资源数据
-    chrome.runtime.onMessage.addListener(function (MediaData, sender, sendResponse) {
-        if (MediaData.Message) { return; }
-        const html = AddMedia(MediaData, MediaData.tabId == G.tabId);
-        if (MediaData.tabId == G.tabId) {
-            !currentCount && $mediaList.append($current);
-            currentCount++;
-            $current.append(html);
-            UItoggle();
-        } else if (allCount) {
-            allCount++;
-            $all.append(html);
-            UItoggle();
+    chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
+        if (!Message.Message || !Message.data) { return; }
+        // 添加资源
+        if (Message.Message == "popupAddData") {
+            const html = AddMedia(Message.data, Message.data.tabId == G.tabId);
+            if (Message.data.tabId == G.tabId) {
+                !currentCount && $mediaList.append($current);
+                currentCount++;
+                $current.append(html);
+                UItoggle();
+            } else if (allCount) {
+                allCount++;
+                $all.append(html);
+                UItoggle();
+            }
+            sendResponse("OK");
+            return true;
         }
-        sendResponse("OK");
+        // 添加疑似密钥
+        if (Message.Message == "popupAddKey") {
+            $("#maybeKeyTab").show();
+            chrome.tabs.query({}, function (tabs) {
+                let tabId = -1;
+                for (let item of tabs) {
+                    if (item.url == Message.url) {
+                        tabId = item.id;
+                        break;
+                    }
+                }
+                if (tabId == -1 || tabId == G.tabId) {
+                    $maybeKey.append(AddKey(Message.data));
+                }
+                !$("#maybeKey .panel").length && $("#maybeKey").append($maybeKey);
+            });
+            sendResponse("OK");
+            return true;
+        }
     });
     // 获取模拟手机 自动下载 捕获 状态
     updateButton();
@@ -707,24 +730,6 @@ const interval = setInterval(function () {
                 UItoggle();
             });
         }
-    });
-    // 监听密钥
-    chrome.runtime.onMessage.addListener(function (data, sender, sendResponse) {
-        if (!data.Message || !data.data || data.Message != "popupAddKey") { return; }
-        $("#maybeKeyTab").show();
-        chrome.tabs.query({}, function (tabs) {
-            let tabId = -1;
-            for (let item of tabs) {
-                if (item.url == data.url) {
-                    tabId = item.id;
-                    break;
-                }
-            }
-            if (tabId == -1 || tabId == G.tabId) {
-                $maybeKey.append(AddKey(data.data));
-            }
-            !$("#maybeKey .panel").length && $("#maybeKey").append($maybeKey);
-        });
     });
 }, 0);
 /********************绑定事件END********************/
@@ -807,7 +812,6 @@ function copyLink(data) {
 }
 
 // 猫抓下载器
-let catDownloadCreateTabId = 0;
 function catDownload(obj, extra = {}) {
     if (G.testDownloader) {
         catDownload2(obj, extra);
@@ -835,32 +839,37 @@ function catDownload(obj, extra = {}) {
         chrome.tabs.create(arg);
     });
 }
+
+// 新建下载器标签
+let catDownloadIsProcessing = false;
 function catDownload2(data, extra = {}) {
-    if (!Array.isArray(data)) { data = [data]; }
-    chrome.runtime.sendMessage(chrome.runtime.id, { Message: "setTempData", data: data });
 
-    if (!extra.ffmpeg && !G.downStream && data._size > 2147483648 && confirm(i18n("fileTooLargeStream", ["2G"]))) {
-        extra.downStream = 1;
-    }
-
-    // 如果已经创建下载器页面 直接发送数据
-    if (catDownloadCreateTabId) {
-        const timer = setInterval(() => {
-            // 获取页面状态 非complete状态继续等待
-            chrome.tabs.get(catDownloadCreateTabId, function (tab) {
-                if (tab.status == "complete") {
-                    clearInterval(timer);
-                    chrome.tabs.sendMessage(catDownloadCreateTabId, { Message: "catDownload", data: data }, (response) => {
-                        if (chrome.runtime.lastError || !response || response != "OK") { createCatDownload(data, extra); }
-                    });
-                }
-            });
+    // 防止连续多次提交
+    if (catDownloadIsProcessing) {
+        setTimeout(() => {
+            catDownload2(data, extra);
         }, 233);
         return;
     }
-    createCatDownload(data, extra);
+    catDownloadIsProcessing = true;
+    if (!Array.isArray(data)) { data = [data]; }
+    // 储存数据到临时变量
+    chrome.runtime.sendMessage(chrome.runtime.id, { Message: "setTempData", data: data });
+
+    // 如果大于2G 询问是否使用流式下载
+    if (!extra.ffmpeg && !G.downStream && data._size > 2147483648 && confirm(i18n("fileTooLargeStream", ["2G"]))) {
+        extra.downStream = 1;
+    }
+    // 发送消息给下载器
+    chrome.runtime.sendMessage(chrome.runtime.id, { Message: "catDownload", data: data }, (message) => {
+        // 不存在下载器或者下载器出错 新建一个下载器
+        if (chrome.runtime.lastError || !message || message.message != "OK") {
+            createCatDownload(data, extra);
+            return;
+        }
+        catDownloadIsProcessing = false;
+    });
 }
-// 新建下载器标签
 function createCatDownload(data, extra) {
     chrome.tabs.get(G.tabId, function (tab) {
         const arg = {
@@ -872,7 +881,15 @@ function createCatDownload(data, extra) {
             active: !G.downActive
         };
         chrome.tabs.create(arg, (tab) => {
-            catDownloadCreateTabId = tab.id;
+            // 循环获取tab.id 的状态 准备就绪 重置任务状态
+            const interval = setInterval(() => {
+                chrome.tabs.get(tab.id, (tab) => {
+                    if (tab.status == "complete") {
+                        clearInterval(interval);
+                        catDownloadIsProcessing = false;
+                    }
+                });
+            });
         });
     });
 }
