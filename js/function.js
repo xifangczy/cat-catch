@@ -123,10 +123,10 @@ function templatesFunction(text, action, data) {
                 return item.trim().replace(/^['"]|['"]$/g, "");
             });
         }
-        // 字符串不允许为空 除非 exists find 函数
-        if (isEmpty(text) && action != "exists" && action != "find") { return "" };
-        // 参数不能为空 除非 filter 函数
-        if (arg.length == 0 && action != "filter") { return text }
+        // 字符串不允许为空 除非 exists find prompt函数
+        if (isEmpty(text) && !["exists", "find", "prompt"].includes(action)) { return "" };
+        // 参数不能为空 除非 filter prompt函数
+        if (arg.length == 0 && !["filter", "prompt"].includes(action)) { return text }
 
         if (action == "slice") {
             text = text.slice(...arg);
@@ -177,6 +177,8 @@ function templatesFunction(text, action, data) {
             }
         } else if (action == "filter") {
             text = stringModify(text, arg[0]);
+        } else if (action == "prompt") {
+            text = window.prompt("", text);
         }
     }
     return text;
