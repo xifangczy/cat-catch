@@ -77,8 +77,7 @@ function start() {
         itemDOM.set(fragment.index, {
             progressText: html.find("#downFilepProgress"),
             progress: html.find(".progress"),
-            button: $button,
-            index: fragment.index,
+            button: $button
         });
 
         $button.click(function () {
@@ -87,7 +86,8 @@ function start() {
                 down.stop(fragment.index);
                 $(this).html(i18n.retryDownload).data("action", "start");
                 if (fragment.fileStream) {
-                    fragment.fileStream.abort();
+                    fragment.fileStream.close();
+                    fragment.fileStream = streamSaver.createWriteStream(fragment._filename).getWriter();
                 }
             } else if (action == "start") {
                 down.state = "waiting";
@@ -114,13 +114,13 @@ function start() {
     }
 
     // 下载列表添加对应html
-    down.fragments.forEach((fragment) => addHtml(fragment));
+    down.fragments.forEach(addHtml);
 
     // 文件进程事件
     let lastEmitted = Date.now();
     down.on('itemProgress', function (fragment, state, receivedLength, contentLength, value) {
-        const $dom = itemDOM.get(fragment.index);
         if (state) {
+            const $dom = itemDOM.get(fragment.index);
             $dom.progress.css("width", "100%");
             $dom.progress.html("100%");
             $dom.progressText.html(i18n.downloadComplete);
@@ -134,6 +134,7 @@ function start() {
 
         // 通过 lastEmitted 限制更新频率 避免疯狂dom操作
         if (Date.now() - lastEmitted >= 100) {
+            const $dom = itemDOM.get(fragment.index);
             if (contentLength) {
                 const progress = (receivedLength / contentLength * 100).toFixed(2) + "%";
                 $dom.progress.css("width", progress);
@@ -212,10 +213,10 @@ function start() {
     $("#stopDownload").click(function () {
         down.stop();
         // 更新对应的按钮状态
-        itemDOM.forEach((item) => {
+        itemDOM.forEach((item, index) => {
             if (item.button.data("action") == "stop") {
                 item.button.html(i18n.retryDownload).data("action", "start");
-                down.fragments[item.index].fileStream && down.fragments[item.index].fileStream.abort();
+                down.fragments[index].fileStream && down.fragments[index].fileStream.abort();
             }
         });
     });
@@ -252,9 +253,11 @@ function start() {
         }
         // 在线ffmpeg返回结果 关闭窗口
         if (Message.Message != "catCatchFFmpegResult" || Message.state != "ok" || _tabId == 0 || Message.tabId != _tabId || down.success != down.total) { return; }
-        setTimeout(() => {
-            $("#autoClose").prop("checked") && window.close();
-        }, Math.ceil(Math.random() * 999));
+        if ($("#autoClose").prop("checked")) {
+            setTimeout(() => {
+                window.close();
+            }, Math.ceil(Math.random() * 999));
+        }
     });
 
     // 监听下载事件 下载完成 关闭窗口
@@ -287,6 +290,7 @@ function sendFile(action, data, fragment) {
         data = new Blob([data], { type: fragment.contentType });
     }
     chrome.tabs.query({ url: G.ffmpegConfig.url }, function (tabs) {
+        // 等待ffmpeg 打开并且可用
         if (tabs.length === 0) {
             chrome.tabs.create({ url: G.ffmpegConfig.url });
             setTimeout(sendFile, 500, action, data, fragment);
@@ -295,6 +299,12 @@ function sendFile(action, data, fragment) {
             setTimeout(sendFile, 233, action, data, fragment);
             return;
         }
+        /**
+         * https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Chrome_incompatibilities#data_cloning_algorithm
+         * chrome.runtime.sendMessage API
+         * chrome 的对象参数需要序列化 无法传递Blob
+         * firefox 可以直接传递Blob
+         */
         const baseData = {
             Message: "catCatchFFmpeg",
             action: action,
