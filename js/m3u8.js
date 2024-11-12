@@ -1446,7 +1446,7 @@ function mergeTs() {
             chrome.runtime.sendMessage({
                 Message: "catCatchFFmpeg",
                 action: $("#onlyAudio").prop("checked") ? "onlyAudio" : "transcode",
-                media: [{ data: URL.createObjectURL(fileBlob), name: `memory${new Date().getTime()}.${ext}` }],
+                media: [{ data: G.isFirefox ? fileBlob : URL.createObjectURL(fileBlob), name: `memory${new Date().getTime()}.${ext}` }],
                 title: `${GetFileName(_m3u8Url)}`,
                 name: "memory" + new Date().getTime() + "." + ext
             });

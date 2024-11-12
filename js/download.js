@@ -81,7 +81,8 @@ function startDownload(tabId) {
 
     const $downFilepProgress = $("#downFilepProgress");
     const $progress = $(".progress");
-    let blobUrl = "";   // 储存blob
+    let blobUrl = "";   // 储存blobURL
+    let _blob = null;   // 储存blob
     let downId = 0; // 下载的文件ID
 
     // 标题 显示 进度
@@ -180,6 +181,7 @@ function startDownload(tabId) {
             return;
         }
         try {
+            _blob = blob;
             blobUrl = URL.createObjectURL(blob);
             $("#ffmpeg").show();
             // 自动发送到ffmpeg
@@ -281,7 +283,7 @@ function startDownload(tabId) {
             const data = {
                 Message: "catCatchFFmpeg",
                 action: action,
-                files: [{ data: blobUrl, name: getUrlFileName(_url) }],
+                files: [{ data: G.isFirefox ? _blob : blobUrl, name: getUrlFileName(_url) }],
                 title: title,
                 tabId: tabId,
                 taskId: _taskId ?? tabId
