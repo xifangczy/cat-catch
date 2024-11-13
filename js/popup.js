@@ -377,6 +377,7 @@ $(".Tabs .TabButton").click(function () {
     $(".container").removeClass("TabShow").eq(index).addClass("TabShow");
     UItoggle();
     $("#filter, #unfold").hide();
+    $("#features").hide();
 });
 // 其他页面
 $('#allTab').click(function () {
