@@ -325,6 +325,24 @@
         return _escape.toString();
     }
 
+    const uint32ArrayToUint8Array_ = (array) => {
+        const newArray = new Uint8Array(16);
+        for (let i = 0; i < 4; i++) {
+            newArray[i * 4] = (array[i] >> 24) & 0xff;
+            newArray[i * 4 + 1] = (array[i] >> 16) & 0xff;
+            newArray[i * 4 + 2] = (array[i] >> 8) & 0xff;
+            newArray[i * 4 + 3] = array[i] & 0xff;
+        }
+        return newArray;
+    }
+    const uint16ArrayToUint8Array_ = (array) => {
+        const newArray = new Uint8Array(16);
+        for (let i = 0; i < 8; i++) {
+            newArray[i * 2] = (array[i] >> 8) & 0xff;
+            newArray[i * 2 + 1] = array[i] & 0xff;
+        }
+        return newArray;
+    }
     // findTypedArray
     const findTypedArray = (target, args) => {
         const isArray = Array.isArray(args[0]) && args[0].length === 16;
@@ -333,7 +351,13 @@
         if (isArray || isArrayBuffer) {
             postData({ action: "catCatchAddKey", key: args[0], href: location.href, ext: "key" });
         } else if (instance.buffer.byteLength === 16) {
-            postData({ action: "catCatchAddKey", key: instance.buffer, href: location.href, ext: "key" });
+            if (target.name === 'Uint32Array') {
+                postData({ action: "catCatchAddKey", key: uint32ArrayToUint8Array_(instance).buffer, href: location.href, ext: "key" });
+            } else if (target.name === 'Uint16Array') {
+                postData({ action: "catCatchAddKey", key: uint16ArrayToUint8Array_(instance).buffer, href: location.href, ext: "key" });
+            } else {
+                postData({ action: "catCatchAddKey", key: instance.buffer, href: location.href, ext: "key" });
+            }
         }
         return instance;
     }
