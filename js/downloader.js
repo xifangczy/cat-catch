@@ -192,8 +192,8 @@ function start() {
     // 错误处理
     down.on('downloadError', function (fragment, error) {
         // 添加range请求头 重新尝试下载
-        if (!fragment.retry) {
-            fragment.retry = 'range';
+        if (!fragment.retry?.Range) {
+            fragment.retry = { "Range": "bytes=0-" };
             down.downloader(fragment);
             return;
         }
@@ -203,8 +203,8 @@ function start() {
 
     // 开始下载事件 如果存在range重下标记 则添加 range 请求头
     down.on('start', function (fragment, options) {
-        if (fragment.retry && fragment.retry == 'range') {
-            options.headers = { "Range": "bytes=0-" };
+        if (fragment.retry) {
+            options.headers = fragment.retry;
             options.cache = "no-cache";
         }
     });
