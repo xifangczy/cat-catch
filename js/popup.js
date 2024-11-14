@@ -246,7 +246,8 @@ function AddMedia(data, currentTab = true) {
                 }
                 // 下载前确认参数
                 if (G.m3u8dlConfirm && event.originalEvent && event.originalEvent.isTrusted) {
-                    const confirm = $(`<div class="m3u8dlConfirm">
+                    data.html.find('.confirm').remove();
+                    const confirm = $(`<div class="confirm">
                         <textarea type="text" class="width100" rows="10">${m3u8dlArg}</textarea>
                         <button class="button2" id="confirm">${i18n.confirm}</button>
                         <button class="button2" id="close">${i18n.close}</button>
@@ -283,8 +284,29 @@ function AddMedia(data, currentTab = true) {
         return false;
     });
     // 调用
-    data.html.find('.invoke').click(function () {
-        const url = templates(G.invokeText, data);
+    data.html.find('.invoke').click(function (event) {
+        const url = data.invoke ?? templates(G.invokeText, data);
+
+        // 下载前确认参数
+        if (G.invokeConfirm && event.originalEvent && event.originalEvent.isTrusted) {
+            data.html.find('.confirm').remove();
+            const confirm = $(`<div class="confirm">
+                        <textarea type="text" class="width100" rows="10">${url}</textarea>
+                        <button class="button2" id="confirm">${i18n.confirm}</button>
+                        <button class="button2" id="close">${i18n.close}</button>
+                    </div>`);
+            confirm.find("#confirm").click(function () {
+                data.invoke = confirm.find("textarea").val();
+                data.html.find('.invoke').click();
+                confirm.hide();
+            });
+            confirm.find("#close").click(function () {
+                confirm.remove();
+            });
+            data.html.append(confirm);
+            return false;
+        }
+
         if (G.isFirefox) {
             window.location.href = url;
         } else {

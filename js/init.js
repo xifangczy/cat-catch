@@ -113,6 +113,7 @@ G.OptionLists = {
     popupLeft: 0,
     invoke: false,
     invokeText: `m3u8dlre:"\${url}" --save-dir "%USERPROFILE%\\Downloads" --del-after-done --save-name "\${title}_\${now}" --auto-select \${referer|exists:'-H "Referer: *"'}`,
+    invokeConfirm: false,
     // m3u8解析器默认参数
     M3u8Thread: 6,
     M3u8Mp4: false,
