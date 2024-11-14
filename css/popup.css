@@ -35,7 +35,8 @@ body {
   overflow: hidden;
   margin-right: 0.2rem;
 }
-.panel .url {
+.panel .url,
+.panel .confirm {
   padding: 5px;
 }
 .icon,
