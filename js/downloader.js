@@ -11,42 +11,45 @@ let _index = null;  // 当前页面 tab index
 // 是否表单提交下载 表单提交 不使用自定义文件名
 let _formDownload = false;
 
-// 获取当前标签信息
-chrome.tabs.getCurrent(function (tabs) {
-    _tabId = tabs.id;
-    _index = tabs.index;
+awaitG(() => {
+    $(`<style>${G.css}</style>`).appendTo("head");
+    // 获取当前标签信息
+    chrome.tabs.getCurrent(function (tabs) {
+        _tabId = tabs.id;
+        _index = tabs.index;
 
-    // 如果没有requestId 显示 提交表单
-    if (!_requestId.length) {
-        $("#getURL, .newDownload").toggle();
-        $("#getURL_btn").click(function () {
-            const data = [{
-                url: $("#getURL #url").val().trim(),
-                requestHeaders: { referer: $("#getURL #referer").val().trim() },
-                requestId: 1,
-            }];
-            _downStream = $("#downStream").prop("checked");
-            _formDownload = true;   // 标记为表单提交下载
-            _data.push(...data);
-            setHeaders(data, () => { awaitG(start); });
+        // 如果没有requestId 显示 提交表单
+        if (!_requestId.length) {
+            $("#downStream").prop("checked", G.downStream);
             $("#getURL, .newDownload").toggle();
-        });
-        return;
-    }
-    // 读取要下载的资源数据
-    chrome.runtime.sendMessage({ Message: "getData", requestId: _requestId }, function (data) {
-        if (data == "error" || !Array.isArray(data) || chrome.runtime.lastError) {
-            chrome.tabs.highlight({ tabs: _index });
-            alert(i18n.dataFetchFailed);
+            $("#getURL_btn").click(function () {
+                const data = [{
+                    url: $("#getURL #url").val().trim(),
+                    requestHeaders: { referer: $("#getURL #referer").val().trim() },
+                    requestId: 1,
+                }];
+                _downStream = $("#downStream").prop("checked");
+                _formDownload = true;   // 标记为表单提交下载
+                _data.push(...data);
+                setHeaders(data, start());
+                $("#getURL, .newDownload").toggle();
+            });
             return;
         }
-        _data.push(...data);
-        setHeaders(data, () => { awaitG(start); });
+        // 读取要下载的资源数据
+        chrome.runtime.sendMessage({ Message: "getData", requestId: _requestId }, function (data) {
+            if (data == "error" || !Array.isArray(data) || chrome.runtime.lastError) {
+                chrome.tabs.highlight({ tabs: _index });
+                alert(i18n.dataFetchFailed);
+                return;
+            }
+            _data.push(...data);
+            setHeaders(data, start());
+        });
     });
 });
 
 function start() {
-    $(`<style>${G.css}</style>`).appendTo("head");
     $("#autoClose").prop("checked", G.downAutoClose);
     streamSaver.mitm = G.streamSaverConfig.url;
 

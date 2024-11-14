@@ -229,9 +229,9 @@
         const rect = el.getBoundingClientRect();
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-        return { 
-            top: rect.top + scrollTop, 
-            left: rect.left + scrollLeft 
+        return {
+            top: rect.top + scrollTop,
+            left: rect.left + scrollLeft
         };
     }
 
@@ -244,7 +244,7 @@
             }
         });
         CatCatch.querySelectorAll('[data-i18n-outer]').forEach(function (element) {
-            const outerTranslation = window.CatCatchI18n[ element.dataset.i18nOuter]?.[language];
+            const outerTranslation = window.CatCatchI18n[element.dataset.i18nOuter]?.[language];
             if (outerTranslation) {
                 element.outerHTML = outerTranslation;
             }

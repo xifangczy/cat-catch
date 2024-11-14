@@ -230,12 +230,16 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
             const html = $(`<div class="block">
                     <div>${item.attrs.RESOLUTION ? i18n.resolution + ":" + item.attrs.RESOLUTION : ""}${item.attrs.BANDWIDTH ? " | " + i18n.bitrate + ":" + (parseInt(item.attrs.BANDWIDTH / 1000) + " Kbps") : ""}</div>
                     <a href="${url}">${name}</a>
+                    <button id="parser" type="button">${i18n.parser}</button>
                     <button class="sendFfmpeg" type="button">${i18n.sendFfmpeg}</button>
                 </div>`);
             html.find(".sendFfmpeg").click(function () {
                 let newUrl = url + `&autoDown=1`;
                 newUrl += `&ffmpeg=addFile`;
                 chrome.tabs.create({ url: newUrl, index: currentIndex + 1, active: false });
+            });
+            html.find("#parser").click(function () {
+                chrome.tabs.update({ url: url });
             });
             $("#next_m3u8").append(html);
         }
@@ -258,12 +262,16 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
             const html = $(`<div class="block">
                     <div>${item.name ? item.name : ""} | ${item.lang ? item.lang : ""} | ${item.groupId ? item.groupId : ""}</div>
                     <a href="${url}">${name}</a>
+                    <button id="parser" type="button">${i18n.parser}</button>
                     <button class="sendFfmpeg" type="button">${i18n.sendFfmpeg}</button>
                 </div>`);
             html.find(".sendFfmpeg").click(function () {
                 let newUrl = url + `&autoDown=1`;
                 newUrl += `&ffmpeg=addFile`;
                 chrome.tabs.create({ url: newUrl, index: currentIndex + 1, active: false });
+            });
+            html.find("#parser").click(function () {
+                chrome.tabs.update({ url: url });
             });
             $("#next_audio").append(html);
         }
