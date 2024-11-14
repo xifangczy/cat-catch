@@ -826,5 +826,8 @@
   },
   "dataFetchFailed": {
     "message": "Falha na busca de dados"
+  },
+  "confirmParameters": {
+    "message": "Confirmar Parâmetros"
   }
 }
