@@ -234,14 +234,32 @@ function AddMedia(data, currentTab = true) {
         return false;
     });
     // 下载
-    data.html.find('#download').click(function () {
+    data.html.find('#download').click(function (event) {
         if (G.m3u8dl && (isM3U8(data) || isMPD(data))) {
             if (!data.url.startsWith("blob:")) {
-                const m3u8dlArg = templates(G.m3u8dlArg, data);
+                const m3u8dlArg = data.m3u8dlArg ?? templates(G.m3u8dlArg, data);
                 const url = 'm3u8dl:' + (G.m3u8dl == 1 ? Base64.encode(m3u8dlArg) : m3u8dlArg);
                 if (url.length >= 2046) {
                     navigator.clipboard.writeText(m3u8dlArg);
                     Tips(i18n.M3U8DLparameterLong, 2000);
+                    return false;
+                }
+                // 下载前确认参数
+                if (G.m3u8dlConfirm && event.originalEvent && event.originalEvent.isTrusted) {
+                    const confirm = $(`<div class="m3u8dlConfirm">
+                        <textarea type="text" class="width100" rows="10">${m3u8dlArg}</textarea>
+                        <button class="button2" id="confirm">${i18n.confirm}</button>
+                        <button class="button2" id="close">${i18n.close}</button>
+                    </div>`);
+                    confirm.find("#confirm").click(function () {
+                        data.m3u8dlArg = confirm.find("textarea").val();
+                        data.html.find('#download').click();
+                        confirm.hide();
+                    });
+                    confirm.find("#close").click(function () {
+                        confirm.remove();
+                    });
+                    data.html.append(confirm);
                     return false;
                 }
                 if (G.isFirefox) {
@@ -912,7 +930,7 @@ function UItoggle() {
     $currentCount.text(currentCount ? `[${currentCount}]` : "");
     $allCount.text(allCount ? `[${allCount}]` : "");
     const id = $('.TabShow').attr("id");
-    if (id == "otherOptions" || id == "maybeKey") {
+    if (id != "mediaList" && id != "allMediaList") {
         $tips.hide();
         $down.hide();
     } else if ($down.is(":hidden")) {

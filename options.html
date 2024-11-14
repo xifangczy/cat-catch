@@ -233,7 +233,21 @@
           </div>
 
           <div class="item">
+            <div data-i18n="confirmParameters">下载前确认参数(只支持N_m3u8DL-RE)(Test)</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="m3u8dlConfirm" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- <div class="item"></div> -->
+
+          <div class="item">
             <div style="margin-bottom: 5px;margin-top: 5px;">
+              <p data-i18n="parameterSetting"></p>
+
               <a href="https://o2bmm.gitbook.io/cat-catch/docs/settings#keywords" target="_blank"
                 data-i18n="replaceKeywordList"></a>
               <a href="https://nilaoda.github.io/N_m3u8DL-CLI/Advanced.html" target="_blank"
@@ -241,8 +255,6 @@
 
               <a href="https://github.com/nilaoda/N_m3u8DL-RE?tab=readme-ov-file#%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%82%E6%95%B0"
                 target="_blank" style="margin-left: 10px;">N_m3u8DL-RE <span data-i18n-outer="parameter"></span></a>
-
-              <p data-i18n="parameterSetting"></p>
             </div>
             <textarea id="m3u8dlArg" save="input" type="text" class="width100 break-all" rows="3"></textarea>
           </div>
