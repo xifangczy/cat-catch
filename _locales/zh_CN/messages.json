@@ -826,5 +826,8 @@
   },
   "dataFetchFailed": {
     "message": "数据获取失败"
+  },
+  "confirmParameters": {
+    "message": "确认参数"
   }
 }
