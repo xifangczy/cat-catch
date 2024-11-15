@@ -122,15 +122,7 @@ function start() {
     // 文件进程事件
     let lastEmitted = Date.now();
     down.on('itemProgress', function (fragment, state, receivedLength, contentLength, value) {
-        if (state) {
-            const $dom = itemDOM.get(fragment.index);
-            $dom.progress.css("width", "100%");
-            $dom.progress.html("100%");
-            $dom.progressText.html(i18n.downloadComplete);
-            $dom.button.html(i18n.sendFfmpeg);
-            $dom.button.data("action", "sendFfmpeg");
-            return;
-        }
+        if (state) { return; }
         if (fragment.fileStream) {
             fragment.fileStream.write(new Uint8Array(value));
         }
@@ -140,8 +132,7 @@ function start() {
             const $dom = itemDOM.get(fragment.index);
             if (contentLength) {
                 const progress = (receivedLength / contentLength * 100).toFixed(2) + "%";
-                $dom.progress.css("width", progress);
-                $dom.progress.html(progress);
+                $dom.progress.css("width", progress).html(progress);
                 $dom.progressText.html(`${byteToSize(receivedLength)} / ${byteToSize(contentLength)}`);
             } else {
                 $dom.progressText.html(`${byteToSize(receivedLength)}`);
@@ -158,6 +149,13 @@ function start() {
 
     // 单文件下载完成事件
     down.on('completed', function (buffer, fragment) {
+
+        const $dom = itemDOM.get(fragment.index);
+        $dom.progress.css("width", "100%").html("100%");
+        $dom.progressText.html(i18n.downloadComplete);
+        $dom.button.html(i18n.sendFfmpeg).data("action", "sendFfmpeg");
+        document.title = `${down.success}/${down.total}`;
+
         // 是流式下载 停止写入
         if (fragment.fileStream) {
             fragment.fileStream.close();
@@ -165,18 +163,17 @@ function start() {
             return;
         }
 
-        // 更新标题
-        document.title = `${down.success}/${down.total}`;
-
         // 转为blob
         const blob = new Blob([buffer], { type: fragment.contentType });
 
         // 发送到ffmpeg
         if (_ffmpeg) {
             sendFile(_ffmpeg, blob, fragment);
+            $dom.progressText.html(i18n.sendFfmpeg);
             return;
         }
 
+        $dom.progressText.html(i18n.saving);
         // 直接下载
         chrome.downloads.download({
             url: URL.createObjectURL(blob),
@@ -219,7 +216,10 @@ function start() {
         itemDOM.forEach((item, index) => {
             if (item.button.data("action") == "stop") {
                 item.button.html(i18n.retryDownload).data("action", "start");
-                down.fragments[index].fileStream && down.fragments[index].fileStream.abort();
+                if (down.fragments[index].fileStream) {
+                    down.fragments[index].fileStream.close();
+                    down.fragments[index].fileStream = null;
+                }
             }
         });
     });
@@ -236,7 +236,8 @@ function start() {
     // 监听事件
     chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         if (!Message.Message) { return; }
-        // 添加下载任务
+
+        // 外部添加下载任务
         if (Message.Message == "catDownload" && Message.data && Array.isArray(Message.data)) {
             // ffmpeg任务的下载器 不允许添加新任务
             if (_ffmpeg) {
@@ -248,25 +249,44 @@ function start() {
                     _data.push(fragment);
                     down.push(fragment);
                     addHtml(fragment);
-                    down.state != "running" && down.downloader(fragment.index);
+                    // 正在运行的下载任务小于线程数 则开始下载
+                    if (down.running < down.thread) {
+                        down.downloader(fragment.index);
+                    }
                 });
             });
             sendResponse({ message: "OK", tabId: _tabId });
             return;
         }
-        // 在线ffmpeg返回结果 关闭窗口
-        if (Message.Message != "catCatchFFmpegResult" || Message.state != "ok" || _tabId == 0 || Message.tabId != _tabId || down.success != down.total) { return; }
-        if ($("#autoClose").prop("checked")) {
-            setTimeout(() => {
-                window.close();
-            }, Math.ceil(Math.random() * 999));
+
+        // 以下为在线ffmpeg返回结果
+        if (Message.Message != "catCatchFFmpegResult" || Message.state != "ok" || _tabId == 0 || Message.tabId != _tabId) { return; }
+
+        // 发送状态提示
+        const $dom = itemDOM.get(Message.index);
+        $dom && $dom.progressText.html(i18n.hasSent);
+
+        // 全部发送完成 检查自动关闭
+        if (down.success == down.total) {
+            if ($("#autoClose").prop("checked")) {
+                setTimeout(() => {
+                    window.close();
+                }, Math.ceil(Math.random() * 999));
+            }
         }
     });
 
     // 监听下载事件 下载完成 关闭窗口
     chrome.downloads.onChanged.addListener(function (downloadDelta) {
         if (!downloadDelta.state || downloadDelta.state.current != "complete") { return; }
-        if (!down.fragments.some(item => item.downId == downloadDelta.id)) { return }
+
+        // 检查id是否本页面提交的下载
+        const fragment = down.fragments.find(item => item.downId == downloadDelta.id);
+        if (!fragment) { return; }
+        // 更新下载状态
+        itemDOM.get(fragment.index).progressText.html(i18n.downloadComplete);
+
+        // 完成下载 检查自动关闭
         if (down.success == down.total) {
             document.title = i18n.downloadComplete;
             if ($("#autoClose").prop("checked")) {
@@ -274,6 +294,18 @@ function start() {
                     window.close();
                 }, Math.ceil(Math.random() * 999));
             }
+        }
+    });
+
+    // 关闭页面 检查关闭所有未完成的下载流
+    window.addEventListener('beforeunload', function (e) {
+        const fileStream = down.fragments.filter(item => item.fileStream);
+        if (fileStream.length) {
+            e.preventDefault();
+            fileStream.forEach((fragment) => {
+                fragment.fileStream.close();
+                fragment.fileStream = null;
+            });
         }
     });
 
@@ -311,9 +343,9 @@ function sendFile(action, data, fragment) {
         const baseData = {
             Message: "catCatchFFmpeg",
             action: action,
-            files: [{ data: G.isFirefox ? data : URL.createObjectURL(data), name: getUrlFileName(fragment.url) }],
+            files: [{ data: G.isFirefox ? data : URL.createObjectURL(data), name: getUrlFileName(fragment.url), index: fragment.index }],
             title: stringModify(fragment.title),
-            tabId: _tabId,
+            tabId: _tabId
         };
         if (action === "merge") {
             baseData.taskId = _taskId;

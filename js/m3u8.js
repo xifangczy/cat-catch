@@ -215,12 +215,7 @@ hls.on(Hls.Events.MANIFEST_LOADED, function (event, data) {
 hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
     // console.log(data);
     $("#m3u8").show(); $("#loading").hide();
-    let more = false;
-
-    // 多条资源
-    if (data.levels.length + data.audioTracks.length + data.subtitleTracks.length >= 2) {
-        more = true;
-    }
+    const more = (data.levels.length + data.audioTracks.length + data.subtitleTracks.length >= 2);
 
     // 多个视频
     if (more && data.levels.length) {

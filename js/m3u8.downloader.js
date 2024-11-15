@@ -17,10 +17,11 @@ class Downloader {
         this.state = 'waiting';          // 下载器状态 waiting running done abort
         this.success = 0;                // 成功下载数量
         this.errorList = new Set();      // 下载错误的列表
-        this.buffersize = 0;              // 已下载buffer大小
+        this.buffersize = 0;             // 已下载buffer大小
         this.duration = 0;               // 已下载时长
         this.pushIndex = 0;              // 推送顺序下载索引
         this.controller = [];            // 储存中断控制器
+        this.running = 0;
     }
     /**
      * 设置监听
@@ -195,6 +196,7 @@ class Downloader {
         // 不存在下载对象 从提取fragments
         fragment ??= this.fragments[this.index++];
         this.state = 'running';
+        this.running++;
 
         // 资源已下载 跳过
         // if (this.buffer[fragment.index]) { return; }
@@ -279,6 +281,7 @@ class Downloader {
                 // 储存下载错误切片
                 !this.errorList.has(fragment) && this.errorList.add(fragment);
             }).finally(() => {
+                this.running--;
                 // 下载下一个切片
                 if (!directDownload && this.index < this.fragments.length) {
                     this.downloader();
