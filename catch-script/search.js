@@ -1,8 +1,9 @@
 // const CATCH_SEARCH_ONLY = true;
 (function () {
+    const isRunningInWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
     const CATCH_SEARCH_DEBUG = false;
     // 防止 console.log 被劫持
-    if (CATCH_SEARCH_DEBUG && console.log.toString() != 'function log() { [native code] }') {
+    if (!isRunningInWorker && CATCH_SEARCH_DEBUG && console.log.toString() != 'function log() { [native code] }') {
         const newIframe = top.document.createElement("iframe");
         newIframe.style.width = 0;
         newIframe.style.height = 0;
@@ -11,11 +12,33 @@
         window.console.log = newIframe.contentWindow.catCatchLOG;
     }
     // 防止 window.postMessage 被劫持
-    const _postMessage = window.postMessage;
+    const _postMessage = (isRunningInWorker ? self : window).postMessage;
 
     console.log("start search.js");
     const filter = new Set();
     const reKeyURL = /URI="(.*)"/;
+
+    // Worker
+    if (!isRunningInWorker) {
+        const _Blob = Blob;
+        const _selfString = arguments.callee.toString();
+        Blob = function (blobParts, options) {
+            if (options?.type.endsWith("/javascript")) {
+                blobParts.unshift(`(${_selfString})();`);
+            }
+            return new _Blob(blobParts, options);
+        };
+        const _Worker = Worker;
+        window.Worker = function (scriptURL, options) {
+            const newWorker = new _Worker(scriptURL, options);
+            newWorker.onmessage = function (event) {
+                if (event.data?.action == "catCatchAddKey") {
+                    postData(event.data);
+                }
+            }
+            return newWorker;
+        }
+    }
 
     // JSON.parse
     const _JSONparse = JSON.parse;
@@ -153,8 +176,8 @@
     }
 
     // fetch
-    const _fetch = window.fetch;
-    window.fetch = async function (input, init) {
+    const _fetch = fetch;
+    fetch = async function (input, init) {
         const response = await _fetch.apply(this, arguments);
         const clone = response.clone();
         CATCH_SEARCH_DEBUG && console.log(response);
@@ -190,7 +213,7 @@
             });
         return clone;
     }
-    window.fetch.toString = function () {
+    fetch.toString = function () {
         return _fetch.toString();
     }
 
@@ -228,8 +251,8 @@
     }
 
     // window.btoa / window.atob
-    const _btoa = window.btoa;
-    window.btoa = function (data) {
+    const _btoa = btoa;
+    btoa = function (data) {
         const base64 = _btoa.apply(this, arguments);
         CATCH_SEARCH_DEBUG && console.log(base64, data, base64.length);
         if (base64.length == 24 && base64.substring(22, 24) == "==") {
@@ -240,11 +263,11 @@
         }
         return base64;
     }
-    window.btoa.toString = function () {
+    btoa.toString = function () {
         return _btoa.toString();
     }
-    const _atob = window.atob;
-    window.atob = function (base64) {
+    const _atob = atob;
+    atob = function (base64) {
         const data = _atob.apply(this, arguments);
         CATCH_SEARCH_DEBUG && console.log(base64, data, base64.length);
         if (base64.length == 24 && base64.substring(22, 24) == "==") {
@@ -258,7 +281,7 @@
         }
         return data;
     }
-    window.atob.toString = function () {
+    atob.toString = function () {
         return _atob.toString();
     }
 
@@ -314,7 +337,7 @@
     });
 
     // escape
-    const _escape = window.escape;
+    const _escape = escape;
     escape = function (str) {
         if (str?.length && str.length == 24 && str.substring(22, 24) == "==") {
             postData({ action: "catCatchAddKey", key: str, href: location.href, ext: "base64Key" });
@@ -363,21 +386,21 @@
     }
     // Uint8Array
     const _Uint8Array = Uint8Array;
-    window.Uint8Array = new Proxy(_Uint8Array, {
+    Uint8Array = new Proxy(_Uint8Array, {
         construct(target, args) {
             return findTypedArray(target, args);
         }
     });
     // Uint16Array
     const _Uint16Array = Uint16Array;
-    window.Uint16Array = new Proxy(_Uint16Array, {
+    Uint16Array = new Proxy(_Uint16Array, {
         construct(target, args) {
             return findTypedArray(target, args);
         }
     });
     // Uint32Array
     const _Uint32Array = Uint32Array;
-    window.Uint32Array = new Proxy(_Uint32Array, {
+    Uint32Array = new Proxy(_Uint32Array, {
         construct(target, args) {
             return findTypedArray(target, args);
         }
@@ -479,15 +502,14 @@
         return text;
     }
     function postData(data) {
-        if (data.action == "catCatchAddKey") {
-            if (data.key == "AAAAAAAAAAAAAAAAAAAAAA==") { return; }
-            if (data.key instanceof ArrayBuffer && isArrayBufferAllZero(data.key)) { return; }
-        }
         let value = data.url ? data.url : data.key;
         if (value instanceof ArrayBuffer || value instanceof Array) {
             if (value.byteLength == 0) { return; }
             data.key = ArrayToBase64(value);
             value = data.key;
+        }
+        if (data.action == "catCatchAddKey" && data.key.startsWith("AAAAAAAAAAAAAAAAAAAA")) {
+            return;
         }
         if (filter.has(value)) { return false; }
         filter.add(value);
