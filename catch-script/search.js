@@ -49,7 +49,7 @@
                 const blob = new Blob([`(${_selfString})();`, xhr.response], { type: 'text/javascript' });
                 const newWorker = new _Worker(URL.createObjectURL(blob), options);
                 newWorker.onmessage = function (event) {
-                    if (event.data?.action == "catCatchAddKey") {
+                    if (event.data?.action == "catCatchAddKey" || event.data?.action == "catCatchAddMedia") {
                         postData(event.data);
                     }
                 }
