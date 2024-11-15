@@ -1,5 +1,6 @@
 // const CATCH_SEARCH_ONLY = true;
-(function () {
+(function __CAT_CATCH_CATCH_SCRIPT_V_2_5_6__() {
+    const _selfString = __CAT_CATCH_CATCH_SCRIPT_V_2_5_6__.toString();
     const isRunningInWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
     const CATCH_SEARCH_DEBUG = false;
     // 防止 console.log 被劫持
@@ -20,23 +21,44 @@
 
     // Worker
     if (!isRunningInWorker) {
-        const _Blob = Blob;
-        const _selfString = arguments.callee.toString();
-        Blob = function (blobParts, options) {
-            if (options?.type.endsWith("/javascript")) {
-                blobParts.unshift(`(${_selfString})();`);
-            }
-            return new _Blob(blobParts, options);
-        };
+        // const _Blob = Blob;
+        // const _selfString = __CAT_CATCH_CATCH_SCRIPT_V_2_5_6__.toString();
+        // Blob = function (blobParts, options) {
+        //     if (options?.type.endsWith("/javascript")) {
+        //         blobParts.unshift(`(${_selfString})();`);
+        //     }
+        //     return new _Blob(blobParts, options);
+        // };
+        // const _Worker = Worker;
+        // window.Worker = function (scriptURL, options) {
+        //     const newWorker = new _Worker(scriptURL, options);
+        //     newWorker.onmessage = function (event) {
+        //         if (event.data?.action == "catCatchAddKey") {
+        //             postData(event.data);
+        //         }
+        //     }
+        //     return newWorker;
+        // }
+
         const _Worker = Worker;
         window.Worker = function (scriptURL, options) {
-            const newWorker = new _Worker(scriptURL, options);
-            newWorker.onmessage = function (event) {
-                if (event.data?.action == "catCatchAddKey") {
-                    postData(event.data);
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', scriptURL, false);
+            xhr.send();
+            if (xhr.status === 200) {
+                const blob = new Blob([`(${_selfString})();`, xhr.response], { type: 'text/javascript' });
+                const newWorker = new _Worker(URL.createObjectURL(blob), options);
+                newWorker.onmessage = function (event) {
+                    if (event.data?.action == "catCatchAddKey") {
+                        postData(event.data);
+                    }
                 }
+                return newWorker;
             }
-            return newWorker;
+            return new _Worker(scriptURL, options);
+        }
+        window.Worker.toString = function () {
+            return _Worker.toString();
         }
     }
 
