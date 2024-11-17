@@ -566,13 +566,4 @@
         }
         return _buffer.buffer;
     }
-    function isArrayBufferAllZero(buffer) {
-        let view = new _Uint8Array(buffer);
-        for (let i = 0; i < view.length; i++) {
-            if (view[i] !== 0) {
-                return false;
-            }
-        }
-        return true;
-    }
 })();
