@@ -10,6 +10,7 @@ let _index = null;  // 当前页面 tab index
 
 // 是否表单提交下载 表单提交 不使用自定义文件名
 let _formDownload = false;
+const downloadData = localStorage.getItem('downloadData') ? JSON.parse(localStorage.getItem('downloadData')) : [];
 
 awaitG(() => {
     $(`<style>${G.css}</style>`).appendTo("head");
@@ -39,9 +40,14 @@ awaitG(() => {
         // 读取要下载的资源数据
         chrome.runtime.sendMessage({ Message: "getData", requestId: _requestId }, function (data) {
             if (data == "error" || !Array.isArray(data) || chrome.runtime.lastError) {
-                chrome.tabs.highlight({ tabs: _index });
-                alert(i18n.dataFetchFailed);
-                return;
+                data = downloadData.filter(item => _requestId.includes(item.requestId));
+                if (data.length == 0) {
+                    alert(i18n.dataFetchFailed);
+                    return;
+                }
+            } else {
+                // 储存数据 防止刷新丢失
+                localStorage.setItem('downloadData', JSON.stringify(data));
             }
             _data.push(...data);
             setHeaders(data, start());
@@ -56,6 +62,8 @@ function start() {
     const $downBox = $("#downBox"); // 下载列表容器
     const down = new Downloader(_data);  // 创建下载器 
     const itemDOM = new Map();  // 提前储存需要平凡操作的dom对象 提高效率
+
+    $("#test").click(() => console.log(down));
 
     // 添加html
     const addHtml = (fragment) => {
@@ -123,10 +131,6 @@ function start() {
     let lastEmitted = Date.now();
     down.on('itemProgress', function (fragment, state, receivedLength, contentLength, value) {
         if (state) { return; }
-        if (fragment.fileStream) {
-            fragment.fileStream.write(new Uint8Array(value));
-        }
-
         // 通过 lastEmitted 限制更新频率 避免疯狂dom操作
         if (Date.now() - lastEmitted >= 100) {
             const $dom = itemDOM.get(fragment.index);
@@ -241,19 +245,34 @@ function start() {
         if (Message.Message == "catDownload" && Message.data && Array.isArray(Message.data)) {
             // ffmpeg任务的下载器 不允许添加新任务
             if (_ffmpeg) {
-                sendResponse({ message: "Error", tabId: _tabId });
+                sendResponse({ message: "FFmpeg", tabId: _tabId });
                 return;
             }
             setHeaders(Message.data, () => {
-                Message.data.forEach((fragment) => {
+                for (let fragment of Message.data) {
+                    // 检查fragment是否已经存在
+                    if (down.fragments.find(item => item.requestId == fragment.requestId)) {
+                        continue;
+                    }
+
                     _data.push(fragment);
                     down.push(fragment);
                     addHtml(fragment);
+
+                    // 修改url requestId 参数
+                    const url = new URL(location.href);
+                    url.searchParams.set("requestId", down.fragments.map(item => item.requestId).join(","));
+                    history.replaceState(null, null, url);
+
+                    // 数据储存到localStorage
+                    downloadData.push(fragment);
+                    localStorage.setItem('downloadData', JSON.stringify(downloadData));
+
                     // 正在运行的下载任务小于线程数 则开始下载
                     if (down.running < down.thread) {
                         down.downloader(fragment.index);
                     }
-                });
+                };
             });
             sendResponse({ message: "OK", tabId: _tabId });
             return;
@@ -283,6 +302,7 @@ function start() {
         // 检查id是否本页面提交的下载
         const fragment = down.fragments.find(item => item.downId == downloadDelta.id);
         if (!fragment) { return; }
+        down.buffer[fragment.index] = null; //清空buffer
         // 更新下载状态
         itemDOM.get(fragment.index).progressText.html(i18n.downloadComplete);
 

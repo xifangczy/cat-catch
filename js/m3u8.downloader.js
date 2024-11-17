@@ -224,7 +224,10 @@ class Downloader {
                     while (true) {
                         const { value, done } = await reader.read();
                         if (done) { break; }
-                        chunks.push(value);
+
+                        // 流式下载
+                        fragment.fileStream ? fragment.fileStream.write(new Uint8Array(value)) : chunks.push(value);
+
                         receivedLength += value.length;
                         this.emit('itemProgress', fragment, false, receivedLength, contentLength, value);
                     }
@@ -252,10 +255,11 @@ class Downloader {
             .then(buffer => {
                 // 储存解密/转码后的buffer
                 this.buffer[fragment.index] = buffer;
+
                 // 成功数+1 累计buffer大小和视频时长
                 this.success++;
                 this.buffersize += buffer.byteLength;
-                this.duration += fragment.duration;
+                this.duration += fragment.duration ?? 0;
 
                 // 下载对象来自错误列表 从错误列表内删除
                 this.errorList.has(fragment) && this.errorList.delete(fragment);
