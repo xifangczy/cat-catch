@@ -148,7 +148,12 @@
                 if (data.data instanceof Blob) {
                     window.postMessage(data);
                 } else {
-                    loadBlob(data);
+                    fetch(data.data)
+                        .then(response => response.blob())
+                        .then(blob => {
+                            data.data = blob;
+                            window.postMessage(data);
+                        });
                 }
             }
             sendResponse("ok");
@@ -261,20 +266,4 @@
             return false;
         }
     }
-
-    function loadBlob(data) {
-        const xhr = new XMLHttpRequest;
-        xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                xhr.response.arrayBuffer()
-                    .then(function (buffer) {
-                        data.data = buffer;
-                        window.postMessage(data, "*", [buffer]);
-                    });
-            }
-        };
-        xhr.open("GET", data.data);
-        xhr.responseType = "blob";
-        xhr.send();
-    };
 })();
