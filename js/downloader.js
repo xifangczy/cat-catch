@@ -111,8 +111,6 @@ function start() {
                 down.state = "waiting";
                 down.downloader(fragment);
                 $(this).html(i18n.stopDownload).data("action", "stop");
-            } else {
-                sendFile("addFile", down.buffer[fragment.index], fragment);
             }
         });
         $downBox.append(html);
@@ -166,6 +164,7 @@ function start() {
         $dom.progressText.html(i18n.downloadComplete);
         $dom.button.html(i18n.sendFfmpeg).data("action", "sendFfmpeg");
         document.title = `${down.success}/${down.total}`;
+        $dom.button.hide();
 
         // 是流式下载 停止写入
         if (fragment.fileStream) {
@@ -309,7 +308,9 @@ function start() {
         // 检查id是否本页面提交的下载
         const fragment = down.fragments.find(item => item.downId == downloadDelta.id);
         if (!fragment) { return; }
+
         down.buffer[fragment.index] = null; //清空buffer
+
         // 更新下载状态
         itemDOM.get(fragment.index).progressText.html(i18n.downloadComplete);
 
