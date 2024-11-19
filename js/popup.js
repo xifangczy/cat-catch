@@ -901,7 +901,7 @@ function catDownload2(data, extra = {}) {
     chrome.runtime.sendMessage(chrome.runtime.id, { Message: "setTempData", data: data });
 
     // 如果大于2G 询问是否使用流式下载
-    if (!extra.ffmpeg && !G.downStream && data._size > 2147483648 && confirm(i18n("fileTooLargeStream", ["2G"]))) {
+    if (!extra.ffmpeg && !G.downStream && Math.max(...data.map(item => item._size)) > 2147483648 && confirm(i18n("fileTooLargeStream", ["2G"]))) {
         extra.downStream = 1;
     }
     // 发送消息给下载器
