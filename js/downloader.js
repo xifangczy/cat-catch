@@ -37,17 +37,24 @@ awaitG(() => {
             });
             return;
         }
-        // 读取要下载的资源数据
+
+        // 优先从downloadData 提取任务数据
+        for (let item of downloadData) {
+            if (_requestId.includes(item.requestId)) {
+                _data.push(item);
+                _requestId.splice(_requestId.indexOf(item.requestId), 1);
+            }
+        }
+        if (!_requestId.length) {
+            setHeaders(_data, start());
+            return;
+        }
+
+        // downloadData 不存在 从后台获取数据
         chrome.runtime.sendMessage({ Message: "getData", requestId: _requestId }, function (data) {
-            if (data == "error" || !Array.isArray(data) || chrome.runtime.lastError) {
-                data = downloadData.filter(item => _requestId.includes(item.requestId));
-                if (data.length == 0) {
-                    alert(i18n.dataFetchFailed);
-                    return;
-                }
-            } else {
-                // 储存数据 防止刷新丢失
-                localStorage.setItem('downloadData', JSON.stringify(data));
+            if (data == "error" || !Array.isArray(data) || chrome.runtime.lastError || data.length == 0) {
+                alert(i18n.dataFetchFailed);
+                return;
             }
             _data.push(...data);
             setHeaders(data, start());

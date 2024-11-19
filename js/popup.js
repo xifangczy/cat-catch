@@ -898,7 +898,8 @@ function catDownload2(data, extra = {}) {
     if (!Array.isArray(data)) { data = [data]; }
 
     // 储存数据到临时变量 提高检索速度
-    chrome.runtime.sendMessage(chrome.runtime.id, { Message: "setTempData", data: data });
+    localStorage.setItem('downloadData', JSON.stringify(data));
+    // chrome.runtime.sendMessage(chrome.runtime.id, { Message: "setTempData", data: data });
 
     // 如果大于2G 询问是否使用流式下载
     if (!extra.ffmpeg && !G.downStream && Math.max(...data.map(item => item._size)) > 2147483648 && confirm(i18n("fileTooLargeStream", ["2G"]))) {

@@ -304,6 +304,10 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         if (!Array.isArray(Message.requestId)) {
             Message.requestId = [Message.requestId];
         }
+        if (Message.requestId.length == 0) {
+            sendResponse("error");
+            return true;
+        }
         const response = [];
         G.temp.forEach(function (data, key) {
             if (Message.requestId.includes(key)) {
