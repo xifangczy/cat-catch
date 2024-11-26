@@ -1346,9 +1346,10 @@ function mergeTsNew(down) {
     // fileName = fileName.split("/");
     // fileName = fileName.length > 1 ? fileName.pop() : fileName.join("");
     // 删除后缀
+    let originalExt = null;
     if (/\.[a-zA-Z0-9]{1,4}$/.test(fileName)) {
         fileName = fileName.split(".");
-        fileName.pop();
+        originalExt = fileName.pop();
         fileName = fileName.join(".");
     }
     // 发送到ffmpeg
@@ -1359,7 +1360,9 @@ function mergeTsNew(down) {
             down.destroy();
             return;
         }
-        if (ext != "mp4" && ext != "mp3") {
+        if (originalExt) {
+            fileName += "." + originalExt;
+        } else if (ext != "mp4" && ext != "mp3") {
             fileName = fileName + ".mp4";
         } else {
             fileName = fileName + "." + ext;
