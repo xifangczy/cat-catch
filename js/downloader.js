@@ -135,9 +135,8 @@ function start() {
     // 文件进程事件
     let lastEmitted = Date.now();
     down.on('itemProgress', function (fragment, state, receivedLength, contentLength, value) {
-        if (state) { return; }
         // 通过 lastEmitted 限制更新频率 避免疯狂dom操作
-        if (Date.now() - lastEmitted >= 100) {
+        if (Date.now() - lastEmitted >= 100 && !state) {
             const $dom = itemDOM.get(fragment.index);
             if (contentLength) {
                 const progress = (receivedLength / contentLength * 100).toFixed(2) + "%";
@@ -290,6 +289,7 @@ function start() {
         // 发送状态提示
         const $dom = itemDOM.get(Message.index);
         $dom && $dom.progressText.html(i18n.hasSent);
+        down.buffer[Message.index] = null; //清空buffer
 
         // 全部发送完成 检查自动关闭
         if (down.success == down.total) {
