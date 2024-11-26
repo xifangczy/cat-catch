@@ -2,6 +2,7 @@ body {
   background: var(--background-color);
   font-size: 13px;
   font-family: "Microsoft YaHei", "Helvetica", "Arial", sans-serif;
+  margin: 0;
 }
 
 .wrapper {
