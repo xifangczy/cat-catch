@@ -1335,8 +1335,9 @@ function mergeTsNew(down) {
     ext = down.transcode ? "mp4" : ext;
 
     let fileName = "";
-    if ($('#customFilename').val()) {
-        fileName = $('#customFilename').val().trim();
+    const customFilename = $('#customFilename').val().trim();
+    if (customFilename) {
+        fileName = customFilename;
     } else if (_fileName) {
         fileName = _fileName;
     } else {
@@ -1360,7 +1361,7 @@ function mergeTsNew(down) {
             down.destroy();
             return;
         }
-        if (originalExt) {
+        if (customFilename && originalExt) {
             fileName += "." + originalExt;
         } else if (ext != "mp4" && ext != "mp3") {
             fileName = fileName + ".mp4";
