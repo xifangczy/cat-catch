@@ -19,8 +19,6 @@ G.initLocalComplete = false;
 var cacheData = { init: true };
 G.blackList = new Set();
 G.requestHeaders = new Map();
-// 临时数据
-G.temp = new Map();
 // 当前tabID
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     if (tabs[0] && tabs[0].id) {

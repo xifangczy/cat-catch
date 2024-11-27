@@ -291,31 +291,12 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         return true;
     }
     Message.tabId = Message.tabId ?? G.tabId;
-    if (Message.Message == "setTempData" && Message.data) {
-        G.temp.clear();
-        Message.data.forEach(function (item) {
-            G.temp.set(item.requestId, item);
-        });
-        sendResponse("OK");
-        return true;
-    }
     if (Message.Message == "getData" && Message.requestId) {
         // 判断Message.requestId是否数组
         if (!Array.isArray(Message.requestId)) {
             Message.requestId = [Message.requestId];
         }
-        if (Message.requestId.length == 0) {
-            sendResponse("error");
-            return true;
-        }
         const response = [];
-        G.temp.forEach(function (data, key) {
-            if (Message.requestId.includes(key)) {
-                response.push(data);
-                Message.requestId.splice(Message.requestId.indexOf(key), 1);
-                G.temp.delete(key);
-            }
-        });
         if (Message.requestId.length) {
             for (let item in cacheData) {
                 for (let data of cacheData[item]) {
@@ -325,11 +306,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
                 }
             }
         }
-        if (response.length == 0) {
-            sendResponse("error");
-            return true;
-        }
-        sendResponse(response);
+        sendResponse(response.length ? response : "error");
         return true;
     }
     if (Message.Message == "getData") {
