@@ -1349,7 +1349,12 @@ function mergeTsNew(down) {
     }
     // 发送到ffmpeg
     if ($("#ffmpeg").prop("checked") || _ffmpeg || isSendFfmpeg) {
-        if (fileBlob.size > 2147483648) {
+        /**
+         * 大于1.8G 不使用ffmpeg直接下载
+         * chrome每个进程限制2G内存 处理2G视频可能导致超过限制。1.8G是安全值。
+         * firefox 不受影响
+         */
+        if (!G.isFirefox && fileBlob.size > 1.8 * 1024 * 1024 * 1024) {
             $progress.html(i18n("fileTooLarge", ["2G"]));
             apiDownload(fileBlob, fileName, ext);
             down.destroy();
