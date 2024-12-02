@@ -1183,7 +1183,7 @@ function downloadNew(start = 0, end = _fragments.length) {
             $fileDuration.html(i18n.recordingDuration + ":" + secToTime(downDuration));
             return;
         }
-        // $(`#downItem${fragment.index}`).remove();
+        itemDOM.get(fragment.index).root.remove();
         $progress.html(`${down.success}/${down.total}`);
         $fileSize.html(i18n.downloaded + ":" + byteToSize(down.buffersize));
         $fileDuration.html(i18n.downloadedVideoLength + ":" + secToTime(down.duration));
@@ -1215,13 +1215,7 @@ function downloadNew(start = 0, end = _fragments.length) {
     // 单个项目下载进度
     let lastEmitted = Date.now();
     down.on('itemProgress', function (fragment, state, receivedLength, contentLength) {
-        if (state) {
-            itemDOM.get(fragment.index).percentage.html(i18n.downloadComplete);
-            itemDOM.get(fragment.index).button.remove();
-            // itemDOM.get(fragment.index).root.remove();
-            return;
-        }
-        if (Date.now() - lastEmitted >= 100) {
+        if (Date.now() - lastEmitted >= 233) {
             itemDOM.get(fragment.index).percentage.html((receivedLength / contentLength * 100).toFixed(2) + "%");
             lastEmitted = Date.now();
         }
