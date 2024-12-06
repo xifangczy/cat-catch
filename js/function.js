@@ -139,7 +139,9 @@ function templatesFunction(text, action, data) {
             text = "";
             if (result && result.length >= 2) {
                 for (let i = 1; i < result.length; i++) {
-                    text += result[i].trim();
+                    if (result[i]) {
+                        text += result[i].trim();
+                    }
                 }
             }
         } else if (action == "exists") {

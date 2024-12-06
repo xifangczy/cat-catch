@@ -77,6 +77,9 @@ function AddMedia(data, currentTab = true) {
     });
     data.downFileName = G.TitleName ? templates(G.downFileName, data) : data.name;
     data.downFileName = filterFileName(data.downFileName);
+    if (isEmpty(data.downFileName)) {
+        data.downFileName = data.name;
+    }
     // 文件大小单位转换
     data._size = data.size;
     if (data.size) {
