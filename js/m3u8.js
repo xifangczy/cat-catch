@@ -1020,12 +1020,32 @@ $("#searchingForRealKey").click(function () {
 
     const check = (buffer) => {
         const uint8Array = new Uint8Array(buffer);
-        const maxCheckLength = Math.min(188, uint8Array.length);
         // fmp4
-        if (uint8Array[4] === 0x66 && uint8Array[5] === 0x74 && uint8Array[6] === 0x79 && uint8Array[7] === 0x70) {
+        if (uint8Array[4] === 0x73 && uint8Array[5] === 0x74 && uint8Array[6] === 0x79 && uint8Array[7] === 0x70) {
+            return true;
+        }
+        // moof
+        if (uint8Array[4] === 0x6d && uint8Array[5] === 0x6f && uint8Array[6] === 0x6f && uint8Array[7] === 0x66) {
+            return true;
+        }
+        // webm
+        if (uint8Array[0] === 0x1a && uint8Array[1] === 0x45 && uint8Array[2] === 0xdf && uint8Array[3] === 0xa3) {
+            return true;
+        }
+        // mp3 ID3
+        if (uint8Array[0] === 0x49 && uint8Array[1] === 0x44 && uint8Array[2] === 0x33) {
+            return true;
+        }
+        // mp3 (MPEG audio frame header)
+        if (uint8Array[0] === 0xff && (uint8Array[1] & 0xe0) === 0xe0) {
+            return true;
+        }
+        // aac (ADTS header)
+        if (uint8Array[0] === 0xff && (uint8Array[1] & 0xf0) === 0xf0) {
             return true;
         }
         // ts
+        const maxCheckLength = Math.min(188, uint8Array.length);
         for (let i = 0; i < maxCheckLength; i++) {
             if (uint8Array[i] === 0x47 && (i + 188) < uint8Array.length && uint8Array[i + 188] === 0x47) {
                 return true;
@@ -1053,6 +1073,9 @@ $("#searchingForRealKey").click(function () {
                 }
             };
             $("#searchingForRealKey").html(i18n.realKeyNotFound);
+        }).catch(function (error) {
+            $("#searchingForRealKey").html(i18n.realKeyNotFound);
+            console.log(error);
         });
 });
 
