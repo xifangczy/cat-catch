@@ -1,20 +1,10 @@
-// 兼容Firefox的manifest V2
+// 兼容Firefox
 if (typeof (browser) == "object") {
     function importScripts() {
         for (let script of arguments) {
             const js = document.createElement('script');
             js.src = script;
             document.head.appendChild(js);
-        }
-    }
-
-    // firefox 小于128版本 executeScript不支持world: MAIN 属性
-    let version = navigator.userAgent.match(/Firefox\/([\d]+)/);
-    version = version && version[1] ? parseInt(version[1]) : 113;
-    if (version < 128) {
-        chrome.scripting = new Object();
-        chrome.scripting.executeScript = (obj) => {
-            return;
         }
     }
 
