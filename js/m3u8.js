@@ -1074,7 +1074,7 @@ $("#searchingForRealKey").click(function () {
             };
             $("#searchingForRealKey").html(i18n.realKeyNotFound);
         }).catch(function (error) {
-            $("#searchingForRealKey").html(i18n.realKeyNotFound);
+            $("#searchingForRealKey").html(i18n.dataFetchFailed);
             console.log(error);
         });
 });
