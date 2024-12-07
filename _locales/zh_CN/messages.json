@@ -829,5 +829,14 @@
   },
   "confirmParameters": {
     "message": "确认参数"
+  },
+  "verifyKey": {
+    "message": "验证密钥"
+  },
+  "verifying": {
+    "message": "验证中"
+  },
+  "verificationComplete": {
+    "message": "验证完成"
   }
 }

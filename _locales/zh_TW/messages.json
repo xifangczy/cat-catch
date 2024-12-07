@@ -829,5 +829,14 @@
   },
   "confirmParameters": {
     "message": "確認參數"
+  },
+  "verifyKey": {
+    "message": "驗證密鑰"
+  },
+  "verifying": {
+    "message": "驗證中"
+  },
+  "verificationComplete": {
+    "message": "驗證完成"
   }
 }

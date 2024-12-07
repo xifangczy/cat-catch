@@ -829,5 +829,14 @@
   },
   "confirmParameters": {
     "message": "Confirm Parameters"
+  },
+  "verifyKey": {
+    "message": "Verify Key"
+  },
+  "verifying": {
+    "message": "Verifying"
+  },
+  "verificationComplete": {
+    "message": "Verification Complete"
   }
 }

@@ -1003,6 +1003,54 @@ $("#sendFfmpeg").click(function () {
     $("#mergeTs").click();
 });
 
+// 找到真密钥
+$("#verifyKey").click(function () {
+    const keys = $('#maybeKey option').map(function () {
+        return $(this).val();
+    }).get();
+    keys.shift();   // 删除提示
+
+    let iv = _fragments[0].decryptdata.iv;
+
+    const customIV = $("#customIV").val().trim();
+    if (customIV) {
+        iv = StringToUint8Array(customIV);
+    }
+    $("#verifyKey").html(i18n.verifying);
+
+    fetch(_fragments[0].url)
+        .then(response => response.arrayBuffer())
+        .then(function (buffer) {
+            let flag = false;
+            keys.forEach(function (key) {
+                try {
+                    decryptor.expandKey(Base64ToArrayBuffer(key));
+                    const testBuffer = decryptor.decrypt(buffer, 0, iv.buffer, true);
+                    // 检查是否解密成功 buffer头部是否为ts头部 500个字节内
+                    for (let i = 0; i <= 500 && i <= testBuffer.byteLength; i++) {
+                        const ts = new Uint8Array(testBuffer.slice(i, i + 4)).toString();
+                        if (ts == "71,64,0,16" || ts == "71,65,0,48") {
+                            flag = key;
+                            break;
+                        }
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            });
+            if (flag) {
+                prompt(i18n.verificationComplete, flag);
+                $("#verifyKey").html(i18n.verificationComplete);
+                $("#customKey").val(flag);
+                $('#maybeKey select').val(flag);
+                $m3u8dlArg.val(getM3u8DlArg());
+                return;
+            }
+        });
+});
+
+
+
 /**************************** 下载TS文件 ****************************/
 // start 开始下载的索引
 // end 结束下载的索引
