@@ -830,13 +830,13 @@
   "confirmParameters": {
     "message": "Confirm Parameters"
   },
-  "verifyKey": {
-    "message": "Verify Key"
+  "searchingForRealKey": {
+    "message": "Searching for real key"
   },
   "verifying": {
     "message": "Verifying"
   },
-  "verificationComplete": {
-    "message": "Verification Complete"
+  "realKeyNotFound": {
+    "message": "Real key not found"
   }
 }

@@ -830,13 +830,13 @@
   "confirmParameters": {
     "message": "确认参数"
   },
-  "verifyKey": {
-    "message": "验证密钥"
+  "searchingForRealKey": {
+    "message": "寻找真实密钥"
   },
   "verifying": {
     "message": "验证中"
   },
-  "verificationComplete": {
-    "message": "验证完成"
+  "realKeyNotFound": {
+    "message": "未找到真实密钥"
   }
 }

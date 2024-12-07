@@ -1004,7 +1004,7 @@ $("#sendFfmpeg").click(function () {
 });
 
 // 找到真密钥
-$("#verifyKey").click(function () {
+$("#searchingForRealKey").click(function () {
     const keys = $('#maybeKey option').map(function () {
         return $(this).val();
     }).get();
@@ -1016,13 +1016,12 @@ $("#verifyKey").click(function () {
     if (customIV) {
         iv = StringToUint8Array(customIV);
     }
-    $("#verifyKey").html(i18n.verifying);
+    $("#searchingForRealKey").html(i18n.verifying);
 
     fetch(_fragments[0].url)
         .then(response => response.arrayBuffer())
         .then(function (buffer) {
-            let flag = false;
-            keys.forEach(function (key) {
+            for (let key of keys) {
                 try {
                     decryptor.expandKey(Base64ToArrayBuffer(key));
                     const testBuffer = decryptor.decrypt(buffer, 0, iv.buffer, true);
@@ -1030,22 +1029,19 @@ $("#verifyKey").click(function () {
                     for (let i = 0; i <= 500 && i <= testBuffer.byteLength; i++) {
                         const ts = new Uint8Array(testBuffer.slice(i, i + 4)).toString();
                         if (ts == "71,64,0,16" || ts == "71,65,0,48") {
-                            flag = key;
-                            break;
+                            prompt(i18n.searchingForRealKey, key);
+                            $("#searchingForRealKey").html(i18n.searchingForRealKey);
+                            $("#customKey").val(key);
+                            $('#maybeKey select').val(key);
+                            $m3u8dlArg.val(getM3u8DlArg());
+                            return;
                         }
                     }
                 } catch (error) {
                     console.log(error);
                 }
-            });
-            if (flag) {
-                prompt(i18n.verificationComplete, flag);
-                $("#verifyKey").html(i18n.verificationComplete);
-                $("#customKey").val(flag);
-                $('#maybeKey select').val(flag);
-                $m3u8dlArg.val(getM3u8DlArg());
-                return;
-            }
+            };
+            $("#searchingForRealKey").html(i18n.realKeyNotFound);
         });
 });
 
