@@ -1010,7 +1010,10 @@ $("#searchingForRealKey").click(function () {
     }).get();
     keys.shift();   // 删除提示
 
-    let iv = _fragments[0].decryptdata.iv;
+    let iv = _fragments[0].decryptdata?.iv;
+    if (!iv) {
+        iv = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _fragments[0].sn]);
+    }
 
     const customIV = $("#customIV").val().trim();
     if (customIV) {
