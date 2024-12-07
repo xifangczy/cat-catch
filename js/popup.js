@@ -617,6 +617,9 @@ if (G.version >= 102) {
 if (G.isFirefox) {
     $("body").addClass("fixFirefoxRight");
     $(".firefoxHide").each(function () { $(this).hide(); });
+    if (G.version < 128) {
+        $(".firefoxHideScript").each(function () { $(this).hide(); });
+    }
 }
 // 跳转页面
 $("[go]").click(function () {

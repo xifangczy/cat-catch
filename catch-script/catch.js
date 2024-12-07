@@ -19,7 +19,6 @@
         try {
             const fakeDiv = document.createElement('div');
             fakeDiv.innerHTML = string;
-            document.body.removeChild(fakeDiv);
             createHTML = (string) => string;
         } catch (e) {
             const policy = trustedTypes.createPolicy('catCatchPolicy', { createHTML: (s) => s });
@@ -289,7 +288,7 @@
                 const mime = item.mimeType.split(';')[0];
                 const fileBlob = new Blob(item.bufferList, { type: mime });
                 const type = mime.split('/')[0];
-                media.push({ data: URL.createObjectURL(fileBlob), type: type });
+                media.push({ data: (typeof chrome == "object") ? URL.createObjectURL(fileBlob) : fileBlob, type: type });
             }
             window.postMessage({
                 action: "catCatchFFmpeg",

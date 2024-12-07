@@ -8,10 +8,14 @@ if (typeof (browser) == "object") {
         }
     }
 
-    // Firefox scripting API 不完善
-    chrome.scripting = new Object();
-    chrome.scripting.executeScript = (obj) => {
-        return;
+    // firefox 小于128版本 executeScript不支持world: MAIN 属性
+    let version = navigator.userAgent.match(/Firefox\/([\d]+)/);
+    version = version && version[1] ? parseInt(version[1]) : 113;
+    if (version < 128) {
+        chrome.scripting = new Object();
+        chrome.scripting.executeScript = (obj) => {
+            return;
+        }
     }
 
     // browser.windows.onFocusChanged.addListener 少一个参数
