@@ -1018,6 +1018,20 @@ $("#searchingForRealKey").click(function () {
     }
     $("#searchingForRealKey").html(i18n.verifying);
 
+    const check = (buffer) => {
+        const uint8Array = new Uint8Array(buffer);
+        const maxCheckLength = Math.min(188, uint8Array.length);
+        // fmp4
+        if (uint8Array[4] === 0x66 && uint8Array[5] === 0x74 && uint8Array[6] === 0x79 && uint8Array[7] === 0x70) {
+            return true;
+        }
+        // ts
+        for (let i = 0; i < maxCheckLength; i++) {
+            if (uint8Array[i] === 0x47 && (i + 188) < uint8Array.length && uint8Array[i + 188] === 0x47) {
+                return true;
+            }
+        }
+    }
     fetch(_fragments[0].url)
         .then(response => response.arrayBuffer())
         .then(function (buffer) {
@@ -1025,17 +1039,14 @@ $("#searchingForRealKey").click(function () {
                 try {
                     decryptor.expandKey(Base64ToArrayBuffer(key));
                     const testBuffer = decryptor.decrypt(buffer, 0, iv.buffer, true);
-                    // 检查是否解密成功 buffer头部是否为ts头部 500个字节内
-                    for (let i = 0; i <= 500 && i <= testBuffer.byteLength; i++) {
-                        const ts = new Uint8Array(testBuffer.slice(i, i + 4)).toString();
-                        if (ts == "71,64,0,16" || ts == "71,65,0,48") {
-                            prompt(i18n.searchingForRealKey, key);
-                            $("#searchingForRealKey").html(i18n.searchingForRealKey);
-                            $("#customKey").val(key);
-                            $('#maybeKey select').val(key);
-                            $m3u8dlArg.val(getM3u8DlArg());
-                            return;
-                        }
+                    // 检查是否解密成功
+                    if (check(testBuffer)) {
+                        prompt(i18n.searchingForRealKey, key);
+                        $("#searchingForRealKey").html(i18n.searchingForRealKey);
+                        $("#customKey").val(key);
+                        $('#maybeKey select').val(key);
+                        $m3u8dlArg.val(getM3u8DlArg());
+                        return;
                     }
                 } catch (error) {
                     console.log(error);
