@@ -132,7 +132,7 @@ function parseMPD(mpdContent) {
         $("#loading").show();
         $("#loading .optionBox").html(`<b>${i18n.DRMerror}</b><br><br>`);
         drmInfo.map(item => {
-            $("#loading .optionBox").append(`<b>${item.encryptionType}</b><p>${item.pssh}</p>`);
+            $("#loading .optionBox").append(`<b>${item.encryptionType}</b><input value="${item.pssh}" style="width: 100%;"/>`);
         });
     }
 
