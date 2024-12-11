@@ -123,7 +123,8 @@ G.OptionLists = {
     // 第三方服务地址
     onlineServiceAddress: 0,
     // 新 猫抓下载器
-    testDownloader: true
+    testDownloader: true,
+    chromeLimitSize: 1.8 * 1024 * 1024 * 1024,
 };
 // 本地储存的配置
 G.LocalVar = {

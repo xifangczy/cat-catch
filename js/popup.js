@@ -868,7 +868,7 @@ function catDownload(obj, extra = {}) {
     }
     let active = !G.downActive;
     if (extra) { active = false; }
-    if (!extra.ffmpeg && !G.downStream && obj._size > 2147483648 && confirm(i18n("fileTooLargeStream", ["2G"]))) {
+    if (!extra.ffmpeg && !G.downStream && obj._size > G.chromeLimitSize && confirm(i18n("fileTooLargeStream", ["2G"]))) {
         extra.downStream = 1;
     }
     chrome.tabs.get(G.tabId, function (tab) {
@@ -907,7 +907,7 @@ function catDownload2(data, extra = {}) {
     localStorage.setItem('downloadData', JSON.stringify(data));
 
     // 如果大于2G 询问是否使用流式下载
-    if (!extra.ffmpeg && !G.downStream && Math.max(...data.map(item => item._size)) > 2147483648 && confirm(i18n("fileTooLargeStream", ["2G"]))) {
+    if (!extra.ffmpeg && !G.downStream && Math.max(...data.map(item => item._size)) > G.chromeLimitSize && confirm(i18n("fileTooLargeStream", ["2G"]))) {
         extra.downStream = 1;
     }
     // 发送消息给下载器
@@ -983,7 +983,7 @@ function mergeDownButtonCheck(data) {
 }
 function mergeDownButton() {
     const [checkedData, maxSize] = getCheckedData();
-    if (checkedData.length != 2 || maxSize > 1.8 * 1024 * 1024 * 1024) {
+    if (checkedData.length != 2 || maxSize > G.chromeLimitSize) {
         // $mergeDown.hide();
         $mergeDown.attr('disabled', true);
         return;
