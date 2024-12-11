@@ -1529,7 +1529,7 @@ function mergeTs() {
 
     // ffmpeg 转码
     if ($("#ffmpeg").prop("checked")) {
-        if (fileBlob.size < 2147483648) {
+        if (fileBlob.size < 1.8 * 1024 * 1024 * 1024) {
             chrome.runtime.sendMessage({
                 Message: "catCatchFFmpeg",
                 action: $("#onlyAudio").prop("checked") ? "onlyAudio" : "transcode",
