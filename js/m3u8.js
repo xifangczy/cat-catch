@@ -423,6 +423,7 @@ function parseTs(data) {
     let discontinuity = { start: 0, cc: 0 };
     data.endCC && $("#cc").show();
     for (let i in data.fragments) {
+        i = parseInt(i);
         /*
         * 少部分网站下载ts必须带有参数才能正常下载
         * 添加m3u8地址的参数
@@ -484,10 +485,9 @@ function parseTs(data) {
         }
 
         // #EXT-X-DISCONTINUITY
-        if (data.fragments[i].cc != discontinuity.cc) {
-            $('#cc').append(`<option value="${+discontinuity.start + 1}-${i}">playlist: ${data.fragments[i].cc}</option>`);
-            discontinuity.cc = data.fragments[i].cc;
-            discontinuity.start = i;
+        if (i === data.fragments.length - 1 || data.fragments[i].cc !== data.fragments[i + 1].cc) {
+            $('#cc').append(`<option value="${+discontinuity.start + 1}-${i + 1}">playlist: ${data.fragments[i].cc}</option>`);
+            discontinuity.start = i + 1;
         }
         _fragments.push({
             url: data.fragments[i].url,
