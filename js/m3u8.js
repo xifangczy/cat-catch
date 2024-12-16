@@ -154,6 +154,27 @@ function init() {
 
     if (isEmpty(_m3u8Url)) {
         $("#loading").hide(); $("#m3u8Custom").show();
+
+        // 批量生成切片链接
+        $("#generateUrls").change(function () {
+            const rangePattern = /\$\{range:(\d+)-(\d+),?(\d+)?\}/;
+            const text = $(this).val();
+            const match = text.match(rangePattern);
+            if (match) {
+                const start = parseInt(match[1]);
+                const end = parseInt(match[2]);
+                const padding = match[3] ? parseInt(match[3]) : 0;
+                const urls = [];
+                for (let i = start; i <= end; i++) {
+                    let number = i.toString();
+                    if (padding > 0) {
+                        number = number.padStart(padding, '0');
+                    }
+                    urls.push(text.replace(rangePattern, number));
+                }
+                $("#m3u8Text").val(urls.join("\n"));
+            }
+        });
         $("#parse").click(function () {
             let m3u8Text = $("#m3u8Text").val().trim();
             let baseUrl = $("#baseUrl").val().trim();
@@ -194,7 +215,7 @@ function init() {
         const getId = parseInt(params.get("getId"));
         if (getId) {
             chrome.tabs.sendMessage(getId, "getM3u8", function (result) {
-                $("#m3u8Text").html(result.m3u8Content);
+                $("#m3u8Text").val(result.m3u8Content);
                 $("#parse").click();
                 $("#info").html(result.mediaInfo);
             });
