@@ -246,7 +246,11 @@ function templates(text, data) {
 
     return text;
 }
-// 从url中获取文件名
+/**
+ * 从url中获取文件名
+ * @param {String} url 
+ * @returns {String} 文件名
+ */
 function getUrlFileName(url) {
     let pathname = new URL(url).pathname;
     let filename = pathname.split("/").pop();
@@ -265,4 +269,38 @@ function JSONparse(str, error = {}) {
     } catch (e) {
         return error;
     }
+}
+
+/**
+ * ArrayBuffer转Blob 大于2G的做切割
+ * @param {ArrayBuffer|Uint8Array} buffer 
+ * @param {String} type 文件类型
+ * @returns {Blob} 返回Blob对象
+ */
+function ArrayBufferToBlob(buffer, type) {
+    if (buffer instanceof Blob) {
+        return buffer;
+    }
+    if (buffer instanceof Uint8Array) {
+        buffer = buffer.buffer;
+    }
+    if (!buffer.byteLength) {
+        return new Blob();
+    }
+    if (!buffer instanceof ArrayBuffer) {
+        return new Blob();
+    }
+    if (buffer.byteLength >= 2 * 1024 * 1024 * 1024) {
+        const MAX_CHUNK_SIZE = 1024 * 1024 * 1024;
+        let offset = 0;
+        const blobs = [];
+        while (offset < buffer.byteLength) {
+            const chunkSize = Math.min(MAX_CHUNK_SIZE, buffer.byteLength - offset);
+            const chunk = buffer.slice(offset, offset + chunkSize);
+            blobs.push(new Blob([chunk]));
+            offset += chunkSize;
+        }
+        return new Blob(blobs, { type: type });
+    }
+    return new Blob([buffer], { type: type });
 }
