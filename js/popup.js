@@ -983,7 +983,7 @@ function mergeDownButtonCheck(data) {
 }
 function mergeDownButton() {
     const [checkedData, maxSize] = getCheckedData();
-    if (checkedData.length != 2 || maxSize > G.chromeLimitSize) {
+    if (checkedData.length != 2 || (!G.isFirefox && maxSize > G.chromeLimitSize)) {
         // $mergeDown.hide();
         $mergeDown.attr('disabled', true);
         return;
