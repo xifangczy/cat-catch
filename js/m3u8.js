@@ -195,7 +195,7 @@ function init() {
 
                         i++;
                         // 防止死循环 最大9999个
-                        if (i >= 9999) { break; }
+                        if (urls.length >= 9999) { break; }
                     }
                 } else {
                     end = parseInt(end);
