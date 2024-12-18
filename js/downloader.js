@@ -26,9 +26,19 @@ awaitG(() => {
             $("#getURL_btn").click(function () {
                 const data = [{
                     url: $("#getURL #url").val().trim(),
-                    requestHeaders: { referer: $("#getURL #referer").val().trim() },
                     requestId: 1,
                 }];
+
+                // 处理请求头 如果是url直接放入referer 支持json格式
+                const referer = $("#getURL #referer").val().trim();
+                if (referer) {
+                    if (referer.startsWith("http")) {
+                        data[0].requestHeaders = { referer: referer };
+                    } else {
+                        data[0].requestHeaders = JSONparse(referer);
+                    }
+                }
+
                 _downStream = $("#downStream").prop("checked");
                 _formDownload = true;   // 标记为表单提交下载
                 _data.push(...data);
