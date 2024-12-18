@@ -176,6 +176,7 @@ function init() {
                 const padding = match[3] ? parseInt(match[3]) : 0;
                 const urls = [];
 
+                // 如果end是 ? 使用fetch一直请求直到错误
                 if (end === "?") {
                     let i = start;
                     while (true) {
@@ -193,6 +194,8 @@ function init() {
                         } catch (error) { break; }
 
                         i++;
+                        // 防止死循环 最大9999个
+                        if (i >= 9999) { break; }
                     }
                 } else {
                     end = parseInt(end);
