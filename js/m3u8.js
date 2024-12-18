@@ -160,10 +160,10 @@ function init() {
             // 请求头
             const referer = $("#referer").val().trim();
             if (referer) {
-                if (referer.startsWith("{") && referer.endsWith("}")) {
-                    setRequestHeaders(JSON.parse(referer));
-                } else {
+                if (referer.startsWith("http")) {
                     setRequestHeaders({ referer: referer });
+                } else {
+                    setRequestHeaders(JSONparse(referer));
                 }
             }
 
@@ -216,20 +216,20 @@ function init() {
             if (m3u8Url != "") {
                 let url = "m3u8.html?url=" + encodeURIComponent(m3u8Url);
                 if (referer) {
-                    if (referer.startsWith("{") && referer.endsWith("}")) {
-                        url += "&requestHeaders=" + encodeURIComponent(referer);
-                    } else {
+                    if (referer.startsWith("http")) {
                         url += "&requestHeaders=" + encodeURIComponent(JSON.stringify({ referer: referer }));
+                    } else {
+                        url += "&requestHeaders=" + encodeURIComponent(referer);
                     }
                 }
                 chrome.tabs.update({ url: url });
                 return;
             }
             if (referer) {
-                if (referer.startsWith("{") && referer.endsWith("}")) {
-                    setRequestHeaders(JSON.parse(referer));
+                if (referer.startsWith("http")) {
+                    data[0].requestHeaders = { referer: referer };
                 } else {
-                    setRequestHeaders({ referer: referer });
+                    data[0].requestHeaders = JSONparse(referer);
                 }
             }
             if (!m3u8Text.includes("#EXTM3U")) {
