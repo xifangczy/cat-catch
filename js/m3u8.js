@@ -156,23 +156,56 @@ function init() {
         $("#loading").hide(); $("#m3u8Custom").show();
 
         // 批量生成切片链接
-        $("#generateUrls").change(function () {
-            const rangePattern = /\$\{range:(\d+)-(\d+),?(\d+)?\}/;
+        $("#generateUrls").change(async function () {
+            // 请求头
+            const referer = $("#referer").val().trim();
+            if (referer) {
+                if (referer.startsWith("{") && referer.endsWith("}")) {
+                    setRequestHeaders(JSON.parse(referer));
+                } else {
+                    setRequestHeaders({ referer: referer });
+                }
+            }
+
+            const rangePattern = /\$\{range:(\d+)-(\d+|\?),?(\d+)?\}/;
             const text = $(this).val();
             const match = text.match(rangePattern);
             if (match) {
                 const start = parseInt(match[1]);
-                const end = parseInt(match[2]);
+                let end = match[2];
                 const padding = match[3] ? parseInt(match[3]) : 0;
                 const urls = [];
-                for (let i = start; i <= end; i++) {
-                    let number = i.toString();
-                    if (padding > 0) {
-                        number = number.padStart(padding, '0');
+
+                if (end === "?") {
+                    let i = start;
+                    while (true) {
+                        let number = i.toString();
+                        if (padding > 0) {
+                            number = number.padStart(padding, '0');
+                        }
+                        const url = text.replace(rangePattern, number);
+                        try {
+                            const response = await fetch(url, { method: 'HEAD' });
+                            if (!response.ok) {
+                                break;
+                            }
+                            urls.push(url);
+                        } catch (error) { break; }
+
+                        i++;
                     }
-                    urls.push(text.replace(rangePattern, number));
+                } else {
+                    end = parseInt(end);
+                    for (let i = start; i <= end; i++) {
+                        let number = i.toString();
+                        if (padding > 0) {
+                            number = number.padStart(padding, '0');
+                        }
+                        urls.push(text.replace(rangePattern, number));
+                    }
                 }
-                $("#m3u8Text").val(urls.join("\n"));
+
+                urls.length && $("#m3u8Text").val(urls.join("\n"));
             }
         });
         $("#parse").click(function () {
@@ -183,13 +216,21 @@ function init() {
             if (m3u8Url != "") {
                 let url = "m3u8.html?url=" + encodeURIComponent(m3u8Url);
                 if (referer) {
-                    url += "&requestHeaders=" + encodeURIComponent(JSON.stringify({ referer: referer }));
+                    if (referer.startsWith("{") && referer.endsWith("}")) {
+                        url += "&requestHeaders=" + encodeURIComponent(referer);
+                    } else {
+                        url += "&requestHeaders=" + encodeURIComponent(JSON.stringify({ referer: referer }));
+                    }
                 }
                 chrome.tabs.update({ url: url });
                 return;
             }
-            if (referer != "") {
-                setRequestHeaders({ referer: referer });
+            if (referer) {
+                if (referer.startsWith("{") && referer.endsWith("}")) {
+                    setRequestHeaders(JSON.parse(referer));
+                } else {
+                    setRequestHeaders({ referer: referer });
+                }
             }
             if (!m3u8Text.includes("#EXTM3U")) {
                 // ts列表链接 转 m3u8
