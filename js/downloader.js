@@ -402,6 +402,7 @@ function sendFile(action, data, fragment) {
 function setHeaders(data, callBack) {
     const rules = { removeRuleIds: [], addRules: [] };
     for (let item of data) {
+        if (!item.requestHeaders) { continue; }
         const rule = {
             "id": parseInt(item.requestId),
             "action": {
