@@ -173,7 +173,7 @@ function start() {
         }
 
         // 转为blob
-        const blob = ArrayBufferToBlob(buffer, fragment.contentType);
+        const blob = ArrayBufferToBlob(buffer, { type: fragment.contentType });
 
         // 发送到ffmpeg
         if (_ffmpeg) {
@@ -350,7 +350,7 @@ function start() {
 function sendFile(action, data, fragment) {
     // 转 blob
     if (data instanceof ArrayBuffer) {
-        data = ArrayBufferToBlob(data, fragment.contentType);
+        data = ArrayBufferToBlob(data, { type: fragment.contentType });
     }
     chrome.tabs.query({ url: G.ffmpegConfig.url }, function (tabs) {
         // 等待ffmpeg 打开并且可用

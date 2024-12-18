@@ -273,11 +273,11 @@ function JSONparse(str, error = {}) {
 
 /**
  * ArrayBuffer转Blob 大于2G的做切割
- * @param {ArrayBuffer|Uint8Array} buffer 
- * @param {String} type 文件类型
+ * @param {ArrayBuffer|Uint8Array} buffer 原始数据
+ * @param {Object} options Blob配置
  * @returns {Blob} 返回Blob对象
  */
-function ArrayBufferToBlob(buffer, type) {
+function ArrayBufferToBlob(buffer, options = {}) {
     if (buffer instanceof Blob) {
         return buffer;
     }
@@ -300,7 +300,7 @@ function ArrayBufferToBlob(buffer, type) {
             blobs.push(new Blob([chunk]));
             offset += chunkSize;
         }
-        return new Blob(blobs, { type: type });
+        return new Blob(blobs, options);
     }
-    return new Blob([buffer], { type: type });
+    return new Blob([buffer], options);
 }
