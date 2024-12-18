@@ -15,7 +15,6 @@
 
     const buttonStyle = 'style="border:solid 1px #000;margin:2px;padding:2px;background:#fff;border-radius:4px;border:solid 1px #c7c7c780;color:#000;"';
     const checkboxStyle = 'style="-webkit-appearance: auto;"';
-    const numberStyle = 'style="width: 5rem;"';
 
     const CatCatch = document.createElement("div");
     CatCatch.setAttribute("id", "catCatchRecorder");

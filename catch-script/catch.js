@@ -1,6 +1,5 @@
 (function () {
     console.log("catch.js Start");
-    if (document.getElementById("CatCatchCatch")) { return; }
 
     // 启用开关
     let enable = true;

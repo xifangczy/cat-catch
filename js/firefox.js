@@ -20,12 +20,10 @@ if (typeof (browser) == "object") {
         }
     });
 
-    if (typeof jQuery != "undefined") {
-        $('#firefoxYes').click(function () {
-            window.close();
-        });
-        $('#firefoxUninstallSelf').click(function () {
-            browser.management.uninstallSelf();
-        });
-    }
+    document.getElementById('firefoxYes').addEventListener('click', function () {
+        window.close();
+    });
+    document.getElementById('firefoxUninstallSelf').addEventListener('click', function () {
+        browser.management.uninstallSelf();
+    });
 }
