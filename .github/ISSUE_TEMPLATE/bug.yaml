@@ -35,7 +35,7 @@ body:
     attributes:
       label: Checklist
       options:
-        - label: 我已查看 https://github.com/xifangczy/cat-catch/issues 未找到解决办法。 The issue observed is not already reported by searching on Github under https://github.com/xifangczy/cat-catch/issues
+        - label: 我已在 [issues](https://github.com/xifangczy/cat-catch/issues) 通过搜索, 未找到解决办法。 The issue observed is not already reported by searching on Github under [issues](https://github.com/xifangczy/cat-catch/issues)
           required: true
         - label: 我已查看 [FAQ](https://github.com/xifangczy/cat-catch/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98-FAQ) 未找到解决办法。 I've already checked the FAQ at [FAQ](https://github.com/xifangczy/cat-catch/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98-FAQ) and couldn't find a solution.
           required: true
