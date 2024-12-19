@@ -27,7 +27,7 @@ body:
   - type: input
     id: url
     attributes:
-      label: 涉及网址 url
+      label: 涉及网址 related URL
       placeholder: e.g. https://example.com
       description: 请提供发生问题的网址 需要授权登陆才能播放的请通过邮箱提交bug
   - type: checkboxes
