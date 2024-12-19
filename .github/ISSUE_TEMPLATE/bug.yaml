@@ -9,7 +9,7 @@ body:
   - type: dropdown
     id: browser
     attributes:
-      label: 浏览器
+      label: 浏览器 browser
       options:
         - Google Chrome
         - Microsoft Edge
@@ -22,17 +22,26 @@ body:
   - type: input
     id: browserVersion
     attributes:
-      label: 浏览器版本号
+      label: 浏览器版本号 browser version
       placeholder: e.g. vX.Y.Z
   - type: input
     id: url
     attributes:
-      label: 涉及网址
+      label: 涉及网址 url
       placeholder: e.g. https://example.com
       description: 请提供发生问题的网址 需要授权登陆才能播放的请通过邮箱提交bug
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: 我已查看 https://github.com/xifangczy/cat-catch/issues 未找到解决办法。 The issue observed is not already reported by searching on Github under https://github.com/xifangczy/cat-catch/issues
+          required: true
+        - label: 我已查看 [FAQ](https://github.com/xifangczy/cat-catch/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98-FAQ) 未找到解决办法。 I've already checked the FAQ at [FAQ](https://github.com/xifangczy/cat-catch/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98-FAQ) and couldn't find a solution.
+          required: true
   - type: textarea
     id: description
     attributes:
-      label: 请详细描述问题
+      label: 请详细描述问题 What actually happened?
     validations:
       required: true
