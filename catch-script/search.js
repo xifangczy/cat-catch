@@ -29,11 +29,11 @@
                 if (xhr.status === 200) {
                     const blob = new Blob([`(${__CAT_CATCH_CATCH_SCRIPT__.toString()})();`, xhr.response], { type: 'text/javascript' });
                     const newWorker = new _Worker(URL.createObjectURL(blob), options);
-                    newWorker.onmessage = function (event) {
+                    newWorker.addEventListener("message", function (event) {
                         if (event.data?.action == "catCatchAddKey" || event.data?.action == "catCatchAddMedia") {
                             postData(event.data);
                         }
-                    }
+                    });
                     return newWorker;
                 }
             } catch (error) {
