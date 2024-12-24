@@ -15,6 +15,7 @@ https://addons.mozilla.org/addon/cat-catch/ 😂需非国区IP访问
 
 # 📒用户文档
 https://o2bmm.gitbook.io/cat-catch/
+( 国内用户无法访问gitbook 尝试 https://cat-catch.bmmmd.com/ )
 
 # 🌏翻译
 [![gitlocalized ](https://gitlocalize.com/repo/9392/whole_project/badge.svg)](https://gitlocalize.com/repo/9392?utm_source=badge)
