@@ -1,5 +1,23 @@
 ## 更新说明
 
+### 2.5.7
+
+[Fixed] 自定义保存文件名使用 `/` 无法创建目录
+
+[Changed] firefox 升级 manifest v3
+
+[Changed] firefox 128 以上版本 支持使用深度搜索 缓存录制 等脚本功能
+
+[Fixed] firefox 无法发送到在线 ffmpeg 问题
+
+[Added] 重构 猫抓下载器 如需旧版本请在设置 关闭 `Test version` 选项
+
+[Added] `URL Protocol m3u8dl` `调用程序` 增加下载前确认参数设置
+
+[Added] m3u8 为疑似密钥增加验证密钥功能
+
+[Changed] 增强 深度搜索 现在能找到更多疑似密钥
+
 ### 2.5.6
 
 [Fixed] m3u8 解析器 自动关闭 bug #531
