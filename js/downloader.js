@@ -84,7 +84,7 @@ function start() {
     const addHtml = (fragment) => {
         const html = $(`
             <div class="downItem">
-                <div class="explain">${stringModify(fragment.name ?? getUrlFileName(fragment.url))}</div>
+                <div class="explain">${fragment.downFileName}</div>
                 <div id="downFilepProgress"></div>
                 <div class="progress-container">
                     <div class="progress-wrapper">
