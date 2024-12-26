@@ -9,7 +9,6 @@ let _tabId = null;  // 当前页面tab id
 let _index = null;  // 当前页面 tab index
 
 // 是否表单提交下载 表单提交 不使用自定义文件名
-let _formDownload = false;
 const downloadData = localStorage.getItem('downloadData') ? JSON.parse(localStorage.getItem('downloadData')) : [];
 
 awaitG(() => {
@@ -40,7 +39,6 @@ awaitG(() => {
                 }
 
                 _downStream = $("#downStream").prop("checked");
-                _formDownload = true;   // 标记为表单提交下载
                 _data.push(...data);
                 setHeaders(data, start());
                 $("#getURL, .newDownload").toggle();
@@ -115,7 +113,7 @@ function start() {
                 $(this).html(i18n.retryDownload).data("action", "start");
                 if (fragment.fileStream) {
                     fragment.fileStream.close();
-                    fragment.fileStream = streamSaver.createWriteStream(fragment._filename).getWriter();
+                    fragment.fileStream = streamSaver.createWriteStream(fragment.downFileName).getWriter();
                 }
             } else if (action == "start") {
                 down.state = "waiting";
@@ -125,17 +123,9 @@ function start() {
         });
         $downBox.append(html);
 
-        // 自定义下载文件名
-        fragment._filename = getUrlFileName(fragment.url);
-        if (G.TitleName && !_formDownload) {
-            fragment.title = stringModify(fragment.title);    // 防止标题中有路径分隔符 导致下载新建文件夹
-            fragment._filename = templates(G.downFileName, fragment);
-        }
-        _formDownload = false;   // 重置表单提交标记
-
         // 流式下载处理
         if ((_downStream || G.downStream) && !_ffmpeg) {
-            fragment.fileStream = streamSaver.createWriteStream(fragment._filename).getWriter();
+            fragment.fileStream = streamSaver.createWriteStream(fragment.downFileName).getWriter();
         }
     }
 
@@ -196,7 +186,7 @@ function start() {
         // 直接下载
         chrome.downloads.download({
             url: URL.createObjectURL(blob),
-            filename: filterFileName(fragment._filename),
+            filename: fragment.downFileName,
             saveAs: G.saveAs
         }, function (downloadId) {
             fragment.downId = downloadId;
