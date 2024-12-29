@@ -13,6 +13,28 @@
         }
     }
 
+    // 删除iframe sandbox属性 避免 issues #576
+    function processIframe(iframe) {
+        if (iframe.hasAttribute('sandbox')) {
+            const clonedIframe = iframe.cloneNode(true);
+            clonedIframe.removeAttribute('sandbox');
+            iframe.parentNode.replaceChild(clonedIframe, iframe);
+        }
+    }
+    document.querySelectorAll('iframe').forEach(processIframe);
+    const observer = new MutationObserver((mutationsList) => {
+        for (const mutation of mutationsList) {
+            if (mutation.type === 'childList') {
+                mutation.addedNodes.forEach(node => {
+                    if (node.nodeName === 'IFRAME') {
+                        processIframe(node);
+                    }
+                });
+            }
+        }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
     // Trusted Types
     let createHTML = (string) => {
         try {
