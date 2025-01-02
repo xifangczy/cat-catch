@@ -25,7 +25,7 @@ Install directly from the official extension store using the link provided.
 ## Source Code Installation
 1. Git clone the repository.
 2. Open the extensions management page and enable "Developer Mode."
-3. Click "Load unpacked" and select the directory you unzipped.
+3. Click "Load unpacked" and select the extension folder.
 ## CRX Installation
 1. Right-click and save the CRX file from [Releases](https://github.com/xifangczy/cat-catch/releases).
 2. Open the extensions management page and enable "Developer Mode."

@@ -26,7 +26,7 @@ https://o2bmm.gitbook.io/cat-catch/
 ## 源码安装
 1. Git Clone 代码。
 2. 扩展管理页面 打开 "开发者模式"。
-3. 点击 "加载已解压的扩展程序" 选中你解压好的目录即可。
+3. 点击 "加载已解压的扩展程序" 选中扩展文件夹即可。
 ## crx安装
 1. [Releases](https://github.com/xifangczy/cat-catch/releases) 右键另存为下载crx文件。
 2. 扩展管理页面 打开 "开发者模式"。
