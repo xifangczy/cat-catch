@@ -19,10 +19,17 @@ https://o2bmm.gitbook.io/cat-catch/
 # 🌏Translations
 [![gitlocalized ](https://gitlocalize.com/repo/9392/whole_project/badge.svg)](https://gitlocalize.com/repo/9392?utm_source=badge)
 
-# 📘Source code loading method for Chrome/Edge and other Chromium core browsers
-1. Download the Source code from https://github.com/xifangczy/cat-catch/releases and unzip it.
-2. Open "Developer Mode" on the extension management page.
-3. Click "Load unpacked extension" and select the directory you unzipped.
+# 📘 Installation Methods
+## App Store Installation
+Install directly from the official extension store using the link provided.
+## Source Code Installation
+1. Git clone the repository.
+2. Open the extensions management page and enable "Developer Mode."
+3. Click "Load unpacked" and select the directory you unzipped.
+## CRX Installation
+1. Right-click and save the CRX file from [Releases](https://github.com/xifangczy/cat-catch/releases).
+2. Open the extensions management page and enable "Developer Mode."
+3. Drag the CRX file into the extensions page.
 
 # 📚Compatibility
 After version 1.0.17, Chromium kernel version 93 or above is required.

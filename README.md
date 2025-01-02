@@ -20,10 +20,17 @@ https://o2bmm.gitbook.io/cat-catch/
 # 🌏翻译
 [![gitlocalized ](https://gitlocalize.com/repo/9392/whole_project/badge.svg)](https://gitlocalize.com/repo/9392?utm_source=badge)
 
-# 📘Chrome/Edge等Chromium内核浏览器 源码加载方法
-1. https://github.com/xifangczy/cat-catch/releases 下载 Source code 并解压。
+# 📘安装方法
+## 应用商店安装
+通过安装地址的链接到官方扩展商店即可安装。
+## 源码安装
+1. Git Clone 代码。
 2. 扩展管理页面 打开 "开发者模式"。
 3. 点击 "加载已解压的扩展程序" 选中你解压好的目录即可。
+## crx安装
+1. [Releases](https://github.com/xifangczy/cat-catch/releases) 右键另存为下载crx文件。
+2. 扩展管理页面 打开 "开发者模式"。
+3. 将crx文件拖入扩展程序页面即可。
 
 # 📚兼容性说明
 1.0.17版本之后需要Chromium内核版本93以上。
