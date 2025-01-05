@@ -56,14 +56,6 @@ let checkboxState = true;
 function AddMedia(data, currentTab = true) {
     data._title = data.title;
     data.title = stringModify(data.title);
-    // 不存在扩展使用类型
-    if (data.ext === undefined && data.type !== undefined) {
-        data.ext = data.type.split("/")[1];
-    }
-    // 正则匹配的备注扩展
-    if (data.extraExt) {
-        data.ext = data.extraExt;
-    }
     //文件名
     data.name = isEmpty(data.name) ? data.title + '.' + data.ext : decodeURIComponent(stringModify(data.name));
     //截取文件名长度

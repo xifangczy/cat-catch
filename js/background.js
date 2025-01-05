@@ -1,4 +1,4 @@
-importScripts("/js/init.js");
+importScripts("/js/init.js", "/js/function.js");
 
 // Service Worker 5分钟后会强制终止扩展
 // https://bugs.chromium.org/p/chromium/issues/detail?id=1271154
@@ -185,13 +185,20 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
             tabId: data.tabId,
             isRegex: isRegex,
             requestId: data.requestId ?? Date.now().toString(),
-            extraExt: data.extraExt,
             initiator: data.initiator,
             requestHeaders: data.requestHeaders,
             cookie: data.cookie,
             cacheURL: { host: urlParsing.host, search: urlParsing.search, pathname: urlParsing.pathname },
             getTime: data.getTime
         };
+        // 不存在扩展使用类型
+        if (info.ext === undefined && info.type !== undefined) {
+            info.ext = info.type.split("/")[1];
+        }
+        // 正则匹配的备注扩展
+        if (data.extraExt) {
+            info.ext = data.extraExt;
+        }
         // 不存在 initiator 和 referer 使用web url代替initiator
         if (info.initiator == undefined || info.initiator == "null") {
             info.initiator = info.requestHeaders?.referer ?? webInfo?.url;
