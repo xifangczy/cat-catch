@@ -1043,18 +1043,18 @@ function aria2AddUri(data, success, error) {
         }
     }
     json.params.push([data.url], params);
-    $.ajax({
-        type: "POST",
-        url: G.aria2Rpc,
-        data: JSON.stringify(json),
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: function (data) {
-            success && success(data);
+    fetch(G.aria2Rpc, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json; charset=utf-8"
         },
-        error: function (errMsg) {
-            error && error(errMsg);
-        }
+        body: JSON.stringify(json)
+    }).then(response => {
+        return response.json();
+    }).then(data => {
+        success && success(data);
+    }).catch(errMsg => {
+        error && error(errMsg);
     });
 }
 
