@@ -1,8 +1,17 @@
-// 追加0
+/**
+ * 小于10的数字前面加0
+ * @param {Number} date 
+ * @returns {String|Number}
+ */
 function appendZero(date) {
     return parseInt(date) < 10 ? `0${date}` : date;
 }
-// 秒转换成时间
+
+/**
+ * 秒转格式化成时间
+ * @param {Number} sec 
+ * @returns {String}
+ */
 function secToTime(sec) {
     let hour = (sec / 3600) | 0;
     let min = ((sec % 3600) / 60) | 0;
@@ -12,7 +21,12 @@ function secToTime(sec) {
     time += sec.toString().padStart(2, '0');
     return time;
 }
-// 字节转换成大小
+
+/**
+ * 字节转换成大小
+ * @param {Number} byte 大小
+ * @returns {String} 格式化后的文件大小
+ */
 function byteToSize(byte) {
     if (!byte || byte < 1024) { return 0; }
     if (byte < 1024 * 1024) {
@@ -23,7 +37,12 @@ function byteToSize(byte) {
         return (byte / 1024 / 1024 / 1024).toFixed(1) + "GB";
     }
 }
-// Firefox download API 无法下载 data URL
+
+/**
+ * Firefox download API 无法下载 data URL
+ * @param {String} url 
+ * @param {String} fileName 文件名
+ */
 function downloadDataURL(url, fileName) {
     const link = document.createElement("a");
     link.href = url;
@@ -31,7 +50,12 @@ function downloadDataURL(url, fileName) {
     link.click();
     delete link;
 }
-// 判断是否为空
+
+/**
+ * 判断变量是否为空
+ * @param {Object|String} obj 判断的变量
+ * @returns {Boolean}
+ */
 function isEmpty(obj) {
     return (typeof obj == "undefined" ||
         obj == null ||
@@ -39,7 +63,11 @@ function isEmpty(obj) {
         obj == " ")
 }
 
-// 修改请求头
+/**
+ * 修改请求头
+ * @param {Object} data 请求头数据
+ * @param {Function} callback 
+ */
 function setRequestHeaders(data = {}, callback = undefined) {
     chrome.declarativeNetRequest.updateSessionRules({ removeRuleIds: [1] });
     chrome.tabs.getCurrent(function (tabs) {
@@ -76,6 +104,11 @@ function setRequestHeaders(data = {}, callback = undefined) {
     });
 }
 
+/**
+ * 等待全局变量G初始化完成
+ * @param {Function} callback 
+ * @param {Number} sec
+ */
 function awaitG(callback, sec = 0) {
     const timer = setInterval(() => {
         if (G.initSyncComplete && G.initLocalComplete) {
@@ -85,7 +118,12 @@ function awaitG(callback, sec = 0) {
     }, sec);
 }
 
-// 分割字符串
+/**
+ * 分割字符串 不分割引号内的内容
+ * @param {String} text 需要处理的文本
+ * @param {String} separator 分隔符
+ * @returns {String} 返回分割后的字符串
+ */
 function splitString(text, separator) {
     text = text.trim();
     if (text.length == 0) { return []; }
@@ -108,7 +146,13 @@ function splitString(text, separator) {
     return parts;
 }
 
-// 模板 函数 实现
+/**
+ * 模板的函数处理
+ * @param {String} text 文本
+ * @param {String} action 函数名
+ * @param {Object} data 填充的数据
+ * @returns {String} 返回处理后的字符串
+ */
 function templatesFunction(text, action, data) {
     text = isEmpty(text) ? "" : text.toString();
     action = splitString(action, "|");
@@ -185,6 +229,13 @@ function templatesFunction(text, action, data) {
     }
     return text;
 }
+
+/**
+ * 模板替换
+ * @param {String} text 标签模板
+ * @param {Object} data 填充的数据
+ * @returns {String} 返回填充后的字符串
+ */
 function templates(text, data) {
     if (isEmpty(text)) { return ""; }
     // fullFileName
@@ -246,6 +297,7 @@ function templates(text, data) {
 
     return text;
 }
+
 /**
  * 从url中获取文件名
  * @param {String} url 
@@ -256,6 +308,7 @@ function getUrlFileName(url) {
     let filename = pathname.split("/").pop();
     return filename ? filename : "NULL";
 }
+
 /**
  * 解析json字符串 解析错误返回默认值
  * @param {string} str json字符串
@@ -303,4 +356,127 @@ function ArrayBufferToBlob(buffer, options = {}) {
         return new Blob(blobs, options);
     }
     return new Blob([buffer], options);
+}
+
+
+/**
+ * 清理冗余数据
+ */
+function clearRedundant() {
+    chrome.tabs.query({}, function (tabs) {
+        const allTabId = new Set(tabs.map(tab => tab.id));
+
+        if (!cacheData.init) {
+            // 清理 缓存数据
+            let cacheDataFlag = false;
+            for (let key in cacheData) {
+                if (!allTabId.has(Number(key))) {
+                    cacheDataFlag = true;
+                    delete cacheData[key];
+                }
+            }
+            cacheDataFlag && (chrome.storage.session ?? chrome.storage.local).set({ MediaData: cacheData });
+        }
+        // 清理脚本
+        G.scriptList.forEach(function (scriptList) {
+            scriptList.tabId.forEach(function (tabId) {
+                if (!allTabId.has(tabId)) {
+                    scriptList.tabId.delete(tabId);
+                }
+            });
+        });
+
+        if (!G.initLocalComplete) { return; }
+
+        // 清理 declarativeNetRequest 模拟手机
+        chrome.declarativeNetRequest.getSessionRules(function (rules) {
+            let mobileFlag = false;
+            for (let item of rules) {
+                if (item.condition.tabIds) {
+                    // 如果tabIds列表都不存在 则删除该条规则
+                    if (!item.condition.tabIds.some(id => allTabId.has(id))) {
+                        mobileFlag = true;
+                        item.condition.tabIds.forEach(id => G.featMobileTabId.delete(id));
+                        chrome.declarativeNetRequest.updateSessionRules({
+                            removeRuleIds: [item.id]
+                        });
+                    }
+                } else if (item.id == 1) {
+                    // 清理预览视频增加的请求头
+                    chrome.declarativeNetRequest.updateSessionRules({ removeRuleIds: [1] });
+                }
+            }
+            mobileFlag && (chrome.storage.session ?? chrome.storage.local).set({ featMobileTabId: Array.from(G.featMobileTabId) });
+        });
+        // 清理自动下载
+        let autoDownFlag = false;
+        G.featAutoDownTabId.forEach(function (tabId) {
+            if (!allTabId.has(tabId)) {
+                autoDownFlag = true;
+                G.featAutoDownTabId.delete(tabId);
+            }
+        });
+        autoDownFlag && (chrome.storage.session ?? chrome.storage.local).set({ featAutoDownTabId: Array.from(G.featAutoDownTabId) });
+    });
+    // G.referer.clear();
+    // G.blackList.clear();
+    // G.temp.clear();
+}
+
+/**
+ * 替换掉文件名中的特殊字符 包含路径
+ * @param {String} str 需要处理的文本
+ * @param {String} text 需要替换的文本
+ * @returns {String} 返回替换后的字符串
+ */
+function stringModify(str, text) {
+    if (!str) { return str; }
+    str = filterFileName(str, text);
+    return str.replaceAll("\\", "&bsol;").replaceAll("/", "&sol;");
+}
+
+/**
+ * 替换掉文件名中的特殊字符 不包含路径
+ * @param {String} str 需要处理的文本
+ * @param {String} text 需要替换的文本
+ * @returns {String} 返回替换后的字符串
+ */
+function filterFileName(str, text) {
+    if (!str) { return str; }
+    reFilterFileName.lastIndex = 0;
+    str = str.replaceAll(/\u200B/g, "").replaceAll(/\u200C/g, "").replaceAll(/\u200D/g, "");
+    str = str.replace(reFilterFileName, function (match) {
+        return text || {
+            '<': '&lt;',
+            '>': '&gt;',
+            ':': '&colon;',
+            '"': '&quot;',
+            '|': '&vert;',
+            '?': '&quest;',
+            '*': '&ast;',
+            '~': '_'
+        }[match];
+    });
+
+    // 如果最后一位是"." chrome.download 无法下载
+    if (str.endsWith(".")) {
+        str = str + "catCatch";
+    }
+    return str;
+}
+
+/**
+ * 发送数据到本地
+ * @param {String} action 发送类型
+ * @param {Object} data 发送的数据
+ * @param {Number} tabId 发送数据的标签页ID
+ */
+async function send2local(action, data, tabId = 0) {
+    fetch(G.send2localURL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify({ action: action, data: data, tabId: tabId })
+    }).catch((e) => { console.log(e) });
 }
