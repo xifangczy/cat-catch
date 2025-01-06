@@ -535,22 +535,11 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
             }
         });
     }
-    // 检查当前标签是否在屏蔽列表中
+    // 检查当前标签是否在屏蔽列表中 设置图标
     if (changeInfo.url && tabId > 0 && G.initSyncComplete && G.blockUrl.length) {
-        G.blockUrlSet.has(tabId) && G.blockUrlSet.delete(tabId);
-        let isBlocked = false;
-        for (let key in G.blockUrl) {
-            if (!G.blockUrl[key].state) { continue; }
-            G.blockUrl[key].url.lastIndex = 0;
-            if (G.blockUrl[key].url.test(changeInfo.url)) {
-                isBlocked = true;
-                break;
-            }
-        }
-        if (G.blockUrlWhite) {
-            isBlocked = !isBlocked;
-        }
-        if (isBlocked) {
+        G.blockUrlSet.delete(tabId);
+        chrome.action.setIcon({ path: G.enable ? "/img/icon.png" : "/img/icon-disable.png" });
+        if (isLockUrl(changeInfo.url)) {
             G.blockUrlSet.add(tabId);
             chrome.action.setIcon({ path: "/img/icon-disable.png" });
         }
@@ -560,6 +549,16 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 // 载入frame时
 chrome.webNavigation.onCommitted.addListener(function (details) {
     if (isSpecialPage(details.url) || details.tabId <= 0 || !G.initSyncComplete) { return; }
+
+    // 刷新检查是否在屏蔽列表中 设置图标
+    if (details.frameId == 0 && details.transitionType == "reload") {
+        G.blockUrlSet.delete(details.tabId);
+        chrome.action.setIcon({ path: G.enable ? "/img/icon.png" : "/img/icon-disable.png" });
+        if (isLockUrl(details.url)) {
+            G.blockUrlSet.add(details.tabId);
+            chrome.action.setIcon({ path: "/img/icon-disable.png" });
+        }
+    }
 
     // 刷新清理角标数
     if (details.frameId == 0 && (details.transitionType == "reload" || details.transitionType == "link") && G.autoClearMode == 1) {

@@ -498,3 +498,19 @@ function wildcardToRegex(urlPattern) {
     // 创建正则表达式，确保匹配整个URL
     return new RegExp(`^${regexPattern}$`, 'i'); // 忽略大小写
 }
+
+function isLockUrl(url) {
+    let isBlocked = false;
+    for (let key in G.blockUrl) {
+        if (!G.blockUrl[key].state) { continue; }
+        G.blockUrl[key].url.lastIndex = 0;
+        if (G.blockUrl[key].url.test(url)) {
+            isBlocked = true;
+            break;
+        }
+    }
+    if (G.blockUrlWhite) {
+        isBlocked = !isBlocked;
+    }
+    return isBlocked;
+}
