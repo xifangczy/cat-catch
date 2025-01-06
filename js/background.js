@@ -503,12 +503,6 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
         return;
     }
     SetIcon({ tabId: G.tabId });
-
-    if (G.blockUrlSet.has(G.tabId) || !G.enable) {
-        chrome.action.setIcon({ path: "/img/icon-disable.png" });
-    } else {
-        chrome.action.setIcon({ path: "/img/icon.png" });
-    }
 });
 
 // 切换窗口，更新全局变量G.tabId
@@ -538,10 +532,8 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     // 检查当前标签是否在屏蔽列表中 设置图标
     if (changeInfo.url && tabId > 0 && G.initSyncComplete && G.blockUrl.length) {
         G.blockUrlSet.delete(tabId);
-        chrome.action.setIcon({ path: G.enable ? "/img/icon.png" : "/img/icon-disable.png" });
         if (isLockUrl(changeInfo.url)) {
             G.blockUrlSet.add(tabId);
-            chrome.action.setIcon({ path: "/img/icon-disable.png" });
         }
     }
 });
@@ -553,10 +545,8 @@ chrome.webNavigation.onCommitted.addListener(function (details) {
     // 刷新检查是否在屏蔽列表中 设置图标
     if (details.frameId == 0 && details.transitionType == "reload") {
         G.blockUrlSet.delete(details.tabId);
-        chrome.action.setIcon({ path: G.enable ? "/img/icon.png" : "/img/icon-disable.png" });
         if (isLockUrl(details.url)) {
             G.blockUrlSet.add(details.tabId);
-            chrome.action.setIcon({ path: "/img/icon-disable.png" });
         }
     }
 
