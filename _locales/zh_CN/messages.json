@@ -838,5 +838,17 @@
   },
   "realKeyNotFound": {
     "message": "未找到真实密钥"
+  },
+  "blockUrl": {
+    "message": "屏蔽网址"
+  },
+  "addUrl": {
+    "message": "添加网址"
+  },
+  "wildcards": {
+    "message": "通配符"
+  },
+  "blockUrlTips": {
+    "message": "支持通配符 * 和 ?"
   }
 }

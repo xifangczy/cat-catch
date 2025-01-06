@@ -838,5 +838,17 @@
   },
   "realKeyNotFound": {
     "message": "未找到真實密鑰"
+  },
+  "blockUrl": {
+    "message": "封鎖網址"
+  },
+  "addUrl": {
+    "message": "添加網址"
+  },
+  "wildcards": {
+    "message": "萬用字元"
+  },
+  "blockUrlTips": {
+    "message": "支持萬用字元*和？"
   }
 }

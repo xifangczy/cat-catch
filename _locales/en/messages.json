@@ -838,5 +838,17 @@
   },
   "realKeyNotFound": {
     "message": "Real key not found"
+  },
+  "blockUrl": {
+    "message": "Block URL"
+  },
+  "addUrl": {
+    "message": "Add URL"
+  },
+  "wildcards": {
+    "message": "wildcards"
+  },
+  "blockUrlTips": {
+    "message": "Support wildcards * and ?"
   }
 }

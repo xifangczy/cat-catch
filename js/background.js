@@ -73,6 +73,10 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         }, 233);
         return;
     }
+    // 检查当前标签是否在屏蔽列表中
+    if (data.tabId && data.tabId > 0 && G.blockUrlSet.has(data.tabId)) {
+        return;
+    }
     if (!G.enable) { return; }
 
     data.getTime = Date.now();
@@ -486,10 +490,10 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
 });
 
 // 选定标签 更新G.tabId
-chrome.tabs.onHighlighted.addListener(function (activeInfo) {
-    if (!activeInfo.tabId || activeInfo.tabId == -1) { return; }
-    G.tabId = activeInfo.tabId;
-});
+// chrome.tabs.onHighlighted.addListener(function (activeInfo) {
+//     if (activeInfo.windowId == -1 || !activeInfo.tabIds || !activeInfo.tabIds.length) { return; }
+//     G.tabId = activeInfo.tabIds[0];
+// });
 
 // 切换标签，更新全局变量G.tabId 更新图标
 chrome.tabs.onActivated.addListener(function (activeInfo) {
@@ -499,13 +503,25 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
         return;
     }
     SetIcon({ tabId: G.tabId });
+
+    if (G.blockUrlSet.has(G.tabId) || !G.enable) {
+        chrome.action.setIcon({ path: "/img/icon-disable.png" });
+    } else {
+        chrome.action.setIcon({ path: "/img/icon.png" });
+    }
 });
 
 // 切换窗口，更新全局变量G.tabId
-chrome.windows.onFocusChanged.addListener(function (activeInfo) {
-    if (!activeInfo.tabId || activeInfo.tabId == -1) { return; }
-    G.tabId = activeInfo.tabId;
-}, { filters: ["normal"] });
+// chrome.windows.onFocusChanged.addListener(function (activeInfo) {
+//     if (activeInfo == -1) { return; }
+//     chrome.tabs.query({ active: true, windowId: activeInfo }, function (tabs) {
+//         if (tabs[0] && tabs[0].id) {
+//             G.tabId = tabs[0].id;
+//         } else {
+//             G.tabId = -1;
+//         }
+//     });
+// }, { filters: ["normal"] });
 
 // 标签更新 清理数据
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
@@ -519,11 +535,23 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
             }
         });
     }
+    // 检查当前标签是否在屏蔽列表中
+    if (changeInfo.url && tabId > 0 && G.initSyncComplete && G.blockUrl.length) {
+        G.blockUrlSet.has(tabId) && G.blockUrlSet.delete(tabId);
+        for (let key in G.blockUrl) {
+            if (!G.blockUrl[key].state) { continue; }
+            G.blockUrl[key].url.lastIndex = 0;
+            if (G.blockUrl[key].url.test(changeInfo.url)) {
+                G.blockUrlSet.add(tabId);
+                chrome.action.setIcon({ path: "/img/icon-disable.png" });
+                break;
+            }
+        }
+    }
 });
 
 // 载入frame时
 chrome.webNavigation.onCommitted.addListener(function (details) {
-    // console.log(details);
     if (isSpecialPage(details.url) || details.tabId <= 0 || !G.initSyncComplete) { return; }
 
     // 刷新清理角标数
@@ -570,6 +598,9 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
     chrome.alarms.get("nowClear", function (alarm) {
         !alarm && chrome.alarms.create("nowClear", { when: Date.now() + 1000 });
     });
+    if (G.initSyncComplete) {
+        G.blockUrlSet.has(tabId) && G.blockUrlSet.delete(tabId);
+    }
 });
 
 // 快捷键

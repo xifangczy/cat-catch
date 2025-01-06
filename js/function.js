@@ -480,3 +480,21 @@ async function send2local(action, data, tabId = 0) {
         body: JSON.stringify({ action: action, data: data, tabId: tabId })
     }).catch((e) => { console.log(e) });
 }
+
+/**
+ * 将用户输入的URL（可能包含通配符）转换为正则表达式
+ * @param {string} urlPattern - 用户输入的URL，可能包含通配符
+ * @returns {RegExp} - 转换后的正则表达式
+ */
+function convertUrlPatternToRegex(urlPattern) {
+    // 将通配符 * 转换为正则表达式的 .*
+    // 将通配符 ? 转换为正则表达式的 .
+    // 同时转义其他正则表达式特殊字符
+    const regexPattern = urlPattern
+        .replace(/[.+^${}()|[\]\\]/g, '\\$&') // 转义正则表达式特殊字符
+        .replace(/\*/g, '.*') // 将 * 替换为 .*
+        .replace(/\?/g, '.'); // 将 ? 替换为 .
+
+    // 创建正则表达式，确保匹配整个URL
+    return new RegExp(`^${regexPattern}$`, 'i'); // 忽略大小写
+}

@@ -17,7 +17,8 @@ G.initSyncComplete = false;
 G.initLocalComplete = false;
 // 缓存数据
 var cacheData = { init: true };
-G.blackList = new Set();
+G.blackList = new Set();    // 正则屏蔽列表
+G.blockUrlSet = new Set();    // 屏蔽网址列表
 G.requestHeaders = new Map();
 // 当前tabID
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -125,6 +126,7 @@ G.OptionLists = {
     // 新 猫抓下载器
     testDownloader: true,
     chromeLimitSize: 1.8 * 1024 * 1024 * 1024,
+    blockUrl: [],
 };
 // 本地储存的配置
 G.LocalVar = {
@@ -201,6 +203,10 @@ function InitOptions() {
             try { reg = new RegExp(item.regex, item.type) } catch (e) { item.state = false; }
             return { regex: reg, ext: item.ext, blackList: item.blackList, state: item.state }
         });
+        // 预编译屏蔽通配符
+        items.blockUrl = items.blockUrl.map(item => {
+            return { url: convertUrlPatternToRegex(item.url), state: item.state }
+        });
 
         // 兼容旧配置
         if (items.copyM3U8.includes('$url$')) {
@@ -256,6 +262,12 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
                 let reg = undefined;
                 try { reg = new RegExp(item.regex, item.type) } catch (e) { item.state = false; }
                 return { regex: reg, ext: item.ext, blackList: item.blackList, state: item.state }
+            });
+            continue;
+        }
+        if (key == "blockUrl") {
+            G.blockUrl = newValue.map(item => {
+                return { url: convertUrlPatternToRegex(item.url), state: item.state }
             });
             continue;
         }
