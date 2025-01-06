@@ -486,7 +486,7 @@ async function send2local(action, data, tabId = 0) {
  * @param {string} urlPattern - 用户输入的URL，可能包含通配符
  * @returns {RegExp} - 转换后的正则表达式
  */
-function convertUrlPatternToRegex(urlPattern) {
+function wildcardToRegex(urlPattern) {
     // 将通配符 * 转换为正则表达式的 .*
     // 将通配符 ? 转换为正则表达式的 .
     // 同时转义其他正则表达式特殊字符

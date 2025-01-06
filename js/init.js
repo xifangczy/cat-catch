@@ -205,7 +205,7 @@ function InitOptions() {
         });
         // 预编译屏蔽通配符
         items.blockUrl = items.blockUrl.map(item => {
-            return { url: convertUrlPatternToRegex(item.url), state: item.state }
+            return { url: wildcardToRegex(item.url), state: item.state }
         });
 
         // 兼容旧配置
@@ -267,7 +267,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
         }
         if (key == "blockUrl") {
             G.blockUrl = newValue.map(item => {
-                return { url: convertUrlPatternToRegex(item.url), state: item.state }
+                return { url: wildcardToRegex(item.url), state: item.state }
             });
             continue;
         }
