@@ -1,4 +1,4 @@
-importScripts("/js/init.js", "/js/function.js");
+importScripts("/js/function.js", "/js/init.js");
 
 // Service Worker 5分钟后会强制终止扩展
 // https://bugs.chromium.org/p/chromium/issues/detail?id=1271154
