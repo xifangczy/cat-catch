@@ -538,14 +538,21 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     // 检查当前标签是否在屏蔽列表中
     if (changeInfo.url && tabId > 0 && G.initSyncComplete && G.blockUrl.length) {
         G.blockUrlSet.has(tabId) && G.blockUrlSet.delete(tabId);
+        let isBlocked = false;
         for (let key in G.blockUrl) {
             if (!G.blockUrl[key].state) { continue; }
             G.blockUrl[key].url.lastIndex = 0;
             if (G.blockUrl[key].url.test(changeInfo.url)) {
-                G.blockUrlSet.add(tabId);
-                chrome.action.setIcon({ path: "/img/icon-disable.png" });
+                isBlocked = true;
                 break;
             }
+        }
+        if (G.blockUrlWhite) {
+            isBlocked = !isBlocked;
+        }
+        if (isBlocked) {
+            G.blockUrlSet.add(tabId);
+            chrome.action.setIcon({ path: "/img/icon-disable.png" });
         }
     }
 });

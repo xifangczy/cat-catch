@@ -850,5 +850,8 @@
   },
   "blockUrlTips": {
     "message": "Support wildcards * and ?"
+  },
+  "setWhiteList": {
+    "message": "Set to whitelist"
   }
 }

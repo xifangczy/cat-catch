@@ -127,6 +127,7 @@ G.OptionLists = {
     testDownloader: true,
     chromeLimitSize: 1.8 * 1024 * 1024 * 1024,
     blockUrl: [],
+    blockUrlWhite: false,
 };
 // 本地储存的配置
 G.LocalVar = {

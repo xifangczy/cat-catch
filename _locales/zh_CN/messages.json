@@ -850,5 +850,8 @@
   },
   "blockUrlTips": {
     "message": "支持通配符 * 和 ?"
+  },
+  "setWhiteList": {
+    "message": "设置为白名单"
   }
 }
