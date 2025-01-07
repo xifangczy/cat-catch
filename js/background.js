@@ -18,6 +18,11 @@ chrome.runtime.onConnect.addListener(function (Port) {
     });
 });
 
+/**
+ *  定时任务
+ *  nowClear clear 清理冗余数据
+ *  save 保存数据
+ */
 chrome.alarms.onAlarm.addListener(function (alarm) {
     if (alarm.name === "nowClear" || alarm.name === "clear") {
         clearRedundant();
@@ -279,35 +284,39 @@ function save(tabId) {
     cacheData[tabId] && SetIcon({ number: cacheData[tabId].length, tabId: tabId });
 }
 
-// 监听来自popup 和 options的请求
+/**
+ * 监听 扩展 message 事件
+ */
 chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     if (!G.initLocalComplete || !G.initSyncComplete) {
         sendResponse("error");
         return true;
     }
+    // 以下检查是否有 tabId 不存在使用当前标签
+    Message.tabId = Message.tabId ?? G.tabId;
+
+    // 从缓存中保存数据到本地
     if (Message.Message == "pushData") {
         (chrome.storage.session ?? chrome.storage.local).set({ MediaData: cacheData });
         sendResponse("ok");
         return true;
     }
+    // 获取所有数据
     if (Message.Message == "getAllData") {
         sendResponse(cacheData);
         return true;
     }
-    // 图标设置
+    /**
+     * 设置扩展图标数字
+     * 提供 type 删除标签为 tabId 的数字
+     * 不提供type 删除所有标签的数字
+     */
     if (Message.Message == "ClearIcon") {
-        if (Message.type) {
-            if (Message.tabId) {
-                SetIcon({ tabId: Message.tabId });
-            } else if (G.tabId) {
-                SetIcon({ tabId: G.tabId });
-            }
-        } else {
-            SetIcon({ tips: false });
-        }
+        Message.type ? SetIcon({ tabId: Message.tabId }) : SetIcon();
         sendResponse("ok");
         return true;
     }
+    // 启用/禁用扩展
     if (Message.Message == "enable") {
         G.enable = !G.enable;
         chrome.storage.sync.set({ enable: G.enable });
@@ -315,7 +324,9 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         sendResponse(G.enable);
         return true;
     }
-    Message.tabId = Message.tabId ?? G.tabId;
+    /**
+     * 提供requestId数组 获取指定的数据
+     */
     if (Message.Message == "getData" && Message.requestId) {
         // 判断Message.requestId是否数组
         if (!Array.isArray(Message.requestId)) {
@@ -334,10 +345,17 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         sendResponse(response.length ? response : "error");
         return true;
     }
+    /**
+     * 提供 tabId 获取该标签数据
+     */
     if (Message.Message == "getData") {
         sendResponse(cacheData[Message.tabId]);
         return true;
     }
+    /**
+     * 获取各按钮状态
+     * 模拟手机 自动下载 启用 以及各种脚本状态
+     */
     if (Message.Message == "getButtonState") {
         let state = {
             MobileUserAgent: G.featMobileTabId.has(Message.tabId),
@@ -350,14 +368,14 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         sendResponse(state);
         return true;
     }
-    // 模拟手机
+    // 对tabId的标签 进行模拟手机操作
     if (Message.Message == "mobileUserAgent") {
         mobileUserAgent(Message.tabId, !G.featMobileTabId.has(Message.tabId));
         chrome.tabs.reload(Message.tabId, { bypassCache: true });
         sendResponse("ok");
         return true;
     }
-    // 自动下载
+    // 对tabId的标签 开启 关闭 自动下载
     if (Message.Message == "autoDown") {
         if (G.featAutoDownTabId.has(Message.tabId)) {
             G.featAutoDownTabId.delete(Message.tabId);
@@ -368,7 +386,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         sendResponse("ok");
         return true;
     }
-    // 脚本
+    // 对tabId的标签 脚本注入或删除
     if (Message.Message == "script") {
         if (!G.scriptList.has(Message.script)) {
             sendResponse("error no exists");
@@ -399,6 +417,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         sendResponse("ok");
         return true;
     }
+    // 脚本注入 脚本申请多语言文件
     if (Message.Message == "scriptI18n") {
         chrome.scripting.executeScript({
             target: { tabId: Message.tabId, allFrames: true },
@@ -495,7 +514,10 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
 //     G.tabId = activeInfo.tabIds[0];
 // });
 
-// 切换标签，更新全局变量G.tabId 更新图标
+/**
+ * 监听 切换标签
+ * 更新全局变量 G.tabId 为当前标签
+ */
 chrome.tabs.onActivated.addListener(function (activeInfo) {
     G.tabId = activeInfo.tabId;
     if (cacheData[G.tabId] !== undefined) {
@@ -517,7 +539,11 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
 //     });
 // }, { filters: ["normal"] });
 
-// 标签更新 清理数据
+/**
+ * 监听 标签页面更新
+ * 检查 清理数据
+ * 检查 是否在屏蔽列表中
+ */
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (isSpecialPage(tab.url) || tabId <= 0 || !G.initSyncComplete) { return; }
     if (changeInfo.status && changeInfo.status == "loading" && G.autoClearMode == 2) {
@@ -529,7 +555,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
             }
         });
     }
-    // 检查当前标签是否在屏蔽列表中 设置图标
+    // 检查当前标签是否在屏蔽列表中
     if (changeInfo.url && tabId > 0 && G.initSyncComplete && G.blockUrl.length) {
         G.blockUrlSet.delete(tabId);
         if (isLockUrl(changeInfo.url)) {
@@ -538,11 +564,16 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     }
 });
 
-// 载入frame时
+/**
+ * 监听 frame 正在载入
+ * 检查 是否在屏蔽列表中 (frameId == 0 为主框架)
+ * 检查 自动清理 (frameId == 0 为主框架)
+ * 检查 注入脚本
+ */
 chrome.webNavigation.onCommitted.addListener(function (details) {
     if (isSpecialPage(details.url) || details.tabId <= 0 || !G.initSyncComplete) { return; }
 
-    // 刷新检查是否在屏蔽列表中 设置图标
+    // 刷新页面 检查是否在屏蔽列表中
     if (details.frameId == 0 && details.transitionType == "reload") {
         G.blockUrlSet.delete(details.tabId);
         if (isLockUrl(details.url)) {
@@ -588,7 +619,9 @@ chrome.webNavigation.onCommitted.addListener(function (details) {
     }
 });
 
-// 标签关闭 清除数据
+/**
+ * 监听 标签关闭 清理数据
+ */
 chrome.tabs.onRemoved.addListener(function (tabId) {
     // 清理缓存数据
     chrome.alarms.get("nowClear", function (alarm) {
@@ -599,7 +632,9 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
     }
 });
 
-// 快捷键
+/**
+ * 浏览器 扩展快捷键
+ */
 chrome.commands.onCommand.addListener(function (command) {
     if (command == "auto_down") {
         if (G.featAutoDownTabId.has(G.tabId)) {
@@ -626,6 +661,10 @@ chrome.commands.onCommand.addListener(function (command) {
     }
 });
 
+/**
+ * 监听 页面完全加载完成 判断是否在线ffmpeg页面
+ * 如果是在线ffmpeg 则发送数据
+ */
 chrome.webNavigation.onCompleted.addListener(function (details) {
     if (G.ffmpegConfig.tab && details.tabId == G.ffmpegConfig.tab) {
         setTimeout(() => {
@@ -638,7 +677,12 @@ chrome.webNavigation.onCompleted.addListener(function (details) {
     }
 });
 
-//检查扩展名以及大小限制
+/**
+ * 检查扩展名和大小
+ * @param {String} ext 
+ * @param {Number} size 
+ * @returns {Boolean|String}
+ */
 function CheckExtension(ext, size) {
     const Ext = G.Ext.get(ext);
     if (!Ext) { return false; }
@@ -646,7 +690,13 @@ function CheckExtension(ext, size) {
     if (Ext.size != 0 && size != undefined && size <= Ext.size * 1024) { return "break"; }
     return true;
 }
-//检查类型以及大小限制
+
+/**
+ * 检查类型和大小
+ * @param {String} dataType 
+ * @param {Number} dataSize 
+ * @returns {Boolean|String}
+ */
 function CheckType(dataType, dataSize) {
     const typeInfo = G.Type.get(dataType.split("/")[0] + "/*") || G.Type.get(dataType);
     if (!typeInfo) { return false; }
@@ -655,14 +705,23 @@ function CheckType(dataType, dataSize) {
     return true;
 }
 
-// 获取文件名 后缀
+/**
+ * 获取文件名及扩展名
+ * @param {String} pathname 
+ * @returns {Array}
+ */
 function fileNameParse(pathname) {
     let fileName = decodeURI(pathname.split("/").pop());
     let ext = fileName.split(".");
     ext = ext.length == 1 ? undefined : ext.pop().toLowerCase();
     return [fileName, ext ? ext : undefined];
 }
-//获取Header属性的值
+
+/**
+ * 获取响应头信息
+ * @param {Object} data 
+ * @returns {Object}
+ */
 function getResponseHeadersValue(data) {
     const header = {};
     if (data.responseHeaders == undefined || data.responseHeaders.length == 0) { return header; }
@@ -683,6 +742,12 @@ function getResponseHeadersValue(data) {
     }
     return header;
 }
+
+/**
+ * 获取请求头
+ * @param {Object} data 
+ * @returns {Object|Boolean}
+ */
 function getRequestHeaders(data) {
     if (data.allRequestHeaders == undefined || data.allRequestHeaders.length == 0) { return false; }
     const header = {};
