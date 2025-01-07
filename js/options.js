@@ -95,7 +95,7 @@ function Gethtml(Type, Param = new Object()) {
         </td>`
             break;
         case "blockUrl":
-            html = `<td><input type="text" value="${Param.url ? Param.url : ""}" name="url" placeholder="${i18n.blockUrl} ${i18n.wildcards}" class="width100"></td>`
+            html = `<td><input type="text" value="${Param.url ? Param.url : ""}" name="url" placeholder="${i18n.blockUrlTips}" class="width100"></td>`
             break;
     }
     html = $(`<tr data-type="${Type}">
