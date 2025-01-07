@@ -17,10 +17,10 @@ G.initSyncComplete = false;
 G.initLocalComplete = false;
 // 缓存数据
 var cacheData = { init: true };
-G.blackList = new Set();    // 正则屏蔽列表
+G.blackList = new Set();    // 正则屏蔽资源列表
 G.blockUrlSet = new Set();    // 屏蔽网址列表
-G.requestHeaders = new Map();
-// 当前tabID
+G.requestHeaders = new Map();   // 临时储存请求头
+// 初始化当前tabId
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     if (tabs[0] && tabs[0].id) {
         G.tabId = tabs[0].id;
@@ -293,3 +293,21 @@ chrome.runtime.onInstalled.addListener(function (details) {
         chrome.alarms.create("nowClear", { when: Date.now() + 3000 });
     }
 });
+
+/**
+ * 将用户输入的URL（可能包含通配符）转换为正则表达式
+ * @param {string} urlPattern - 用户输入的URL，可能包含通配符
+ * @returns {RegExp} - 转换后的正则表达式
+ */
+function wildcardToRegex(urlPattern) {
+    // 将通配符 * 转换为正则表达式的 .*
+    // 将通配符 ? 转换为正则表达式的 .
+    // 同时转义其他正则表达式特殊字符
+    const regexPattern = urlPattern
+        .replace(/[.+^${}()|[\]\\]/g, '\\$&') // 转义正则表达式特殊字符
+        .replace(/\*/g, '.*') // 将 * 替换为 .*
+        .replace(/\?/g, '.'); // 将 ? 替换为 .
+
+    // 创建正则表达式，确保匹配整个URL
+    return new RegExp(`^${regexPattern}$`, 'i'); // 忽略大小写
+}
