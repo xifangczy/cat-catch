@@ -417,6 +417,8 @@ function clearRedundant() {
             }
         });
         autoDownFlag && (chrome.storage.session ?? chrome.storage.local).set({ featAutoDownTabId: Array.from(G.featAutoDownTabId) });
+
+        G.blockUrlSet = new Set([...G.blockUrlSet].filter(x => allTabId.has(x)));
     });
     // G.referer.clear();
     // G.blackList.clear();
