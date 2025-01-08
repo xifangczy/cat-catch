@@ -815,5 +815,35 @@
   },
   "withinChina": {
     "message": "中国国内"
+  },
+  "dataFetchFailed": {
+    "message": "データの取得に失敗しました"
+  },
+  "confirmParameters": {
+    "message": "パラメーターを確認"
+  },
+  "searchingForRealKey": {
+    "message": "本物のキーを検索中"
+  },
+  "verifying": {
+    "message": "検証中"
+  },
+  "realKeyNotFound": {
+    "message": "本物のキーが見つかりません"
+  },
+  "blockUrl": {
+    "message": "URLをブロック"
+  },
+  "addUrl": {
+    "message": "URLを追加"
+  },
+  "wildcards": {
+    "message": "ワイルドカード"
+  },
+  "blockUrlTips": {
+    "message": "ワイルドカード * と ? をサポート"
+  },
+  "setWhiteList": {
+    "message": "ホワイトリストに設定"
   }
 }
