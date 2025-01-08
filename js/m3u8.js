@@ -1253,7 +1253,7 @@ function downloadNew(start = 0, end = _fragments.length) {
     down.setDecrypt(function (buffer, fragment) {
         return new Promise(function (resolve, reject) {
             // 跳过解密 录制模式 切片不存在加密 跳过解密 直接返回
-            if (skipDecrypt || recorder || !fragment.encrypted) {
+            if (skipDecrypt || recorder || !fragment.encrypted || !fragment.decryptdata) {
                 if (fragment.initSegment) {
                     buffer = addInitSegmentData(buffer, fragment.initSegment);
                 }
