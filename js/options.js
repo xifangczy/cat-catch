@@ -395,3 +395,26 @@ function Save(option, sec = 0) {
         }
     }, sec);
 }
+
+// 导航栏
+document.querySelectorAll('nav a').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+            targetElement.scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+    });
+});
+const adjustSidebarPosition = () => {
+    const wrapper = document.querySelector('.wrapper');
+    const sidebar = document.querySelector('.sidebar');
+    if (wrapper && sidebar) {
+        sidebar.style.left = `${wrapper.getBoundingClientRect().left - sidebar.offsetWidth - 20}px`;
+    }
+}
+window.addEventListener('load', adjustSidebarPosition)
+window.addEventListener('resize', adjustSidebarPosition);

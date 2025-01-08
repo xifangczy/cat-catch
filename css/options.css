@@ -7,13 +7,9 @@ body {
 
 .wrapper {
   margin: 0 auto;
-  /* width: 640px; */
   width: 45rem;
 }
 
-/* .wrapper input {
-  margin-left: 10px;
-} */
 .error {
   color: var(--text-error-color);
 }
@@ -542,21 +538,58 @@ a.json-placeholder:hover {
   align-items: center;
   gap: 10px;
 }
+
 .progress-wrapper {
   flex: 1;
 }
+
 .newDownload .downItem {
   margin-bottom: 1rem;
 }
+
 .newDownload .downItem .progress-bar {
   margin-bottom: 0;
   height: 20px;
 }
+
 .newDownload .downItem button {
   margin: 0;
 }
+
 .newDownload .downItem .progress {
   color: var(--background-color-two);
   text-align: center;
   transition: width 0.2s;
+}
+
+/** 导航条 **/
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 10rem;
+  height: 100%;
+  padding: 10px;
+  background-color: var(--background-color-two);
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  text-align: center;
+  margin-right: 0;
+}
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+.sidebar li {
+  margin: 10px 0;
+}
+.sidebar a {
+  text-decoration: none;
+  color: var(--text-color);
+  display: block;
+  padding: 5px;
+  border-radius: 4px;
+}
+.sidebar a:hover {
+  background-color: var(--button-hover-color);
 }
