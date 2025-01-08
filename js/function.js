@@ -489,14 +489,12 @@ async function send2local(action, data, tabId = 0) {
  * @returns {Boolean}
  */
 function isLockUrl(url) {
-    let isBlocked = false;
     for (let key in G.blockUrl) {
         if (!G.blockUrl[key].state) { continue; }
         G.blockUrl[key].url.lastIndex = 0;
         if (G.blockUrl[key].url.test(url)) {
-            isBlocked = true;
-            break;
+            return true;
         }
     }
-    return G.blockUrlWhite ? !isBlocked : isBlocked;
+    return false;
 }

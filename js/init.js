@@ -229,8 +229,7 @@ function InitOptions() {
 
         G = { ...items, ...G };
 
-        const icon = { path: G.enable ? "/img/icon.png" : "/img/icon-disable.png" };
-        chrome.action.setIcon(icon);
+        chrome.action.setIcon({ path: G.enable ? "/img/icon.png" : "/img/icon-disable.png" });
 
         G.initSyncComplete = true;
     });

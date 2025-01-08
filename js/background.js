@@ -78,11 +78,11 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         }, 233);
         return;
     }
-    // 检查当前标签是否在屏蔽列表中
-    if (data.tabId && data.tabId > 0 && G.blockUrlSet.has(data.tabId)) {
+    // 检查 是否启用 是否在当前标签是否在屏蔽列表中
+    const blockUrlFlag = data.tabId && data.tabId > 0 && G.blockUrlSet.has(data.tabId);
+    if (!G.enable || (G.blockUrlWhite ? !blockUrlFlag : blockUrlFlag)) {
         return;
     }
-    if (!G.enable) { return; }
 
     data.getTime = Date.now();
 
