@@ -704,6 +704,14 @@
       }
     }
   },
+  "fileTooLargeStream": {
+    "message": "ファイルが $size$ より大きい場合、ストリーミング保存を有効にしますか？",
+    "placeholders": {
+      "size": {
+        "content": "$1"
+      }
+    }
+  },
   "formatConversionError": {
     "message": "フォーマット変換エラー、mp4変換をキャンセルして、もう一度ダウンロードしてください。"
   },
