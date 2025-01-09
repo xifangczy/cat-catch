@@ -1,9 +1,9 @@
 // 低版本chrome manifest v3协议 会有 getMessage 函数不存在的bug
 if (chrome.i18n.getMessage === undefined) {
     chrome.i18n.getMessage = (key) => key;
-    fetch(chrome.runtime.getURL("_locales/zh/messages.json")).then(res => res.json()).then(data => {
+    fetch(chrome.runtime.getURL("_locales/zh_CN/messages.json")).then(res => res.json()).then(data => {
         chrome.i18n.getMessage = (key) => data[key].messages;
-    });
+    }).catch((e) => { console.error(e); });
 }
 // 简写翻译函数
 const i18n = new Proxy(chrome.i18n.getMessage, {
