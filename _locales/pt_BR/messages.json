@@ -309,7 +309,7 @@
     "message": "Invocar"
   },
   "parameter": {
-    "message": "Parâmetro"
+    "message": "Parâmetros"
   },
   "parameterSetting": {
     "message": "Configuração de Parâmetro"
@@ -318,7 +318,7 @@
     "message": "Testar"
   },
   "replaceTags": {
-    "message": "Substituir Tags"
+    "message": "Substituir Etiquetas"
   },
   "customSaveFileName": {
     "message": "Personalizar Nome do Arquivo Salvo"
@@ -354,7 +354,7 @@
     "message": "Deixe em branco para desativá-lo. O padrão é usar a página pop-up para visualizar o vídeo"
   },
   "preview": {
-    "message": "Exibição"
+    "message": "Prévia"
   },
   "customFilenameOption": {
     "message": "Usar um nome de arquivo personalizado para salvar o arquivo (o padrão é o título da página da web)"
@@ -372,7 +372,7 @@
     "message": "Não Limpar"
   },
   "normalClear": {
-    "message": "Limpar Normal"
+    "message": "Limpeza Normal"
   },
   "moreFrequent": {
     "message": "Mais Freqüente"
@@ -507,7 +507,7 @@
     "message": "Comando Copiar"
   },
   "previewCommand": {
-    "message": "Comando de Visualização"
+    "message": "Comando Prévia"
   },
   "addSettingParameters": {
     "message": "Adicionar Parâmetros de Configuração"
@@ -546,7 +546,7 @@
     "message": "Faixa de Download"
   },
   "recordLive": {
-    "message": "Registro"
+    "message": "Gravar"
   },
   "mergeDownloads": {
     "message": "Mesclar Downloads"
@@ -734,7 +734,7 @@
     "message": "Selecionar Vídeo"
   },
   "extractSlices": {
-    "message": "Extrair Fatias"
+    "message": "Extrair Pedaços"
   },
   "convertToM3U8": {
     "message": "Converter para Análise M3U8"
@@ -829,5 +829,29 @@
   },
   "confirmParameters": {
     "message": "Confirmar Parâmetros"
+	  },
+  "searchingForRealKey": {
+    "message": "Procurando pela chave real"
+  },
+  "verifying": {
+    "message": "Verificando"
+  },
+  "realKeyNotFound": {
+    "message": "Chave real não encontrada"
+  },
+  "blockUrl": {
+    "message": "Bloquear URL"
+  },
+  "addUrl": {
+    "message": "Adicionar URL"
+  },
+  "wildcards": {
+    "message": "curingas"
+  },
+  "blockUrlTips": {
+    "message": "Suportar curingas * e ?"
+  },
+  "setWhiteList": {
+    "message": "Definir para lista de permissões"
   }
 }
