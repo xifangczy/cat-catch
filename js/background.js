@@ -43,7 +43,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 // 保存requestHeaders
 chrome.webRequest.onSendHeaders.addListener(
     function (data) {
-        if (G && !G.enable) { return; }
+        if (G && G.initSyncComplete && !G.enable) { return; }
         data.requestHeaders && G.requestHeaders.set(data.requestId, data.requestHeaders);
     }, { urls: ["<all_urls>"] }, ['requestHeaders',
         chrome.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS].filter(Boolean)
@@ -52,9 +52,8 @@ chrome.webRequest.onSendHeaders.addListener(
 chrome.webRequest.onResponseStarted.addListener(
     function (data) {
         try {
-            const requestHeaders = G.requestHeaders.get(data.requestId);
-            if (requestHeaders) {
-                data.allRequestHeaders = requestHeaders;
+            data.allRequestHeaders = G.requestHeaders.get(data.requestId);
+            if (data.allRequestHeaders) {
                 G.requestHeaders.delete(data.requestId);
             }
             findMedia(data);
