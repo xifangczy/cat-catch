@@ -175,6 +175,7 @@ function init() {
                 let end = match[2];
                 const padding = match[3] ? parseInt(match[3]) : 0;
                 const urls = [];
+                $("#m3u8Text").val(i18n.loadingData);
 
                 // 如果end是 ? 使用fetch一直请求直到错误
                 if (end === "?") {
@@ -208,7 +209,7 @@ function init() {
                     }
                 }
 
-                urls.length && $("#m3u8Text").val(urls.join("\n"));
+                urls.length && $("#m3u8Text").val(urls.join("\n\n"));
             }
         });
         $("#parse").click(function () {
