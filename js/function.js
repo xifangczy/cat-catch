@@ -210,9 +210,10 @@ function templatesFunction(text, action, data) {
             } else if (arg[0] == "upperCase") {
                 text = text.toUpperCase();
             } else if (arg[0] == "trim") {
-                text = text.trim();
+                if (text) { text = text.trim(); }
             } else if (arg[0] == "filter") {
-                text = stringModify(text.trim());
+                if (text) { text = text.trim(); }
+                text = stringModify(text);
             }
         } else if (action == "find") {
             text = "";
@@ -419,6 +420,10 @@ function clearRedundant() {
         autoDownFlag && (chrome.storage.session ?? chrome.storage.local).set({ featAutoDownTabId: Array.from(G.featAutoDownTabId) });
 
         G.blockUrlSet = new Set([...G.blockUrlSet].filter(x => allTabId.has(x)));
+
+        if (G.requestHeaders.size >= 10240) {
+            G.requestHeaders.clear();
+        }
     });
     // G.referer.clear();
     // G.blackList.clear();
