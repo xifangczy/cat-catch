@@ -291,6 +291,9 @@ chrome.runtime.onInstalled.addListener(function (details) {
         });
         chrome.alarms.create("nowClear", { when: Date.now() + 3000 });
     }
+    if (details.reason == "install") {
+        chrome.tabs.create({ url: "install.html" });
+    }
 });
 
 /**
