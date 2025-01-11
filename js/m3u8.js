@@ -651,7 +651,7 @@ chrome.downloads.onChanged.addListener(function (downloadDelta) {
     if (!downloadDelta.state) { return; }
     if (downloadDelta.state.current == "complete" && downId == downloadDelta.id) {
         $progress.html(i18n.SavePrompt);
-        $("#autoClose").prop("checked") && window.close();
+        $("#autoClose").prop("checked") && closeTab();
     }
 });
 // 打开目录
@@ -2158,6 +2158,6 @@ function autoMerge() {
 chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     if (!Message.Message || Message.Message != "catCatchFFmpegResult" || Message.state != "ok" || currentTabId == 0 || Message.tabId != currentTabId) { return; }
     setTimeout(() => {
-        $("#autoClose").prop("checked") && window.close();
+        $("#autoClose").prop("checked") && closeTab();
     }, Math.ceil(Math.random() * 500));
 });

@@ -645,7 +645,7 @@ $("#popup").click(function () {
                 left: G.popupLeft ?? 0,
             });
         }
-        window.close();
+        closeTab();
     });
 });
 $("#currentPage").click(function () {

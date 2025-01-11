@@ -295,7 +295,7 @@ function start() {
         if (down.success == down.total) {
             if ($("#autoClose").prop("checked")) {
                 setTimeout(() => {
-                    window.close();
+                    closeTab();
                 }, Math.ceil(Math.random() * 999));
             }
         }
@@ -319,7 +319,7 @@ function start() {
             document.title = i18n.downloadComplete;
             if ($("#autoClose").prop("checked")) {
                 setTimeout(() => {
-                    window.close();
+                    closeTab();
                 }, Math.ceil(Math.random() * 999));
             }
         }

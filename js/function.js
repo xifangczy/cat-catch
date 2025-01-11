@@ -503,3 +503,19 @@ function isLockUrl(url) {
     }
     return false;
 }
+
+/**
+ * 关闭标签页 如果tabId为0 则关闭当前标签
+ * 当前只有一个标签页面 创建新标签页 再关闭
+ * @param {Number|Array} tabId 
+ */
+function closeTab(tabId = 0) {
+    chrome.tabs.query({}, async function (tabs) {
+        if (tabs.length === 1) {
+            await chrome.tabs.create({ url: 'chrome://newtab' });
+            tabId ? chrome.tabs.remove(tabId) : window.close();
+        } else {
+            tabId ? chrome.tabs.remove(tabId) : window.close();
+        }
+    });
+}

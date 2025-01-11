@@ -1,5 +1,5 @@
 document.getElementById('installYes').addEventListener('click', function () {
-    window.close();
+    closeTab();
 });
 document.getElementById('installUninstallSelf').addEventListener('click', function () {
     chrome.management.uninstallSelf();
