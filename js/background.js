@@ -480,7 +480,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     // ffmpeg网页通信
     if (Message.Message == "catCatchFFmpeg") {
         const data = { ...Message, Message: "ffmpeg", tabId: Message.tabId ?? sender.tab.id, version: G.ffmpegConfig.version };
-        chrome.tabs.query({ url: G.ffmpegConfig.url }, function (tabs) {
+        chrome.tabs.query({ url: G.ffmpegConfig.url + "*" }, function (tabs) {
             if (chrome.runtime.lastError || !tabs.length) {
                 chrome.tabs.create({ url: G.ffmpegConfig.url, active: Message.active ?? true }, function (tab) {
                     if (chrome.runtime.lastError) { return; }

@@ -352,7 +352,7 @@ function sendFile(action, data, fragment) {
     if (data instanceof ArrayBuffer) {
         data = ArrayBufferToBlob(data, { type: fragment.contentType });
     }
-    chrome.tabs.query({ url: G.ffmpegConfig.url }, function (tabs) {
+    chrome.tabs.query({ url: G.ffmpegConfig.url + "*" }, function (tabs) {
         // 等待ffmpeg 打开并且可用
         if (tabs.length === 0) {
             chrome.tabs.create({ url: G.ffmpegConfig.url });
