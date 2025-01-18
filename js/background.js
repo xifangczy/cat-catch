@@ -167,6 +167,13 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
     cacheData[data.tabId] ??= [];
     cacheData[G.tabId] ??= [];
 
+    // 缓存数据大于9999条 清空缓存 避免内存占用过多
+    if (cacheData[data.tabId].length > G.maxLength) {
+        cacheData[data.tabId] = [];
+        (chrome.storage.session ?? chrome.storage.local).set({ MediaData: cacheData });
+        return;
+    }
+
     // 查重 避免CPU占用 大于500 强制关闭查重
     if (G.checkDuplicates && cacheData[data.tabId].length <= 500) {
         for (let item of cacheData[data.tabId]) {
@@ -223,12 +230,6 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         // 发送到popup 并检查自动下载
         chrome.runtime.sendMessage({ Message: "popupAddData", data: info }, function () {
             if (G.featAutoDownTabId.size > 0 && G.featAutoDownTabId.has(info.tabId)) {
-                // const downDir = info.title == "NULL" ? "CatCatch/" : stringModify(info.title) + "/";
-                // chrome.downloads.download({
-                //     url: info.url,
-                //     filename: downDir + info.name
-                // });
-
                 try {
                     const downDir = info.title == "NULL" ? "CatCatch/" : stringModify(info.title) + "/";
                     let fileName = isEmpty(info.name) ? stringModify(info.title) + '.' + info.ext : decodeURIComponent(stringModify(info.name));

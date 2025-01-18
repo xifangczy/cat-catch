@@ -128,6 +128,7 @@ G.OptionLists = {
     chromeLimitSize: 1.8 * 1024 * 1024 * 1024,
     blockUrl: [],
     blockUrlWhite: false,
+    maxLength: 9999,
 };
 // 本地储存的配置
 G.LocalVar = {
