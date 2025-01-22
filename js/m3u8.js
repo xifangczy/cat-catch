@@ -75,6 +75,7 @@ const decryptor = new AESDecryptor(); // 解密工具 来自hls.js 分离出来�
 let skipDecrypt = false; // 是否跳过解密
 let possibleKeys = new Set();   // 储存疑似 密钥
 let downId = 0; // chrome下载api 回调id
+let currentLevel = -1;  // 当前Level
 
 /* 以下参数 新下载器已弃用 */
 let stopDownload = false; // 停止下载flag
@@ -388,6 +389,7 @@ hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
         }
         delete video;
     }
+    currentLevel = data.level;
 });
 
 // 监听 ERROR m3u8解析错误
@@ -452,6 +454,9 @@ hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
         !data.tracks.audio && info.append(` (${i18n.noAudio})`);
         if (data.tracks.video?.metadata) {
             info.append(` ${i18n.resolution}:${data.tracks.video.metadata.width} x ${data.tracks.video.metadata.height}`);
+        }
+        if (hls.levels[currentLevel]?.bitrate) {
+            info.append(` ${i18n.bitrate}:${parseInt(hls.levels[currentLevel].bitrate / 1000)} Kbps`);
         }
     }
 });
