@@ -556,7 +556,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
         });
     }
     // 检查当前标签是否在屏蔽列表中
-    if (changeInfo.url && tabId > 0 && G.initSyncComplete && G.blockUrl.length) {
+    if (changeInfo.url && tabId > 0 && G.blockUrl.length) {
         G.blockUrlSet.delete(tabId);
         if (isLockUrl(changeInfo.url)) {
             G.blockUrlSet.add(tabId);
