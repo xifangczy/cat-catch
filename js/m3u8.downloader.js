@@ -213,7 +213,7 @@ class Downloader {
         fetch(fragment.url, options)
             .then(response => {
                 if (!response.ok) {
-                    throw new Error(response.status);
+                    throw new Error(response.status, { cause: 'HTTPError' });
                 }
                 const reader = response.body.getReader();
                 const contentLength = parseInt(response.headers.get('content-length')) || 0;
@@ -230,6 +230,9 @@ class Downloader {
 
                         receivedLength += value.length;
                         this.emit('itemProgress', fragment, false, receivedLength, contentLength, value);
+                    }
+                    if (fragment.fileStream) {
+                        return new ArrayBuffer();
                     }
                     const allChunks = new Uint8Array(receivedLength);
                     let position = 0;

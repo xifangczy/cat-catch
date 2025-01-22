@@ -201,7 +201,7 @@ function start() {
     // 错误处理
     down.on('downloadError', function (fragment, error) {
         // 添加range请求头 重新尝试下载
-        if (!fragment.retry?.Range) {
+        if (!fragment.retry?.Range && error?.cause == "HTTPError") {
             fragment.retry = { "Range": "bytes=0-" };
             down.downloader(fragment);
             return;
