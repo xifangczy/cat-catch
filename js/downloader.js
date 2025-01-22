@@ -168,7 +168,6 @@ function start() {
         // 是流式下载 停止写入
         if (fragment.fileStream) {
             fragment.fileStream.close();
-            fragment.fileStream = null;
             return;
         }
 
@@ -196,6 +195,13 @@ function start() {
     // 全部下载完成事件
     down.on('allCompleted', function (buffer) {
         $("#stopDownload").hide();
+
+        // 检查 down.fragments 是否都为边下边存 检查自动关闭
+        if (down.fragments.every(item => item.fileStream) && $("#autoClose").prop("checked")) {
+            setTimeout(() => {
+                closeTab();
+            }, Math.ceil(Math.random() * 999));
+        }
     });
 
     // 错误处理
@@ -332,7 +338,6 @@ function start() {
             e.preventDefault();
             fileStream.forEach((fragment) => {
                 fragment.fileStream.close();
-                fragment.fileStream = null;
             });
         }
     });
