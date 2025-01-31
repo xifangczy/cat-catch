@@ -358,10 +358,10 @@ function AddMedia(data, currentTab = true) {
             filterExt.set(this.id, html.find("input").prop("checked"));
             getAllData().forEach(function (value) {
                 if (filterExt.get(value.ext)) {
-                    value.html.find("input").prop("checked", true);
+                    value.checked = true;
                     value.html.show();
                 } else {
-                    value.html.find("input").prop("checked", false);
+                    value.checked = false;
                     value.html.hide();
                 }
             });
@@ -556,6 +556,14 @@ $('#openFilter, #more').click(function () {
 // 正则筛选
 $("#regular input").bind('keypress', function (event) {
     if (event.keyCode == "13") {
+        const input = $(this).val();
+        if (input == "") {
+            getData().forEach(function (data) {
+                data.checked = true;
+                data.html.show();
+            });
+            return;
+        }
         const regex = new RegExp($(this).val());
         getData().forEach(function (data) {
             if (!regex.test(data.url)) {
