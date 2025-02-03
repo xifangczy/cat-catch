@@ -1341,14 +1341,14 @@ function downloadNew(start = 0, end = _fragments.length) {
         $fileDuration.html(i18n.downloadedVideoLength + ":" + secToTime(down.duration));
     });
     // 全部下载完成
-    down.on('allCompleted', function (buffer) {
+    down.on('allCompleted', async function (buffer) {
         if (recorder) { return; }
         if (fileStream) {
             fileStream.close();
             fileStream = undefined;
         } else {
             if ($("#ffmpeg").prop("checked") || _ffmpeg || isSendFfmpeg) {
-                chrome.runtime.sendMessage({
+                await chrome.runtime.sendMessage({
                     Message: "catCatchFFmpeg",
                     action: "openFFmpeg",
                     extra: i18n.waitingForMedia
