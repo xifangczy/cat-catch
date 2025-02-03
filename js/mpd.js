@@ -109,7 +109,10 @@ function isDRM(mpdContent) {
     for (let i = 0; i < contentProtections.length; i++) {
         const protection = contentProtections[i];
         const schemeIdUri = protection.getAttribute("schemeIdUri");
-        const pssh = protection.getElementsByTagName("cenc:pssh")[0];
+        let pssh = protection.getElementsByTagName("cenc:pssh")[0];
+        if (!pssh) {
+            pssh = protection.getElementsByTagName("mspr:pro")[0];
+        }
 
         if (schemeIdUri && pssh) {
             if (!drmInfo.has(schemeIdUri)) {
