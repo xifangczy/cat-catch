@@ -111,6 +111,7 @@ function AddMedia(data, currentTab = true) {
                 <img src="img/download.svg" class="icon download" id="download" title="${i18n.download}"/>
                 <img src="img/aria2.png" class="icon aria2 ${G.enableAria2Rpc ? "" : "hide"}"" id="aria2" title="Aria2"/>
                 <img src="img/invoke.svg" class="icon invoke ${G.invoke ? "" : "hide"}"" id="invoke" title="${i18n.invoke}"/>
+                <img src="img/send.svg" class="icon invoke ${G.send2localManual ? "" : "hide"}"" id="send2local" title="${i18n.send2local}"/>
             </div>
             <div class="url hide">
                 <div id="mediaInfo" data-state="false">
@@ -345,6 +346,10 @@ function AddMedia(data, currentTab = true) {
             data._checked = newValue;
             data.html.find('input').prop("checked", newValue);
         }
+    });
+
+    data.html.find("#send2local").click(function () {
+        send2local("catch", data, data.tabId);
     });
 
     // 使用Map 储存数据
@@ -661,6 +666,34 @@ $("#currentPage").click(function () {
         chrome.tabs.update({ url: `popup.html?tabId=${tabs[0].id}` });
     });
 });
+
+// 手动发送
+$("#send2localSelect").click(function () {
+    getData().forEach(function (item) {
+        if (item.checked) {
+            const info = {
+                name: item.name,
+                url: item.url,
+                size: item.size,
+                ext: item.ext,
+                type: item.type,
+                tabId: item.tabId,
+                isRegex: item.isRegex,
+                requestId: item.requestId,
+                initiator: item.initiator,
+                requestHeaders: item.requestHeaders,
+                cookie: item.cookie,
+                cacheURL: item.cacheURL,
+                getTime: item.getTime,
+                title: item.title,
+                favIconUrl: item.favIconUrl,
+                webUrl: item.webUrl,
+            };
+            send2local("catch", info, item.tabId);
+        }
+    });
+});
+
 // 一些需要等待G变量加载完整的操作
 const interval = setInterval(function () {
     if (!G.initSyncComplete || !G.initLocalComplete || !G.tabId) { return; }
@@ -954,7 +987,8 @@ function Tips(text, delay = 200) {
 * 如果标签是其他设置 隐藏底部按钮
 */
 function UItoggle() {
-    getData().size > 0 ? $tips.hide() : $tips.show().html(i18n.noData);
+    const size = getData().size;
+    size > 0 ? $tips.hide() : $tips.show().html(i18n.noData);
     $currentCount.text(currentCount ? `[${currentCount}]` : "");
     $allCount.text(allCount ? `[${allCount}]` : "");
     const id = $('.TabShow').attr("id");
@@ -972,7 +1006,7 @@ function UItoggle() {
             this.classList.remove("faviconFlag");
         }
     });
-    getData().size >= 2 ? mergeDownButton() : $mergeDown.attr('disabled', true);
+    size >= 2 ? mergeDownButton() : $mergeDown.attr('disabled', true);
 }
 // 检查是否符合条件 更改 合并下载 按钮状态
 function mergeDownButtonCheck(data) {

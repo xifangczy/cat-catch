@@ -104,6 +104,7 @@ G.OptionLists = {
     m3u8AutoDown: true,
     badgeNumber: true,
     send2local: false,
+    send2localManual: false,
     send2localURL: "http://127.0.0.1:8000/",
     popup: false,
     popupHeight: 720,

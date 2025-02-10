@@ -853,5 +853,11 @@
   },
   "setWhiteList": {
     "message": "Set to whitelist"
+  },
+  "autoSend": {
+    "message": "Manual data transmission"
+  },
+  "manualSend": {
+    "message": "Automatic data transmission"
   }
 }

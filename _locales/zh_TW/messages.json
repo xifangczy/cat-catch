@@ -853,5 +853,11 @@
   },
   "setWhiteList": {
     "message": "設定為白名單"
+  },
+  "autoSend": {
+    "message": "自動發送"
+  },
+  "manualSend": {
+    "message": "手動發送"
   }
 }
