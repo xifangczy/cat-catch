@@ -1347,13 +1347,13 @@ function downloadNew(start = 0, end = _fragments.length) {
             fileStream.close();
             fileStream = undefined;
         } else {
-            if ($("#ffmpeg").prop("checked") || _ffmpeg || isSendFfmpeg) {
-                await chrome.runtime.sendMessage({
-                    Message: "catCatchFFmpeg",
-                    action: "openFFmpeg",
-                    extra: i18n.waitingForMedia
-                });
-            }
+            // if ($("#ffmpeg").prop("checked") || _ffmpeg || isSendFfmpeg) {
+            //     await chrome.runtime.sendMessage({
+            //         Message: "catCatchFFmpeg",
+            //         action: "openFFmpeg",
+            //         extra: i18n.waitingForMedia
+            //     });
+            // }
             mergeTsNew(down);
         }
         transmuxer?.off && transmuxer.off('data');
