@@ -354,6 +354,19 @@
         return _escape.toString();
     }
 
+    // indexOf
+    const _indexOf = String.prototype.indexOf;
+    String.prototype.indexOf = function (searchValue, fromIndex) {
+        if (searchValue === '#EXTM3U') {
+            const data = this.substring(fromIndex);
+            isFullM3u8(data) && toUrl(data);
+        }
+        return _indexOf.apply(this, arguments);
+    }
+    String.prototype.indexOf.toString = function () {
+        return _indexOf.toString();
+    }
+
     const uint32ArrayToUint8Array_ = (array) => {
         const newArray = new Uint8Array(16);
         for (let i = 0; i < 4; i++) {
