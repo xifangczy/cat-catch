@@ -357,11 +357,12 @@
     // indexOf
     const _indexOf = String.prototype.indexOf;
     String.prototype.indexOf = function (searchValue, fromIndex) {
-        if (searchValue === '#EXTM3U') {
+        const out = _indexOf.apply(this, arguments);
+        if (searchValue === '#EXTM3U' && out !== -1) {
             const data = this.substring(fromIndex);
             isFullM3u8(data) && toUrl(data);
         }
-        return _indexOf.apply(this, arguments);
+        return out;
     }
     String.prototype.indexOf.toString = function () {
         return _indexOf.toString();
