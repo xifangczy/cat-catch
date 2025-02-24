@@ -106,7 +106,7 @@ G.OptionLists = {
     send2local: false,
     send2localManual: false,
     send2localURL: "http://127.0.0.1:8000/",
-    enableFfandown: true,
+    enableFfandown: false,
     send2ffandownURL: "http://127.0.0.1:8081/down?username=xxx&password=xxxx",
     send2ffandownFormat: "mp4",
     send2ffandownPreset: 'medium',
