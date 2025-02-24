@@ -296,11 +296,20 @@
   "address": {
     "message": "地址"
   },
+  "format": {
+    "message": "格式"
+  },
+  "preset": {
+    "message": "預設"
+  },
   "documentation": {
     "message": "文檔"
   },
   "aria2Tip": {
     "message": "非常優秀的下載工具 使用方法檢視"
+  },
+  "ffandownTip": {
+    "message": "m3u8視頻、直播下載器使用方法查看"
   },
   "m3u8DLTips": {
     "message": "非常優秀的m3u8 mpd第三方下載工具 使用方法查看"

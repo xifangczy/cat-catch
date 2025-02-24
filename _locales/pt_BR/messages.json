@@ -296,11 +296,20 @@
   "address": {
     "message": "Endereço"
   },
+  "format": {
+    "message": "Formato"
+  },
+  "preset": {
+    "message": "Predefinido"
+  },
   "documentation": {
     "message": "Documentação"
   },
   "aria2Tip": {
     "message": "Uma excelente ferramenta de download, veja como usar"
+  },
+  "ffandownTip": {
+    "message": "Veja as instruções de uso do vídeo m3u8 e do downloader de streaming ao vivo"
   },
   "m3u8DLTips": {
     "message": "Uma excelente ferramenta de download de m3u8 e mpd de terceiros, veja como usar"

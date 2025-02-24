@@ -296,11 +296,20 @@
   "address": {
     "message": "ウェブサイトのアドレス"
   },
+  "format": {
+    "message": "書式設定"
+  },
+  "preset": {
+    "message": "プリセット"
+  },
   "documentation": {
     "message": "これは文書ですよ"
   },
   "aria2Tip": {
     "message": "これは優れたダウンロードツールです 使い方 ドキュメントを見る"
+  },
+  "ffandownTip": {
+    "message": "m 3 u 8ビデオ、ライブダウンロードの使用方法表示"
   },
   "m3u8DLTips": {
     "message": "これは非常に優秀なm3u8 MPDの第三者ダウンロードツールです。使用方法は文書を参照してください。"

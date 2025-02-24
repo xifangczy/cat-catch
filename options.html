@@ -21,6 +21,7 @@
       <li><a href="#anchorBlockUrl" data-i18n="blockUrl"></a></li>
       <li><a href="#anchorCopy" data-i18n="copy"></a></li>
       <li><a href="#anchorAria2Rpc">Aria2 RPC</a></li>
+      <li><a href="#anchorFFandown">FFandown</a></li>
       <li><a href="#anchorSend2local" data-i18n="send2local"></a></li>
       <li><a href="#anchorM3u8dl">URL Protocol m3u8dl</a></li>
       <li><a href="#anchorInvokeApp" data-i18n="invokeApp"></a></li>
@@ -222,6 +223,51 @@
             <div>Aira2 RPC <span data-i18n-outer="address"></span></div>
             <input id="aria2Rpc" save="input" type="text" class="width100"></input>
           </div>
+          <div class="flex-end">
+            <button type="button" class="resetOption" data-i18n="resetSettings"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ffandown 下载 -->
+    <section id="anchorFFandown">
+      <h1 class="optionsTitle">
+        <img src="img/ffandown.png" style="width: 18px" class="ffandown" />
+        FFandown
+      </h1>
+      <div class="optionBox">
+        <span class="explain">
+          <p data-i18n-outer="ffandownTip"></p>
+          <a href="https://ffandown.oimi.space" target="_blank"
+            data-i18n="documentation"></a>
+        </span>
+        <div class="list">
+          <div class="item">
+            <div><span data-i18n-outer="enable"></span>FFandown</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="enableFfandown" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+    
+          <div class="item">
+            <div><span data-i18n-outer="address"></span></div>
+            <input id="send2ffandownURL" save="input" type="text" class="width100"></input>
+          </div>
+
+          <div class="item">
+            <div><span data-i18n-outer="format"></span></div>
+            <input id="send2ffandownFormat" save="input" type="text" class="width100"></input>
+          </div>
+
+          <div class="item">
+            <div><span data-i18n-outer="preset"></span></div>
+            <input id="send2ffandownPreset" save="input" type="text" class="width100"></input>
+          </div>
+
           <div class="flex-end">
             <button type="button" class="resetOption" data-i18n="resetSettings"></button>
           </div>

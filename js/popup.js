@@ -110,6 +110,7 @@ function AddMedia(data, currentTab = true) {
                 <img src="img/play.png" class="icon play ${data.isPlay ? "" : "hide"}" id="play" title="${i18n.preview}"/>
                 <img src="img/download.svg" class="icon download" id="download" title="${i18n.download}"/>
                 <img src="img/aria2.png" class="icon aria2 ${G.enableAria2Rpc ? "" : "hide"}"" id="aria2" title="Aria2"/>
+                <img src="img/ffandown.png" class="icon aria2 ${G.enableFfandown ? "" : "hide"}"" id="ffandown" title="FFandown"/>
                 <img src="img/invoke.svg" class="icon invoke ${G.invoke ? "" : "hide"}"" id="invoke" title="${i18n.invoke}"/>
                 <img src="img/send.svg" class="icon invoke ${G.send2localManual ? "" : "hide"}"" id="send2local" title="${i18n.send2local}"/>
             </div>
@@ -222,6 +223,16 @@ function AddMedia(data, currentTab = true) {
     // 发送到Aria2
     data.html.find('#aria2').click(function () {
         aria2AddUri(data, function (data) {
+            Tips(i18n.hasSent + JSON.stringify(data), 2000);
+        }, function (errMsg) {
+            Tips(i18n.sendFailed, 2000);
+            console.log(errMsg);
+        });
+        return false;
+    });
+    // ffandown 下载
+    data.html.find('#ffandown').click(function () {
+        ffandownAddUri(data, function (data) {
             Tips(i18n.hasSent + JSON.stringify(data), 2000);
         }, function (errMsg) {
             Tips(i18n.sendFailed, 2000);
@@ -1086,6 +1097,34 @@ function aria2AddUri(data, success, error) {
     }
     json.params.push([data.url], params);
     fetch(G.aria2Rpc, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json; charset=utf-8"
+        },
+        body: JSON.stringify(json)
+    }).then(response => {
+        return response.json();
+    }).then(data => {
+        success && success(data);
+    }).catch(errMsg => {
+        error && error(errMsg);
+    });
+}
+
+/**
+ * ffandown发送一套资源
+ * @param {object} data 资源对象
+ * @param {Function} success 成功运行函数
+ * @param {Function} error 失败运行函数
+ */
+function ffandownAddUri(data, success, error) {
+    const json = {
+        name: data.title || data.name,
+        url: data.url,
+        preset: G.send2ffandownPreset || 'medium',
+        outputformat: G.send2ffandownFormat || 'mp4',
+    }
+    fetch(G.send2ffandownURL, {
         method: "POST",
         headers: {
             "Content-Type": "application/json; charset=utf-8"
