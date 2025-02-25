@@ -321,6 +321,7 @@ function getUrlFileName(url) {
  * 解析json字符串 尝试修复键名没有双引号 解析错误返回默认值
  * @param {string} str json字符串
  * @param {object} error 解析错误返回的默认值
+ * @param {number} attempt 尝试修复次数
  * @returns {object} 返回解析后的对象
  */
 function JSONparse(str, error = {}, attempt = 0) {
@@ -529,8 +530,9 @@ function send2local(action, data, tabId = 0) {
         postData = JSONparse(postData, { action, data, tabId });
 
         try {
-            // 解析URL 判断URl是否正确
-            let send2localURL = new URL(G.send2localURL);
+            // 处理URL中的模板字符串 并检查URL是否合法
+            let send2localURL = templates(G.send2localURL, data);
+            send2localURL = new URL(send2localURL);
 
             // GET请求拼接参数
             if (option.method == 'GET') {
