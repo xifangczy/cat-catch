@@ -174,6 +174,7 @@ const reFilename = /filename="?([^"]+)"?/;
 const reStringModify = /[<>:"\/\\|?*~]/g;
 const reFilterFileName = /[<>:"|?*~]/g;
 const reTemplates = /\${([^}|]+)(?:\|([^}]+))?}/g;
+const reJSONparse = /([{,]\s*)([\w-]+)(\s*:)/g;
 
 // 防抖
 let debounce = undefined;

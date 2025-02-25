@@ -318,17 +318,25 @@ function getUrlFileName(url) {
 }
 
 /**
- * 解析json字符串 解析错误返回默认值
+ * 解析json字符串 尝试修复键名没有双引号 解析错误返回默认值
  * @param {string} str json字符串
  * @param {object} error 解析错误返回的默认值
  * @returns {object} 返回解析后的对象
  */
-function JSONparse(str, error = {}) {
+function JSONparse(str, error = {}, attempt = 0) {
     if (!str) { return error; }
     try {
         return JSON.parse(str);
     } catch (e) {
-        return error;
+        if (attempt === 0) {
+            // 第一次解析失败，修正字符串后递归调用
+            reJSONparse.lastIndex = 0;
+            const fixedStr = str.replace(reJSONparse, '$1"$2"$3');
+            return JSONparse(fixedStr, error, ++attempt);
+        } else {
+            // 第二次解析仍然失败，返回 error 对象
+            return error;
+        }
     }
 }
 
