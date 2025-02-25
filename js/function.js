@@ -473,19 +473,98 @@ function filterFileName(str, text) {
 }
 
 /**
+ * 获取对象的深层属性值 
+ * @param {Object} obj 
+ * @param {String} path 
+ * @returns 
+ */
+function getDeepVal(obj, path) {
+    if (typeof obj === "undefined" || obj === null) return;
+    path = path.split(/[\.\[\]\"\']{1,2}/);
+    for (var i = 0, l = path.length; i < l; i++) {
+        if (path[i] === "") continue;
+        obj = obj[path[i]];
+        if (typeof obj === "undefined" || obj === null) return;
+    }
+    return obj;
+}
+
+/**
+ * 获取发送到本地的数据
+ * @param {Object} data 
+ * @returns 
+ */
+function getSend2LocalData(data) {
+    const send2localBody = G.send2localBody
+    try {
+        const send2localDataMap = JSON.parse(send2localBody)
+        return Object.entries(send2localDataMap).reduce((pre, val) => {
+            const [key, value] = val
+            // 检查 value 是否为变量
+            const isVar = typeof value === 'string' && value.startsWith('$')
+            // 不是变量直接赋值
+            if (!isVar) pre[key] = value
+            // 变量的话获取变量参数
+            if (isVar) {
+                const varKey = value.slice(1)
+                // 通过数据对象去获取变量的值，如果异常的数据，直接返回 undefined
+                const varValue = getDeepVal(data, varKey, undefined)
+                if (varValue !== undefined)  pre[key] = varValue
+            }
+            return pre;
+        }, {})
+    } catch {
+        // 如果出现异常，返回默认格式
+        return { action: action, data: data, tabId: tabId };
+    }
+}
+
+/**
+ * 获取发送到本地的URL
+ * @param {*} params 
+ * @returns 
+ */
+function getSend2LocalURL(params) {
+    // 如果配置的地址不合法
+    try {
+        // send2localURL 可能已经存在参数，所以 params 只能追加
+        const url = new URL(G.send2localURL)
+        for (const [key, value] of Object.entries(params)) {
+            // 是否考虑：如果参数类型是对象，将其转换为字符串
+            url.searchParams.set(key, value)
+        }
+        return url.href
+    } catch {
+        return null
+    }
+}
+
+/**
  * 发送数据到本地
  * @param {String} action 发送类型
  * @param {Object} data 发送的数据
  * @param {Number} tabId 发送数据的标签页ID
  */
 async function send2local(action, data, tabId = 0) {
-    fetch(G.send2localURL, {
-        method: 'POST',
+    // 请求参数
+    const postData = getSend2LocalData({ action, data, tabId })
+    // 请求方式
+    const requestMethod = G.MethodMap[G.send2localMethod] || 'POST'
+    // 请求地址：GET请求拼接参数，POST请求发送JSON数据
+    // 为了兼容性考虑这里通过数组判断请求方式
+    const send2localURL = ['GET'].includes(requestMethod) ?
+        `${getSend2LocalURL(postData)}` : G.send2localURL
+    // 用户输入的地址可能存在不合法的情况
+    if (!send2localURL) return;
+    const option = {
+        method: requestMethod,
         headers: {
             'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({ action: action, data: data, tabId: tabId })
-    }).catch((e) => { console.log(e) });
+        }
+    }
+    // 为了兼容性考虑这里通过数组判断请求方式
+    if (['PUT', 'POST'].includes(requestMethod)) option.body = JSON.stringify(postData)
+    fetch(send2localURL, option).catch((e) => { console.log(e) });
 }
 
 /**

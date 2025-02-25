@@ -859,5 +859,11 @@
   },
   "manualSend": {
     "message": "Transmissão automática de dados"	
+  },
+  "requestMethod": {
+    "message": "Método de pedido"
+  },
+  "requestBody": {
+    "message": "Corpo pedido"
   }
 }

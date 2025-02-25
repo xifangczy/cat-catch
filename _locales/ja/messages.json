@@ -853,5 +853,11 @@
   },
   "setWhiteList": {
     "message": "ホワイトリストに設定"
+  },
+  "requestMethod": {
+    "message": "リクエストモード"
+  },
+  "requestBody": {
+    "message": "要求体"
   }
 }

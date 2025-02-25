@@ -75,6 +75,11 @@ G.OptionLists = {
         { "type": "ig", "regex": "https://cache\\.video\\.[a-z]*\\.com/dash\\?tvid=.*", "ext": "json", "state": false },
         { "type": "ig", "regex": ".*\\.bilivideo\\.(com|cn).*\\/live-bvc\\/.*m4s", "ext": "", "blackList": true, "state": false },
     ],
+    MethodMap: {
+        0: 'GET',
+        1: 'POST',
+        2: 'PUT'
+    },
     TitleName: false,
     Player: "",
     ShowWebIco: true,
@@ -106,6 +111,8 @@ G.OptionLists = {
     send2local: false,
     send2localManual: false,
     send2localURL: "http://127.0.0.1:8000/",
+    send2localMethod: 1,
+    send2localBody: '{"action": "$action", "data": "$data", "tabId": "$tabId"}',
     popup: false,
     popupHeight: 720,
     popupWidth: 1280,
