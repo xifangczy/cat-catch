@@ -259,9 +259,26 @@
               </label>
             </div>
           </div>
+
+          <div class="item">
+            <div><span data-i18n-outer="requestMethod"></span> </div>
+            <div class="switch switchSelect">
+              <select id="send2localMethod" class="select" save="select">
+                <option value="0">GET</option>
+                <option value="1">POST</option>
+                <option value="2">PUT</option>
+              </select>
+            </div>
+          </div>
+
           <div class="item">
             <div><span data-i18n-outer="address"></span></div>
             <input id="send2localURL" save="input" type="text" class="width100"></input>
+          </div>
+
+          <div class="item">
+            <div><span data-i18n-outer="requestBody"></span></div>
+            <textarea id="send2localBody" save="input" type="text" class="width100 break-all" rows="3"></textarea>
           </div>
 
           <div class="flex-end">

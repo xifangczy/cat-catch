@@ -859,5 +859,11 @@
   },
   "manualSend": {
     "message": "Automatic data transmission"
+  },
+  "requestMethod": {
+    "message": "Request Method"
+  },
+  "requestBody": {
+    "message": "Request Body"
   }
 }

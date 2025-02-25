@@ -859,5 +859,11 @@
   },
   "manualSend": {
     "message": "手动发送"
+  },
+  "requestMethod": {
+    "message": "请求方式"
+  },
+  "requestBody": {
+    "message": "请求体"
   }
 }
