@@ -198,6 +198,10 @@ function templatesFunction(text, action, data) {
                 continue;
             }
             text = "";
+        } else if (action == "prepend") {
+            text = arg[0] + text;
+        } else if (action == "concat") {
+            text = text + arg[0];
         } else if (action == "to") {
             if (arg[0] == "base64") {
                 text = window.Base64 ? Base64.encode(text) : btoa(unescape(encodeURIComponent(text)));
