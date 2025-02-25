@@ -167,7 +167,9 @@ $("[save='click']").bind("click", function () {
 });
 // [save='select'] 元素 储存
 $("[save='select']").on("change", function () {
-    chrome.storage.sync.set({ [this.id]: parseInt($(this).val()) });
+    let val = $(this).val();
+    if (!isNaN(val)) { val = parseInt(val); }
+    chrome.storage.sync.set({ [this.id]: val });
 });
 
 // 一键禁用/启用

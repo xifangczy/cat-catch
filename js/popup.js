@@ -349,7 +349,11 @@ function AddMedia(data, currentTab = true) {
     });
 
     data.html.find("#send2local").click(function () {
-        send2local("catch", data, data.tabId);
+        send2local("catch", data, data.tabId).then(function (success) {
+            success && success?.ok && Tips(i18n.hasSent, 1000);
+        }).catch(function (error) {
+            error ? Tips(error, 1000) : Tips(i18n.sendFailed, 1000);
+        });
     });
 
     // 使用Map 储存数据
@@ -689,7 +693,11 @@ $("#send2localSelect").click(function () {
                 favIconUrl: item.favIconUrl,
                 webUrl: item.webUrl,
             };
-            send2local("catch", info, item.tabId);
+            send2local("catch", info, item.tabId).then(function (hasSent) {
+                success && success?.ok && Tips(i18n.hasSent, 1000);
+            }).catch(function (error) {
+                error ? Tips(error, 1000) : Tips(i18n.sendFailed, 1000);
+            });
         }
     });
 });
