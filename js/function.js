@@ -537,7 +537,8 @@ function send2local(action, data, tabId = 0) {
             // GET请求拼接参数
             if (option.method == 'GET') {
                 let flattenedObj = flattenObject(postData);
-                send2localURL.search = new URLSearchParams(flattenedObj);
+                const urlParams = new URLSearchParams(flattenedObj);
+                send2localURL.search = send2localURL.search ? `${send2localURL.search}&${urlParams}` : `?${urlParams}`;
             } else {
                 option.body = JSON.stringify(postData);
                 option.headers = { 'Content-Type': 'application/json;charset=utf-8' };
