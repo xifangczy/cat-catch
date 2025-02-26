@@ -111,7 +111,7 @@ function AddMedia(data, currentTab = true) {
                 <img src="img/download.svg" class="icon download" id="download" title="${i18n.download}"/>
                 <img src="img/aria2.png" class="icon aria2 ${G.enableAria2Rpc ? "" : "hide"}"" id="aria2" title="Aria2"/>
                 <img src="img/invoke.svg" class="icon invoke ${G.invoke ? "" : "hide"}"" id="invoke" title="${i18n.invoke}"/>
-                <img src="img/send.svg" class="icon invoke ${G.send2localManual ? "" : "hide"}"" id="send2local" title="${i18n.send2local}"/>
+                <img src="img/send.svg" class="icon send ${G.send2localManual ? "" : "hide"}"" id="send2local" title="${i18n.send2local}"/>
             </div>
             <div class="url hide">
                 <div id="mediaInfo" data-state="false">
@@ -354,6 +354,7 @@ function AddMedia(data, currentTab = true) {
         }).catch(function (error) {
             error ? Tips(error, 1000) : Tips(i18n.sendFailed, 1000);
         });
+        return false;
     });
 
     // 使用Map 储存数据
