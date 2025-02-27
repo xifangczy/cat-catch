@@ -656,3 +656,6 @@ function isPicture(data) {
         data.ext == "webp"
     )
 }
+function isMediaExt(ext) {
+    return ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'm4a', '3gp', 'mpeg', 'mov', 'm4s', 'aac'].includes(ext);
+}

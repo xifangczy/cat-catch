@@ -855,7 +855,6 @@ function updateButton() {
     });
 }
 /* 格式判断 */
-const isMediaExt = (ext) => ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'm4a', '3gp', 'mpeg', 'mov', 'm4s', 'aac'].includes(ext);
 function isPlay(data) {
     if (G.Player && !isJSON(data) && !isPicture(data)) { return true; }
     const typeArray = ['video/ogg', 'video/mp4', 'video/webm', 'audio/ogg', 'audio/mp3', 'audio/wav', 'audio/m4a', 'video/3gp', 'video/mpeg', 'video/mov'];
