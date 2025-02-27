@@ -71,14 +71,14 @@ body {
   padding: 10px;
   cursor: pointer;
   position: relative;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px var(--button2-color);
 
   display: flex;
   flex-direction: column;
   min-height: 150px;
 }
 
-.file-item>*:not(.bottom-row) {
+.file-item > *:not(.bottom-row) {
   flex: 0 0 auto;
 }
 
@@ -170,7 +170,8 @@ body {
 #selection-box {
   position: absolute;
   border: 2px dashed var(--button2-color);
-  background-color: rgba(var(--button2-rgb), 0.1);
+  background-color: var(--button2-active-color);
   pointer-events: none;
   z-index: 1000;
+  display: none;
 }
