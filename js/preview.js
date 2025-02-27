@@ -3,6 +3,7 @@ class FilePreview {
         this.fileItems = [];
         this.originalItems = [];
         this.sizeFilters = null;
+        this.regexFilters = null;
         this.sortField = { field: 'getTime', order: 'desc' };
         this.catDownloadIsProcessing = false;
         this.MAX_CONCURRENT = 3;   // 最大并行生成预览数
@@ -41,6 +42,14 @@ class FilePreview {
                 };
                 this.updateFileList();
             });
+        });
+
+        document.querySelector('#regular').addEventListener('keypress', (e) => {
+            if (e.keyCode == 13) {
+                const value = e.target.value.trim();
+                this.regexFilters = new RegExp(value);
+                this.updateFileList();
+            }
         });
     }
     // 选中切换
@@ -158,7 +167,7 @@ class FilePreview {
     updateFileList() {
         this.fileItems = [...this.originalItems];
         this.applyExtensionFilters();
-        // this.applySizeFilters();
+        this.applyRegexFilters();
         this.sortItems();
         this.renderFileItems();
     }
@@ -167,6 +176,12 @@ class FilePreview {
         const selectedExts = Array.from(document.querySelectorAll('.ext-checkbox:checked'))
             .map(checkbox => checkbox.value);
         this.fileItems = this.fileItems.filter(item => selectedExts.includes(item.ext));
+    }
+    // 正则过滤
+    applyRegexFilters() {
+        if (this.regexFilters) {
+            this.fileItems = this.fileItems.filter(item => this.regexFilters.test(item.url));
+        }
     }
     // 排序
     sortItems() {
