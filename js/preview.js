@@ -162,7 +162,7 @@ class FilePreview {
 
     downloadSelected() {
         const data = this.getSelectedItems();
-        this.catDownload(data);
+        data.length && this.catDownload(data);
     }
 
     // 更新文件列表
@@ -404,7 +404,7 @@ class FilePreview {
                         if (item.preview || !item.url) {
                             continue;
                         }
-                        if (item.type.startsWith('video') || isM3U8(item)) {
+                        if (item.type.startsWith('video') || isMediaExt(item.ext) || isM3U8(item)) {
                             try {
                                 await this.generatePreview(item);
                                 console.log('Preview generated for:', item.url);
