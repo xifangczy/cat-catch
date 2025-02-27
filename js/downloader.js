@@ -40,7 +40,7 @@ awaitG(() => {
 
                 _downStream = $("#downStream").prop("checked");
                 _data.push(...data);
-                setHeaders(data, start());
+                setHeaders(data, start(), _tabId);
                 $("#getURL, .newDownload").toggle();
             });
             return;
@@ -54,7 +54,7 @@ awaitG(() => {
             }
         }
         if (!_requestId.length) {
-            setHeaders(_data, start());
+            setHeaders(_data, start(), _tabId);
             return;
         }
 
@@ -65,7 +65,7 @@ awaitG(() => {
                 return;
             }
             _data.push(...data);
-            setHeaders(data, start());
+            setHeaders(data, start(), _tabId);
         });
     });
 });
@@ -284,7 +284,7 @@ function start() {
                         down.downloader(fragment.index);
                     }
                 };
-            });
+            }, _tabId);
             sendResponse({ message: "OK", tabId: _tabId });
             return;
         }
@@ -386,37 +386,5 @@ function sendFile(action, data, fragment) {
         }
 
         chrome.runtime.sendMessage(baseData);
-    });
-}
-
-/**
- * 设置请求头
- * @param {Array} data 请求头数据
- * @param {Function} callBack 回调函数
- */
-function setHeaders(data, callBack) {
-    const rules = { removeRuleIds: [], addRules: [] };
-    for (let item of data) {
-        if (!item.requestHeaders) { continue; }
-        const rule = {
-            "id": parseInt(item.requestId),
-            "action": {
-                "type": "modifyHeaders",
-                "requestHeaders": Object.keys(item.requestHeaders).map(key => ({ header: key, operation: "set", value: item.requestHeaders[key] }))
-            },
-            "condition": {
-                "resourceTypes": ["xmlhttprequest", "media", "image"],
-                "tabIds": [_tabId],
-                "urlFilter": item.url
-            }
-        }
-        if (item.cookie) {
-            rule.action.requestHeaders.push({ header: "Cookie", operation: "set", value: item.cookie });
-        }
-        rules.removeRuleIds.push(parseInt(item.requestId));
-        rules.addRules.push(rule);
-    }
-    chrome.declarativeNetRequest.updateSessionRules(rules, () => {
-        callBack && callBack();
     });
 }

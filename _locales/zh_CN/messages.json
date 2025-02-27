@@ -865,5 +865,20 @@
   },
   "requestBody": {
     "message": "请求体"
+  },
+  "sort": {
+    "message": "排序"
+  },
+  "asc": {
+    "message": "升序"
+  },
+  "desc": {
+    "message": "降序"
+  },
+  "getTime": {
+    "message": "获取时间"
+  },
+  "fileSize": {
+    "message": "文件大小"
   }
 }

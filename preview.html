@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>filter</title>
+    <link rel="stylesheet" type="text/css" href="css/public.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="css/preview.css" media="all" />
+    <script src="js/init.js"></script>
+    <script src="js/firefox.js"></script>
+    <script src="js/function.js"></script>
+</head>
+
+<body>
+    <div class="play-container hide">
+        <video controls id="video-player"></video>
+    </div>
+    <div class="container">
+        <!-- 筛选条件 -->
+        <div class="filters">
+            <div class="filter-row">
+                <span data-i18n="type"></span>
+                <div id="extensionFilters"></div>
+            </div>
+
+            <div class="filter-row">
+                <span data-i18n="sort"></span>
+                <div class="sort-options">
+                    <div class="sort-group">
+                        <label><input type="radio" name="sortField" value="getTime" checked>
+                            <i18n>getTime</i18n>
+                        </label>
+                        <label><input type="radio" name="sortField" value="size">
+                            <i18n>fileSize</i18n>
+                        </label>
+                    </div>
+                    <div class="sort-order">
+                        <label><input type="radio" name="sortOrder" value="asc" data-i18n="asc" checked>
+                            <i18n>asc</i18n>
+                        </label>
+                        <label><input type="radio" name="sortOrder" value="desc" data-i18n="desc">
+                            <i18n>desc</i18n>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-row">
+                <button class="button2" id="select-all" data-i18n="selectAll"></button>
+                <button class="button2" id="select-reverse" data-i18n="invertSelection"></button>
+                <button class="button2" id="download-selected" data-i18n="download"></button>
+                <button id="merge-download" class="button2" data-i18n="onlineMerge" disabled></button>
+            </div>
+        </div>
+
+        <!-- 媒体列表 -->
+        <div id="file-container" class="file-grid"></div>
+    </div>
+
+    <script src="lib/base64.js"></script>
+    <script src="lib/hls.min.js"></script>
+    <script src="js/preview.js"></script>
+    <script src="js/i18n.js"></script>
+</body>
+
+</html>

@@ -865,5 +865,20 @@
   },
   "requestBody": {
     "message": "請求體"
+  },
+  "sort": {
+    "message": "排序"
+  },
+  "asc": {
+    "message": "昇冪"
+  },
+  "desc": {
+    "message": "降冪"
+  },
+  "getTime": {
+    "message": "獲取時間"
+  },
+  "fileSize": {
+    "message": "文件大小"
   }
 }

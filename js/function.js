@@ -105,6 +105,42 @@ function setRequestHeaders(data = {}, callback = undefined) {
 }
 
 /**
+ * 指定标签页修改 urlFilter请求头
+ * @param {Object} data 需要修改请求头的对象数组
+ * @param {*} callBack 回调函数
+ * @param {*} tabId 需要修改的tabId
+ */
+function setHeaders(data, callBack, tabId = -1) {
+    if (!tabId == -1) {
+        tabId = G.tabId;
+    }
+    const rules = { removeRuleIds: [], addRules: [] };
+    for (let item of data) {
+        if (!item.requestHeaders) { continue; }
+        const rule = {
+            "id": parseInt(item.requestId),
+            "action": {
+                "type": "modifyHeaders",
+                "requestHeaders": Object.keys(item.requestHeaders).map(key => ({ header: key, operation: "set", value: item.requestHeaders[key] }))
+            },
+            "condition": {
+                "resourceTypes": ["xmlhttprequest", "media", "image"],
+                "tabIds": [tabId],
+                "urlFilter": item.url
+            }
+        }
+        if (item.cookie) {
+            rule.action.requestHeaders.push({ header: "Cookie", operation: "set", value: item.cookie });
+        }
+        rules.removeRuleIds.push(parseInt(item.requestId));
+        rules.addRules.push(rule);
+    }
+    chrome.declarativeNetRequest.updateSessionRules(rules, () => {
+        callBack && callBack();
+    });
+}
+
+/**
  * 等待全局变量G初始化完成
  * @param {Function} callback 
  * @param {Number} sec
@@ -583,4 +619,37 @@ function closeTab(tabId = 0) {
             tabId ? chrome.tabs.remove(tabId) : window.close();
         }
     });
+}
+
+function isM3U8(data) {
+    return (data.ext == "m3u8" ||
+        data.ext == "m3u" ||
+        data.type == "application/vnd.apple.mpegurl" ||
+        data.type == "application/x-mpegurl" ||
+        data.type == "application/mpegurl" ||
+        data.type == "application/octet-stream-m3u8"
+    )
+}
+function isMPD(data) {
+    return (data.ext == "mpd" ||
+        data.type == "application/dash+xml"
+    )
+}
+function isJSON(data) {
+    return (data.ext == "json" ||
+        data.type == "application/json" ||
+        data.type == "text/json"
+    )
+}
+function isPicture(data) {
+    if (data.type && data.type.split("/")[0] == "image") {
+        return true;
+    }
+    return (data.ext == "jpg" ||
+        data.ext == "png" ||
+        data.ext == "jpeg" ||
+        data.ext == "bmp" ||
+        data.ext == "gif" ||
+        data.ext == "webp"
+    )
 }

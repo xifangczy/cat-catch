@@ -5,6 +5,9 @@
     document.querySelectorAll('[data-i18n-outer]').forEach(function (element) {
         element.outerHTML = i18n(element.dataset.i18nOuter);
     });
+    document.querySelectorAll('i18n').forEach(function (element) {
+        element.outerHTML = i18n(element.innerHTML);
+    });
     document.querySelectorAll('[data-i18n-placeholder]').forEach(function (element) {
         element.setAttribute('placeholder', i18n(element.dataset.i18nPlaceholder));
     });

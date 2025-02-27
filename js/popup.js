@@ -649,22 +649,23 @@ $("#enable").click(function () {
 });
 // 弹出窗口
 $("#popup").click(function () {
-    chrome.tabs.query({ currentWindow: false, windowType: "popup", url: chrome.runtime.getURL("popup.html?tabId=") + "*" }, function (tabs) {
-        if (tabs.length) {
-            chrome.tabs.update(tabs[0].id, { url: `popup.html?tabId=${G.tabId}` });
-            chrome.windows.update(tabs[0].windowId, { focused: true });
-        } else {
-            chrome.windows.create({
-                url: `popup.html?tabId=${G.tabId}`,
-                type: "popup",
-                height: G.popupHeight ?? 1080,
-                width: G.popupWidth ?? 1920,
-                top: G.popupTop ?? 0,
-                left: G.popupLeft ?? 0,
-            });
-        }
-        closeTab();
-    });
+    // chrome.tabs.query({ currentWindow: false, windowType: "popup", url: chrome.runtime.getURL("popup.html?tabId=") + "*" }, function (tabs) {
+    //     if (tabs.length) {
+    //         chrome.tabs.update(tabs[0].id, { url: `popup.html?tabId=${G.tabId}` });
+    //         chrome.windows.update(tabs[0].windowId, { focused: true });
+    //     } else {
+    //         chrome.windows.create({
+    //             url: `popup.html?tabId=${G.tabId}`,
+    //             type: "popup",
+    //             height: G.popupHeight ?? 1080,
+    //             width: G.popupWidth ?? 1920,
+    //             top: G.popupTop ?? 0,
+    //             left: G.popupLeft ?? 0,
+    //         });
+    //     }
+    //     closeTab();
+    // });
+    chrome.tabs.create({ url: `preview.html?tabId=${G.tabId}` });
 });
 $("#currentPage").click(function () {
     chrome.tabs.query({ active: true, currentWindow: false }, function (tabs) {
@@ -857,38 +858,7 @@ function isPlay(data) {
     const typeArray = ['video/ogg', 'video/mp4', 'video/webm', 'audio/ogg', 'audio/mp3', 'audio/wav', 'audio/m4a', 'video/3gp', 'video/mpeg', 'video/mov'];
     return isMediaExt(data.ext) || typeArray.includes(data.type) || isM3U8(data);
 }
-function isM3U8(data) {
-    return (data.ext == "m3u8" ||
-        data.ext == "m3u" ||
-        data.type == "application/vnd.apple.mpegurl" ||
-        data.type == "application/x-mpegurl" ||
-        data.type == "application/mpegurl" ||
-        data.type == "application/octet-stream-m3u8"
-    )
-}
-function isMPD(data) {
-    return (data.ext == "mpd" ||
-        data.type == "application/dash+xml"
-    )
-}
-function isJSON(data) {
-    return (data.ext == "json" ||
-        data.type == "application/json" ||
-        data.type == "text/json"
-    )
-}
-function isPicture(data) {
-    if (data.type && data.type.split("/")[0] == "image") {
-        return true;
-    }
-    return (data.ext == "jpg" ||
-        data.ext == "png" ||
-        data.ext == "jpeg" ||
-        data.ext == "bmp" ||
-        data.ext == "gif" ||
-        data.ext == "webp"
-    )
-}
+
 // 复制选项
 function copyLink(data) {
     let text = data.url;

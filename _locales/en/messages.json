@@ -865,5 +865,20 @@
   },
   "requestBody": {
     "message": "Request Body"
+  },
+  "sort": {
+    "message": "Sort"
+  },
+  "asc": {
+    "message": "Ascending"
+  },
+  "desc": {
+    "message": "Descending"
+  },
+  "getTime": {
+    "message": "Retrieval Time"
+  },
+  "fileSize": {
+    "message": "File Size"
   }
 }
