@@ -115,6 +115,9 @@ function setHeaders(data, callBack, tabId = -1) {
         tabId = G.tabId;
     }
     const rules = { removeRuleIds: [], addRules: [] };
+    if (!Array.isArray(data)) {
+        data = [data];
+    }
     for (let item of data) {
         if (!item.requestHeaders) { continue; }
         const rule = {
