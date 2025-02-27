@@ -8,6 +8,9 @@ class FilePreview {
         this.catDownloadIsProcessing = false;
         this.MAX_CONCURRENT = 3;   // 最大并行生成预览数
         this.MAX_LIST_SIZE = 100;  // 最大文件列表长度
+        this.isSelecting = false;
+        this.selectionBox = null;
+        this.startPoint = { x: 0, y: 0 };
         this.init();
     }
     async init() {
@@ -17,6 +20,7 @@ class FilePreview {
         this.setupExtensionFilters();   // 设置扩展名筛选
         this.renderFileItems();         // 渲染文件列表
         this.startPreviewGeneration();  // 开始预览生成
+        this.setupSelectionBox();      // 框选
     }
     // 按钮监听
     setupEventListeners() {
@@ -103,7 +107,6 @@ class FilePreview {
                     filename: data.downFileName,
                     tabid: data.tabId == -1 ? this.tab.id : data.tabId,
                     initiator: data.initiator,
-                    tabid: this.tab.id,
                     requestHeaders: data.requestHeaders ? JSON.stringify(data.requestHeaders) : undefined,
                     quantity: checkedData.length,
                     taskId: Date.parse(new Date()),
@@ -144,7 +147,6 @@ class FilePreview {
                     filename: data.downFileName,
                     tabid: data.tabId == -1 ? this.tab.id : data.tabId,
                     initiator: data.initiator,
-                    tabid: this.tab.id,
                     requestHeaders: data.requestHeaders ? JSON.stringify(data.requestHeaders) : undefined,
                     taskId: Date.parse(new Date()),
                     autoDown: true,
@@ -465,6 +467,72 @@ class FilePreview {
                     });
                 });
             });
+        });
+    }
+
+    // 添加框选功能
+    setupSelectionBox() {
+        this.selectionBox = document.getElementById('selection-box');
+        const container = document.querySelector('body');
+
+        container.addEventListener('mousedown', (e) => {
+            // 如果点击的是file-item或其子元素,不启动框选
+            if (e.target.closest('.file-item')) return;
+
+            this.isSelecting = true;
+            this.startPoint = {
+                x: e.pageX,
+                y: e.pageY
+            };
+
+            this.selectionBox.style.display = 'block';
+            this.selectionBox.style.left = `${this.startPoint.x}px`;
+            this.selectionBox.style.top = `${this.startPoint.y}px`;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!this.isSelecting) return;
+
+            const currentPoint = {
+                x: e.pageX,
+                y: e.pageY
+            };
+
+            // 计算选择框的位置和大小
+            const left = Math.min(this.startPoint.x, currentPoint.x);
+            const top = Math.min(this.startPoint.y, currentPoint.y);
+            const width = Math.abs(currentPoint.x - this.startPoint.x);
+            const height = Math.abs(currentPoint.y - this.startPoint.y);
+
+            this.selectionBox.style.left = `${left}px`;
+            this.selectionBox.style.top = `${top}px`;
+            this.selectionBox.style.width = `${width}px`;
+            this.selectionBox.style.height = `${height}px`;
+
+            // 检查每个file-item是否在选择框内
+            const items = document.querySelectorAll('.file-item');
+            items.forEach(item => {
+                const rect = item.getBoundingClientRect();
+                const itemCenter = {
+                    x: rect.left + rect.width / 2 + window.scrollX,
+                    y: rect.top + rect.height / 2 + window.scrollY
+                };
+
+                if (itemCenter.x >= left && itemCenter.x <= left + width &&
+                    itemCenter.y >= top && itemCenter.y <= top + height) {
+                    item.classList.add('selected');
+                }
+            });
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (!this.isSelecting) return;
+
+            this.isSelecting = false;
+            this.selectionBox.style.display = 'none';
+            this.selectionBox.style.width = '0';
+            this.selectionBox.style.height = '0';
+            this.updateMergeDownloadButton();
         });
     }
 }

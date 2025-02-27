@@ -2,6 +2,7 @@ body {
   margin: 0;
   padding: 0;
 }
+
 /* 主容器 */
 .container {
   padding: 20px;
@@ -15,33 +16,39 @@ body {
   gap: 5px;
   margin-bottom: 10px;
 }
+
 .filter-row {
   display: flex;
   align-items: center;
   gap: 20px;
   flex-wrap: wrap;
 }
+
 .sort-options {
   display: flex;
   gap: 15px;
   align-items: center;
 }
+
 .sort-group,
 .sort-order {
   display: flex;
   gap: 8px;
 }
+
 /* 文件大小筛选 */
 .range-container {
   display: flex;
   align-items: center;
   gap: 10px;
 }
+
 .range-inputs {
   display: flex;
   align-items: center;
   gap: 5px;
 }
+
 .range-inputs input {
   width: 80px;
   padding: 5px;
@@ -56,7 +63,9 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 10px;
+  user-select: none;
 }
+
 .file-item {
   border-radius: 8px;
   padding: 10px;
@@ -68,9 +77,11 @@ body {
   flex-direction: column;
   min-height: 150px;
 }
-.file-item > *:not(.bottom-row) {
+
+.file-item>*:not(.bottom-row) {
   flex: 0 0 auto;
 }
+
 .bottom-row {
   margin-top: auto;
   display: flex;
@@ -89,6 +100,7 @@ body {
   /* border-radius: 4px; */
   margin-top: 10px;
 }
+
 .file-name {
   font-weight: bold;
   color: var(--text2-color);
@@ -99,24 +111,29 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
 .file-size {
   /* color: var(--text-color);
   margin-top: 8px; */
   margin: 0;
   flex-shrink: 0;
 }
+
 .file-actions {
   display: flex;
   gap: 10px;
   margin-top: 12px;
 }
+
 .selected {
   border: 2px solid var(--button2-color);
   background-color: var(--button-hover-color);
 }
+
 .preview-container {
   text-align: center;
 }
+
 .media-actions {
   display: flex;
   gap: 10px;
@@ -136,6 +153,7 @@ body {
   align-items: center;
   z-index: 9999;
 }
+
 .play-container.hide {
   display: none;
 }
@@ -147,4 +165,12 @@ body {
   height: auto;
   object-fit: contain;
   background: black;
+}
+
+#selection-box {
+  position: absolute;
+  border: 2px dashed var(--button2-color);
+  background-color: rgba(var(--button2-rgb), 0.1);
+  pointer-events: none;
+  z-index: 1000;
 }
