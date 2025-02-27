@@ -242,6 +242,19 @@ class FilePreview {
             container.appendChild(fileElement);
         });
     }
+    trimFileName(data) {
+        data._title = data.title;
+        data.title = stringModify(data.title);
+
+        data.name = isEmpty(data.name) ? data.title + '.' + data.ext : decodeURIComponent(stringModify(data.name));
+
+        data.downFileName = G.TitleName ? templates(G.downFileName, data) : data.name;
+        data.downFileName = filterFileName(data.downFileName);
+        if (isEmpty(data.downFileName)) {
+            data.downFileName = data.name;
+        }
+        return data;
+    }
     // 载入数据
     async loadFileItems() {
         const params = new URL(location.href).searchParams;
@@ -250,17 +263,7 @@ class FilePreview {
         setHeaders(this.fileItems, null, this.tab.id);
         this.originalItems = [];
         for (let index = 0; index < this.fileItems.length; index++) {
-            const data = this.fileItems[index];
-            data._title = data.title;
-            data.title = stringModify(data.title);
-
-            data.name = isEmpty(data.name) ? data.title + '.' + data.ext : decodeURIComponent(stringModify(data.name));
-
-            data.downFileName = G.TitleName ? templates(G.downFileName, data) : data.name;
-            data.downFileName = filterFileName(data.downFileName);
-            if (isEmpty(data.downFileName)) {
-                data.downFileName = data.name;
-            }
+            const data = this.trimFileName(this.fileItems[index]);
             this.originalItems.push(data);
             // 最大预览数限制
             if (index > this.MAX_LIST_SIZE) {
@@ -537,4 +540,18 @@ class FilePreview {
     }
 }
 
-awaitG(() => { new FilePreview(); });
+awaitG(() => {
+    const filePreview = new FilePreview();
+    // 监听新数据
+    chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
+        if (!Message.Message || !Message.data || !filePreview) { return; }
+        // 添加资源
+        if (Message.Message == "popupAddData") {
+            setHeaders(Message.data, null, filePreview.tab.id);
+            filePreview.originalItems.push(filePreview.trimFileName(Message.data));
+            filePreview.updateFileList();
+            filePreview.startPreviewGeneration();
+            return;
+        }
+    });
+});
