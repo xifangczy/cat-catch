@@ -71,7 +71,7 @@ body {
   padding: 10px;
   cursor: pointer;
   position: relative;
-  box-shadow: 0 2px 8px var(--button2-color);
+  box-shadow: 0px 0px 3px var(--button2-color);
 
   display: flex;
   flex-direction: column;
@@ -128,6 +128,7 @@ body {
 .selected {
   border: 2px solid var(--button2-color);
   background-color: var(--button-hover-color);
+  box-shadow: 0px 0px 8px var(--button2-color);
 }
 
 .preview-container {
