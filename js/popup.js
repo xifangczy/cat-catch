@@ -649,23 +649,26 @@ $("#enable").click(function () {
 });
 // 弹出窗口
 $("#popup").click(function () {
-    // chrome.tabs.query({ currentWindow: false, windowType: "popup", url: chrome.runtime.getURL("popup.html?tabId=") + "*" }, function (tabs) {
-    //     if (tabs.length) {
-    //         chrome.tabs.update(tabs[0].id, { url: `popup.html?tabId=${G.tabId}` });
-    //         chrome.windows.update(tabs[0].windowId, { focused: true });
-    //     } else {
-    //         chrome.windows.create({
-    //             url: `popup.html?tabId=${G.tabId}`,
-    //             type: "popup",
-    //             height: G.popupHeight ?? 1080,
-    //             width: G.popupWidth ?? 1920,
-    //             top: G.popupTop ?? 0,
-    //             left: G.popupLeft ?? 0,
-    //         });
-    //     }
-    //     closeTab();
-    // });
-    chrome.tabs.create({ url: `preview.html?tabId=${G.tabId}` });
+    if (G.newPopup) {
+        chrome.tabs.create({ url: `preview.html?tabId=${G.tabId}` });
+        return;
+    }
+    chrome.tabs.query({ currentWindow: false, windowType: "popup", url: chrome.runtime.getURL("popup.html?tabId=") + "*" }, function (tabs) {
+        if (tabs.length) {
+            chrome.tabs.update(tabs[0].id, { url: `popup.html?tabId=${G.tabId}` });
+            chrome.windows.update(tabs[0].windowId, { focused: true });
+        } else {
+            chrome.windows.create({
+                url: `popup.html?tabId=${G.tabId}`,
+                type: "popup",
+                height: G.popupHeight ?? 1080,
+                width: G.popupWidth ?? 1920,
+                top: G.popupTop ?? 0,
+                left: G.popupLeft ?? 0,
+            });
+        }
+        closeTab();
+    });
 });
 $("#currentPage").click(function () {
     chrome.tabs.query({ active: true, currentWindow: false }, function (tabs) {

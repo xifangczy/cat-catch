@@ -132,6 +132,7 @@ G.OptionLists = {
     blockUrl: [],
     blockUrlWhite: false,
     maxLength: 9999,
+    newPopup: true,
 };
 // 本地储存的配置
 G.LocalVar = {
