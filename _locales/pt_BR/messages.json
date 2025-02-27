@@ -865,5 +865,20 @@
   },
   "requestBody": {
     "message": "Corpo pedido"
+  },
+  "sort": {
+    "message": "Ordenar"
+  },
+  "asc": {
+    "message": "Ascendentemente"
+  },
+  "desc": {
+    "message": "Descendentemente"
+  },
+  "getTime": {
+    "message": "Tempo de Recuperação"
+  },
+  "fileSize": {
+    "message": "Tamanho do Arquivo"
   }
 }
