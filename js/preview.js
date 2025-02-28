@@ -229,11 +229,15 @@ class FilePreview {
                 <img src="img/icon.png" class="preview-image">
             </div>
             <div class="bottom-row">
-                <div class="file-info">${item.ext.toUpperCase()} / ${byteToSize(item.size)}</div>
+                <div class="file-info">${item.ext.toUpperCase()}</div>
                 <div class="media-actions">
                     <img src="img/download.svg" class="icon download" data-action="download">
                 </div>
             </div>`;
+        // 添加文件信息
+        if (item.size) {
+            item.html.querySelector('.file-info').innerHTML += ` / ${byteToSize(item.size)}`;
+        }
         item.html.addEventListener('click', () => {
             item.selected = !item.selected;
             this.updateMergeDownloadButton();
