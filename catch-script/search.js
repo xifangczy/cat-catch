@@ -17,6 +17,8 @@
     console.log("start search.js");
     const filter = new Set();
     const reKeyURL = /URI="(.*)"/;
+    const baseUrl = new Set();
+    getBaseUrl(location.href);
 
     // Worker
     if (!isRunningInWorker) {
@@ -92,11 +94,21 @@
             if (typeof data[key] == "string") {
                 if (isUrl(data[key])) {
                     const ext = getExtension(data[key]);
-                    ext && postData({ action: "catCatchAddMedia", url: data[key].startsWith("//") ? (location.protocol + data[key]) : data[key], href: location.href, ext: ext });
+                    if (ext) {
+                        const url = data[key].startsWith("//") ? (location.protocol + data[key]) : data[key];
+                        getBaseUrl(url);
+                        postData({ action: "catCatchAddMedia", url: url, href: location.href, ext: ext });
+                    }
                     continue;
                 }
                 if (data[key].substring(0, 7).toUpperCase() == "#EXTM3U") {
-                    isFullM3u8(data[key]) && toUrl(data[key]);
+                    if (isFullM3u8(data[key])) {
+                        toUrl(data[key]);
+                    } else {
+                        baseUrl.forEach((url) => {
+                            toUrl(addBashUrl(url, data[key]));
+                        });
+                    }
                     continue;
                 }
                 if (data[key].substring(0, 17).toLowerCase() == "data:application/") {
@@ -471,7 +483,13 @@
                 }
             }
             if (ts[0] != "#" && !isUrl(ts)) {
-                ts = baseUrl + ts;
+                if (ts.startsWith("/")) {
+                    // url根目录
+                    const urlSplit = baseUrl.split("/");
+                    ts = urlSplit[0] + "//" + urlSplit[2] + ts;
+                } else {
+                    ts = baseUrl + ts;
+                }
             }
             m3u8Text += ts + "\n";
         }
@@ -571,5 +589,10 @@
             }
         }
         return _buffer.buffer;
+    }
+    function getBaseUrl(url) {
+        let urlSplit = url.split("/");
+        urlSplit.pop();
+        baseUrl.add(urlSplit.join("/") + "/");
     }
 })();
