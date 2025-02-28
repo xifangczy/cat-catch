@@ -4,7 +4,6 @@ class FilePreview {
         this.originalItems = [];
         this.sizeFilters = null;
         this.regexFilters = null;
-        this.sortField = { field: 'getTime', order: 'asc' };
         this.catDownloadIsProcessing = false;
         this.MAX_CONCURRENT = 3;   // 最大并行生成预览数
         this.MAX_LIST_SIZE = 100;  // 最大文件列表长度
@@ -13,6 +12,9 @@ class FilePreview {
         this.startPoint = { x: 0, y: 0 };
         this.init();
     }
+    /**
+     * 初始化
+     */
     async init() {
         this.tab = await chrome.tabs.getCurrent();  // 获取当前标签
         this.setupEventListeners();     // 设置事件监听
@@ -22,28 +24,29 @@ class FilePreview {
         this.startPreviewGeneration();  // 开始预览生成
         this.setupSelectionBox();      // 框选
     }
-    // 按钮监听
+
+    /**
+     * 设置按钮、键盘 、等事件监听
+     */
     setupEventListeners() {
-        // 全选、反选、下载按钮、关闭视频按钮
+        // 全选
         document.querySelector('#select-all').addEventListener('click', () => this.toggleSelectAll());
+        // 反选
         document.querySelector('#select-reverse').addEventListener('click', () => this.toggleSelectReverse());
+        // 下载选中
         document.querySelector('#download-selected').addEventListener('click', () => this.downloadSelected());
+        // 合并下载
         document.querySelector('#merge-download').addEventListener('click', () => this.mergeDownload());
-        document.querySelector('.play-container video').addEventListener('click', (e) => e.stopPropagation());
+        // 关闭视频
         document.querySelector('.play-container').addEventListener('click', () => this.closeVideo());
         document.addEventListener('keydown', () => this.closeVideo());
-
+        // 点击视频 阻止冒泡 以免关闭视频
+        document.querySelector('.play-container video').addEventListener('click', (e) => e.stopPropagation());
         // 排序按钮
         document.querySelectorAll('.sort-options input').forEach(input => {
-            input.addEventListener('change', (e) => {
-                this.sortField = {
-                    field: document.querySelector('input[name="sortField"]:checked').value,
-                    order: document.querySelector('input[name="sortOrder"]:checked').value
-                };
-                this.updateFileList();
-            });
+            input.addEventListener('change', () => this.updateFileList());
         });
-
+        // 正则过滤 监听回车
         document.querySelector('#regular').addEventListener('keypress', (e) => {
             if (e.keyCode == 13) {
                 const value = e.target.value.trim();
@@ -51,36 +54,32 @@ class FilePreview {
                 this.updateFileList();
             }
         });
+        // debug
         document.querySelector('#debug').addEventListener('click', () => console.dir(this.fileItems));
     }
-    // 选中切换
-    toggleSelection(element) {
-        element.classList.toggle('selected');
-        this.updateMergeDownloadButton();
-    }
-    // 全选
+    /**
+     * 全选
+     */
     toggleSelectAll() {
-        const items = document.querySelectorAll('.file-item');
-        items.forEach(item => {
-            item.classList.add('selected');
-        });
+        this.fileItems.forEach(item => item.selected = true);
         this.updateMergeDownloadButton();
     }
-    // 反选
+    /**
+     * 反选
+     */
     toggleSelectReverse() {
-        const items = document.querySelectorAll('.file-item');
-        items.forEach(item => {
-            item.classList.toggle('selected')
-        });
+        this.fileItems.forEach(item => item.selected = !item.selected);
         this.updateMergeDownloadButton();
     }
-
+    /**
+     * 获取选中元素 转为对象
+     */
     getSelectedItems() {
-        const selectedItems = document.querySelectorAll('.file-item.selected');
-        const indexs = Array.from(selectedItems).map(item => parseInt(item.getAttribute('data-index')));
-        if (indexs.length == 0) { return []; }
-        return indexs.map(index => this.fileItems[index]);
+        return this.fileItems.filter(item => item.selected);
     }
+    /**
+     * 更新合并下载按钮状态
+     */
     updateMergeDownloadButton() {
         const selectedItems = this.getSelectedItems();
         const button = document.querySelector('#merge-download');
@@ -92,7 +91,9 @@ class FilePreview {
             }
         }
     }
-
+    /**
+     * 合并下载
+     */
     mergeDownload() {
         const checkedData = this.getSelectedItems();
         // 都是m3u8 自动合并并发送到ffmpeg
@@ -117,6 +118,10 @@ class FilePreview {
         this.catDownload(checkedData, { ffmpeg: "merge" });
     }
 
+    /**
+     * 下载文件
+     * @param {Object} data 下载数据
+     */
     downloadItem(data) {
         if (G.m3u8dl && isM3U8(data)) {
             if (!data.url.startsWith("blob:")) {
@@ -156,13 +161,16 @@ class FilePreview {
         }
         this.catDownload(data);
     }
-
+    /**
+     * 下载选中
+     */
     downloadSelected() {
         const data = this.getSelectedItems();
         data.length && this.catDownload(data);
     }
-
-    // 更新文件列表
+    /**
+     * 更新文件列表
+     */
     updateFileList() {
         this.fileItems = [...this.originalItems];
         this.applyExtensionFilters();
@@ -170,32 +178,43 @@ class FilePreview {
         this.sortItems();
         this.renderFileItems();
     }
-    // 扩展过滤
+    /**
+     * 扩展过滤
+     */
     applyExtensionFilters() {
         const selectedExts = Array.from(document.querySelectorAll('.ext-checkbox:checked'))
             .map(checkbox => checkbox.value);
         this.fileItems = this.fileItems.filter(item => selectedExts.includes(item.ext));
     }
-    // 正则过滤
+    /**
+     * 正则过滤
+     */
     applyRegexFilters() {
         if (this.regexFilters) {
             this.fileItems = this.fileItems.filter(item => this.regexFilters.test(item.url));
         }
     }
-    // 排序
+    /**
+     * 排序
+     */
     sortItems() {
+        const order = document.querySelector('input[name="sortOrder"]:checked').value;
+        const field = document.querySelector('input[name="sortField"]:checked').value;
         this.fileItems.sort((a, b) => {
-            const order = this.sortField.order === 'asc' ? 1 : -1;
-            return order * (a[this.sortField.field] - b[this.sortField.field]);
+            const _order = order === 'asc' ? 1 : -1;
+            return _order * (a[field] - b[field]);
         });
     }
-
-    // 创建文件元素
+    /**
+     * 创建文件元素
+     * @param {Object} item 数据
+     * @param {Number} index 索引
+     */
     createFileElement(item, index) {
-        const div = document.createElement('div');
-        div.setAttribute('data-index', index);
-        div.className = 'file-item';
-        div.innerHTML = `
+        item.html = document.createElement('div');
+        item.html.setAttribute('data-index', index);
+        item.html.className = 'file-item';
+        item.html.innerHTML = `
             <div class="file-name">${item.name}</div>
             <div class="preview-container">
                 <div class="video-preview hide"></div>
@@ -207,19 +226,38 @@ class FilePreview {
                     <img src="img/download.svg" class="icon download" data-action="download">
                 </div>
             </div>`;
-        div.querySelector('.video-preview').addEventListener('click', (event) => {
+        item.html.querySelector('.video-preview').addEventListener('click', (event) => {
             event.stopPropagation();
             this.playItem(item);
         });
-        div.querySelector('.download').addEventListener('click', (event) => {
+        item.html.querySelector('.download').addEventListener('click', (event) => {
             event.stopPropagation();
             this.downloadItem(item);
         });
-        div.addEventListener('click', () => { this.toggleSelection(div) });
-        item.html = div;
-        return div;
+        item.html.addEventListener('click', () => {
+            item.selected = !item.selected;
+            this.updateMergeDownloadButton();
+        });
+        // 存在预览视频标签 直接设置
+        item.previewVideo && this.setPerviewVideo(item);
+        // 选中状态 添加对应class
+        item._selected = false;
+        if (item.selected === undefined) {
+            Object.defineProperty(item, "selected", {
+                get() {
+                    return item._selected;
+                },
+                set(newValue) {
+                    item._selected = newValue;
+                    newValue ? item.html.classList.add('selected') : item.html.classList.remove('selected');
+                }
+            });
+        }
+        return item.html;
     }
-    // 设置扩展名筛选
+    /**
+     * 设置扩展名复选框
+     */
     setupExtensionFilters() {
         const extensions = [...new Set(this.originalItems.map(item => item.ext))];
         const extFilter = document.querySelector('#extensionFilters');
@@ -230,6 +268,9 @@ class FilePreview {
             extFilter.appendChild(label);
         });
     }
+    /**
+     * 渲染文件列表
+     */
     renderFileItems() {
         const container = document.querySelector('#file-container');
         container.innerHTML = '';
@@ -238,6 +279,10 @@ class FilePreview {
             container.appendChild(fileElement);
         });
     }
+    /**
+     * 修剪文件名
+     * @param {Object} data 数据
+     */
     trimFileName(data) {
         data._title = data.title;
         data.title = stringModify(data.title);
@@ -251,7 +296,9 @@ class FilePreview {
         }
         return data;
     }
-    // 载入数据
+    /**
+     * 载入数据
+     */
     async loadFileItems() {
         const params = new URL(location.href).searchParams;
         const _tabId = parseInt(params.get("tabId"));
@@ -267,14 +314,19 @@ class FilePreview {
             }
         }
     }
-
+    /**
+     * 关闭预览视频
+     */
     closeVideo() {
         document.querySelector('.play-container').classList.add('hide');
         const video = document.querySelector('#video-player');
         video.pause();
         video.src = '';
     }
-    // 播放文件
+    /**
+     * 播放文件
+     * @param {Object} item 
+     */
     playItem(item) {
         const video = document.querySelector('#video-player');
         const container = document.querySelector('.play-container');
@@ -296,8 +348,10 @@ class FilePreview {
             video.play();
         }
     }
-
-    // 生成预览图
+    /**
+     * 生成预览video标签
+     * @param {Object} item 数据
+     */
     async generatePreview(item) {
         return new Promise((resolve, reject) => {
             const video = document.createElement('video');
@@ -346,7 +400,31 @@ class FilePreview {
             }
         });
     }
+    /**
+     * 设置预览video标签到对应位置 以及添加鼠标悬停事件
+     * @param {Object} item data
+     */
+    setPerviewVideo(item) {
+        const previewContainer = item.html.querySelector('.video-preview');
+        const previewImage = item.html.querySelector('.preview-image');
+        if (previewContainer) {
+            previewContainer.classList.remove('hide');
+            previewImage.classList.add('hide');
+            previewContainer.appendChild(item.previewVideo);
 
+            // 添加鼠标悬停事件
+            item.html.addEventListener('mouseenter', () => {
+                item.previewVideo.play();
+            });
+
+            item.html.addEventListener('mouseleave', () => {
+                item.previewVideo.pause();
+            });
+        }
+    }
+    /**
+     * 多线程 开始生成预览video标签
+     */
     async startPreviewGeneration() {
         const pendingItems = this.fileItems.filter(item =>
             !item.previewVideo &&
@@ -360,27 +438,10 @@ class FilePreview {
                 (async () => {
                     while (pendingItems.length) {
                         const item = pendingItems.shift();
-                        if (!item || !item.url) continue;
+                        if (!item || !item.url || item.previewVideo) continue;
                         try {
-                            const video = await this.generatePreview(item);
-                            item.previewVideo = video;
-
-                            const previewContainer = item.html.querySelector('.video-preview');
-                            const previewImage = item.html.querySelector('.preview-image');
-                            if (previewContainer) {
-                                previewContainer.classList.remove('hide');
-                                previewImage.classList.add('hide');
-                                previewContainer.appendChild(video);
-
-                                // 添加鼠标悬停事件
-                                item.html.addEventListener('mouseenter', () => {
-                                    video.play();
-                                });
-
-                                item.html.addEventListener('mouseleave', () => {
-                                    video.pause();
-                                });
-                            }
+                            item.previewVideo = await this.generatePreview(item);
+                            this.setPerviewVideo(item);
 
                             console.log('Preview generated for:', item.url);
                         } catch (error) {
@@ -393,8 +454,11 @@ class FilePreview {
 
         await Promise.all(workers);
     }
-
-    // 猫抓下载器
+    /**
+     * 猫抓下载器
+     * @param {Object} data 
+     * @param {Object} extra 
+     */
     catDownload(data, extra = {}) {
         // 防止连续多次提交
         if (this.catDownloadIsProcessing) {
@@ -423,6 +487,11 @@ class FilePreview {
             this.catDownloadIsProcessing = false;
         });
     }
+    /**
+     * 创建猫抓下载器
+     * @param {Object} data 
+     * @param {Object} extra 
+     */
     createCatDownload(data, extra) {
         chrome.tabs.get(G.tabId, (tab) => {
             const arg = {
@@ -446,8 +515,9 @@ class FilePreview {
             });
         });
     }
-
-    // 添加框选功能
+    /**
+     * 设置框选
+     */
     setupSelectionBox() {
         this.selectionBox = document.getElementById('selection-box');
         const container = document.querySelector('body');
@@ -487,9 +557,8 @@ class FilePreview {
             this.selectionBox.style.height = `${height}px`;
 
             // 检查每个file-item是否在选择框内
-            const items = document.querySelectorAll('.file-item');
-            items.forEach(item => {
-                const rect = item.getBoundingClientRect();
+            this.fileItems.forEach(item => {
+                const rect = item.html.getBoundingClientRect();
                 const itemCenter = {
                     x: rect.left + rect.width / 2 + window.scrollX,
                     y: rect.top + rect.height / 2 + window.scrollY
@@ -497,7 +566,7 @@ class FilePreview {
 
                 if (itemCenter.x >= left && itemCenter.x <= left + width &&
                     itemCenter.y >= top && itemCenter.y <= top + height) {
-                    item.classList.add('selected');
+                    item.selected = true;
                 }
             });
         });
@@ -515,7 +584,14 @@ class FilePreview {
 }
 
 awaitG(() => {
+    // 自定义css
+    const css = document.createElement('style');
+    css.textContent = G.css;
+    document.head.appendChild(css);
+
+    // 实例化 FilePreview
     const filePreview = new FilePreview();
+
     // 监听新数据
     chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         if (!Message.Message || !Message.data || !filePreview) { return; }
