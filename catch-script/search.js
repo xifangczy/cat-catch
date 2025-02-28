@@ -91,8 +91,8 @@
             }
             if (typeof data[key] == "string") {
                 if (isUrl(data[key])) {
-                    let ext = getExtension(data[key]);
-                    ext && postData({ action: "catCatchAddMedia", url: data[key], href: location.href, ext: ext });
+                    const ext = getExtension(data[key]);
+                    ext && postData({ action: "catCatchAddMedia", url: data[key].startsWith("//") ? (location.protocol + data[key]) : data[key], href: location.href, ext: ext });
                     continue;
                 }
                 if (data[key].substring(0, 7).toUpperCase() == "#EXTM3U") {
@@ -168,6 +168,9 @@
                     toUrl(this.response, "json");
                     return;
                 }
+            }
+            if (this.responseURL.includes("sdkInit")) {
+                debugger;
             }
             const isJson = isJSON(this.response);
             if (isJson) {
@@ -439,7 +442,7 @@
     }
 
     function isUrl(str) {
-        return (str.startsWith("http://") || str.startsWith("https://"));
+        return (str.startsWith("http://") || str.startsWith("https://") || str.startsWith("//"));
     }
     function isFullM3u8(text) {
         let tsLists = text.split("\n");
@@ -487,7 +490,12 @@
     }
     function getExtension(str) {
         let ext;
-        try { ext = new URL(str); } catch (e) { return undefined; }
+        try {
+            if (str.startsWith("//")) {
+                str = location.protocol + str;
+            }
+            ext = new URL(str);
+        } catch (e) { return undefined; }
         ext = ext.pathname.split(".");
         if (ext.length == 1) { return undefined; }
         ext = ext[ext.length - 1].toLowerCase();
