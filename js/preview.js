@@ -229,9 +229,9 @@ class FilePreview {
             </div>
             <div class="bottom-row">
                 <div class="file-info">${item.ext.toUpperCase()}</div>
-                <div class="actions">
-                    <img src="img/copy.png" class="icon copy" id="copy">
-                </div>
+            </div>
+            <div class="actions">
+                <img src="img/copy.png" class="icon copy" id="copy">
             </div>`;
         // 添加文件信息
         if (item.size && item.size >= 1024) {
@@ -401,11 +401,6 @@ class FilePreview {
      * @param {Object} item 数据
      */
     async generatePreview(item) {
-        // 判断是否为音频文件
-        if (item.type?.startsWith('audio/') || ['mp3', 'wav', 'm4a', 'aac', 'ogg'].includes(item.ext)) {
-            return { video: null, height: 0, width: 0, type: 'audio' };
-        }
-
         return new Promise((resolve, reject) => {
             const video = document.createElement('video');
             video.muted = true;
@@ -417,6 +412,18 @@ class FilePreview {
                 video.pause();
                 videoInfo.height = video.videoHeight;
                 videoInfo.width = video.videoWidth;
+
+                if (video.duration && video.duration != Infinity) {
+                    videoInfo.duration = secToTime(video.duration);
+                }
+
+                // 判断是否为音频文件
+                if (item.type?.startsWith('audio/') || ['mp3', 'wav', 'm4a', 'aac', 'ogg'].includes(item.ext)) {
+                    videoInfo.type = 'audio';
+                    videoInfo.video = null;
+                    videoInfo.height = 0;
+                    videoInfo.width = 0;
+                }
                 resolve(videoInfo);
             });
 
@@ -426,7 +433,7 @@ class FilePreview {
                 if (hls) hls.destroy();
             };
 
-            const videoInfo = { video: video, height: 0, width: 0, type: 'video' };
+            const videoInfo = { video: video, height: 0, width: 0, duration: 0, type: 'video' };
             // 处理HLS视频
             if (isM3U8(item)) {
                 if (!Hls.isSupported()) {
@@ -477,6 +484,10 @@ class FilePreview {
             });
             // 填写视频信息
             item.html.querySelector('.file-info').innerHTML += ` / ${item.previewVideo.width}*${item.previewVideo.height}`;
+        }
+        // 填写时长
+        if (item.previewVideo.duration) {
+            item.html.querySelector('.file-info').innerHTML += ` / ${item.previewVideo.duration}`;
         }
 
         // 点击预览容器 播放  阻止冒泡 以免选中

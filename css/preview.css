@@ -69,7 +69,7 @@ body {
 
 .file-item {
   border-radius: 8px;
-  padding: 10px;
+  padding: 8px;
   cursor: pointer;
   position: relative;
   box-shadow: 0px 0px 3px var(--button2-color);
@@ -89,7 +89,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 2px;
   /* padding-top: 12px; */
 }
 
@@ -145,7 +145,9 @@ body {
 /* 图标 */
 .actions {
   display: flex;
-  gap: 5px;
+  gap: 2px;
+  justify-content: flex-end;
+  margin-bottom: -5px;
 }
 .actions .icon {
   transition: all 0.1s;
