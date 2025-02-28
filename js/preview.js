@@ -261,6 +261,9 @@ class FilePreview {
         // 图片预览
         if (item.type?.startsWith('image/') || ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(item.ext)) {
             const previewImage = item.html.querySelector('.preview-image');
+            previewImage.onload = () => {
+                item.html.querySelector('.file-info').innerHTML += ` / ${previewImage.naturalWidth}*${previewImage.naturalHeight}`;
+            };
             previewImage.src = item.url;
             // 点击预览图片
             previewImage.addEventListener('click', (event) => {
