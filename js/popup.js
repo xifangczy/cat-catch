@@ -680,25 +680,7 @@ $("#currentPage").click(function () {
 $("#send2localSelect").click(function () {
     getData().forEach(function (item) {
         if (item.checked) {
-            const info = {
-                name: item.name,
-                url: item.url,
-                size: item.size,
-                ext: item.ext,
-                type: item.type,
-                tabId: item.tabId,
-                isRegex: item.isRegex,
-                requestId: item.requestId,
-                initiator: item.initiator,
-                requestHeaders: item.requestHeaders,
-                cookie: item.cookie,
-                cacheURL: item.cacheURL,
-                getTime: item.getTime,
-                title: item.title,
-                favIconUrl: item.favIconUrl,
-                webUrl: item.webUrl,
-            };
-            send2local("catch", info, item.tabId).then(function (hasSent) {
+            send2local("catch", item, item.tabId).then(function (hasSent) {
                 success && success?.ok && Tips(i18n.hasSent, 1000);
             }).catch(function (error) {
                 error ? Tips(error, 1000) : Tips(i18n.sendFailed, 1000);
