@@ -211,13 +211,13 @@ class FilePreview {
      * @param {Number} index 索引
      */
     createFileElement(item, index) {
+        if (item.html) { return item.html; }
         item.html = document.createElement('div');
         item.html.setAttribute('data-index', index);
         item.html.className = 'file-item';
         item.html.innerHTML = `
             <div class="file-name">${item.name}</div>
             <div class="preview-container">
-                <div class="video-preview hide"></div>
                 <img src="img/icon.png" class="preview-image">
             </div>
             <div class="bottom-row">
@@ -226,33 +226,26 @@ class FilePreview {
                     <img src="img/download.svg" class="icon download" data-action="download">
                 </div>
             </div>`;
-        item.html.querySelector('.video-preview').addEventListener('click', (event) => {
-            event.stopPropagation();
-            this.playItem(item);
-        });
-        item.html.querySelector('.download').addEventListener('click', (event) => {
-            event.stopPropagation();
-            this.downloadItem(item);
-        });
         item.html.addEventListener('click', () => {
             item.selected = !item.selected;
             this.updateMergeDownloadButton();
         });
-        // 存在预览视频标签 直接设置
-        item.previewVideo && this.setPerviewVideo(item);
+        // 下载图标
+        item.html.querySelector('.download').addEventListener('click', (event) => {
+            event.stopPropagation();
+            this.downloadItem(item);
+        });
         // 选中状态 添加对应class
         item._selected = false;
-        if (item.selected === undefined) {
-            Object.defineProperty(item, "selected", {
-                get() {
-                    return item._selected;
-                },
-                set(newValue) {
-                    item._selected = newValue;
-                    newValue ? item.html.classList.add('selected') : item.html.classList.remove('selected');
-                }
-            });
-        }
+        Object.defineProperty(item, "selected", {
+            get() {
+                return item._selected;
+            },
+            set(newValue) {
+                item._selected = newValue;
+                newValue ? item.html.classList.add('selected') : item.html.classList.remove('selected');
+            }
+        });
         return item.html;
     }
     /**
@@ -353,6 +346,12 @@ class FilePreview {
      * @param {Object} item 数据
      */
     async generatePreview(item) {
+        // 判断是否为音频文件
+        const isAudio = item.type?.startsWith('audio') || ['mp3', 'wav', 'm4a', 'aac', 'ogg'].includes(item.ext);
+        if (isAudio) {
+            return { isAudio: true };
+        }
+
         return new Promise((resolve, reject) => {
             const video = document.createElement('video');
             video.muted = true;
@@ -378,7 +377,7 @@ class FilePreview {
 
                 hls.on(Hls.Events.MANIFEST_PARSED, () => {
                     video.pause();
-                    resolve(video);
+                    resolve({ isAudio: false, element: video });
                 });
 
                 hls.on(Hls.Events.ERROR, (event, data) => {
@@ -390,8 +389,12 @@ class FilePreview {
             else {
                 video.src = item.url;
                 video.addEventListener('loadedmetadata', () => {
+                    const out = { isAudio: false, element: video };
+                    if (video.videoHeight == 0 || video.videoWidth == 0) {
+                        out.isAudio = true;
+                    }
                     video.pause();
-                    resolve(video);
+                    resolve(out);
                 });
                 video.addEventListener('error', () => {
                     cleanup();
@@ -405,22 +408,33 @@ class FilePreview {
      * @param {Object} item data
      */
     setPerviewVideo(item) {
-        const previewContainer = item.html.querySelector('.video-preview');
-        const previewImage = item.html.querySelector('.preview-image');
-        if (previewContainer) {
-            previewContainer.classList.remove('hide');
-            previewImage.classList.add('hide');
-            previewContainer.appendChild(item.previewVideo);
+        // 视频放入预览容器 增加class
+        const container = item.html.querySelector('.preview-container');
+        container.classList.add('video-preview');
 
-            // 添加鼠标悬停事件
+        if (item.previewVideo.isAudio) {
+            // 如果是音频文件，使用音乐图标
+            container.innerHTML = '<img src="img/music.svg" class="icon" />';
+        } else {
+            // 如果是视频文件，使用视频预览
+            container.appendChild(item.previewVideo.element);
+            // 鼠标悬停事件
             item.html.addEventListener('mouseenter', () => {
-                item.previewVideo.play();
+                item.previewVideo.element.play();
             });
-
             item.html.addEventListener('mouseleave', () => {
-                item.previewVideo.pause();
+                item.previewVideo.element.pause();
             });
         }
+
+        // 点击预览容器 播放  阻止冒泡 以免选中
+        container.addEventListener('click', (event) => {
+            event.stopPropagation();
+            this.playItem(item);
+        });
+
+        // 删除 preview-image
+        item.html.querySelector('.preview-image').remove();
     }
     /**
      * 多线程 开始生成预览video标签

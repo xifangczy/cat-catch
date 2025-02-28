@@ -90,7 +90,7 @@ body {
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  padding-top: 12px;
+  /* padding-top: 12px; */
 }
 
 .preview-image {
@@ -136,6 +136,9 @@ body {
 .preview-container {
   margin: auto 0;
   text-align: center;
+}
+.preview-container .icon {
+  height: 150px;
 }
 
 .media-actions {
@@ -198,7 +201,7 @@ body {
   height: 150px;
   position: relative;
   overflow: hidden;
-  background: #000;
+  /* background: #000; */
   display: flex;
   align-items: center;
   justify-content: center;
