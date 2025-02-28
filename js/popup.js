@@ -1094,7 +1094,7 @@ function openParser(data, options = {}) {
             filename: data.downFileName,
             tabid: data.tabId == -1 ? G.tabId : data.tabId,
             initiator: data.initiator,
-            tabid: tab.id,
+            // tabid: tab.id,
             requestHeaders: data.requestHeaders ? JSON.stringify(data.requestHeaders) : undefined,
             ...Object.fromEntries(Object.entries(options).map(([key, value]) => [key, typeof value === 'boolean' ? 1 : value])),
         })}`
