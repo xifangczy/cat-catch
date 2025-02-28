@@ -4,7 +4,7 @@ class FilePreview {
         this.originalItems = [];
         this.sizeFilters = null;
         this.regexFilters = null;
-        this.sortField = { field: 'getTime', order: 'desc' };
+        this.sortField = { field: 'getTime', order: 'asc' };
         this.catDownloadIsProcessing = false;
         this.MAX_CONCURRENT = 3;   // 最大并行生成预览数
         this.MAX_LIST_SIZE = 100;  // 最大文件列表长度
@@ -30,12 +30,8 @@ class FilePreview {
         document.querySelector('#download-selected').addEventListener('click', () => this.downloadSelected());
         document.querySelector('#merge-download').addEventListener('click', () => this.mergeDownload());
         document.querySelector('.play-container video').addEventListener('click', (e) => e.stopPropagation());
-        document.querySelector('.play-container').addEventListener('click', () => {
-            document.querySelector('.play-container').classList.add('hide');
-            const video = document.querySelector('#video-player');
-            video.pause();
-            video.src = '';
-        });
+        document.querySelector('.play-container').addEventListener('click', () => this.closeVideo());
+        document.addEventListener('keydown', () => this.closeVideo());
 
         // 排序按钮
         document.querySelectorAll('.sort-options input').forEach(input => {
@@ -55,6 +51,7 @@ class FilePreview {
                 this.updateFileList();
             }
         });
+        document.querySelector('#debug').addEventListener('click', () => console.dir(this.fileItems));
     }
     // 选中切换
     toggleSelection(element) {
@@ -201,21 +198,20 @@ class FilePreview {
         div.innerHTML = `
             <div class="file-name">${item.name}</div>
             <div class="preview-container">
-                <img src="${item.preview ? item.preview : 'img/icon.png'}" class="preview-image">
+                <div class="video-preview hide"></div>
+                <img src="img/icon.png" class="preview-image">
             </div>
             <div class="bottom-row">
                 <div class="file-size">${byteToSize(item.size)}</div>
                 <div class="media-actions">
-                    <button class="button2" data-action="play">${i18n.play}</button>
-                    <button class="button2" data-action="download">${i18n.download}</button>
+                    <img src="img/download.svg" class="icon download" data-action="download">
                 </div>
-            </div>
-        `;
-        div.querySelector('[data-action="play"]').addEventListener('click', (event) => {
+            </div>`;
+        div.querySelector('.video-preview').addEventListener('click', (event) => {
             event.stopPropagation();
             this.playItem(item);
         });
-        div.querySelector('[data-action="download"]').addEventListener('click', (event) => {
+        div.querySelector('.download').addEventListener('click', (event) => {
             event.stopPropagation();
             this.downloadItem(item);
         });
@@ -272,6 +268,12 @@ class FilePreview {
         }
     }
 
+    closeVideo() {
+        document.querySelector('.play-container').classList.add('hide');
+        const video = document.querySelector('#video-player');
+        video.pause();
+        video.src = '';
+    }
     // 播放文件
     playItem(item) {
         const video = document.querySelector('#video-player');
@@ -296,75 +298,24 @@ class FilePreview {
     }
 
     // 生成预览图
-    generatePreview(item) {
+    async generatePreview(item) {
         return new Promise((resolve, reject) => {
             const video = document.createElement('video');
             video.muted = true;
             video.playsInline = true;
-            video.style.display = 'none';
-            document.body.appendChild(video);
+            video.loop = true;
+            video.preload = 'metadata';
 
             let hls = null;
-            let timeoutId = null;
 
             const cleanup = () => {
-                clearTimeout(timeoutId);
-                document.body.removeChild(video);
                 if (hls) hls.destroy();
-            };
-
-            const handleSuccess = (blob) => {
-                item.preview = URL.createObjectURL(blob);
-                item.html.querySelector('.preview-image').src = item.preview;
-                cleanup();
-                resolve();
-            };
-
-            const handleError = (error) => {
-                console.error('Preview generation failed:', error);
-                cleanup();
-                reject(error);
-            };
-
-            // 设置10秒超时
-            timeoutId = setTimeout(() => {
-                handleError(new Error('Preview generation timeout'));
-            }, 10000);
-
-            // 截图处理函数
-            const captureFrame = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = video.videoWidth || 640;
-                canvas.height = video.videoHeight || 360;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                try {
-                    canvas.toBlob(blob => {
-                        if (!blob) {
-                            reject(new Error('Canvas conversion failed'));
-                            return;
-                        }
-                        handleSuccess(blob);
-                    }, 'image/jpeg', 0.8);
-                } catch (e) {
-                    handleError(e);
-                }
-            };
-
-            // 视频准备就绪后定位到指定时间点
-            const prepareVideo = () => {
-                if (video.duration === Infinity) { // 处理直播流
-                    video.currentTime = Math.min(10, video.buffered.end(0));
-                } else {
-                    video.currentTime = Math.min(10, video.duration * 0.1);
-                }
             };
 
             // 处理HLS视频
             if (isM3U8(item)) {
                 if (!Hls.isSupported()) {
-                    return handleError(new Error('HLS is not supported'));
+                    return reject(new Error('HLS is not supported'));
                 }
 
                 hls = new Hls();
@@ -372,45 +323,68 @@ class FilePreview {
                 hls.attachMedia(video);
 
                 hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    video.addEventListener('loadedmetadata', prepareVideo);
+                    video.pause();
+                    resolve(video);
                 });
 
                 hls.on(Hls.Events.ERROR, (event, data) => {
-                    handleError(data);
+                    cleanup();
+                    reject(data);
                 });
             }
             // 处理普通视频
             else {
                 video.src = item.url;
-                video.addEventListener('loadedmetadata', prepareVideo);
+                video.addEventListener('loadedmetadata', () => {
+                    video.pause();
+                    resolve(video);
+                });
+                video.addEventListener('error', () => {
+                    cleanup();
+                    reject(new Error('Video load failed'));
+                });
             }
-
-            // 监听时间点定位完成事件
-            video.addEventListener('seeked', captureFrame);
-            video.addEventListener('error', handleError);
         });
     }
 
     async startPreviewGeneration() {
-        const pendingItems = this.fileItems.filter(item => !item.preview);
+        const pendingItems = this.fileItems.filter(item =>
+            !item.previewVideo &&
+            (item.type.startsWith('video') || isMediaExt(item.ext) || isM3U8(item))
+        );
+
         const workers = [];
 
-        // 创建并行任务池
         for (const _ of Array(this.MAX_CONCURRENT)) {
             workers.push(
                 (async () => {
                     while (pendingItems.length) {
                         const item = pendingItems.shift();
-                        if (item.preview || !item.url) {
-                            continue;
-                        }
-                        if (item.type.startsWith('video') || isMediaExt(item.ext) || isM3U8(item)) {
-                            try {
-                                await this.generatePreview(item);
-                                console.log('Preview generated for:', item.url);
-                            } catch (error) {
-                                console.warn('Failed to generate preview for:', item.url);
+                        if (!item || !item.url) continue;
+                        try {
+                            const video = await this.generatePreview(item);
+                            item.previewVideo = video;
+
+                            const previewContainer = item.html.querySelector('.video-preview');
+                            const previewImage = item.html.querySelector('.preview-image');
+                            if (previewContainer) {
+                                previewContainer.classList.remove('hide');
+                                previewImage.classList.add('hide');
+                                previewContainer.appendChild(video);
+
+                                // 添加鼠标悬停事件
+                                item.html.addEventListener('mouseenter', () => {
+                                    video.play();
+                                });
+
+                                item.html.addEventListener('mouseleave', () => {
+                                    video.pause();
+                                });
                             }
+
+                            console.log('Preview generated for:', item.url);
+                        } catch (error) {
+                            console.warn('Failed to generate preview for:', item.url);
                         }
                     }
                 })()
