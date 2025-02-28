@@ -426,10 +426,8 @@ class FilePreview {
      * 多线程 开始生成预览video标签
      */
     async startPreviewGeneration() {
-        const pendingItems = this.fileItems.filter(item =>
-            !item.previewVideo &&
-            (item.type.startsWith('video') || isMediaExt(item.ext) || isM3U8(item))
-        );
+        const pendingItems = this.fileItems.filter(item => !item.previewVideo &&
+            (item.type?.startsWith('video') || isMediaExt(item.ext) || isM3U8(item)));
 
         const workers = [];
 
@@ -438,12 +436,12 @@ class FilePreview {
                 (async () => {
                     while (pendingItems.length) {
                         const item = pendingItems.shift();
-                        if (!item || !item.url || item.previewVideo) continue;
+                        if (!item || !item.url) continue;
                         try {
                             item.previewVideo = await this.generatePreview(item);
                             this.setPerviewVideo(item);
 
-                            console.log('Preview generated for:', item.url);
+                            // console.log('Preview generated for:', item.url);
                         } catch (error) {
                             console.warn('Failed to generate preview for:', item.url);
                         }
