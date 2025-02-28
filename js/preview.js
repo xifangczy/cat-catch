@@ -10,6 +10,13 @@ class FilePreview {
         this.isSelecting = false;
         this.selectionBox = null;
         this.startPoint = { x: 0, y: 0 };
+
+        const params = new URL(location.href).searchParams;
+        this._tabId = parseInt(params.get("tabId"));
+
+        // 全屏预览视频HLS工具
+        this.previewHLS = null;
+
         this.init();
     }
     /**
@@ -98,6 +105,7 @@ class FilePreview {
         const checkedData = this.getSelectedItems();
         // 都是m3u8 自动合并并发送到ffmpeg
         if (checkedData.every(data => isM3U8(data))) {
+            const taskId = Date.parse(new Date());
             checkedData.forEach((data) => {
                 const url = `/m3u8.html?${new URLSearchParams({
                     url: data.url,
@@ -107,7 +115,7 @@ class FilePreview {
                     initiator: data.initiator,
                     requestHeaders: data.requestHeaders ? JSON.stringify(data.requestHeaders) : undefined,
                     quantity: checkedData.length,
-                    taskId: Date.parse(new Date()),
+                    taskId: taskId,
                     autoDown: true,
                     autoClose: true,
                 })}`
@@ -293,9 +301,7 @@ class FilePreview {
      * 载入数据
      */
     async loadFileItems() {
-        const params = new URL(location.href).searchParams;
-        const _tabId = parseInt(params.get("tabId"));
-        this.fileItems = await chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getData", tabId: _tabId }) || [];
+        this.fileItems = await chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getData", tabId: this._tabId }) || [];
         setHeaders(this.fileItems, null, this.tab.id);
         this.originalItems = [];
         for (let index = 0; index < this.fileItems.length; index++) {
@@ -315,6 +321,7 @@ class FilePreview {
         const video = document.querySelector('#video-player');
         video.pause();
         video.src = '';
+        this.previewHLS && this.previewHLS.destroy();
     }
     /**
      * 播放文件
@@ -323,15 +330,15 @@ class FilePreview {
     playItem(item) {
         const video = document.querySelector('#video-player');
         const container = document.querySelector('.play-container');
-        let hls = null;
         if (isM3U8(item)) {
-            hls = new Hls({ enableWorker: false });
-            hls.loadSource(item.url);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.ERROR, (event, data) => {
-                hls.stopLoad();
+            this.previewHLS = new Hls({ enableWorker: false });
+            this.previewHLS.loadSource(item.url);
+            this.previewHLS.attachMedia(video);
+            this.previewHLS.on(Hls.Events.ERROR, (event, data) => {
+                this.previewHLS.stopLoad();
+                this.previewHLS.destroy();
             });
-            hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+            this.previewHLS.on(Hls.Events.MEDIA_ATTACHED, () => {
                 container.classList.remove('hide');
                 video.play();
             });
@@ -389,12 +396,8 @@ class FilePreview {
             else {
                 video.src = item.url;
                 video.addEventListener('loadedmetadata', () => {
-                    const out = { isAudio: false, element: video };
-                    if (video.videoHeight == 0 || video.videoWidth == 0) {
-                        out.isAudio = true;
-                    }
                     video.pause();
-                    resolve(out);
+                    resolve({ isAudio: video.videoHeight === 0 || video.videoWidth === 0, element: video });
                 });
                 video.addEventListener('error', () => {
                     cleanup();
@@ -434,7 +437,7 @@ class FilePreview {
         });
 
         // 删除 preview-image
-        item.html.querySelector('.preview-image').remove();
+        item.html.querySelector('.preview-image')?.remove();
     }
     /**
      * 多线程 开始生成预览video标签
@@ -535,8 +538,11 @@ class FilePreview {
         const container = document.querySelector('body');
 
         container.addEventListener('mousedown', (e) => {
+            if (e.button == 2) return;
             // 如果点击的是file-item或其子元素,不启动框选
             if (e.target.closest('.file-item')) return;
+            // 非body和div元素不启动框选
+            if (e.target.tagName !== "BODY" && e.target.tagName !== "DIV") return;
 
             this.isSelecting = true;
             this.startPoint = {
@@ -583,7 +589,8 @@ class FilePreview {
             });
         });
 
-        document.addEventListener('mouseup', () => {
+        document.addEventListener('mouseup', (e) => {
+            if (e.button == 2) return;
             if (!this.isSelecting) return;
 
             this.isSelecting = false;
@@ -606,7 +613,7 @@ awaitG(() => {
 
     // 监听新数据
     chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
-        if (!Message.Message || !Message.data || !filePreview) { return; }
+        if (!Message.Message || !Message.data || !filePreview || Message.data.tabId != filePreview._tabId) { return; }
         // 添加资源
         if (Message.Message == "popupAddData") {
             setHeaders(Message.data, null, filePreview.tab.id);
