@@ -229,7 +229,7 @@ class FilePreview {
                 <img src="img/icon.png" class="preview-image">
             </div>
             <div class="bottom-row">
-                <div class="file-size">${byteToSize(item.size)}</div>
+                <div class="file-info">${item.ext.toUpperCase()} / ${byteToSize(item.size)}</div>
                 <div class="media-actions">
                     <img src="img/download.svg" class="icon download" data-action="download">
                 </div>
@@ -263,8 +263,10 @@ class FilePreview {
         const extensions = [...new Set(this.originalItems.map(item => item.ext))];
         const extFilter = document.querySelector('#extensionFilters');
         extensions.forEach(ext => {
+            // 检查 extFilter 是否存在ext
+            if (extFilter.querySelector(`input[value="${ext}"]`)) return;
             const label = document.createElement('label');
-            label.innerHTML = `<input type="checkbox" name="ext" value="${ext}" class="ext-checkbox" checked> ${ext.toUpperCase()}`;
+            label.innerHTML = `<input type="checkbox" name="ext" value="${ext}" class="ext-checkbox" checked>${ext.toUpperCase()}`;
             label.querySelector('input').addEventListener('click', () => this.updateFileList());
             extFilter.appendChild(label);
         });
@@ -354,9 +356,8 @@ class FilePreview {
      */
     async generatePreview(item) {
         // 判断是否为音频文件
-        const isAudio = item.type?.startsWith('audio') || ['mp3', 'wav', 'm4a', 'aac', 'ogg'].includes(item.ext);
-        if (isAudio) {
-            return { isAudio: true };
+        if (item.type?.startsWith('audio') || ['mp3', 'wav', 'm4a', 'aac', 'ogg'].includes(item.ext)) {
+            return { video: null, height: 0, width: 0, type: 'audio' };
         }
 
         return new Promise((resolve, reject) => {
@@ -365,6 +366,12 @@ class FilePreview {
             video.playsInline = true;
             video.loop = true;
             video.preload = 'metadata';
+            video.addEventListener('loadedmetadata', () => {
+                video.pause();
+                videoInfo.height = video.videoHeight;
+                videoInfo.width = video.videoWidth;
+                resolve(videoInfo);
+            });
 
             let hls = null;
 
@@ -372,6 +379,7 @@ class FilePreview {
                 if (hls) hls.destroy();
             };
 
+            const videoInfo = { video: video, height: 0, width: 0, type: 'video' };
             // 处理HLS视频
             if (isM3U8(item)) {
                 if (!Hls.isSupported()) {
@@ -381,11 +389,7 @@ class FilePreview {
                 hls = new Hls();
                 hls.loadSource(item.url);
                 hls.attachMedia(video);
-
-                hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    video.pause();
-                    resolve({ isAudio: false, element: video });
-                });
+                videoInfo.type = 'hlsVideo';
 
                 hls.on(Hls.Events.ERROR, (event, data) => {
                     cleanup();
@@ -395,10 +399,6 @@ class FilePreview {
             // 处理普通视频
             else {
                 video.src = item.url;
-                video.addEventListener('loadedmetadata', () => {
-                    video.pause();
-                    resolve({ isAudio: video.videoHeight === 0 || video.videoWidth === 0, element: video });
-                });
                 video.addEventListener('error', () => {
                     cleanup();
                     reject(new Error('Video load failed'));
@@ -415,19 +415,21 @@ class FilePreview {
         const container = item.html.querySelector('.preview-container');
         container.classList.add('video-preview');
 
-        if (item.previewVideo.isAudio) {
+        if (item.previewVideo.type == 'audio' || (item.previewVideo.width == 0 && item.previewVideo.height == 0)) {
             // 如果是音频文件，使用音乐图标
             container.innerHTML = '<img src="img/music.svg" class="icon" />';
         } else {
             // 如果是视频文件，使用视频预览
-            container.appendChild(item.previewVideo.element);
+            container.appendChild(item.previewVideo.video);
             // 鼠标悬停事件
             item.html.addEventListener('mouseenter', () => {
-                item.previewVideo.element.play();
+                item.previewVideo.video.play();
             });
             item.html.addEventListener('mouseleave', () => {
-                item.previewVideo.element.pause();
+                item.previewVideo.video.pause();
             });
+            // 填写视频信息
+            item.html.querySelector('.file-info').innerHTML += ` / ${item.previewVideo.height}*${item.previewVideo.width}`;
         }
 
         // 点击预览容器 播放  阻止冒泡 以免选中
@@ -618,6 +620,7 @@ awaitG(() => {
         if (Message.Message == "popupAddData") {
             setHeaders(Message.data, null, filePreview.tab.id);
             filePreview.originalItems.push(filePreview.trimFileName(Message.data));
+            filePreview.setupExtensionFilters();
             filePreview.updateFileList();
             filePreview.startPreviewGeneration();
             return;
