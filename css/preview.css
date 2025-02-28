@@ -2,12 +2,12 @@ body {
   margin: 0;
   padding: 0;
   height: 100vh;
+  user-select: none;
 }
 
 /* 主容器 */
 .container {
   padding: 20px;
-  /* max-width: 1200px; */
   margin: 0 auto;
 }
 
@@ -137,25 +137,24 @@ body {
   margin: auto 0;
   text-align: center;
 }
+
 .preview-container .icon {
   height: 150px;
 }
 
-.media-actions {
+/* 图标 */
+.actions {
   display: flex;
   gap: 5px;
 }
-
-.media-actions .icon {
+.actions .icon {
   transition: all 0.1s;
   width: 23px;
 }
-
-.media-actions .icon:hover {
+.actions .icon:hover {
   transform: scale(1.1);
 }
-
-.media-actions .icon:active {
+.actions .icon:active {
   transform: scale(0.9);
 }
 
@@ -171,27 +170,43 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 3;
 }
 .play-container.hide {
   display: none;
 }
-#video-player {
+.image-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 3;
+}
+.image-container.hide {
+  display: none;
+}
+#video-player,
+#image-player {
   max-width: 90vw;
   max-height: 90vh;
-  /* max-height: calc(100vh - 100px); 为关闭按钮留出空间 */
   width: auto;
   height: auto;
   object-fit: contain;
-  background: black;
+  /* background: black; */
 }
 
 #selection-box {
   position: absolute;
-  border: 2px dashed var(--button2-color);
-  background-color: var(--button2-active-color);
+  border: 1px solid var(--button2-color);
+  background-color: var(--button-active-color);
   pointer-events: none;
-  z-index: 1000;
+  z-index: 2;
   display: none;
 }
 
@@ -216,4 +231,24 @@ body {
 
 .video-preview.hide {
   display: none;
+}
+
+/* 提示信息 */
+.alert-box {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 20px 40px;
+  border-radius: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+.alert-box.active {
+  opacity: 1;
+  visibility: visible;
 }

@@ -12,8 +12,11 @@
 </head>
 
 <body>
-    <div class="play-container hide">
+    <div class="play-container preview-container hide">
         <video controls id="video-player"></video>
+    </div>
+    <div class="image-container preview-container hide">
+        <img src="" id="image-player" />
     </div>
     <div class="container">
         <!-- 筛选条件 -->
@@ -52,6 +55,7 @@
                 <button class="button2" id="select-reverse" data-i18n="invertSelection"></button>
                 <button class="button2" id="download-selected" data-i18n="download"></button>
                 <button id="merge-download" class="button2" data-i18n="onlineMerge" disabled></button>
+                <button id="clear" class="button2" data-i18n="clear"></button>
                 <button id="debug" class="button2">debug</button>
             </div>
         </div>

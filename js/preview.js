@@ -44,11 +44,15 @@ class FilePreview {
         document.querySelector('#download-selected').addEventListener('click', () => this.downloadSelected());
         // 合并下载
         document.querySelector('#merge-download').addEventListener('click', () => this.mergeDownload());
-        // 关闭视频
-        document.querySelector('.play-container').addEventListener('click', () => this.closeVideo());
-        document.addEventListener('keydown', () => this.closeVideo());
+        // 关闭预览
+        document.querySelectorAll('.preview-container').forEach(container => {
+            container.addEventListener('click', () => this.closePreview());
+        });
+        document.addEventListener('keydown', () => this.closePreview());
         // 点击视频 阻止冒泡 以免关闭视频
-        document.querySelector('.play-container video').addEventListener('click', (e) => e.stopPropagation());
+        document.querySelectorAll('.preview-container video, .preview-container img').forEach(container => {
+            container.addEventListener('click', (e) => e.stopPropagation());
+        });
         // 排序按钮
         document.querySelectorAll('.sort-options input').forEach(input => {
             input.addEventListener('change', () => this.updateFileList());
@@ -60,6 +64,13 @@ class FilePreview {
                 this.regexFilters = new RegExp(value);
                 this.updateFileList();
             }
+        });
+        document.querySelector('#clear').addEventListener('click', (e) => {
+            chrome.runtime.sendMessage({ Message: "clearData", type: true, tabId: this._tabId });
+            chrome.runtime.sendMessage({ Message: "ClearIcon", type: true, tabId: this._tabId });
+            this.originalItems = [];
+            document.querySelector('#extensionFilters').innerHTML = '';
+            this.updateFileList();
         });
         // debug
         document.querySelector('#debug').addEventListener('click', () => console.dir(this.fileItems));
@@ -107,19 +118,7 @@ class FilePreview {
         if (checkedData.every(data => isM3U8(data))) {
             const taskId = Date.parse(new Date());
             checkedData.forEach((data) => {
-                const url = `/m3u8.html?${new URLSearchParams({
-                    url: data.url,
-                    title: data.title,
-                    filename: data.downFileName,
-                    tabid: data.tabId == -1 ? this.tab.id : data.tabId,
-                    initiator: data.initiator,
-                    requestHeaders: data.requestHeaders ? JSON.stringify(data.requestHeaders) : undefined,
-                    quantity: checkedData.length,
-                    taskId: taskId,
-                    autoDown: true,
-                    autoClose: true,
-                })}`
-                chrome.tabs.create({ url: url, index: this.tab.index + 1, active: true });
+                this.openM3U8(data, { quantity: checkedData.length, taskId: taskId, autoDown: true, autoClose: true });
             });
             return;
         }
@@ -230,22 +229,23 @@ class FilePreview {
             </div>
             <div class="bottom-row">
                 <div class="file-info">${item.ext.toUpperCase()}</div>
-                <div class="media-actions">
-                    <img src="img/download.svg" class="icon download" data-action="download">
+                <div class="actions">
+                    <img src="img/copy.png" class="icon copy" id="copy">
                 </div>
             </div>`;
         // 添加文件信息
-        if (item.size) {
+        if (item.size && item.size >= 1024) {
             item.html.querySelector('.file-info').innerHTML += ` / ${byteToSize(item.size)}`;
         }
         item.html.addEventListener('click', () => {
             item.selected = !item.selected;
             this.updateMergeDownloadButton();
         });
-        // 下载图标
-        item.html.querySelector('.download').addEventListener('click', (event) => {
+        // 复制图标
+        item.html.querySelector('.copy').addEventListener('click', (event) => {
             event.stopPropagation();
-            this.downloadItem(item);
+            navigator.clipboard.writeText(item.url);
+            this.alert(i18n.copiedToClipboard);
         });
         // 选中状态 添加对应class
         item._selected = false;
@@ -257,6 +257,42 @@ class FilePreview {
                 item._selected = newValue;
                 newValue ? item.html.classList.add('selected') : item.html.classList.remove('selected');
             }
+        });
+        // 图片预览
+        if (item.type?.startsWith('image/') || ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(item.ext)) {
+            const previewImage = item.html.querySelector('.preview-image');
+            previewImage.src = item.url;
+            // 点击预览图片
+            previewImage.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const container = document.querySelector('.image-container');
+                container.querySelector('img').src = item.url;
+                container.classList.remove('hide');
+            });
+        }
+
+        // 添加一些图标 和 事件
+        const actions = item.html.querySelector('.actions');
+
+        if (isM3U8(item)) {
+            const m3u8 = document.createElement('img');
+            m3u8.src = 'img/parsing.png';
+            m3u8.className = 'icon m3u8';
+            m3u8.addEventListener('click', (event) => {
+                event.stopPropagation();
+                this.openM3U8(item);
+            });
+            actions.appendChild(m3u8);
+        }
+
+        // 下载图标
+        const download = document.createElement('img');
+        download.src = 'img/download.svg';
+        download.className = 'icon download';
+        actions.appendChild(download);
+        item.html.querySelector('.download').addEventListener('click', (event) => {
+            event.stopPropagation();
+            this.downloadItem(item);
         });
         return item.html;
     }
@@ -322,12 +358,15 @@ class FilePreview {
     /**
      * 关闭预览视频
      */
-    closeVideo() {
+    closePreview() {
         document.querySelector('.play-container').classList.add('hide');
         const video = document.querySelector('#video-player');
         video.pause();
         video.src = '';
         this.previewHLS && this.previewHLS.destroy();
+
+        const imageContainer = document.querySelector('.image-container');
+        imageContainer.classList.add('hide');
     }
     /**
      * 播放文件
@@ -360,7 +399,7 @@ class FilePreview {
      */
     async generatePreview(item) {
         // 判断是否为音频文件
-        if (item.type?.startsWith('audio') || ['mp3', 'wav', 'm4a', 'aac', 'ogg'].includes(item.ext)) {
+        if (item.type?.startsWith('audio/') || ['mp3', 'wav', 'm4a', 'aac', 'ogg'].includes(item.ext)) {
             return { video: null, height: 0, width: 0, type: 'audio' };
         }
 
@@ -371,6 +410,7 @@ class FilePreview {
             video.loop = true;
             video.preload = 'metadata';
             video.addEventListener('loadedmetadata', () => {
+                video.currentTime = 0.5;
                 video.pause();
                 videoInfo.height = video.videoHeight;
                 videoInfo.width = video.videoWidth;
@@ -433,7 +473,7 @@ class FilePreview {
                 item.previewVideo.video.pause();
             });
             // 填写视频信息
-            item.html.querySelector('.file-info').innerHTML += ` / ${item.previewVideo.height}*${item.previewVideo.width}`;
+            item.html.querySelector('.file-info').innerHTML += ` / ${item.previewVideo.width}*${item.previewVideo.height}`;
         }
 
         // 点击预览容器 播放  阻止冒泡 以免选中
@@ -450,7 +490,7 @@ class FilePreview {
      */
     async startPreviewGeneration() {
         const pendingItems = this.fileItems.filter(item => !item.previewVideo &&
-            (item.type?.startsWith('video') || isMediaExt(item.ext) || isM3U8(item)));
+            (item.type?.startsWith('video/') || isMediaExt(item.ext) || isM3U8(item)));
 
         const workers = [];
 
@@ -542,6 +582,7 @@ class FilePreview {
     setupSelectionBox() {
         this.selectionBox = document.getElementById('selection-box');
         const container = document.querySelector('body');
+        let isDragging = false;
 
         container.addEventListener('mousedown', (e) => {
             if (e.button == 2) return;
@@ -555,10 +596,6 @@ class FilePreview {
                 x: e.pageX,
                 y: e.pageY
             };
-
-            this.selectionBox.style.display = 'block';
-            this.selectionBox.style.left = `${this.startPoint.x}px`;
-            this.selectionBox.style.top = `${this.startPoint.y}px`;
         });
 
         document.addEventListener('mousemove', (e) => {
@@ -568,6 +605,20 @@ class FilePreview {
                 x: e.pageX,
                 y: e.pageY
             };
+
+            // 计算移动距离，只有真正拖动时才显示选择框
+            const moveDistance = Math.sqrt(
+                Math.pow(currentPoint.x - this.startPoint.x, 2) +
+                Math.pow(currentPoint.y - this.startPoint.y, 2)
+            );
+
+            // 如果移动距离大于5像素，认为是拖动而不是点击
+            if (!isDragging && moveDistance > 5) {
+                isDragging = true;
+                this.selectionBox.style.display = 'block';
+            }
+
+            if (!isDragging) return;
 
             // 计算选择框的位置和大小
             const left = Math.min(this.startPoint.x, currentPoint.x);
@@ -591,6 +642,8 @@ class FilePreview {
                 if (itemCenter.x >= left && itemCenter.x <= left + width &&
                     itemCenter.y >= top && itemCenter.y <= top + height) {
                     item.selected = true;
+                } else {
+                    item.selected = false;
                 }
             });
         });
@@ -600,11 +653,39 @@ class FilePreview {
             if (!this.isSelecting) return;
 
             this.isSelecting = false;
+            isDragging = false;
             this.selectionBox.style.display = 'none';
             this.selectionBox.style.width = '0';
             this.selectionBox.style.height = '0';
             this.updateMergeDownloadButton();
         });
+    }
+
+    openM3U8(data, options = {}) {
+        const url = `/m3u8.html?${new URLSearchParams({
+            url: data.url,
+            title: data.title,
+            filename: data.downFileName,
+            tabid: data.tabId == -1 ? this._tabId : data.tabId,
+            initiator: data.initiator,
+            requestHeaders: data.requestHeaders ? JSON.stringify(data.requestHeaders) : undefined,
+            ...Object.fromEntries(Object.entries(options).map(([key, value]) => [key, typeof value === 'boolean' ? 1 : value])),
+        })}`
+        chrome.tabs.create({ url: url, index: this.tab.index + 1, active: !options.autoDown });
+    }
+
+    alert(message, sec = 1000) {
+        let toast = document.querySelector('.alert-box');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.className = 'alert-box';
+            document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.classList.add('active');
+        setTimeout(() => {
+            toast.classList.remove('active');
+        }, sec);
     }
 }
 
