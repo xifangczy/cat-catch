@@ -1839,9 +1839,9 @@ function createStreamSaver(url) {
     const ext = $("#mp4").prop("checked") ? "mp4" : GetExt(url);
     return streamSaver.createWriteStream(`${GetFileName(url)}.${ext}`).getWriter();
 }
-window.onunload = function () {
+window.addEventListener('beforeunload', function () {
     fileStream && fileStream.abort();
-}
+});
 window.onbeforeunload = function (event) {
     if (fileStream) {
         event.returnValue = i18n.streamOnbeforeunload;
