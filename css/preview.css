@@ -21,7 +21,7 @@ body {
 .filter-row {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
@@ -100,7 +100,7 @@ body {
   max-height: 200px;
   object-fit: cover;
   /* border-radius: 4px; */
-  margin-top: 10px;
+  /* margin-top: 10px; */
 }
 
 .file-name {
@@ -109,7 +109,6 @@ body {
   word-break: break-all;
   display: -webkit-box;
   -webkit-line-clamp: 2;
-  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

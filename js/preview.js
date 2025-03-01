@@ -1,11 +1,14 @@
 class FilePreview {
+
+    MAX_CONCURRENT = 3;   // 最大并行生成预览数
+    MAX_LIST_SIZE = 200;  // 最大文件列表长度
+
     constructor() {
         this.fileItems = [];
         this.originalItems = [];
         this.regexFilters = null;
         this.catDownloadIsProcessing = false;
-        this.MAX_CONCURRENT = 3;   // 最大并行生成预览数
-        this.MAX_LIST_SIZE = 100;  // 最大文件列表长度
+
         this.isSelecting = false;
         this.selectionBox = null;
         this.startPoint = { x: 0, y: 0 };
@@ -37,9 +40,9 @@ class FilePreview {
      */
     setupEventListeners() {
         // 全选
-        document.querySelector('#select-all').addEventListener('click', () => this.toggleSelectAll());
+        document.querySelector('#select-all').addEventListener('click', () => this.toggleSelection('all'));
         // 反选
-        document.querySelector('#select-reverse').addEventListener('click', () => this.toggleSelectReverse());
+        document.querySelector('#select-reverse').addEventListener('click', () => this.toggleSelection('reverse'));
         // 下载选中
         document.querySelector('#download-selected').addEventListener('click', () => this.downloadSelected());
         // 合并下载
@@ -61,7 +64,12 @@ class FilePreview {
         document.querySelector('#regular').addEventListener('keypress', (e) => {
             if (e.keyCode == 13) {
                 const value = e.target.value.trim();
-                this.regexFilters = new RegExp(value);
+                try {
+                    this.regexFilters = value ? new RegExp(value) : null;
+                } catch (error) {
+                    this.regexFilters = null;
+                    this.alert(i18n.noMatch);
+                }
                 this.updateFileList();
             }
         });
@@ -82,19 +90,12 @@ class FilePreview {
             this.updateFileList();
         });
     }
-    /**
-     * 全选
-     */
-    toggleSelectAll() {
-        this.fileItems.forEach(item => item.selected = true);
-        this.updateMergeDownloadButton();
-    }
-    /**
-     * 反选
-     */
-    toggleSelectReverse() {
-        this.fileItems.forEach(item => item.selected = !item.selected);
-        this.updateMergeDownloadButton();
+    // 全选/反选
+    toggleSelection(type) {
+        this.fileItems.forEach(item => {
+            item.selected = type === 'all' ? true :
+                type === 'reverse' ? !item.selected : false;
+        });
     }
     /**
      * 获取选中元素 转为对象
@@ -111,6 +112,7 @@ class FilePreview {
         button.setAttribute('disabled', 'disabled');
         if (selectedItems.length == 2) {
             const maxSize = selectedItems.reduce((prev, current) => (prev.size > current.size) ? prev : current);
+            console.log(maxSize)
             if (maxSize.size <= G.chromeLimitSize) {
                 button.removeAttribute('disabled');
             }
@@ -228,7 +230,7 @@ class FilePreview {
             </div>`;
         // 添加文件信息
         if (item.size && item.size >= 1024) {
-            item.html.querySelector('.file-info').innerHTML += ` / ${byteToSize(item.size)}`;
+            item.html.querySelector('.file-info').textContent += ` / ${byteToSize(item.size)}`;
         }
         item.html.addEventListener('click', () => {
             item.selected = !item.selected;
@@ -255,7 +257,7 @@ class FilePreview {
         if (item.type?.startsWith('image/') || ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(item.ext)) {
             const previewImage = item.html.querySelector('.preview-image');
             previewImage.onload = () => {
-                item.html.querySelector('.file-info').innerHTML += ` / ${previewImage.naturalWidth}*${previewImage.naturalHeight}`;
+                item.html.querySelector('.file-info').textContent += ` / ${previewImage.naturalWidth}*${previewImage.naturalHeight}`;
             };
             previewImage.src = item.url;
             // 点击预览图片
@@ -311,12 +313,13 @@ class FilePreview {
      * 渲染文件列表
      */
     renderFileItems() {
+        const fragment = document.createDocumentFragment();
+        this.fileItems.forEach((item, index) => {
+            fragment.appendChild(this.createFileElement(item, index));
+        });
         const container = document.querySelector('#file-container');
         container.innerHTML = '';
-        this.fileItems.forEach((item, index) => {
-            const fileElement = this.createFileElement(item, index);
-            container.appendChild(fileElement);
-        });
+        container.appendChild(fragment);
     }
     /**
      * 修剪文件名
@@ -429,6 +432,7 @@ class FilePreview {
 
             const cleanup = () => {
                 if (hls) hls.destroy();
+                video.remove();
             };
 
             const videoInfo = { video: video, height: 0, width: 0, duration: 0, type: 'video' };
@@ -481,11 +485,11 @@ class FilePreview {
                 item.previewVideo.video.pause();
             });
             // 填写视频信息
-            item.html.querySelector('.file-info').innerHTML += ` / ${item.previewVideo.width}*${item.previewVideo.height}`;
+            item.html.querySelector('.file-info').textContent += ` / ${item.previewVideo.width}*${item.previewVideo.height}`;
         }
         // 填写时长
         if (item.previewVideo.duration) {
-            item.html.querySelector('.file-info').innerHTML += ` / ${item.previewVideo.duration}`;
+            item.html.querySelector('.file-info').textContent += ` / ${item.previewVideo.duration}`;
         }
 
         // 点击预览容器 播放  阻止冒泡 以免选中
@@ -502,30 +506,23 @@ class FilePreview {
      */
     async startPreviewGeneration() {
         const pendingItems = this.fileItems.filter(item => !item.previewVideo &&
-            (item.type?.startsWith('video/') || isMediaExt(item.ext) || isM3U8(item)));
+            (item.type?.startsWith('video/') || isMediaExt(item.ext) || isM3U8(item)) && !item.previewVideoError);
 
-        const workers = [];
-
-        for (const _ of Array(this.MAX_CONCURRENT)) {
-            workers.push(
-                (async () => {
-                    while (pendingItems.length) {
-                        const item = pendingItems.shift();
-                        if (!item || !item.url) continue;
-                        try {
-                            item.previewVideo = await this.generatePreview(item);
-                            this.setPerviewVideo(item);
-
-                            // console.log('Preview generated for:', item.url);
-                        } catch (error) {
-                            console.warn('Failed to generate preview for:', item.url);
-                        }
-                    }
-                })()
-            );
-        }
-
-        await Promise.all(workers);
+        const processItem = async () => {
+            while (pendingItems.length) {
+                const item = pendingItems.shift();
+                if (!item || !item.url) continue;
+                try {
+                    item.previewVideo = await this.generatePreview(item);
+                    this.setPerviewVideo(item);
+                    // console.log('Preview generated for:', item.url);
+                } catch (e) {
+                    item.previewVideoError = true;
+                    console.warn('Failed to generate preview for:', item.url, e);
+                }
+            }
+        };
+        await Promise.all(Array(this.MAX_CONCURRENT).fill().map(processItem));
     }
     /**
      * 猫抓下载器
@@ -646,13 +643,10 @@ class FilePreview {
             // 检查每个file-item是否在选择框内
             this.fileItems.forEach(item => {
                 const rect = item.html.getBoundingClientRect();
-                const itemCenter = {
-                    x: rect.left + rect.width / 2 + window.scrollX,
-                    y: rect.top + rect.height / 2 + window.scrollY
-                };
-
-                if (itemCenter.x >= left && itemCenter.x <= left + width &&
-                    itemCenter.y >= top && itemCenter.y <= top + height) {
+                if (rect.left + window.scrollX < left + width &&
+                    rect.left + rect.width + window.scrollX > left &&
+                    rect.top + window.scrollY < top + height &&
+                    rect.top + rect.height + window.scrollY > top) {
                     item.selected = true;
                 } else {
                     item.selected = false;
