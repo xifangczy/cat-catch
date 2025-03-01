@@ -115,7 +115,7 @@ function AddMedia(data, currentTab = true) {
             </div>
             <div class="url hide">
                 <div id="mediaInfo" data-state="false">
-                    ${data.title ? `<b>标题:</b> ${data.title}` : ""}
+                    ${data.title ? `<b>${i18n.title}:</b> ${data.title}` : ""}
                     ${data.type ? `<br><b>MIME:</b>  ${data.type}` : ""}
                 </div>
                 <div class="moreButton">

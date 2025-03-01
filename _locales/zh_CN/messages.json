@@ -880,5 +880,8 @@
   },
   "fileSize": {
     "message": "文件大小"
+  },
+  "title": {
+    "message": "标题"
   }
 }
