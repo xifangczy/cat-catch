@@ -9,7 +9,7 @@ class FilePreview {
         this.isSelecting = false;
         this.selectionBox = null;
         this.startPoint = { x: 0, y: 0 };
-        this.previewDebounce = null;
+        this.pushDebounce = null;
 
         const params = new URL(location.href).searchParams;
         this._tabId = parseInt(params.get("tabId"));
@@ -706,12 +706,12 @@ class FilePreview {
         }
         setHeaders(data, null, this.tab.id);
         this.originalItems.push(this.trimFileName(data));
-        this.setupExtensionFilters();
-        this.updateFileList();
 
         // this.startPreviewGeneration(); 防抖
-        clearTimeout(this.previewDebounce);
-        this.previewDebounce = setTimeout(() => {
+        clearTimeout(this.pushDebounce);
+        this.pushDebounce = setTimeout(() => {
+            this.setupExtensionFilters();
+            this.updateFileList();
             this.startPreviewGeneration();
         }, 1000);
     }
