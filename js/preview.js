@@ -2,7 +2,6 @@ class FilePreview {
     constructor() {
         this.fileItems = [];
         this.originalItems = [];
-        this.sizeFilters = null;
         this.regexFilters = null;
         this.catDownloadIsProcessing = false;
         this.MAX_CONCURRENT = 3;   // 最大并行生成预览数
@@ -10,6 +9,7 @@ class FilePreview {
         this.isSelecting = false;
         this.selectionBox = null;
         this.startPoint = { x: 0, y: 0 };
+        this.previewDebounce = null;
 
         const params = new URL(location.href).searchParams;
         this._tabId = parseInt(params.get("tabId"));
@@ -74,6 +74,13 @@ class FilePreview {
         });
         // debug
         document.querySelector('#debug').addEventListener('click', () => console.dir(this.fileItems));
+
+        document.querySelector('input[name="showTitle"]').addEventListener('change', (e) => {
+            this.fileItems.forEach(item => {
+                item.html.querySelector('.file-title').classList.toggle('hide', !e.target.checked);
+            });
+            this.updateFileList();
+        });
     }
     /**
      * 全选
@@ -118,7 +125,7 @@ class FilePreview {
         if (checkedData.every(data => isM3U8(data))) {
             const taskId = Date.parse(new Date());
             checkedData.forEach((data) => {
-                this.openM3U8(data, { quantity: checkedData.length, taskId: taskId, autoDown: true, autoClose: true });
+                this.openM3U8(data, { ffmpeg: "merge", quantity: checkedData.length, taskId: taskId, autoDown: true, autoClose: true });
             });
             return;
         }
@@ -148,22 +155,7 @@ class FilePreview {
             }
         }
         if (G.m3u8AutoDown && isM3U8(data)) {
-            chrome.tabs.create({
-                url: `/m3u8.html?${new URLSearchParams({
-                    requestId: data.requestId,
-                    url: data.url,
-                    title: data.title,
-                    filename: data.downFileName,
-                    tabid: data.tabId == -1 ? this.tab.id : data.tabId,
-                    initiator: data.initiator,
-                    requestHeaders: data.requestHeaders ? JSON.stringify(data.requestHeaders) : undefined,
-                    taskId: Date.parse(new Date()),
-                    autoDown: true,
-                    autoClose: true,
-                })}`,
-                index: this.tab.index + 1,
-                active: !G.downActive
-            });
+            this.openM3U8(data, { taskId: Date.parse(new Date()), autoDown: true, autoClose: true });
             return;
         }
         this.catDownload(data);
@@ -189,7 +181,7 @@ class FilePreview {
      * 扩展过滤
      */
     applyExtensionFilters() {
-        const selectedExts = Array.from(document.querySelectorAll('.ext-checkbox:checked'))
+        const selectedExts = Array.from(document.querySelectorAll('input[name="ext"]:checked'))
             .map(checkbox => checkbox.value);
         this.fileItems = this.fileItems.filter(item => selectedExts.includes(item.ext));
     }
@@ -223,12 +215,13 @@ class FilePreview {
         item.html.setAttribute('data-index', index);
         item.html.className = 'file-item';
         item.html.innerHTML = `
+            <div class="file-title hide">${item.title}</div>
             <div class="file-name">${item.name}</div>
             <div class="preview-container">
-                <img src="img/icon.png" class="preview-image">
+                <img src="${item.favIconUrl ? item.favIconUrl : 'img/icon.png'}" class="preview-image">
             </div>
             <div class="bottom-row">
-                <div class="file-info">${item.ext.toUpperCase()}</div>
+                <div class="file-info">${item.ext == 'Unknown' ? item.ext : item.ext.toLowerCase()}</div>
             </div>
             <div class="actions">
                 <img src="img/copy.png" class="icon copy" id="copy">
@@ -309,7 +302,7 @@ class FilePreview {
             // 检查 extFilter 是否存在ext
             if (extFilter.querySelector(`input[value="${ext}"]`)) return;
             const label = document.createElement('label');
-            label.innerHTML = `<input type="checkbox" name="ext" value="${ext}" class="ext-checkbox" checked>${ext.toUpperCase()}`;
+            label.innerHTML = `<input type="checkbox" name="ext" value="${ext}" checked>${ext == 'Unknown' ? ext : ext.toLowerCase()}`;
             label.querySelector('input').addEventListener('click', () => this.updateFileList());
             extFilter.appendChild(label);
         });
@@ -340,6 +333,7 @@ class FilePreview {
         if (isEmpty(data.downFileName)) {
             data.downFileName = data.name;
         }
+        data.ext = data.ext ? data.ext : 'Unknown';
         return data;
     }
     /**
@@ -347,6 +341,10 @@ class FilePreview {
      */
     async loadFileItems() {
         this.fileItems = await chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getData", tabId: this._tabId }) || [];
+        if (this.fileItems.length == 0) {
+            this.alert(i18n.noData, 1500);
+            return;
+        }
         setHeaders(this.fileItems, null, this.tab.id);
         this.originalItems = [];
         for (let index = 0; index < this.fileItems.length; index++) {
@@ -440,7 +438,7 @@ class FilePreview {
                     return reject(new Error('HLS is not supported'));
                 }
 
-                hls = new Hls();
+                hls = new Hls({ enableWorker: false });
                 hls.loadSource(item.url);
                 hls.attachMedia(video);
                 videoInfo.type = 'hlsVideo';
@@ -701,6 +699,22 @@ class FilePreview {
             toast.classList.remove('active');
         }, sec);
     }
+
+    push(data) {
+        if (this.originalItems.length >= this.MAX_LIST_SIZE) {
+            return;
+        }
+        setHeaders(data, null, this.tab.id);
+        this.originalItems.push(this.trimFileName(data));
+        this.setupExtensionFilters();
+        this.updateFileList();
+
+        // this.startPreviewGeneration(); 防抖
+        clearTimeout(this.previewDebounce);
+        this.previewDebounce = setTimeout(() => {
+            this.startPreviewGeneration();
+        }, 1000);
+    }
 }
 
 awaitG(() => {
@@ -717,11 +731,7 @@ awaitG(() => {
         if (!Message.Message || !Message.data || !filePreview || Message.data.tabId != filePreview._tabId) { return; }
         // 添加资源
         if (Message.Message == "popupAddData") {
-            setHeaders(Message.data, null, filePreview.tab.id);
-            filePreview.originalItems.push(filePreview.trimFileName(Message.data));
-            filePreview.setupExtensionFilters();
-            filePreview.updateFileList();
-            filePreview.startPreviewGeneration();
+            filePreview.push(Message.data);
             return;
         }
     });
