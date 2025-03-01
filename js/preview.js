@@ -489,17 +489,17 @@ class FilePreview {
             });
             // 填写视频信息
             item.html.querySelector('.file-info').textContent += ` / ${item.previewVideo.width}*${item.previewVideo.height}`;
+
+            // 点击视频 全屏播放 阻止冒泡 以免选中
+            container.querySelector("video")?.addEventListener('click', (event) => {
+                event.stopPropagation();
+                this.playItem(item);
+            });
         }
         // 填写时长
         if (item.previewVideo.duration) {
             item.html.querySelector('.file-info').textContent += ` / ${item.previewVideo.duration}`;
         }
-
-        // 点击预览容器 播放  阻止冒泡 以免选中
-        container.addEventListener('click', (event) => {
-            event.stopPropagation();
-            this.playItem(item);
-        });
 
         // 删除 preview-image
         item.html.querySelector('.preview-image')?.remove();

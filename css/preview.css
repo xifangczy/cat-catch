@@ -90,6 +90,7 @@ body {
   justify-content: space-between;
   align-items: center;
   gap: 2px;
+  margin: 0 auto;
   /* padding-top: 12px; */
 }
 
@@ -145,7 +146,7 @@ body {
 .actions {
   display: flex;
   gap: 2px;
-  justify-content: flex-end;
+  justify-content: center;
   margin-bottom: -5px;
 }
 .actions .icon {
@@ -224,8 +225,8 @@ body {
 }
 
 .video-preview video {
-  width: 100%;
-  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
   cursor: pointer;
 }
