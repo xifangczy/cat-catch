@@ -4,22 +4,24 @@ class FilePreview {
     MAX_LIST_SIZE = 200;  // 最大文件列表长度
 
     constructor() {
-        this.fileItems = [];
-        this.originalItems = [];
-        this.regexFilters = null;
-        this.catDownloadIsProcessing = false;
+        this.fileItems = [];         // 文件列表
+        this.originalItems = [];     // 原始文件列表
+        this.regexFilters = null;    // 正则过滤
+        this.catDownloadIsProcessing = false;   // 猫抓下载器是否正在处理
+        this.pushDebounce = null;   // 添加文件防抖
 
-        this.isSelecting = false;
-        this.selectionBox = null;
-        this.startPoint = { x: 0, y: 0 };
-        this.pushDebounce = null;
-
+        // 获取tabId
         const params = new URL(location.href).searchParams;
         this._tabId = parseInt(params.get("tabId"));
+        if (isNaN(this._tabId)) {
+            this.alert(i18n.noData, 1500);
+            return;
+        }
 
         // 全屏预览视频HLS工具
         this.previewHLS = null;
 
+        // 初始化
         this.init();
     }
     /**
@@ -73,6 +75,7 @@ class FilePreview {
                 this.updateFileList();
             }
         });
+        // 清理数据
         document.querySelector('#clear').addEventListener('click', (e) => {
             chrome.runtime.sendMessage({ Message: "clearData", type: true, tabId: this._tabId });
             chrome.runtime.sendMessage({ Message: "ClearIcon", type: true, tabId: this._tabId });
@@ -83,6 +86,7 @@ class FilePreview {
         // debug
         document.querySelector('#debug').addEventListener('click', () => console.dir(this.fileItems));
 
+        // 显示标题
         document.querySelector('input[name="showTitle"]').addEventListener('change', (e) => {
             this.fileItems.forEach(item => {
                 item.html.querySelector('.file-title').classList.toggle('hide', !e.target.checked);
@@ -112,7 +116,6 @@ class FilePreview {
         button.setAttribute('disabled', 'disabled');
         if (selectedItems.length == 2) {
             const maxSize = selectedItems.reduce((prev, current) => (prev.size > current.size) ? prev : current);
-            console.log(maxSize)
             if (maxSize.size <= G.chromeLimitSize) {
                 button.removeAttribute('disabled');
             }
@@ -563,24 +566,21 @@ class FilePreview {
      * @param {Object} extra 
      */
     createCatDownload(data, extra) {
-        chrome.tabs.get(G.tabId, (tab) => {
-            const arg = {
-                url: `/downloader.html?${new URLSearchParams({
-                    requestId: data.map(item => item.requestId).join(","),
-                    ...extra
-                })}`,
-                index: tab.index + 1,
-                active: !G.downActive
-            };
-            chrome.tabs.create(arg, (tab) => {
-                // 循环获取tab.id 的状态 准备就绪 重置任务状态
-                const interval = setInterval(() => {
-                    chrome.tabs.get(tab.id, (tab) => {
-                        if (tab.status == "complete") {
-                            clearInterval(interval);
-                            this.catDownloadIsProcessing = false;
-                        }
-                    });
+        const arg = {
+            url: `/downloader.html?${new URLSearchParams({
+                requestId: data.map(item => item.requestId).join(","),
+                ...extra
+            })}`,
+            index: this.tab.index + 1,
+            active: !G.downActive
+        };
+        chrome.tabs.create(arg, (tab) => {
+            // 循环获取tab.id 的状态 准备就绪 重置任务状态
+            const interval = setInterval(() => {
+                chrome.tabs.get(tab.id, (tab) => {
+                    if (tab.status != "complete") { return; }
+                    clearInterval(interval);
+                    this.catDownloadIsProcessing = false;
                 });
             });
         });
@@ -589,9 +589,11 @@ class FilePreview {
      * 设置框选
      */
     setupSelectionBox() {
-        this.selectionBox = document.getElementById('selection-box');
+        const selectionBox = document.getElementById('selection-box');
         const container = document.querySelector('body');
         let isDragging = false;
+        let isSelecting = false;
+        const startPoint = { x: 0, y: 0 };
 
         container.addEventListener('mousedown', (e) => {
             if (e.button == 2) return;
@@ -600,15 +602,13 @@ class FilePreview {
             // 非body和div元素不启动框选
             if (e.target.tagName !== "BODY" && e.target.tagName !== "DIV") return;
 
-            this.isSelecting = true;
-            this.startPoint = {
-                x: e.pageX,
-                y: e.pageY
-            };
+            isSelecting = true;
+            startPoint.x = e.pageX;
+            startPoint.y = e.pageY;
         });
 
         document.addEventListener('mousemove', (e) => {
-            if (!this.isSelecting) return;
+            if (!isSelecting) return;
 
             const currentPoint = {
                 x: e.pageX,
@@ -617,28 +617,28 @@ class FilePreview {
 
             // 计算移动距离，只有真正拖动时才显示选择框
             const moveDistance = Math.sqrt(
-                Math.pow(currentPoint.x - this.startPoint.x, 2) +
-                Math.pow(currentPoint.y - this.startPoint.y, 2)
+                Math.pow(currentPoint.x - startPoint.x, 2) +
+                Math.pow(currentPoint.y - startPoint.y, 2)
             );
 
             // 如果移动距离大于5像素，认为是拖动而不是点击
             if (!isDragging && moveDistance > 5) {
                 isDragging = true;
-                this.selectionBox.style.display = 'block';
+                selectionBox.style.display = 'block';
             }
 
             if (!isDragging) return;
 
             // 计算选择框的位置和大小
-            const left = Math.min(this.startPoint.x, currentPoint.x);
-            const top = Math.min(this.startPoint.y, currentPoint.y);
-            const width = Math.abs(currentPoint.x - this.startPoint.x);
-            const height = Math.abs(currentPoint.y - this.startPoint.y);
+            const left = Math.min(startPoint.x, currentPoint.x);
+            const top = Math.min(startPoint.y, currentPoint.y);
+            const width = Math.abs(currentPoint.x - startPoint.x);
+            const height = Math.abs(currentPoint.y - startPoint.y);
 
-            this.selectionBox.style.left = `${left}px`;
-            this.selectionBox.style.top = `${top}px`;
-            this.selectionBox.style.width = `${width}px`;
-            this.selectionBox.style.height = `${height}px`;
+            selectionBox.style.left = `${left}px`;
+            selectionBox.style.top = `${top}px`;
+            selectionBox.style.width = `${width}px`;
+            selectionBox.style.height = `${height}px`;
 
             // 检查每个file-item是否在选择框内
             this.fileItems.forEach(item => {
@@ -656,17 +656,22 @@ class FilePreview {
 
         document.addEventListener('mouseup', (e) => {
             if (e.button == 2) return;
-            if (!this.isSelecting) return;
+            if (!isSelecting) return;
 
-            this.isSelecting = false;
+            isSelecting = false;
             isDragging = false;
-            this.selectionBox.style.display = 'none';
-            this.selectionBox.style.width = '0';
-            this.selectionBox.style.height = '0';
+            selectionBox.style.display = 'none';
+            selectionBox.style.width = '0';
+            selectionBox.style.height = '0';
             this.updateMergeDownloadButton();
         });
     }
 
+    /**
+     * 打开m3u8解析器
+     * @param {Object} data 
+     * @param {Object} options 
+     */
     openM3U8(data, options = {}) {
         const url = `/m3u8.html?${new URLSearchParams({
             url: data.url,
@@ -679,7 +684,11 @@ class FilePreview {
         })}`
         chrome.tabs.create({ url: url, index: this.tab.index + 1, active: !options.autoDown });
     }
-
+    /**
+     * 提示信息
+     * @param {String} message 提示信息
+     * @param {Number} sec 显示时间
+     */
     alert(message, sec = 1000) {
         let toast = document.querySelector('.alert-box');
         if (!toast) {
@@ -693,7 +702,10 @@ class FilePreview {
             toast.classList.remove('active');
         }, sec);
     }
-
+    /**
+     * 添加文件
+     * @param {Object} data 
+     */
     push(data) {
         if (this.originalItems.length >= this.MAX_LIST_SIZE) {
             return;
