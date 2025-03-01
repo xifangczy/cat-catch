@@ -1,3 +1,4 @@
+document.getElementById('installYes').focus();
 document.getElementById('installYes').addEventListener('click', function () {
     closeTab();
 });
