@@ -120,6 +120,9 @@ button:disabled,
   cursor: no-drop;
   color: var(--button2-text-color);
 }
+.icon {
+  -webkit-user-drag: none;
+}
 /*定义整个滚动条高宽及背景：高宽分别对应横竖滚动条的尺寸*/
 ::-webkit-scrollbar {
   width: 5px;
