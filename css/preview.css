@@ -1,3 +1,4 @@
+/* 基础样式 */
 body {
   margin: 0;
   padding: 0;
@@ -5,13 +6,12 @@ body {
   user-select: none;
 }
 
-/* 主容器 */
 .container {
   padding: 20px;
   margin: 0 auto;
 }
 
-/* 筛选 */
+/* 筛选区域 */
 .filters {
   display: grid;
   gap: 5px;
@@ -37,71 +37,29 @@ body {
   gap: 8px;
 }
 
-/* 文件大小筛选 */
-.range-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.range-inputs {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.range-inputs input {
-  width: 80px;
-  padding: 5px;
-  border: var(--input-border);
-  border-radius: 4px;
-  background: var(--background-color);
-  color: var(--text-color);
-}
-
 /* 文件列表 */
 .file-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 10px;
-  user-select: none;
 }
 
 .file-item {
-  border-radius: 8px;
-  padding: 8px;
-  cursor: pointer;
-  position: relative;
-  box-shadow: 0px 0px 3px var(--button2-color);
-
   display: flex;
   flex-direction: column;
   min-height: 150px;
-  border: 2px solid #ffffff00;
+  padding: 8px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 3px var(--button2-color);
+  max-height: 233px;
 }
 
-.file-item > *:not(.bottom-row) {
-  flex: 0 0 auto;
-}
-
-.bottom-row {
-  margin-top: auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 2px;
-  margin: 0 auto;
-  /* padding-top: 12px; */
-}
-
-.preview-image {
-  /* width: 100%;
-  height: 150px; */
-  max-width: 200px;
-  max-height: 200px;
-  object-fit: cover;
-  /* border-radius: 4px; */
-  /* margin-top: 10px; */
+.file-item.selected {
+  border-color: var(--button2-color);
+  background-color: var(--button-hover-color);
+  box-shadow: 0 0 8px var(--button2-color);
 }
 
 .file-name {
@@ -114,69 +72,71 @@ body {
   overflow: hidden;
 }
 
-.file-info {
-  /* color: var(--text-color);
-  margin-top: 8px; */
-  margin: 0;
-  flex-shrink: 0;
-}
-
-.file-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 12px;
-}
-
-.selected {
-  border: 2px solid var(--button2-color);
-  background-color: var(--button-hover-color);
-  box-shadow: 0px 0px 8px var(--button2-color);
-}
-
+/* 预览容器 */
 .preview-container {
   margin: auto 0;
   text-align: center;
 }
 
 .preview-container .icon {
-  height: 150px;
+  /* height: 150px; */
+  max-height: 150px;
+  max-width: 233px;
 }
 
-/* 图标 */
+/* .preview-image {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+} */
+
+.video-preview {
+  width: 100%;
+  max-height: 150px;
+}
+
+.video-preview video {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* 底部信息栏 */
+.bottom-row {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2px;
+}
+
+.file-info {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+/* 操作图标 */
 .actions {
   display: flex;
   gap: 2px;
   justify-content: center;
   margin-bottom: -5px;
 }
+
 .actions .icon {
-  transition: all 0.1s;
   width: 23px;
+  transition: all 0.1s;
 }
+
 .actions .icon:hover {
   transform: scale(1.1);
 }
+
 .actions .icon:active {
   transform: scale(0.9);
 }
 
-/* 预览播放 */
-.play-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 3;
-}
-.play-container.hide {
-  display: none;
-}
+/* 全屏预览 */
+.play-container,
 .image-container {
   position: fixed;
   top: 0;
@@ -185,14 +145,17 @@ body {
   height: 100vh;
   background: rgba(0, 0, 0, 0.8);
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   z-index: 3;
 }
-.image-container.hide {
+
+.play-container.hide,
+.image-container.hide,
+.video-preview.hide {
   display: none;
 }
+
 #video-player,
 #image-player {
   max-width: 90vw;
@@ -200,9 +163,9 @@ body {
   width: auto;
   height: auto;
   object-fit: contain;
-  /* background: black; */
 }
 
+/* 框选 */
 #selection-box {
   position: absolute;
   border: 1px solid var(--button2-color);
@@ -212,30 +175,7 @@ body {
   display: none;
 }
 
-/* 添加视频预览相关样式 */
-.video-preview {
-  width: 100%;
-  height: 150px;
-  position: relative;
-  overflow: hidden;
-  /* background: #000; */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.video-preview video {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  cursor: pointer;
-}
-
-.video-preview.hide {
-  display: none;
-}
-
-/* 提示信息 */
+/* 提示框 */
 .alert-box {
   position: fixed;
   top: 50%;
@@ -250,6 +190,7 @@ body {
   transition: all 0.3s ease;
   z-index: 1000;
 }
+
 .alert-box.active {
   opacity: 1;
   visibility: visible;

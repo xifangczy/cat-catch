@@ -177,37 +177,21 @@ class FilePreview {
      */
     updateFileList() {
         this.fileItems = [...this.originalItems];
-        this.applyExtensionFilters();
-        this.applyRegexFilters();
-        this.sortItems();
-        this.renderFileItems();
-    }
-    /**
-     * 扩展过滤
-     */
-    applyExtensionFilters() {
+        // 获取勾选扩展
         const selectedExts = Array.from(document.querySelectorAll('input[name="ext"]:checked'))
             .map(checkbox => checkbox.value);
-        this.fileItems = this.fileItems.filter(item => selectedExts.includes(item.ext));
-    }
-    /**
-     * 正则过滤
-     */
-    applyRegexFilters() {
-        if (this.regexFilters) {
-            this.fileItems = this.fileItems.filter(item => this.regexFilters.test(item.url));
-        }
-    }
-    /**
-     * 排序
-     */
-    sortItems() {
-        const order = document.querySelector('input[name="sortOrder"]:checked').value;
+        // 应用 正则 and 扩展过滤
+        this.fileItems = this.fileItems.filter(item =>
+            selectedExts.includes(item.ext) &&
+            (!this.regexFilters || this.regexFilters.test(item.url))
+        );
+        // 排序
+        const order = document.querySelector('input[name="sortOrder"]:checked').value === 'asc' ? 1 : -1;
         const field = document.querySelector('input[name="sortField"]:checked').value;
-        this.fileItems.sort((a, b) => {
-            const _order = order === 'asc' ? 1 : -1;
-            return _order * (a[field] - b[field]);
-        });
+        this.fileItems.sort((a, b) => order * (a[field] - b[field]));
+        // 更新显示
+        this.renderFileItems();
+        this.updateMergeDownloadButton();
     }
     /**
      * 创建文件元素
@@ -223,7 +207,7 @@ class FilePreview {
             <div class="file-title hide">${item.title}</div>
             <div class="file-name">${item.name}</div>
             <div class="preview-container">
-                <img src="${item.favIconUrl ? item.favIconUrl : 'img/icon.png'}" class="preview-image icon">
+                <img src="${item.favIconUrl || 'img/icon.png'}" class="preview-image icon">
             </div>
             <div class="bottom-row">
                 <div class="file-info">${item.ext == 'Unknown' ? item.ext : item.ext.toLowerCase()}</div>
@@ -248,12 +232,10 @@ class FilePreview {
         // 选中状态 添加对应class
         item._selected = false;
         Object.defineProperty(item, "selected", {
-            get() {
-                return item._selected;
-            },
+            get: () => item._selected,
             set(newValue) {
                 item._selected = newValue;
-                newValue ? item.html.classList.add('selected') : item.html.classList.remove('selected');
+                item.html.classList.toggle('selected', newValue);
             }
         });
         // 图片预览
@@ -291,7 +273,7 @@ class FilePreview {
         download.src = 'img/download.svg';
         download.className = 'icon download';
         actions.appendChild(download);
-        item.html.querySelector('.download').addEventListener('click', (event) => {
+        download.addEventListener('click', (event) => {
             event.stopPropagation();
             this.downloadItem(item);
         });
@@ -478,6 +460,7 @@ class FilePreview {
             // 如果是音频文件，使用音乐图标
             container.innerHTML = '<img src="img/music.svg" class="preview-music icon" />';
         } else {
+            if (container.querySelector('video')) return;
             // 如果是视频文件，使用视频预览
             container.appendChild(item.previewVideo.video);
             // 鼠标悬停事件
@@ -509,13 +492,19 @@ class FilePreview {
      * 多线程 开始生成预览video标签
      */
     async startPreviewGeneration() {
-        const pendingItems = this.fileItems.filter(item => !item.previewVideo &&
-            (item.type?.startsWith('video/') || isMediaExt(item.ext) || isM3U8(item)) && !item.previewVideoError);
+        const pendingItems = this.fileItems.filter(item =>
+            !item.previewVideo &&
+            !item.previewVideoError &&
+            (item.type?.startsWith('video/') ||
+                item.type?.startsWith('audio/') ||
+                isMediaExt(item.ext) ||
+                isM3U8(item))
+        );
 
         const processItem = async () => {
             while (pendingItems.length) {
                 const item = pendingItems.shift();
-                if (!item || !item.url) continue;
+                if (!item?.url) continue;
                 try {
                     item.previewVideo = await this.generatePreview(item);
                     this.setPerviewVideo(item);
