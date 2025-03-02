@@ -880,5 +880,8 @@
   },
   "fileSize": {
     "message": "Tamanho do Arquivo"
+  },
+  "title": {
+    "message": "Título"
   }
 }
