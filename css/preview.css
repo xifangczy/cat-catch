@@ -102,7 +102,7 @@ body {
 
 /* 底部信息栏 */
 .bottom-row {
-  margin-top: auto;
+  /* margin-top: auto; */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -110,7 +110,7 @@ body {
 }
 
 .file-info {
-  margin: 0;
+  margin: 0 auto;
   flex-shrink: 0;
 }
 
@@ -125,10 +125,12 @@ body {
 .actions .icon {
   width: 23px;
   transition: all 0.1s;
+  opacity: 0.5;
 }
 
 .actions .icon:hover {
-  transform: scale(1.1);
+  /* transform: scale(1.1); */
+  opacity: 1;
 }
 
 .actions .icon:active {
