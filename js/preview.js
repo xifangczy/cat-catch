@@ -223,7 +223,7 @@ class FilePreview {
             <div class="file-title hide">${item.title}</div>
             <div class="file-name">${item.name}</div>
             <div class="preview-container">
-                <img src="${item.favIconUrl ? item.favIconUrl : 'img/icon.png'}" class="preview-image">
+                <img src="${item.favIconUrl ? item.favIconUrl : 'img/icon.png'}" class="preview-image icon">
             </div>
             <div class="bottom-row">
                 <div class="file-info">${item.ext == 'Unknown' ? item.ext : item.ext.toLowerCase()}</div>
@@ -257,7 +257,7 @@ class FilePreview {
             }
         });
         // 图片预览
-        if (item.type?.startsWith('image/') || ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(item.ext)) {
+        if (isPicture(item)) {
             const previewImage = item.html.querySelector('.preview-image');
             previewImage.onload = () => {
                 item.html.querySelector('.file-info').textContent += ` / ${previewImage.naturalWidth}*${previewImage.naturalHeight}`;
@@ -476,7 +476,7 @@ class FilePreview {
 
         if (item.previewVideo.type == 'audio' || (item.previewVideo.width == 0 && item.previewVideo.height == 0)) {
             // 如果是音频文件，使用音乐图标
-            container.innerHTML = '<img src="img/music.svg" class="icon" />';
+            container.innerHTML = '<img src="img/music.svg" class="preview-music icon" />';
         } else {
             // 如果是视频文件，使用视频预览
             container.appendChild(item.previewVideo.video);
@@ -489,13 +489,14 @@ class FilePreview {
             });
             // 填写视频信息
             item.html.querySelector('.file-info').textContent += ` / ${item.previewVideo.width}*${item.previewVideo.height}`;
-
-            // 点击视频 全屏播放 阻止冒泡 以免选中
-            container.querySelector("video")?.addEventListener('click', (event) => {
+        }
+        // 点击视频 全屏播放 阻止冒泡 以免选中
+        container.querySelectorAll("video, .preview-music").forEach((element) => {
+            element.addEventListener('click', (event) => {
                 event.stopPropagation();
                 this.playItem(item);
             });
-        }
+        });
         // 填写时长
         if (item.previewVideo.duration) {
             item.html.querySelector('.file-info').textContent += ` / ${item.previewVideo.duration}`;
