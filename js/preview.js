@@ -75,6 +75,8 @@ class FilePreview {
                 this.updateFileList();
             }
         });
+        // 复制
+        document.querySelector('#copy-selected').addEventListener('click', () => this.copy());
         // 清理数据
         document.querySelector('#clear').addEventListener('click', (e) => {
             chrome.runtime.sendMessage({ Message: "clearData", type: true, tabId: this._tabId });
@@ -83,9 +85,10 @@ class FilePreview {
             document.querySelector('#extensionFilters').innerHTML = '';
             this.updateFileList();
         });
+        // 删除
+        document.querySelector('#delete-selected').addEventListener('click', () => this.deleteItem());
         // debug
         document.querySelector('#debug').addEventListener('click', () => console.dir(this.fileItems));
-
         // 显示标题
         document.querySelector('input[name="showTitle"]').addEventListener('change', (e) => {
             this.fileItems.forEach(item => {
@@ -100,6 +103,7 @@ class FilePreview {
             item.selected = type === 'all' ? true :
                 type === 'reverse' ? !item.selected : false;
         });
+        this.updateButtonStatus();
     }
     /**
      * 获取选中元素 转为对象
@@ -108,18 +112,17 @@ class FilePreview {
         return this.fileItems.filter(item => item.selected);
     }
     /**
-     * 更新合并下载按钮状态
+     * 更新按钮状态
      */
-    updateMergeDownloadButton() {
+    updateButtonStatus() {
         const selectedItems = this.getSelectedItems();
-        const button = document.querySelector('#merge-download');
-        button.setAttribute('disabled', 'disabled');
-        if (selectedItems.length == 2) {
-            const maxSize = selectedItems.reduce((prev, current) => (prev.size > current.size) ? prev : current);
-            if (maxSize.size <= G.chromeLimitSize) {
-                button.removeAttribute('disabled');
-            }
-        }
+
+        const hasItems = selectedItems.length > 0;
+        const canMerge = selectedItems.length === 2 && selectedItems.every(item => item.size <= G.chromeLimitSize);
+
+        document.querySelector('#delete-selected').disabled = !hasItems;
+        document.querySelector('#merge-download').disabled = !canMerge;
+        document.querySelector('#copy-selected').disabled = !hasItems;
     }
     /**
      * 合并下载
@@ -166,6 +169,33 @@ class FilePreview {
         this.catDownload(data);
     }
     /**
+     * 删除文件
+     * @param {Object|null} data 
+     */
+    deleteItem(data = null) {
+        data = data ? [data] : this.getSelectedItems();
+        data.forEach(item => {
+            const index = this.originalItems.findIndex(originalItem => originalItem.requestId === item.requestId);
+            if (index !== -1) {
+                this.originalItems.splice(index, 1);
+            }
+        });
+        this.updateFileList();
+    }
+    /**
+     * 复制文件链接
+     * @param {Object|null} item 
+     */
+    copy(data = null) {
+        data = data ? [data] : this.getSelectedItems();
+        const url = [];
+        data.forEach(function (item) {
+            url.push(copyLink(item));
+        });
+        navigator.clipboard.writeText(url.join("\n"));
+        this.alert(i18n.copiedToClipboard);
+    }
+    /**
      * 下载选中
      */
     downloadSelected() {
@@ -191,7 +221,7 @@ class FilePreview {
         this.fileItems.sort((a, b) => order * (a[field] - b[field]));
         // 更新显示
         this.renderFileItems();
-        this.updateMergeDownloadButton();
+        this.updateButtonStatus();
     }
     /**
      * 创建文件元素
@@ -214,6 +244,7 @@ class FilePreview {
             </div>
             <div class="actions">
                 <img src="img/copy.png" class="icon copy" id="copy">
+                <img src="img/delete.svg" class="icon delete" id="delete">
             </div>`;
         // 添加文件信息
         if (item.size && item.size >= 1024) {
@@ -221,13 +252,17 @@ class FilePreview {
         }
         item.html.addEventListener('click', () => {
             item.selected = !item.selected;
-            this.updateMergeDownloadButton();
+            this.updateButtonStatus();
         });
         // 复制图标
         item.html.querySelector('.copy').addEventListener('click', (event) => {
             event.stopPropagation();
-            navigator.clipboard.writeText(item.url);
-            this.alert(i18n.copiedToClipboard);
+            this.copy(item);
+        });
+        // 删除图标
+        item.html.querySelector('.delete').addEventListener('click', (event) => {
+            event.stopPropagation();
+            this.deleteItem(item);
         });
         // 选中状态 添加对应class
         item._selected = false;
@@ -653,7 +688,7 @@ class FilePreview {
             selectionBox.style.display = 'none';
             selectionBox.style.width = '0';
             selectionBox.style.height = '0';
-            this.updateMergeDownloadButton();
+            this.updateButtonStatus();
         });
     }
 

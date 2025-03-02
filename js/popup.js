@@ -843,19 +843,6 @@ function isPlay(data) {
     return isMediaExt(data.ext) || typeArray.includes(data.type) || isM3U8(data);
 }
 
-// 复制选项
-function copyLink(data) {
-    let text = data.url;
-    if (data.parsing == "m3u8") {
-        text = G.copyM3U8;
-    } else if (data.parsing == "mpd") {
-        text = G.copyMPD;
-    } else {
-        text = G.copyOther;
-    }
-    return templates(text, data);
-}
-
 // 猫抓下载器
 function catDownload(obj, extra = {}) {
     if (G.testDownloader) {

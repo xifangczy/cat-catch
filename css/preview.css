@@ -7,7 +7,7 @@ body {
 }
 
 .container {
-  padding: 20px;
+  padding: 10px;
   margin: 0 auto;
 }
 
@@ -35,6 +35,10 @@ body {
 .sort-order {
   display: flex;
   gap: 8px;
+}
+
+#regular {
+  width: 512px;
 }
 
 /* 文件列表 */

@@ -55,13 +55,19 @@
                 </label>
             </div>
 
-            <input type="text" data-i18n-placeholder="regularFilterPlaceholder" id="regular" />
+            <div class="filter-row">
+                <span data-i18n="regex"></span>
+                <input type="text" data-i18n-placeholder="regularFilterPlaceholder" id="regular" />
+            </div>
 
             <div class="filter-row">
+                <span data-i18n="operation"></span>
                 <button class="button2" id="select-all" data-i18n="selectAll"></button>
                 <button class="button2" id="select-reverse" data-i18n="invertSelection"></button>
                 <button class="button2" id="download-selected" data-i18n="download"></button>
                 <button id="merge-download" class="button2" data-i18n="onlineMerge" disabled></button>
+                <button id="copy-selected" class="button2" data-i18n="copy" disabled></button>
+                <button id="delete-selected" class="button2" data-i18n="delete" disabled></button>
                 <button id="clear" class="button2" data-i18n="clear"></button>
                 <button id="debug" class="button2">debug</button>
             </div>

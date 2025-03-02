@@ -658,3 +658,15 @@ function isPicture(data) {
 function isMediaExt(ext) {
     return ['ogg', 'ogv', 'mp4', 'webm', 'mp3', 'wav', 'm4a', '3gp', 'mpeg', 'mov', 'm4s', 'aac'].includes(ext);
 }
+// 复制选项
+function copyLink(data) {
+    let text = data.url;
+    if (data.parsing == "m3u8") {
+        text = G.copyM3U8;
+    } else if (data.parsing == "mpd") {
+        text = G.copyMPD;
+    } else {
+        text = G.copyOther;
+    }
+    return templates(text, data);
+}
