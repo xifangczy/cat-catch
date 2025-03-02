@@ -645,15 +645,14 @@ function isJSON(data) {
     )
 }
 function isPicture(data) {
-    if (data.type && data.type.split("/")[0] == "image") {
-        return true;
-    }
-    return (data.ext == "jpg" ||
+    return (data.type?.startsWith("image/") ||
+        data.ext == "jpg" ||
         data.ext == "png" ||
         data.ext == "jpeg" ||
         data.ext == "bmp" ||
         data.ext == "gif" ||
-        data.ext == "webp"
+        data.ext == "webp" ||
+        data.ext == "svg"
     )
 }
 function isMediaExt(ext) {
