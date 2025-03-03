@@ -16,6 +16,9 @@ body {
   display: grid;
   gap: 5px;
   margin-bottom: 10px;
+  background: var(--background-color-two);
+  padding: 10px;
+  border-radius: 8px;
 }
 
 .filter-row {

@@ -1,7 +1,7 @@
 class FilePreview {
 
     MAX_CONCURRENT = 3;   // 最大并行生成预览数
-    MAX_LIST_SIZE = 200;  // 最大文件列表长度
+    MAX_LIST_SIZE = 1000;  // 最大文件列表长度
 
     constructor() {
         this.fileItems = [];         // 文件列表
@@ -10,6 +10,7 @@ class FilePreview {
         this.catDownloadIsProcessing = false;   // 猫抓下载器是否正在处理
         this.pushDebounce = null;   // 添加文件防抖
         this.alertTimer = null;     // 提示信息定时器
+        this.isDragging = false;    // 是否正在拖动
 
         // 获取tabId
         const params = new URL(location.href).searchParams;
@@ -313,7 +314,7 @@ class FilePreview {
             item.html.querySelector('.file-info').textContent += ` / ${byteToSize(item.size)}`;
         }
         item.html.addEventListener('click', (event) => {
-            if (event.target.closest('.icon')) { return; }
+            if (event.target.closest('.icon') || this.isDragging) { return; }
             item.selected = !item.selected;
             this.updateButtonStatus();
         });
@@ -694,16 +695,14 @@ class FilePreview {
     setupSelectionBox() {
         const selectionBox = document.getElementById('selection-box');
         const container = document.querySelector('body');
-        let isDragging = false;
+        // let isDragging = false;
         let isSelecting = false;
         const startPoint = { x: 0, y: 0 };
 
         container.addEventListener('mousedown', (e) => {
             if (e.button == 2) return;
-            // 如果点击的是file-item或其子元素,不启动框选
-            if (e.target.closest('.file-item')) return;
-            // 非body和div元素不启动框选
-            if (e.target.tagName !== "BODY" && e.target.tagName !== "DIV") return;
+            // 限定起始位范围
+            if (e.target.closest('.icon, .preview-image, video, button, input')) return;
 
             isSelecting = true;
             startPoint.x = e.pageX;
@@ -725,12 +724,12 @@ class FilePreview {
             );
 
             // 如果移动距离大于5像素，认为是拖动而不是点击
-            if (!isDragging && moveDistance > 5) {
-                isDragging = true;
+            if (!this.isDragging && moveDistance > 5) {
+                this.isDragging = true;
                 selectionBox.style.display = 'block';
             }
 
-            if (!isDragging) return;
+            if (!this.isDragging) return;
 
             // 计算选择框的位置和大小
             const left = Math.min(startPoint.x, currentPoint.x);
@@ -758,11 +757,10 @@ class FilePreview {
         });
 
         document.addEventListener('mouseup', (e) => {
-            if (e.button == 2) return;
-            if (!isSelecting) return;
+            if (e.button == 2 || !isSelecting) return;
 
             isSelecting = false;
-            isDragging = false;
+            setTimeout(() => { this.isDragging = false; }, 10);
             selectionBox.style.display = 'none';
             selectionBox.style.width = '0';
             selectionBox.style.height = '0';
