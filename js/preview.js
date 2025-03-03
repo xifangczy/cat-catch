@@ -49,14 +49,16 @@ class FilePreview {
         document.querySelector('#download-selected').addEventListener('click', () => this.downloadSelected());
         // 合并下载
         document.querySelector('#merge-download').addEventListener('click', () => this.mergeDownload());
-        // 关闭预览
+        // 点击非视频区域 关闭视频
         document.querySelectorAll('.preview-container').forEach(container => {
-            container.addEventListener('click', () => this.closePreview());
+            container.addEventListener('click', (event) => {
+                if (event.target.closest('video, img')) { return; }
+                this.closePreview()
+            });
         });
-        document.addEventListener('keydown', () => this.closePreview());
-        // 点击视频 阻止冒泡 以免关闭视频
-        document.querySelectorAll('.preview-container video, .preview-container img').forEach(container => {
-            container.addEventListener('click', (e) => e.stopPropagation());
+        // 按键盘ESC关闭视频
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') { this.closePreview(); }
         });
         // 排序按钮
         document.querySelectorAll('.sort-options input').forEach(input => {
@@ -96,6 +98,22 @@ class FilePreview {
             });
             this.updateFileList();
         });
+        // aria2
+        if (G.enableAria2Rpc) {
+            const aria2 = document.querySelector("#aria2-selected");
+            aria2.classList.remove("hide");
+            aria2.addEventListener('click', () => {
+                this.getSelectedItems().forEach(item => this.aria2(item));
+            });
+        }
+        // 发送
+        if (G.send2localManual) {
+            const send = document.querySelector("#send-selected");
+            send.classList.remove("hide");
+            send.addEventListener('click', () => {
+                this.getSelectedItems().forEach(item => this.send(item));
+            });
+        }
     }
     // 全选/反选
     toggleSelection(type) {
@@ -118,16 +136,24 @@ class FilePreview {
         const selectedItems = this.getSelectedItems();
 
         const hasItems = selectedItems.length > 0;
-        const canMerge = selectedItems.length === 2 && selectedItems.every(item => item.size <= G.chromeLimitSize);
+        const canMerge = selectedItems.length === 2 && selectedItems.every(item => item.size <= G.chromeLimitSize || isMedia(item));
 
         document.querySelector('#delete-selected').disabled = !hasItems;
         document.querySelector('#merge-download').disabled = !canMerge;
         document.querySelector('#copy-selected').disabled = !hasItems;
+        document.querySelector('#download-selected').disabled = !hasItems;
+        document.querySelector('#aria2-selected').disabled = !hasItems;
+        document.querySelector('#send-selected').disabled = !hasItems;
     }
     /**
      * 合并下载
      */
     mergeDownload() {
+        chrome.runtime.sendMessage({
+            Message: "catCatchFFmpeg",
+            action: "openFFmpeg",
+            extra: i18n.waitingForMedia
+        });
         const checkedData = this.getSelectedItems();
         // 都是m3u8 自动合并并发送到ffmpeg
         if (checkedData.every(data => isM3U8(data))) {
@@ -203,6 +229,40 @@ class FilePreview {
         data.length && this.catDownload(data);
     }
     /**
+     * 发送到aria2
+     * @param {Object} data 文件对象
+     */
+    aria2(data) {
+        aria2AddUri(data, (success) => {
+            this.alert(success, 1000);
+        }, (msg) => {
+            this.alert(msg, 1500);
+        });
+    }
+    /**
+     * 调用第三方工具
+     * @param {Object} data 文件对象
+     */
+    invoke(data) {
+        const url = templates(G.invokeText, data);
+        if (G.isFirefox) {
+            window.location.href = url;
+        } else {
+            chrome.tabs.update({ url: url });
+        }
+    }
+    /**
+     * 发送到远程或本地地址
+     * @param {Object} data 文件对象
+     */
+    send(data) {
+        send2local("catch", data, this._tabId).then((success) => {
+            success && success?.ok && this.alert(i18n.hasSent, 1000);
+        }).catch((error) => {
+            error ? this.alert(error, 1500) : this.alert(i18n.sendFailed, 1500);
+        });
+    }
+    /**
      * 更新文件列表
      */
     updateFileList() {
@@ -243,27 +303,25 @@ class FilePreview {
                 <div class="file-info">${item.ext == 'Unknown' ? item.ext : item.ext.toLowerCase()}</div>
             </div>
             <div class="actions">
-                <img src="img/copy.png" class="icon copy" id="copy">
-                <img src="img/delete.svg" class="icon delete" id="delete">
+                <img src="img/copy.png" class="icon copy">
+                <img src="img/delete.svg" class="icon delete">
+                <img src="img/download.svg" class="icon download">
             </div>`;
         // 添加文件信息
         if (item.size && item.size >= 1024) {
             item.html.querySelector('.file-info').textContent += ` / ${byteToSize(item.size)}`;
         }
-        item.html.addEventListener('click', () => {
+        item.html.addEventListener('click', (event) => {
+            if (event.target.closest('.icon')) { return; }
             item.selected = !item.selected;
             this.updateButtonStatus();
         });
         // 复制图标
-        item.html.querySelector('.copy').addEventListener('click', (event) => {
-            event.stopPropagation();
-            this.copy(item);
-        });
+        item.html.querySelector('.copy').addEventListener('click', () => this.copy(item));
         // 删除图标
-        item.html.querySelector('.delete').addEventListener('click', (event) => {
-            event.stopPropagation();
-            this.deleteItem(item);
-        });
+        item.html.querySelector('.delete').addEventListener('click', () => this.deleteItem(item));
+        // 下载图标
+        item.html.querySelector('.download').addEventListener('click', () => this.downloadItem(item));
         // 选中状态 添加对应class
         item._selected = false;
         Object.defineProperty(item, "selected", {
@@ -296,22 +354,41 @@ class FilePreview {
             const m3u8 = document.createElement('img');
             m3u8.src = 'img/parsing.png';
             m3u8.className = 'icon m3u8';
-            m3u8.addEventListener('click', (event) => {
-                event.stopPropagation();
-                this.openM3U8(item);
-            });
+            m3u8.title = i18n.parser;
+            m3u8.addEventListener('click', () => this.openM3U8(item));
             actions.appendChild(m3u8);
         }
 
-        // 下载图标
-        const download = document.createElement('img');
-        download.src = 'img/download.svg';
-        download.className = 'icon download';
-        actions.appendChild(download);
-        download.addEventListener('click', (event) => {
-            event.stopPropagation();
-            this.downloadItem(item);
-        });
+        // 发送到aria2
+        if (G.enableAria2Rpc) {
+            const aria2 = document.createElement('img');
+            aria2.src = 'img/aria2.png';
+            aria2.className = 'icon aria2';
+            aria2.title = "aria2";
+            aria2.addEventListener('click', () => this.aria2(item));
+            actions.appendChild(aria2);
+        }
+
+        // 调用第三方工具
+        if (G.invoke) {
+            const invoke = document.createElement('img');
+            invoke.src = 'img/invoke.svg';
+            invoke.className = 'icon invoke';
+            invoke.title = i18n.invoke;
+            invoke.addEventListener('click', () => this.invoke(item));
+            actions.appendChild(invoke);
+        }
+
+        // 发送到远程或本地地址
+        if (G.send2localManual) {
+            const send = document.createElement('img');
+            send.src = 'img/send.svg';
+            send.className = 'icon send2local';
+            send.title = i18n.send2local;
+            send.addEventListener('click', () => this.send(item));
+            actions.appendChild(send);
+        }
+
         return item.html;
     }
     /**
@@ -721,6 +798,7 @@ class FilePreview {
             toast.className = 'alert-box';
             document.body.appendChild(toast);
         }
+        toast.classList.remove('active');
         toast.textContent = message;
         toast.classList.add('active');
         setTimeout(() => {
