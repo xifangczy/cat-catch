@@ -1004,51 +1004,6 @@ function getAllData() {
     data.push(...allData.get(false).values());
     return data;
 }
-/**
- * ari2a RPC发送一套资源
- * @param {object} data 资源对象
- * @param {Function} success 成功运行函数
- * @param {Function} error 失败运行函数
- */
-function aria2AddUri(data, success, error) {
-    const json = {
-        "jsonrpc": "2.0",
-        "id": "cat-catch-" + data.requestId,
-        "method": "aria2.addUri",
-        "params": []
-    };
-    if (G.aria2RpcToken) {
-        json.params.push(`token:${G.aria2RpcToken}`);
-    }
-    const params = { out: data.downFileName };
-    if (G.enableAria2RpcReferer) {
-        params.header = [];
-        params.header.push(G.userAgent ? G.userAgent : navigator.userAgent);
-        if (data.requestHeaders?.referer) {
-            params.header.push("Referer: " + data.requestHeaders.referer);
-        }
-        if (data.cookie) {
-            params.header.push("Cookie: " + data.cookie);
-        }
-        if (data.requestHeaders?.authorization) {
-            params.header.push("Authorization: " + data.requestHeaders.authorization);
-        }
-    }
-    json.params.push([data.url], params);
-    fetch(G.aria2Rpc, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json; charset=utf-8"
-        },
-        body: JSON.stringify(json)
-    }).then(response => {
-        return response.json();
-    }).then(data => {
-        success && success(data);
-    }).catch(errMsg => {
-        error && error(errMsg);
-    });
-}
 
 /**
  * 打开解析器
