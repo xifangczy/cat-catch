@@ -352,6 +352,7 @@ function start() {
  * @param {ArrayBuffer|Blob} data 数据内容
  * @param {Object} fragment 数据对象
  */
+let isCreatingTab = false;
 function sendFile(action, data, fragment) {
     // 转 blob
     if (data instanceof ArrayBuffer) {
@@ -360,13 +361,17 @@ function sendFile(action, data, fragment) {
     chrome.tabs.query({ url: G.ffmpegConfig.url + "*" }, function (tabs) {
         // 等待ffmpeg 打开并且可用
         if (tabs.length === 0) {
-            chrome.tabs.create({ url: G.ffmpegConfig.url });
+            if (!isCreatingTab) {
+                isCreatingTab = true; // 设置创建标志位
+                chrome.tabs.create({ url: G.ffmpegConfig.url });
+            }
             setTimeout(sendFile, 500, action, data, fragment);
             return;
         } else if (tabs[0].status !== "complete") {
             setTimeout(sendFile, 233, action, data, fragment);
             return;
         }
+        isCreatingTab = false; // 重置创建标志位
         /**
          * https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Chrome_incompatibilities#data_cloning_algorithm
          * chrome.runtime.sendMessage API
