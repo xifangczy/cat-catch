@@ -9,6 +9,7 @@ class FilePreview {
         this.regexFilters = null;    // 正则过滤
         this.catDownloadIsProcessing = false;   // 猫抓下载器是否正在处理
         this.pushDebounce = null;   // 添加文件防抖
+        this.alertTimer = null;     // 提示信息定时器
 
         // 获取tabId
         const params = new URL(location.href).searchParams;
@@ -136,7 +137,7 @@ class FilePreview {
         const selectedItems = this.getSelectedItems();
 
         const hasItems = selectedItems.length > 0;
-        const canMerge = selectedItems.length === 2 && selectedItems.every(item => item.size <= G.chromeLimitSize || isMedia(item));
+        const canMerge = selectedItems.length === 2 && selectedItems.every(item => item.size <= G.chromeLimitSize && isMedia(item));
 
         document.querySelector('#delete-selected').disabled = !hasItems;
         document.querySelector('#merge-download').disabled = !canMerge;
@@ -798,10 +799,13 @@ class FilePreview {
             toast.className = 'alert-box';
             document.body.appendChild(toast);
         }
+        // 显示期间新消息顶替
+        clearTimeout(this.alertTimer);
         toast.classList.remove('active');
+
         toast.textContent = message;
         toast.classList.add('active');
-        setTimeout(() => {
+        this.alertTimer = setTimeout(() => {
             toast.classList.remove('active');
         }, sec);
     }
