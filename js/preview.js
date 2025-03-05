@@ -68,7 +68,15 @@ class FilePreview {
         });
         // 按键盘ESC关闭视频
         document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') { this.closePreview(); }
+            if (event.key === 'Escape') {
+                this.closePreview();
+                return;
+            }
+            // ctrl + a
+            if ((event.ctrlKey || event.metaKey) && event.key === 'a' && event.target.tagName != "INPUT") {
+                this.toggleSelection('all');
+                event.preventDefault();
+            }
         });
         // 排序按钮
         document.querySelectorAll('.sort-options input').forEach(input => {

@@ -6,19 +6,22 @@ body {
   user-select: none;
 }
 
-.container {
+/* .container {
   padding: 10px;
   margin: 0 auto;
-}
+} */
 
 /* 筛选区域 */
 .filters {
   display: grid;
   gap: 5px;
-  margin-bottom: 10px;
+  /* margin-bottom: 10px; */
   background: var(--background-color-two);
   padding: 10px;
   border-radius: 8px;
+  /* position: sticky; */
+  /* top: 0; */
+  /* z-index: 2; */
 }
 
 .filter-row {
@@ -49,6 +52,7 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 10px;
+  padding: 10px;
 }
 
 .file-item {
@@ -157,7 +161,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 3;
+  z-index: 4;
 }
 
 .play-container.hide,
@@ -181,7 +185,7 @@ body {
   border: 1px solid var(--button2-color);
   background-color: var(--button-active-color);
   pointer-events: none;
-  z-index: 2;
+  z-index: 3;
   display: none;
 }
 
@@ -211,7 +215,7 @@ body {
   justify-content: center;
   align-items: center;
   gap: 8px;
-  margin-top: 20px;
+  /* margin-top: 20px; */
   padding: 15px;
   background: var(--background-color-two);
   border-radius: 8px;
