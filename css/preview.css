@@ -204,3 +204,33 @@ body {
   opacity: 1;
   visibility: visible;
 }
+
+/* 分页组件样式 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 15px;
+  background: var(--background-color-two);
+  border-radius: 8px;
+}
+.pagination.hide {
+  display: none;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.page-numbers button {
+  min-width: 36px;
+  padding: 5px 8px;
+}
+
+#go-page {
+  margin-left: 5px;
+}

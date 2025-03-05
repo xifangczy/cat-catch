@@ -1,7 +1,7 @@
 class FilePreview {
 
     MAX_CONCURRENT = 3;   // 最大并行生成预览数
-    MAX_LIST_SIZE = 1000;  // 最大文件列表长度
+    MAX_LIST_SIZE = 128;  // 最大文件列表长度
 
     constructor() {
         this.fileItems = [];         // 文件列表
@@ -11,6 +11,7 @@ class FilePreview {
         this.pushDebounce = null;   // 添加文件防抖
         this.alertTimer = null;     // 提示信息定时器
         this.isDragging = false;    // 是否正在拖动
+        this.previewHLS = null;     // 全屏预览视频HLS工具
 
         // 获取tabId
         const params = new URL(location.href).searchParams;
@@ -20,8 +21,14 @@ class FilePreview {
             return;
         }
 
-        // 全屏预览视频HLS工具
-        this.previewHLS = null;
+        // 显示范围
+        this.currentRange = params.get("range")?.split("-").map(Number);
+        if (this.currentRange) {
+            this.currentRange = { start: this.currentRange[0], end: this.currentRange[1] || undefined };
+        }
+
+        // 分页
+        this.currentPage = params.get("page") ? parseInt(params.get("page")) : 1;
 
         // 初始化
         this.init();
@@ -442,21 +449,24 @@ class FilePreview {
      * 载入数据
      */
     async loadFileItems() {
-        this.fileItems = await chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getData", tabId: this._tabId }) || [];
-        if (this.fileItems.length == 0) {
+        this.originalItems = await chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getData", tabId: this._tabId }) || [];
+        if (this.originalItems.length == 0) {
             this.alert(i18n.noData, 1500);
             return;
         }
-        setHeaders(this.fileItems, null, this.tab.id);
-        this.originalItems = [];
-        for (let index = 0; index < this.fileItems.length; index++) {
-            const data = this.trimFileName(this.fileItems[index]);
-            this.originalItems.push(data);
-            // 最大预览数限制
-            if (index > this.MAX_LIST_SIZE) {
-                break;
-            }
+        // 设置分页
+        if (this.originalItems.length > this.MAX_LIST_SIZE) {
+            this.setupPage(this.originalItems.length);
+            this.originalItems = this.originalItems.slice((this.currentPage - 1) * this.MAX_LIST_SIZE, this.currentPage * this.MAX_LIST_SIZE);
         }
+        // 显示范围
+        if (this.currentRange) {
+            this.originalItems = this.originalItems.slice(this.currentRange.start, this.currentRange.end ?? this.originalItems.length);
+        }
+        this.originalItems = this.originalItems.map(data => this.trimFileName(data));
+        this.fileItems = [...this.originalItems];
+        setHeaders(this.fileItems, null, this.tab.id);
+
     }
     /**
      * 关闭预览视频
@@ -825,6 +835,39 @@ class FilePreview {
             this.updateFileList();
             this.startPreviewGeneration();
         }, 1000);
+    }
+
+    /**
+     * 设置分页
+     * @param {Number} fileLength 文件数
+     */
+    setupPage(fileLength) {
+        const url = new URL(location.href);
+        document.querySelector('.pagination').classList.remove('hide'); // 显示页面组件
+        const maxPage = Math.ceil(fileLength / this.MAX_LIST_SIZE); // 最大页数
+
+        // 设置页码
+        document.querySelector('.page-numbers').textContent = `${this.currentPage} / ${maxPage}`;
+
+        // 上一页按钮
+        if (this.currentPage != 1) {
+            const prev = document.querySelector('#prev-page');
+            prev.disabled = false;
+            prev.addEventListener('click', () => {
+                url.searchParams.set('page', this.currentPage - 1);
+                chrome.tabs.update({ url: url.toString() });
+            });
+        }
+
+        // 下一页按钮
+        if (this.currentPage != maxPage) {
+            const next = document.querySelector('#next-page');
+            next.disabled = false;
+            next.addEventListener('click', () => {
+                url.searchParams.set('page', this.currentPage + 1);
+                chrome.tabs.update({ url: url.toString() });
+            });
+        }
     }
 }
 
