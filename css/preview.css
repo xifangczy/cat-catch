@@ -75,6 +75,7 @@ body {
   word-break: break-all;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -199,7 +200,6 @@ body {
   transition: all 0.3s ease;
   z-index: 1000;
 }
-
 .alert-box.active {
   opacity: 1;
   visibility: visible;
@@ -219,18 +219,8 @@ body {
 .pagination.hide {
   display: none;
 }
-
 .page-numbers {
   display: flex;
   gap: 5px;
   flex-wrap: wrap;
-}
-
-.page-numbers button {
-  min-width: 36px;
-  padding: 5px 8px;
-}
-
-#go-page {
-  margin-left: 5px;
 }

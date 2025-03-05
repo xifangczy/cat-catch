@@ -28,7 +28,8 @@ class FilePreview {
         }
 
         // 分页
-        this.currentPage = params.get("page") ? parseInt(params.get("page")) : 1;
+        this.currentPage = params.get("page");
+        this.currentPage = this.currentPage ? parseInt(this.currentPage) : 1;
 
         // 初始化
         this.init();
