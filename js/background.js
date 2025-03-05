@@ -582,7 +582,7 @@ chrome.webNavigation.onCommitted.addListener(function (details) {
     }
 
     // 刷新清理角标数
-    if (details.frameId == 0 && (details.transitionType == "reload" || details.transitionType == "link") && G.autoClearMode == 1) {
+    if (details.frameId == 0 && (!['auto_subframe', 'manual_subframe', 'form_submit'].includes(details.transitionType)) && G.autoClearMode == 1) {
         delete cacheData[details.tabId];
         (chrome.storage.session ?? chrome.storage.local).set({ MediaData: cacheData });
         SetIcon({ tabId: details.tabId });
