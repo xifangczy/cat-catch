@@ -229,7 +229,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         }
         // 发送到popup 并检查自动下载
         chrome.runtime.sendMessage({ Message: "popupAddData", data: info }, function () {
-            if (G.featAutoDownTabId.size > 0 && G.featAutoDownTabId.has(info.tabId)) {
+            if (G.featAutoDownTabId.size > 0 && G.featAutoDownTabId.has(info.tabId) && chrome.downloads?.State) {
                 try {
                     const downDir = info.title == "NULL" ? "CatCatch/" : stringModify(info.title) + "/";
                     let fileName = isEmpty(info.name) ? stringModify(info.title) + '.' + info.ext : decodeURIComponent(stringModify(info.name));
