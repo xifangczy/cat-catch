@@ -431,7 +431,7 @@ hls.on(Hls.Events.ERROR, function (event, data) {
             params.delete("requestHeaders");
         } else if (_initiator) {
             params.delete("requestHeaders");
-            params.append("requestHeaders", JSON.stringify({ "referer": _initiator }));
+            params.append("requestHeaders", JSON.stringify({ "referer": `${_initiator}/`, "origin": _initiator }));
         }
         const href = window.location.origin + window.location.pathname + "?" + params.toString();
         if (!autoReferer && window.location.href != href) {
