@@ -196,4 +196,10 @@ button:disabled,
   img.invoke {
     content: url(../img/invoke-dark.svg);
   }
+  img.send {
+    content: url(../img/send-dark.svg);
+  }
+  img.delete {
+    content: url(../img/delete-dark.svg);
+  }
 }
