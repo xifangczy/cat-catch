@@ -401,7 +401,7 @@ class FilePreview {
         if (G.send2localManual) {
             const send = document.createElement('img');
             send.src = 'img/send.svg';
-            send.className = 'icon send2local';
+            send.className = 'icon send';
             send.title = i18n.send2local;
             send.addEventListener('click', () => this.send(item));
             actions.appendChild(send);

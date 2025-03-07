@@ -60,17 +60,21 @@ body {
   flex-direction: column;
   min-height: 150px;
   padding: 8px;
-  border: 2px solid transparent;
+  border: 3px solid transparent;
   border-radius: 8px;
   cursor: pointer;
   box-shadow: 0 0 3px var(--button2-color);
   max-height: 233px;
+  transition: all 0.2s;
+}
+.file-item:hover {
+  box-shadow: 0 0 10px var(--button2-color);
 }
 
 .file-item.selected {
   border-color: var(--button2-color);
   background-color: var(--button-hover-color);
-  box-shadow: 0 0 8px var(--button2-color);
+  /* box-shadow: 0 0 8px var(--button2-color); */
 }
 
 .file-name {
