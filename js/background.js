@@ -35,16 +35,20 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
 });
 
 // onBeforeRequest 浏览器发送请求之前使用正则匹配发送请求的URL
-chrome.webRequest.onBeforeRequest.addListener(
-    function (data) {
-        try { findMedia(data, true); } catch (e) { console.log(e); }
-    }, { urls: ["<all_urls>"] }, ["requestBody"]
-);
+// chrome.webRequest.onBeforeRequest.addListener(
+//     function (data) {
+//         try { findMedia(data, true); } catch (e) { console.log(e); }
+//     }, { urls: ["<all_urls>"] }, ["requestBody"]
+// );
 // 保存requestHeaders
 chrome.webRequest.onSendHeaders.addListener(
     function (data) {
         if (G && G.initSyncComplete && !G.enable) { return; }
-        data.requestHeaders && G.requestHeaders.set(data.requestId, data.requestHeaders);
+        if (data.requestHeaders) {
+            G.requestHeaders.set(data.requestId, data.requestHeaders);
+            data.allRequestHeaders = data.requestHeaders;
+        }
+        try { findMedia(data, true); } catch (e) { console.log(e); }
     }, { urls: ["<all_urls>"] }, ['requestHeaders',
         chrome.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS].filter(Boolean)
 );
@@ -129,10 +133,11 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         return;
     }
 
+    data.header = getResponseHeadersValue(data);
     // 非正则匹配
     if (!isRegex) {
         // 获取头部信息
-        data.header = getResponseHeadersValue(data);
+        // data.header = getResponseHeadersValue(data);
         //检查后缀
         if (!filter && ext != undefined) {
             filter = CheckExtension(ext, data.header?.size);
