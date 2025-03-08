@@ -128,6 +128,7 @@ G.OptionLists = {
     send2localURL: "http://127.0.0.1:8000/",
     send2localMethod: 'POST',
     send2localBody: '{"action": "${action}", "data": ${data}, "tabId": "${tabId}"}',
+    send2localType: 0,
     popup: false,
     popupHeight: 720,
     popupWidth: 1280,

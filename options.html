@@ -272,6 +272,18 @@
           </div>
 
           <div class="item">
+            <div><span>Content-Type</span> </div>
+            <div class="switch switchSelect send2localType">
+              <select id="send2localType" class="select" save="select">
+                <option value="0">application/json;charset=utf-8</option>
+                <option value="1">multipart/form-data</option>
+                <option value="2">application/x-www-form-urlencoded</option>
+                <option value="3">text/plain</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="item">
             <div><span data-i18n-outer="address"></span></div>
             <input id="send2localURL" save="input" type="text" class="width100"></input>
           </div>

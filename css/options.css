@@ -593,3 +593,10 @@ a.json-placeholder:hover {
 .sidebar a:hover {
   background-color: var(--button-hover-color);
 }
+
+.item .send2localType {
+  margin-right: 196px;
+}
+.item .send2localType select {
+  width: 15rem;
+}

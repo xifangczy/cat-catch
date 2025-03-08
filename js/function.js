@@ -559,6 +559,8 @@ function flattenObject(obj, prefix = '') {
  */
 function send2local(action, data, tabId = 0) {
     return new Promise((resolve, reject) => {
+
+        // 请求方式
         const option = { method: G.send2localMethod };
 
         // 处理替换模板
@@ -569,19 +571,57 @@ function send2local(action, data, tabId = 0) {
         postData = JSONparse(postData, { action, data, tabId });
 
         try {
-            // 处理URL中的模板字符串 并检查URL是否合法
+            // 处理URL中的模板字符串并检查合法性
             let send2localURL = templates(G.send2localURL, data);
             send2localURL = new URL(send2localURL);
 
             // GET请求拼接参数
-            if (option.method == 'GET') {
-                let flattenedObj = flattenObject(postData);
+            if (option.method === 'GET') {
+                const flattenedObj = flattenObject(postData);
                 const urlParams = new URLSearchParams(flattenedObj);
-                send2localURL.search = send2localURL.search ? `${send2localURL.search}&${urlParams}` : `?${urlParams}`;
-            } else {
-                option.body = JSON.stringify(postData);
-                option.headers = { 'Content-Type': 'application/json;charset=utf-8' };
+                send2localURL.search = send2localURL.search
+                    ? `${send2localURL.search}&${urlParams}`
+                    : `?${urlParams}`;
             }
+            // 非GET请求处理不同Content-Type
+            else {
+                const contentType = {
+                    0: 'application/json;charset=utf-8',
+                    1: 'multipart/form-data',
+                    2: 'application/x-www-form-urlencoded',
+                    3: 'text/plain'
+                }[G.send2localType];
+                option.headers = { 'Content-Type': contentType };
+
+                switch (contentType) {
+                    case 'application/json;charset=utf-8':
+                        option.body = JSON.stringify(postData);
+                        break;
+                    case 'multipart/form-data':
+                        const formData = new FormData();
+                        const flattened = flattenObject(postData);
+                        Object.entries(flattened).forEach(([key, value]) => {
+                            formData.append(key, value);
+                        });
+                        option.body = formData;
+                        delete option.headers['Content-Type']; // 浏览器自动生成boundary
+                        break;
+                    case 'application/x-www-form-urlencoded':
+                        const flattenedObj = flattenObject(postData);
+                        const urlParams = new URLSearchParams(flattenedObj);
+                        option.body = urlParams.toString();
+                        break;
+                    case 'text/plain':
+                        option.body = typeof postData === 'object'
+                            ? JSON.stringify(postData)
+                            : String(postData);
+                        break;
+                    default:
+                        option.body = JSON.stringify(postData);
+                        break;
+                }
+            }
+
             send2localURL = send2localURL.toString();
             fetch(send2localURL, option)
                 .then(response => resolve(response))
