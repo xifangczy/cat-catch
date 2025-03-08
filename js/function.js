@@ -564,8 +564,15 @@ function send2local(action, data, tabId = 0) {
         const option = { method: G.send2localMethod };
 
         // 处理替换模板
+        let body = G.send2localBody;
+        // 处理 addKey 请求
+        if (action == 'addKey') {
+            body = G.send2localBody.replaceAll('${data}', `"${data}"`);
+            data = { tabId: tabId };
+        }
+
         data.action = action;
-        let postData = templates(G.send2localBody, data);
+        let postData = templates(body, data);
 
         // 转为对象
         postData = JSONparse(postData, { action, data, tabId });
