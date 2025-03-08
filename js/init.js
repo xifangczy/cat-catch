@@ -220,7 +220,12 @@ function InitOptions() {
         if (chrome.runtime.lastError) {
             items = G.OptionLists;
         }
-        items = { ...G.OptionLists, ...items }; // 确保有默认值
+        // 确保有默认值
+        for (let key in G.OptionLists) {
+            if (items[key] === undefined || items[key] === null) {
+                items[key] = G.OptionLists[key];
+            }
+        }
         // Ext的Array转为Map类型
         items.Ext = new Map(items.Ext.map(item => [item.ext, item]));
         // Type的Array转为Map类型

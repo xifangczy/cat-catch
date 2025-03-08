@@ -3,6 +3,12 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
     if (chrome.runtime.lastError) {
         items = G.OptionLists;
     }
+    // 确保有默认值
+    for (let key in G.OptionLists) {
+        if (items[key] === undefined || items[key] === null) {
+            items[key] = G.OptionLists[key];
+        }
+    }
     if (items.Ext === undefined || items.Type === undefined || items.Regex === undefined) {
         location.reload();
     }
