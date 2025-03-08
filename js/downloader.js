@@ -113,9 +113,11 @@ function start() {
                 $(this).html(i18n.retryDownload).data("action", "start");
                 if (fragment.fileStream) {
                     fragment.fileStream.close();
-                    fragment.fileStream = streamSaver.createWriteStream(fragment.downFileName).getWriter();
                 }
             } else if (action == "start") {
+                if (fragment.fileStream) {
+                    fragment.fileStream = streamSaver.createWriteStream(fragment.downFileName).getWriter();
+                }
                 down.state = "waiting";
                 down.downloader(fragment);
                 $(this).html(i18n.stopDownload).data("action", "stop");
