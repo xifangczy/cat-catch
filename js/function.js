@@ -554,7 +554,7 @@ function flattenObject(obj, prefix = '') {
 /**
  * 发送数据到本地
  * @param {String} action 发送类型
- * @param {Object} data 发送的数据
+ * @param {Object|Srting} data 发送的数据
  * @param {Number} tabId 发送数据的标签页ID
  */
 function send2local(action, data, tabId = 0) {
@@ -566,7 +566,7 @@ function send2local(action, data, tabId = 0) {
         // 处理替换模板
         let body = G.send2localBody;
         // 处理 addKey 请求
-        if (action == 'addKey') {
+        if (action == 'addKey' || typeof data === 'string') {
             body = G.send2localBody.replaceAll('${data}', `"${data}"`);
             data = { tabId: tabId };
         }
