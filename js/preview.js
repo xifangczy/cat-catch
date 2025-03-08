@@ -318,12 +318,12 @@ class FilePreview {
                 <img src="${item.favIconUrl || 'img/icon.png'}" class="preview-image icon">
             </div>
             <div class="bottom-row">
-                <div class="file-info">${item.ext == 'Unknown' ? item.ext : item.ext.toLowerCase()}</div>
+                <div class="file-info">${item.ext}</div>
             </div>
             <div class="actions">
-                <img src="img/copy.png" class="icon copy">
-                <img src="img/delete.svg" class="icon delete">
-                <img src="img/download.svg" class="icon download">
+                <img src="img/copy.png" class="icon copy" title="${i18n.copy}">
+                <img src="img/delete.svg" class="icon delete" title="${i18n.delete}">
+                <img src="img/download.svg" class="icon download" title="${i18n.download}">
             </div>`;
         // 添加文件信息
         if (item.size && item.size >= 1024) {
