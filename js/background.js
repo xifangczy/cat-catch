@@ -775,7 +775,7 @@ function getRequestHeaders(data) {
 //设置扩展图标
 function SetIcon(obj) {
     if (obj?.number == 0 || obj?.number == undefined) {
-        chrome.action.setBadgeText({ text: "", tabId: obj.tabId }, function () { if (chrome.runtime.lastError) { return; } });
+        chrome.action.setBadgeText({ text: "", tabId: obj?.tabId ?? G.tabId }, function () { if (chrome.runtime.lastError) { return; } });
         // chrome.action.setTitle({ title: "还没闻到味儿~", tabId: obj.tabId }, function () { if (chrome.runtime.lastError) { return; } });
     } else if (G.badgeNumber) {
         obj.number = obj.number > 999 ? "999+" : obj.number.toString();
