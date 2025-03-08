@@ -102,13 +102,7 @@
                     continue;
                 }
                 if (data[key].substring(0, 7).toUpperCase() == "#EXTM3U") {
-                    if (isFullM3u8(data[key])) {
-                        toUrl(data[key]);
-                    } else {
-                        baseUrl.forEach((url) => {
-                            toUrl(addBashUrl(url, data[key]));
-                        });
-                    }
+                    toUrl(data[key]);
                     continue;
                 }
                 if (data[key].substring(0, 17).toLowerCase() == "data:application/") {
@@ -169,7 +163,7 @@
                         postData({ action: "catCatchAddMedia", url: this.responseURL, href: location.href, ext: "m3u8" });
                         return;
                     }
-                    isFullM3u8(this.response) && toUrl(this.response);
+                    toUrl(this.response);
                     return;
                 }
                 if (isJSON(this.response)) {
@@ -220,7 +214,7 @@
                         postData({ action: "catCatchAddMedia", url: input, href: location.href, ext: "m3u8" });
                         return;
                     }
-                    isFullM3u8(text) && toUrl(text);
+                    toUrl(text);
                     return;
                 }
                 if (text.substring(0, 17).toLowerCase() == "data:application/") {
@@ -276,7 +270,7 @@
         if (base64.length == 24 && base64.substring(22, 24) == "==") {
             postData({ action: "catCatchAddKey", key: base64, href: location.href, ext: "base64Key" });
         }
-        if (data.substring(0, 7).toUpperCase() == "#EXTM3U" && isFullM3u8(data)) {
+        if (data.substring(0, 7).toUpperCase() == "#EXTM3U") {
             toUrl(data);
         }
         return base64;
@@ -291,7 +285,7 @@
         if (base64.length == 24 && base64.substring(22, 24) == "==") {
             postData({ action: "catCatchAddKey", key: base64, href: location.href, ext: "base64Key" });
         }
-        if (data.substring(0, 7).toUpperCase() == "#EXTM3U" && isFullM3u8(data)) {
+        if (data.substring(0, 7).toUpperCase() == "#EXTM3U") {
             toUrl(data);
         }
         if (data.endsWith("</MPD>")) {
@@ -372,7 +366,7 @@
         const out = _indexOf.apply(this, arguments);
         if (searchValue === '#EXTM3U' && out !== -1) {
             const data = this.substring(fromIndex);
-            isFullM3u8(data) && toUrl(data);
+            toUrl(data);
         }
         return out;
     }
@@ -438,11 +432,12 @@
         }
     });
 
+    // json
     const _arrayJoin = Array.prototype.join;
     Array.prototype.join = function () {
         const data = _arrayJoin.apply(this, arguments);
         if (data.substring(0, 7).toUpperCase() == "#EXTM3U") {
-            isFullM3u8(data) && toUrl(data);
+            toUrl(data);
         }
         return data;
     }
@@ -525,8 +520,16 @@
         return false;
     }
     function toUrl(text, ext = "m3u8") {
-        let url = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(text)]));
-        postData({ action: "catCatchAddMedia", url: url, href: location.href, ext: ext });
+        if (!text) { return; }
+        if (isFullM3u8(text)) {
+            let url = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(text)]));
+            postData({ action: "catCatchAddMedia", url: url, href: location.href, ext: ext });
+            return;
+        }
+        baseUrl.forEach((url) => {
+            url = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(addBashUrl(url, text))]));
+            postData({ action: "catCatchAddMedia", url: url, href: location.href, ext: ext });
+        });
     }
     function getDataM3U8(text) {
         const type = ["vnd.apple.mpegurl", "x-mpegurl", "mpegurl"];
