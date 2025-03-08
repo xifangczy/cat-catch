@@ -181,9 +181,6 @@
                     return;
                 }
             }
-            if (this.responseURL.includes("sdkInit")) {
-                debugger;
-            }
             const isJson = isJSON(this.response);
             if (isJson) {
                 findMedia(isJson);
