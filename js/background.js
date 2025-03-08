@@ -133,11 +133,10 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         return;
     }
 
-    data.header = getResponseHeadersValue(data);
     // 非正则匹配
     if (!isRegex) {
         // 获取头部信息
-        // data.header = getResponseHeadersValue(data);
+        data.header = getResponseHeadersValue(data);
         //检查后缀
         if (!filter && ext != undefined) {
             filter = CheckExtension(ext, data.header?.size);
