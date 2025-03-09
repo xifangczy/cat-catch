@@ -214,6 +214,14 @@ function start() {
             down.downloader(fragment);
             return;
         }
+        // 添加sec-fetch 再次尝试下载
+        if (!fragment.retry?.sec && error?.cause == "HTTPError") {
+            fragment.retry.sec = true;
+            if (!fragment.requestHeaders) { fragment.requestHeaders = {}; }
+            fragment.requestHeaders = { ...fragment.requestHeaders, "sec-fetch-mode": "no-cors", "sec-fetch-site": "same-site" };
+            setHeaders(fragment, () => { down.downloader(fragment); }, _tabId);
+            return;
+        }
         itemDOM.get(fragment.index).progressText.html(error);
         chrome.tabs.highlight({ tabs: _index });
     });
