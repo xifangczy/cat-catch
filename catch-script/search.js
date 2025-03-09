@@ -14,12 +14,35 @@
     // 防止 window.postMessage 被劫持
     const _postMessage = (isRunningInWorker ? self : window).postMessage;
 
-    console.log("start search.js");
+    // console.log("start search.js");
     const filter = new Set();
     const reKeyURL = /URI="(.*)"/;
-    const baseUrl = new Set();
-    getBaseUrl(location.href);
     const dataRE = /^data:(application|video|audio)\//i;
+
+    class ObservableSet extends Set {
+        constructor() {
+            super();
+            this._listeners = new Set();
+        }
+        add(value) {
+            if (!super.has(value)) {
+                this._listeners.forEach(fn => fn(value));
+            }
+            const result = super.add(value);
+            if (result.size !== this.size) return;
+            return this;
+        }
+        onAdd(callback) {
+            this._listeners.add(callback);
+            return () => this._listeners.delete(callback);
+        }
+    }
+    const task = [];
+    const baseUrl = new ObservableSet();
+    baseUrl.onAdd(newUrl => {
+        task.forEach(fn => fn(newUrl));
+    });
+    extractBaseUrl(location.href);
 
     // Worker
     if (!isRunningInWorker) {
@@ -97,7 +120,7 @@
                     const ext = getExtension(data[key]);
                     if (ext) {
                         const url = data[key].startsWith("//") ? (location.protocol + data[key]) : data[key];
-                        getBaseUrl(url);
+                        extractBaseUrl(url);
                         postData({ action: "catCatchAddMedia", url: url, href: location.href, ext: ext });
                     }
                     continue;
@@ -132,10 +155,13 @@
             if (this.status != 200) { return; }
             // 查找疑似key
             if (this.responseType == "arraybuffer" && this.response?.byteLength && this.response.byteLength == 32) {
-                console.log(this.response);
+                postData({ action: "catCatchAddKey", key: this.response, href: location.href, ext: "key" });
             }
             if (this.responseType == "arraybuffer" && this.response?.byteLength && this.response.byteLength == 16) {
                 postData({ action: "catCatchAddKey", key: this.response, href: location.href, ext: "key" });
+            }
+            if (this.responseType == "arraybuffer" && this.responseURL.includes(".ts")) {
+                extractBaseUrl(this.responseURL);
             }
             if (typeof this.response == "object") {
                 findMedia(this.response);
@@ -160,7 +186,7 @@
             if (this.response.toUpperCase().includes("#EXTM3U")) {
                 if (this.response.substring(0, 7) == "#EXTM3U") {
                     if (method == "GET") {
-                        toUrl(addBashUrl(getBashUrl(this.responseURL), this.response));
+                        toUrl(addBaseUrl(getBaseUrl(this.responseURL), this.response));
                         postData({ action: "catCatchAddMedia", url: this.responseURL, href: location.href, ext: "m3u8" });
                         return;
                     }
@@ -211,7 +237,7 @@
                 }
                 if (text.substring(0, 7).toUpperCase() == "#EXTM3U") {
                     if (init?.method == undefined || (init.method && init.method.toUpperCase() == "GET")) {
-                        toUrl(addBashUrl(getBashUrl(input), text));
+                        toUrl(addBaseUrl(getBaseUrl(input), text));
                         postData({ action: "catCatchAddMedia", url: input, href: location.href, ext: "m3u8" });
                         return;
                     }
@@ -433,7 +459,7 @@
         }
     });
 
-    // json
+    // join
     const _arrayJoin = Array.prototype.join;
     Array.prototype.join = function () {
         const data = _arrayJoin.apply(this, arguments);
@@ -458,13 +484,13 @@
         }
         return false;
     }
-    function getBashUrl(url) {
+    function getBaseUrl(url) {
         let bashUrl = url.split("/");
         bashUrl.pop();
         // return bashUrl._arrayJoin("/") + "/";
         return bashUrl.join("/") + "/";
     }
-    function addBashUrl(baseUrl, m3u8Text) {
+    function addBaseUrl(baseUrl, m3u8Text) {
         let m3u8_split = m3u8Text.split("\n");
         m3u8Text = "";
         for (let ts of m3u8_split) {
@@ -528,7 +554,11 @@
             return;
         }
         baseUrl.forEach((url) => {
-            url = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(addBashUrl(url, text))]));
+            url = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(addBaseUrl(url, text))]));
+            postData({ action: "catCatchAddMedia", url: url, href: location.href, ext: ext });
+        });
+        task.push((url) => {
+            url = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(addBaseUrl(url, text))]));
             postData({ action: "catCatchAddMedia", url: url, href: location.href, ext: ext });
         });
     }
@@ -591,7 +621,7 @@
         }
         return _buffer.buffer;
     }
-    function getBaseUrl(url) {
+    function extractBaseUrl(url) {
         let urlSplit = url.split("/");
         urlSplit.pop();
         baseUrl.add(urlSplit.join("/") + "/");
