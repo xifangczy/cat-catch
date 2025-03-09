@@ -431,7 +431,9 @@ hls.on(Hls.Events.ERROR, function (event, data) {
             params.delete("requestHeaders");
         } else if (_initiator) {
             params.delete("requestHeaders");
-            params.append("requestHeaders", JSON.stringify({ "referer": `${_initiator}/`, "origin": _initiator }));
+            let origin = null;
+            try { origin = new URL(_initiator).origin; } catch (e) { }
+            params.append("requestHeaders", JSON.stringify({ "referer": `${_initiator}/`, "origin": origin ?? _initiator }));
         }
         const href = window.location.origin + window.location.pathname + "?" + params.toString();
         if (!autoReferer && window.location.href != href) {
