@@ -11,12 +11,12 @@ function copyLink(data) {
     return templates(text, data);
 }
 function isM3U8(data) {
-    return (data.ext == "m3u8" ||
-        data.ext == "m3u" ||
-        data.type == "application/vnd.apple.mpegurl" ||
-        data.type == "application/x-mpegurl" ||
-        data.type == "application/mpegurl" ||
-        data.type == "application/octet-stream-m3u8"
+    return (
+        data.ext == "m3u8" ||
+        data.type?.endsWith("/vnd.apple.mpegurl") ||
+        data.type?.endsWith("/x-mpegurl") ||
+        data.type?.endsWith("/mpegurl") ||
+        data.type?.endsWith("/octet-stream-m3u8")
     )
 }
 function isMPD(data) {
