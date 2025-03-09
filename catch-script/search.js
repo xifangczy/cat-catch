@@ -19,6 +19,7 @@
     const reKeyURL = /URI="(.*)"/;
     const baseUrl = new Set();
     getBaseUrl(location.href);
+    const dataRE = /^data:(application|video|audio)\//i;
 
     // Worker
     if (!isRunningInWorker) {
@@ -105,8 +106,8 @@
                     toUrl(data[key]);
                     continue;
                 }
-                if (data[key].substring(0, 17).toLowerCase() == "data:application/") {
-                    const text = getDataM3U8(data[key].substring(17));
+                if (dataRE.test(data[key].substring(0, 17))) {
+                    const text = getDataM3U8(data[key]);
                     text && toUrl(text);
                     continue;
                 }
@@ -141,13 +142,13 @@
                 return;
             }
             if (this.response == "" || typeof this.response != "string") { return; }
-            if (this.response.substring(0, 17).toLowerCase() == "data:application/") {
-                const text = getDataM3U8(this.response.substring(17));
+            if (dataRE.test(this.response)) {
+                const text = getDataM3U8(this.response);
                 text && toUrl(text);
                 return;
             }
-            if (this.responseURL.substring(0, 17).toLowerCase() == "data:application/") {
-                const text = getDataM3U8(this.responseURL.substring(17));
+            if (dataRE.test(this.responseURL)) {
+                const text = getDataM3U8(this.responseURL);
                 text && toUrl(text);
                 return;
             }
@@ -217,9 +218,9 @@
                     toUrl(text);
                     return;
                 }
-                if (text.substring(0, 17).toLowerCase() == "data:application/") {
-                    const text = getDataM3U8(text.substring(0, 17));
-                    text && toUrl(text);
+                if (dataRE.test(text.substring(0, 17))) {
+                    const data = getDataM3U8(text);
+                    data && toUrl(data);
                     return;
                 }
             });
@@ -532,20 +533,20 @@
         });
     }
     function getDataM3U8(text) {
-        const type = ["vnd.apple.mpegurl", "x-mpegurl", "mpegurl"];
-        let isM3U8 = false;
-        for (let item of type) {
-            if (text.substring(0, item.length).toLowerCase() == item) {
-                text = text.substring(item.length + 1);
-                isM3U8 = true;
-                break;
-            }
-        }
-        if (!isM3U8) { return false; }
-        if (text.substring(0, 7).toLowerCase() == "base64,") {
-            return _atob(text.substring(7));
-        }
-        return text;
+        text = text.substring(text.indexOf('/') + 1);
+        const mimeTypes = ["vnd.apple.mpegurl", "x-mpegurl", "mpegurl"];
+
+        const matchedType = mimeTypes.find(type =>
+            text.toLowerCase().startsWith(type)
+        );
+
+        if (!matchedType) return false;
+        const remainingText = text.slice(matchedType.length + 1);
+        const [prefix, data] = remainingText.split(/,(.+)/);
+
+        return prefix.toLowerCase() === 'base64'
+            ? _atob(data)
+            : remainingText;
     }
     function postData(data) {
         let value = data.url ? data.url : data.key;
