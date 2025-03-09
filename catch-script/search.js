@@ -18,30 +18,8 @@
     const filter = new Set();
     const reKeyURL = /URI="(.*)"/;
     const dataRE = /^data:(application|video|audio)\//i;
-
-    class ObservableSet extends Set {
-        constructor() {
-            super();
-            this._listeners = new Set();
-        }
-        add(value) {
-            if (!super.has(value)) {
-                this._listeners.forEach(fn => fn(value));
-            }
-            const result = super.add(value);
-            if (result.size !== this.size) return;
-            return this;
-        }
-        onAdd(callback) {
-            this._listeners.add(callback);
-            return () => this._listeners.delete(callback);
-        }
-    }
-    const task = [];
-    const baseUrl = new ObservableSet();
-    baseUrl.onAdd(newUrl => {
-        task.forEach(fn => fn(newUrl));
-    });
+    const joinBaseUrlTask = [];
+    const baseUrl = new Set();
     extractBaseUrl(location.href);
 
     // Worker
@@ -557,7 +535,7 @@
             url = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(addBaseUrl(url, text))]));
             postData({ action: "catCatchAddMedia", url: url, href: location.href, ext: ext });
         });
-        task.push((url) => {
+        joinBaseUrlTask.push((url) => {
             url = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(addBaseUrl(url, text))]));
             postData({ action: "catCatchAddMedia", url: url, href: location.href, ext: ext });
         });
@@ -624,6 +602,10 @@
     function extractBaseUrl(url) {
         let urlSplit = url.split("/");
         urlSplit.pop();
-        baseUrl.add(urlSplit.join("/") + "/");
+        urlSplit = urlSplit.join("/") + "/"
+        if (!baseUrl.has(urlSplit)) {
+            joinBaseUrlTask.forEach(fn => fn(urlSplit));
+            baseUrl.add(urlSplit);
+        }
     }
 })();
