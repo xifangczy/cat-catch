@@ -13,6 +13,7 @@ function copyLink(data) {
 function isM3U8(data) {
     return (
         data.ext == "m3u8" ||
+        data.ext == "m3u" ||
         data.type?.endsWith("/vnd.apple.mpegurl") ||
         data.type?.endsWith("/x-mpegurl") ||
         data.type?.endsWith("/mpegurl") ||
