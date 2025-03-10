@@ -644,7 +644,7 @@ class FilePreview {
                     // console.log('Preview generated for:', item.url);
                 } catch (e) {
                     item.previewVideoError = true;
-                    console.warn('Failed to generate preview for:', item.url, e);
+                    // console.warn('Failed to generate preview for:', item.url, e);
                 }
             }
         };
