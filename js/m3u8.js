@@ -1131,6 +1131,11 @@ $("#searchingForRealKey").click(function () {
     fetch(_fragments[0].url)
         .then(response => response.arrayBuffer())
         .then(function (buffer) {
+            if (check(buffer)) {
+                $("#searchingForRealKey").html(i18n.searchingForRealKey);
+                alert(i18n.noKeyIsRequired);
+                return;
+            }
             for (let key of keys) {
                 try {
                     decryptor.expandKey(Base64ToArrayBuffer(key));

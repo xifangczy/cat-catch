@@ -883,5 +883,8 @@
   },
   "title": {
     "message": "標題"
+  },
+  "noKeyIsRequired": {
+    "message": "不需要金鑰"
   }
 }

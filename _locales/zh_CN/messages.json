@@ -883,5 +883,8 @@
   },
   "title": {
     "message": "标题"
+  },
+  "noKeyIsRequired": {
+    "message": "不需要密钥"
   }
 }
