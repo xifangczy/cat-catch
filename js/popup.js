@@ -778,6 +778,14 @@ const interval = setInterval(function () {
 
     $(`<style>${G.css}</style>`).appendTo("head");
 
+    if (G.isMobile) {
+        $("<link>").attr({
+            rel: "stylesheet",
+            type: "text/css",
+            href: "css/mobile.css"
+        }).appendTo("head");
+    }
+
     updateDownHeight();
     const observer = new MutationObserver(updateDownHeight);
     observer.observe($down[0], { childList: true, subtree: true, attributes: true });

@@ -167,6 +167,9 @@ G.isFirefox = (typeof browser == "object");
 G.version = navigator.userAgent.match(/(Chrome|Firefox)\/([\d]+)/);
 G.version = G.version && G.version[2] ? parseInt(G.version[2]) : 93;
 
+// 手机浏览器
+G.isMobile = /Android|webOS|iPhone|iPad/i.test(navigator.userAgent);
+
 // 脚本列表
 G.scriptList = new Map();
 G.scriptList.set("search.js", { key: "search", refresh: true, allFrames: true, world: "MAIN", name: i18n.deepSearch, off: i18n.closeSearch, i18n: false, tabId: new Set() });
