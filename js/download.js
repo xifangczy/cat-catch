@@ -21,6 +21,7 @@ let _data = {};
 let requestHeaders = {};
 if (_requestId) {
     chrome.runtime.sendMessage({ Message: "getData", requestId: _requestId }, function (data) {
+        if (chrome.runtime.lastError) { return; }
         if (data == "error") {
             awaitG(start);
             return;
