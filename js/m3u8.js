@@ -59,7 +59,7 @@ setRequestHeaders(requestHeaders, () => {
 // 默认设置
 const allOption = {
     addParam: false,
-    fold: true,
+    fold: !G.isMobile,
     m3u8dlRE: false,
 };
 let _m3u8Content;   // 储存m3u8文件内容
