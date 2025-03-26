@@ -168,7 +168,7 @@ G.version = navigator.userAgent.match(/(Chrome|Firefox)\/([\d]+)/);
 G.version = G.version && G.version[2] ? parseInt(G.version[2]) : 93;
 
 // 手机浏览器
-G.isMobile = /Android|webOS|iPhone|iPad/i.test(navigator.userAgent);
+G.isMobile = /Mobile|Android|iPhone|iPad/i.test(navigator.userAgent);
 
 // 脚本列表
 G.scriptList = new Map();
