@@ -54,6 +54,9 @@ function start() {
     $("#autoClose").prop("checked", G.downAutoClose);
     // $("#downActive").prop("checked", G.downActive);
     $("#downStream").prop("checked", G.downStream);
+    if (G.isMobile) {
+        $(`<link rel="stylesheet" type="text/css" href="css/mobile.css">`).appendTo("head");
+    }
     $(`<style>${G.css}</style>`).appendTo("head");
     // 流式下载服务端
     streamSaver.mitm = G.streamSaverConfig.url;

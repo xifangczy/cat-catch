@@ -117,6 +117,9 @@ function init() {
             _data.pageDOM = new DOMParser().parseFromString(result, 'text/html');
         });
     }
+    if (G.isMobile) {
+        $(`<link rel="stylesheet" type="text/css" href="css/mobile.css">`).appendTo("head");
+    }
     // 自定义CSS
     $(`<style>${G.css}</style>`).appendTo("head");
 

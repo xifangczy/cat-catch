@@ -12,6 +12,9 @@ let _index = null;  // 当前页面 tab index
 const downloadData = localStorage.getItem('downloadData') ? JSON.parse(localStorage.getItem('downloadData')) : [];
 
 awaitG(() => {
+    if (G.isMobile) {
+        $(`<link rel="stylesheet" type="text/css" href="css/mobile.css">`).appendTo("head");
+    }
     $(`<style>${G.css}</style>`).appendTo("head");
     // 获取当前标签信息
     chrome.tabs.getCurrent(function (tabs) {

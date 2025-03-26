@@ -12,6 +12,9 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
     if (items.Ext === undefined || items.Type === undefined || items.Regex === undefined) {
         location.reload();
     }
+    if (G.isMobile) {
+        $(`<link rel="stylesheet" type="text/css" href="css/mobile.css">`).appendTo("head");
+    }
     $(`<style>${items.css}</style>`).appendTo("head");
     const $extList = $("#extList");
     for (let key in items.Ext) {
