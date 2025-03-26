@@ -521,13 +521,7 @@ class FilePreview {
      */
     async generatePreview(item) {
         return new Promise((resolve, reject) => {
-            const video = document.createElement('video');
-            video.muted = true;
-            video.playsInline = true;
-            video.loop = true;
-            video.preload = 'metadata';
-            video.addEventListener('loadedmetadata', () => {
-                video.currentTime = 0.5;
+            const getVideoInfo = (video) => {
                 video.pause();
                 videoInfo.height = video.videoHeight;
                 videoInfo.width = video.videoWidth;
@@ -544,6 +538,19 @@ class FilePreview {
                     videoInfo.width = 0;
                 }
                 resolve(videoInfo);
+            };
+            const video = document.createElement('video');
+            video.muted = true;
+            video.playsInline = true;
+            video.loop = true;
+            video.preload = 'metadata';
+            video.addEventListener('loadedmetadata', () => {
+                video.currentTime = 0.5;
+                if (video.videoHeight && video.videoWidth) {
+                    getVideoInfo(video);
+                } else {
+                    setTimeout(getVideoInfo, 500, video);
+                }
             });
 
             let hls = null;
