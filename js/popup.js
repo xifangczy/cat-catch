@@ -111,7 +111,7 @@ function AddMedia(data, currentTab = true) {
                 <img src="img/download.svg" class="icon download" id="download" title="${i18n.download}"/>
                 <img src="img/aria2.png" class="icon aria2 ${G.enableAria2Rpc ? "" : "hide"}"" id="aria2" title="Aria2"/>
                 <img src="img/invoke.svg" class="icon invoke ${G.invoke ? "" : "hide"}"" id="invoke" title="${i18n.invoke}"/>
-                <img src="img/send.svg" class="icon send ${G.send2localManual ? "" : "hide"}"" id="send2local" title="${i18n.send2local}"/>
+                <img src="img/send.svg" class="icon send ${G.send2localManual || G.send2local ? "" : "hide"}"" id="send2local" title="${i18n.send2local}"/>
             </div>
             <div class="url hide">
                 <div id="mediaInfo" data-state="false">
@@ -348,6 +348,7 @@ function AddMedia(data, currentTab = true) {
         }
     });
 
+    // 数据发送
     data.html.find("#send2local").click(function () {
         send2local("catch", data, data.tabId).then(function (success) {
             success && success?.ok && Tips(i18n.hasSent, 1000);
@@ -394,6 +395,7 @@ function AddKey(key) {
             <div class="panel-heading">
                 <span class="name bold">${key}</span>
                 <img src="img/copy.png" class="icon copy" id="copy" title="${i18n.copy}"/>
+                <img src="img/send.svg" class="icon send ${G.send2localManual || G.send2local ? "" : "hide"}"" id="send2local" title="${i18n.send2local}"/>
             </div>
             <div class="url hide">
                 Hex: ${base64ToHex(key)}
@@ -407,6 +409,14 @@ function AddKey(key) {
     data.html.find('.copy').click(function () {
         navigator.clipboard.writeText(key);
         Tips(i18n.copiedToClipboard);
+        return false;
+    });
+    data.html.find("#send2local").click(function () {
+        send2local("addKey", key).then(function (success) {
+            success && success?.ok && Tips(i18n.hasSent, 1000);
+        }).catch(function (error) {
+            error ? Tips(error, 1000) : Tips(i18n.sendFailed, 1000);
+        });
         return false;
     });
     return data.html;
@@ -776,15 +786,12 @@ const interval = setInterval(function () {
     // 上一次设定的倍数
     $("#playbackRate").val(G.playbackRate);
 
-    $(`<style>${G.css}</style>`).appendTo("head");
-
+    // 手机浏览器
     if (G.isMobile) {
-        $("<link>").attr({
-            rel: "stylesheet",
-            type: "text/css",
-            href: "css/mobile.css"
-        }).appendTo("head");
+        $(`<link rel="stylesheet" type="text/css" href="css/mobile.css">`).appendTo("head");
     }
+
+    $(`<style>${G.css}</style>`).appendTo("head");
 
     updateDownHeight();
     const observer = new MutationObserver(updateDownHeight);
