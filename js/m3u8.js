@@ -1544,7 +1544,7 @@ function mergeTsNew(down) {
             title: fileName,
             output: fileName,
             name: "memory" + new Date().getTime() + "." + ext,
-            active: !autoDown,
+            active: G.isMobile || !autoDown,
             tabId: currentTabId,
         };
         if (_quantity) {

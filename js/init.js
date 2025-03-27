@@ -48,6 +48,10 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         G.tabId = -1;
     }
 });
+
+// 手机浏览器
+G.isMobile = /Mobile|Android|iPhone|iPad/i.test(navigator.userAgent);
+
 // 所有设置变量 默认值
 G.OptionLists = {
     Ext: [
@@ -97,7 +101,7 @@ G.OptionLists = {
     ],
     TitleName: false,
     Player: "",
-    ShowWebIco: true,
+    ShowWebIco: !G.isMobile,
     MobileUserAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1",
     m3u8dl: 0,
     m3u8dlArg: `"\${url}" --save-dir "%USERPROFILE%\\Downloads\\m3u8dl" --save-name "\${title}_\${now}" \${referer|exists:'-H "Referer:*"'} \${cookie|exists:'-H "Cookie:*"'} --no-log`,
@@ -114,7 +118,7 @@ G.OptionLists = {
     css: "",
     checkDuplicates: true,
     enable: true,
-    downActive: true,
+    downActive: !G.isMobile,    // 手机端默认不启用 后台下载
     downAutoClose: false,
     downStream: false,
     aria2Rpc: "http://localhost:6800/jsonrpc",
@@ -152,7 +156,7 @@ G.OptionLists = {
     chromeLimitSize: 1.8 * 1024 * 1024 * 1024,
     blockUrl: [],
     blockUrlWhite: false,
-    maxLength: 9999,
+    maxLength: G.isMobile ? 999 : 9999,
     newPopup: true,
 };
 // 本地储存的配置
@@ -166,9 +170,6 @@ G.LocalVar = {
 G.isFirefox = (typeof browser == "object");
 G.version = navigator.userAgent.match(/(Chrome|Firefox)\/([\d]+)/);
 G.version = G.version && G.version[2] ? parseInt(G.version[2]) : 93;
-
-// 手机浏览器
-G.isMobile = /Mobile|Android|iPhone|iPad/i.test(navigator.userAgent);
 
 // 脚本列表
 G.scriptList = new Map();

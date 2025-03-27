@@ -1037,7 +1037,11 @@ function openParser(data, options = {}) {
             requestHeaders: data.requestHeaders ? JSON.stringify(data.requestHeaders) : undefined,
             ...Object.fromEntries(Object.entries(options).map(([key, value]) => [key, typeof value === 'boolean' ? 1 : value])),
         })}`
-        chrome.tabs.create({ url: url, index: tab.index + 1, active: !options.autoDown });
+        chrome.tabs.create({
+            url: url,
+            index: tab.index + 1,
+            active: G.isMobile || !options.autoDown
+        });
     });
 }
 
