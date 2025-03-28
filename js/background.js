@@ -6,7 +6,7 @@ importScripts("/js/function.js", "/js/init.js");
 chrome.webNavigation.onBeforeNavigate.addListener(function () { return; });
 chrome.webNavigation.onHistoryStateUpdated.addListener(function () { return; });
 chrome.runtime.onConnect.addListener(function (Port) {
-    if (Port.name !== "HeartBeat") return;
+    if (chrome.runtime.lastError || Port.name !== "HeartBeat") return;
     Port.postMessage("HeartBeat");
     Port.onMessage.addListener(function (message, Port) { return; });
     const interval = setInterval(function () {
@@ -14,7 +14,8 @@ chrome.runtime.onConnect.addListener(function (Port) {
         Port.disconnect();
     }, 250000);
     Port.onDisconnect.addListener(function () {
-        if (interval) { clearInterval(interval); }
+        interval && clearInterval(interval);
+        if (chrome.runtime.lastError) { return; }
     });
 });
 
@@ -292,6 +293,7 @@ function save(tabId) {
  * 监听 扩展 message 事件
  */
 chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
+    if (chrome.runtime.lastError) { return; }
     if (!G.initLocalComplete || !G.initSyncComplete) {
         sendResponse("error");
         return true;

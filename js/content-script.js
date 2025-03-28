@@ -3,6 +3,7 @@
     var _videoSrc = [];
     var _key = [];
     chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
+        if (chrome.runtime.lastError) { return; }
         // 获取页面视频对象
         if (Message.Message == "getVideoState") {
             let videoObj = [];
