@@ -214,6 +214,7 @@ function start() {
         // 添加range请求头 重新尝试下载
         if (!fragment.retry?.Range && error?.cause == "HTTPError") {
             fragment.retry = { "Range": "bytes=0-" };
+            down.stop(fragment.index);
             down.downloader(fragment);
             return;
         }
@@ -222,7 +223,7 @@ function start() {
             fragment.retry.sec = true;
             if (!fragment.requestHeaders) { fragment.requestHeaders = {}; }
             fragment.requestHeaders = { ...fragment.requestHeaders, "sec-fetch-mode": "no-cors", "sec-fetch-site": "same-site" };
-            setHeaders(fragment, () => { down.downloader(fragment); }, _tabId);
+            setHeaders(fragment, () => { down.stop(fragment.index); down.downloader(fragment); }, _tabId);
             return;
         }
         itemDOM.get(fragment.index).progressText.html(error);
@@ -294,7 +295,8 @@ function start() {
 
                     // 正在运行的下载任务小于线程数 则开始下载
                     if (down.running < down.thread) {
-                        down.downloader(fragment.index);
+                        // down.downloader(fragment.index);
+                        down.downloader();
                     }
                 };
             }, _tabId);
