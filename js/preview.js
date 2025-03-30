@@ -154,7 +154,10 @@ class FilePreview {
         const selectedItems = this.getSelectedItems();
 
         const hasItems = selectedItems.length > 0;
-        const canMerge = selectedItems.length === 2 && selectedItems.every(item => (item.size ?? 0) <= G.chromeLimitSize && isMedia(item));
+        const canMerge = selectedItems.length === 2 && (
+            selectedItems.every(item => (item.size ?? 0) <= G.chromeLimitSize && isMedia(item)) ||
+            selectedItems.every(isM3U8)
+        );
 
         document.querySelector('#delete-selected').disabled = !hasItems;
         document.querySelector('#merge-download').disabled = !canMerge;
