@@ -85,6 +85,9 @@ function start() {
 
     // 添加html
     const addHtml = (fragment) => {
+        if (!fragment.downFileName) {
+            fragment.downFileName = getUrlFileName(fragment.url);
+        }
         const html = $(`
             <div class="downItem">
                 <div class="explain">${fragment.downFileName}</div>
