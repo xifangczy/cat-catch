@@ -104,9 +104,34 @@
         flex-direction: column;
         line-height: 20px;`;
 
+    // 解决 issues #693 安全使用attachShadow 从iframe中获取原生方法
+    const createSecureShadowRoot = (element, mode = 'closed') => {
+        const getPristineAttachShadow = () => {
+            try {
+                const iframe = document.createElement('iframe');
+                const parentNode = document.body || document.documentElement;
+                parentNode.appendChild(iframe);
+                const pristineMethod = iframe.contentDocument.createElement('div').attachShadow;
+                iframe.remove();
+                if (pristineMethod) return pristineMethod;
+            } catch (e) { console.log(e) }
+            return Element.prototype.attachShadow;
+        };
+        const executor = Element.prototype.attachShadow.toString().includes('[native code]')
+            ? Element.prototype.attachShadow.bind(element)
+            : getPristineAttachShadow().bind(element);
+        try {
+            return executor({ mode });
+        } catch (e) {
+            console.error('Shadow DOM 创建失败:', e);
+            // 应急处理：降级方案
+            return document.createElement('div');
+        }
+    }
+
     // 创建 Shadow DOM 放入CatCatch
     const divShadow = document.createElement('div');
-    const shadowRoot = divShadow.attachShadow({ mode: 'closed' });
+    const shadowRoot = createSecureShadowRoot(divShadow);
     shadowRoot.appendChild(CatCatch);
     // 页面插入Shadow DOM
     document.getElementsByTagName('html')[0].appendChild(divShadow);
