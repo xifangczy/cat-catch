@@ -10,11 +10,13 @@ https://chrome.google.com/webstore/detail/jfedfbgedapdagkghmgibemcoggfppbb
 https://microsoftedge.microsoft.com/addons/detail/oohmdefbjalncfplafanlagojlakmjci
 ## 🦊Firefox
 https://addons.mozilla.org/addon/cat-catch/ 😂Non-China IP required for access
+## 📱Edge Android
+<img src="https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/edgeqrcode.png" width="20%" />
 
 💔Cat-Catch is open source, anyone can download, modify, and list it in the app store. There are already quite a few fake Cat-Catch extensions listed with added ad codes, please pay attention to your data security. All installation URLs are subject to github and user documentation.
 
 # 📒Documentation
-https://o2bmm.gitbook.io/cat-catch/
+https://cat-catch.bmmmd.com/
 
 # 🌏Translations
 [![gitlocalized ](https://gitlocalize.com/repo/9392/whole_project/badge.svg)](https://gitlocalize.com/repo/9392?utm_source=badge)
@@ -27,7 +29,7 @@ Install directly from the official extension store using the link provided.
 2. Open the extensions management page and enable "Developer Mode."
 3. Click "Load unpacked" and select the extension folder.
 ## CRX Installation
-1. Right-click and save the CRX file from [Releases](https://github.com/xifangczy/cat-catch/releases).
+1. **Right-click** and save the CRX file from [Releases](https://github.com/xifangczy/cat-catch/releases).
 2. Open the extensions management page and enable "Developer Mode."
 3. Drag the CRX file into the extensions page.
 
@@ -41,10 +43,10 @@ For full functionality, use version 104 or above.
 ![m3u8 parser Screenshot](https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/m3u8.png)
 
 # 🤚🏻Disclaimer
-The extension is a universal sniffing tool and has the same functionality as the browser DevTools, it does not decrypt any specific website. The extension is not responsible for any content downloaded by the user, please be aware of the permissions and copyrights of the downloaded resources.
+This extension is intended for downloading videos that you own or have authorized access to. It is prohibited to use this Tool for downloading copyrighted content without permission. Users are solely responsible for their actions, and the developer is not liable for any user behavior. This Tool is provided "as-is," and the developer assumes no direct or indirect liability.
 
 # 🔒Privacy Policy
-The extension will not collect any personal information and does not contain any trackers.
+The extension collects and processes all information locally without sending it to remote servers and does not include any trackers.
 
 # 💖Acknowledgements
 - [hls.js](https://github.com/video-dev/hls.js)
