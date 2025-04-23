@@ -194,11 +194,11 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         if (tabFingerprints.has(data.url)) {
             return; // 找到重复，直接返回
         }
-        if (tabFingerprints.size > 500) {
-            tabFingerprints.clear();
-        }
         tabFingerprints.add(data.url);
         G.urlMap.set(data.tabId, tabFingerprints);
+        if (tabFingerprints.size >= 500) {
+            tabFingerprints.clear();
+        }
     }
 
     chrome.tabs.get(data.tabId, async function (webInfo) {
