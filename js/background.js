@@ -180,14 +180,27 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
     }
 
     // 查重 避免CPU占用 大于500 强制关闭查重
+    // if (G.checkDuplicates && cacheData[data.tabId].length <= 500) {
+    //     for (let item of cacheData[data.tabId]) {
+    //         if (item.url.length == data.url.length &&
+    //             item.cacheURL.pathname == urlParsing.pathname &&
+    //             item.cacheURL.host == urlParsing.host &&
+    //             item.cacheURL.search == urlParsing.search) { return; }
+    //     }
+    // }
+
     if (G.checkDuplicates && cacheData[data.tabId].length <= 500) {
-        for (let item of cacheData[data.tabId]) {
-            if (item.url.length == data.url.length &&
-                item.cacheURL.pathname == urlParsing.pathname &&
-                item.cacheURL.host == urlParsing.host &&
-                item.cacheURL.search == urlParsing.search) { return; }
+        const tabFingerprints = G.urlMap.get(data.tabId) || new Set();
+        if (tabFingerprints.has(data.url)) {
+            return; // 找到重复，直接返回
         }
+        if (tabFingerprints.size > 500) {
+            tabFingerprints.clear();
+        }
+        tabFingerprints.add(data.url);
+        G.urlMap.set(data.tabId, tabFingerprints);
     }
+
     chrome.tabs.get(data.tabId, async function (webInfo) {
         if (chrome.runtime.lastError) { return; }
         data.requestHeaders = getRequestHeaders(data);
@@ -208,7 +221,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
             initiator: data.initiator,
             requestHeaders: data.requestHeaders,
             cookie: data.cookie,
-            cacheURL: { host: urlParsing.host, search: urlParsing.search, pathname: urlParsing.pathname },
+            // cacheURL: { host: urlParsing.host, search: urlParsing.search, pathname: urlParsing.pathname },
             getTime: data.getTime
         };
         // 不存在扩展使用类型
@@ -553,6 +566,7 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (isSpecialPage(tab.url) || tabId <= 0 || !G.initSyncComplete) { return; }
     if (changeInfo.status && changeInfo.status == "loading" && G.autoClearMode == 2) {
+        G.urlMap.delete(tabId);
         chrome.alarms.get("save", function (alarm) {
             if (!alarm) {
                 delete cacheData[tabId];
@@ -590,6 +604,7 @@ chrome.webNavigation.onCommitted.addListener(function (details) {
     // 刷新清理角标数
     if (details.frameId == 0 && (!['auto_subframe', 'manual_subframe', 'form_submit'].includes(details.transitionType)) && G.autoClearMode == 1) {
         delete cacheData[details.tabId];
+        G.urlMap.delete(details.tabId);
         (chrome.storage.session ?? chrome.storage.local).set({ MediaData: cacheData });
         SetIcon({ tabId: details.tabId });
     }

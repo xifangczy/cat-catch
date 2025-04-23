@@ -433,6 +433,12 @@ function clearRedundant() {
             }
             cacheDataFlag && (chrome.storage.session ?? chrome.storage.local).set({ MediaData: cacheData });
         }
+
+        // 清理
+        G.urlMap.forEach((_, key) => {
+            !allTabId.has(key) && G.urlMap.delete(key);
+        });
+
         // 清理脚本
         G.scriptList.forEach(function (scriptList) {
             scriptList.tabId.forEach(function (tabId) {

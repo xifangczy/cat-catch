@@ -40,6 +40,8 @@ var cacheData = { init: true };
 G.blackList = new Set();    // 正则屏蔽资源列表
 G.blockUrlSet = new Set();    // 屏蔽网址列表
 G.requestHeaders = new Map();   // 临时储存请求头
+G.urlMap = new Map();   // url查重map
+
 // 初始化当前tabId
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     if (tabs[0] && tabs[0].id) {
