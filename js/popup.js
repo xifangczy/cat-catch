@@ -690,7 +690,7 @@ $("#currentPage").click(function () {
 $("#send2localSelect").click(function () {
     getData().forEach(function (item) {
         if (item.checked) {
-            send2local("catch", item, item.tabId).then(function (hasSent) {
+            send2local("catch", item, item.tabId).then(function (success) {
                 success && success?.ok && Tips(i18n.hasSent, 1000);
             }).catch(function (error) {
                 error ? Tips(error, 1000) : Tips(i18n.sendFailed, 1000);
@@ -932,7 +932,7 @@ function createCatDownload(data, extra) {
             // 循环获取tab.id 的状态 准备就绪 重置任务状态
             const interval = setInterval(() => {
                 chrome.tabs.get(tab.id, (tab) => {
-                    if (tab.status == "complete") {
+                    if (chrome.runtime.lastError || tab.status == "complete") {
                         clearInterval(interval);
                         catDownloadIsProcessing = false;
                     }
