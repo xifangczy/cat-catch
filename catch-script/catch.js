@@ -5,7 +5,7 @@
 
             // 初始化属性
             this.enable = true;  // 捕获开关
-            this.language = navigator.language.replace("-", "_");   // 语言设置
+            this.language = navigator.language;   // 语言设置
             this.isComplete = false; // 捕获完成标志
             this.catchMedia = [];   // 捕获的媒体数据
             this.mediaSize = 0; // 捕获的媒体数据大小
@@ -18,7 +18,7 @@
             // 初始化语言
             if (window.CatCatchI18n) {
                 if (!window.CatCatchI18n.languages.includes(this.language)) {
-                    this.language = this.language.split("_")[0];
+                    this.language = this.language.split("-")[0];
                     if (!window.CatCatchI18n.languages.includes(this.language)) {
                         this.language = "en";
                     }
