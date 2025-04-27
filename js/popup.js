@@ -625,7 +625,7 @@ $("#AutoDown").click(function () {
 // 深度搜索 缓存捕捉 注入脚本
 $("[type='script']").click(function () {
     chrome.runtime.sendMessage({ Message: "script", tabId: G.tabId, script: this.id + ".js" }, function () {
-        G.refreshClear && $('#Clear').click();
+        G.autoClearMode > 0 && $('#Clear').click();
         updateButton();
     });
 });
