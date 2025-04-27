@@ -45,6 +45,9 @@ class FilePreview {
         this.renderFileItems();         // 渲染文件列表
         this.startPreviewGeneration();  // 开始预览生成
         this.setupSelectionBox();      // 框选
+        this.srciptList();         // 脚本列表
+        this.updateSrciptButton();         // 更新按钮状态
+        this.checkVersion();     // 检查版本
     }
 
     /**
@@ -98,13 +101,7 @@ class FilePreview {
         // 复制
         document.querySelector('#copy-selected').addEventListener('click', () => this.copy());
         // 清理数据
-        document.querySelector('#clear').addEventListener('click', (e) => {
-            chrome.runtime.sendMessage({ Message: "clearData", type: true, tabId: this._tabId });
-            chrome.runtime.sendMessage({ Message: "ClearIcon", type: true, tabId: this._tabId });
-            this.originalItems = [];
-            document.querySelector('#extensionFilters').innerHTML = '';
-            this.updateFileList();
-        });
+        document.querySelector('#clear').addEventListener('click', () => this.clearData());
         // 删除
         document.querySelector('#delete-selected').addEventListener('click', () => this.deleteItem());
         // debug
@@ -132,6 +129,11 @@ class FilePreview {
                 this.getSelectedItems().forEach(item => this.send(item));
             });
         }
+
+        // 默认弹出模式
+        document.querySelector('#defaultPopup').addEventListener('click', (e) => {
+            chrome.storage.sync.set({ popup: e.target.checked });
+        });
     }
     // 全选/反选
     toggleSelection(type) {
@@ -886,6 +888,50 @@ class FilePreview {
                 url.searchParams.set('page', this.currentPage + 1);
                 chrome.tabs.update({ url: url.toString() });
             });
+        }
+    }
+
+    // 清理数据
+    clearData() {
+        chrome.runtime.sendMessage({ Message: "clearData", type: true, tabId: this._tabId });
+        chrome.runtime.sendMessage({ Message: "ClearIcon", type: true, tabId: this._tabId });
+        this.originalItems = [];
+        document.querySelector('#extensionFilters').innerHTML = '';
+        this.updateFileList();
+    }
+
+    // 脚本
+    srciptList() {
+        document.querySelectorAll("[type='script']").forEach((script) => {
+            script.addEventListener('click', (e) => {
+                chrome.runtime.sendMessage({ Message: "script", tabId: this._tabId, script: e.target.id + ".js" }, () => {
+                    G.autoClearMode > 0 && this.clearData();
+                    this.updateSrciptButton();
+                });
+            });
+        });
+    }
+
+    // 更新脚本按钮状态
+    updateSrciptButton() {
+        chrome.runtime.sendMessage({ Message: "getButtonState", tabId: this._tabId }, (state) => {
+            Object.entries(state).forEach(([key, value]) => {
+                const element = document.getElementById(key);
+                if (!element) return;
+                const script = G.scriptList.get(`${key}.js`);
+                if (script) {
+                    element.textContent = value ? script.off : script.name;
+                }
+            });
+        });
+
+        document.querySelector('#defaultPopup').checked = G.popup;
+    }
+
+    // 版本检测
+    checkVersion() {
+        if (G.version < 102 || (G.isFirefox && G.version < 128)) {
+            document.querySelectorAll("[type='script']").forEach(script => script.style.display = 'none');
         }
     }
 }
