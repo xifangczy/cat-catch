@@ -47,6 +47,13 @@ body {
   width: 512px;
 }
 
+input[type="radio"] {
+  vertical-align: bottom;
+}
+input[type="checkbox"] {
+  vertical-align: middle;
+}
+
 /* 文件列表 */
 .file-grid {
   display: grid;

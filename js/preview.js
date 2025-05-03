@@ -42,6 +42,7 @@ class FilePreview {
         this.setupEventListeners();     // 设置事件监听
         await this.loadFileItems();     // 载入数据
         this.setupExtensionFilters();   // 设置扩展名筛选
+        this.setupTypeFilters();   // 设置扩展名筛选
         this.renderFileItems();         // 渲染文件列表
         this.startPreviewGeneration();  // 开始预览生成
         this.setupSelectionBox();      // 框选
@@ -293,15 +294,25 @@ class FilePreview {
         // 获取勾选扩展
         const selectedExts = Array.from(document.querySelectorAll('input[name="ext"]:checked'))
             .map(checkbox => checkbox.value);
+
+        //勾选类型
+        const selectedTyps = Array.from(document.querySelectorAll('input[name="type"]:checked'))
+            .map(checkbox => checkbox.value);
+
         // 应用 正则 and 扩展过滤
         this.fileItems = this.fileItems.filter(item =>
-            selectedExts.includes(item.ext) &&
+            selectedExts.includes(item.ext) && selectedTyps.includes(item.type) &&
             (!this.regexFilters || this.regexFilters.test(item.url))
         );
         // 排序
         const order = document.querySelector('input[name="sortOrder"]:checked').value === 'asc' ? 1 : -1;
         const field = document.querySelector('input[name="sortField"]:checked').value;
-        this.fileItems.sort((a, b) => order * (a[field] - b[field]));
+        if (field === 'name') {
+            this.fileItems.sort((a, b) => order * a[field].localeCompare(b[field]));
+        } else {
+            this.fileItems.sort((a, b) => order * (a[field] - b[field]));
+        }
+
         // 更新显示
         this.renderFileItems();
         this.updateButtonStatus();
@@ -415,19 +426,35 @@ class FilePreview {
         return item.html;
     }
     /**
+     * 设置复选框
+     * @param {String} filterId 过滤器的DOM ID
+     * @param {Array} items 数据项
+     * @param {String} property 数据项的属性
+     */
+    setupFilters(filterId, items, property) {
+        const uniqueValues = [...new Set(items.map(item => item[property]))];
+        const filterContainer = document.querySelector(`#${filterId}`);
+        uniqueValues.forEach(value => {
+            if (filterContainer.querySelector(`input[value="${value}"]`)) return;
+            const label = document.createElement('label');
+            label.innerHTML = `<input type="checkbox" name="${property}" value="${value}" checked>${value == 'Unknown' ? value : value.toLowerCase()}`;
+            label.querySelector('input').addEventListener('click', () => this.updateFileList());
+            filterContainer.appendChild(label);
+        });
+    }
+
+    /**
      * 设置扩展名复选框
      */
     setupExtensionFilters() {
-        const extensions = [...new Set(this.originalItems.map(item => item.ext))];
-        const extFilter = document.querySelector('#extensionFilters');
-        extensions.forEach(ext => {
-            // 检查 extFilter 是否存在ext
-            if (extFilter.querySelector(`input[value="${ext}"]`)) return;
-            const label = document.createElement('label');
-            label.innerHTML = `<input type="checkbox" name="ext" value="${ext}" checked>${ext == 'Unknown' ? ext : ext.toLowerCase()}`;
-            label.querySelector('input').addEventListener('click', () => this.updateFileList());
-            extFilter.appendChild(label);
-        });
+        this.setupFilters('extensionFilters', this.originalItems, 'ext');
+    }
+
+    /**
+     * 设置类型复选框
+     */
+    setupTypeFilters() {
+        this.setupFilters('typeFilters', this.originalItems, 'type');
     }
     /**
      * 渲染文件列表

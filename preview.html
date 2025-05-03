@@ -22,8 +22,13 @@
         <!-- 筛选条件 -->
         <div class="filters">
             <div class="filter-row">
-                <span data-i18n="type"></span>
+                <span data-i18n="suffix"></span>
                 <div id="extensionFilters"></div>
+            </div>
+
+            <div class="filter-row">
+                <span data-i18n="type"></span>
+                <div id="typeFilters"></div>
             </div>
 
             <div class="filter-row">
@@ -36,6 +41,9 @@
                         <label><input type="radio" name="sortField" value="size">
                             <i18n>fileSize</i18n>
                         </label>
+                        <!-- <label><input type="radio" name="sortField" value="name">
+                            文件名
+                        </label> -->
                     </div>
                     <div class="sort-order">
                         <label><input type="radio" name="sortOrder" value="asc" data-i18n="asc" checked>
