@@ -147,6 +147,9 @@ function init() {
     $("#ffmpeg").prop("checked", G.M3u8Ffmpeg);
     $("#autoClose").prop("checked", autoClose ? true : G.M3u8AutoClose);
 
+    // 发送到ffmpeg取消边下边存设置
+    _ffmpeg && $("#StreamSaver").prop("checked", false);
+
     // 存在密钥参数 自动填写密钥
     key && $("#customKey").val(key);
 
