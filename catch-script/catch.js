@@ -110,32 +110,37 @@
 
             this.catCatch = document.createElement("div");
             this.catCatch.setAttribute("id", "CatCatchCatch");
+            const style = `
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;`;
             this.catCatch.innerHTML = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAAKlBMVEUAAADLlROxbBlRAD16GS5oAjWWQiOCIytgADidUx/95gHqwwTx0gDZqwT6kfLuAAAACnRSTlMA/vUejV7kuzi8za0PswAAANpJREFUGNNjwA1YSxkYTEqhnKZLLi6F1w0gnKA1shdvHYNxdq1atWobjLMKCOAyC3etlVrUAOH4HtNZmLgoAMKpXX37zO1FwcZAwMDguGq1zKpFmTNnzqx0Bpp2WvrU7ttn9py+I8JgLn1R8Pad22vurNkjwsBReHv33junzuyRnOnMwNCSeFH27K5dq1SNgcZxFMnuWrNq1W5VkNntihdv7ToteGcT0C7mIkE1qbWCYjJnM4CqEoWKdoslChXuUgXJqIcLebiphSgCZRhaPDhcDFhdmUMCGIgEAFA+Uc02aZg9AAAAAElFTkSuQmCC" style="-webkit-user-drag: none;width: 20px;">
-            <div id="tips"></div>
-            <button id="download" ${buttonStyle} data-i18n="downloadCapturedData">下载已捕获的数据</button>
-            <button id="clean" ${buttonStyle} data-i18n="deleteCapturedData">删除已捕获数据</button>
-            <div><button id="hide" ${buttonStyle} data-i18n="hide">隐藏</button><button id="close" ${buttonStyle} data-i18n="close">关闭</button></div>
-            <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown") || ""} ${checkboxStyle}><span data-i18n="automaticDownload">完成捕获自动下载</span></label>
-            <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg") || ""} ${checkboxStyle}><span data-i18n="ffmpeg">使用ffmpeg合并</span></label>
-            <label><input type="checkbox" id="autoToBuffered" ${checkboxStyle}><span data-i18n="autoToBuffered">自动跳转缓冲尾</span></label>
-            <label><input type="checkbox" id="checkHead" ${checkboxStyle}>清理多余头部数据</label>
-            <label><input type="checkbox" id="completeClearCache" ${localStorage.getItem("CatCatchCatch_completeClearCache") || ""} ${checkboxStyle}>下载完成后清空数据</label>
-            <details>
-                <summary data-i18n="fileName" id="summary">文件名设置</summary>
-                <div style="font-weight:bold;"><span data-i18n="fileName">文件名</span>: </div><div id="fileName"></div>
-                <div style="font-weight:bold;"><span data-i18n="selector">表达式</span>: </div><div id="selector">Null</div>
-                <div style="font-weight:bold;"><span data-i18n="regular">正则</span>: </div><div id="regular">Null</div>
-                <button id="setSelector" ${buttonStyle} data-i18n="usingSelector">表达式提取</button>
-                <button id="setRegular" ${buttonStyle} data-i18n="usingRegular">正则提取</button>
-                <button id="setFileName" ${buttonStyle} data-i18n="customize">手动填写</button>
-            </details>
-            <details>
-            <summary>test</summary>
-                <button id="test" ${buttonStyle}>test</button>
-                <button id="restart" ${buttonStyle} data-i18n="capturedBeginning">从头捕获</button>
-                <label><input type="checkbox" id="restartAlways" ${localStorage.getItem("CatCatchCatch_restart") || ""} ${checkboxStyle}><span data-i18n="alwaysCapturedBeginning">始终从头捕获</span>(beta)</label>
-            </details>`;
-
+            <div id="catCatch" style="${style}">
+                <div id="tips"></div>
+                <button id="download" ${buttonStyle} data-i18n="downloadCapturedData">下载已捕获的数据</button>
+                <button id="clean" ${buttonStyle} data-i18n="deleteCapturedData">删除已捕获数据</button>
+                <div><button id="hide" ${buttonStyle} data-i18n="hide">隐藏</button><button id="close" ${buttonStyle} data-i18n="close">关闭</button></div>
+                <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown") || ""} ${checkboxStyle}><span data-i18n="automaticDownload">完成捕获自动下载</span></label>
+                <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg") || ""} ${checkboxStyle}><span data-i18n="ffmpeg">使用ffmpeg合并</span></label>
+                <label><input type="checkbox" id="autoToBuffered" ${checkboxStyle}><span data-i18n="autoToBuffered">自动跳转缓冲尾</span></label>
+                <label><input type="checkbox" id="checkHead" ${checkboxStyle}>清理多余头部数据</label>
+                <label><input type="checkbox" id="completeClearCache" ${localStorage.getItem("CatCatchCatch_completeClearCache") || ""} ${checkboxStyle}>下载完成后清空数据</label>
+                <details>
+                    <summary data-i18n="fileName" id="summary">文件名设置</summary>
+                    <div style="font-weight:bold;"><span data-i18n="fileName">文件名</span>: </div><div id="fileName"></div>
+                    <div style="font-weight:bold;"><span data-i18n="selector">表达式</span>: </div><div id="selector">Null</div>
+                    <div style="font-weight:bold;"><span data-i18n="regular">正则</span>: </div><div id="regular">Null</div>
+                    <button id="setSelector" ${buttonStyle} data-i18n="usingSelector">表达式提取</button>
+                    <button id="setRegular" ${buttonStyle} data-i18n="usingRegular">正则提取</button>
+                    <button id="setFileName" ${buttonStyle} data-i18n="customize">手动填写</button>
+                </details>
+                <details>
+                <summary>test</summary>
+                    <button id="test" ${buttonStyle}>test</button>
+                    <button id="restart" ${buttonStyle} data-i18n="capturedBeginning">从头捕获</button>
+                    <label><input type="checkbox" id="restartAlways" ${localStorage.getItem("CatCatchCatch_restart") || ""} ${checkboxStyle}><span data-i18n="alwaysCapturedBeginning">始终从头捕获</span>(beta)</label>
+                </details>
+            </div>`;
             this.catCatch.style = `
                 position: fixed;
                 z-index: 999999;
@@ -148,12 +153,7 @@
                 padding: 5px 5px 5px 5px;
                 font-size: 12px;
                 font-family: "Microsoft YaHei", "Helvetica", "Arial", sans-serif;
-                user-select: none;
-                display: flex;
-                align-items: flex-start;
-                justify-content: space-evenly;
-                flex-direction: column;
-                line-height: 20px;`;
+                user-select: none;`;
 
             // 创建 Shadow DOM
             this.createShadowRoot();
@@ -267,6 +267,9 @@
 
             const hide = this.catCatch.querySelector("#hide");
             if (hide) hide.addEventListener('click', this.handleHide.bind(this));
+
+            const img = this.catCatch.querySelector("img");
+            if (img) img.addEventListener('click', this.handleHide.bind(this));
 
             const close = this.catCatch.querySelector("#close");
             if (close) close.addEventListener('click', this.handleClose.bind(this));
@@ -401,12 +404,19 @@
         }
 
         handleHide(event) {
-            if (this.catCatch) this.catCatch.style.display = "none";
+            const catCatchElement = this.catCatch.querySelector('#catCatch');
+            if (catCatchElement.style.display === "none") {
+                catCatchElement.style.display = "flex";
+                this.catCatch.style.opacity = "";
+            } else {
+                catCatchElement.style.display = "none";
+                this.catCatch.style.opacity = "0.5";
+            }
         }
 
         handleClose(event) {
             this.enable = false;
-            if (this.catCatch) this.catCatch.style.display = "none";
+            this.catCatch.style.display = "none";
             window.postMessage({ action: "catCatchToBackground", Message: "script", script: "catch.js", refresh: false });
         }
 
@@ -663,6 +673,9 @@
              * 检查是否有多个头部文件 根据用户选项 是否清理多于头部数据
              */
             const checkHead = this.catCatch.querySelector("#checkHead");
+            // 仅确认一次是否清除多余头部数据
+            let userConfirmedHeadChoice = false;
+
             for (let key in this.catchMedia) {
                 if (!this.catchMedia[key]?.bufferList || this.catchMedia[key].bufferList.length <= 1) continue;
                 let lastHeaderIndex = -1;
@@ -684,9 +697,13 @@
                     downloadWithFFmpeg = false; // 没有头部数据则不使用ffmpeg合并
                 }
                 if (lastHeaderIndex > 0) {
-                    const shouldClearHead = checkHead.checked || window.confirm(this.i18n("headData", "检测到多余头部数据, 是否清除?"));
-                    if (shouldClearHead) {
-                        checkHead.checked = true;
+                    // 只有第一次遇到多余头部且用户尚未选择时才提示
+                    if (!userConfirmedHeadChoice && !checkHead.checked) {
+                        checkHead.checked = window.confirm(this.i18n("headData", "检测到多余头部数据, 是否清除?"));
+                        userConfirmedHeadChoice = true; // 标记已经询问过用户
+                    }
+
+                    if (checkHead.checked) {
                         this.catchMedia[key].bufferList.splice(0, lastHeaderIndex); // 移除最后一个头部之前的所有元素
                     }
                 }
