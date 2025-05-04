@@ -2016,7 +2016,8 @@ function GetFileName(url) {
 }
 // 获取扩展名
 function GetExt(url) {
-    let str = url.split(".");
+    let fileName = GetFile(url);
+    let str = fileName.split(".");
     if (str.length == 1) {
         return undefined;
     }
