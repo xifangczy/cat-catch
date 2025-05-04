@@ -84,7 +84,9 @@ G.OptionLists = {
         { "ext": "mpeg4", "size": 0, "state": true },
         { "ext": "vid", "size": 0, "state": true },
         { "ext": "aac", "size": 0, "state": true },
-        { "ext": "mpd", "size": 0, "state": true }
+        { "ext": "mpd", "size": 0, "state": true },
+        { "ext": "weba", "size": 0, "state": true },
+        { "ext": "opus", "size": 0, "state": true },
     ],
     Type: [
         { "type": "audio/*", "size": 0, "state": true },
