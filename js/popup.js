@@ -389,6 +389,10 @@ function AddMedia(data, currentTab = true) {
 }
 
 function AddKey(key) {
+    // 检查key是否合法
+    const base64Key = base64ToHex(key);
+    if (!base64Key) { return; }
+
     const data = {};
     data.html = $(`
         <div class="panel">
@@ -398,7 +402,7 @@ function AddKey(key) {
                 <img src="img/send.svg" class="icon send ${G.send2localManual || G.send2local ? "" : "hide"}"" id="send2local" title="${i18n.send2local}"/>
             </div>
             <div class="url hide">
-                Hex: ${base64ToHex(key)}
+                Hex: ${base64Key}
                 <br>
                 Base64: ${key}
             </div>
@@ -1051,7 +1055,13 @@ function updateDownHeight() {
 }
 
 function base64ToHex(base64) {
-    const binaryString = atob(base64);
+    let binaryString;
+    try {
+        binaryString = atob(base64);
+    } catch (error) {
+        console.error("Invalid Base64 string:", error, base64);
+        return false;
+    }
     let hexString = '';
     for (let i = 0; i < binaryString.length; i++) {
         let hex = binaryString.charCodeAt(i).toString(16);
