@@ -195,7 +195,13 @@
     // fetch
     const _fetch = fetch;
     fetch = async function (input, init) {
-        const response = await _fetch.apply(this, arguments);
+        let response;
+        try {
+            response = await _fetch.apply(this, arguments);
+        } catch (error) {
+            console.error("Fetch error:", error);
+            throw error; // Re-throw the error if necessary
+        }
         const clone = response.clone();
         CATCH_SEARCH_DEBUG && console.log(response);
         response.arrayBuffer()
