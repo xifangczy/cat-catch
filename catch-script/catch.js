@@ -683,6 +683,8 @@
                 // 遍历所有 buffer 寻找最后一个头部
                 for (let i = 0; i < this.catchMedia[key].bufferList.length; i++) {
                     const data = new Uint8Array(this.catchMedia[key].bufferList[i]);
+
+                    // 检查MP4格式的头部 (ftyp)
                     if (data.length > 8 &&
                         data[4] === 0x66 && // 'f'
                         data[5] === 0x74 && // 't'
@@ -690,6 +692,14 @@
                         data[7] === 0x70)   // 'p'
                     {
                         lastHeaderIndex = i; // 持续更新直到找到最后一个头部
+                    }
+                    // 检查WebM格式的头部 (1A 45 DF A3)
+                    else if (data.length > 4 &&
+                        data[0] === 0x1A &&
+                        data[1] === 0x45 &&
+                        data[2] === 0xDF &&
+                        data[3] === 0xA3) {
+                        lastHeaderIndex = i; // 持续更新直到找到最后一个WebM头部
                     }
                 }
                 if (lastHeaderIndex == -1) {
