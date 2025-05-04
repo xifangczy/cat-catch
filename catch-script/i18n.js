@@ -203,5 +203,13 @@ window.CatCatchI18n = {
     frameRate: {
         en: "frame Rate",
         zh: "帧率"
-    }
+    },
+    noHeader: {
+        en: "No header data detected, please process with local tools",
+        zh: "没有检测到视频头部数据, 请使用本地工具处理"
+    },
+    headData: {
+        en: "Multiple header data found in media file, Clear it?",
+        zh: "检测到多余头部数据, 是否清除?"
+    },
 };

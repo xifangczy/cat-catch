@@ -119,6 +119,7 @@
             <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg") || ""} ${checkboxStyle}><span data-i18n="ffmpeg">使用ffmpeg合并</span></label>
             <label><input type="checkbox" id="autoToBuffered" ${checkboxStyle}><span data-i18n="autoToBuffered">自动跳转缓冲尾</span></label>
             <label><input type="checkbox" id="checkHead" ${checkboxStyle}>清理多余头部数据</label>
+            <label><input type="checkbox" id="completeClearCache" ${localStorage.getItem("CatCatchCatch_completeClearCache") || ""} ${checkboxStyle}>下载完成后清空数据</label>
             <details>
                 <summary data-i18n="fileName" id="summary">文件名设置</summary>
                 <div style="font-weight:bold;"><span data-i18n="fileName">文件名</span>: </div><div id="fileName"></div>
@@ -282,6 +283,9 @@
             const summary = this.catCatch.querySelector("#summary");
             if (summary) summary.addEventListener('click', this.getFileName.bind(this));
 
+            const completeClearCache = this.catCatch.querySelector("#completeClearCache");
+            if (completeClearCache) completeClearCache.addEventListener('click', this.handleCompleteClearCache.bind(this));
+
             // 自动跳转到缓冲节点
             this.autoToBufferedFlag = true;
             const autoToBuffered = this.catCatch.querySelector("#autoToBuffered");
@@ -428,6 +432,10 @@
 
         handleTest(event) {
             console.log("捕获的媒体数据:", this.catchMedia);
+        }
+
+        handleCompleteClearCache(event) {
+            localStorage.setItem("CatCatchCatch_completeClearCache", event.target.checked ? "checked" : "");
         }
 
         /**
@@ -647,30 +655,47 @@
                 return;
             }
 
-            // catchMedia 预处理 解决 从头捕获 文件头重复 临时解决办法
-            const checkHead = this.catCatch.querySelector("#checkHead");
-            if (checkHead && checkHead.checked) {
-                for (let key in this.catchMedia) {
-                    const media = this.catchMedia[key];
-                    if (!media || !media.bufferList || media.bufferList.length <= 1) continue;
+            let downloadWithFFmpeg = this.catchMedia.length >= 2 && localStorage.getItem("CatCatchCatch_ffmpeg") == "checked";
 
-                    const data = new Uint8Array(media.bufferList[1]);
-                    if (data && data.length > 8 &&
-                        data[4] == 0x66 && data[5] == 0x74 && data[6] == 0x79 && data[7] == 0x70) {
-                        media.bufferList.shift();
+            /**
+             * 检查文件
+             * 检查是否有头部文件 没有头部文件则提示 不使用ffmpeg合并
+             * 检查是否有多个头部文件 根据用户选项 是否清理多于头部数据
+             */
+            const checkHead = this.catCatch.querySelector("#checkHead");
+            for (let key in this.catchMedia) {
+                if (!this.catchMedia[key]?.bufferList || this.catchMedia[key].bufferList.length <= 1) continue;
+                let lastHeaderIndex = -1;
+
+                // 遍历所有 buffer 寻找最后一个头部
+                for (let i = 0; i < this.catchMedia[key].bufferList.length; i++) {
+                    const data = new Uint8Array(this.catchMedia[key].bufferList[i]);
+                    if (data.length > 8 &&
+                        data[4] === 0x66 && // 'f'
+                        data[5] === 0x74 && // 't'
+                        data[6] === 0x79 && // 'y'
+                        data[7] === 0x70)   // 'p'
+                    {
+                        lastHeaderIndex = i; // 持续更新直到找到最后一个头部
                     }
                 }
-                checkHead.checked = false;
+                if (lastHeaderIndex == -1) {
+                    alert(this.i18n("noHead", "没有检测到视频头部数据, 请使用本地工具处理"));
+                    downloadWithFFmpeg = false; // 没有头部数据则不使用ffmpeg合并
+                }
+                if (lastHeaderIndex > 0) {
+                    const shouldClearHead = checkHead.checked || window.confirm(this.i18n("headData", "检测到多余头部数据, 是否清除?"));
+                    if (shouldClearHead) {
+                        checkHead.checked = true;
+                        this.catchMedia[key].bufferList.splice(0, lastHeaderIndex); // 移除最后一个头部之前的所有元素
+                    }
+                }
             }
 
-            if (this.catchMedia.length >= 2 && localStorage.getItem("CatCatchCatch_ffmpeg") == "checked") {
-                this.downloadWithFFmpeg();
-            } else {
-                this.downloadDirect();
-            }
+            downloadWithFFmpeg ? this.downloadWithFFmpeg() : this.downloadDirect();
 
             if (this.isComplete) {
-                this.clearCache();
+                if (localStorage.getItem("CatCatchCatch_completeClearCache") == "checked") { this.clearCache(); }
                 if (this.tips) {
                     this.tips.innerHTML = this.i18n("downloadCompleted", "下载完毕...");
                 }
