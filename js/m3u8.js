@@ -1079,6 +1079,7 @@ $("details summary").click(function () {
 // 发送到在线ffmpeg
 $("#sendFfmpeg").click(function () {
     isSendFfmpeg = true;
+    $("#StreamSaver").prop("checked", false);
     $("#mergeTs").click();
 });
 
