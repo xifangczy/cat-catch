@@ -212,4 +212,12 @@ window.CatCatchI18n = {
         en: "Multiple header data found in media file, Clear it?",
         zh: "检测到多余头部数据, 是否清除?"
     },
+    clearCacheConfirmation: {
+        en: "Are you sure you want to clear the cache?",
+        zh: "确定要清除缓存吗?"
+    },
+    closeConfirmation: {
+        en: "Are you sure you want to close?",
+        zh: "确定要关闭吗?"
+    }
 };

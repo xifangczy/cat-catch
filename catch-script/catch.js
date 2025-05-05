@@ -378,14 +378,16 @@
          * @param {MouseEvent} event 
          */
         handleClean(event) {
-            this.clearCache();
-            const $clean = this.catCatch.querySelector("#clean");
-            if (!$clean) return;
+            if (window.confirm(this.i18n("clearCacheConfirmation", "确认清除缓存?"))) {
+                this.clearCache();
+                const $clean = this.catCatch.querySelector("#clean");
+                if (!$clean) return;
 
-            $clean.innerHTML = this.i18n("cleanupCompleted", "清理完成!");
-            setTimeout(() => {
-                if ($clean) $clean.innerHTML = this.i18n("clearCache", "清理缓存");
-            }, 1000);
+                $clean.innerHTML = this.i18n("cleanupCompleted", "清理完成!");
+                setTimeout(() => {
+                    if ($clean) $clean.innerHTML = this.i18n("clearCache", "清理缓存");
+                }, 1000);
+            }
         }
 
         /**
@@ -415,9 +417,12 @@
         }
 
         handleClose(event) {
-            this.enable = false;
-            this.catCatch.style.display = "none";
-            window.postMessage({ action: "catCatchToBackground", Message: "script", script: "catch.js", refresh: false });
+            if (this.isComplete || window.confirm(this.i18n("closeConfirmation", "确认关闭?"))) {
+                this.clearCache();
+                this.enable = false;
+                this.catCatch.style.display = "none";
+                window.postMessage({ action: "catCatchToBackground", Message: "script", script: "catch.js", refresh: false });
+            }
         }
 
         /**
