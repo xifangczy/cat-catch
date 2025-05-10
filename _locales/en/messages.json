@@ -855,10 +855,10 @@
     "message": "Set to whitelist"
   },
   "autoSend": {
-    "message": "Manual data transmission"
+    "message": "Automatic data transmission"
   },
   "manualSend": {
-    "message": "Automatic data transmission"
+    "message": "Manual data transmission"
   },
   "requestMethod": {
     "message": "Request Method"
