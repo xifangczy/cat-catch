@@ -484,6 +484,7 @@ class FilePreview {
             data.downFileName = data.name;
         }
         data.ext = data.ext ? data.ext : 'Unknown';
+        data.type = data.type ? data.type : 'Unknown';
         return data;
     }
     /**
