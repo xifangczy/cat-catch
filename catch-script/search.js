@@ -20,6 +20,8 @@
     const dataRE = /^data:(application|video|audio)\//i;
     const joinBaseUrlTask = [];
     const baseUrl = new Set();
+    const regexVimeo = /^https:\/\/.*\.vimeocdn\.com\/.*\/playlist\.json/i;
+    const videoSet = new Set();
     extractBaseUrl(location.href);
 
     // Worker
@@ -131,6 +133,10 @@
         this.addEventListener("readystatechange", function (event) {
             CATCH_SEARCH_DEBUG && console.log(this);
             if (this.status != 200) { return; }
+
+            // 处理viemo
+            this.responseURL.includes("vimeocdn.com") && vimeo(this.responseURL, this.response);
+
             // 查找疑似key
             if (this.responseType == "arraybuffer" && this.response?.byteLength && this.response.byteLength == 32) {
                 postData({ action: "catCatchAddKey", key: this.response, href: location.href, ext: "key" });
@@ -612,6 +618,91 @@
         if (!baseUrl.has(urlSplit)) {
             joinBaseUrlTask.forEach(fn => fn(urlSplit));
             baseUrl.add(urlSplit);
+        }
+    }
+
+    // vimeo json 翻译为 m3u8
+    async function vimeo(originalUrl, json) {
+        // Early return if invalid input or duplicated URL
+        if (!json || !regexVimeo.test(originalUrl) || videoSet.has(originalUrl)) return;
+
+        const data = isJSON(json);
+        if (!data?.base_url || !data?.video) return;
+
+        // Mark as processed
+        videoSet.add(originalUrl);
+
+        // Parse URL more elegantly
+        try {
+            const url = new URL(originalUrl);
+            const pathBase = url.pathname.substring(0, url.pathname.lastIndexOf('/')) + "/";
+            const baseURL = new URL(url.origin + pathBase + data.base_url).href;
+
+            let M3U8List = ["#EXTM3U", "#EXT-X-INDEPENDENT-SEGMENTS", "#EXT-X-VERSION:3"];
+
+            // Process both video and audio streams
+            const allStreams = [];
+            if (data.video && data.video.length) {
+                for (let i = 0; i < data.video.length; i++) {
+                    allStreams.push(data.video[i]);
+                }
+            }
+            if (data.audio && data.audio.length) {
+                for (let i = 0; i < data.audio.length; i++) {
+                    allStreams.push(data.audio[i]);
+                }
+            }
+
+            for (let i = 0; i < allStreams.length; i++) {
+                const stream = allStreams[i];
+                if (!stream) continue;
+
+                // Build M3U8 content
+                let M3U8 = [
+                    "#EXTM3U",
+                    "#EXT-X-VERSION:3",
+                    `#EXT-X-TARGETDURATION:${stream.duration}`,
+                    "#EXT-X-MEDIA-SEQUENCE:0",
+                    "#EXT-X-PLAYLIST-TYPE:VOD"
+                ];
+
+                // Add initialization segment
+                if (stream.init_segment) {
+                    M3U8.push(`#EXT-X-MAP:URI="data:application/octet-stream;base64,${stream.init_segment}"`);
+                } else if (stream.init_segment_url) {
+                    M3U8.push(`#EXT-X-MAP:URI="${baseURL}${stream.base_url}${stream.init_segment_url}"`);
+                }
+
+                // Add media segments
+                if (stream.segments && stream.segments.length) {
+                    for (let j = 0; j < stream.segments.length; j++) {
+                        const segment = stream.segments[j];
+                        M3U8.push(`#EXTINF:${segment.end - segment.start},`);
+                        M3U8.push(`${baseURL}${stream.base_url}${segment.url}`);
+                    }
+                }
+
+                M3U8.push("#EXT-X-ENDLIST");
+
+                // Create blob URL and post data
+                const blobUrl = URL.createObjectURL(
+                    new Blob([new TextEncoder("utf-8").encode(_arrayJoin.call(M3U8, "\n"))])
+                );
+                if (stream.mime_type.startsWith("video/")) {
+                    M3U8List.push(`#EXT-X-STREAM-INF:BANDWIDTH=${stream.bitrate},RESOLUTION=${stream.width}x${stream.height},CODECS="${stream.codecs}"`);
+                    M3U8List.push(blobUrl);
+                } else if (stream.mime_type.startsWith("audio/")) {
+                    M3U8List.push(`#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${stream.id}",NAME="${stream.bitrate}",URI="${blobUrl}"`);
+                }
+            }
+            if (M3U8List.length > 3) {
+                const blobUrl = URL.createObjectURL(
+                    new Blob([new TextEncoder("utf-8").encode(_arrayJoin.call(M3U8List, "\n"))])
+                );
+                postData({ action: "catCatchAddMedia", url: blobUrl, href: location.href, ext: "m3u8" });
+            }
+        } catch (e) {
+            CATCH_SEARCH_DEBUG && console.error("Error processing Vimeo stream:", e);
         }
     }
 })();
