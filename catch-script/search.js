@@ -477,7 +477,7 @@
     function getBaseUrl(url) {
         let bashUrl = url.split("/");
         bashUrl.pop();
-        return _arrayJoin.call(bashUrl, "/") + "/";
+        return baseUrl.join("/") + "/";
     }
     function addBaseUrl(baseUrl, m3u8Text) {
         let m3u8_split = m3u8Text.split("\n");
@@ -613,7 +613,7 @@
     function extractBaseUrl(url) {
         let urlSplit = url.split("/");
         urlSplit.pop();
-        urlSplit = _arrayJoin.call(urlSplit, "/") + "/";
+        urlSplit = urlSplit.join("/") + "/";
         if (!baseUrl.has(urlSplit)) {
             joinBaseUrlTask.forEach(fn => fn(urlSplit));
             baseUrl.add(urlSplit);
