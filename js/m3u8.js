@@ -1488,7 +1488,7 @@ function mergeTsNew(down) {
     const fileBlob = new Blob(down.buffer, { type: down.transcode ? "video/mp4" : "video/MP2T" });
 
     // 默认后缀
-    let ext = (down.mapTag ? down.mapTag : down.fragments[0].url).split("/").pop();
+    let ext = (down.mapTag && !down.mapTag.startsWith("data:") ? down.mapTag : down.fragments[0].url).split("/").pop();
     ext = ext.split("?").shift();
     ext = ext.split(".").pop();
     ext = ext ? ext : "ts";
