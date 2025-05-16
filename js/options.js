@@ -297,7 +297,7 @@ $("#exportOptions").bind("click", function () {
         let ExportData = JSON.stringify(items);
         ExportData = "data:text/plain," + Base64.encode(ExportData);
         let date = new Date();
-        const filename = `cat-catch-${chrome.runtime.getManifest().version}-${date.getFullYear()}${appendZero(date.getMonth() + 1)}${date.getDate()}T${date.getHours()}${date.getMinutes()}.txt`;
+        const filename = `cat-catch-${chrome.runtime.getManifest().version}-${date.getFullYear()}${appendZero(date.getMonth() + 1)}${appendZero(date.getDate())}T${appendZero(date.getHours())}${appendZero(date.getMinutes())}.txt`;
         if (G.isFirefox) {
             downloadDataURL(ExportData, filename);
             return;
