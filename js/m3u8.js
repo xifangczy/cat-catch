@@ -76,6 +76,7 @@ let skipDecrypt = false; // 是否跳过解密
 let possibleKeys = new Set();   // 储存疑似 密钥
 let downId = 0; // chrome下载api 回调id
 let currentLevel = -1;  // 当前Level
+let estimateFileSize = 0; // 估算的文件最终大小
 
 /* 以下参数 新下载器已弃用 */
 let stopDownload = false; // 停止下载flag
@@ -480,6 +481,7 @@ function parseTs(data) {
     // #EXT-X-DISCONTINUITY
     let discontinuity = { start: 0, cc: 0 };
     data.endCC && $("#cc").show();
+
     for (let i in data.fragments) {
         i = parseInt(i);
         /*
@@ -491,6 +493,10 @@ function parseTs(data) {
             if (arg && arg[0]) {
                 data.fragments[i].url = arg[0] + (tsAddArg ? "?" + tsAddArg : "");
             }
+        }
+        // 尝试下载第一个切片 获取长度 估算文件大小
+        if (i == 0 && !data.live) {
+            estimateSize(data.fragments[0].url, data.fragments.length);
         }
         /* 
         * 查看是否加密 下载key
@@ -651,6 +657,26 @@ function parseTs(data) {
             $("#tips").append('<div class="key flex"><div>偏移量(IV): <input type="text" value="' + iv + '" spellcheck="false" readonly="readonly" class="offset"></div></div>');
         }
     }
+}
+/**
+ * 估算整个视频大小
+ * @param {String} url ts链接
+ * @param {Number} length 切片数量
+ */
+async function estimateSize(url, length) {
+    fetch(url, {
+        method: "HEAD",
+        headers: requestHeaders,
+    }).then(function (response) {
+        if (response.ok) {
+            const contentLength = response.headers.get("Content-Length");
+            if (contentLength) {
+                estimateFileSize = parseInt(contentLength) * length;
+            }
+        }
+    }).catch(function (error) {
+        console.log("Error estimating file size:", error);
+    });
 }
 /**************************** 监听 / 按钮绑定 ****************************/
 // 标题
@@ -996,6 +1022,11 @@ $("#mergeTs").click(async function () {
     skipDecrypt = $("#skipDecrypt").prop("checked");    // 是否跳过解密
     downTotalTs = end - start + 1;  // 需要下载的文件数量
     $progress.html(`${downCurrentTs}/${downTotalTs}`); // 进度显示
+
+    // 估算检查文件大小
+    if (estimateFileSize > G.chromeLimitSize && confirm(i18n("fileTooLargeStream", ["2G"]))) {
+        $("#StreamSaver").prop("checked", true);
+    }
 
     // 流式下载
     if ($("#StreamSaver").prop("checked")) {
