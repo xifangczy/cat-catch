@@ -76,7 +76,7 @@ let skipDecrypt = false; // 是否跳过解密
 let possibleKeys = new Set();   // 储存疑似 密钥
 let downId = 0; // chrome下载api 回调id
 let currentLevel = -1;  // 当前Level
-let estimateFileSize = 0; // 估算的文件最终大小
+let estimateFileSize = -1; // 估算的文件最终大小
 
 /* 以下参数 新下载器已弃用 */
 let stopDownload = false; // 停止下载flag
@@ -494,9 +494,10 @@ function parseTs(data) {
                 data.fragments[i].url = arg[0] + (tsAddArg ? "?" + tsAddArg : "");
             }
         }
-        // 尝试下载第一个切片 获取长度 估算文件大小
-        if (i == 0 && !data.live) {
-            estimateSize(data.fragments[0].url, data.fragments.length);
+        // 估算文件大小
+        if (estimateFileSize == -1 && !data.live) {
+            estimateFileSize = 0;
+            estimateSize(data.fragments, data.fragments.length);
         }
         /* 
         * 查看是否加密 下载key
@@ -660,23 +661,45 @@ function parseTs(data) {
 }
 /**
  * 估算整个视频大小
- * @param {String} url ts链接
+ * 获取3个切片大小 取平均值 * 切片数量
+ * @param {Array} url ts对象数组
  * @param {Number} length 切片数量
  */
-async function estimateSize(url, length) {
-    fetch(url, {
-        method: "HEAD",
-        headers: requestHeaders,
-    }).then(function (response) {
-        if (response.ok) {
-            const contentLength = response.headers.get("Content-Length");
-            if (contentLength) {
-                estimateFileSize = parseInt(contentLength) * length;
-            }
-        }
-    }).catch(function (error) {
-        console.log("Error estimating file size:", error);
-    });
+async function estimateSize(fragments, length) {
+    if (!fragments || fragments.length === 0) return;
+
+    const samplesToCheck = Math.min(3, fragments.length);
+    let totalSize = 0;
+    let successfulFetches = 0;
+
+    const promises = [];
+
+    for (let i = 0; i < samplesToCheck; i++) {
+        promises.push(
+            fetch(fragments[i].url, {
+                method: "HEAD",
+                headers: requestHeaders,
+            }).then(function (response) {
+                if (response.ok) {
+                    const contentLength = response.headers.get("Content-Length");
+                    if (contentLength) {
+                        totalSize += parseInt(contentLength);
+                        successfulFetches++;
+                    }
+                }
+            }).catch(function (error) {
+                console.log(`Error estimating file size for sample ${i}:`, error);
+            })
+        );
+    }
+
+    await Promise.all(promises);
+
+    if (successfulFetches > 0) {
+        const averageSize = totalSize / successfulFetches;
+        estimateFileSize = averageSize * length;
+        $(".videoInfo #info").append(` ${i18n.estimateSize}: ${byteToSize(estimateFileSize)}`);
+    }
 }
 /**************************** 监听 / 按钮绑定 ****************************/
 // 标题

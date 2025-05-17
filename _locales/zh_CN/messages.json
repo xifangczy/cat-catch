@@ -886,5 +886,8 @@
   },
   "noKeyIsRequired": {
     "message": "不需要密钥"
+  },
+  "estimateSize": {
+    "message": "估算大小"
   }
 }

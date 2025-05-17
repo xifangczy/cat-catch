@@ -886,5 +886,8 @@
   },
   "noKeyIsRequired": {
     "message": "No key is required"
+  },
+  "estimateSize": {
+    "message": "Estimated size"
   }
 }
