@@ -568,23 +568,11 @@ function parseTs(data) {
     // 录制直播
     /* 直播是持续更新的m3u8 recorderLast保存下载的最后一个url 以便下次更新时判断从哪个切片开始继续下载 */
     if (recorder) {
-        if ($("#test").prop("checked")) {
-            let indexLast = _fragments.findIndex((fragment) => {
-                return fragment.url == recorderLast;
-            });
-            recorderLast = _fragments[_fragments.length - 1].url;
-            downloadNew(indexLast + 1);
-        } else {
-            let indexLast = -1;
-            for (let index = 0; index < _fragments.length; index++) {
-                if (_fragments[index].url == recorderLast) {
-                    indexLast = index;
-                    break;
-                }
-            }
-            recorderLast = _fragments[_fragments.length - 1].url;
-            fileStream ? streamDownload(indexLast + 1) : downloadTs(indexLast + 1);
-        }
+        let indexLast = _fragments.findIndex((fragment) => {
+            return fragment.url == recorderLast;
+        });
+        recorderLast = _fragments[_fragments.length - 1].url;
+        downloadNew(indexLast + 1);
     }
 
     writeText(_fragments);   // 写入ts链接到textarea
@@ -933,15 +921,9 @@ $("#recorder").click(function () {
         initDownload(); // 初始化下载变量
         recorder = true;
 
-        // 测试功能 录制模式必须开启流式下载
-        if ($("#test").prop("checked")) {
-            $("#StreamSaver").prop("checked", true);
-        }
-
-        // 流式下载
-        if ($("#StreamSaver").prop("checked")) {
-            fileStream = createStreamSaver(_fragments[0].url);
-        }
+        // 只允许流式下载
+        $("#StreamSaver").prop("checked", true);
+        fileStream = createStreamSaver(_fragments[0].url);
 
         $(this).html(fileStream ? i18n.stopDownload : i18n.download).data("switch", "off");
         $progress.html(i18n.waitingForLiveData);
@@ -1054,19 +1036,15 @@ $("#mergeTs").click(async function () {
     // 流式下载
     if ($("#StreamSaver").prop("checked")) {
         fileStream = createStreamSaver(_fragments[0].url);
-        // streamDownload(start, end);
-        $("#test").prop("checked") ? downloadNew(start, end + 1) : downloadTs(start, end);
+        downloadNew(start, end + 1);
         $("#ffmpeg").prop("checked", false);
         $("#saveAs").prop("checked", false);
         $("#stopStream").show();
         return;
     }
-    $("#test").prop("checked") ? downloadNew(start, end + 1) : downloadTs(start, end);
+    downloadNew(start, end + 1);
 });
-// 强制下载
-$("#ForceDownload").click(function () {
-    !$("#test").prop("checked") && mergeTs();
-});
+
 // 停止下载流
 $("#stopStream").click(function () {
     if (fileStream) {
@@ -1076,16 +1054,7 @@ $("#stopStream").click(function () {
         buttonState("#mergeTs", true);
     }
 });
-// 重新下载
-$("#errorDownload").click(function () {
-    if ($("#test").prop("checked")) { return; }
-    $("#errorTsList button").each(function (index) {
-        let button = this;
-        setTimeout(() => {
-            button.click();
-        }, index * 233);
-    });
-});
+
 // 添加ts 参数
 $("#tsAddArg").click(function () {
     if (tsAddArg != null) {
@@ -1221,89 +1190,6 @@ $("#searchingForRealKey").click(function () {
         });
 });
 
-
-
-/**************************** 下载TS文件 ****************************/
-// start 开始下载的索引
-// end 结束下载的索引
-function downloadTs(start = 0, end = _fragments.length - 1, errorObj = undefined) {
-    buttonState("#mergeTs", false);
-    const _tsThread = parseInt($("#thread").val());  // 原始线程数量
-    let tsThread = _tsThread;  // 线程数量
-    let index = start - 1; // 当前下载的索引
-    downTotalTs = errorObj ? downTotalTs : end - start + 1;  // 需要下载的文件数量
-    let fileSize = 0;
-    const tsInterval = setInterval(function () {
-        // 停止下载flag
-        if (stopDownload) {
-            clearInterval(tsInterval);
-            $progress.html(stopDownload);
-            return;
-        }
-        // 列表为空 等待线程数回归 检查是否下载完成
-        if (index == end && tsThread == _tsThread) {
-            clearInterval(tsInterval);
-            if (stopDownload) { return; }
-            // 错误列表为0 下载完成
-            if (errorTsList.length == 0) {
-                $("#ForceDownload").hide();
-                $("#errorDownload").hide();
-                $("#errorTsList").hide();
-                !recorder && mergeTs();  // 合并下载
-                return;
-            }
-            $progress.html(`数据不完整... 剩余未下载: ${errorTsList.length}`);
-            return;
-        }
-        // 下载
-        if (tsThread > 0 && index < end) {
-            tsThread--;
-            let currentIndex = ++index;   // 当前下载的索引
-            const fragment = _fragments[currentIndex];
-            if (recorder) { currentIndex = recorderIndex++; }
-            const timeout = errorObj ? 0 : 60000;
-            $.ajax({
-                url: fragment.url,
-                xhrFields: { responseType: "arraybuffer" },
-                timeout: timeout
-            }).fail(function () {
-                // 直播 不处理下载失败
-                if (stopDownload || recorder) { return; }
-                if (errorObj) {
-                    errorObj.find("button").html("下载失败...重试");
-                    buttonState(errorObj.find("button"), true);
-                }
-                if (!errorTsList.includes(currentIndex)) {
-                    errorTsList.push(currentIndex);
-                    downloadTsError(currentIndex);
-                }
-            }).done(function (responseData) {
-                if (stopDownload) { return; }
-                if (errorObj) { errorObj.remove(); }
-                if (errorTsList.length && errorTsList.includes(currentIndex)) {
-                    errorTsList.splice(errorTsList.indexOf(currentIndex), 1);
-                }
-                tsBuffer[currentIndex] = tsDecrypt(responseData, currentIndex); //解密m3u8
-                fileSize += tsBuffer[currentIndex].byteLength;
-                $fileSize.html("已下载:" + byteToSize(fileSize));
-                downDuration += fragment.duration;
-                if (recorder) {
-                    $fileDuration.html("录制时长:" + secToTime(downDuration));
-                    return;
-                }
-                downCurrentTs++;
-                if (downCurrentTs == downTotalTs) {
-                    $progress.html($("#mp4").prop("checked") ? `数据正在转换格式...` : `数据正在合并...`);
-                    return;
-                }
-                $progress.html(`${downCurrentTs}/${downTotalTs}`);
-            }).always(function () {
-                tsThread++;
-            });
-        }
-    }, 10);
-}
-
 /**
  * 调用新下载器的方法
  * @param {number} start 下载范围 开始索引
@@ -1415,13 +1301,6 @@ function downloadNew(start = 0, end = _fragments.length) {
             fileStream.close();
             fileStream = undefined;
         } else {
-            // if ($("#ffmpeg").prop("checked") || _ffmpeg || isSendFfmpeg) {
-            //     await chrome.runtime.sendMessage({
-            //         Message: "catCatchFFmpeg",
-            //         action: "openFFmpeg",
-            //         extra: i18n.waitingForMedia
-            //     });
-            // }
             mergeTsNew(down);
         }
         transmuxer?.off && transmuxer.off('data');
@@ -1494,12 +1373,11 @@ function downloadNew(start = 0, end = _fragments.length) {
 
     // 强制下载
     $("#ForceDownload").off("click").click(function () {
-        $("#test").prop("checked") && mergeTsNew(down);
+        mergeTsNew(down);
     });
 
     // 重新下载
     $("#errorDownload").off("click").click(function () {
-        if (!$("#test").prop("checked")) { return; }
         down.errorItem.forEach(function (fragment, index) {
             const button = $(`#downItem${fragment.index} button`);
             setTimeout(() => {
@@ -1643,244 +1521,6 @@ function apiDownload(fileBlob, fileName, ext) {
     });
 }
 
-// 合并下载
-function mergeTs() {
-    if (tsBuffer.length == 0 && down.buffer.length != 0) {
-        tsBuffer = down.buffer;
-    }
-    // 修正数组，清理空白数据
-    const _tsBuffer = [];
-    for (let i = 0; i < tsBuffer.length; i++) {
-        if (tsBuffer[i]) {
-            _tsBuffer.push(tsBuffer[i]);
-            tsBuffer[i] = undefined;
-        }
-        delete tsBuffer[i];
-    }
-    tsBuffer = [];
-
-    // 默认下载格式
-    let fileBlob = new Blob(_tsBuffer, { type: "video/MP2T" });
-    let ext = _fragments[0].url.split("/").pop();
-    ext = ext.split("?")[0];
-    ext = ext.split(".").pop();
-    ext = ext ? ext : "ts";
-
-    // ffmpeg 转码
-    if ($("#ffmpeg").prop("checked")) {
-        if (fileBlob.size < G.chromeLimitSize) {
-            chrome.runtime.sendMessage({
-                Message: "catCatchFFmpeg",
-                action: $("#onlyAudio").prop("checked") ? "onlyAudio" : "transcode",
-                media: [{ data: G.isFirefox ? fileBlob : URL.createObjectURL(fileBlob), name: `memory${new Date().getTime()}.${ext}` }],
-                title: `${GetFileName(_m3u8Url)}`,
-                name: "memory" + new Date().getTime() + "." + ext
-            });
-            buttonState("#mergeTs", true);
-            $progress.html(i18n.sendFfmpeg);
-            return;
-        } else {
-            $progress.html(i18n("fileTooLarge", ["2G"]));
-        }
-    }
-
-    /* 有初始化切片 可能是fMP4 获取初始化切片的后缀 */
-    if (_fragments[0].initSegment) {
-        let name = _fragments[0].initSegment.url.split("/").pop();
-        name = name.split("?")[0];
-        ext = name.split(".").pop();
-        ext = ext ? ext : "ts";
-    }
-    // 转码mp4
-    if (downSet.mp4 && ext.toLowerCase() != "mp4") {
-        let index;
-        transmuxerheadEncode = false;
-        /* 转码工具 */
-        transmuxer = new muxjs.mp4.Transmuxer({ remux: !downSet.onlyAudio });    // mux.js 对象
-        // 转码服务监听
-        transmuxer.on('data', function (segment) {
-            // console.log(segment);
-            if (downSet.onlyAudio && segment.type != "audio") { return; }
-            // 头部信息
-            if (!transmuxerheadEncode) {
-                transmuxerheadEncode = true;
-                let data = new Uint8Array(segment.initSegment.byteLength + segment.data.byteLength);
-                data.set(segment.initSegment, 0);
-                data.set(segment.data, segment.initSegment.byteLength);
-                _tsBuffer[index] = fixFileDuration(data, downDuration);
-                return;
-            }
-            _tsBuffer[index] = segment.data;
-        });
-        // 载入ts数据转码
-        for (index in _tsBuffer) {
-            transmuxer.push(new Uint8Array(_tsBuffer[index]));
-            transmuxer.flush();
-        }
-        // 关闭监听
-        transmuxer.off('data');
-        // 正确转换 下载格式改为 mp4 
-        if (transmuxerheadEncode) {
-            fileBlob = new Blob(_tsBuffer, { type: "video/mp4" });
-            ext = "mp4";
-        }
-        transmuxer = undefined;
-        transmuxerheadEncode = undefined;
-    }
-    chrome.downloads.download({
-        url: URL.createObjectURL(fileBlob),
-        filename: `${GetFileName(_m3u8Url)}.${ext}`,
-        saveAs: $("#saveAs").prop("checked")
-    }, function (downloadId) { downId = downloadId });
-    buttonState("#mergeTs", true);
-    _tsBuffer.splice(0); delete _tsBuffer;
-}
-
-// 流式下载
-function streamDownload(start = 0, end = _fragments.length - 1) {
-    buttonState("#mergeTs", false); // 禁止下载按钮
-    const _tsThread = parseInt($("#thread").val());  // 原始线程数量
-    let tsThread = _tsThread;  // 线程数量
-    // 下载范围
-    const downList = [];
-    for (let index = start; index <= end; index++) {
-        downList.push({ url: _fragments[index].url, index: index, duration: _fragments[index].duration });
-    }
-    let index = 0;  // 下载指针
-    let downP = 0;  // 推流指针 帮助按照顺序下载
-    const errorList = [];
-    const downTotalTs = end - start + 1;  // 需要下载的文件数量
-    /* 转码工具 */
-    if (downSet.mp4 && transmuxer == undefined) {
-        transmuxer = new muxjs.mp4.Transmuxer({ remux: !downSet.onlyAudio });    // mux.js 对象
-        transmuxer.on('data', function (segment) {
-            if (downSet.onlyAudio && segment.type != "audio") { return; }
-            // 头部信息
-            if (!transmuxerheadEncode) {
-                transmuxerheadEncode = true;
-                const data = new Uint8Array(segment.initSegment.byteLength + segment.data.byteLength);
-                data.set(segment.initSegment, 0);
-                data.set(segment.data, segment.initSegment.byteLength);
-                fileStream.write(fixFileDuration(data, downDuration));
-                return;
-            }
-            fileStream.write(segment.data);
-        });
-    }
-    const tsInterval = setInterval(function () {
-        // 停止下载flag
-        if (stopDownload) {
-            if (fileStream) {
-                fileStream.abort();
-                fileStream = undefined;
-            }
-            downSet.mp4 && transmuxer.off('data');
-            clearInterval(tsInterval);
-            $progress.html(stopDownload);
-            buttonState("#mergeTs", true);
-            return;
-        }
-        errorList.includes(downP) && downP++;
-        // 推流指针位置大于总下载量 已完成下载
-        // downTotalTs 从1开始 所以 判断相等
-        // 录播不停止
-        if (downP == downTotalTs) {
-            clearInterval(tsInterval);
-            if (!recorder) {
-                setTimeout(() => {
-                    fileStream.close();
-                    fileStream = undefined;
-                }, 1000);
-                if (downSet.mp4) {
-                    transmuxer.off('data');
-                    transmuxer = undefined;
-                }
-                $progress.html(i18n.savePrompt);
-                $("#stopStream").hide();
-                buttonState("#mergeTs", true);
-            }
-            return;
-        }
-        // 检查当前推流指针是否有数据
-        if (downList[downP].data) {
-            if (!fileStream) { clearInterval(tsInterval); return; }
-            if (downSet.mp4) {
-                // 如果编码已经开始 但没有任何headEncode 转码错误 取消
-                if (transmuxerStatus && !transmuxerheadEncode) {
-                    stopDownload = i18n.formatConversionError;
-                    return;
-                }
-                transmuxerStatus = true;
-                transmuxer.push(new Uint8Array(downList[downP].data));
-                transmuxer.flush();
-            } else {
-                fileStream.write(new Uint8Array(downList[downP].data));
-            }
-            downList[downP].data = undefined;
-            downP++;
-        }
-        // 下载指针超过推流指针太多(超过线程数) 暂停下载
-        if (index - downP > _tsThread) { return; }
-        // 还有线程数 并且下载指针小于总下载量 开启下载
-        if (tsThread > 0 && index < downTotalTs) {
-            tsThread--;
-            const currentIndex = index++; // 记录当前下载指针
-            $.ajax({
-                url: downList[currentIndex].url,
-                xhrFields: { responseType: "arraybuffer" },
-                timeout: 60000
-            }).fail(function (error) {
-                if (stopDownload) { return; }
-                errorList.push(currentIndex);
-                console.error('Error:', error);
-            }).done(function (buffer) {
-                if (stopDownload) { return; }
-                // 解密需要当前资源的总索引 downList[currentIndex].index
-                downList[currentIndex].data = tsDecrypt(buffer, downList[currentIndex].index);
-                if (recorder) {
-                    downDuration += downList[currentIndex].duration;
-                    $fileDuration.html(i18n.recordingDuration + ":" + secToTime(downDuration));
-                    return;
-                }
-                $progress.html(`${++downCurrentTs}/${downTotalTs}`);
-            }).always(function () {
-                tsThread++;
-            });
-        }
-    }, 4);
-}
-
-// ts解密
-function tsDecrypt(responseData, index) {
-    // 是否存在初始化切片
-    if (_fragments[index] && _fragments[index].initSegment) {
-        let initSegmentData = initData.get(_fragments[index].initSegment.url);
-        let initLength = initSegmentData.byteLength;
-        let newData = new Uint8Array(initLength + responseData.byteLength);
-        newData.set(new Uint8Array(initSegmentData), 0);
-        newData.set(new Uint8Array(responseData), initLength);
-        responseData = newData.buffer;
-    }
-    if (skipDecrypt || recorder || !_fragments[index].encrypted) {
-        return responseData;
-    }
-    try {
-        decryptor.expandKey(_fragments[index].decryptdata.keyContent);
-    } catch (e) {
-        stopDownload = i18n.incorrectKey;
-        buttonState("#mergeTs", true);
-        console.log(e);
-        return;
-    }
-    try {
-        let iv = _fragments[index].decryptdata.iv ?? new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, index]);
-        return decryptor.decrypt(responseData, 0, iv.buffer, true);
-    } catch (e) {
-        stopDownload = i18n.decryptionError;
-        buttonState("#mergeTs", true);
-        console.log(e);
-    }
-}
 // 初始化下载变量
 function initDownload() {
     $fileSize.html("");
