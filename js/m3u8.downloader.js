@@ -21,7 +21,7 @@ class Downloader {
         this.duration = 0;               // 已下载时长
         this.pushIndex = 0;              // 推送顺序下载索引
         this.controller = [];            // 储存中断控制器
-        this.running = 0;
+        this.running = 0;                // 正在下载数量
     }
     /**
      * 设置监听
