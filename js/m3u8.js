@@ -77,7 +77,7 @@ let skipDecrypt = false; // 是否跳过解密
 let possibleKeys = new Set();   // 储存疑似 密钥
 let downId = 0; // chrome下载api 回调id
 let currentLevel = -1;  // 当前Level
-let estimateFileSize = -1; // 估算的文件最终大小
+let estimateFileSize = 0; // 估算的文件最终大小
 
 let downDuration = 0; // 下载媒体得时长
 
@@ -507,11 +507,6 @@ function parseTs(data) {
                 data.fragments[i].url = arg[0] + (tsAddArg ? "?" + tsAddArg : "");
             }
         }
-        // 估算文件大小
-        if (estimateFileSize == -1 && !data.live) {
-            estimateFileSize = 0;
-            estimateSize(data.fragments, data.fragments.length);
-        }
         /* 
         * 查看是否加密 下载key
         * firefox CSP政策不允许在script-src 使用blob 不能直接调用hls.js下载好的密钥
@@ -612,6 +607,7 @@ function parseTs(data) {
         $("#recorder").show();
         $("#count").html(i18n.liveHLS);
     } else {
+        estimateSize(_fragments); // 估算文件大小
         $("#count").append(i18n("m3u8Info", [_fragments.length, secToTime(data.totalduration)]));
         $("#sendFfmpeg").show();
         $("#retryCount").parent().hide();
@@ -671,9 +667,8 @@ function parseTs(data) {
  * 估算整个视频大小
  * 获取3个切片大小 取平均值 * 切片数量
  * @param {Array} url ts对象数组
- * @param {Number} length 切片数量
  */
-async function estimateSize(fragments, length) {
+async function estimateSize(fragments) {
     if (!fragments || fragments.length === 0) return;
 
     const samplesToCheck = Math.min(3, fragments.length);
@@ -704,8 +699,7 @@ async function estimateSize(fragments, length) {
     await Promise.all(promises);
 
     if (successfulFetches > 0) {
-        const averageSize = totalSize / successfulFetches;
-        estimateFileSize = averageSize * length;
+        estimateFileSize = totalSize / successfulFetches * fragments.length;
         $("#estimateFileSize").append(` ${i18n.estimateSize}: ${byteToSize(estimateFileSize)}`);
     }
 }
