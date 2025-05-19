@@ -425,6 +425,7 @@ hls.on(Hls.Events.ERROR, function (event, data) {
         const url = new URL(location.href);
         const params = new URLSearchParams(url.search);
         params.set("retryCount", recorderRetryCount ? recorderRetryCount - 1 : 0);
+        params.set("autoDown", 1);
         $progress.html(i18n.retryCount + ": " + recorderRetryCount);
         setTimeout(() => {
             window.location.href = window.location.origin + window.location.pathname + "?" + params.toString();
