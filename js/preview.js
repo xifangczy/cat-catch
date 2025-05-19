@@ -334,6 +334,7 @@ class FilePreview {
                 <img src="${item.favIconUrl || 'img/icon.png'}" class="preview-image icon">
             </div>
             <div class="bottom-row">
+                <img src="img/regex.png" class="${item.isRegex ? "" : "hide"}" title="${i18n.regexTitle}" style="width: 23px;">
                 <div class="file-info">${item.ext}</div>
             </div>
             <div class="actions">
