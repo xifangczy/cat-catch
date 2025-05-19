@@ -11,6 +11,7 @@ const tabId = parseInt(params.get("tabid"));    // 资源所在的标签页ID �
 const key = params.get("key");  // 自定义密钥
 let autoDown = params.get("autoDown");  //是否自动下载
 const autoClose = params.get("autoClose");  // 下载完是否关闭页面
+let retryCount = parseInt(params.get("retryCount"));  // 重试次数
 
 let currentTabId = 0;   // 本页面tab Id
 let currentIndex = 0;   // 本页面Index
@@ -150,6 +151,9 @@ function init() {
         tsAddArg = decodeURIComponent(tsAddArg);
         $("#tsAddArg").html(i18n.restoreGetParameters);
     }
+
+    // 填充重试次数
+    retryCount && $("#retryCount").val(retryCount);
 
     if (isEmpty(_m3u8Url)) {
         $("#loading").hide(); $("#m3u8Custom").show();
@@ -411,9 +415,24 @@ hls.on(Hls.Events.ERROR, function (event, data) {
     $("#loading").show();
     $("#loading .optionBox").html(`${i18n.m3u8Error}<button id="setRequestHeadersError">${i18n.setRequestHeaders}</button>`);
 
-    // 出错 如果正在录制中 自动点击下载录制按钮
+    /**
+     * 下载出错 如果在录制中 停止下载 保存文件
+     * 检查重试次数 重新下载
+     */
+    if (retryCount) {
+        recorder && stopRecorder();
+        const recorderRetryCount = parseInt($("#retryCount").val());
+        const url = new URL(location.href);
+        const params = new URLSearchParams(url.search);
+        params.set("retryCount", recorderRetryCount ? recorderRetryCount - 1 : 0);
+        $progress.html(i18n.retryCount + ": " + recorderRetryCount);
+        setTimeout(() => {
+            window.location.href = window.location.origin + window.location.pathname + "?" + params.toString();
+        }, 3000);
+        return;
+    }
     if (recorder) {
-        $("#recorder").click();
+        stopRecorder();
         autoReferer = true;
         return;
     }
@@ -573,17 +592,18 @@ function parseTs(data) {
     }
 
     writeText(_fragments);   // 写入ts链接到textarea
-    $("#count").append(i18n("m3u8Info", [_fragments.length, secToTime(data.totalduration)]));
 
+    // 提示加密
     isEncrypted && $("#count").append(` (${i18n.encryptedHLS})`);
+
+    // SAMPLE 加密算法
     if (_m3u8Content.includes("#EXT-X-KEY:METHOD=SAMPLE-AES-CTR")) {
         $("#count").append(' <b>' + i18n.encryptedSAMPLE + '</b>');
     }
+
     // 范围下载所需数据
     $("#rangeStart").attr("max", _fragments.length);
-    $("#rangeEnd").attr("max", _fragments.length);
-    $("#rangeStart").val(1);
-    $("#rangeEnd").val(_fragments.length);
+    $("#rangeEnd").attr("max", _fragments.length).val(_fragments.length);
     $m3u8dlArg.val(getM3u8DlArg());
 
     if (data.live) {
@@ -591,7 +611,9 @@ function parseTs(data) {
         $("#recorder").show();
         $("#count").html(i18n.liveHLS);
     } else {
+        $("#count").append(i18n("m3u8Info", [_fragments.length, secToTime(data.totalduration)]));
         $("#sendFfmpeg").show();
+        $("#retryCount").parent().hide();
     }
     if (!_fragments.some(fragment => fragment.initSegment) && autoDown) {
         $("#mergeTs").click();
@@ -912,6 +934,14 @@ $("#uploadKeyFile").change(function () {
 $("#uploadKey").click(function () {
     $("#uploadKeyFile").click();
 });
+function stopRecorder() {
+    $("#recorder").html(i18n.recordLive).data("switch", "on");
+    recorder = false;
+    fileStream.close();
+    buttonState("#mergeTs", true);
+    $progress.html(i18n.stopRecording);
+    initDownload();
+}
 // 录制直播
 $("#recorder").click(function () {
     if ($(this).data("switch") == "on") {
@@ -925,14 +955,10 @@ $("#recorder").click(function () {
 
         $(this).html(fileStream ? i18n.stopDownload : i18n.download).data("switch", "off");
         $progress.html(i18n.waitingForLiveData);
+        retryCount = parseInt($("#retryCount").val());
         return;
     }
-    $(this).html(i18n.recordLive).data("switch", "on");
-    recorder = false;
-    fileStream.close();
-    buttonState("#mergeTs", true);
-    $progress.html(i18n.stopRecording);
-    initDownload();
+    stopRecorder();
 });
 // 在线下载合并ts
 $("#mergeTs").click(async function () {

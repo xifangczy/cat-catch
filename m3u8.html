@@ -154,12 +154,16 @@
                 <option disabled selected hidden>playlist</option>
               </select>
               <div class="merge">
-                <input type="text" id="rangeStart" spellcheck="false" data-i18n-placeholder="start" />
+                <input type="text" id="rangeStart" spellcheck="false" data-i18n-placeholder="start" value="1" />
                 <input type="text" id="rangeEnd" spellcheck="false" data-i18n-placeholder="end" />
               </div>
             </div>
             <button id="recorder" class="button2 hide" data-switch="on" data-switch="on"
               data-i18n="recordLive"></button>
+            <div class="textColor m3u8checkbox">
+              <p data-i18n-outer="retryCount"></p>(test) <input type="number" value="0" id="retryCount"
+                spellcheck="false" style="width: 35px;" step="1" min="0" />
+            </div>
             <button id="mergeTs" class="button2" data-i18n="mergeDownloads"></button>
             <button id="errorDownload" class="hide button2" data-i18n="redownloadFailedItems"></button>
             <button id="ForceDownload" class="hide button2" data-i18n="downloadExistingData"></button>

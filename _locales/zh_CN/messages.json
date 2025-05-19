@@ -889,5 +889,8 @@
   },
   "estimateSize": {
     "message": "估算大小"
+  },
+  "retryCount": {
+    "message": "重试次数"
   }
 }
