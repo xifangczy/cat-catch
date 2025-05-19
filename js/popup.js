@@ -163,10 +163,7 @@ function AddMedia(data, currentTab = true) {
                     }
                 });
                 hls.on(Hls.Events.ERROR, function (event, data) {
-                    if (data.error.message == "Unsupported HEVC in M2TS found") {
-                        hls.stopLoad();
-                        mediaInfo.append(`<br><b>${i18n.hevcPreviewTip}</b>`);
-                    }
+                    hls.stopLoad();
                 });
                 hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
                     if (data.levels.length > 1 && !mediaInfo.text().includes(i18n.m3u8Playlist)) {

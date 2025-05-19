@@ -402,11 +402,6 @@ hls.on(Hls.Events.ERROR, function (event, data) {
             $("#tips").append("<b>" + i18n.ADTSerror + "</b>");
             hls.stopLoad();
         }
-        if (data.error.message == "Unsupported HEVC in M2TS found") {
-            $("#mp4").prop("checked", false);
-            $(".videoInfo #info").html("<b>" + i18n.hevcTip + "</b>");
-            hls.skipTheError = true;
-        }
         $("#play").hide();
         return;
     }
@@ -449,6 +444,9 @@ hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
             if (data.tracks.audiovideo?.metadata) {
                 info.append(` ${i18n.resolution}:${data.tracks.audiovideo.metadata.width} x ${data.tracks.audiovideo.metadata.height}`);
             }
+            if (data.tracks.audiovideo.codec && data.tracks.audiovideo.codec.startsWith("hvc1")) {
+                info.append(` <b>${i18n.hevcTip}</b>`);
+            }
             return;
         }
         !data.tracks.audio && info.append(` (${i18n.noAudio})`);
@@ -458,6 +456,9 @@ hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
         }
         if (hls.levels[currentLevel]?.bitrate) {
             info.append(` ${i18n.bitrate}:${parseInt(hls.levels[currentLevel].bitrate / 1000)} Kbps`);
+        }
+        if (data.tracks?.video?.codec && data.tracks.video.codec.startsWith("hvc1")) {
+            info.append(` <b>${i18n.hevcTip}</b>`);
         }
     }
 });
