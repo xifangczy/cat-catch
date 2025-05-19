@@ -886,5 +886,14 @@
   },
   "noKeyIsRequired": {
     "message": "Nenhuma chave é necessária"    
+  },
+  "estimateSize": {
+    "message": "Tamanho estimado"
+  },
+  "retryCount": {
+    "message": "Número de tentativas"
+  },
+  "useSidePanel": {
+    "message": "Usar painel lateral"
   }
 }
