@@ -892,5 +892,8 @@
   },
   "retryCount": {
     "message": "Retry count"
+  },
+  "useSidePanel": {
+    "message": "Use side panel"
   }
 }

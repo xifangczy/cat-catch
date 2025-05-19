@@ -28,7 +28,8 @@
     "webNavigation",
     "alarms",
     "declarativeNetRequest",
-    "scripting"
+    "scripting",
+    "sidePanel"
   ],
   "commands": {
     "_execute_action": {},

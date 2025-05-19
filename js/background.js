@@ -582,6 +582,10 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
             G.blockUrlSet.add(tabId);
         }
     }
+    chrome.sidePanel.setOptions({
+        tabId,
+        path: "popup.html?tabId=" + tabId
+    });
 });
 
 /**

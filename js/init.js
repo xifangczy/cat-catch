@@ -138,10 +138,6 @@ G.OptionLists = {
     send2localBody: '{"action": "${action}", "data": ${data}, "tabId": "${tabId}"}',
     send2localType: 0,
     popup: false,
-    popupHeight: 720,
-    popupWidth: 1280,
-    popupTop: 0,
-    popupLeft: 0,
     invoke: false,
     invokeText: `m3u8dlre:"\${url}" --save-dir "%USERPROFILE%\\Downloads" --del-after-done --save-name "\${title}_\${now}" --auto-select \${referer|exists:'-H "Referer: *"'}`,
     invokeConfirm: false,
@@ -161,7 +157,7 @@ G.OptionLists = {
     blockUrl: [],
     blockUrlWhite: false,
     maxLength: G.isMobile ? 999 : 9999,
-    newPopup: true,
+    sidePanel: false,   // 侧边栏
 };
 // 本地储存的配置
 G.LocalVar = {
@@ -268,6 +264,9 @@ function InitOptions() {
             chrome.storage.sync.set({ m3u8dl: items.m3u8dl });
         }
 
+        // 侧边栏
+        !G.isFirefox && chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: items.sidePanel });
+
         G = { ...items, ...G };
 
         chrome.action.setIcon({ path: G.enable ? "/img/icon.png" : "/img/icon-disable.png" });
@@ -314,6 +313,10 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
         }
         if (key == "featMobileTabId" || key == "featAutoDownTabId") {
             G[key] = new Set(newValue);
+            continue;
+        }
+        if (key == "sidePanel" && !G.isFirefox) {
+            chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: newValue });
             continue;
         }
         G[key] = newValue;

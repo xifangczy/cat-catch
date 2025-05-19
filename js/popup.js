@@ -1,7 +1,7 @@
 // 解析参数
 const params = new URL(location.href).searchParams;
 const _tabId = parseInt(params.get("tabId"));
-window.isPopup = _tabId ? true : false;
+window.isSidePanel = _tabId ? true : false;
 
 // 当前页面
 const $mediaList = $('#mediaList');
@@ -60,7 +60,7 @@ function AddMedia(data, currentTab = true) {
     data.name = isEmpty(data.name) ? data.title + '.' + data.ext : decodeURIComponent(stringModify(data.name));
     //截取文件名长度
     let trimName = data.name;
-    if (data.name.length >= 50 && !isPopup) {
+    if (data.name && data.name.length >= 50 && !isSidePanel) {
         trimName = trimName.substr(0, 20) + '...' + trimName.substr(-30);
     }
     //添加下载文件名
@@ -649,7 +649,6 @@ $("[go]").click(function () {
         chrome.tabs.create({ url: G.ffmpegConfig.url })
         return;
     }
-    // isPopup ? chrome.tabs.update({ url: url }) : chrome.tabs.create({ url: url });
     chrome.tabs.create({ url: url });
 });
 // 暂停 启用
@@ -660,26 +659,7 @@ $("#enable").click(function () {
 });
 // 弹出窗口
 $("#popup").click(function () {
-    if (G.newPopup) {
-        chrome.tabs.create({ url: `preview.html?tabId=${G.tabId}` });
-        return;
-    }
-    chrome.tabs.query({ currentWindow: false, windowType: "popup", url: chrome.runtime.getURL("popup.html?tabId=") + "*" }, function (tabs) {
-        if (tabs.length) {
-            chrome.tabs.update(tabs[0].id, { url: `popup.html?tabId=${G.tabId}` });
-            chrome.windows.update(tabs[0].windowId, { focused: true });
-        } else {
-            chrome.windows.create({
-                url: `popup.html?tabId=${G.tabId}`,
-                type: "popup",
-                height: G.popupHeight ?? 1080,
-                width: G.popupWidth ?? 1920,
-                top: G.popupTop ?? 0,
-                left: G.popupLeft ?? 0,
-            });
-        }
-        closeTab();
-    });
+    chrome.tabs.create({ url: `preview.html?tabId=${G.tabId}` });
 });
 $("#currentPage").click(function () {
     chrome.tabs.query({ active: true, currentWindow: false }, function (tabs) {
@@ -705,17 +685,14 @@ const interval = setInterval(function () {
     if (!G.initSyncComplete || !G.initLocalComplete || !G.tabId) { return; }
     clearInterval(interval);
 
-    // 弹出模式 修改G.tabID为参数设定 设置css
-    if (isPopup) {
-        G.tabId = _tabId;
-        $("body").css("width", "100%"); // body 宽度100%
-        $("#popup").hide(); // 隐藏弹出按钮
-        $("#more").hide();  // 隐藏更多功能按钮
-        $("#down").append($("#features button")).css("justify-content", "center");  // 把更多功能内按钮移动到底部
-        $("#down button").css("margin-left", "5px");    // 按钮间隔
-        $("#currentPage").show();
-    } else if (G.popup) {
-        $("#popup").click();    // 默认弹出模式
+    // 默认弹出模式
+    if (G.popup) {
+        chrome.tabs.create({ url: `preview.html?tabId=${G.tabId}` });
+        return;
+    }
+    // 侧边面板模式 body 宽度100%
+    if (isSidePanel) {
+        $("body").css("width", "100%");
     }
 
     // 获取页面DOM
@@ -797,17 +774,6 @@ const interval = setInterval(function () {
     updateDownHeight();
     const observer = new MutationObserver(updateDownHeight);
     observer.observe($down[0], { childList: true, subtree: true, attributes: true });
-
-    // 记忆弹出窗口的大小
-    (isPopup && !G.isFirefox) && chrome.windows.onBoundsChanged.addListener(function (window) {
-        chrome.storage.sync.set({
-            popupHeight: window.height,
-            popupWidth: window.width,
-            popupTop: window.top,
-            popupLeft: window.left,
-        });
-        updateDownHeight();
-    });
 
     // 疑似密钥
     chrome.webNavigation.getAllFrames({ tabId: G.tabId }, function (frames) {

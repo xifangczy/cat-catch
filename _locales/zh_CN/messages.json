@@ -892,5 +892,8 @@
   },
   "retryCount": {
     "message": "重试次数"
+  },
+  "useSidePanel": {
+    "message": "使用侧边栏"
   }
 }
