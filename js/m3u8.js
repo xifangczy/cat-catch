@@ -372,22 +372,16 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
         $("#more_options_merge").click(function () {
             const taskId = Date.parse(new Date());
             if (dataMerge.audio && dataMerge.video) {
-                openParser({
-                    url: dataMerge.audio.url,
+                const data = {
                     title: _title,
                     downFileName: _fileName,
                     tabId: tabId,
                     initiator: _initiator,
                     requestHeaders: requestHeaders,
-                }, { ffmpeg: "merge", quantity: 2, taskId: taskId, autoDown: true, autoClose: true });
-                openParser({
-                    url: dataMerge.video.url,
-                    title: _title,
-                    downFileName: _fileName,
-                    tabId: tabId,
-                    initiator: _initiator,
-                    requestHeaders: requestHeaders,
-                }, { ffmpeg: "merge", quantity: 2, taskId: taskId, autoDown: true, autoClose: true });
+                }
+                const option = { ffmpeg: "merge", quantity: 2, taskId: taskId, autoDown: true, autoClose: true };
+                openParser({ ...data, url: dataMerge.audio.url }, option);
+                openParser({ ...data, url: dataMerge.video.url }, option);
             }
         });
     } else {
