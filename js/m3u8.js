@@ -285,14 +285,19 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
     // console.log(data);
     $("#m3u8").show(); $("#loading").hide();
     const more = (data.levels.length + data.audioTracks.length + data.subtitleTracks.length >= 2);
+    const dataMerge = {};
 
     // 多个视频
     if (more && data.levels.length) {
         $("#more_m3u8").show();
-        for (let item of data.levels) {
+        let maxBandwidth = 0;
+        for (let index in data.levels) {
+            const item = data.levels[index];
             let [name, url] = getNewUrl(item);
+            maxBandwidth = Math.max(maxBandwidth, item.attrs.BANDWIDTH);
+            if (maxBandwidth == item.attrs.BANDWIDTH) { dataMerge.video = item; }   // 默选择码率最大的
             const html = $(`<div class="block">
-                    <div>${item.attrs.RESOLUTION ? i18n.resolution + ":" + item.attrs.RESOLUTION : ""}${item.attrs.BANDWIDTH ? " | " + i18n.bitrate + ":" + (parseInt(item.attrs.BANDWIDTH / 1000) + " Kbps") : ""}</div>
+                    <div><label class="more_class"><input type="radio" name="more_video" ${maxBandwidth == item.attrs.BANDWIDTH ? "checked" : ""}/>${item.attrs.RESOLUTION ? i18n.resolution + ":" + item.attrs.RESOLUTION : ""}${item.attrs.BANDWIDTH ? " | " + i18n.bitrate + ":" + (parseInt(item.attrs.BANDWIDTH / 1000) + " Kbps") : ""}</label></div>
                     <a href="${url}">${name}</a>
                     <button id="parser" type="button">${i18n.parser}</button>
                     <button class="sendFfmpeg" type="button">${i18n.sendFfmpeg}</button>
@@ -305,13 +310,17 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
             html.find("#parser").click(function () {
                 chrome.tabs.update({ url: url });
             });
+            html.find(".more_class").click(function (e) {
+                dataMerge.video = item;
+            });
             $("#next_m3u8").append(html);
         }
     }
     // 多个音频
     if (more && data.audioTracks.length) {
         $("#more_audio").show();
-        for (let item of data.audioTracks) {
+        for (let index in data.audioTracks) {
+            const item = data.audioTracks[index];
             // 音频信息没有m3u8文件 使用groupId去寻找
             if (item.url == "") {
                 let groupId = item.groupId;
@@ -323,8 +332,9 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
                 }
             }
             let [name, url] = getNewUrl(item);
+            if (index == 0) { dataMerge.audio = item; }     // 默选择第一个
             const html = $(`<div class="block">
-                    <div>${item.name ? item.name : ""} | ${item.lang ? item.lang : ""} | ${item.groupId ? item.groupId : ""}</div>
+                    <div><label><input type="radio" name="more_audio" ${index == 0 ? "checked" : ""}/>${item.name ? item.name : ""} | ${item.lang ? item.lang : ""} | ${item.groupId ? item.groupId : ""}</label></div>
                     <a href="${url}">${name}</a>
                     <button id="parser" type="button">${i18n.parser}</button>
                     <button class="sendFfmpeg" type="button">${i18n.sendFfmpeg}</button>
@@ -336,6 +346,9 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
             });
             html.find("#parser").click(function () {
                 chrome.tabs.update({ url: url });
+            });
+            html.find("label").click(function () {
+                dataMerge.video = item;
             });
             $("#next_audio").append(html);
         }
@@ -352,6 +365,37 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
             $("#next_subtitle").append(html);
         }
     }
+
+    // 合并按钮
+    if (dataMerge.audio && dataMerge.video) {
+        $("#more_options").show();
+        $("#more_options_merge").click(function () {
+            const taskId = Date.parse(new Date());
+            if (dataMerge.audio && dataMerge.video) {
+                openParser({
+                    url: dataMerge.audio.url,
+                    title: _title,
+                    downFileName: _fileName,
+                    tabId: tabId,
+                    initiator: _initiator,
+                    requestHeaders: requestHeaders,
+                }, { ffmpeg: "merge", quantity: 2, taskId: taskId, autoDown: true, autoClose: true });
+                openParser({
+                    url: dataMerge.video.url,
+                    title: _title,
+                    downFileName: _fileName,
+                    tabId: tabId,
+                    initiator: _initiator,
+                    requestHeaders: requestHeaders,
+                }, { ffmpeg: "merge", quantity: 2, taskId: taskId, autoDown: true, autoClose: true });
+            }
+        });
+    } else {
+        $("#more_m3u8 input").hide();
+        $("#more_audio input").hide();
+    }
+
+
     // 有下一级m3u8 停止解析
     if (more) {
         autoDown && highlight();

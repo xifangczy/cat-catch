@@ -676,3 +676,27 @@ function closeTab(tabId = 0) {
         }
     });
 }
+
+/**
+ * 打开解析器
+ * @param {Object} data 资源对象
+ * @param {Object} options 选项
+ */
+function openParser(data, options = {}) {
+    chrome.tabs.get(G.tabId, function (tab) {
+        const url = `/${data.parsing ? data.parsing : "m3u8"}.html?${new URLSearchParams({
+            url: data.url,
+            title: data.title,
+            filename: data.downFileName,
+            tabid: data.tabId == -1 ? G.tabId : data.tabId,
+            initiator: data.initiator,
+            requestHeaders: data.requestHeaders ? JSON.stringify(data.requestHeaders) : undefined,
+            ...Object.fromEntries(Object.entries(options).map(([key, value]) => [key, typeof value === 'boolean' ? 1 : value])),
+        })}`
+        chrome.tabs.create({
+            url: url,
+            index: tab.index + 1,
+            active: G.isMobile || !options.autoDown
+        });
+    });
+}
