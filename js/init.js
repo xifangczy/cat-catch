@@ -151,8 +151,6 @@ G.OptionLists = {
     M3u8AutoClose: false,
     // 第三方服务地址
     onlineServiceAddress: 0,
-    // 新 猫抓下载器
-    testDownloader: true,
     chromeLimitSize: 1.8 * 1024 * 1024 * 1024,
     blockUrl: [],
     blockUrlWhite: false,

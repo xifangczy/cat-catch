@@ -500,16 +500,7 @@ $mergeDown.click(function () {
         });
         return true;
     }
-    G.testDownloader ?
-        catDownload(checkedData, { ffmpeg: "merge" }) :
-        checkedData.forEach(function (data) {
-            catDownload(data, {
-                ffmpeg: "merge",
-                quantity: checkedData.length,
-                title: data._title,
-                taskId: taskId,
-            });
-        });
+    catDownload(checkedData, { ffmpeg: "merge" })
 });
 // 复制选中文件
 $('#AllCopy').click(function () {
@@ -826,42 +817,13 @@ function isPlay(data) {
 }
 
 // 猫抓下载器
-function catDownload(obj, extra = {}) {
-    if (G.testDownloader) {
-        catDownload2(obj, extra);
-        return;
-    }
-    let active = !G.downActive;
-    if (extra) { active = false; }
-    if (!extra.ffmpeg && !G.downStream && obj._size > G.chromeLimitSize && confirm(i18n("fileTooLargeStream", ["2G"]))) {
-        extra.downStream = 1;
-    }
-    chrome.tabs.get(G.tabId, function (tab) {
-        const arg = {
-            url: `/download.html?${new URLSearchParams({
-                url: obj.url,
-                // requestHeaders: JSON.stringify({ ...obj.requestHeaders, cookie: obj.cookie }),
-                requestId: obj.requestId,
-                // requestHeaders: JSON.stringify(obj.requestHeaders),
-                filename: stringModify(obj.downFileName),
-                initiator: obj.initiator,
-                ...extra
-            })}`,
-            index: tab.index + 1,
-            active: active
-        };
-        chrome.tabs.create(arg);
-    });
-}
-
-// 新建下载器标签
 let catDownloadIsProcessing = false;
-function catDownload2(data, extra = {}) {
+function catDownload(data, extra = {}) {
 
     // 防止连续多次提交
     if (catDownloadIsProcessing) {
         setTimeout(() => {
-            catDownload2(data, extra);
+            catDownload(data, extra);
         }, 233);
         return;
     }
