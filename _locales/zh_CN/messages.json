@@ -354,7 +354,7 @@
     "message": "留空为不启用 默认使用popup页面预览视频"
   },
   "preview": {
-    "message": "视频"
+    "message": "预览"
   },
   "customFilenameOption": {
     "message": "使用自定义文件名保存文件(默认为网页标题)"
