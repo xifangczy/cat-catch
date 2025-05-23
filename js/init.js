@@ -267,8 +267,16 @@ function InitOptions() {
 
         G = { ...items, ...G };
 
-        chrome.action.setIcon({ path: G.enable ? "/img/icon.png" : "/img/icon-disable.png" });
+        // 初始化 G.blockUrlSet
+        chrome.tabs.query({}, function (tabs) {
+            for (const tab of tabs) {
+                if (tab.url && isLockUrl(tab.url)) {
+                    G.blockUrlSet.add(tab.id);
+                }
+            }
+        });
 
+        chrome.action.setIcon({ path: G.enable ? "/img/icon.png" : "/img/icon-disable.png" });
         G.initSyncComplete = true;
     });
     // 读取local配置数据 交给全局变量G
