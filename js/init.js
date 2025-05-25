@@ -268,7 +268,7 @@ function InitOptions() {
         G = { ...items, ...G };
 
         // 初始化 G.blockUrlSet
-        chrome.tabs.query({}, function (tabs) {
+        (typeof isLockUrl == 'function') && chrome.tabs.query({}, function (tabs) {
             for (const tab of tabs) {
                 if (tab.url && isLockUrl(tab.url)) {
                     G.blockUrlSet.add(tab.id);
