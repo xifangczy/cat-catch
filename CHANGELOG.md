@@ -1,5 +1,27 @@
 ## 更新说明
 
+### 2.6.2
+
+[Added] m3u8 解析器 录制失败重试功能 (测试)
+
+[Added] m3u8 解析器 尝试估算文件大小
+
+[Added] 增加 其他设置 `使用侧边栏` 选项。从 popup 模式改为浏览器侧边栏打开扩展 (不支持 firefox)
+
+[Updated] m3u8 预览现在支持 hevc/h265 编码
+
+[Updated] 深度搜索 支持解析 vimeo playlist.json
+
+[Changed] 重构 缓存捕捉 脚本 减少头部数据缺失问题
+
+[Changed] 重构 排除重复的资源 减少资源占用
+
+[Fixed] 缓存捕捉脚本导致视频无法播放问题
+
+[Deleted] m3u8 解析器 删除了旧版本下载器
+
+[Deleted] 启用新弹出页 删除旧弹出页
+
 ### 2.6.1
 
 [Changed] 对手机浏览器进行一些适配
