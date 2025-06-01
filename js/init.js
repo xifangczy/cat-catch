@@ -25,6 +25,14 @@ if (!chrome.downloads) {
         show: function () { },
     }
 }
+// 兼容 114版本以下没有chrome.sidePanel
+if (!chrome.sidePanel) {
+    chrome.sidePanel = {
+        setOptions: function (options) { },
+        setPanelBehavior: function (options) { },
+    }
+}
+
 // 简写翻译函数
 const i18n = new Proxy(chrome.i18n.getMessage, {
     get: function (target, key) {

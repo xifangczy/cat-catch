@@ -19,8 +19,4 @@ if (typeof (browser) == "object") {
             browser.tabs.create({ url: "install.html" });
         }
     });
-    chrome.sidePanel = {
-        setOptions: function (options) { },
-        setPanelBehavior: function (options) { },
-    }
 }
