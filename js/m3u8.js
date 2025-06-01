@@ -440,9 +440,10 @@ hls.on(Hls.Events.ERROR, function (event, data) {
         hls.stopLoad();
     }
     if (data.type == "mediaError" && data.details == "fragParsingError") {
-        if (data.error.message == "No ADTS header found in AAC PES") {
+        if (data.error.message == "No ADTS header found in AAC PES" && !hls.adtsTips) {
             $("#tips").append("<b>" + i18n.ADTSerror + "</b>");
             hls.stopLoad();
+            hls.adtsTips = true; // 标记已经提示过
         }
         $("#play").hide();
         return;
