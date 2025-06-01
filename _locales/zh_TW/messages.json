@@ -886,5 +886,14 @@
   },
   "noKeyIsRequired": {
     "message": "不需要金鑰"
+  },
+  "estimateSize": {
+    "message": "估算大小"
+  },
+  "retryCount": {
+    "message": "重試次數"
+  },
+  "useSidePanel": {
+    "message": "使用側邊欄"
   }
 }
