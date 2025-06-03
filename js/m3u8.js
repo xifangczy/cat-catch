@@ -1194,7 +1194,7 @@ $("#searchingForRealKey").click(function () {
             return true;
         }
         // ts
-        const maxCheckLength = Math.min(188, uint8Array.length);
+        const maxCheckLength = Math.min(1024, uint8Array.length);
         for (let i = 0; i < maxCheckLength; i++) {
             if (uint8Array[i] === 0x47 && (i + 188) < uint8Array.length && uint8Array[i + 188] === 0x47) {
                 return true;
