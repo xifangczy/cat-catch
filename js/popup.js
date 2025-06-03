@@ -907,7 +907,7 @@ function mergeDownButtonCheck(data) {
     if (!data.type) {
         return isMediaExt(data.ext);
     }
-    return data.type.startsWith("video") || data.type.startsWith("audio") || data.type.endsWith("octet-stream");
+    return isMediaExt(data.ext) || data.type.startsWith("video") || data.type.startsWith("audio") || data.type.endsWith("octet-stream");
 }
 function mergeDownButton() {
     const [checkedData, maxSize] = getCheckedData();
