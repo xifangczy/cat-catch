@@ -474,10 +474,22 @@
         }
         return false;
     }
+    function TsProtocol(text) {
+        let tsLists = text.split("\n");
+        for (let i in tsLists) {
+            if (tsLists[i][0] == "#") { continue; }
+            if (tsLists[i].startsWith("//")) {
+                tsLists[i] = location.protocol + tsLists[i];
+            }
+        }
+        // return tsLists.join("\n");
+        return _arrayJoin.call(tsLists, "\n");
+    }
     function getBaseUrl(url) {
         let bashUrl = url.split("/");
         bashUrl.pop();
-        return baseUrl.join("/") + "/";
+        // return baseUrl.join("/") + "/";
+        return _arrayJoin.call(bashUrl, "/") + "/";
     }
     function addBaseUrl(baseUrl, m3u8Text) {
         let m3u8_split = m3u8Text.split("\n");
@@ -537,6 +549,8 @@
     }
     function toUrl(text, ext = "m3u8") {
         if (!text) { return; }
+        // 处理ts地址无protocol
+        text = TsProtocol(text);
         if (isFullM3u8(text)) {
             let url = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(text)]));
             postData({ action: "catCatchAddMedia", url: url, href: location.href, ext: ext });
