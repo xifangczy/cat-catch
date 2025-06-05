@@ -1201,6 +1201,7 @@ $("#searchingForRealKey").click(function () {
             }
         }
     }
+    const decryptor = new AESDecryptor();
     fetch(_fragments[0].url)
         .then(response => response.arrayBuffer())
         .then(function (buffer) {
