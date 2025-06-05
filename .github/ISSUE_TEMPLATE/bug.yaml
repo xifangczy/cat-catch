@@ -13,10 +13,12 @@ body:
       options:
         - Google Chrome
         - Microsoft Edge
+        - Microsoft Edge (Android)
         - Firefox
+        - Firefox (Android)
         - Chromium
         - 360浏览器
-        - 其他基于 Chromium 的浏览器
+        - 其他基于 Chromium 的浏览器 / Other Chromium-based browsers
     validations:
       required: true
   - type: input
