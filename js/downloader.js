@@ -74,6 +74,16 @@ awaitG(() => {
 });
 
 function start() {
+
+    // 提前打开ffmpeg页面
+    if (_ffmpeg) {
+        chrome.runtime.sendMessage({
+            Message: "catCatchFFmpeg",
+            action: "openFFmpeg",
+            extra: i18n.waitingForMedia
+        });
+    }
+
     $("#autoClose").prop("checked", G.downAutoClose);
     streamSaver.mitm = G.streamSaverConfig.url;
 

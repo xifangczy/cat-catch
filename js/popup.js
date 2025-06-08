@@ -487,11 +487,6 @@ $('#DownFile').click(function () {
 // 合并下载
 $mergeDown.click(function () {
     const [checkedData, maxSize] = getCheckedData();
-    chrome.runtime.sendMessage({
-        Message: "catCatchFFmpeg",
-        action: "openFFmpeg",
-        extra: i18n.waitingForMedia
-    });
     const taskId = Date.parse(new Date());
     // 都是m3u8 自动合并并发送到ffmpeg
     if (checkedData.every(data => isM3U8(data))) {
@@ -762,10 +757,9 @@ const interval = setInterval(function () {
 
     $(`<style>${G.css}</style>`).appendTo("head");
 
-    updateDownHeight();
     const observer = new MutationObserver(updateDownHeight);
     observer.observe($down[0], { childList: true, subtree: true, attributes: true });
-
+    setInterval(() => { updateDownHeight(); }, 233);
     // 疑似密钥
     chrome.webNavigation.getAllFrames({ tabId: G.tabId }, function (frames) {
         if (!frames) { return; }
@@ -783,7 +777,7 @@ const interval = setInterval(function () {
     });
 }, 0);
 /********************绑定事件END********************/
-window.addEventListener('unload', function () {
+window.addEventListener('beforeunload', function () {
     chrome.runtime.sendMessage(chrome.runtime.id, { Message: "clearRedundant" });
 });
 
