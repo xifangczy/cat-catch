@@ -271,7 +271,7 @@ function InitOptions() {
         }
 
         // 侧边栏
-        !G.isFirefox && chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: items.sidePanel });
+        chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: items.sidePanel });
 
         G = { ...items, ...G };
 
