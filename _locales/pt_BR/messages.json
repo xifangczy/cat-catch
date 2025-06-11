@@ -895,5 +895,11 @@
   },
   "useSidePanel": {
     "message": "Usar painel lateral"
+  },
+  "Script": {
+    "message": "Script"
+  },
+  "alwaysSearch": {
+    "message": "Sempre habilitar pesquisa profunda"
   }
 }
