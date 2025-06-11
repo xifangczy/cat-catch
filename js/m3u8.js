@@ -427,6 +427,11 @@ hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
             hls.detachMedia(video);
             video.remove();
         }
+        video.onerror = function () {
+            hls.stopLoad();
+            hls.detachMedia(video);
+            video.remove();
+        }
         delete video;
     }
     currentLevel = data.level;
@@ -443,6 +448,7 @@ hls.on(Hls.Events.ERROR, function (event, data) {
         if (data.error.message == "No ADTS header found in AAC PES" && !hls.adtsTips) {
             $("#tips").append("<b>" + i18n.ADTSerror + "</b>");
             hls.stopLoad();
+            hls.destroy();
             hls.adtsTips = true; // 标记已经提示过
         }
         $("#play").hide();
