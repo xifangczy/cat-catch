@@ -416,6 +416,9 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         const refresh = Message.refresh ?? script.refresh;
         if (scriptTabid.has(Message.tabId)) {
             scriptTabid.delete(Message.tabId);
+            if (Message.script == "search.js") {
+                G.deepSearchTemporarilyClose = Message.tabId;
+            }
             refresh && chrome.tabs.reload(Message.tabId, { bypassCache: true });
             sendResponse("ok");
             return true;
@@ -615,6 +618,11 @@ chrome.webNavigation.onCommitted.addListener(function (details) {
 
     // chrome内核版本 102 以下不支持 chrome.scripting.executeScript API
     if (G.version < 102) { return; }
+
+    if (G.deepSearch && G.deepSearchTemporarilyClose != details.tabId) {
+        G.scriptList.get("search.js").tabId.add(details.tabId);
+        G.deepSearchTemporarilyClose = null;
+    }
 
     // catch-script 脚本
     G.scriptList.forEach(function (item, script) {

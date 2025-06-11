@@ -18,6 +18,7 @@
       <li><a href="#anchorSuffix" data-i18n="suffix"></a></li>
       <li><a href="#anchorType" data-i18n="type"></a></li>
       <li><a href="#anchorRegexMatch" data-i18n="regexMatch"></a></li>
+      <li><a href="#anchorScriptSettings" data-i18n="Script"></a></li>
       <li><a href="#anchorBlockUrl" data-i18n="blockUrl"></a></li>
       <li><a href="#anchorCopy" data-i18n="copy"></a></li>
       <li><a href="#anchorAria2Rpc">Aria2 RPC</a></li>
@@ -121,6 +122,29 @@
         <span data-i18n="flag"></span><br />
         <input type="text" id="testFlag" style="width: 20px" value="ig" />
         <span style="color: #ff0000" id="testResult" data-i18n="noMatch"></span>
+      </div>
+    </section>
+
+    <!-- 脚本设置 -->
+    <section id="anchorScriptSettings">
+      <h1 class="optionsTitle" data-i18n="Script"></h1>
+      <div class="optionBox" id="OtherOption">
+        <div class="list otherOption">
+
+          <div class="item">
+            <div data-i18n="alwaysSearch"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" save="click" id="deepSearch" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+        <div class="flex-end">
+          <button type="button" class="resetOption" data-i18n="resetSettings"></button>
+        </div>
       </div>
     </section>
 

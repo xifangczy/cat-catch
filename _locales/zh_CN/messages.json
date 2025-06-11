@@ -895,5 +895,11 @@
   },
   "useSidePanel": {
     "message": "使用侧边栏"
+  },
+  "Script": {
+    "message": "脚本"
+  },
+  "alwaysSearch": {
+    "message": "始终打开深度搜索"
   }
 }

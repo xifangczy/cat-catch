@@ -895,5 +895,11 @@
   },
   "useSidePanel": {
     "message": "Use side panel"
+  },
+  "Script": {
+    "message": "Script"
+  },
+  "alwaysSearch": {
+    "message": "Always enable deep search"
   }
 }
