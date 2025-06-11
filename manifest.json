@@ -7,6 +7,9 @@
     "default_title": "__MSG_catCatch__",
     "default_popup": "popup.html"
   },
+  "side_panel": {
+    "default_path": "popup.html"
+  },
   "description": "__MSG_description__",
   "icons": {
     "64": "img/icon.png",
