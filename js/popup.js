@@ -672,10 +672,10 @@ const interval = setInterval(function () {
 
     if (G.popup) {
         if (!_tabId) {
-            chrome.tabs.create({ url: `${G.popup == 1 ? "preview" : "popup"}.html?tabId=${G.tabId}` });
+            chrome.tabs.create({ url: `${G.popupMode === 0 ? "preview" : "popup"}.html?tabId=${G.tabId}` });
             return;
         }
-        if (G.popup === 2) {
+        if (G.popupMode === 1) {
             $("body").addClass("full-width-mode");
             $("#popup, #more").hide();
             $("#features button").appendTo("#down");

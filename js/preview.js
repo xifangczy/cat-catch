@@ -133,7 +133,7 @@ class FilePreview {
 
         // 默认弹出模式
         document.querySelector('#defaultPopup').addEventListener('change', (e) => {
-            chrome.storage.sync.set({ popup: parseInt(e.target.value) });
+            chrome.storage.sync.set({ popup: e.target.checked });
         });
     }
     // 全选/反选

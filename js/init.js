@@ -146,7 +146,8 @@ G.OptionLists = {
     send2localMethod: 'POST',
     send2localBody: '{"action": "${action}", "data": ${data}, "tabId": "${tabId}"}',
     send2localType: 0,
-    popup: 0, // 1:preview.html 2:popup.html
+    popup: false,
+    popupMode: 0, // 0:preview.html 1:popup.html
     invoke: false,
     invokeText: `m3u8dlre:"\${url}" --save-dir "%USERPROFILE%\\Downloads" --del-after-done --save-name "\${title}_\${now}" --auto-select \${referer|exists:'-H "Referer: *"'}`,
     invokeConfirm: false,
@@ -270,10 +271,6 @@ function InitOptions() {
         if (typeof items.m3u8dl == 'boolean') {
             items.m3u8dl = items.m3u8dl ? 1 : 0;
             chrome.storage.sync.set({ m3u8dl: items.m3u8dl });
-        }
-        if (typeof items.popup == 'boolean') {
-            items.popup = items.popup ? 1 : 0;
-            chrome.storage.sync.set({ popup: items.popup });
         }
 
         // 侧边栏
