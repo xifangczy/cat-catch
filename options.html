@@ -701,11 +701,12 @@
 
           <div class="item">
             <div data-i18n="defaultPopup"></div>
-            <div class="switch">
-              <label class="switchLabel switchRadius">
-                <input type="checkbox" id="popup" save="click" class="switchInput" />
-                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
-              </label>
+            <div class="switch switchSelect">
+              <select id="popup" class="select" save="select">
+                <option value="0" data-i18n="close"></option>
+                <option value="1">preview</option>
+                <option value="2">popup</option>
+              </select>
             </div>
           </div>
 

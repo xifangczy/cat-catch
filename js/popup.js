@@ -1,7 +1,6 @@
 // 解析参数
 const params = new URL(location.href).searchParams;
 const _tabId = parseInt(params.get("tabId"));
-window.isSidePanel = _tabId ? true : false;
 
 // 当前页面
 const $mediaList = $('#mediaList');
@@ -60,7 +59,7 @@ function AddMedia(data, currentTab = true) {
     data.name = isEmpty(data.name) ? data.title + '.' + data.ext : decodeURIComponent(stringModify(data.name));
     //截取文件名长度
     let trimName = data.name;
-    if (data.name && data.name.length >= 50 && !isSidePanel) {
+    if (data.name && data.name.length >= 50 && !_tabId) {
         trimName = trimName.substr(0, 20) + '...' + trimName.substr(-30);
     }
     //添加下载文件名
@@ -671,13 +670,25 @@ const interval = setInterval(function () {
     if (!G.initSyncComplete || !G.initLocalComplete || !G.tabId) { return; }
     clearInterval(interval);
 
-    // 默认弹出模式
     if (G.popup) {
-        chrome.tabs.create({ url: `preview.html?tabId=${G.tabId}` });
-        return;
+        if (!_tabId) {
+            chrome.tabs.create({ url: `${G.popup == 1 ? "preview" : "popup"}.html?tabId=${G.tabId}` });
+            return;
+        }
+        if (G.popup === 2) {
+            $("body").addClass("full-width-mode");
+            $("#popup, #more").hide();
+            $("#features button").appendTo("#down");
+            $("#down")
+                .css("justify-content", "center")
+                .find("button")
+                .css("margin-left", "5px");
+            $("#currentPage").show();
+        }
     }
     // 侧边面板模式 body 宽度100%
-    if (isSidePanel) {
+    if (_tabId) {
+        G.tabId = _tabId;
         $("body").css("width", "100%");
     }
 
