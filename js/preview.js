@@ -132,8 +132,8 @@ class FilePreview {
         }
 
         // 默认弹出模式
-        document.querySelector('#defaultPopup').addEventListener('click', (e) => {
-            chrome.storage.sync.set({ popup: e.target.checked });
+        document.querySelector('#defaultPopup').addEventListener('change', (e) => {
+            chrome.storage.sync.set({ popup: parseInt(e.target.value) });
         });
     }
     // 全选/反选
@@ -954,7 +954,7 @@ class FilePreview {
             });
         });
 
-        document.querySelector('#defaultPopup').checked = G.popup;
+        document.querySelector('#defaultPopup').value = G.popup;
     }
 
     // 版本检测
