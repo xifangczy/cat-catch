@@ -186,6 +186,7 @@ function start() {
         // 是流式下载 停止写入
         if (fragment.fileStream) {
             fragment.fileStream.close();
+            fragment.fileStream = null;
             return;
         }
 
