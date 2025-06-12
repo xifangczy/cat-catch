@@ -954,7 +954,7 @@ class FilePreview {
             });
         });
 
-        document.querySelector('#defaultPopup').value = G.popup;
+        document.querySelector('#defaultPopup').checked = G.popup;
     }
 
     // 版本检测
