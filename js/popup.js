@@ -1,6 +1,7 @@
 // 解析参数
 const params = new URL(location.href).searchParams;
 const _tabId = parseInt(params.get("tabId"));
+const _type = params.get("type");
 
 // 当前页面
 const $mediaList = $('#mediaList');
@@ -644,11 +645,27 @@ $("#enable").click(function () {
 });
 // 弹出窗口
 $("#popup").click(function () {
-    chrome.tabs.create({ url: `preview.html?tabId=${G.tabId}` });
+    switch (G.popupMode) {
+        case 0:
+            chrome.tabs.create({ url: `preview.html?tabId=${G.tabId}` });
+            break;
+        case 1:
+            chrome.tabs.create({ url: `popup.html?tabId=${G.tabId}&type=tab` });
+            break;
+        case 2:
+            chrome.windows.create({ url: `preview.html?tabId=${G.tabId}`, type: "popup", height: 1080, width: 1920 });
+            break;
+        case 3:
+            chrome.windows.create({ url: `popup.html?tabId=${G.tabId}&type=window`, type: "popup", height: 1080, width: 1920 });
+            break;
+        default:
+            chrome.tabs.create({ url: `preview.html?tabId=${G.tabId}` });
+            break;
+    }
 });
 $("#currentPage").click(function () {
     chrome.tabs.query({ active: true, currentWindow: false }, function (tabs) {
-        chrome.tabs.update({ url: `popup.html?tabId=${tabs[0].id}` });
+        chrome.tabs.update({ url: `popup.html?tabId=${tabs[0].id}${_type ? "&type=" + _type : ""}` });
     });
 });
 
@@ -670,26 +687,18 @@ const interval = setInterval(function () {
     if (!G.initSyncComplete || !G.initLocalComplete || !G.tabId) { return; }
     clearInterval(interval);
 
-    if (G.popup) {
-        if (!_tabId) {
-            chrome.tabs.create({ url: `${G.popupMode === 0 ? "preview" : "popup"}.html?tabId=${G.tabId}` });
-            return;
-        }
-        if (G.popupMode === 1) {
-            $("body").addClass("full-width-mode");
-            $("#popup, #more").hide();
-            $("#features button").appendTo("#down");
-            $("#down")
-                .css("justify-content", "center")
-                .find("button")
-                .css("margin-left", "5px");
-            $("#currentPage").show();
-        }
+    if (G.popup && !_tabId) {
+        closeTab();
+        $("#popup").click();
+        return;
     }
     // 侧边面板模式 body 宽度100%
     if (_tabId) {
         G.tabId = _tabId;
         $("body").css("width", "100%");
+        $("#down").css("justify-content", "center").find("button").css("margin-left", "5px");
+        $("#popup").hide();
+        _type == "window" && $("#currentPage").show();
     }
 
     // 获取页面DOM
