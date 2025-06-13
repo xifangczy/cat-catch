@@ -691,6 +691,8 @@ chrome.commands.onCommand.addListener(function (command) {
         G.enable = !G.enable;
         chrome.storage.sync.set({ enable: G.enable });
         chrome.action.setIcon({ path: G.enable ? "/img/icon.png" : "/img/icon-disable.png" });
+    } else if (command == "reboot") {
+        chrome.runtime.reload();
     }
 });
 

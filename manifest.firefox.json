@@ -48,6 +48,9 @@
     },
     "clear": {
       "description": "__MSG_clear__"
+    },
+    "reboot": {
+      "description": "__MSG_restartExtension__"
     }
   },
   "browser_specific_settings": {
