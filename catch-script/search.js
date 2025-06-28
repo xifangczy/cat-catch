@@ -5,11 +5,9 @@
     // 防止 console.log 被劫持
     if (!isRunningInWorker && CATCH_SEARCH_DEBUG && console.log.toString() != 'function log() { [native code] }') {
         const newIframe = top.document.createElement("iframe");
-        newIframe.style.width = 0;
-        newIframe.style.height = 0;
+        newIframe.style.display = "none";
         top.document.body.appendChild(newIframe);
-        newIframe.contentWindow.document.write("<script>(window.catCatchLOG=function(){console.log(...arguments);})();</script>");
-        window.console.log = newIframe.contentWindow.catCatchLOG;
+        window.console.log = newIframe.contentWindow.console.log;
     }
     // 防止 window.postMessage 被劫持
     const _postMessage = (isRunningInWorker ? self : window).postMessage;
