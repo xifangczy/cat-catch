@@ -110,11 +110,7 @@ function init() {
             _data.pageDOM = new DOMParser().parseFromString(result, 'text/html');
         });
     }
-    if (G.isMobile) {
-        $(`<link rel="stylesheet" type="text/css" href="css/mobile.css">`).appendTo("head");
-    }
-    // 自定义CSS
-    $(`<style>${G.css}</style>`).appendTo("head");
+    loadCSS();
 
     // 隐藏firefox 不支持的功能
     G.isFirefox && $(".firefoxHide").each(function () { $(this).hide(); });

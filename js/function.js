@@ -700,3 +700,18 @@ function openParser(data, options = {}) {
         });
     });
 }
+/**
+ * 加载CSS样式
+ */
+function loadCSS() {
+    if (G.isMobile) {
+        const mobileCssLink = document.createElement('link');
+        mobileCssLink.rel = 'stylesheet';
+        mobileCssLink.type = 'text/css';
+        mobileCssLink.href = 'css/mobile.css';
+        document.head.appendChild(mobileCssLink);
+    }
+    const styleElement = document.createElement('style');
+    styleElement.textContent = G.css;
+    document.head.appendChild(styleElement);
+}

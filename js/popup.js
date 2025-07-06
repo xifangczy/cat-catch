@@ -770,12 +770,7 @@ const interval = setInterval(function () {
     // 上一次设定的倍数
     $("#playbackRate").val(G.playbackRate);
 
-    // 手机浏览器
-    if (G.isMobile) {
-        $(`<link rel="stylesheet" type="text/css" href="css/mobile.css">`).appendTo("head");
-    }
-
-    $(`<style>${G.css}</style>`).appendTo("head");
+    loadCSS();
 
     const observer = new MutationObserver(updateDownHeight);
     observer.observe($down[0], { childList: true, subtree: true, attributes: true });

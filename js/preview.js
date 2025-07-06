@@ -966,10 +966,7 @@ class FilePreview {
 }
 
 awaitG(() => {
-    // 自定义css
-    const css = document.createElement('style');
-    css.textContent = G.css;
-    document.head.appendChild(css);
+    loadCSS();
 
     // 实例化 FilePreview
     const filePreview = new FilePreview();

@@ -22,7 +22,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 });
 
 function init() {
-    $(`<style>${G.css}</style>`).appendTo("head");
+    loadCSS();
     if (_url) {
         fetch(_url)
             .then(response => response.text())

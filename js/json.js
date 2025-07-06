@@ -9,7 +9,7 @@ let requestHeaders = JSONparse(_requestHeaders);
 setRequestHeaders(requestHeaders, () => { awaitG(init); });
 
 function init() {
-    $(`<style>${G.css}</style>`).appendTo("head");
+    loadCSS();
     var jsonContent = "";
     var options = {
         collapsed: true,
