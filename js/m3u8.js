@@ -214,10 +214,20 @@ function init() {
         $("#parse").click(function () {
             let m3u8Text = $("#m3u8Text").val().trim();
             let baseUrl = $("#baseUrl").val().trim();
-            let m3u8Url = $("#m3u8Url").val().trim();
             let referer = $("#referer").val().trim();
-            if (m3u8Url != "") {
-                let url = "m3u8.html?url=" + encodeURIComponent(m3u8Url);
+            if (referer) {
+                if (referer.startsWith("http")) {
+                    setRequestHeaders({ referer: referer });
+                } else {
+                    setRequestHeaders(JSONparse(referer));
+                }
+            }
+
+            if (m3u8Text == "") { return; }
+
+            // 只有一个链接 后缀为m3u8 直接解析
+            if (m3u8Text.split("\n").length == 1 && GetExt(m3u8Text) == "m3u8") {
+                let url = "m3u8.html?url=" + encodeURIComponent(m3u8Text);
                 if (referer) {
                     if (referer.startsWith("http")) {
                         url += "&requestHeaders=" + encodeURIComponent(JSON.stringify({ referer: referer }));
@@ -228,13 +238,8 @@ function init() {
                 chrome.tabs.update({ url: url });
                 return;
             }
-            if (referer) {
-                if (referer.startsWith("http")) {
-                    data[0].requestHeaders = { referer: referer };
-                } else {
-                    data[0].requestHeaders = JSONparse(referer);
-                }
-            }
+
+            // 如果不是 m3u8 文件内容 转换为 m3u8 文件内容
             if (!m3u8Text.includes("#EXTM3U")) {
                 // ts列表链接 转 m3u8
                 const tsList = m3u8Text.split("\n");
