@@ -41,14 +41,13 @@ class FilePreview {
         this.tab = await chrome.tabs.getCurrent();  // 获取当前标签
         this.setupEventListeners();     // 设置事件监听
         await this.loadFileItems();     // 载入数据
-        this.setupExtensionFilters();   // 设置扩展名筛选
-        this.setupTypeFilters();   // 设置扩展名筛选
+        this.setupFilters();            // 设置 后缀/类型 筛选
         this.renderFileItems();         // 渲染文件列表
         this.startPreviewGeneration();  // 开始预览生成
-        this.setupSelectionBox();      // 框选
-        this.srciptList();         // 脚本列表
-        this.updateSrciptButton();         // 更新按钮状态
-        this.checkVersion();     // 检查版本
+        this.setupSelectionBox();       // 框选
+        this.srciptList();              // 脚本列表
+        this.updateSrciptButton();      // 更新按钮状态
+        this.checkVersion();            // 检查版本
     }
 
     /**
@@ -432,8 +431,13 @@ class FilePreview {
      * @param {Array} items 数据项
      * @param {String} property 数据项的属性
      */
-    setupFilters(filterId, items, property) {
-        const uniqueValues = [...new Set(items.map(item => item[property]))];
+    setupFilters(filterId, property) {
+        if (arguments.length === 0) {
+            this.setupFilters('extensionFilters', 'ext');
+            this.setupFilters('typeFilters', 'type');
+            return;
+        }
+        const uniqueValues = [...new Set(this.originalItems.map(item => item[property]))];
         const filterContainer = document.querySelector(`#${filterId}`);
         uniqueValues.forEach(value => {
             if (filterContainer.querySelector(`input[value="${value}"]`)) return;
@@ -444,19 +448,6 @@ class FilePreview {
         });
     }
 
-    /**
-     * 设置扩展名复选框
-     */
-    setupExtensionFilters() {
-        this.setupFilters('extensionFilters', this.originalItems, 'ext');
-    }
-
-    /**
-     * 设置类型复选框
-     */
-    setupTypeFilters() {
-        this.setupFilters('typeFilters', this.originalItems, 'type');
-    }
     /**
      * 渲染文件列表
      */
@@ -881,7 +872,7 @@ class FilePreview {
         // this.startPreviewGeneration(); 防抖
         clearTimeout(this.pushDebounce);
         this.pushDebounce = setTimeout(() => {
-            this.setupExtensionFilters();
+            this.setupFilters();
             this.updateFileList();
             this.startPreviewGeneration();
         }, 1000);
