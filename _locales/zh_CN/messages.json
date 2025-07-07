@@ -441,7 +441,7 @@
     "message": "后台打开下载器页面"
   },
   "m3u8Placeholder": {
-    "message": "输入m3u8内容 或 ts碎片列表."
+    "message": "请输入 m3u8链接 / m3u8内容 / 切片列表"
   },
   "m3u8Url": {
     "message": "m3u8地址"
