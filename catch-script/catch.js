@@ -41,8 +41,15 @@
 
             // 自动跳转到缓冲尾
             if (localStorage.getItem("CatCatchCatch_autoToBuffered") == "checked") {
-                setTimeout(() => {
-                    this.catCatch.querySelector("#autoToBuffered").click();
+                const autoToBufferedInterval = setInterval(() => {
+                    const videos = document.querySelectorAll('video');
+                    if (videos.length > 0 && Array.from(videos).some(video => !video.paused && video.readyState > 2)) {
+                        const autoToBufferedElement = this.catCatch.querySelector("#autoToBuffered");
+                        if (autoToBufferedElement) {
+                            autoToBufferedElement.click();
+                            clearInterval(autoToBufferedInterval);
+                        }
+                    }
                 }, 1000);
             }
         }
