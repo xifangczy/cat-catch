@@ -10,6 +10,7 @@
             this.catchMedia = [];   // 捕获的媒体数据
             this.mediaSize = 0; // 捕获的媒体数据大小
             this.setFileName = null;    // 文件名
+            this.catCatch = null; // UI元素
 
             // 移动面板相关属性
             this.x = 0;
@@ -37,6 +38,13 @@
 
             // 代理MediaSource方法
             this.proxyMediaSourceMethods();
+
+            // 自动跳转到缓冲尾
+            if (localStorage.getItem("CatCatchCatch_autoToBuffered") == "checked") {
+                setTimeout(() => {
+                    this.catCatch.querySelector("#autoToBuffered").click();
+                }, 1000);
+            }
         }
 
         /**
@@ -290,7 +298,7 @@
             if (completeClearCache) completeClearCache.addEventListener('click', this.handleCompleteClearCache.bind(this));
 
             // 自动跳转到缓冲节点
-            this.autoToBufferedFlag = true;
+            // this.autoToBufferedFlag = true;
             const autoToBuffered = this.catCatch.querySelector("#autoToBuffered");
             if (autoToBuffered) autoToBuffered.addEventListener('click', this.handleAutoToBuffered.bind(this));
 
@@ -458,11 +466,13 @@
          * @param {MouseEvent} event 
          */
         handleAutoToBuffered(event) {
-            if (!this.autoToBufferedFlag) return;
-            this.autoToBufferedFlag = false;
+            // if (!this.autoToBufferedFlag) return;
+            // this.autoToBufferedFlag = false;
 
             const $autoToBuffered = this.catCatch.querySelector("#autoToBuffered");
             if (!$autoToBuffered) return;
+
+            localStorage.setItem("CatCatchCatch_autoToBuffered", event.target.checked ? "checked" : "");
 
             const videos = document.querySelectorAll("video");
             for (let video of videos) {
