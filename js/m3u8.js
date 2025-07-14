@@ -606,6 +606,9 @@ function parseTs(data) {
 
         // #EXT-X-DISCONTINUITY
         if (i === data.fragments.length - 1 || data.fragments[i].cc !== data.fragments[i + 1].cc) {
+            if (discontinuity.start == 0) {
+                $('#cc').append(`<option value="0">${i18n.selectAll}</option>`);
+            }
             $('#cc').append(`<option value="${+discontinuity.start + 1}-${i + 1}">playlist: ${data.fragments[i].cc}</option>`);
             discontinuity.start = i + 1;
         }
@@ -1138,6 +1141,11 @@ $(document).on("click", "#setRequestHeaders, #setRequestHeadersError", function 
 
 // #EXT-X-DISCONTINUITY 范围选择
 $('#cc').change(function () {
+    if (this.value == "0") {
+        $("#rangeStart").val(1);
+        $("#rangeEnd").val(_fragments.length);
+        return;
+    }
     const range = this.value.split("-");
     $("#rangeStart").val(+range[0]);
     $("#rangeEnd").val(+range[1]);
