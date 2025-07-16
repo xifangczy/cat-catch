@@ -475,7 +475,9 @@ $('#DownFile').click(function () {
             openParser(data, { autoDown: true, autoClose: true });
             continue;
         }
+        // 以防止popup页面被关闭，丢失下载数据 批量下载前临时修改为 后台下载
         G.downActive = true;
+
         index++;
         setTimeout(function () {
             chrome.downloads.download({
