@@ -7,7 +7,6 @@ class FilePreview {
         this.fileItems = [];         // 文件列表
         this.originalItems = [];     // 原始文件列表
         this.regexFilters = null;    // 正则过滤
-        this.catDownloadIsProcessing = false;   // 猫抓下载器是否正在处理
         this.pushDebounce = null;   // 添加文件防抖
         this.alertTimer = null;     // 提示信息定时器
         this.isDragging = false;    // 是否正在拖动
@@ -688,56 +687,33 @@ class FilePreview {
      * @param {Object} extra 
      */
     catDownload(data, extra = {}) {
-        // 防止连续多次提交
-        if (this.catDownloadIsProcessing) {
-            setTimeout(() => {
-                catDownload(data, extra);
-            }, 233);
-            return;
-        }
-        this.catDownloadIsProcessing = true;
         if (!Array.isArray(data)) { data = [data]; }
-
-        // 储存数据到临时变量 提高检索速度
         localStorage.setItem('downloadData', JSON.stringify(data));
-
-        // 如果大于2G 询问是否使用流式下载
         if (!extra.ffmpeg && !G.downStream && Math.max(...data.map(item => item._size)) > G.chromeLimitSize && confirm(i18n("fileTooLargeStream", ["2G"]))) {
             extra.downStream = 1;
         }
-        // 发送消息给下载器
         chrome.runtime.sendMessage(chrome.runtime.id, { Message: "catDownload", data: data }, (message) => {
             // 不存在下载器或者下载器出错 新建一个下载器
             if (chrome.runtime.lastError || !message || message.message != "OK") {
-                this.createCatDownload(data, extra);
-                return;
-            }
-            this.catDownloadIsProcessing = false;
-        });
-    }
-    /**
-     * 创建猫抓下载器
-     * @param {Object} data 
-     * @param {Object} extra 
-     */
-    createCatDownload(data, extra) {
-        const arg = {
-            url: `/downloader.html?${new URLSearchParams({
-                requestId: data.map(item => item.requestId).join(","),
-                ...extra
-            })}`,
-            index: this.tab.index + 1,
-            active: !G.downActive
-        };
-        chrome.tabs.create(arg, (tab) => {
-            // 循环获取tab.id 的状态 准备就绪 重置任务状态
-            const interval = setInterval(() => {
-                chrome.tabs.get(tab.id, (tab) => {
-                    if (tab.status != "complete") { return; }
-                    clearInterval(interval);
-                    this.catDownloadIsProcessing = false;
+                chrome.tabs.create({
+                    url: `/downloader.html?${new URLSearchParams({
+                        requestId: data.map(item => item.requestId).join(","),
+                        ...extra
+                    })}`,
+                    index: this.tab.index + 1,
+                    active: !G.downActive
+                }, (newTab) => {
+                    const listener = (tabId, info) => {
+                        if (tabId === newTab.id && info.status === "complete") {
+                            chrome.tabs.onUpdated.removeListener(listener);
+                            setTimeout(() => {
+                                this.catDownload(data, extra)
+                            }, 233);
+                        }
+                    };
+                    chrome.tabs.onUpdated.addListener(listener);
                 });
-            });
+            }
         });
     }
     /**
