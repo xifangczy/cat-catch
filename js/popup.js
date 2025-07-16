@@ -475,6 +475,7 @@ $('#DownFile').click(function () {
             openParser(data, { autoDown: true, autoClose: true });
             continue;
         }
+        G.downActive = true;
         index++;
         setTimeout(function () {
             chrome.downloads.download({
@@ -828,7 +829,6 @@ function isPlay(data) {
 // 猫抓下载器
 let catDownloadIsProcessing = false;
 function catDownload(data, extra = {}) {
-
     // 防止连续多次提交
     if (catDownloadIsProcessing) {
         setTimeout(() => {
