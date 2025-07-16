@@ -132,7 +132,7 @@ G.OptionLists = {
     checkDuplicates: true,
     enable: true,
     downActive: !G.isMobile,    // 手机端默认不启用 后台下载
-    downAutoClose: false,
+    downAutoClose: true,
     downStream: false,
     aria2Rpc: "http://localhost:6800/jsonrpc",
     enableAria2Rpc: false,
