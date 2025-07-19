@@ -28,6 +28,8 @@ const allData = new Map([
 const $filter_ext = $("#filter #ext");
 // 储存所有扩展名，保存是否筛选状态 来判断新加入的资源 立刻判断是否需要隐藏
 const filterExt = new Map();
+// 删除重复文件名
+let duplicateFilenamesSet = null;
 // 当前所在页面
 let activeTab = true;
 // 储存下载id
@@ -377,10 +379,11 @@ function AddMedia(data, currentTab = true) {
         $filter_ext.append(html);
     }
     // 如果被筛选出去 直接隐藏
-    if (!filterExt.get(data.ext)) {
+    if (!filterExt.get(data.ext) || duplicateFilenamesSet?.has(data.name)) {
         data.html.hide();
         data.html.find("input").prop("checked", false);
     }
+    duplicateFilenamesSet && duplicateFilenamesSet.add(data.name);
 
     return data.html;
 }
@@ -587,7 +590,7 @@ $("#regular input").bind('keypress', function (event) {
 
 // 删除重复文件名
 $("#duplicateFilenames").click(function () {
-    const duplicateFilenamesSet = new Set();
+    duplicateFilenamesSet = new Set();
     getData().forEach(function (value) {
         if (duplicateFilenamesSet.has(value.name)) {
             value.html.hide();
