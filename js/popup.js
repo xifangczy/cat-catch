@@ -585,6 +585,21 @@ $("#regular input").bind('keypress', function (event) {
     }
 });
 
+// 删除重复文件名
+$("#duplicateFilenames").click(function () {
+    const duplicateFilenamesSet = new Set();
+    getData().forEach(function (value) {
+        if (duplicateFilenamesSet.has(value.name)) {
+            value.html.hide();
+            value.checked = false;
+            return;
+        }
+        duplicateFilenamesSet.add(value.name);
+    });
+    $("#filter").hide();
+    mergeDownButton();
+});
+
 // 清空数据
 $('#Clear').click(function () {
     chrome.runtime.sendMessage({ Message: "clearData", tabId: G.tabId, type: activeTab });

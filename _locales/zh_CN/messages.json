@@ -901,5 +901,8 @@
   },
   "alwaysSearch": {
     "message": "始终打开深度搜索"
+  },
+  "deleteDuplicateFilenames": {
+    "message": "删除重复文件名"
   }
 }

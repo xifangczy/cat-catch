@@ -901,5 +901,8 @@
   },
   "alwaysSearch": {
     "message": "Always enable deep search"
+  },
+  "deleteDuplicateFilenames": {
+    "message": "Delete duplicate filenames"
   }
 }
