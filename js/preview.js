@@ -13,6 +13,9 @@ class FilePreview {
         this.previewHLS = null;     // 全屏预览视频HLS工具
         this.catDownloadIsProcessing = false; // 猫抓下载器是否正在处理
 
+        this.showTitle = false; // 是否显示标题
+        this.deleteDuplicateFilenames = false; // 是否删除重复文件名
+
         // 获取tabId
         const params = new URL(location.href).searchParams;
         this._tabId = parseInt(params.get("tabId"));
@@ -42,7 +45,8 @@ class FilePreview {
         this.setupEventListeners();     // 设置事件监听
         await this.loadFileItems();     // 载入数据
         this.setupFilters();            // 设置 后缀/类型 筛选
-        this.renderFileItems();         // 渲染文件列表
+        this.setOptions();              // 设置选项
+        this.updateFileList();          // 渲染文件列表
         this.startPreviewGeneration();  // 开始预览生成
         this.setupSelectionBox();       // 框选
         this.srciptList();              // 脚本列表
@@ -108,12 +112,16 @@ class FilePreview {
         document.querySelector('#debug').addEventListener('click', () => console.dir(this.fileItems));
         // 显示标题
         document.querySelector('#showTitle').addEventListener('change', (e) => {
+            (chrome.storage.session ?? chrome.storage.local).set({ previewShowTitle: e.target.checked });
+            this.showTitle = e.target.checked;
             this.fileItems.forEach(item => {
                 item.html.querySelector('.file-title').classList.toggle('hide', !e.target.checked);
             });
             this.updateFileList();
         });
         document.querySelector('#deleteDuplicateFilenames').addEventListener('change', (e) => {
+            (chrome.storage.session ?? chrome.storage.local).set({ previewDeleteDuplicateFilenames: e.target.checked });
+            this.deleteDuplicateFilenames = e.target.checked;
             this.updateFileList();
         });
         // aria2
@@ -295,7 +303,7 @@ class FilePreview {
         this.fileItems = [...this.originalItems];
 
         // 删除重复的文件名
-        if (document.querySelector('#deleteDuplicateFilenames').checked) {
+        if (this.deleteDuplicateFilenames) {
             const uniqueNames = new Set();
             this.fileItems = this.fileItems.filter(item => {
                 if (uniqueNames.has(item.name)) {
@@ -343,7 +351,7 @@ class FilePreview {
         item.html.setAttribute('data-index', index);
         item.html.className = 'file-item';
         item.html.innerHTML = `
-            <div class="file-title hide">${item.title}</div>
+            <div class="file-title ${this.showTitle ? "" : "hide"}">${item.title}</div>
             <div class="file-name">${item.name}</div>
             <div class="preview-container">
                 <img src="${item.favIconUrl || 'img/icon.png'}" class="preview-image icon">
@@ -462,6 +470,17 @@ class FilePreview {
             label.querySelector('input').addEventListener('click', () => this.updateFileList());
             filterContainer.appendChild(label);
         });
+    }
+
+    setOptions() {
+        if (G.previewShowTitle) {
+            document.querySelector('#showTitle').checked = true;
+            this.showTitle = true;
+        }
+        if (G.previewDeleteDuplicateFilenames) {
+            document.querySelector('#deleteDuplicateFilenames').checked = true;
+            this.deleteDuplicateFilenames = true;
+        }
     }
 
     /**

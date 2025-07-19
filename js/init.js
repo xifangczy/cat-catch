@@ -172,7 +172,9 @@ G.OptionLists = {
 G.LocalVar = {
     featMobileTabId: [],
     featAutoDownTabId: [],
-    mediaControl: { tabid: 0, index: -1 }
+    mediaControl: { tabid: 0, index: -1 },
+    previewShowTitle: false, // 是否显示标题
+    previewDeleteDuplicateFilenames: false, // 是否删除重复文件名
 };
 
 // 102版本以上 非Firefox 开启更多功能
