@@ -107,10 +107,13 @@ class FilePreview {
         // debug
         document.querySelector('#debug').addEventListener('click', () => console.dir(this.fileItems));
         // 显示标题
-        document.querySelector('input[name="showTitle"]').addEventListener('change', (e) => {
+        document.querySelector('#showTitle').addEventListener('change', (e) => {
             this.fileItems.forEach(item => {
                 item.html.querySelector('.file-title').classList.toggle('hide', !e.target.checked);
             });
+            this.updateFileList();
+        });
+        document.querySelector('#deleteDuplicateFilenames').addEventListener('change', (e) => {
             this.updateFileList();
         });
         // aria2
@@ -290,6 +293,19 @@ class FilePreview {
      */
     updateFileList() {
         this.fileItems = [...this.originalItems];
+
+        // 删除重复的文件名
+        if (document.querySelector('#deleteDuplicateFilenames').checked) {
+            const uniqueNames = new Set();
+            this.fileItems = this.fileItems.filter(item => {
+                if (uniqueNames.has(item.name)) {
+                    return false;
+                }
+                uniqueNames.add(item.name);
+                return true;
+            });
+        }
+
         // 获取勾选扩展
         const selectedExts = Array.from(document.querySelectorAll('input[name="ext"]:checked'))
             .map(checkbox => checkbox.value);
