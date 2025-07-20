@@ -901,5 +901,8 @@
   },
   "alwaysSearch": {
     "message": "Sempre habilitar pesquisa profunda"
+  },
+  "deleteDuplicateFilenames": {
+    "message": "Excluir nomes de arquivos duplicados"
   }
 }
