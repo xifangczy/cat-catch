@@ -16,6 +16,35 @@ class FilePreview {
         this.showTitle = false; // 是否显示标题
         this.deleteDuplicateFilenames = false; // 是否删除重复文件名
 
+        this._tabId = -1; // 当前标签ID
+        this.currentRange = null; // 当前显示范围
+        this.currentPage = 1; // 当前页码
+
+        // 初始化
+        this.init();
+    }
+    /**
+     * 初始化
+     */
+    async init() {
+        this.parseParams();             // url解析参数
+        this.tab = await chrome.tabs.getCurrent();  // 获取当前标签
+        console.dir(this.tab);
+        this.setupEventListeners();     // 设置事件监听
+        await this.loadFileItems();     // 载入数据
+        this.setupFilters();            // 设置 后缀/类型 筛选
+        this.setOptions();              // 设置选项
+        this.updateFileList();          // 渲染文件列表
+        this.startPreviewGeneration();  // 开始预览生成
+        this.setupSelectionBox();       // 框选
+        this.srciptList();              // 脚本列表
+        this.updateSrciptButton();      // 更新按钮状态
+        this.checkVersion();            // 检查版本
+    }
+    /**
+     * 解析参数
+     */
+    parseParams() {
         // 获取tabId
         const params = new URL(location.href).searchParams;
         this._tabId = parseInt(params.get("tabId"));
@@ -33,27 +62,7 @@ class FilePreview {
         // 分页
         this.currentPage = params.get("page");
         this.currentPage = this.currentPage ? parseInt(this.currentPage) : 1;
-
-        // 初始化
-        this.init();
     }
-    /**
-     * 初始化
-     */
-    async init() {
-        this.tab = await chrome.tabs.getCurrent();  // 获取当前标签
-        this.setupEventListeners();     // 设置事件监听
-        await this.loadFileItems();     // 载入数据
-        this.setupFilters();            // 设置 后缀/类型 筛选
-        this.setOptions();              // 设置选项
-        this.updateFileList();          // 渲染文件列表
-        this.startPreviewGeneration();  // 开始预览生成
-        this.setupSelectionBox();       // 框选
-        this.srciptList();              // 脚本列表
-        this.updateSrciptButton();      // 更新按钮状态
-        this.checkVersion();            // 检查版本
-    }
-
     /**
      * 设置按钮、键盘 、等事件监听
      */
