@@ -213,6 +213,7 @@ function init() {
                     m3u8Text = urls.join("\n\n");
                     $("#m3u8Text").val(m3u8Text);
                 } else {
+                    $("#m3u8Text").val("");
                     alert(i18n.m3u8Error);
                     return;
                 }
