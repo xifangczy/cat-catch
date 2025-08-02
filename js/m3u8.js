@@ -154,6 +154,15 @@ function init() {
     if (isEmpty(_m3u8Url)) {
         $("#loading").hide(); $("#m3u8Custom").show();
 
+        $("#uploadM3U8").change(function (event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = () => {
+                $("#m3u8Text").val(reader.result)
+            };
+            reader.readAsText(file);
+        });
+
         $("#parse").click(async function () {
             let m3u8Text = $("#m3u8Text").val().trim();
             let baseUrl = $("#baseUrl").val().trim();
@@ -250,6 +259,8 @@ function init() {
             if (baseUrl != "") {
                 m3u8Text = addBashUrl(baseUrl, m3u8Text);
             }
+            autoReferer = true; // 不自动调整referer
+
             _m3u8Url = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(m3u8Text)]));
             hls.loadSource(_m3u8Url);
             $("#m3u8Custom").hide();
