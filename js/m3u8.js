@@ -154,10 +154,10 @@ function init() {
     if (isEmpty(_m3u8Url)) {
         $("#loading").hide(); $("#m3u8Custom").show();
 
-        // 批量生成切片链接
-        $("#generateUrls").change(async function () {
-            // 请求头
-            const referer = $("#referer").val().trim();
+        $("#parse").click(async function () {
+            let m3u8Text = $("#m3u8Text").val().trim();
+            let baseUrl = $("#baseUrl").val().trim();
+            let referer = $("#referer").val().trim();
             if (referer) {
                 if (referer.startsWith("http")) {
                     setRequestHeaders({ referer: referer });
@@ -166,17 +166,19 @@ function init() {
                 }
             }
 
-            const rangePattern = /\$\{range:(\d+)-(\d+|\?),?(\d+)?\}/;
-            const text = $(this).val();
-            const match = text.match(rangePattern);
-            if (match) {
+            if (m3u8Text == "") { return; }
+
+            // // 批量生成切片链接 解析range标签
+            if (m3u8Text.includes('${range:')) {
+                const rangePattern = /\$\{range:(\d+)-(\d+|\?),?(\d+)?\}/;
+                const match = m3u8Text.match(rangePattern);
+                if (!match) { return; }
                 const start = parseInt(match[1]);
                 let end = match[2];
                 const padding = match[3] ? parseInt(match[3]) : 0;
                 const urls = [];
                 $("#m3u8Text").val(i18n.loadingData);
 
-                // 如果end是 ? 使用fetch一直请求直到错误
                 if (end === "?") {
                     let i = start;
                     while (true) {
@@ -184,7 +186,7 @@ function init() {
                         if (padding > 0) {
                             number = number.padStart(padding, '0');
                         }
-                        const url = text.replace(rangePattern, number);
+                        const url = m3u8Text.replace(rangePattern, number);
                         try {
                             const response = await fetch(url, { method: 'HEAD' });
                             if (!response.ok) {
@@ -204,26 +206,17 @@ function init() {
                         if (padding > 0) {
                             number = number.padStart(padding, '0');
                         }
-                        urls.push(text.replace(rangePattern, number));
+                        urls.push(m3u8Text.replace(rangePattern, number));
                     }
                 }
-
-                urls.length && $("#m3u8Text").val(urls.join("\n\n"));
-            }
-        });
-        $("#parse").click(function () {
-            let m3u8Text = $("#m3u8Text").val().trim();
-            let baseUrl = $("#baseUrl").val().trim();
-            let referer = $("#referer").val().trim();
-            if (referer) {
-                if (referer.startsWith("http")) {
-                    setRequestHeaders({ referer: referer });
+                if (urls && urls.length) {
+                    m3u8Text = urls.join("\n\n");
+                    $("#m3u8Text").val(m3u8Text);
                 } else {
-                    setRequestHeaders(JSONparse(referer));
+                    alert(i18n.m3u8Error);
+                    return;
                 }
             }
-
-            if (m3u8Text == "") { return; }
 
             // 只有一个链接 后缀为m3u8 直接解析
             if (m3u8Text.split("\n").length == 1 && GetExt(m3u8Text) == "m3u8") {
