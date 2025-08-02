@@ -1,6 +1,6 @@
 class FilePreview {
 
-    MAX_CONCURRENT = 3;   // 最大并行生成预览数
+    MAX_CONCURRENT = 5;   // 最大并行生成预览数
     MAX_LIST_SIZE = 128;  // 最大文件列表长度
 
     constructor() {
@@ -29,7 +29,6 @@ class FilePreview {
     async init() {
         this.parseParams();             // url解析参数
         this.tab = await chrome.tabs.getCurrent();  // 获取当前标签
-        console.dir(this.tab);
         this.setupEventListeners();     // 设置事件监听
         await this.loadFileItems();     // 载入数据
         this.setupFilters();            // 设置 后缀/类型 筛选
@@ -596,6 +595,7 @@ class FilePreview {
                 videoInfo.width = video.videoWidth;
 
                 if (video.duration && video.duration != Infinity) {
+                    videoInfo._duration = video.duration;
                     videoInfo.duration = secToTime(video.duration);
                 }
 
