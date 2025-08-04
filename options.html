@@ -1,37 +1,38 @@
 <!DOCTYPE html>
-<html>
-
-<head>
-  <meta charset="UTF-8" />
-  <title>titleOption</title>
-  <link rel="stylesheet" type="text/css" href="css/public.css" media="all" />
-  <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
-  <script src="lib/jquery.min.js"></script>
-  <script src="js/init.js"></script>
-  <script src="js/function.js"></script>
-</head>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>titleOption</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/public.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
+    <script src="lib/jquery.min.js" defer></script>
+    <script src="js/init.js" defer></script>
+    <script src="js/function.js" defer></script>
+  </head>
 
 <body>
   <!-- 添加导航栏 -->
-  <nav class="sidebar">
+  <nav class="sidebar" aria-label="Main Navigation">
     <ul>
-      <li><a href="#anchorSuffix" data-i18n="suffix"></a></li>
-      <li><a href="#anchorType" data-i18n="type"></a></li>
-      <li><a href="#anchorRegexMatch" data-i18n="regexMatch"></a></li>
-      <li><a href="#anchorBlockUrl" data-i18n="blockUrl"></a></li>
-      <li><a href="#anchorScriptSettings" data-i18n="Script"></a></li>
-      <li><a href="#anchorCopy" data-i18n="copy"></a></li>
-      <li><a href="#anchorAria2Rpc">Aria2 RPC</a></li>
-      <li><a href="#anchorSend2local" data-i18n="send2local"></a></li>
-      <li><a href="#anchorM3u8dl">URL Protocol m3u8dl</a></li>
-      <li><a href="#anchorInvokeApp" data-i18n="invokeApp"></a></li>
-      <li><a href="#anchorReplaceTags" data-i18n="replaceTags"></a></li>
-      <li><a href="#anchorDownloader" data-i18n="downloader"></a></li>
-      <li><a href="#anchorM3u8Parser" data-i18n="m3u8Parser"></a></li>
-      <li><a href="#anchorOtherSettings" data-i18n="otherSettings"></a></li>
-      <li><a href="#anchorCustomCSS" data-i18n="customCSS"></a></li>
-      <li><a href="#anchorOperation" data-i18n="operation"></a></li>
-      <li><a href="#anchorAbout" data-i18n="about"></a></li>
+      <li><a href="#anchorSuffix" data-i18n="suffix" title="suffix"></a></li>
+      <li><a href="#anchorType" data-i18n="type" title="type"></a></li>
+      <li><a href="#anchorRegexMatch" data-i18n="regexMatch" title="regexMatch"></a></li>
+      <li><a href="#anchorBlockUrl" data-i18n="blockUrl" title="blockUrl"></a></li>
+      <li><a href="#anchorScriptSettings" data-i18n="Script" title="Script"></a></li>
+      <li><a href="#anchorCopy" data-i18n="copy" title="copy"></a></li>
+      <li><a href="#anchorAria2Rpc" title="Aria2 RPC">Aria2 RPC</a></li>
+      <li><a href="#anchorSend2local" data-i18n="send2local" title="send2local"></a></li>
+      <li><a href="#anchorM3u8dl" title="URL Protocol m3u8dl">URL Protocol m3u8dl</a></li>
+      <li><a href="#anchorInvokeApp" data-i18n="invokeApp" title="invokeApp"></a></li>
+      <li><a href="#anchorReplaceTags" data-i18n="replaceTags" title="replaceTags"></a></li>
+      <li><a href="#anchorDownloader" data-i18n="downloader" title="downloader"></a></li>
+      <li><a href="#anchorM3u8Parser" data-i18n="m3u8Parser" title="m3u8Parser"></a></li>
+      <li><a href="#anchorOtherSettings" data-i18n="otherSettings" title="otherSettings"></a></li>
+      <li><a href="#anchorCustomCSS" data-i18n="customCSS" title="customCSS"></a></li>
+      <li><a href="#anchorMQTT" data-i18n="MQTT" title="MQTT"></a></li>
+      <li><a href="#anchorOperation" data-i18n="operation" title="operation"></a></li>
+      <li><a href="#anchorAbout" data-i18n="about" title="about"></a></li>
     </ul>
   </nav>
 
@@ -51,10 +52,10 @@
           </tr>
         </table>
         <div class="flex-end">
-          <button type="button" id="AddExt" class="button2" data-i18n="addSuffix"></button>
-          <button type="button" id="ResetExt" data-reset="Ext" data-i18n="resetSettings"></button>
-          <button type="button" id="allDisable" data-switch="Ext" data-i18n="disableAll"></button>
-          <button type="button" id="allEnable" data-switch="Ext" data-i18n="enableAll"></button>
+          <button type="button" id="AddExt" class="button2" data-i18n="addSuffix" title="add Suffix"></button>
+          <button type="button" id="ResetExt" data-reset="Ext" data-i18n="resetSettings" title="reset Suffixs"></button>
+          <button type="button" id="allDisable" data-switch="Ext" data-i18n="disableAll" title="disable All Ext"></button>
+          <button type="button" id="allEnable" data-switch="Ext" data-i18n="enableAll" title="enable All Ext"></button>
         </div>
       </div>
     </section>
@@ -73,10 +74,10 @@
           </tr>
         </table>
         <div class="flex-end">
-          <button type="button" id="AddType" class="button2" data-i18n="addType"></button>
-          <button type="button" id="ResetType" data-reset="Type" data-i18n="resetSettings"></button>
-          <button type="button" id="allDisable" data-switch="Type" data-i18n="disableAll"></button>
-          <button type="button" id="allEnable" data-switch="Type" data-i18n="enableAll"></button>
+          <button type="button" id="AddType" class="button2" data-i18n="addType" title="add Type"></button>
+          <button type="button" id="ResetType" data-reset="Type" data-i18n="resetSettings" title="reset Types"></button>
+          <button type="button" id="allDisable" data-switch="Type" data-i18n="disableAll" title="disable All Types"></button>
+          <button type="button" id="allEnable" data-switch="Type" data-i18n="enableAll" title="enable All Types"></button>
         </div>
       </div>
     </section>
@@ -109,18 +110,18 @@
           </tr>
         </table>
         <div class="flex-end">
-          <button type="button" id="AddRegex" class="button2" data-i18n="addRegex"></button>
-          <button type="button" id="ResetRegex" data-reset="Regex" data-i18n="resetSettings"></button>
-          <button type="button" id="allDisable" data-switch="Regex" data-i18n="disableAll"></button>
-          <button type="button" id="allEnable" data-switch="Regex" data-i18n="enableAll"></button>
+          <button type="button" id="AddRegex" class="button2" data-i18n="addRegex" title="add Regex"></button>
+          <button type="button" id="ResetRegex" data-reset="Regex" data-i18n="resetSettings" title="reset Regex"></button>
+          <button type="button" id="allDisable" data-switch="Regex" data-i18n="disableAll" title="disable All Regex"></button>
+          <button type="button" id="allEnable" data-switch="Regex" data-i18n="enableAll" title="enable All Regex"></button>
         </div>
         <span style="font-weight: bold; font-size: 15px" data-i18n="regexTest"></span><br />
-        <span>URL</span><br />
+        <label for="testUrl">URL</label><br />
         <input type="text" id="testUrl" style="width: 590px" /><br />
-        <span data-i18n="regex"></span><br />
+        <label for="testRegex" data-i18n="regex"></label><br />
         <input type="text" id="testRegex" style="width: 590px" /><br />
-        <span data-i18n="flag"></span><br />
-        <input type="text" id="testFlag" style="width: 20px" value="ig" />
+        <label for="testFlag" data-i18n="flag"></label><br />
+        <input type="text" id="testFlag" style="width: 20px" value="ig" maxlength="4" />
         <span style="color: #ff0000" id="testResult" data-i18n="noMatch"></span>
       </div>
     </section>
@@ -147,10 +148,10 @@
           </tr>
         </table>
         <div class="flex-end">
-          <button type="button" id="blockAddUrl" class="button2" data-i18n="addUrl"></button>
-          <button type="button" id="ResetBlockUrl" data-reset="blockUrl" data-i18n="resetSettings"></button>
-          <button type="button" id="allDisable" data-switch="blockUrl" data-i18n="disableAll"></button>
-          <button type="button" id="allEnable" data-switch="blockUrl" data-i18n="enableAll"></button>
+          <button type="button" id="blockAddUrl" class="button2" data-i18n="addUrl" title="add Url"></button>
+          <button type="button" id="ResetBlockUrl" data-reset="blockUrl" data-i18n="resetSettings" title="reset block Url"></button>
+          <button type="button" id="allDisable" data-switch="blockUrl" data-i18n="disableAll" title="disable All block Url"></button>
+          <button type="button" id="allEnable" data-switch="blockUrl" data-i18n="enableAll" title="enable All block Url"></button>
         </div>
       </div>
     </section>
@@ -181,7 +182,7 @@
     <!-- 复制选项 -->
     <section id="anchorCopy">
       <h1 class="optionsTitle">
-        <img src="img/copy.png" style="width: 18px" class="copy" />
+        <img src="img/copy.png" style="width: 18px" class="copy" alt="Copy icon" />
         <p data-i18n-outer="copy"></p>
       </h1>
       <div class="optionBox">
@@ -189,21 +190,22 @@
           <p data-i18n-outer="copyTip"></p><br />
           <a href="https://cat-catch.bmmmd.com/docs/settings#keywords" target="_blank"
             data-i18n="replaceKeywordList"></a><br /><br />
-          <div class="item">
-            <div>HLS m3u8</div>
-            <textarea id="copyM3U8" save="input" type="text" class="width100"></textarea>
-          </div>
-          <div class="item" style="margin-top: 10px;">
-            <div>DASH mpb</div>
-            <textarea id="copyMPD" save="input" type="text" class="width100"></textarea>
-          </div>
-          <div class="item" style="margin-top: 10px;">
-            <div data-i18n="otherFiles"></div>
-            <textarea id="copyOther" save="input" type="text" class="width100"></textarea>
-          </div>
-          <div class="flex-end">
-            <button type="button" class="resetOption" data-i18n="resetSettings"></button>
-          </div>
+        </span>
+        <div class="item">
+          <div>HLS m3u8</div>
+          <textarea id="copyM3U8" save="input" type="text" class="width100"></textarea>
+        </div>
+        <div class="item" style="margin-top: 10px;">
+          <div>DASH mpb</div>
+          <textarea id="copyMPD" save="input" type="text" class="width100"></textarea>
+        </div>
+        <div class="item" style="margin-top: 10px;">
+          <div data-i18n="otherFiles"></div>
+          <textarea id="copyOther" save="input" type="text" class="width100"></textarea>
+        </div>
+        <div class="flex-end">
+          <button type="button" class="resetOption" data-i18n="resetSettings"></button>
+        </div>
       </div>
     </section>
 
@@ -240,11 +242,11 @@
           </div>
           <div class="item">
             <div data-i18n="secretKey"></div>
-            <input id="aria2RpcToken" save="input" type="text" class="width100"></input>
+            <input id="aria2RpcToken" save="input" type="password" class="width100">
           </div>
           <div class="item">
-            <div>Aira2 RPC <span data-i18n-outer="address"></span></div>
-            <input id="aria2Rpc" save="input" type="text" class="width100"></input>
+            <div>Aria2 RPC <span data-i18n-outer="address"></span></div>
+            <input id="aria2Rpc" save="input" type="text" class="width100">
           </div>
           <div class="flex-end">
             <button type="button" class="resetOption" data-i18n="resetSettings"></button>
@@ -256,7 +258,7 @@
     <!-- 发送数据 -->
     <section id="anchorSend2local">
       <h1 class="optionsTitle">
-        <img src="img/send.svg" style="width: 18px" class="regex" />
+        <img src="img/send.svg" style="width: 18px" class="regex" alt="Send icon" />
         <p data-i18n-outer="send2local"></p>
       </h1>
       <div class="optionBox">
@@ -309,18 +311,19 @@
 
           <div class="item">
             <div><span data-i18n-outer="address"></span></div>
-            <input id="send2localURL" save="input" type="text" class="width100"></input>
+            <input id="send2localURL" save="input" type="text" class="width100">
           </div>
 
           <div class="item">
             <div><span data-i18n-outer="requestBody"></span></div>
-            <textarea id="send2localBody" save="input" type="text" class="width100 break-all" rows="3"></textarea>
+            <textarea id="send2localBody" save="input" class="width100 break-all" rows="3"></textarea>
           </div>
 
           <div class="flex-end">
             <button type="button" class="resetOption" data-i18n="resetSettings"></button>
           </div>
         </div>
+      </div>
     </section>
 
     <!-- m3u8DL -->
@@ -447,18 +450,18 @@
               <div>
                 <p data-i18n="test"></p>
               </div>
-              <textarea id="testTextarea" type="text" class="width100 break-all"
+              <textarea id="testTextarea" class="width100 break-all"
                 rows="3">${url} ${referer|exists:'--headers "Referer:*"'} ${url|regexp:"(https?://[^?]*)"|replace:"http://","https://"|to:base64}</textarea>
             </div>
-            ${url}<input type="text" class="width100" value="https://bmmmd.com/test.m3u8" id="url">
-            ${referer}<input type="text" class="width100" value="https://bmmmd.com/" id="referer">
-            ${initiator}<input type="text" class="width100" value="https://bmmmd.com" id="initiator">
-            ${webUrl}<input type="text" class="width100" value="https://bmmmd.com/test.html" id="webUrl">
-            ${title}<input type="text" class="width100" value="test Video" id="title">
+            <label for="url">${url}</label><input type="text" class="width100" value="https://bmmmd.com/test.m3u8" id="url">
+            <label for="referer">${referer}</label><input type="text" class="width100" value="https://bmmmd.com/" id="referer">
+            <label for="initiator">${initiator}</label><input type="text" class="width100" value="https://bmmmd.com" id="initiator">
+            <label for="webUrl">${webUrl}</label><input type="text" class="width100" value="https://bmmmd.com/test.html" id="webUrl">
+            <label for="title">${title}</label><input type="text" class="width100" value="test Video" id="title">
             <span data-i18n-outer="result"></span>:<br><span id="tagTestResult"></span>
           </div>
           <div class="flex-end">
-            <button type="button" id="showTestTag" data-i18n="test"></button>
+            <button type="button" id="showTestTag" data-i18n="test" ></button>
             <button type="button" class="resetOption" data-i18n="resetSettings"></button>
           </div>
         </div>
@@ -468,7 +471,7 @@
     <!-- 下载器 -->
     <section id="anchorDownloader">
       <h1 class="optionsTitle">
-        <img src="img/cat-down.png" style="width: 18px" class="cat-down" />
+        <img src="img/cat-down.png" style="width: 18px" class="cat-down" alt="Downloader icon" />
         <p data-i18n-outer="downloader"></p>
       </h1>
       <div class="optionBox" id="downOption">
@@ -524,7 +527,7 @@
     <!-- m3u8解析器 -->
     <section id="anchorM3u8Parser">
       <h1 class="optionsTitle">
-        <img src="img/parsing.png" style="width: 18px" class="parsing" />
+        <img src="img/parsing.png" style="width: 18px" class="parsing" alt="Parser icon" />
         <p data-i18n-outer="m3u8Parser"></p>
       </h1>
       <div class="optionBox" id="m3u8Option">
@@ -544,7 +547,7 @@
           <div class="item">
             <div data-i18n="downloadThreads"></div>
             <div class="switch">
-              <input id="M3u8Thread" save="input" type="number" class="width3rem"></input>
+              <input id="M3u8Thread" save="input" type="number" min="1" max="32" class="width3rem">
             </div>
           </div>
 
@@ -748,6 +751,101 @@
       </div>
     </section>
 
+    <!-- MQTT Configuration -->
+    <section id="anchorMQTT">
+      <h1 class="optionsTitle" data-i18n="MQTT"></h1>
+      <div class="optionBox" id="mqttOption">
+        <div class="list">
+          <div class="item">
+            <div data-i18n="enable"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="mqttEnable" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="mqttBroker"></div>
+            <input id="mqttBroker" save="input" type="text" class="width100" placeholder="test.mosquitto.org" data-i18n-placeholder="mqttBrokerHelp" />
+          </div>
+
+          <div class="item">
+            <div data-i18n="port"></div>
+            <input id="mqttPort" save="input" type="number" min="1" max="65535" class="width100" placeholder="8081" />
+          </div>
+
+          <div class="item">
+            <div data-i18n="mqttPath"></div>
+            <input id="mqttPath" save="input" type="text" class="width100" placeholder="/mqtt" data-i18n-placeholder="mqttPathHelp" />
+          </div>
+
+          <div class="item">
+            <div data-i18n="mqttProtocol"></div>
+            <div class="switch switchSelect">
+              <select id="mqttProtocol" class="select" save="select">
+                <option value="wss" data-i18n="mqttProtocolWss"></option>
+                <option value="ws" data-i18n="mqttProtocolWs"></option>
+              </select>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="mqttClientId"></div>
+            <input id="mqttClientId" save="input" type="text" class="width100" placeholder="cat-catch-client" data-i18n-placeholder="mqttClientIdHelp" />
+          </div>
+
+          <div class="item">
+            <div data-i18n="mqttTitleLength"></div>
+            <input id="mqttTitleLength" save="input" type="number" min="1" max="1000" class="width100" value="100" data-i18n-placeholder="mqttTitleLengthHelp" />
+          </div>
+
+          <div class="item">
+            <div data-i18n="mqttUsername"></div>
+            <input id="mqttUser" save="input" type="text" class="width100" data-i18n-placeholder="mqttCredentialsHelp" />
+          </div>
+
+          <div class="item">
+            <div data-i18n="mqttPassword"></div>
+            <input id="mqttPassword" save="input" type="password" class="width100" data-i18n-placeholder="mqttCredentialsHelp" />
+          </div>
+
+          <div class="item">
+            <div data-i18n="mqttTopic"></div>
+            <input id="mqttTopic" save="input" type="text" class="width100" placeholder="cat-catch/media" data-i18n-placeholder="mqttTopicHelp" />
+          </div>
+
+          <div class="item">
+            <div data-i18n="mqttQos"></div>
+            <div class="switch switchSelect">
+              <select id="mqttQos" class="select" save="select">
+                <option value="0">0 <span data-i18n="mqttQos0"></span></option>
+                <option value="1">1 <span data-i18n="mqttQos1"></span></option>
+                <option value="2">2 <span data-i18n="mqttQos2"></span></option>
+              </select>
+            </div>
+            <div class="help-text" data-i18n="mqttQosHelp"></div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="mqttDataFormat"></div>
+            <textarea id="mqttDataFormat" save="input" class="width100" rows="4" 
+              placeholder='{"url": "{url}", "title": "{title}", "type": "{type}", "ext": "{ext}", "timestamp": "{timestamp}"}' 
+              data-i18n-placeholder="mqttDataFormatHelp"></textarea>
+            <div class="help-text">
+              <span data-i18n="mqttDataFormatVars"></span>: {url}, {title}, {type}, {ext}, {timestamp}<br>
+              <span data-i18n="mqttDataFormatDefault"></span>
+            </div>
+          </div>
+
+          <div class="flex-end">
+            <button type="button" class="resetOption" data-i18n="resetSettings"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- 操作按钮 -->
     <section id="anchorOperation">
       <h1 class="optionsTitle" data-i18n="operation"></h1>
@@ -782,9 +880,9 @@
     </section>
   </div>
 
-  <script src="lib/base64.js"></script>
-  <script src="js/options.js"></script>
-  <script src="js/i18n.js"></script>
+  <script src="lib/base64.js" defer></script>
+  <script src="js/options.js" defer></script>
+  <script src="js/i18n.js" defer></script>
 </body>
 
 </html>

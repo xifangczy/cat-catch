@@ -257,6 +257,7 @@ $("#ClearData, #ResetAllOption").bind("click", function () {
     chrome.runtime.sendMessage({ Message: "ClearIcon" });
     location.reload();
 });
+
 //重启扩展
 $("#extensionReload").bind("click", function () {
     chrome.runtime.reload();

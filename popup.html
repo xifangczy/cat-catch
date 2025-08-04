@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
   <meta charset="UTF-8" />
   <title>catCatch</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" type="text/css" href="css/public.css" media="all" />
   <link rel="stylesheet" type="text/css" href="css/popup.css" media="all" />
   <script src="js/init.js"></script>
@@ -13,18 +13,18 @@
 
 <body class="popupBody">
   <div class="Tabs">
-    <div id="currentTab" class="TabButton flex Active">
+    <div id="currentTab" class="TabButton flex Active" title="Current Page">
       <span data-i18n-outer="currentPage"></span>
       <div id="quantity"></div>
     </div>
-    <div id="allTab" class="TabButton flex">
+    <div id="allTab" class="TabButton flex" title="Other Pages">
       <span data-i18n-outer="otherPage"></span>
       <div id="quantity"></div>
     </div>
-    <div id="otherTab" class="TabButton">
+    <div id="otherTab" class="TabButton" title="Other Features / Media Control">
       <span data-i18n-outer="otherFeatures"></span> / <span data-i18n-outer="mediaControl"></span>
     </div>
-    <div id="maybeKeyTab" class="TabButton hide">
+    <div id="maybeKeyTab" class="TabButton hide" title="Possible Key">
       <span data-i18n-outer="possibleKey"></span>
     </div>
   </div>
@@ -37,87 +37,88 @@
     <div class="otherTips" data-i18n="mediaControl"></div>
     <div class="flexRow">
       <b class="nowrap" data-i18n="selectWebpage"></b>
-      <select id="videoTabIndex">
+      <select id="videoTabIndex" title="Video Tab">
         <option value="-1" id="videoTabTips" data-i18n="noMediaDetected"></option>
       </select>
     </div>
     <div class="flexRow">
       <b class="nowrap" data-i18n="selectMedia"></b>
-      <select id="videoIndex">
+      <select id="videoIndex" title="Video">
         <option value="-1" id="videoIndexTips" data-i18n="noControllableMediaDetected"></option>
       </select>
     </div>
     <div id="PlayControl" class="textColor">
-      <span data-i18n-outer="multiplier"></span><input id="playbackRate" type="number" value="2" min="0.1" max="16"
+      <span data-i18n-outer="multiplier"></span><input id="playbackRate" type="number" value="2" min="0.1" max="16" title="Play Back Rate"
         step="1" />
-      <button id="speed" class="button2" data-i18n="speedPlayback"></button>
-      <button id="control" data-switch="play" data-i18n="play"></button>
-      <button id="pip" class="firefoxHide" data-i18n="pictureInPicture"></button>
-      <button id="fullScreen" class="firefoxHide" data-i18n="fullscreen"></button>
-      <button id="screenshot" data-switch="play" data-i18n="screenshot"></button>
-      <label class="flexColumn loop">
-        <div data-i18n="loop"></div><input type="checkbox" id="loop">
+      <button id="speed" class="button2" data-i18n="speedPlayback" title="Adjust playback speed"></button>
+      <button id="control" data-switch="play" data-i18n="play" title="Play/Pause media"></button>
+      <button id="pip" class="firefoxHide" data-i18n="pictureInPicture" title="Toggle picture-in-picture mode"></button>
+      <button id="fullScreen" class="firefoxHide" data-i18n="fullscreen" title="Toggle fullscreen mode"></button>
+      <button id="screenshot" data-switch="play" data-i18n="screenshot" title="Take screenshot of current frame"></button>
+      <label class="flexColumn loop" title="Loop">
+        <div data-i18n="loop"></div><input type="checkbox" id="loop" placeholder="Loop">
       </label>
-      <label class="flexColumn muted">
-        <div data-i18n="mute"></div><input type="checkbox" id="muted">
+      <label class="flexColumn muted" title="Mute">
+        <div data-i18n="mute"></div><input type="checkbox" id="muted" placeholder="Mute">
       </label>
       <div class="flexColumn">
-        <div data-i18n="volume"></div><input type="range" id="volume" class="volume" min="0" max="1" value="1"
-          step="0.01" />
+        <div data-i18n="volume" title="Volume"></div><input type="range" id="volume" class="volume" min="0" max="1" value="1"
+          step="0.01" title="Volume Control"/>
       </div>
       <div class="flexColumn width100">
-        <div id="timeShow"></div><input type="range" id="time" class="width100" min="0" max="100" value="0" step="1" />
+        <div id="timeShow" title="Time"></div><input type="range" id="time" class="width100" min="0" max="100" value="0" step="1" title="Time Control"/>
       </div>
     </div>
     <div class="line"></div>
     <div class="otherTips" data-i18n="functionEntry"></div>
     <div class="otherFeat flexRow">
-      <button go="downloader.html" class="button2" data-i18n="downloader"></button>
-      <button go="m3u8.html" class="button2" data-i18n="m3u8Parser"></button>
-      <button go="mpd.html" class="button2" data-i18n="mpdParser"></button>
-      <button go="json.html" class="button2" data-i18n="jsonFormatter"></button>
-      <button go="ffmpegURL" class="button2">FFmpeg</button>
+      <button go="downloader.html" class="button2" data-i18n="downloader" title="Downloader"></button>
+      <button go="m3u8.html" class="button2" data-i18n="m3u8Parser" title="M3U8 Parser"></button>
+      <button go="mpd.html" class="button2" data-i18n="mpdParser" title="MPD Parser"></button>
+      <button go="json.html" class="button2" data-i18n="jsonFormatter" title="JSON Formatter"></button>
+      <button go="ffmpegURL" class="button2" title="FFmpeg">FFmpeg</button>
     </div>
   </div>
   <div id="maybeKey" class="container hide"></div>
   <div id="filter" class="more">
     <span id="regular" class="width100 regular">
-      <input type="text" data-i18n-placeholder="regularFilterPlaceholder" /><button id="regularFilter" class="hide"
-        data-i18n="confirm"></button>
+      <input type="text" data-i18n-placeholder="regularFilterPlaceholder" title="Regular Filter"/><button id="regularFilter" class="hide"
+        data-i18n="confirm" title="Confirm"></button>
     </span>
-    <div id="ext"></div>
-    <button id="duplicateFilenames" class="button2" data-i18n="deleteDuplicateFilenames"></button>
+    <div id="ext" title="Extensions"></div>
+    <button id="duplicateFilenames" class="button2" data-i18n="deleteDuplicateFilenames" title="Delete Duplicate Filenames"></button>
   </div>
   <div id="features" class="more flex-end">
-    <button id="unfoldAll" data-i18n="expandAll"></button>
-    <button id="unfoldPlay" data-i18n="expandPlayable"></button>
-    <button id="unfoldFilter" data-i18n="expandSelected"></button>
-    <button id="fold" data-i18n="collapseAll"></button>
-    <button id="recorder" class="button2 hide firefoxHideScript" type="script" data-i18n="videoRecording"></button>
-    <button id="webrtc" class="button2 hide firefoxHideScript" type="script" data-i18n="recordWebRTC"></button>
-    <button id="recorder2" class="button2 hide" type="script" data-i18n="screenCapture"></button>
-    <button id="MobileUserAgent" class="button2 firefoxHideScript" data-i18n="simulateMobile"></button>
-    <button id="AutoDown" class="button2" data-i18n="autoDownload"></button>
-    <button id="send2localSelect" class="button2" data-i18n="send2local"></button>
+    <button id="unfoldAll" data-i18n="expandAll" title="Expand All"></button>
+    <button id="unfoldPlay" data-i18n="expandPlayable" title="Expand Playable"></button>
+    <button id="unfoldFilter" data-i18n="expandSelected" title="Expand Selected"></button>
+    <button id="fold" data-i18n="collapseAll" title="Collapse All"></button>
+      <button id="recorder" class="button2 hide firefoxHideScript" type="button" data-i18n="videoRecording" title="Start video recording"></button>
+      <button id="webrtc" class="button2 hide firefoxHideScript" type="button" data-i18n="recordWebRTC" title="Record WebRTC streams"></button>
+      <button id="recorder2" class="button2 hide" type="button" data-i18n="screenCapture" title="Capture screen content"></button>
+      <button id="MobileUserAgent" class="button2 firefoxHideScript" data-i18n="simulateMobile" title="Simulate mobile device"></button>
+      <button id="AutoDown" class="button2" data-i18n="autoDownload" title="Enable automatic downloads"></button>
+      <button id="send2localSelect" class="button2" data-i18n="send2local" title="Send selected items to local storage"></button>
   </div>
   <div id="down">
-    <button id="mergeDown" class="button2" data-i18n="onlineMerge" disabled></button>
-    <button id="DownFile" data-i18n="download"></button>
-    <button id="AllCopy" data-i18n="copy"></button>
-    <button id="AllSelect" data-i18n="selectAll" class="hide"></button>
-    <button id="invertSelection" data-i18n="invertSelection"></button>
-    <button id="openFilter" panel="filter" data-i18n="filter"></button>
-    <button id="Clear" data-i18n="clear"></button>
-    <button id="search" class="button2 hide firefoxHideScript" type="script" data-i18n="deepSearch"></button>
-    <button id="catch" class="button2 hide firefoxHideScript" type="script" data-i18n="cacheCapture"></button>
-    <button id="more" class="button2" panel="features" data-i18n="moreFeatures"></button>
-    <button id="enable" class="button2" data-i18n="pause"></button>
-    <button id="Options" go="options.html" class="button2" data-i18n="settings"></button>
-    <button id="popup" class="button2" data-i18n="popup"></button>
-    <button id="currentPage" class="hide" data-i18n="currentPage"></button>
+    <button id="mergeDown" class="button2" data-i18n="onlineMerge" disabled title="Merge selected items for download"></button>
+    <button id="DownFile" data-i18n="download" title="Download selected items"></button>
+    <button id="AllCopy" data-i18n="copy" title="Copy selected items to clipboard"></button>
+    <button id="AllSelect" data-i18n="selectAll" class="hide" title="Select all items"></button>
+    <button id="invertSelection" data-i18n="invertSelection" title="Invert selection"></button>
+    <button id="openFilter" panel="filter" data-i18n="filter" title="Open filter options"></button>
+    <button id="Clear" data-i18n="clear" title="Clear all items"></button>
+    <button id="search" class="button2 hide firefoxHideScript" type="button" data-i18n="deepSearch" title="Perform deep search"></button>
+    <button id="catch" class="button2 hide firefoxHideScript" type="button" data-i18n="cacheCapture" title="Capture cached content"></button>
+    <button id="more" class="button2" panel="features" data-i18n="moreFeatures" title="Show more features"></button>
+    <button id="enable" class="button2" data-i18n="pause" title="Pause/Resume capturing"></button>
+    <button id="Options" go="options.html" class="button2" data-i18n="settings" title="Open settings"></button>
+    <button id="popup" class="button2" data-i18n="popup" title="Open in popup window"></button>
+    <button id="currentPage" class="hide" data-i18n="currentPage" title="Switch to current page"></button>
   </div>
   <!-- <script src="js/firefox.js"></script> -->
   <script src="lib/base64.js"></script>
+  <script src="lib/mqtt.min.js"></script>
   <script src="js/pupup-utils.js"></script>
   <script src="js/popup.js"></script>
   <script src="js/media-control.js"></script>

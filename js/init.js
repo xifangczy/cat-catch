@@ -167,6 +167,20 @@ G.OptionLists = {
     maxLength: G.isMobile ? 999 : 9999,
     sidePanel: false,   // 侧边栏
     deepSearch: false, // 常开深度搜索
+    // MQTT 配置
+    send2MQTT: false,
+    mqttEnable: false,
+    mqttBroker: "test.mosquitto.org",
+    mqttPort: 8081,
+    mqttPath: "/mqtt",
+    mqttProtocol: "wss",
+    mqttClientId: "cat-catch-client",
+    mqttUser: "",
+    mqttPassword: "",
+    mqttTopic: "cat-catch/media",
+    mqttQos: 0,
+    mqttTitleLength: 100,
+    mqttDataFormat: "",
 };
 // 本地储存的配置
 G.LocalVar = {
