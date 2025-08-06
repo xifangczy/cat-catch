@@ -890,6 +890,18 @@
   "send2MQTT": {
     "message": "发送到 MQTT"
   },
+  "sendingToMQTT": {
+    "message": "正在发送到MQTT服务器..."
+  },
+  "connectingToMQTT": {
+    "message": "正在连接 MQTT 服务器..."
+  },
+  "sendingMessageToMQTT": {
+    "message": "正在发送消息到 MQTT 服务器..."
+  },
+  "messageSentToMQTT": {
+    "message": "已发送消息到 MQTT 服务器"
+  },
   "popup": {
     "message": "弹出"
   },

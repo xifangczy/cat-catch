@@ -890,6 +890,18 @@
   "send2MQTT": {
     "message": "Send to MQTT"
   },
+  "sendingToMQTT": {
+    "message": "Sending to MQTT server..."
+  },
+  "connectingToMQTT": {
+    "message": "Connecting to MQTT server..."
+  },
+  "sendingMessageToMQTT": {
+    "message": "Sending message to MQTT server..."
+  },
+  "messageSentToMQTT": {
+    "message": "Message sent to MQTT server"
+  },
   "popup": {
     "message": "Popup"
   },
