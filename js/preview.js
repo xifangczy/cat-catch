@@ -263,6 +263,18 @@ class FilePreview {
         navigator.clipboard.writeText(url.join("\n"));
         this.alert(i18n.copiedToClipboard);
     }
+    mqtt(data) {
+        this.alert(i18n.sending2MQTT);
+        sendToMQTT(data, { alert: this.alert }).then((success) => {
+            // 5. 已发送消息到 MQTT 服务器
+            this.alert(i18n.messageSentToMQTT || "Message sent to MQTT server", 2000);
+        }).catch((error) => {
+            // 失败时显示详细错误信息
+            const errorMsg = error ? error.toString() : (i18n.sendFailed || "Send failed");
+            this.alert(errorMsg, 10000);
+            console.error("MQTT send error:", error);
+        });
+    }
     /**
      * 下载选中
      */
@@ -372,6 +384,7 @@ class FilePreview {
                 <img src="img/copy.png" class="icon copy" title="${i18n.copy}">
                 <img src="img/delete.svg" class="icon delete" title="${i18n.delete}">
                 <img src="img/download.svg" class="icon download" title="${i18n.download}">
+                <img src="img/mqtt.svg" class="icon mqtt ${G.mqttEnable ? "" : "hide"}" title="${i18n.send2MQTT}">
             </div>`;
         // 添加文件信息
         if (item.size && item.size >= 1024) {
@@ -388,6 +401,8 @@ class FilePreview {
         item.html.querySelector('.delete').addEventListener('click', () => this.deleteItem(item));
         // 下载图标
         item.html.querySelector('.download').addEventListener('click', () => this.downloadItem(item));
+        // MQTT图标
+        item.html.querySelector('.mqtt').addEventListener('click', () => this.mqtt(item));
         // 选中状态 添加对应class
         item._selected = false;
         Object.defineProperty(item, "selected", {
@@ -875,7 +890,7 @@ class FilePreview {
      * @param {String} message 提示信息
      * @param {Number} sec 显示时间
      */
-    alert(message, sec = 1000) {
+    alert = (message, sec = 1000) => {
         let toast = document.querySelector('.alert-box');
         if (!toast) {
             toast = document.createElement('div');

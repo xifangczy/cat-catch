@@ -100,7 +100,7 @@ function aria2AddUri(data, success, error) {
  * @param {Object} data - 要发送的媒体数据
  * @returns {Promise} - 返回发送结果的 Promise
  */
-function sendToMQTT(data) {
+function sendToMQTT(data, config) {
     return new Promise((resolve, reject) => {
         if (!G.mqttEnable) {
             reject("MQTT is not enabled");
@@ -114,7 +114,7 @@ function sendToMQTT(data) {
         data = trimData(data);
 
         // 创建 MQTT 连接并发送数据
-        connectAndSendMQTT(data)
+        connectAndSendMQTT(data, config)
             .then(() => {
                 resolve(true);
             })
@@ -130,7 +130,7 @@ function sendToMQTT(data) {
  * @param {Object} data - 要发送的数据
  * @returns {Promise} - 连接和发送的 Promise
  */
-function connectAndSendMQTT(data) {
+function connectAndSendMQTT(data, config) {
     return new Promise((resolve, reject) => {
         try {
             // 构建 MQTT 连接 URL
@@ -169,6 +169,10 @@ function connectAndSendMQTT(data) {
                 throw new Error("MQTT.connect method not found. Available methods: " + Object.keys(mqttLib));
             }
 
+            // 如果提供了提示回调函数，则使用它
+            if (typeof config?.alert === 'function') {
+                Tips = config.alert;
+            }
             // 2. 创建连接阶段提示：正在连接 MQTT 服务器
             Tips(i18n.connectingToMQTT || "Connecting to MQTT server...", 2000);
 
