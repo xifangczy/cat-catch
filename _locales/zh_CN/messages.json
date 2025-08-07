@@ -383,6 +383,84 @@
   "customCSS": {
     "message": "自定义CSS"
   },
+  "MQTT": {
+    "message": "MQTT"
+  },
+  "mqttBroker": {
+    "message": "MQTT代理地址"
+  },
+  "mqttPath": {
+    "message": "路径"
+  },
+  "mqttProtocol": {
+    "message": "协议"
+  },
+  "mqttClientId": {
+    "message": "客户端ID"
+  },
+  "mqttTitleLength": {
+    "message": "标题最大长度"
+  },
+  "mqttUsername": {
+    "message": "用户名"
+  },
+  "mqttPassword": {
+    "message": "密码"
+  },
+  "mqttTopic": {
+    "message": "主题"
+  },
+  "mqttQos": {
+    "message": "QoS级别"
+  },
+  "mqttQos0": {
+    "message": "(最多一次)"
+  },
+  "mqttQos1": {
+    "message": "(至少一次)"
+  },
+  "mqttQos2": {
+    "message": "(确保一次)"
+  },
+  "mqttDataFormat": {
+    "message": "数据格式"
+  },
+  "mqttDataFormatHelp": {
+    "message": "{\"url\": \"{url}\", \"title\": \"{title}\", \"type\": \"{type}\", \"ext\": \"{ext}\", \"timestamp\": \"{timestamp}\"}"
+  },
+  "mqttDataFormatVars": {
+    "message": "可用变量"
+  },
+  "mqttDataFormatDefault": {
+    "message": "留空则使用默认JSON格式"
+  },
+  "mqttProtocolWss": {
+    "message": "WSS (安全)"
+  },
+  "mqttProtocolWs": {
+    "message": "WS (非安全)"
+  },
+  "mqttTitleLengthHelp": {
+    "message": "MQTT消息中标题的最大长度"
+  },
+  "mqttBrokerHelp": {
+    "message": "MQTT代理的主机名或IP地址"
+  },
+  "mqttPathHelp": {
+    "message": "WebSocket路径 (通常为/mqtt或/ws)"
+  },
+  "mqttClientIdHelp": {
+    "message": "此连接的唯一客户端标识符"
+  },
+  "mqttTopicHelp": {
+    "message": "发布消息的MQTT主题"
+  },
+  "mqttQosHelp": {
+    "message": "服务质量级别 (0=最多一次, 1=至少一次, 2=确保一次)"
+  },
+  "mqttCredentialsHelp": {
+    "message": "如不需要认证，请留空用户名和密码"
+  },
   "operation": {
     "message": "操作"
   },
@@ -808,6 +886,21 @@
   },
   "send2local": {
     "message": "数据发送"
+  },
+  "send2MQTT": {
+    "message": "发送到 MQTT"
+  },
+  "sendingToMQTT": {
+    "message": "正在发送到MQTT服务器..."
+  },
+  "connectingToMQTT": {
+    "message": "正在连接 MQTT 服务器..."
+  },
+  "sendingMessageToMQTT": {
+    "message": "正在发送消息到 MQTT 服务器..."
+  },
+  "messageSentToMQTT": {
+    "message": "已发送消息到 MQTT 服务器"
   },
   "popup": {
     "message": "弹出"

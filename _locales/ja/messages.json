@@ -383,6 +383,84 @@
   "customCSS": {
     "message": "カスタムCSS"
   },
+  "MQTT": {
+    "message": "MQTT"
+  },
+  "mqttBroker": {
+    "message": "MQTTブローカーアドレス"
+  },
+  "mqttPath": {
+    "message": "パス"
+  },
+  "mqttProtocol": {
+    "message": "プロトコル"
+  },
+  "mqttClientId": {
+    "message": "クライアントID"
+  },
+  "mqttTitleLength": {
+    "message": "タイトルの最大長"
+  },
+  "mqttUsername": {
+    "message": "ユーザー名"
+  },
+  "mqttPassword": {
+    "message": "パスワード"
+  },
+  "mqttTopic": {
+    "message": "トピック"
+  },
+  "mqttQos": {
+    "message": "QoSレベル"
+  },
+  "mqttQos0": {
+    "message": "(最大1回)"
+  },
+  "mqttQos1": {
+    "message": "(少なくとも1回)"
+  },
+  "mqttQos2": {
+    "message": "(1回のみ確実に配信)"
+  },
+  "mqttDataFormat": {
+    "message": "データ形式"
+  },
+  "mqttDataFormatHelp": {
+    "message": "{\"url\": \"{url}\", \"title\": \"{title}\", \"type\": \"{type}\", \"ext\": \"{ext}\", \"timestamp\": \"{timestamp}\"}"
+  },
+  "mqttDataFormatVars": {
+    "message": "使用可能な変数"
+  },
+  "mqttDataFormatDefault": {
+    "message": "空の場合はデフォルトのJSON形式を使用"
+  },
+  "mqttProtocolWss": {
+    "message": "WSS (セキュア)"
+  },
+  "mqttProtocolWs": {
+    "message": "WS (非セキュア)"
+  },
+  "mqttTitleLengthHelp": {
+    "message": "MQTTメッセージのタイトルの最大長"
+  },
+  "mqttBrokerHelp": {
+    "message": "MQTTブローカーのホスト名またはIPアドレス"
+  },
+  "mqttPathHelp": {
+    "message": "WebSocketパス (通常は/mqttまたは/ws)"
+  },
+  "mqttClientIdHelp": {
+    "message": "この接続の一意のクライアント識別子"
+  },
+  "mqttTopicHelp": {
+    "message": "メッセージを公開するMQTTトピック"
+  },
+  "mqttQosHelp": {
+    "message": "サービス品質レベル (0=最大1回, 1=少なくとも1回, 2=1回のみ確実に配信)"
+  },
+  "mqttCredentialsHelp": {
+    "message": "認証が不要な場合は、ユーザー名とパスワードを空のままにしてください"
+  },
   "operation": {
     "message": "操作"
   },
@@ -809,6 +887,21 @@
   "send2local": {
     "message": "データ送信"
   },
+  "send2MQTT": {
+    "message": "MQTTに送信"
+  },
+  "sendingToMQTT": {
+    "message": "MQTTサーバーに送信中..."
+  },
+  "connectingToMQTT": {
+    "message": "MQTTサーバーに接続中..."
+  },
+  "sendingMessageToMQTT": {
+    "message": "MQTTサーバーにメッセージ送信中..."
+  },
+  "messageSentToMQTT": {
+    "message": "MQTTサーバーにメッセージ送信完了"
+  },
   "popup": {
     "message": "ポップアップ"
   },
@@ -901,5 +994,8 @@
   },
   "alwaysSearch": {
     "message": "常に深層検索を有効"
+  },
+  "deleteDuplicateFilenames": {
+    "message": "重複ファイル名を削除"
   }
 }

@@ -383,6 +383,84 @@
   "customCSS": {
     "message": "自訂CSS"
   },
+  "MQTT": {
+    "message": "MQTT"
+  },
+  "mqttBroker": {
+    "message": "MQTT代理位址"
+  },
+  "mqttPath": {
+    "message": "路徑"
+  },
+  "mqttProtocol": {
+    "message": "通訊協定"
+  },
+  "mqttClientId": {
+    "message": "客戶端ID"
+  },
+  "mqttTitleLength": {
+    "message": "標題最大長度"
+  },
+  "mqttUsername": {
+    "message": "使用者名稱"
+  },
+  "mqttPassword": {
+    "message": "密碼"
+  },
+  "mqttTopic": {
+    "message": "主題"
+  },
+  "mqttQos": {
+    "message": "QoS級別"
+  },
+  "mqttQos0": {
+    "message": "(最多一次)"
+  },
+  "mqttQos1": {
+    "message": "(至少一次)"
+  },
+  "mqttQos2": {
+    "message": "(確保一次)"
+  },
+  "mqttDataFormat": {
+    "message": "資料格式"
+  },
+  "mqttDataFormatHelp": {
+    "message": "{\"url\": \"{url}\", \"title\": \"{title}\", \"type\": \"{type}\", \"ext\": \"{ext}\", \"timestamp\": \"{timestamp}\"}"
+  },
+  "mqttDataFormatVars": {
+    "message": "可用變數"
+  },
+  "mqttDataFormatDefault": {
+    "message": "留空則使用預設JSON格式"
+  },
+  "mqttProtocolWss": {
+    "message": "WSS (安全)"
+  },
+  "mqttProtocolWs": {
+    "message": "WS (非安全)"
+  },
+  "mqttTitleLengthHelp": {
+    "message": "MQTT訊息中標題的最大長度"
+  },
+  "mqttBrokerHelp": {
+    "message": "MQTT代理的主機名稱或IP位址"
+  },
+  "mqttPathHelp": {
+    "message": "WebSocket路徑 (通常為/mqtt或/ws)"
+  },
+  "mqttClientIdHelp": {
+    "message": "此連線的唯一客戶端識別碼"
+  },
+  "mqttTopicHelp": {
+    "message": "發佈訊息的MQTT主題"
+  },
+  "mqttQosHelp": {
+    "message": "服務品質級別 (0=最多一次, 1=至少一次, 2=確保一次)"
+  },
+  "mqttCredentialsHelp": {
+    "message": "如不需要認證，請留空使用者名稱和密碼"
+  },
   "operation": {
     "message": "操作"
   },
@@ -808,6 +886,21 @@
   },
   "send2local": {
     "message": "數據發送"
+  },
+  "send2MQTT": {
+    "message": "傳送到 MQTT"
+  },
+  "sendingToMQTT": {
+    "message": "正在傳送到 MQTT 伺服器..."
+  },
+  "connectingToMQTT": {
+    "message": "正在連接 MQTT 伺服器..."
+  },
+  "sendingMessageToMQTT": {
+    "message": "正在發送訊息到 MQTT 伺服器..."
+  },
+  "messageSentToMQTT": {
+    "message": "已發送訊息到 MQTT 伺服器"
   },
   "popup": {
     "message": "彈出"

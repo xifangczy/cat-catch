@@ -114,6 +114,7 @@ function AddMedia(data, currentTab = true) {
                 <img src="img/aria2.png" class="icon aria2 ${G.enableAria2Rpc ? "" : "hide"}"" id="aria2" title="Aria2"/>
                 <img src="img/invoke.svg" class="icon invoke ${G.invoke ? "" : "hide"}"" id="invoke" title="${i18n.invoke}"/>
                 <img src="img/send.svg" class="icon send ${G.send2localManual || G.send2local ? "" : "hide"}"" id="send2local" title="${i18n.send2local}"/>
+                <img src="img/mqtt.svg" class="icon mqtt ${G.mqttEnable ? "" : "hide"}" id="mqtt" title="${i18n.send2MQTT}"/>
             </div>
             <div class="url hide">
                 <div id="mediaInfo" data-state="false">
@@ -224,7 +225,7 @@ function AddMedia(data, currentTab = true) {
             Tips(i18n.hasSent + JSON.stringify(data), 2000);
         }, function (errMsg) {
             Tips(i18n.sendFailed, 2000);
-            console.log(errMsg);
+            console.error(errMsg);
         });
         return false;
     });
@@ -353,6 +354,36 @@ function AddMedia(data, currentTab = true) {
             success && success?.ok && Tips(i18n.hasSent, 1000);
         }).catch(function (error) {
             error ? Tips(error, 1000) : Tips(i18n.sendFailed, 1000);
+        });
+        return false;
+    });
+
+    // MQTT 发送
+    data.html.find("#mqtt").click(function () {
+        const $mqttButton = $(this);
+        
+        // 防止重复点击
+        if ($mqttButton.hasClass('mqtt-sending')) {
+            return false;
+        }
+        
+        // 禁用按钮并添加发送中状态
+        $mqttButton.addClass('mqtt-sending').prop('disabled', true);
+        
+        // 1. 点击后，提示 正在发送到MQTT服务器
+        Tips(i18n.sendingToMQTT || "Sending to MQTT server...", 2000);
+
+        sendToMQTT(data).then(function (success) {
+            // 5. 已发送消息到 MQTT 服务器
+            Tips(i18n.messageSentToMQTT || "Message sent to MQTT server", 2000);
+        }).catch(function (error) {
+            // 失败时显示详细错误信息
+            const errorMsg = error ? error.toString() : (i18n.sendFailed || "Send failed");
+            Tips(errorMsg, 10000);
+            console.error("MQTT send error:", error);
+        }).finally(function () {
+            // 恢复按钮状态
+            $mqttButton.removeClass('mqtt-sending').prop('disabled', false);
         });
         return false;
     });
@@ -1000,4 +1031,153 @@ function base64ToHex(base64) {
         hexString += hex;
     }
     return hexString;
+}
+
+// MQTT 相关功能
+let mqttClient = null;
+
+/**
+ * 发送数据到 MQTT 服务器
+ * @param {Object} data - 要发送的媒体数据
+ * @returns {Promise} - 返回发送结果的 Promise
+ */
+function sendToMQTT(data) {
+    return new Promise((resolve, reject) => {
+        if (!G.mqttEnable) {
+            reject("MQTT is not enabled");
+            return;
+        }
+
+        // 使用配置的标题长度，如果未设置则默认为100
+        const titleLength = G.mqttTitleLength || 100;
+        const title = data.title.slice(0, titleLength) || "";
+
+        // 准备要发送的数据
+        const mqttData = {
+            action: "media_found",
+            url: data.url,
+            title: title,
+            ext: data.ext || "",
+            type: data.type || "",
+            timestamp: new Date().toISOString(),
+        };
+
+        // 创建 MQTT 连接并发送数据
+        connectAndSendMQTT(mqttData)
+            .then(() => {
+                resolve(true);
+            })
+            .catch((error) => {
+                console.error("MQTT send error:", error);
+                reject("MQTT send failed: " + error.message);
+            });
+    });
+}
+
+/**
+ * 连接到 MQTT 服务器并发送消息
+ * @param {Object} data - 要发送的数据
+ * @returns {Promise} - 连接和发送的 Promise
+ */
+function connectAndSendMQTT(data) {
+    return new Promise((resolve, reject) => {
+        try {
+            // 构建 MQTT 连接 URL
+            const protocol = G.mqttProtocol;
+            const broker = G.mqttBroker;
+            const port = G.mqttPort;
+            const path = G.mqttPath;
+
+            if (!protocol || !broker || !port || !path) {
+                throw new Error("MQTT connection parameters are missing");
+            }
+
+            const mqttUrl = `${protocol}://${broker}:${port}${path}`;       
+
+            // 创建 MQTT 客户端选项
+            const options = {
+                clientId: `${G.mqttClientId || "cat-catch-client"}-${Math.random().toString(16).slice(2)}`,
+                clean: true,
+                connectTimeout: 10000,
+                reconnectPeriod: 0 // 不自动重连，用完即断
+            };
+
+            // 添加用户名和密码（如果有）
+            if (G.mqttUser) {
+                options.username = G.mqttUser;
+            }
+            if (G.mqttPassword) {
+                options.password = G.mqttPassword;
+            }
+
+            const mqttLib = window.mqtt || (typeof mqtt !== 'undefined' ? mqtt : null);
+            if (!mqttLib) {
+                throw new Error("MQTT library not found. Please check if lib/mqtt.min.js is loaded correctly.");
+            }
+            if (!mqttLib.connect) {
+                throw new Error("MQTT.connect method not found. Available methods: " + Object.keys(mqttLib));
+            }
+
+            // 2. 创建连接阶段提示：正在连接 MQTT 服务器
+            Tips(i18n.connectingToMQTT || "Connecting to MQTT server...", 2000);
+            
+            const client = mqttLib.connect(mqttUrl, options);
+            // 连接成功
+            client.on('connect', () => {
+                
+                const topic = G.mqttTopic || "cat-catch/media";
+                const qos = parseInt(G.mqttQos) || 2;
+
+                // 处理自定义数据格式
+                let message;
+                if (G.mqttDataFormat && G.mqttDataFormat.trim()) {
+                    // 使用自定义格式
+                    message = G.mqttDataFormat
+                        .replace(/\{url\}/g, data.url || '')
+                        .replace(/\{title\}/g, data.title || '')
+                        .replace(/\{type\}/g, data.type || '')
+                        .replace(/\{ext\}/g, data.ext || '')
+                        .replace(/\{timestamp\}/g, data.timestamp || '');
+                } else {
+                    // 使用默认JSON格式
+                    message = JSON.stringify(data);
+                }
+
+                // 3. 正在发送消息到 MQTT 服务器
+                Tips(i18n.sendingMessageToMQTT || "Sending message to MQTT server...", 2000);
+
+                // 发送消息
+                client.publish(topic, message, { qos: qos }, (error) => {
+                    if (error) {
+                        console.error("MQTT publish error:", error);
+                        reject(error);
+                    } else {
+                        resolve();
+                    }
+                });
+            });
+
+            // 连接错误
+            client.on('error', (error) => {
+                console.error("MQTT connection error:", error);
+                reject(error);
+            });
+
+            // 连接超时
+            setTimeout(() => {
+                if (!client.connected) {
+                    client.end();
+                    reject(new Error("MQTT connection timeout"));
+                }
+            }, 6000);
+
+            // client.on('close', () => {
+            //     console.log('MQTT connection closed');
+            // });            
+
+        } catch (error) {
+            console.error("MQTT setup error:", error);
+            reject(error);
+        }
+    });
 }

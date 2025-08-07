@@ -55,6 +55,13 @@ body {
 .icon:active {
   transform: scale(0.9);
 }
+.icon.mqtt-sending {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.icon.mqtt-sending:hover {
+  transform: none;
+}
 .panel-heading .icon {
   padding-left: 2px;
 }
