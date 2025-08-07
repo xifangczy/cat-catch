@@ -766,7 +766,10 @@
 
     <!-- MQTT Configuration -->
     <section id="anchorMQTT">
-      <h1 class="optionsTitle" data-i18n="MQTT"></h1>
+      <h1 class="optionsTitle">
+        <img src="img/mqtt.svg" style="width: 18px" class="mqtt" />
+        <i18n>MQTT</i18n>
+      </h1>
       <div class="optionBox" id="mqttOption">
         <div class="list">
           <div class="item">
@@ -851,7 +854,6 @@
           <div class="item">
             <div data-i18n="mqttDataFormat"></div>
             <textarea id="mqttDataFormat" save="input" class="width100" rows="4"
-              placeholder='{"url": "{url}", "title": "{title}", "type": "{type}", "ext": "{ext}", "timestamp": "{timestamp}"}'
               data-i18n-placeholder="mqttDataFormatHelp"></textarea>
             <div class="help-text">
               <a href="https://cat-catch.bmmmd.com/docs/tag" target="_blank" data-i18n="replaceKeywordList"></a>
