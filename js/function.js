@@ -321,6 +321,7 @@ function templates(text, data) {
         minutes: appendZero(date.getMinutes()),
         seconds: appendZero(date.getSeconds()),
         now: Date.now(),
+        timestamp: new Date().toISOString(),
 
         // 文件名
         fullFileName: data.fullFileName ? data.fullFileName : "",
@@ -714,4 +715,19 @@ function loadCSS() {
     const styleElement = document.createElement('style');
     styleElement.textContent = G.css;
     document.head.appendChild(styleElement);
+}
+
+/**
+ * 修建数据 不发送不必要的数据
+ * @param {Object} originalData 原始数据
+ * @returns {Object} 返回处理后的数据
+ */
+function trimData(originalData) {
+    const data = { ...originalData };
+    // 不发送HTML内容
+    data.html = undefined;
+    data.panelHeading = undefined;
+    data.urlPanel = undefined;
+    data.urlPanelShow = undefined;
+    return data;
 }

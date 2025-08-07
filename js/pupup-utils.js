@@ -109,20 +109,12 @@ function sendToMQTT(data) {
 
         // 使用配置的标题长度，如果未设置则默认为100
         const titleLength = G.mqttTitleLength || 100;
-        const title = data.title.slice(0, titleLength) || "";
-
-        // 准备要发送的数据
-        const mqttData = {
-            action: "media_found",
-            url: data.url,
-            title: title,
-            ext: data.ext || "",
-            type: data.type || "",
-            timestamp: new Date().toISOString(),
-        };
+        data.title = data.title.slice(0, titleLength) || "";
+        data.action = "media_found";
+        data = trimData(data);
 
         // 创建 MQTT 连接并发送数据
-        connectAndSendMQTT(mqttData)
+        connectAndSendMQTT(data)
             .then(() => {
                 resolve(true);
             })
