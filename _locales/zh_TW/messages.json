@@ -426,7 +426,7 @@
     "message": "資料格式"
   },
   "mqttDataFormatHelp": {
-    "message": "{\"url\": \"{url}\", \"title\": \"{title}\", \"type\": \"{type}\", \"ext\": \"{ext}\", \"timestamp\": \"{timestamp}\"}"
+    "message": "{\"url\": \"$${url}\", \"title\": \"$${title}\", \"type\": \"$${type}\", \"ext\": \"$${ext}\", \"timestamp\": \"$${timestamp}\"}"
   },
   "mqttDataFormatVars": {
     "message": "可用變數"

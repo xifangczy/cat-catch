@@ -189,14 +189,8 @@ function connectAndSendMQTT(data) {
 
                 // 处理自定义数据格式
                 let message;
-                if (G.mqttDataFormat && G.mqttDataFormat.trim()) {
-                    // 使用自定义格式
-                    message = G.mqttDataFormat
-                        .replace(/\{url\}/g, data.url || '')
-                        .replace(/\{title\}/g, data.title || '')
-                        .replace(/\{type\}/g, data.type || '')
-                        .replace(/\{ext\}/g, data.ext || '')
-                        .replace(/\{timestamp\}/g, data.timestamp || '');
+                if (G.mqttDataFormat?.trim()) {
+                    message = templates(G.mqttDataFormat, data);
                 } else {
                     // 使用默认JSON格式
                     message = JSON.stringify(data);

@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>titleOption</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="css/public.css" media="all" />
-    <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
-    <script src="lib/jquery.min.js" defer></script>
-    <script src="js/init.js" defer></script>
-    <script src="js/function.js" defer></script>
-  </head>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>titleOption</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="css/public.css" media="all" />
+  <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
+  <script src="lib/jquery.min.js" defer></script>
+  <script src="js/init.js" defer></script>
+  <script src="js/function.js" defer></script>
+</head>
 
 <body>
   <!-- 添加导航栏 -->
@@ -54,7 +55,8 @@
         <div class="flex-end">
           <button type="button" id="AddExt" class="button2" data-i18n="addSuffix" title="add Suffix"></button>
           <button type="button" id="ResetExt" data-reset="Ext" data-i18n="resetSettings" title="reset Suffixs"></button>
-          <button type="button" id="allDisable" data-switch="Ext" data-i18n="disableAll" title="disable All Ext"></button>
+          <button type="button" id="allDisable" data-switch="Ext" data-i18n="disableAll"
+            title="disable All Ext"></button>
           <button type="button" id="allEnable" data-switch="Ext" data-i18n="enableAll" title="enable All Ext"></button>
         </div>
       </div>
@@ -76,8 +78,10 @@
         <div class="flex-end">
           <button type="button" id="AddType" class="button2" data-i18n="addType" title="add Type"></button>
           <button type="button" id="ResetType" data-reset="Type" data-i18n="resetSettings" title="reset Types"></button>
-          <button type="button" id="allDisable" data-switch="Type" data-i18n="disableAll" title="disable All Types"></button>
-          <button type="button" id="allEnable" data-switch="Type" data-i18n="enableAll" title="enable All Types"></button>
+          <button type="button" id="allDisable" data-switch="Type" data-i18n="disableAll"
+            title="disable All Types"></button>
+          <button type="button" id="allEnable" data-switch="Type" data-i18n="enableAll"
+            title="enable All Types"></button>
         </div>
       </div>
     </section>
@@ -111,9 +115,12 @@
         </table>
         <div class="flex-end">
           <button type="button" id="AddRegex" class="button2" data-i18n="addRegex" title="add Regex"></button>
-          <button type="button" id="ResetRegex" data-reset="Regex" data-i18n="resetSettings" title="reset Regex"></button>
-          <button type="button" id="allDisable" data-switch="Regex" data-i18n="disableAll" title="disable All Regex"></button>
-          <button type="button" id="allEnable" data-switch="Regex" data-i18n="enableAll" title="enable All Regex"></button>
+          <button type="button" id="ResetRegex" data-reset="Regex" data-i18n="resetSettings"
+            title="reset Regex"></button>
+          <button type="button" id="allDisable" data-switch="Regex" data-i18n="disableAll"
+            title="disable All Regex"></button>
+          <button type="button" id="allEnable" data-switch="Regex" data-i18n="enableAll"
+            title="enable All Regex"></button>
         </div>
         <span style="font-weight: bold; font-size: 15px" data-i18n="regexTest"></span><br />
         <label for="testUrl">URL</label><br />
@@ -149,9 +156,12 @@
         </table>
         <div class="flex-end">
           <button type="button" id="blockAddUrl" class="button2" data-i18n="addUrl" title="add Url"></button>
-          <button type="button" id="ResetBlockUrl" data-reset="blockUrl" data-i18n="resetSettings" title="reset block Url"></button>
-          <button type="button" id="allDisable" data-switch="blockUrl" data-i18n="disableAll" title="disable All block Url"></button>
-          <button type="button" id="allEnable" data-switch="blockUrl" data-i18n="enableAll" title="enable All block Url"></button>
+          <button type="button" id="ResetBlockUrl" data-reset="blockUrl" data-i18n="resetSettings"
+            title="reset block Url"></button>
+          <button type="button" id="allDisable" data-switch="blockUrl" data-i18n="disableAll"
+            title="disable All block Url"></button>
+          <button type="button" id="allEnable" data-switch="blockUrl" data-i18n="enableAll"
+            title="enable All block Url"></button>
         </div>
       </div>
     </section>
@@ -188,8 +198,7 @@
       <div class="optionBox">
         <span class="explain">
           <p data-i18n-outer="copyTip"></p><br />
-          <a href="https://cat-catch.bmmmd.com/docs/settings#keywords" target="_blank"
-            data-i18n="replaceKeywordList"></a><br /><br />
+          <a href="https://cat-catch.bmmmd.com/docs/tag" target="_blank" data-i18n="replaceKeywordList"></a><br /><br />
         </span>
         <div class="item">
           <div>HLS m3u8</div>
@@ -453,15 +462,19 @@
               <textarea id="testTextarea" class="width100 break-all"
                 rows="3">${url} ${referer|exists:'--headers "Referer:*"'} ${url|regexp:"(https?://[^?]*)"|replace:"http://","https://"|to:base64}</textarea>
             </div>
-            <label for="url">${url}</label><input type="text" class="width100" value="https://bmmmd.com/test.m3u8" id="url">
-            <label for="referer">${referer}</label><input type="text" class="width100" value="https://bmmmd.com/" id="referer">
-            <label for="initiator">${initiator}</label><input type="text" class="width100" value="https://bmmmd.com" id="initiator">
-            <label for="webUrl">${webUrl}</label><input type="text" class="width100" value="https://bmmmd.com/test.html" id="webUrl">
+            <label for="url">${url}</label><input type="text" class="width100" value="https://bmmmd.com/test.m3u8"
+              id="url">
+            <label for="referer">${referer}</label><input type="text" class="width100" value="https://bmmmd.com/"
+              id="referer">
+            <label for="initiator">${initiator}</label><input type="text" class="width100" value="https://bmmmd.com"
+              id="initiator">
+            <label for="webUrl">${webUrl}</label><input type="text" class="width100" value="https://bmmmd.com/test.html"
+              id="webUrl">
             <label for="title">${title}</label><input type="text" class="width100" value="test Video" id="title">
             <span data-i18n-outer="result"></span>:<br><span id="tagTestResult"></span>
           </div>
           <div class="flex-end">
-            <button type="button" id="showTestTag" data-i18n="test" ></button>
+            <button type="button" id="showTestTag" data-i18n="test"></button>
             <button type="button" class="resetOption" data-i18n="resetSettings"></button>
           </div>
         </div>
@@ -768,7 +781,8 @@
 
           <div class="item">
             <div data-i18n="mqttBroker"></div>
-            <input id="mqttBroker" save="input" type="text" class="width100" placeholder="test.mosquitto.org" data-i18n-placeholder="mqttBrokerHelp" />
+            <input id="mqttBroker" save="input" type="text" class="width100" placeholder="test.mosquitto.org"
+              data-i18n-placeholder="mqttBrokerHelp" />
           </div>
 
           <div class="item">
@@ -778,7 +792,8 @@
 
           <div class="item">
             <div data-i18n="mqttPath"></div>
-            <input id="mqttPath" save="input" type="text" class="width100" placeholder="/mqtt" data-i18n-placeholder="mqttPathHelp" />
+            <input id="mqttPath" save="input" type="text" class="width100" placeholder="/mqtt"
+              data-i18n-placeholder="mqttPathHelp" />
           </div>
 
           <div class="item">
@@ -793,27 +808,32 @@
 
           <div class="item">
             <div data-i18n="mqttClientId"></div>
-            <input id="mqttClientId" save="input" type="text" class="width100" placeholder="cat-catch-client" data-i18n-placeholder="mqttClientIdHelp" />
+            <input id="mqttClientId" save="input" type="text" class="width100" placeholder="cat-catch-client"
+              data-i18n-placeholder="mqttClientIdHelp" />
           </div>
 
           <div class="item">
             <div data-i18n="mqttTitleLength"></div>
-            <input id="mqttTitleLength" save="input" type="number" min="1" max="1000" class="width100" value="100" data-i18n-placeholder="mqttTitleLengthHelp" />
+            <input id="mqttTitleLength" save="input" type="number" min="1" max="1000" class="width100" value="100"
+              data-i18n-placeholder="mqttTitleLengthHelp" />
           </div>
 
           <div class="item">
             <div data-i18n="mqttUsername"></div>
-            <input id="mqttUser" save="input" type="text" class="width100" data-i18n-placeholder="mqttCredentialsHelp" />
+            <input id="mqttUser" save="input" type="text" class="width100"
+              data-i18n-placeholder="mqttCredentialsHelp" />
           </div>
 
           <div class="item">
             <div data-i18n="mqttPassword"></div>
-            <input id="mqttPassword" save="input" type="password" class="width100" data-i18n-placeholder="mqttCredentialsHelp" />
+            <input id="mqttPassword" save="input" type="password" class="width100"
+              data-i18n-placeholder="mqttCredentialsHelp" />
           </div>
 
           <div class="item">
             <div data-i18n="mqttTopic"></div>
-            <input id="mqttTopic" save="input" type="text" class="width100" placeholder="cat-catch/media" data-i18n-placeholder="mqttTopicHelp" />
+            <input id="mqttTopic" save="input" type="text" class="width100" placeholder="cat-catch/media"
+              data-i18n-placeholder="mqttTopicHelp" />
           </div>
 
           <div class="item">
@@ -830,11 +850,11 @@
 
           <div class="item">
             <div data-i18n="mqttDataFormat"></div>
-            <textarea id="mqttDataFormat" save="input" class="width100" rows="4" 
-              placeholder='{"url": "{url}", "title": "{title}", "type": "{type}", "ext": "{ext}", "timestamp": "{timestamp}"}' 
+            <textarea id="mqttDataFormat" save="input" class="width100" rows="4"
+              placeholder='{"url": "{url}", "title": "{title}", "type": "{type}", "ext": "{ext}", "timestamp": "{timestamp}"}'
               data-i18n-placeholder="mqttDataFormatHelp"></textarea>
             <div class="help-text">
-              <span data-i18n="mqttDataFormatVars"></span>: {url}, {title}, {type}, {ext}, {timestamp}<br>
+              <a href="https://cat-catch.bmmmd.com/docs/tag" target="_blank" data-i18n="replaceKeywordList"></a>
               <span data-i18n="mqttDataFormatDefault"></span>
             </div>
           </div>
