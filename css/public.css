@@ -202,4 +202,7 @@ button:disabled,
   img.delete {
     content: url(../img/delete-dark.svg);
   }
+  img.mqtt {
+    content: url(../img/mqtt-dark.svg);
+  }
 }

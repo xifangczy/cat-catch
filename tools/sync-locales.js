@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Paths
-const localesDir = path.join(__dirname, '_locales');
+const localesDir = path.join(__dirname, '../_locales');
 const enFile = path.join(localesDir, 'en/messages.json');
 
 // Read and parse JSON file
@@ -44,7 +44,7 @@ function syncLocales() {
 
     // Get all locale directories
     const locales = getLocaleDirs();
-    
+
     // Process each locale
     locales.forEach(locale => {
         const localeFile = path.join(localesDir, locale, 'messages.json');
@@ -52,7 +52,7 @@ function syncLocales() {
         const syncedMessages = {};
         let added = 0;
         let removed = 0;
-        
+
         // Create new messages object with English key order
         Object.keys(enMessages).forEach(key => {
             if (localeMessages[key]) {
@@ -64,10 +64,10 @@ function syncLocales() {
                 added++;
             }
         });
-        
+
         // Count removed keys (present in locale but not in English)
         removed = Object.keys(localeMessages).length - (Object.keys(syncedMessages).length - added);
-        
+
         // Write the synchronized file
         if (writeJsonFile(localeFile, syncedMessages)) {
             console.log(`Synced ${locale}: ${added} added, ${removed} removed`);
