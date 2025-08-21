@@ -519,10 +519,10 @@ class FilePreview {
         container.appendChild(fragment);
     }
     /**
-     * 修剪文件名
+     * 修整数据
      * @param {Object} data 数据
      */
-    trimFileName(data) {
+    trimData(data) {
         data._title = data.title;
         data.title = stringModify(data.title);
 
@@ -535,6 +535,7 @@ class FilePreview {
         }
         data.ext = data.ext ? data.ext : 'Unknown';
         data.type = data.type ? data.type : 'Unknown';
+        data.duration = data.duration ? data.duration : 0;
         return data;
     }
     /**
@@ -555,7 +556,7 @@ class FilePreview {
         if (this.currentRange) {
             this.originalItems = this.originalItems.slice(this.currentRange.start, this.currentRange.end ?? this.originalItems.length);
         }
-        this.originalItems = this.originalItems.map(data => this.trimFileName(data));
+        this.originalItems = this.originalItems.map(data => this.trimData(data));
         this.fileItems = [...this.originalItems];
         setHeaders(this.fileItems, null, this.tab.id);
 
@@ -706,6 +707,7 @@ class FilePreview {
         });
         // 填写时长
         if (item.previewVideo.duration) {
+            item.duration = item.previewVideo._duration;
             item.html.querySelector('.file-info').textContent += ` / ${item.previewVideo.duration}`;
         }
 
@@ -916,7 +918,7 @@ class FilePreview {
             return;
         }
         setHeaders(data, null, this.tab.id);
-        this.originalItems.push(this.trimFileName(data));
+        this.originalItems.push(this.trimData(data));
 
         // this.startPreviewGeneration(); 防抖
         clearTimeout(this.pushDebounce);
