@@ -110,6 +110,10 @@
             en: "Select Video",
             zh: "选择视频"
         },
+        selectAudio: {
+            en: "Select Audio",
+            zh: "选择音频"
+        },
         recordEncoding: {
             en: "Record Encoding",
             zh: "录制编码"
