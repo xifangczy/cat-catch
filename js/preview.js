@@ -352,6 +352,16 @@ class FilePreview {
         const field = document.querySelector('input[name="sortField"]:checked').value;
         if (field === 'name') {
             this.fileItems.sort((a, b) => order * a[field].localeCompare(b[field]));
+        } else if (field == 'duration') {
+            this.fileItems.sort((a, b) => {
+                // If both have invalid duration (-1), maintain original order
+                if (a[field] === -1 && b[field] === -1) return 0;
+                // Items with duration -1 always go to the end
+                if (a[field] === -1) return 1;
+                if (b[field] === -1) return -1;
+                // Normal comparison for valid durations
+                return order * (a[field] - b[field]);
+            });
         } else {
             this.fileItems.sort((a, b) => order * (a[field] - b[field]));
         }
@@ -535,7 +545,7 @@ class FilePreview {
         }
         data.ext = data.ext ? data.ext : 'Unknown';
         data.type = data.type ? data.type : 'Unknown';
-        data.duration = data.duration ? data.duration : 0;
+        data.duration = data.duration ? data.duration : -1;
         return data;
     }
     /**
