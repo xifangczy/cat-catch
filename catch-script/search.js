@@ -10,7 +10,7 @@
         window.console.log = newIframe.contentWindow.console.log;
     }
     // 防止 window.postMessage 被劫持
-    const _postMessage = (isRunningInWorker ? self : window).postMessage;
+    const _postMessage = self.postMessage;
 
     // console.log("start search.js");
     const filter = new Set();
@@ -23,31 +23,29 @@
     extractBaseUrl(location.href);
 
     // Worker
-    if (!isRunningInWorker) {
-        const _Worker = Worker;
-        window.Worker = function (scriptURL, options) {
-            try {
-                const xhr = new XMLHttpRequest();
-                xhr.open('GET', scriptURL, false);
-                xhr.send();
-                if (xhr.status === 200) {
-                    const blob = new Blob([`(${__CAT_CATCH_CATCH_SCRIPT__.toString()})();`, xhr.response], { type: 'text/javascript' });
-                    const newWorker = new _Worker(URL.createObjectURL(blob), options);
-                    newWorker.addEventListener("message", function (event) {
-                        if (event.data?.action == "catCatchAddKey" || event.data?.action == "catCatchAddMedia") {
-                            postData(event.data);
-                        }
-                    });
-                    return newWorker;
-                }
-            } catch (error) {
-                return new _Worker(scriptURL, options);
+    const _Worker = Worker;
+    self.Worker = function (scriptURL, options) {
+        try {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', scriptURL, false);
+            xhr.send();
+            if (xhr.status === 200) {
+                const blob = new Blob([`(${__CAT_CATCH_CATCH_SCRIPT__.toString()})();`, xhr.response], { type: 'text/javascript' });
+                const newWorker = new _Worker(URL.createObjectURL(blob), options);
+                newWorker.addEventListener("message", function (event) {
+                    if (event.data?.action == "catCatchAddKey" || event.data?.action == "catCatchAddMedia") {
+                        postData(event.data);
+                    }
+                });
+                return newWorker;
             }
+        } catch (error) {
             return new _Worker(scriptURL, options);
         }
-        window.Worker.toString = function () {
-            return _Worker.toString();
-        }
+        return new _Worker(scriptURL, options);
+    }
+    self.Worker.toString = function () {
+        return _Worker.toString();
     }
 
     // JSON.parse
@@ -353,11 +351,15 @@
             if (instance.byteLength == 16 && instance.buffer.byteLength == 16) {
                 postData({ action: "catCatchAddKey", key: instance.buffer, href: location.href, ext: "key" });
             }
-            if (instance.byteLength == 256 || instance.byteLength == 128) {
+            if (instance.byteLength == 256 || instance.byteLength == 128 || instance.byteLength == 32) {
                 const _buffer = isRepeatedExpansion(instance.buffer, 16);
                 if (_buffer) {
                     postData({ action: "catCatchAddKey", key: _buffer, href: location.href, ext: "key" });
                 }
+            }
+            if (instance.byteLength == 32) {
+                const key = instance.buffer.slice(0, 16);
+                postData({ action: "catCatchAddKey", key: key, href: location.href, ext: "key" });
             }
             return instance;
         }
