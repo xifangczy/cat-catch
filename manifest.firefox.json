@@ -51,6 +51,9 @@
     },
     "reboot": {
       "description": "__MSG_restartExtension__"
+    },
+    "deepSearch": {
+      "description": "__MSG_deepSearch__"
     }
   },
   "browser_specific_settings": {

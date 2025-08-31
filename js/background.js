@@ -550,16 +550,16 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
 });
 
 // 切换窗口，更新全局变量G.tabId
-// chrome.windows.onFocusChanged.addListener(function (activeInfo) {
-//     if (activeInfo == -1) { return; }
-//     chrome.tabs.query({ active: true, windowId: activeInfo }, function (tabs) {
-//         if (tabs[0] && tabs[0].id) {
-//             G.tabId = tabs[0].id;
-//         } else {
-//             G.tabId = -1;
-//         }
-//     });
-// }, { filters: ["normal"] });
+chrome.windows.onFocusChanged.addListener(function (activeInfo) {
+    if (activeInfo == -1) { return; }
+    chrome.tabs.query({ active: true, windowId: activeInfo }, function (tabs) {
+        if (tabs[0] && tabs[0].id) {
+            G.tabId = tabs[0].id;
+        } else {
+            G.tabId = -1;
+        }
+    });
+}, { filters: ["normal"] });
 
 /**
  * 监听 标签页面更新
@@ -693,6 +693,17 @@ chrome.commands.onCommand.addListener(function (command) {
         chrome.action.setIcon({ path: G.enable ? "/img/icon.png" : "/img/icon-disable.png" });
     } else if (command == "reboot") {
         chrome.runtime.reload();
+    } else if (command == "deepSearch") {
+        const script = G.scriptList.get("search.js");
+        const scriptTabid = script.tabId;
+        if (scriptTabid.has(G.tabId)) {
+            scriptTabid.delete(G.tabId);
+            G.deepSearchTemporarilyClose = G.tabId;
+            chrome.tabs.reload(G.tabId, { bypassCache: true });
+            return;
+        }
+        scriptTabid.add(G.tabId);
+        chrome.tabs.reload(G.tabId, { bypassCache: true });
     }
 });
 

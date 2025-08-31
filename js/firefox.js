@@ -10,7 +10,7 @@ if (typeof (browser) == "object") {
 
     // browser.windows.onFocusChanged.addListener 少一个参数
     const _onFocusChanged = chrome.windows.onFocusChanged.addListener;
-    chrome.windows.onFocusChanged.addListener = function (listener) {
+    chrome.windows.onFocusChanged.addListener = function (listener, option) {
         _onFocusChanged(listener);
     };
 
