@@ -519,7 +519,7 @@
     "message": "Open Downloader Page in Background"
   },
   "m3u8Placeholder": {
-    "message": "Enter m3u8 content or ts fragment list."
+    "message": "Please enter m3u8 link / m3u8 content / segment list / $${range} tag"
   },
   "m3u8Url": {
     "message": "m3u8 URL"
