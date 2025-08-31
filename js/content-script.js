@@ -1,7 +1,7 @@
 (function () {
     var _videoObj = [];
     var _videoSrc = [];
-    var _key = [];
+    var _key = new Set();
     chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         if (chrome.runtime.lastError) { return; }
         // 获取页面视频对象
@@ -133,7 +133,7 @@
             } catch (e) { console.log(e); return true; }
         }
         if (Message.Message == "getKey") {
-            sendResponse(_key);
+            sendResponse(Array.from(_key));
             return true;
         }
         if (Message.Message == "ffmpeg") {
@@ -212,8 +212,8 @@
             if (key instanceof ArrayBuffer || key instanceof Array) {
                 key = ArrayToBase64(key);
             }
-            if (!key || _key.includes(key)) { return; }
-            _key.push(key);
+            if (_key.has(key)) { return; }
+            _key.add(key);
             chrome.runtime.sendMessage({
                 Message: "send2local",
                 action: "addKey",
