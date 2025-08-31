@@ -519,7 +519,7 @@
     "message": "後台開啟下載器頁面"
   },
   "m3u8Placeholder": {
-    "message": "輸入m3u8內容 或 ts碎片列表."
+    "message": "請輸入m3u8連結 / m3u8內容 / 切片清單 / $${range}標籤"
   },
   "m3u8Url": {
     "message": "m3u8位址"
