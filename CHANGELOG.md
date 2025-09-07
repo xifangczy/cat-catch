@@ -1,5 +1,23 @@
 ## 更新说明
 
+### 2.6.4
+
+[Updated] webrtc 录制脚本 更新
+
+[Updated] 深度搜索脚本 更新
+
+[Updated] 更新日语 感谢@hmaoraze
+
+[Added] 支持 MQTT 协议 感谢@jetsung
+
+[Added] 筛选 删除重复文件名
+
+[Added] 始终打开 深度搜索 选项 (慎用)
+
+[Added] 弹出模式 可选择页面
+
+[Added] 筛选页面 支持时长排序
+
 ### 2.6.3
 
 [Fixed] Chromium 114 版本以下缺少 `sidePanel` 功能，导致扩展无法使用
