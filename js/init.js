@@ -26,7 +26,7 @@ if (!chrome.downloads) {
     }
 }
 // 兼容 114版本以下没有chrome.sidePanel
-if (!chrome.sidePanel) {
+if (!chrome.sidePanel || !chrome.sidePanel.setPanelBehavior) {
     chrome.sidePanel = {
         setOptions: function (options) { },
         setPanelBehavior: function (options) { },
