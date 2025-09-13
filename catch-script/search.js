@@ -20,6 +20,7 @@
     const baseUrl = new Set();
     const regexVimeo = /^https:\/\/[^\.]*\.vimeocdn\.com\/exp=.*\/playlist\.json\?/i;
     const videoSet = new Set();
+    const base64Regex = /^[A-Za-z0-9+/]+={0,2}$/;
     extractBaseUrl(location.href);
 
     // Worker
@@ -455,6 +456,10 @@
         const data = _arrayJoin.apply(this, arguments);
         if (data.substring(0, 7).toUpperCase() == "#EXTM3U") {
             toUrl(data);
+        }
+        if (data.length == 24) {
+            // 判断是否是base64
+            base64Regex.test(data) && postData({ action: "catCatchAddKey", key: data, href: location.href, ext: "base64Key" });
         }
         return data;
     }
