@@ -438,7 +438,7 @@ hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
             hls.detachMedia(video);
             video.remove();
         }
-        delete video;
+        video = null;
     }
     currentLevel = data.level;
 });
@@ -1190,7 +1190,7 @@ $("#searchingForRealKey").click(function () {
     const check = (buffer) => {
         const uint8Array = new Uint8Array(buffer);
         // fmp4
-        if (uint8Array[4] === 0x73 && uint8Array[5] === 0x74 && uint8Array[6] === 0x79 && uint8Array[7] === 0x70) {
+        if ((uint8Array[4] === 0x73 || uint8Array[4] === 0x66) && uint8Array[5] === 0x74 && uint8Array[6] === 0x79 && uint8Array[7] === 0x70) {
             return true;
         }
         // moof
