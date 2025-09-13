@@ -124,6 +124,7 @@ function AddMedia(data, currentTab = true) {
                 <div class="moreButton">
                     <div id="qrcode"><img src="img/qrcode.png" class="icon qrcode" title="QR Code"/></div>
                     <div id="catDown"><img src="img/cat-down.png" class="icon cat-down" title="${i18n.downloadWithRequestHeader}"/></div>
+                    <div id="catDownFFmpeg"><img src="img/send2ffmpeg.svg" class="icon send2ffmpeg" title="${i18n.sendFfmpeg}"/></div>
                     <div><img src="img/invoke.svg" class="icon invoke" title="${i18n.invoke}"/></div>
                 </div>
                 <a href="${data.url}" target="_blank" download="${data.downFileName}">${data.url}</a>
@@ -211,6 +212,9 @@ function AddMedia(data, currentTab = true) {
     // 猫抓下载器 下载
     data.html.find("#catDown").click(function () {
         catDownload(data);
+    });
+    data.html.find("#catDownFFmpeg").click(function () {
+        catDownload(data, { ffmpeg: "addFile" });
     });
     //点击复制网址
     data.html.find('#copy').click(function () {
