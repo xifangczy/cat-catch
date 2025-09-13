@@ -259,22 +259,31 @@
         return _slice.toString();
     }
 
-    // Int8Array.prototype.subarray
-    const _subarray = Int8Array.prototype.subarray;
-    Int8Array.prototype.subarray = function (start, end) {
-        const data = _subarray.apply(this, arguments);
-        if (data.byteLength == 16) {
-            const uint8 = new _Uint8Array(data);
-            for (let item of uint8) {
-                if (typeof item != "number" || item > 255) { return data; }
+    //#region TypedArray.prototype.subarray
+    const createSubarrayWrapper = (originalSubarray) => {
+        return function (start, end) {
+            const data = originalSubarray.apply(this, arguments);
+            if (data.byteLength == 16) {
+                const uint8 = new _Uint8Array(data);
+                const isValid = Array.from(uint8).every(item => typeof item == "number" && item <= 255);
+                isValid && postData({ action: "catCatchAddKey", key: uint8.buffer, href: location.href, ext: "key" });
             }
-            postData({ action: "catCatchAddKey", key: uint8.buffer, href: location.href, ext: "key" });
+            return data;
         }
-        return data;
     }
+    // Int8Array.prototype.subarray
+    const _Int8ArraySubarray = Int8Array.prototype.subarray;
+    Int8Array.prototype.subarray = createSubarrayWrapper(_Int8ArraySubarray);
     Int8Array.prototype.subarray.toString = function () {
-        return _subarray.toString();
+        return _Int8ArraySubarray.toString();
     }
+    // Uint8Array.prototype.subarray
+    const _Uint8ArraySubarray = Uint8Array.prototype.subarray;
+    Uint8Array.prototype.subarray = createSubarrayWrapper(_Uint8ArraySubarray);
+    Uint8Array.prototype.subarray.toString = function () {
+        return _Uint8ArraySubarray.toString();
+    }
+    //#endregion
 
     // window.btoa / window.atob
     const _btoa = btoa;
@@ -593,7 +602,11 @@
             data.key = ArrayToBase64(value);
             value = data.key;
         }
-        if (data.action == "catCatchAddKey" && data.key.startsWith("AAAAAAAAAAAAAAAAAAAA")) {
+        /**
+         * AAAAAAAA... 空数据
+         * AAAAJGZ0eXB... ftyp 开头的数据
+         */
+        if (data.action == "catCatchAddKey" && (data.key.startsWith("AAAAAAAAAAAAAAAAAAAA") || data.key.startsWith("AAAAJGZ0eXB"))) {
             return;
         }
         if (filter.has(value)) { return false; }
