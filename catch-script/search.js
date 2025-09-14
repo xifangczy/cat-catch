@@ -599,14 +599,20 @@
         let value = data.url ? data.url : data.key;
         if (value instanceof ArrayBuffer || value instanceof Array) {
             if (value.byteLength == 0) { return; }
+            if (data.action == "catCatchAddKey") {
+                // 判断是否ftyp
+                const uint8 = new _Uint8Array(value);
+                if ((uint8[4] === 0x73 || uint8[4] === 0x66) && uint8[5] == 0x74 && uint8[6] == 0x79 && uint8[7] == 0x70) {
+                    return;
+                }
+            }
             data.key = ArrayToBase64(value);
             value = data.key;
         }
         /**
          * AAAAAAAA... 空数据
-         * AAAAJGZ0eXB... ftyp 开头的数据
          */
-        if (data.action == "catCatchAddKey" && (data.key.startsWith("AAAAAAAAAAAAAAAAAAAA") || data.key.startsWith("AAAAJGZ0eXB"))) {
+        if (data.action == "catCatchAddKey" && (data.key.startsWith("AAAAAAAAAAAAAAAAAAAA"))) {
             return;
         }
         if (filter.has(value)) { return false; }
