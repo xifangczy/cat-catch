@@ -126,8 +126,8 @@
                 link.href = canvas.toDataURL("image/jpeg");
                 link.download = `${location.hostname}-${secToTime(video.currentTime)}.jpg`;
                 link.click();
-                delete canvas;
-                delete link;
+                canvas = null;
+                link = null;
                 sendResponse("ok");
                 return true;
             } catch (e) { console.log(e); return true; }
