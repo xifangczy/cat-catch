@@ -75,16 +75,6 @@
       "all_frames": true
     }
   ],
-  "web_accessible_resources": [
-    {
-      "resources": [
-        "catch-script/*"
-      ],
-      "matches": [
-        "<all_urls>"
-      ]
-    }
-  ],
   "default_locale": "en",
   "version": "2.6.4",
   "incognito": "split"
