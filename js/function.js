@@ -44,11 +44,11 @@ function byteToSize(byte) {
  * @param {String} fileName 文件名
  */
 function downloadDataURL(url, fileName) {
-    const link = document.createElement("a");
+    let link = document.createElement("a");
     link.href = url;
     link.download = fileName;
     link.click();
-    delete link;
+    link = null;
 }
 
 /**
@@ -262,7 +262,7 @@ function templatesFunction(text, action, data) {
             text = "";
             if (data.pageDOM) {
                 try {
-                    text = data.pageDOM.querySelector(arg[0]).innerHTML;
+                    text = data.pageDOM.querySelector(arg[0]).innerText?.trim();
                 } catch (e) { text = ""; }
             }
         } else if (action == "filter") {
@@ -527,9 +527,12 @@ function filterFileName(str, text) {
         }[match];
     });
 
-    // 如果最后一位是"." chrome.download 无法下载
+    // 前后不能是 “.”
     if (str.endsWith(".")) {
         str = str + "catCatch";
+    }
+    if (str.startsWith(".")) {
+        str = "catCatch" + str;
     }
     return str;
 }
