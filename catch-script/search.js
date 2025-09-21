@@ -1,7 +1,7 @@
 // const CATCH_SEARCH_ONLY = true;
 (function __CAT_CATCH_CATCH_SCRIPT__() {
     const isRunningInWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
-    const CATCH_SEARCH_DEBUG = false;
+    const CATCH_SEARCH_DEBUG = false; // 开发调试日志
     // 防止 console.log 被劫持
     if (!isRunningInWorker && CATCH_SEARCH_DEBUG && console.log.toString() != 'function log() { [native code] }') {
         const newIframe = top.document.createElement("iframe");
@@ -135,20 +135,20 @@
             this.responseURL.includes("vimeocdn.com") && vimeo(this.responseURL, this.response);
 
             // 查找疑似key
-            if (this.responseType == "arraybuffer" && this.response?.byteLength && this.response.byteLength == 32) {
-                postData({ action: "catCatchAddKey", key: this.response, href: location.href, ext: "key" });
-            }
-            if (this.responseType == "arraybuffer" && this.response?.byteLength && this.response.byteLength == 16) {
-                postData({ action: "catCatchAddKey", key: this.response, href: location.href, ext: "key" });
-            }
-            if (this.responseType == "arraybuffer" && this.responseURL.includes(".ts")) {
-                extractBaseUrl(this.responseURL);
+            if (this.responseType === "arraybuffer" && this.response?.byteLength) {
+                if (this.response.byteLength === 16 || this.response.byteLength === 32) {
+                    postData({ action: "catCatchAddKey", key: this.response, href: location.href, ext: "key" });
+                }
+                if (this.responseURL.includes(".ts")) {
+                    extractBaseUrl(this.responseURL);
+                }
             }
             if (typeof this.response == "object") {
                 findMedia(this.response);
                 return;
             }
             if (this.response == "" || typeof this.response != "string") { return; }
+
             if (dataRE.test(this.response)) {
                 const text = getDataM3U8(this.response);
                 text && toUrl(text);
@@ -164,8 +164,9 @@
                 ext && postData({ action: "catCatchAddMedia", url: this.response, href: location.href, ext: ext });
                 return;
             }
-            if (this.response.toUpperCase().includes("#EXTM3U")) {
-                if (this.response.substring(0, 7) == "#EXTM3U") {
+            const responseUpper = this.response.toUpperCase();
+            if (responseUpper.includes("#EXTM3U")) {
+                if (responseUpper.substring(0, 7) == "#EXTM3U") {
                     if (method == "GET") {
                         toUrl(addBaseUrl(getBaseUrl(this.responseURL), this.response));
                         postData({ action: "catCatchAddMedia", url: this.responseURL, href: location.href, ext: "m3u8" });
@@ -182,6 +183,16 @@
                     toUrl(this.response, "json");
                     return;
                 }
+            }
+            // dash DRM
+            if (responseUpper.includes("<MPD") && responseUpper.includes("</MPD>")) {
+                _postMessage({
+                    action: "catCatchDashDRMMedia",
+                    url: this.responseURL,
+                    data: this.response,
+                    href: location.href
+                });
+                return;
             }
             const isJson = isJSON(this.response);
             if (isJson) {
@@ -248,6 +259,7 @@
     Array.prototype.slice = function (start, end) {
         const data = _slice.apply(this, arguments);
         if (end == 16 && this.length == 32) {
+            CATCH_SEARCH_DEBUG && console.log(this, start, end, data);
             for (let item of data) {
                 if (typeof item != "number" || item > 255) { return data; }
             }
@@ -263,6 +275,7 @@
     const createSubarrayWrapper = (originalSubarray) => {
         return function (start, end) {
             const data = originalSubarray.apply(this, arguments);
+            CATCH_SEARCH_DEBUG && console.log(this, start, end, data);
             if (data.byteLength == 16) {
                 const uint8 = new _Uint8Array(data);
                 const isValid = Array.from(uint8).every(item => typeof item == "number" && item <= 255);
@@ -326,6 +339,7 @@
     String.fromCharCode = function () {
         const data = _fromCharCode.apply(this, arguments);
         if (data.length < 7) { return data; }
+        CATCH_SEARCH_DEBUG && console.log(data, this, arguments);
         if (data.substring(0, 7) == "#EXTM3U" || data.includes("#EXTINF:")) {
             m3u8Text += data;
             if (m3u8Text.includes("#EXT-X-ENDLIST")) {
@@ -349,15 +363,22 @@
     DataView = new Proxy(_DataView, {
         construct(target, args) {
             let instance = new target(...args);
-            instance.setInt32 = new Proxy(instance.setInt32, {
-                apply(target, thisArg, argArray) {
-                    Reflect.apply(target, thisArg, argArray);
-                    if (thisArg.byteLength == 16) {
-                        postData({ action: "catCatchAddKey", key: thisArg.buffer, href: location.href, ext: "key" });
-                    }
-                    return;
+            // 劫持常用的set方法
+            for (const methodName of ['setInt8', 'setUint8', 'setInt16', 'setUint16', 'setInt32', 'setUint32']) {
+                if (typeof instance[methodName] !== 'function') {
+                    continue;
                 }
-            });
+                instance[methodName] = new Proxy(instance[methodName], {
+                    apply(target, thisArg, argArray) {
+                        const result = Reflect.apply(target, thisArg, argArray);
+                        if (thisArg.byteLength == 16) {
+                            postData({ action: "catCatchAddKey", key: thisArg.buffer, href: location.href, ext: "key" });
+                        }
+                        return result;
+                    }
+                });
+            }
+            CATCH_SEARCH_DEBUG && console.log(target.name, args, instance);
             if (instance.byteLength == 16 && instance.buffer.byteLength == 16) {
                 postData({ action: "catCatchAddKey", key: instance.buffer, href: location.href, ext: "key" });
             }
@@ -378,6 +399,7 @@
     // escape
     const _escape = escape;
     escape = function (str) {
+        CATCH_SEARCH_DEBUG && console.log(str);
         if (str?.length && str.length == 24 && str.substring(22, 24) == "==") {
             postData({ action: "catCatchAddKey", key: str, href: location.href, ext: "base64Key" });
         }
@@ -391,6 +413,7 @@
     const _indexOf = String.prototype.indexOf;
     String.prototype.indexOf = function (searchValue, fromIndex) {
         const out = _indexOf.apply(this, arguments);
+        // CATCH_SEARCH_DEBUG && console.log(this, searchValue, fromIndex, out);
         if (searchValue === '#EXTM3U' && out !== -1) {
             const data = this.substring(fromIndex);
             toUrl(data);
@@ -424,6 +447,7 @@
         const isArray = Array.isArray(args[0]) && args[0].length === 16;
         const isArrayBuffer = args[0] instanceof ArrayBuffer && args[0].byteLength === 16;
         const instance = new target(...args);
+        CATCH_SEARCH_DEBUG && console.log(target.name, args, instance);
         if (isArray || isArrayBuffer) {
             postData({ action: "catCatchAddKey", key: args[0], href: location.href, ext: "key" });
         } else if (instance.buffer.byteLength === 16) {
@@ -463,11 +487,13 @@
     const _arrayJoin = Array.prototype.join;
     Array.prototype.join = function () {
         const data = _arrayJoin.apply(this, arguments);
+        // CATCH_SEARCH_DEBUG && console.log(data, this, arguments);
         if (data.substring(0, 7).toUpperCase() == "#EXTM3U") {
             toUrl(data);
         }
         if (data.length == 24) {
             // 判断是否是base64
+            CATCH_SEARCH_DEBUG && console.log(data, this, arguments);
             base64Regex.test(data) && postData({ action: "catCatchAddKey", key: data, href: location.href, ext: "base64Key" });
         }
         return data;
