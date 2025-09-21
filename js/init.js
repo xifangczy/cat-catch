@@ -17,7 +17,7 @@ if (!chrome.downloads) {
             a.href = options.url;
             a.download = options.filename;
             a.click();
-            delete a;
+            a = null;
             callback && callback();
         },
         onChanged: { addListener: function () { } },
@@ -183,6 +183,7 @@ G.OptionLists = {
     mqttQos: 0,
     mqttTitleLength: 100,
     mqttDataFormat: "",
+    getHtmlDOM: false,
 };
 // 本地储存的配置
 G.LocalVar = {

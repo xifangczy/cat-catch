@@ -737,9 +737,26 @@ $("#send2localSelect").click(function () {
         }
     });
 });
+async function getPageDOM() {
+    try {
+        const result = await new Promise((resolve, reject) => {
+            chrome.tabs.sendMessage(G.tabId, { Message: "getPage" }, { frameId: 0 }, (response) => {
+                if (chrome.runtime.lastError) {
+                    reject(null);
+                } else {
+                    resolve(response);
+                }
+            });
+        });
 
+        return new DOMParser().parseFromString(result, 'text/html');
+    } catch (error) {
+        console.error('Error getting page:', error);
+        return null;
+    }
+}
 // 一些需要等待G变量加载完整的操作
-const interval = setInterval(function () {
+const interval = setInterval(async function () {
     if (!G.initSyncComplete || !G.initLocalComplete || !G.tabId) { return; }
     clearInterval(interval);
 
@@ -758,10 +775,9 @@ const interval = setInterval(function () {
     }
 
     // 获取页面DOM
-    chrome.tabs.sendMessage(G.tabId, { Message: "getPage" }, { frameId: 0 }, function (result) {
-        if (chrome.runtime.lastError) { return; }
-        pageDOM = new DOMParser().parseFromString(result, 'text/html');
-    });
+    if (G.getHtmlDOM) {
+        pageDOM = await getPageDOM();
+    }
     // 填充数据
     chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getData", tabId: G.tabId }, function (data) {
         if (!data || data === "OK") {
