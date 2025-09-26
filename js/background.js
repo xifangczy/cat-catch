@@ -74,12 +74,12 @@ chrome.webRequest.onErrorOccurred.addListener(
 );
 
 function findMedia(data, isRegex = false, filter = false, timer = false) {
-    if (timer) { return; }
     // Service Worker被强行杀死之后重新自我唤醒，等待全局变量初始化完成。
     if (!G || !G.initSyncComplete || !G.initLocalComplete || G.tabId == undefined || cacheData.init) {
+        if (timer) { return; }
         setTimeout(() => {
             findMedia(data, isRegex, filter, true);
-        }, 233);
+        }, 500);
         return;
     }
     // 检查 是否启用 是否在当前标签是否在屏蔽列表中
