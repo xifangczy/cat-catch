@@ -422,7 +422,7 @@ hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
     parseTs(data.details);  // 提取Ts链接
     // 获取视频信息
     if ($(".videoInfo #info").html() == "") {
-        const video = document.createElement("video");
+        let video = document.createElement("video");
         video.muted = true;
         video.autoplay = false;
         hls.attachMedia(video);
