@@ -432,13 +432,14 @@ hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
         video.oncanplay = function () {
             hls.detachMedia(video);
             video.remove();
+            video = null;
         }
         video.onerror = function () {
             hls.stopLoad();
             hls.detachMedia(video);
             video.remove();
+            video = null;
         }
-        video = null;
     }
     currentLevel = data.level;
 });
