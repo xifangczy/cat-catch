@@ -117,8 +117,8 @@
         // 截图视频图片
         if (Message.Message == "screenshot") {
             try {
-                const video = _videoObj[Message.index];
-                const canvas = document.createElement("canvas");
+                let video = _videoObj[Message.index];
+                let canvas = document.createElement("canvas");
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
