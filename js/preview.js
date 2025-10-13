@@ -1,6 +1,6 @@
 class FilePreview {
 
-    MAX_CONCURRENT = 5;   // 最大并行生成预览数
+    MAX_CONCURRENT = 16;   // 最大并行生成预览数
     MAX_LIST_SIZE = 128;  // 最大文件列表长度
 
     constructor() {
