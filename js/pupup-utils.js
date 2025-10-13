@@ -67,7 +67,7 @@ function aria2AddUri(data, success, error) {
     const params = { out: data.downFileName };
     if (G.enableAria2RpcReferer) {
         params.header = [];
-        params.header.push(G.userAgent ? G.userAgent : navigator.userAgent);
+        params.header.push("User-Agent: " + (G.userAgent ? G.userAgent : navigator.userAgent));
         if (data.requestHeaders?.referer) {
             params.header.push("Referer: " + data.requestHeaders.referer);
         }
