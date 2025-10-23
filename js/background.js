@@ -82,6 +82,11 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         }, 500);
         return;
     }
+
+    if (G.damn && G.damnUrlSet.has(data.tabId)) {
+        return;
+    }
+
     // 检查 是否启用 是否在当前标签是否在屏蔽列表中
     const blockUrlFlag = data.tabId && data.tabId > 0 && G.blockUrlSet.has(data.tabId);
     if (!G.enable || (G.blockUrlWhite ? !blockUrlFlag : blockUrlFlag)) {
@@ -584,6 +589,11 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
         if (isLockUrl(changeInfo.url)) {
             G.blockUrlSet.add(tabId);
         }
+
+        G.damnUrlSet.delete(tabId);
+        if (isDamnUrl(changeInfo.url)) {
+            G.damnUrlSet.add(tabId);
+        }
     }
     chrome.sidePanel.setOptions({
         tabId,
@@ -605,6 +615,11 @@ chrome.webNavigation.onCommitted.addListener(function (details) {
         G.blockUrlSet.delete(details.tabId);
         if (isLockUrl(details.url)) {
             G.blockUrlSet.add(details.tabId);
+        }
+
+        G.damnUrlSet.delete(details.tabId);
+        if (isDamnUrl(details.url)) {
+            G.damnUrlSet.add(details.tabId);
         }
     }
 

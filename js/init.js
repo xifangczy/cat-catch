@@ -51,6 +51,9 @@ G.requestHeaders = new Map();   // 临时储存请求头
 G.urlMap = new Map();   // url查重map
 G.deepSearchTemporarilyClose = null; // 深度搜索临时变量
 
+G.damnUrl = [/^https:\/\/www\.douyin\.com\/.*$/i];
+G.damnUrlSet = new Set();
+
 // 初始化当前tabId
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     if (tabs[0] && tabs[0].id) {
@@ -186,7 +189,9 @@ G.OptionLists = {
     mqttTitleLength: 100,
     mqttDataFormat: "",
     getHtmlDOM: false,
+    damn: true
 };
+
 // 本地储存的配置
 G.LocalVar = {
     featMobileTabId: [],
@@ -302,8 +307,9 @@ function InitOptions() {
         // 初始化 G.blockUrlSet
         (typeof isLockUrl == 'function') && chrome.tabs.query({}, function (tabs) {
             for (const tab of tabs) {
-                if (tab.url && isLockUrl(tab.url)) {
-                    G.blockUrlSet.add(tab.id);
+                if (tab.url) {
+                    isLockUrl(tab.url) && G.blockUrlSet.add(tab.id);
+                    isDamnUrl(tab.url) && G.damnUrlSet.add(tab.id);
                 }
             }
         });

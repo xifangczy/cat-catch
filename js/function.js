@@ -649,6 +649,16 @@ function send2local(action, data, tabId = 0) {
     });
 }
 
+function isDamnUrl(url) {
+    for (let key in G.damnUrl) {
+        G.damnUrl[key].lastIndex = 0;
+        if (G.damnUrl[key].test(url)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 /**
  * 判断url是否在屏蔽网址中
  * @param {String} url 
