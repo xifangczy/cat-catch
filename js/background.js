@@ -412,6 +412,9 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // 对tabId的标签 脚本注入或删除
     if (Message.Message == "script") {
+        if (G.damn && G.damnUrlSet.has(Message.tabId)) {
+            return;
+        }
         if (!G.scriptList.has(Message.script)) {
             sendResponse("error no exists");
             return false;
