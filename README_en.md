@@ -45,6 +45,20 @@ For full functionality, use version 104 or above.
 # 🤚🏻Disclaimer
 This extension is intended for downloading videos that you own or have authorized access to. It is prohibited to use this Tool for downloading copyrighted content without permission. Users are solely responsible for their actions, and the developer is not liable for any user behavior. This Tool is provided "as-is," and the developer assumes no direct or indirect liability.
 
+# 🚫 Copyright Protection and Opt-Out Policy
+We respect the intellectual property rights and legitimate interests of all websites and their operators.
+If you prefer that your website not be accessed for resource catching by this tool, please follow the procedure below to submit your request. We will add your domain to the project's "Opt-Out List."
+- Create a new **Issue** in this repository.
+- **Please use the following title format:** `[Opt-Out Request] YourDomain.com`
+
+In the Issue description, please provide the following information for verification:
+- **Website Domain:** (e.g., `example.com`)
+- **Contact Email:** (For potential identity verification if necessary).
+
+We commit to respecting your wishes and will add domains from verified requests to our Opt-Out list in subsequent version updates.
+Please note that this is an open-source project, and updates and releases follow a certain cycle. Thank you for your understanding and cooperation.
+
+
 # 🔒Privacy Policy
 The extension collects and processes all information locally without sending it to remote servers and does not include any trackers.
 
