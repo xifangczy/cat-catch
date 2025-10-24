@@ -482,6 +482,7 @@ function clearRedundant() {
         autoDownFlag && (chrome.storage.session ?? chrome.storage.local).set({ featAutoDownTabId: Array.from(G.featAutoDownTabId) });
 
         G.blockUrlSet = new Set([...G.blockUrlSet].filter(x => allTabId.has(x)));
+        G.damnUrlSet = new Set([...G.damnUrlSet].filter(x => allTabId.has(x)));
 
         if (G.requestHeaders.size >= 10240) {
             G.requestHeaders.clear();

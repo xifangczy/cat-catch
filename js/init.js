@@ -51,6 +51,7 @@ G.requestHeaders = new Map();   // 临时储存请求头
 G.urlMap = new Map();   // url查重map
 G.deepSearchTemporarilyClose = null; // 深度搜索临时变量
 
+// 避免抓取列表
 G.damnUrl = [/^https:\/\/.*\.douyin\.com\/.*$/i];
 G.damnUrlSet = new Set();
 
