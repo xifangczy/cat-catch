@@ -221,13 +221,13 @@ G.ffmpegConfig = {
     cacheData: [],
     version: 1,
     get url() {
-        return G.onlineServiceAddress == 0 ? "https://ffmpeg.bmmmd.com/" : "https://ffmpeg2.bmmmd.com/";
+        return G.onlineServiceAddress == 0 ? "https://ffmpeg.bmmmd.com/" : "https://ffmpeg.94cat.com/";
     }
 }
 // streamSaver 边下边存
 G.streamSaverConfig = {
     get url() {
-        return G.onlineServiceAddress == 0 ? "https://stream.bmmmd.com/mitm.html" : "https://stream2.bmmmd.com/mitm.html";
+        return G.onlineServiceAddress == 0 ? "https://stream.bmmmd.com/mitm.html" : "https://ffmpeg.94cat.com/mitm.html";
     }
 }
 
