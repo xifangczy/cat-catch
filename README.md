@@ -16,7 +16,7 @@ https://addons.mozilla.org/addon/cat-catch/ 😂需非国区IP访问
 💔猫抓是开源的，任何人都可以下载修改上架到应用商店，已经有不少加上广告代码后上架的伪猫抓，请注意自己的数据安全。所有安装地址以github和用户文档为准。
 
 # 📒用户文档
-https://cat-catch.bmmmd.com/
+https://o2bmm.gitbook.io/cat-catch/
 
 # 🌏翻译
 [![gitlocalized ](https://gitlocalize.com/repo/9392/whole_project/badge.svg)](https://gitlocalize.com/repo/9392?utm_source=badge)
