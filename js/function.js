@@ -203,7 +203,8 @@ function templatesFunction(text, action, data) {
         if (colon != -1) {
             action = item.slice(0, colon).trim();
             arg = splitString(item.slice(colon + 1).trim(), ",").map(item => {
-                return item.trim().replace(/^['"]|['"]$/g, "");
+                // return item.trim().replace(/^['"]|['"]$/g, "");
+                return item.trim().replace(/^(['"])([\s\S]*)\1$/, '$2');
             });
         }
         // 字符串不允许为空 除非 exists find prompt函数
