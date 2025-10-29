@@ -1,13 +1,13 @@
 name: "🚫 Opt-Out Request / 拒绝抓取请求"
 description: "Submit website opt-out request / 提交网站拒绝抓取请求"
-title: "[Opt-Out Request] Please enter your website domain here / [拒绝抓取] 请在此处填写您的网站域名"
+title: "[Opt-Out Request] Please enter your website domain here / 请在此处填写您的网站域名"
 labels: ["opt-out"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thank you for using our opt-out service. Please carefully fill in the following information. We will add your domain to the avoid-crawl list after verification.
-        感谢您使用我们的拒绝抓取服务。请仔细填写以下信息，我们将在核实后把您的域名加入避免抓取列表。
+        Please carefully fill in the following information. We will add your domain to the avoid-crawl list after verification.
+        请仔细填写以下信息，我们将在核实后把您的域名加入避免抓取列表。
 
         **Note:** This is an open source project, updates and releases require certain cycles. Thank you for your understanding and cooperation.
         **注意：** 本项目是开源项目，更新和发布需要一定的周期，感谢您的理解与配合。
@@ -31,11 +31,11 @@ body:
       required: true
 
   - type: textarea
-    id: verification
+    id: additional_info
     attributes:
-      label: "Domain Ownership Verification / 域名所有权验证"
-      description: "Please briefly describe how you can verify ownership of this domain (optional, but helps speed up processing) / 请简要说明您如何验证对该域名的所有权（可选，但有助于加快处理速度）"
-      placeholder: "Example: I am the administrator/owner of this domain and can verify through WHOIS information or website backend / 例如：我是该域名的管理员/所有者，可以通过whois信息或网站后台验证"
+      label: "Additional Information / 其他说明"
+      description: "Please provide any additional information that may help us process your request / 请提供任何可能有助于我们处理您请求的额外信息"
+      placeholder: "Example: Any special requirements or additional context about your request / 例如：任何特殊要求或关于您请求的额外背景信息"
 
   - type: checkboxes
     id: terms
