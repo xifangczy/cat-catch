@@ -359,42 +359,85 @@
     }
 
     // DataView
+    // const _DataView = DataView;
+    // DataView = new Proxy(_DataView, {
+    //     construct(target, args) {
+    //         let instance = new target(...args);
+    //         // 劫持常用的set方法
+    //         for (const methodName of ['setInt8', 'setUint8', 'setInt16', 'setUint16', 'setInt32', 'setUint32']) {
+    //             if (typeof instance[methodName] !== 'function') {
+    //                 continue;
+    //             }
+    //             instance[methodName] = new Proxy(instance[methodName], {
+    //                 apply(target, thisArg, argArray) {
+    //                     const result = Reflect.apply(target, thisArg, argArray);
+    //                     if (thisArg.byteLength == 16) {
+    //                         postData({ action: "catCatchAddKey", key: thisArg.buffer, href: location.href, ext: "key" });
+    //                     }
+    //                     return result;
+    //                 }
+    //             });
+    //         }
+    //         CATCH_SEARCH_DEBUG && console.log(target.name, args, instance);
+    //         if (instance.byteLength == 16 && instance.buffer.byteLength == 16) {
+    //             postData({ action: "catCatchAddKey", key: instance.buffer, href: location.href, ext: "key" });
+    //         }
+    //         if (instance.byteLength == 256 || instance.byteLength == 128 || instance.byteLength == 32) {
+    //             const _buffer = isRepeatedExpansion(instance.buffer, 16);
+    //             if (_buffer) {
+    //                 postData({ action: "catCatchAddKey", key: _buffer, href: location.href, ext: "key" });
+    //             }
+    //         }
+    //         if (instance.byteLength == 32) {
+    //             const key = instance.buffer.slice(0, 16);
+    //             postData({ action: "catCatchAddKey", key: key, href: location.href, ext: "key" });
+    //         }
+    //         return instance;
+    //     }
+    // });
+
     const _DataView = DataView;
-    DataView = new Proxy(_DataView, {
-        construct(target, args) {
-            let instance = new target(...args);
-            // 劫持常用的set方法
-            for (const methodName of ['setInt8', 'setUint8', 'setInt16', 'setUint16', 'setInt32', 'setUint32']) {
-                if (typeof instance[methodName] !== 'function') {
-                    continue;
+    DataView = function () {
+        // 创建原始 DataView 实例
+        const instance = new _DataView(...arguments);
+        // 劫持常用的 set 方法
+        for (const methodName of ['setInt8', 'setUint8', 'setInt16', 'setUint16', 'setInt32', 'setUint32']) {
+            if (typeof instance[methodName] !== 'function') {
+                continue;
+            }
+            const originalMethod = instance[methodName];
+            instance[methodName] = function (...args) {
+                const result = originalMethod.apply(this, args);
+                // 在方法调用后检查条件
+                if (this.byteLength === 16) {
+                    postData({ action: "catCatchAddKey", key: this.buffer, href: location.href, ext: "key" });
                 }
-                instance[methodName] = new Proxy(instance[methodName], {
-                    apply(target, thisArg, argArray) {
-                        const result = Reflect.apply(target, thisArg, argArray);
-                        if (thisArg.byteLength == 16) {
-                            postData({ action: "catCatchAddKey", key: thisArg.buffer, href: location.href, ext: "key" });
-                        }
-                        return result;
-                    }
-                });
-            }
-            CATCH_SEARCH_DEBUG && console.log(target.name, args, instance);
-            if (instance.byteLength == 16 && instance.buffer.byteLength == 16) {
-                postData({ action: "catCatchAddKey", key: instance.buffer, href: location.href, ext: "key" });
-            }
-            if (instance.byteLength == 256 || instance.byteLength == 128 || instance.byteLength == 32) {
-                const _buffer = isRepeatedExpansion(instance.buffer, 16);
-                if (_buffer) {
-                    postData({ action: "catCatchAddKey", key: _buffer, href: location.href, ext: "key" });
-                }
-            }
-            if (instance.byteLength == 32) {
-                const key = instance.buffer.slice(0, 16);
-                postData({ action: "catCatchAddKey", key: key, href: location.href, ext: "key" });
-            }
-            return instance;
+                return result;
+            };
         }
-    });
+        // 调试输出
+        if (typeof CATCH_SEARCH_DEBUG !== 'undefined' && CATCH_SEARCH_DEBUG) {
+            console.log(_DataView.name, arguments, instance);
+        }
+        // 根据 byteLength 条件发送数据
+        if (instance.byteLength === 16 && instance.buffer.byteLength === 16) {
+            postData({ action: "catCatchAddKey", key: instance.buffer, href: location.href, ext: "key" });
+        }
+        if (instance.byteLength === 256 || instance.byteLength === 128 || instance.byteLength === 32) {
+            const _buffer = isRepeatedExpansion(instance.buffer, 16);
+            if (_buffer) {
+                postData({ action: "catCatchAddKey", key: _buffer, href: location.href, ext: "key" });
+            }
+        }
+        if (instance.byteLength === 32) {
+            const key = instance.buffer.slice(0, 16);
+            postData({ action: "catCatchAddKey", key: key, href: location.href, ext: "key" });
+        }
+        return instance;
+    };
+    DataView.toString = function () {
+        return _DataView.toString();
+    }
 
     // escape
     const _escape = escape;
