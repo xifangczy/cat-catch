@@ -1237,7 +1237,7 @@ $("#searchingForRealKey").click(function () {
                     const testBuffer = decryptor.decrypt(buffer, 0, iv.buffer, true);
                     // 检查是否解密成功
                     if (check(testBuffer)) {
-                        prompt(i18n.searchingForRealKey, key);
+                        if (!prompt(i18n.searchingForRealKey, key)) { continue; }
                         $("#searchingForRealKey").html(i18n.searchingForRealKey);
                         $("#customKey").val(key);
                         $('#maybeKey select').val(key);
