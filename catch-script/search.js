@@ -415,10 +415,7 @@
                 return result;
             };
         }
-        // 调试输出
-        if (typeof CATCH_SEARCH_DEBUG !== 'undefined' && CATCH_SEARCH_DEBUG) {
-            console.log(_DataView.name, arguments, instance);
-        }
+        CATCH_SEARCH_DEBUG && console.log(_DataView.name, arguments, instance);
         // 根据 byteLength 条件发送数据
         if (instance.byteLength === 16 && instance.buffer.byteLength === 16) {
             postData({ action: "catCatchAddKey", key: instance.buffer, href: location.href, ext: "key" });
@@ -434,7 +431,7 @@
             postData({ action: "catCatchAddKey", key: key, href: location.href, ext: "key" });
         }
         return instance;
-    };
+    }
     DataView.toString = function () {
         return _DataView.toString();
     }
