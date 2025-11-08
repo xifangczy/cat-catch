@@ -39,8 +39,8 @@ Utilice la versión 1.0.16 si es inferior a 93.
 Para una funcionalidad completa, utilice la versión 104 o superior.
 
 # 🔍Captura de pantalla
-![popup Screenshot](https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/popup.png)
-![m3u8 parser Screenshot](https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/m3u8.png)
+![popup Screenshot](https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/popup_es.png)
+![m3u8 parser Screenshot](https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/m3u8_es.png)
 
 # 🤚🏻Descargo de responsabilidad
 Esta extensión está pensada para descargar vídeos de tu propiedad o a los que tengas acceso autorizado. Está prohibido utilizar esta herramienta para descargar contenidos protegidos por derechos de autor sin autorización. Los usuarios son los únicos responsables de sus acciones, y el desarrollador no es responsable de ningún comportamiento de los usuarios. Esta herramienta se proporciona "tal cual" y el promotor no asume ninguna responsabilidad directa o indirecta.
