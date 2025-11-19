@@ -31,9 +31,9 @@ Download:
 lib/hls.min.js
 Source: https://github.com/video-dev/hls.js
 License: Apache-2.0 license
-Version: 1.6.13
+Version: 1.6.15
 Download:
-`https://github.com/video-dev/hls.js/releases/tag/v1.6.13` -> `release.zip` -> `dist/hls.min.js`
+`https://github.com/video-dev/hls.js/releases/tag/v1.6.15` -> `release.zip` -> `dist/hls.min.js`
 
 lib/mqtt.min.js
 Source: https://github.com/mqttjs/MQTT.js
