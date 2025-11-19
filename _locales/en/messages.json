@@ -999,6 +999,6 @@
     "message": "Delete duplicate filenames"
   },
   "isBlockedSite": {
-    "message": "This site has been blocked"
+    "message": "This site requires blocking the operation of this extension"
   }
 }

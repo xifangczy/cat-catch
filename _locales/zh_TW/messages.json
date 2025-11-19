@@ -999,6 +999,6 @@
     "message": "删除重複檔名"
   },
   "isBlockedSite": {
-    "message": "該網站已被屏蔽"
+    "message": "該網站要求禁止運行本程式"
   }
 }

@@ -999,6 +999,6 @@
     "message": "删除重复文件名"
   },
   "isBlockedSite": {
-    "message": "该网站已被屏蔽"
+    "message": "该网站要求禁止运行本程序"
   }
 }
