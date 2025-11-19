@@ -1,5 +1,23 @@
 ## 更新说明
 
+### 2.6.5
+
+[Added] 部分网站不希望被本扩展抓取 添加 全局强制屏蔽 [屏蔽列表](https://o2bmm.gitbook.io/cat-catch/blockedsite)
+
+[Added] 增加土耳其语 感谢 @ilker-binzet
+
+[Added] 增加西班牙语 感谢 @Oleada1
+
+[Fixed] 部分浏览器 侧边栏无法使用问题
+
+[Fixed] 发送到 Aria2 User-Agent 传递错误
+
+[Fixed] 模板标签替换 双引号处理错误
+
+[Fixed] 导入配置时部分设置丢失问题
+
+[Fixed] 深度搜索导致部分网站无法正常使用问题
+
 ### 2.6.4
 
 [Updated] webrtc 录制脚本 更新
