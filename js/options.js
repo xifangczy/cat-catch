@@ -322,7 +322,7 @@ $("#importOptionsFile").change(function () {
         }
         const keys = Object.keys(G.OptionLists);
         for (let item in G.OptionLists) {
-            if (keys.includes(item) && importData[item]) {
+            if (keys.includes(item) && importData[item] !== undefined) {
                 chrome.storage.sync.set({ [item]: importData[item] });
             }
         }
