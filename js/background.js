@@ -536,6 +536,10 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         sendResponse("ok");
         return true;
     }
+    if (Message.Message == "damnUrlHas") {
+        sendResponse(G.damnUrlSet.has(Message.tabId));
+        return true;
+    }
 });
 
 // 选定标签 更新G.tabId
