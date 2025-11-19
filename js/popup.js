@@ -865,7 +865,9 @@ const interval = setInterval(async function () {
 
     // 是否屏蔽网站
     chrome.runtime.sendMessage(chrome.runtime.id, { Message: "damnUrlHas" }, function (response) {
-        response && $tips.html(i18n("isBlockedSite"));
+        if (response && G.damn) {
+            $tips.html(i18n("isBlockedSite"));
+        }
     });
 }, 0);
 /********************绑定事件END********************/
