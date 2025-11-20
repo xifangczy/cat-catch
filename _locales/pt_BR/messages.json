@@ -997,5 +997,8 @@
   },
   "deleteDuplicateFilenames": {
     "message": "Excluir nomes de arquivos duplicados"
+  },
+  "isBlockedSite": {
+    "message": "Este site exige bloquear a operação desta extensão"
   }
 }
