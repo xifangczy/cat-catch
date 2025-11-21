@@ -192,7 +192,7 @@ G.OptionLists = {
     mqttTitleLength: 100,
     mqttDataFormat: "",
     getHtmlDOM: false,
-    damn: true
+    damn: false
 };
 
 // 本地储存的配置
