@@ -377,6 +377,18 @@
   "moreFrequent": {
     "message": "Daha Sık"
   },
+  "dopreview": {
+    "message": "preview"
+  },
+  "dopopup": {
+    "message": "popup"
+  },
+  "winpreview": {
+    "message": "window preview"
+  },
+  "winpopup": {
+    "message": "window popup"
+  },   
   "excludeDuplicateResources": {
     "message": "Yinelenen kaynakları hariç tut (çok fazla kaynak çok fazla CPU tüketecektir)"
   },
