@@ -377,6 +377,18 @@
   "moreFrequent": {
     "message": "更频繁"
   },
+  "dopreview": {
+    "message": "preview"
+  },
+  "dopopup": {
+    "message": "popup"
+  },
+  "winpreview": {
+    "message": "window preview"
+  },
+  "winpopup": {
+    "message": "window popup"
+  },   
   "excludeDuplicateResources": {
     "message": "排除重复的资源 (资源过多会占用大量CPU)"
   },
