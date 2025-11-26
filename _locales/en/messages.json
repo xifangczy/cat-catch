@@ -383,6 +383,84 @@
   "customCSS": {
     "message": "Custom CSS"
   },
+  "MQTT": {
+    "message": "MQTT"
+  },
+  "mqttBroker": {
+    "message": "Broker address"
+  },
+  "mqttPath": {
+    "message": "Path"
+  },
+  "mqttProtocol": {
+    "message": "Protocol"
+  },
+  "mqttClientId": {
+    "message": "Client ID"
+  },
+  "mqttTitleLength": {
+    "message": "Title Max Length"
+  },
+  "mqttUsername": {
+    "message": "Username"
+  },
+  "mqttPassword": {
+    "message": "Password"
+  },
+  "mqttTopic": {
+    "message": "Topic"
+  },
+  "mqttQos": {
+    "message": "QoS Level"
+  },
+  "mqttQos0": {
+    "message": "(At most once)"
+  },
+  "mqttQos1": {
+    "message": "(At least once)"
+  },
+  "mqttQos2": {
+    "message": "(Exactly once)"
+  },
+  "mqttDataFormat": {
+    "message": "Data Format"
+  },
+  "mqttDataFormatHelp": {
+    "message": "{\"url\": \"$${url}\", \"title\": \"$${title}\", \"type\": \"$${type}\", \"ext\": \"$${ext}\", \"timestamp\": \"$${timestamp}\"}"
+  },
+  "mqttDataFormatVars": {
+    "message": "Available variables"
+  },
+  "mqttDataFormatDefault": {
+    "message": "Leave blank to use default JSON format"
+  },
+  "mqttProtocolWss": {
+    "message": "WSS (Secure)"
+  },
+  "mqttProtocolWs": {
+    "message": "WS (Insecure)"
+  },
+  "mqttTitleLengthHelp": {
+    "message": "Maximum length of the title to send in MQTT messages"
+  },
+  "mqttBrokerHelp": {
+    "message": "Hostname or IP address of the MQTT broker"
+  },
+  "mqttPathHelp": {
+    "message": "WebSocket path (usually /mqtt or /ws)"
+  },
+  "mqttClientIdHelp": {
+    "message": "Unique client identifier for this connection"
+  },
+  "mqttTopicHelp": {
+    "message": "MQTT topic to publish messages to"
+  },
+  "mqttQosHelp": {
+    "message": "Quality of Service level (0=At most once, 1=At least once, 2=Exactly once)"
+  },
+  "mqttCredentialsHelp": {
+    "message": "Leave username/password empty if not required"
+  },
   "operation": {
     "message": "Operation"
   },
@@ -441,7 +519,7 @@
     "message": "Open Downloader Page in Background"
   },
   "m3u8Placeholder": {
-    "message": "Enter m3u8 content or ts fragment list."
+    "message": "Please enter m3u8 link / m3u8 content / segment list / $${range} tag"
   },
   "m3u8Url": {
     "message": "m3u8 URL"
@@ -809,6 +887,21 @@
   "send2local": {
     "message": "Data transmission"
   },
+  "send2MQTT": {
+    "message": "Send to MQTT"
+  },
+  "sendingToMQTT": {
+    "message": "Sending to MQTT server..."
+  },
+  "connectingToMQTT": {
+    "message": "Connecting to MQTT server..."
+  },
+  "sendingMessageToMQTT": {
+    "message": "Sending message to MQTT server..."
+  },
+  "messageSentToMQTT": {
+    "message": "Message sent to MQTT server"
+  },
   "popup": {
     "message": "Popup"
   },
@@ -895,5 +988,17 @@
   },
   "useSidePanel": {
     "message": "Use side panel"
+  },
+  "Script": {
+    "message": "Script"
+  },
+  "alwaysSearch": {
+    "message": "Always enable deep search"
+  },
+  "deleteDuplicateFilenames": {
+    "message": "Delete duplicate filenames"
+  },
+  "isBlockedSite": {
+    "message": "This site requires blocking the operation of this extension"
   }
 }

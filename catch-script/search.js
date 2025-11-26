@@ -1,18 +1,16 @@
 // const CATCH_SEARCH_ONLY = true;
 (function __CAT_CATCH_CATCH_SCRIPT__() {
     const isRunningInWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
-    const CATCH_SEARCH_DEBUG = false;
+    const CATCH_SEARCH_DEBUG = false; // 开发调试日志
     // 防止 console.log 被劫持
     if (!isRunningInWorker && CATCH_SEARCH_DEBUG && console.log.toString() != 'function log() { [native code] }') {
         const newIframe = top.document.createElement("iframe");
-        newIframe.style.width = 0;
-        newIframe.style.height = 0;
+        newIframe.style.display = "none";
         top.document.body.appendChild(newIframe);
-        newIframe.contentWindow.document.write("<script>(window.catCatchLOG=function(){console.log(...arguments);})();</script>");
-        window.console.log = newIframe.contentWindow.catCatchLOG;
+        window.console.log = newIframe.contentWindow.console.log;
     }
     // 防止 window.postMessage 被劫持
-    const _postMessage = (isRunningInWorker ? self : window).postMessage;
+    const _postMessage = self.postMessage;
 
     // console.log("start search.js");
     const filter = new Set();
@@ -22,34 +20,33 @@
     const baseUrl = new Set();
     const regexVimeo = /^https:\/\/[^\.]*\.vimeocdn\.com\/exp=.*\/playlist\.json\?/i;
     const videoSet = new Set();
+    const base64Regex = /^[A-Za-z0-9+/]+={0,2}$/;
     extractBaseUrl(location.href);
 
     // Worker
-    if (!isRunningInWorker) {
-        const _Worker = Worker;
-        window.Worker = function (scriptURL, options) {
-            try {
-                const xhr = new XMLHttpRequest();
-                xhr.open('GET', scriptURL, false);
-                xhr.send();
-                if (xhr.status === 200) {
-                    const blob = new Blob([`(${__CAT_CATCH_CATCH_SCRIPT__.toString()})();`, xhr.response], { type: 'text/javascript' });
-                    const newWorker = new _Worker(URL.createObjectURL(blob), options);
-                    newWorker.addEventListener("message", function (event) {
-                        if (event.data?.action == "catCatchAddKey" || event.data?.action == "catCatchAddMedia") {
-                            postData(event.data);
-                        }
-                    });
-                    return newWorker;
-                }
-            } catch (error) {
-                return new _Worker(scriptURL, options);
+    const _Worker = Worker;
+    self.Worker = function (scriptURL, options) {
+        try {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', scriptURL, false);
+            xhr.send();
+            if (xhr.status === 200) {
+                const blob = new Blob([`(${__CAT_CATCH_CATCH_SCRIPT__.toString()})();`, xhr.response], { type: 'text/javascript' });
+                const newWorker = new _Worker(URL.createObjectURL(blob), options);
+                newWorker.addEventListener("message", function (event) {
+                    if (event.data?.action == "catCatchAddKey" || event.data?.action == "catCatchAddMedia") {
+                        postData(event.data);
+                    }
+                });
+                return newWorker;
             }
+        } catch (error) {
             return new _Worker(scriptURL, options);
         }
-        window.Worker.toString = function () {
-            return _Worker.toString();
-        }
+        return new _Worker(scriptURL, options);
+    }
+    self.Worker.toString = function () {
+        return _Worker.toString();
     }
 
     // JSON.parse
@@ -138,20 +135,20 @@
             this.responseURL.includes("vimeocdn.com") && vimeo(this.responseURL, this.response);
 
             // 查找疑似key
-            if (this.responseType == "arraybuffer" && this.response?.byteLength && this.response.byteLength == 32) {
-                postData({ action: "catCatchAddKey", key: this.response, href: location.href, ext: "key" });
-            }
-            if (this.responseType == "arraybuffer" && this.response?.byteLength && this.response.byteLength == 16) {
-                postData({ action: "catCatchAddKey", key: this.response, href: location.href, ext: "key" });
-            }
-            if (this.responseType == "arraybuffer" && this.responseURL.includes(".ts")) {
-                extractBaseUrl(this.responseURL);
+            if (this.responseType === "arraybuffer" && this.response?.byteLength) {
+                if (this.response.byteLength === 16 || this.response.byteLength === 32) {
+                    postData({ action: "catCatchAddKey", key: this.response, href: location.href, ext: "key" });
+                }
+                if (this.responseURL.includes(".ts")) {
+                    extractBaseUrl(this.responseURL);
+                }
             }
             if (typeof this.response == "object") {
                 findMedia(this.response);
                 return;
             }
             if (this.response == "" || typeof this.response != "string") { return; }
+
             if (dataRE.test(this.response)) {
                 const text = getDataM3U8(this.response);
                 text && toUrl(text);
@@ -167,8 +164,9 @@
                 ext && postData({ action: "catCatchAddMedia", url: this.response, href: location.href, ext: ext });
                 return;
             }
-            if (this.response.toUpperCase().includes("#EXTM3U")) {
-                if (this.response.substring(0, 7) == "#EXTM3U") {
+            const responseUpper = this.response.toUpperCase();
+            if (responseUpper.includes("#EXTM3U")) {
+                if (responseUpper.substring(0, 7) == "#EXTM3U") {
                     if (method == "GET") {
                         toUrl(addBaseUrl(getBaseUrl(this.responseURL), this.response));
                         postData({ action: "catCatchAddMedia", url: this.responseURL, href: location.href, ext: "m3u8" });
@@ -186,6 +184,16 @@
                     return;
                 }
             }
+            // dash DRM
+            // if (responseUpper.includes("<MPD") && responseUpper.includes("</MPD>")) {
+            //     _postMessage({
+            //         action: "catCatchDashDRMMedia",
+            //         url: this.responseURL,
+            //         data: this.response,
+            //         href: location.href
+            //     });
+            //     return;
+            // }
             const isJson = isJSON(this.response);
             if (isJson) {
                 findMedia(isJson);
@@ -251,6 +259,7 @@
     Array.prototype.slice = function (start, end) {
         const data = _slice.apply(this, arguments);
         if (end == 16 && this.length == 32) {
+            CATCH_SEARCH_DEBUG && console.log(this, start, end, data);
             for (let item of data) {
                 if (typeof item != "number" || item > 255) { return data; }
             }
@@ -262,22 +271,32 @@
         return _slice.toString();
     }
 
-    // Int8Array.prototype.subarray
-    const _subarray = Int8Array.prototype.subarray;
-    Int8Array.prototype.subarray = function (start, end) {
-        const data = _subarray.apply(this, arguments);
-        if (data.byteLength == 16) {
-            const uint8 = new _Uint8Array(data);
-            for (let item of uint8) {
-                if (typeof item != "number" || item > 255) { return data; }
+    //#region TypedArray.prototype.subarray
+    const createSubarrayWrapper = (originalSubarray) => {
+        return function (start, end) {
+            const data = originalSubarray.apply(this, arguments);
+            CATCH_SEARCH_DEBUG && console.log(this, start, end, data);
+            if (data.byteLength == 16) {
+                const uint8 = new _Uint8Array(data);
+                const isValid = Array.from(uint8).every(item => typeof item == "number" && item <= 255);
+                isValid && postData({ action: "catCatchAddKey", key: uint8.buffer, href: location.href, ext: "key" });
             }
-            postData({ action: "catCatchAddKey", key: uint8.buffer, href: location.href, ext: "key" });
+            return data;
         }
-        return data;
     }
+    // Int8Array.prototype.subarray
+    const _Int8ArraySubarray = Int8Array.prototype.subarray;
+    Int8Array.prototype.subarray = createSubarrayWrapper(_Int8ArraySubarray);
     Int8Array.prototype.subarray.toString = function () {
-        return _subarray.toString();
+        return _Int8ArraySubarray.toString();
     }
+    // Uint8Array.prototype.subarray
+    const _Uint8ArraySubarray = Uint8Array.prototype.subarray;
+    Uint8Array.prototype.subarray = createSubarrayWrapper(_Uint8ArraySubarray);
+    Uint8Array.prototype.subarray.toString = function () {
+        return _Uint8ArraySubarray.toString();
+    }
+    //#endregion
 
     // window.btoa / window.atob
     const _btoa = btoa;
@@ -320,6 +339,7 @@
     String.fromCharCode = function () {
         const data = _fromCharCode.apply(this, arguments);
         if (data.length < 7) { return data; }
+        CATCH_SEARCH_DEBUG && console.log(data, this, arguments);
         if (data.substring(0, 7) == "#EXTM3U" || data.includes("#EXTINF:")) {
             m3u8Text += data;
             if (m3u8Text.includes("#EXT-X-ENDLIST")) {
@@ -339,35 +359,87 @@
     }
 
     // DataView
+    // const _DataView = DataView;
+    // DataView = new Proxy(_DataView, {
+    //     construct(target, args) {
+    //         let instance = new target(...args);
+    //         // 劫持常用的set方法
+    //         for (const methodName of ['setInt8', 'setUint8', 'setInt16', 'setUint16', 'setInt32', 'setUint32']) {
+    //             if (typeof instance[methodName] !== 'function') {
+    //                 continue;
+    //             }
+    //             instance[methodName] = new Proxy(instance[methodName], {
+    //                 apply(target, thisArg, argArray) {
+    //                     const result = Reflect.apply(target, thisArg, argArray);
+    //                     if (thisArg.byteLength == 16) {
+    //                         postData({ action: "catCatchAddKey", key: thisArg.buffer, href: location.href, ext: "key" });
+    //                     }
+    //                     return result;
+    //                 }
+    //             });
+    //         }
+    //         CATCH_SEARCH_DEBUG && console.log(target.name, args, instance);
+    //         if (instance.byteLength == 16 && instance.buffer.byteLength == 16) {
+    //             postData({ action: "catCatchAddKey", key: instance.buffer, href: location.href, ext: "key" });
+    //         }
+    //         if (instance.byteLength == 256 || instance.byteLength == 128 || instance.byteLength == 32) {
+    //             const _buffer = isRepeatedExpansion(instance.buffer, 16);
+    //             if (_buffer) {
+    //                 postData({ action: "catCatchAddKey", key: _buffer, href: location.href, ext: "key" });
+    //             }
+    //         }
+    //         if (instance.byteLength == 32) {
+    //             const key = instance.buffer.slice(0, 16);
+    //             postData({ action: "catCatchAddKey", key: key, href: location.href, ext: "key" });
+    //         }
+    //         return instance;
+    //     }
+    // });
+
     const _DataView = DataView;
-    DataView = new Proxy(_DataView, {
-        construct(target, args) {
-            let instance = new target(...args);
-            instance.setInt32 = new Proxy(instance.setInt32, {
-                apply(target, thisArg, argArray) {
-                    Reflect.apply(target, thisArg, argArray);
-                    if (thisArg.byteLength == 16) {
-                        postData({ action: "catCatchAddKey", key: thisArg.buffer, href: location.href, ext: "key" });
-                    }
-                    return;
-                }
-            });
-            if (instance.byteLength == 16 && instance.buffer.byteLength == 16) {
-                postData({ action: "catCatchAddKey", key: instance.buffer, href: location.href, ext: "key" });
+    DataView = function () {
+        // 创建原始 DataView 实例
+        const instance = new _DataView(...arguments);
+        // 劫持常用的 set 方法
+        for (const methodName of ['setInt8', 'setUint8', 'setInt16', 'setUint16', 'setInt32', 'setUint32']) {
+            if (typeof instance[methodName] !== 'function') {
+                continue;
             }
-            if (instance.byteLength == 256 || instance.byteLength == 128) {
-                const _buffer = isRepeatedExpansion(instance.buffer, 16);
-                if (_buffer) {
-                    postData({ action: "catCatchAddKey", key: _buffer, href: location.href, ext: "key" });
+            const originalMethod = instance[methodName];
+            instance[methodName] = function (...args) {
+                const result = originalMethod.apply(this, args);
+                // 在方法调用后检查条件
+                if (this.byteLength === 16) {
+                    postData({ action: "catCatchAddKey", key: this.buffer, href: location.href, ext: "key" });
                 }
-            }
-            return instance;
+                return result;
+            };
         }
-    });
+        CATCH_SEARCH_DEBUG && console.log(_DataView.name, arguments, instance);
+        // 根据 byteLength 条件发送数据
+        if (instance.byteLength === 16 && instance.buffer.byteLength === 16) {
+            postData({ action: "catCatchAddKey", key: instance.buffer, href: location.href, ext: "key" });
+        }
+        if (instance.byteLength === 256 || instance.byteLength === 128 || instance.byteLength === 32) {
+            const _buffer = isRepeatedExpansion(instance.buffer, 16);
+            if (_buffer) {
+                postData({ action: "catCatchAddKey", key: _buffer, href: location.href, ext: "key" });
+            }
+        }
+        if (instance.byteLength === 32) {
+            const key = instance.buffer.slice(0, 16);
+            postData({ action: "catCatchAddKey", key: key, href: location.href, ext: "key" });
+        }
+        return instance;
+    }
+    DataView.toString = function () {
+        return _DataView.toString();
+    }
 
     // escape
     const _escape = escape;
     escape = function (str) {
+        CATCH_SEARCH_DEBUG && console.log(str);
         if (str?.length && str.length == 24 && str.substring(22, 24) == "==") {
             postData({ action: "catCatchAddKey", key: str, href: location.href, ext: "base64Key" });
         }
@@ -381,6 +453,7 @@
     const _indexOf = String.prototype.indexOf;
     String.prototype.indexOf = function (searchValue, fromIndex) {
         const out = _indexOf.apply(this, arguments);
+        // CATCH_SEARCH_DEBUG && console.log(this, searchValue, fromIndex, out);
         if (searchValue === '#EXTM3U' && out !== -1) {
             const data = this.substring(fromIndex);
             toUrl(data);
@@ -414,6 +487,7 @@
         const isArray = Array.isArray(args[0]) && args[0].length === 16;
         const isArrayBuffer = args[0] instanceof ArrayBuffer && args[0].byteLength === 16;
         const instance = new target(...args);
+        CATCH_SEARCH_DEBUG && console.log(target.name, args, instance);
         if (isArray || isArrayBuffer) {
             postData({ action: "catCatchAddKey", key: args[0], href: location.href, ext: "key" });
         } else if (instance.buffer.byteLength === 16) {
@@ -453,8 +527,14 @@
     const _arrayJoin = Array.prototype.join;
     Array.prototype.join = function () {
         const data = _arrayJoin.apply(this, arguments);
+        // CATCH_SEARCH_DEBUG && console.log(data, this, arguments);
         if (data.substring(0, 7).toUpperCase() == "#EXTM3U") {
             toUrl(data);
+        }
+        if (data.length == 24) {
+            // 判断是否是base64
+            CATCH_SEARCH_DEBUG && console.log(data, this, arguments);
+            base64Regex.test(data) && postData({ action: "catCatchAddKey", key: data, href: location.href, ext: "base64Key" });
         }
         return data;
     }
@@ -474,10 +554,22 @@
         }
         return false;
     }
+    function TsProtocol(text) {
+        let tsLists = text.split("\n");
+        for (let i in tsLists) {
+            if (tsLists[i][0] == "#") { continue; }
+            if (tsLists[i].startsWith("//")) {
+                tsLists[i] = location.protocol + tsLists[i];
+            }
+        }
+        // return tsLists.join("\n");
+        return _arrayJoin.call(tsLists, "\n");
+    }
     function getBaseUrl(url) {
         let bashUrl = url.split("/");
         bashUrl.pop();
-        return baseUrl.join("/") + "/";
+        // return baseUrl.join("/") + "/";
+        return _arrayJoin.call(bashUrl, "/") + "/";
     }
     function addBaseUrl(baseUrl, m3u8Text) {
         let m3u8_split = m3u8Text.split("\n");
@@ -537,6 +629,8 @@
     }
     function toUrl(text, ext = "m3u8") {
         if (!text) { return; }
+        // 处理ts地址无protocol
+        text = TsProtocol(text);
         if (isFullM3u8(text)) {
             let url = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(text)]));
             postData({ action: "catCatchAddMedia", url: url, href: location.href, ext: ext });
@@ -571,10 +665,20 @@
         let value = data.url ? data.url : data.key;
         if (value instanceof ArrayBuffer || value instanceof Array) {
             if (value.byteLength == 0) { return; }
+            if (data.action == "catCatchAddKey") {
+                // 判断是否ftyp
+                const uint8 = new _Uint8Array(value);
+                if ((uint8[4] === 0x73 || uint8[4] === 0x66) && uint8[5] == 0x74 && uint8[6] == 0x79 && uint8[7] == 0x70) {
+                    return;
+                }
+            }
             data.key = ArrayToBase64(value);
             value = data.key;
         }
-        if (data.action == "catCatchAddKey" && data.key.startsWith("AAAAAAAAAAAAAAAAAAAA")) {
+        /**
+         * AAAAAAAA... 空数据
+         */
+        if (data.action == "catCatchAddKey" && (data.key.startsWith("AAAAAAAAAAAAAAAAAAAA"))) {
             return;
         }
         if (filter.has(value)) { return false; }

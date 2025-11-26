@@ -19,6 +19,14 @@
     CatCatch.innerHTML = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAAKlBMVEUAAADLlROxbBlRAD16GS5oAjWWQiOCIytgADidUx/95gHqwwTx0gDZqwT6kfLuAAAACnRSTlMA/vUejV7kuzi8za0PswAAANpJREFUGNNjwA1YSxkYTEqhnKZLLi6F1w0gnKA1shdvHYNxdq1atWobjLMKCOAyC3etlVrUAOH4HtNZmLgoAMKpXX37zO1FwcZAwMDguGq1zKpFmTNnzqx0Bpp2WvrU7ttn9py+I8JgLn1R8Pad22vurNkjwsBReHv33junzuyRnOnMwNCSeFH27K5dq1SNgcZxFMnuWrNq1W5VkNntihdv7ToteGcT0C7mIkE1qbWCYjJnM4CqEoWKdoslChXuUgXJqIcLebiphSgCZRhaPDhcDFhdmUMCGIgEAFA+Uc02aZg9AAAAAElFTkSuQmCC" style="-webkit-user-drag: none;width: 20px;">
     <div id="tips" data-i18n="waiting">正在等待视频流..."</div>
     <div id="time"></div>
+    ${i18n("selectVideo", "选择视频")}:
+        <select id="videoTrack">
+            <option value="-1">${i18n("selectVideo", "选择视频")}</option>
+        </select>
+    ${i18n("selectAudio", "选择音频")}:
+        <select id="audioTrack">
+            <option value="-1">${i18n("selectVideo", "选择视频")}</option>
+        </select>
     ${i18n("recordEncoding", "录制编码")}: <select id="mimeTypeList" style="max-width: 200px;"></select>
     <label><input type="checkbox" id="autoSave1"} ${checkboxStyle} data-i18n="save1hour">1小时保存一次</label>
     <label>
@@ -30,7 +38,7 @@
             <option value="16000000">16 Mbps</option>
         </select>
         <select id="audioBits">
-            <option value="128000" data-i18n="audioBits">视频码率</option>
+            <option value="128000" data-i18n="audioBits">音频码率</option>
             <option value="128000">128 kbps</option>
             <option value="256000">256 kbps</option>
         </select>
@@ -96,9 +104,11 @@
         CatCatch.style.display = "none";
     });
 
+    const tracks = { video: [], audio: [] };
+    const $tracks = { video: CatCatch.querySelector('#videoTrack'), audio: CatCatch.querySelector('#audioTrack') };
+
     /* 核心变量 */
     let recorder = null;    // 录制器
-    let mediaStream = null;    // 媒体流
     let autoSave1Timer = null;    // 1小时保存一次
 
     // #region 编码选择
@@ -143,22 +153,30 @@
     // 录制
     $time = CatCatch.querySelector("#time");
     CatCatch.querySelector("#start").addEventListener('click', function () {
-        if (!mediaStream) {
+        if (!tracks.video.length && !tracks.audio.length) {
             tips(i18n("streamEmpty", "媒体流为空"));
-            return;
-        }
-        if (!mediaStream instanceof MediaStream) {
-            tips(i18n("notStream", "非媒体流对象"));
             return;
         }
         let recorderTime = 0;
         let recorderTimeer = undefined;
         let chunks = [];
 
+        // 音频 视频 选择
+        const videoTrack = +CatCatch.querySelector("#videoTrack").value;
+        const audioTrack = +CatCatch.querySelector("#audioTrack").value;
+        const streamTrack = [];
+        if (videoTrack !== -1 && tracks.video[videoTrack]) {
+            streamTrack.push(tracks.video[videoTrack]);
+        }
+        if (audioTrack !== -1 && tracks.audio[audioTrack]) {
+            streamTrack.push(tracks.audio[audioTrack]);
+        }
+
         // 码率
         option.audioBitsPerSecond = +CatCatch.querySelector("#audioBits").value;
         option.videoBitsPerSecond = +CatCatch.querySelector("#videoBits").value;
 
+        const mediaStream = new MediaStream(streamTrack);
         recorder = new MediaRecorder(mediaStream, option);
         recorder.ondataavailable = event => {
             chunks.push(event.data)
@@ -181,6 +199,9 @@
                 $time.innerHTML = secToTime(recorderTime);
             }, 1000);
             buttonState(false);
+        }
+        recorder.onerror = (msg) => {
+            console.error(msg);
         }
         recorder.start(60000);
     });
@@ -215,15 +236,14 @@
     window.RTCPeerConnection = new Proxy(window.RTCPeerConnection, {
         construct(target, args) {
             const pc = new target(...args);
-            mediaStream = new MediaStream();
             pc.addEventListener('track', (event) => {
                 const track = event.track;
                 if (track.kind === 'video' || track.kind === 'audio') {
-                    mediaStream.addTrack(track);
                     tips(`${track.kind} ${i18n("streamAdded", "流已添加")}`);
-                    const hasVideo = mediaStream.getVideoTracks().length > 0;
-                    const hasAudio = mediaStream.getAudioTracks().length > 0;
-                    if (hasVideo && hasAudio) {
+                    $tracks[track.kind].appendChild(new Option(track.label, tracks[track.kind].length));
+                    $tracks[track.kind].value = tracks[track.kind].length;
+                    tracks[track.kind].push(track);
+                    if (tracks.video.length && tracks.audio.length) {
                         tips(i18n("videoAndAudio", "已包含音频和视频流"));
                     }
                 }

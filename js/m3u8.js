@@ -110,11 +110,7 @@ function init() {
             _data.pageDOM = new DOMParser().parseFromString(result, 'text/html');
         });
     }
-    if (G.isMobile) {
-        $(`<link rel="stylesheet" type="text/css" href="css/mobile.css">`).appendTo("head");
-    }
-    // 自定义CSS
-    $(`<style>${G.css}</style>`).appendTo("head");
+    loadCSS();
 
     // 隐藏firefox 不支持的功能
     G.isFirefox && $(".firefoxHide").each(function () { $(this).hide(); });
@@ -158,10 +154,19 @@ function init() {
     if (isEmpty(_m3u8Url)) {
         $("#loading").hide(); $("#m3u8Custom").show();
 
-        // 批量生成切片链接
-        $("#generateUrls").change(async function () {
-            // 请求头
-            const referer = $("#referer").val().trim();
+        $("#uploadM3U8").change(function (event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = () => {
+                $("#m3u8Text").val(reader.result)
+            };
+            reader.readAsText(file);
+        });
+
+        $("#parse").click(async function () {
+            let m3u8Text = $("#m3u8Text").val().trim();
+            let baseUrl = $("#baseUrl").val().trim();
+            let referer = $("#referer").val().trim();
             if (referer) {
                 if (referer.startsWith("http")) {
                     setRequestHeaders({ referer: referer });
@@ -170,17 +175,19 @@ function init() {
                 }
             }
 
-            const rangePattern = /\$\{range:(\d+)-(\d+|\?),?(\d+)?\}/;
-            const text = $(this).val();
-            const match = text.match(rangePattern);
-            if (match) {
+            if (m3u8Text == "") { return; }
+
+            // // 批量生成切片链接 解析range标签
+            if (m3u8Text.includes('${range:')) {
+                const rangePattern = /\$\{range:(\d+)-(\d+|\?),?(\d+)?\}/;
+                const match = m3u8Text.match(rangePattern);
+                if (!match) { return; }
                 const start = parseInt(match[1]);
                 let end = match[2];
                 const padding = match[3] ? parseInt(match[3]) : 0;
                 const urls = [];
                 $("#m3u8Text").val(i18n.loadingData);
 
-                // 如果end是 ? 使用fetch一直请求直到错误
                 if (end === "?") {
                     let i = start;
                     while (true) {
@@ -188,7 +195,7 @@ function init() {
                         if (padding > 0) {
                             number = number.padStart(padding, '0');
                         }
-                        const url = text.replace(rangePattern, number);
+                        const url = m3u8Text.replace(rangePattern, number);
                         try {
                             const response = await fetch(url, { method: 'HEAD' });
                             if (!response.ok) {
@@ -208,20 +215,22 @@ function init() {
                         if (padding > 0) {
                             number = number.padStart(padding, '0');
                         }
-                        urls.push(text.replace(rangePattern, number));
+                        urls.push(m3u8Text.replace(rangePattern, number));
                     }
                 }
-
-                urls.length && $("#m3u8Text").val(urls.join("\n\n"));
+                if (urls && urls.length) {
+                    m3u8Text = urls.join("\n\n");
+                    $("#m3u8Text").val(m3u8Text);
+                } else {
+                    $("#m3u8Text").val("");
+                    alert(i18n.m3u8Error);
+                    return;
+                }
             }
-        });
-        $("#parse").click(function () {
-            let m3u8Text = $("#m3u8Text").val().trim();
-            let baseUrl = $("#baseUrl").val().trim();
-            let m3u8Url = $("#m3u8Url").val().trim();
-            let referer = $("#referer").val().trim();
-            if (m3u8Url != "") {
-                let url = "m3u8.html?url=" + encodeURIComponent(m3u8Url);
+
+            // 只有一个链接 后缀为m3u8 直接解析
+            if (m3u8Text.split("\n").length == 1 && GetExt(m3u8Text) == "m3u8") {
+                let url = "m3u8.html?url=" + encodeURIComponent(m3u8Text);
                 if (referer) {
                     if (referer.startsWith("http")) {
                         url += "&requestHeaders=" + encodeURIComponent(JSON.stringify({ referer: referer }));
@@ -232,13 +241,8 @@ function init() {
                 chrome.tabs.update({ url: url });
                 return;
             }
-            if (referer) {
-                if (referer.startsWith("http")) {
-                    data[0].requestHeaders = { referer: referer };
-                } else {
-                    data[0].requestHeaders = JSONparse(referer);
-                }
-            }
+
+            // 如果不是 m3u8 文件内容 转换为 m3u8 文件内容
             if (!m3u8Text.includes("#EXTM3U")) {
                 // ts列表链接 转 m3u8
                 const tsList = m3u8Text.split("\n");
@@ -255,6 +259,8 @@ function init() {
             if (baseUrl != "") {
                 m3u8Text = addBashUrl(baseUrl, m3u8Text);
             }
+            autoReferer = true; // 不自动调整referer
+
             _m3u8Url = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(m3u8Text)]));
             hls.loadSource(_m3u8Url);
             $("#m3u8Custom").hide();
@@ -416,7 +422,7 @@ hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
     parseTs(data.details);  // 提取Ts链接
     // 获取视频信息
     if ($(".videoInfo #info").html() == "") {
-        const video = document.createElement("video");
+        let video = document.createElement("video");
         video.muted = true;
         video.autoplay = false;
         hls.attachMedia(video);
@@ -426,8 +432,14 @@ hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
         video.oncanplay = function () {
             hls.detachMedia(video);
             video.remove();
+            video = null;
         }
-        delete video;
+        video.onerror = function () {
+            hls.stopLoad();
+            hls.detachMedia(video);
+            video.remove();
+            video = null;
+        }
     }
     currentLevel = data.level;
 });
@@ -440,9 +452,11 @@ hls.on(Hls.Events.ERROR, function (event, data) {
         hls.stopLoad();
     }
     if (data.type == "mediaError" && data.details == "fragParsingError") {
-        if (data.error.message == "No ADTS header found in AAC PES") {
+        if (data.error.message == "No ADTS header found in AAC PES" && !hls.adtsTips) {
             $("#tips").append("<b>" + i18n.ADTSerror + "</b>");
             hls.stopLoad();
+            hls.destroy();
+            hls.adtsTips = true; // 标记已经提示过
         }
         $("#play").hide();
         return;
@@ -598,6 +612,9 @@ function parseTs(data) {
 
         // #EXT-X-DISCONTINUITY
         if (i === data.fragments.length - 1 || data.fragments[i].cc !== data.fragments[i + 1].cc) {
+            if (discontinuity.start == 0) {
+                $('#cc').append(`<option value="0">${i18n.selectAll}</option>`);
+            }
             $('#cc').append(`<option value="${+discontinuity.start + 1}-${i + 1}">playlist: ${data.fragments[i].cc}</option>`);
             discontinuity.start = i + 1;
         }
@@ -1130,6 +1147,11 @@ $(document).on("click", "#setRequestHeaders, #setRequestHeadersError", function 
 
 // #EXT-X-DISCONTINUITY 范围选择
 $('#cc').change(function () {
+    if (this.value == "0") {
+        $("#rangeStart").val(1);
+        $("#rangeEnd").val(_fragments.length);
+        return;
+    }
     const range = this.value.split("-");
     $("#rangeStart").val(+range[0]);
     $("#rangeEnd").val(+range[1]);
@@ -1169,7 +1191,7 @@ $("#searchingForRealKey").click(function () {
     const check = (buffer) => {
         const uint8Array = new Uint8Array(buffer);
         // fmp4
-        if (uint8Array[4] === 0x73 && uint8Array[5] === 0x74 && uint8Array[6] === 0x79 && uint8Array[7] === 0x70) {
+        if ((uint8Array[4] === 0x73 || uint8Array[4] === 0x66) && uint8Array[5] === 0x74 && uint8Array[6] === 0x79 && uint8Array[7] === 0x70) {
             return true;
         }
         // moof
@@ -1193,13 +1215,14 @@ $("#searchingForRealKey").click(function () {
             return true;
         }
         // ts
-        const maxCheckLength = Math.min(188, uint8Array.length);
+        const maxCheckLength = Math.min(512, uint8Array.length);
         for (let i = 0; i < maxCheckLength; i++) {
             if (uint8Array[i] === 0x47 && (i + 188) < uint8Array.length && uint8Array[i + 188] === 0x47) {
                 return true;
             }
         }
     }
+    const decryptor = new AESDecryptor();
     fetch(_fragments[0].url)
         .then(response => response.arrayBuffer())
         .then(function (buffer) {
@@ -1214,7 +1237,7 @@ $("#searchingForRealKey").click(function () {
                     const testBuffer = decryptor.decrypt(buffer, 0, iv.buffer, true);
                     // 检查是否解密成功
                     if (check(testBuffer)) {
-                        prompt(i18n.searchingForRealKey, key);
+                        if (!prompt(i18n.searchingForRealKey, key)) { continue; }
                         $("#searchingForRealKey").html(i18n.searchingForRealKey);
                         $("#customKey").val(key);
                         $('#maybeKey select').val(key);
@@ -1291,7 +1314,7 @@ function downloadNew(start = 0, end = _fragments.length) {
     if (downSet.mp4 && !down.mapTag) {
         let tempBuffer = null;
         let head = true;
-        transmuxer = new muxjs.mp4.Transmuxer({ remux: !downSet.onlyAudio });    // mux.js 对象
+        transmuxer = new muxjs.mp4.Transmuxer({ keepOriginalTimestamps: true, remux: !downSet.onlyAudio });    // mux.js 对象
         transmuxer.on('data', function (segment) {
             if (downSet.onlyAudio && segment.type != "audio") { return; }
             if (head) {

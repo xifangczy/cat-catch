@@ -1,7 +1,7 @@
 (function () {
     var _videoObj = [];
     var _videoSrc = [];
-    var _key = [];
+    var _key = new Set();
     chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         if (chrome.runtime.lastError) { return; }
         // 获取页面视频对象
@@ -117,23 +117,23 @@
         // 截图视频图片
         if (Message.Message == "screenshot") {
             try {
-                const video = _videoObj[Message.index];
-                const canvas = document.createElement("canvas");
+                let video = _videoObj[Message.index];
+                let canvas = document.createElement("canvas");
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
-                const link = document.createElement("a");
+                let link = document.createElement("a");
                 link.href = canvas.toDataURL("image/jpeg");
                 link.download = `${location.hostname}-${secToTime(video.currentTime)}.jpg`;
                 link.click();
-                delete canvas;
-                delete link;
+                canvas = null;
+                link = null;
                 sendResponse("ok");
                 return true;
             } catch (e) { console.log(e); return true; }
         }
         if (Message.Message == "getKey") {
-            sendResponse(_key);
+            sendResponse(Array.from(_key));
             return true;
         }
         if (Message.Message == "ffmpeg") {
@@ -212,8 +212,8 @@
             if (key instanceof ArrayBuffer || key instanceof Array) {
                 key = ArrayToBase64(key);
             }
-            if (!key || _key.includes(key)) { return; }
-            _key.push(key);
+            if (_key.has(key)) { return; }
+            _key.add(key);
             chrome.runtime.sendMessage({
                 Message: "send2local",
                 action: "addKey",
@@ -250,6 +250,10 @@
             delete event.data.action;
             chrome.runtime.sendMessage(event.data);
         }
+        // if (event.data.action == "catCatchDashDRMMedia") {
+        //     // TODO DRM Media
+        //     console.log("DRM Media", event);
+        // }
     }, false);
 
     function ArrayToBase64(data) {

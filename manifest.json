@@ -7,6 +7,9 @@
     "default_title": "__MSG_catCatch__",
     "default_popup": "popup.html"
   },
+  "side_panel": {
+    "default_path": "popup.html"
+  },
   "description": "__MSG_description__",
   "icons": {
     "64": "img/icon.png",
@@ -47,6 +50,12 @@
     },
     "clear": {
       "description": "__MSG_clear__"
+    },
+    "reboot": {
+      "description": "__MSG_restartExtension__"
+    },
+    "deepSearch": {
+      "description": "__MSG_deepSearch__"
     }
   },
   "host_permissions": [
@@ -66,17 +75,7 @@
       "all_frames": true
     }
   ],
-  "web_accessible_resources": [
-    {
-      "resources": [
-        "catch-script/*"
-      ],
-      "matches": [
-        "<all_urls>"
-      ]
-    }
-  ],
   "default_locale": "en",
-  "version": "2.6.1",
+  "version": "2.6.5",
   "incognito": "split"
 }

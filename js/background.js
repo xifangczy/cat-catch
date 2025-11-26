@@ -74,14 +74,19 @@ chrome.webRequest.onErrorOccurred.addListener(
 );
 
 function findMedia(data, isRegex = false, filter = false, timer = false) {
-    if (timer) { return; }
     // Service Worker被强行杀死之后重新自我唤醒，等待全局变量初始化完成。
     if (!G || !G.initSyncComplete || !G.initLocalComplete || G.tabId == undefined || cacheData.init) {
+        if (timer) { return; }
         setTimeout(() => {
             findMedia(data, isRegex, filter, true);
-        }, 233);
+        }, 500);
         return;
     }
+
+    if (G.damn && G.damnUrlSet.has(data.tabId)) {
+        return;
+    }
+
     // 检查 是否启用 是否在当前标签是否在屏蔽列表中
     const blockUrlFlag = data.tabId && data.tabId > 0 && G.blockUrlSet.has(data.tabId);
     if (!G.enable || (G.blockUrlWhite ? !blockUrlFlag : blockUrlFlag)) {
@@ -407,6 +412,9 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // 对tabId的标签 脚本注入或删除
     if (Message.Message == "script") {
+        if (G.damn && G.damnUrlSet.has(Message.tabId)) {
+            return;
+        }
         if (!G.scriptList.has(Message.script)) {
             sendResponse("error no exists");
             return false;
@@ -416,6 +424,9 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         const refresh = Message.refresh ?? script.refresh;
         if (scriptTabid.has(Message.tabId)) {
             scriptTabid.delete(Message.tabId);
+            if (Message.script == "search.js") {
+                G.deepSearchTemporarilyClose = Message.tabId;
+            }
             refresh && chrome.tabs.reload(Message.tabId, { bypassCache: true });
             sendResponse("ok");
             return true;
@@ -525,6 +536,10 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         sendResponse("ok");
         return true;
     }
+    if (Message.Message == "damnUrlHas") {
+        sendResponse(G.damnUrlSet.has(Message.tabId));
+        return true;
+    }
 });
 
 // 选定标签 更新G.tabId
@@ -547,16 +562,16 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
 });
 
 // 切换窗口，更新全局变量G.tabId
-// chrome.windows.onFocusChanged.addListener(function (activeInfo) {
-//     if (activeInfo == -1) { return; }
-//     chrome.tabs.query({ active: true, windowId: activeInfo }, function (tabs) {
-//         if (tabs[0] && tabs[0].id) {
-//             G.tabId = tabs[0].id;
-//         } else {
-//             G.tabId = -1;
-//         }
-//     });
-// }, { filters: ["normal"] });
+chrome.windows.onFocusChanged.addListener(function (activeInfo) {
+    if (activeInfo == -1) { return; }
+    chrome.tabs.query({ active: true, windowId: activeInfo }, function (tabs) {
+        if (tabs[0] && tabs[0].id) {
+            G.tabId = tabs[0].id;
+        } else {
+            G.tabId = -1;
+        }
+    });
+}, { filters: ["normal"] });
 
 /**
  * 监听 标签页面更新
@@ -576,10 +591,17 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
         });
     }
     // 检查当前标签是否在屏蔽列表中
-    if (changeInfo.url && tabId > 0 && G.blockUrl.length) {
-        G.blockUrlSet.delete(tabId);
-        if (isLockUrl(changeInfo.url)) {
-            G.blockUrlSet.add(tabId);
+    if (changeInfo.url && tabId > 0) {
+        if (G.blockUrl.length) {
+            G.blockUrlSet.delete(tabId);
+            if (isLockUrl(changeInfo.url)) {
+                G.blockUrlSet.add(tabId);
+            }
+        }
+
+        G.damnUrlSet.delete(tabId);
+        if (isDamnUrl(changeInfo.url)) {
+            G.damnUrlSet.add(tabId);
         }
     }
     chrome.sidePanel.setOptions({
@@ -603,6 +625,11 @@ chrome.webNavigation.onCommitted.addListener(function (details) {
         if (isLockUrl(details.url)) {
             G.blockUrlSet.add(details.tabId);
         }
+
+        G.damnUrlSet.delete(details.tabId);
+        if (isDamnUrl(details.url)) {
+            G.damnUrlSet.add(details.tabId);
+        }
     }
 
     // 刷新清理角标数
@@ -615,6 +642,11 @@ chrome.webNavigation.onCommitted.addListener(function (details) {
 
     // chrome内核版本 102 以下不支持 chrome.scripting.executeScript API
     if (G.version < 102) { return; }
+
+    if (G.deepSearch && G.deepSearchTemporarilyClose != details.tabId) {
+        G.scriptList.get("search.js").tabId.add(details.tabId);
+        G.deepSearchTemporarilyClose = null;
+    }
 
     // catch-script 脚本
     G.scriptList.forEach(function (item, script) {
@@ -683,6 +715,19 @@ chrome.commands.onCommand.addListener(function (command) {
         G.enable = !G.enable;
         chrome.storage.sync.set({ enable: G.enable });
         chrome.action.setIcon({ path: G.enable ? "/img/icon.png" : "/img/icon-disable.png" });
+    } else if (command == "reboot") {
+        chrome.runtime.reload();
+    } else if (command == "deepSearch") {
+        const script = G.scriptList.get("search.js");
+        const scriptTabid = script.tabId;
+        if (scriptTabid.has(G.tabId)) {
+            scriptTabid.delete(G.tabId);
+            G.deepSearchTemporarilyClose = G.tabId;
+            chrome.tabs.reload(G.tabId, { bypassCache: true });
+            return;
+        }
+        scriptTabid.add(G.tabId);
+        chrome.tabs.reload(G.tabId, { bypassCache: true });
     }
 });
 

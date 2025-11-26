@@ -383,6 +383,84 @@
   "customCSS": {
     "message": "CSS Personalizado"
   },
+  "MQTT": {
+    "message": "MQTT"
+  },
+  "mqttBroker": {
+    "message": "Endereço do Broker MQTT"
+  },
+  "mqttPath": {
+    "message": "Caminho"
+  },
+  "mqttProtocol": {
+    "message": "Protocolo"
+  },
+  "mqttClientId": {
+    "message": "ID do Cliente"
+  },
+  "mqttTitleLength": {
+    "message": "Tamanho Máximo do Título"
+  },
+  "mqttUsername": {
+    "message": "Nome de Usuário"
+  },
+  "mqttPassword": {
+    "message": "Senha"
+  },
+  "mqttTopic": {
+    "message": "Tópico"
+  },
+  "mqttQos": {
+    "message": "Nível de QoS"
+  },
+  "mqttQos0": {
+    "message": "(No Máximo Uma Vez)"
+  },
+  "mqttQos1": {
+    "message": "(Pelo Menos Uma Vez)"
+  },
+  "mqttQos2": {
+    "message": "(Exatamente Uma Vez)"
+  },
+  "mqttDataFormat": {
+    "message": "Formato dos Dados"
+  },
+  "mqttDataFormatHelp": {
+    "message": "{\"url\": \"$${url}\", \"title\": \"$${title}\", \"type\": \"$${type}\", \"ext\": \"$${ext}\", \"timestamp\": \"$${timestamp}\"}"
+  },
+  "mqttDataFormatVars": {
+    "message": "Variáveis disponíveis"
+  },
+  "mqttDataFormatDefault": {
+    "message": "Deixe em branco para usar o formato JSON padrão"
+  },
+  "mqttProtocolWss": {
+    "message": "WSS (Seguro)"
+  },
+  "mqttProtocolWs": {
+    "message": "WS (Não Seguro)"
+  },
+  "mqttTitleLengthHelp": {
+    "message": "Comprimento máximo do título nas mensagens MQTT"
+  },
+  "mqttBrokerHelp": {
+    "message": "Endereço do host ou IP do broker MQTT"
+  },
+  "mqttPathHelp": {
+    "message": "Caminho do WebSocket (geralmente /mqtt ou /ws)"
+  },
+  "mqttClientIdHelp": {
+    "message": "Identificador único do cliente para esta conexão"
+  },
+  "mqttTopicHelp": {
+    "message": "Tópico MQTT para publicar as mensagens"
+  },
+  "mqttQosHelp": {
+    "message": "Nível de Qualidade de Serviço (0=No Máximo Uma Vez, 1=Pelo Menos Uma Vez, 2=Exatamente Uma Vez)"
+  },
+  "mqttCredentialsHelp": {
+    "message": "Deixe em branco se não for necessária autenticação"
+  },
   "operation": {
     "message": "Operação"
   },
@@ -809,6 +887,21 @@
   "send2local": {
     "message": "Transmissão de dados"
   },
+  "send2MQTT": {
+    "message": "Enviar para MQTT"
+  },
+  "sendingToMQTT": {
+    "message": "Enviando para servidor MQTT..."
+  },
+  "connectingToMQTT": {
+    "message": "Conectando ao servidor MQTT..."
+  },
+  "sendingMessageToMQTT": {
+    "message": "Enviando mensagem para servidor MQTT..."
+  },
+  "messageSentToMQTT": {
+    "message": "Mensagem enviada para servidor MQTT"
+  },
   "popup": {
     "message": "Balão"
   },
@@ -858,7 +951,7 @@
     "message": "Transmissão manual de dados"
   },
   "manualSend": {
-    "message": "Transmissão automática de dados"	
+    "message": "Transmissão automática de dados"
   },
   "requestMethod": {
     "message": "Método de pedido"
@@ -885,7 +978,7 @@
     "message": "Título"
   },
   "noKeyIsRequired": {
-    "message": "Nenhuma chave é necessária"    
+    "message": "Nenhuma chave é necessária"
   },
   "estimateSize": {
     "message": "Tamanho estimado"
@@ -895,5 +988,17 @@
   },
   "useSidePanel": {
     "message": "Usar painel lateral"
+  },
+  "Script": {
+    "message": "Script"
+  },
+  "alwaysSearch": {
+    "message": "Sempre habilitar pesquisa profunda"
+  },
+  "deleteDuplicateFilenames": {
+    "message": "Excluir nomes de arquivos duplicados"
+  },
+  "isBlockedSite": {
+    "message": "Este site exige bloquear a operação desta extensão"
   }
 }

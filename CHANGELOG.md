@@ -1,5 +1,67 @@
 ## 更新说明
 
+### 2.6.5
+
+[Added] 部分网站不希望被本扩展抓取 添加 全局强制屏蔽 [屏蔽列表](https://o2bmm.gitbook.io/cat-catch/blockedsite)
+
+[Added] 增加土耳其语 感谢 @ilker-binzet
+
+[Added] 增加西班牙语 感谢 @Oleada1
+
+[Fixed] 部分浏览器 侧边栏无法使用问题
+
+[Fixed] 发送到 Aria2 User-Agent 传递错误
+
+[Fixed] 模板标签替换 双引号处理错误
+
+[Fixed] 导入配置时部分设置丢失问题
+
+[Fixed] 深度搜索导致部分网站无法正常使用问题
+
+### 2.6.4
+
+[Updated] webrtc 录制脚本 更新
+
+[Updated] 深度搜索脚本 更新
+
+[Updated] 更新日语 感谢@hmaoraze
+
+[Added] 支持 MQTT 协议 感谢@jetsung
+
+[Added] 筛选 删除重复文件名
+
+[Added] 始终打开 深度搜索 选项 (慎用)
+
+[Added] 弹出模式 可选择页面
+
+[Added] 筛选页面 支持时长排序
+
+### 2.6.3
+
+[Fixed] Chromium 114 版本以下缺少 `sidePanel` 功能，导致扩展无法使用
+
+### 2.6.2
+
+[Added] m3u8 解析器 录制失败重试功能 (测试)
+
+[Added] m3u8 解析器 尝试估算文件大小
+
+[Added] 增加 其他设置 `使用侧边栏` 选项。从 popup 模式改为浏览器侧边栏打开扩展 (不支持 firefox)
+
+[Updated] m3u8 预览现在支持 hevc/h265 编码
+
+[Updated] 深度搜索 支持解析 vimeo playlist.json
+
+[Changed] 重构 缓存捕捉 脚本 减少头部数据缺失问题
+
+[Changed] 重构 排除重复的资源 减少资源占用
+
+[Fixed] 缓存捕捉脚本导致视频无法播放问题
+
+[Deleted] m3u8 解析器 删除了旧版本下载器
+
+[Deleted] 启用新弹出页 删除旧弹出页
+
 ### 2.6.1
 
 [Changed] 对手机浏览器进行一些适配

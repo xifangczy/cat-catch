@@ -44,11 +44,11 @@ function byteToSize(byte) {
  * @param {String} fileName 文件名
  */
 function downloadDataURL(url, fileName) {
-    const link = document.createElement("a");
+    let link = document.createElement("a");
     link.href = url;
     link.download = fileName;
     link.click();
-    delete link;
+    link = null;
 }
 
 /**
@@ -203,7 +203,8 @@ function templatesFunction(text, action, data) {
         if (colon != -1) {
             action = item.slice(0, colon).trim();
             arg = splitString(item.slice(colon + 1).trim(), ",").map(item => {
-                return item.trim().replace(/^['"]|['"]$/g, "");
+                // return item.trim().replace(/^['"]|['"]$/g, "");
+                return item.trim().replace(/^(['"])([\s\S]*)\1$/, '$2');
             });
         }
         // 字符串不允许为空 除非 exists find prompt函数
@@ -262,7 +263,7 @@ function templatesFunction(text, action, data) {
             text = "";
             if (data.pageDOM) {
                 try {
-                    text = data.pageDOM.querySelector(arg[0]).innerHTML;
+                    text = data.pageDOM.querySelector(arg[0]).innerText?.trim();
                 } catch (e) { text = ""; }
             }
         } else if (action == "filter") {
@@ -321,6 +322,7 @@ function templates(text, data) {
         minutes: appendZero(date.getMinutes()),
         seconds: appendZero(date.getSeconds()),
         now: Date.now(),
+        timestamp: new Date().toISOString(),
 
         // 文件名
         fullFileName: data.fullFileName ? data.fullFileName : "",
@@ -481,6 +483,7 @@ function clearRedundant() {
         autoDownFlag && (chrome.storage.session ?? chrome.storage.local).set({ featAutoDownTabId: Array.from(G.featAutoDownTabId) });
 
         G.blockUrlSet = new Set([...G.blockUrlSet].filter(x => allTabId.has(x)));
+        G.damnUrlSet = new Set([...G.damnUrlSet].filter(x => allTabId.has(x)));
 
         if (G.requestHeaders.size >= 10240) {
             G.requestHeaders.clear();
@@ -526,9 +529,12 @@ function filterFileName(str, text) {
         }[match];
     });
 
-    // 如果最后一位是"." chrome.download 无法下载
+    // 前后不能是 “.”
     if (str.endsWith(".")) {
         str = str + "catCatch";
+    }
+    if (str.startsWith(".")) {
+        str = "catCatch" + str;
     }
     return str;
 }
@@ -645,6 +651,16 @@ function send2local(action, data, tabId = 0) {
     });
 }
 
+function isDamnUrl(url) {
+    for (let key in G.damnUrl) {
+        G.damnUrl[key].lastIndex = 0;
+        if (G.damnUrl[key].test(url)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 /**
  * 判断url是否在屏蔽网址中
  * @param {String} url 
@@ -699,4 +715,34 @@ function openParser(data, options = {}) {
             active: G.isMobile || !options.autoDown
         });
     });
+}
+/**
+ * 加载CSS样式
+ */
+function loadCSS() {
+    if (G.isMobile) {
+        const mobileCssLink = document.createElement('link');
+        mobileCssLink.rel = 'stylesheet';
+        mobileCssLink.type = 'text/css';
+        mobileCssLink.href = 'css/mobile.css';
+        document.head.appendChild(mobileCssLink);
+    }
+    const styleElement = document.createElement('style');
+    styleElement.textContent = G.css;
+    document.head.appendChild(styleElement);
+}
+
+/**
+ * 修建数据 不发送不必要的数据
+ * @param {Object} originalData 原始数据
+ * @returns {Object} 返回处理后的数据
+ */
+function trimData(originalData) {
+    const data = { ...originalData };
+    // 不发送HTML内容
+    data.html = undefined;
+    data.panelHeading = undefined;
+    data.urlPanel = undefined;
+    data.urlPanelShow = undefined;
+    return data;
 }

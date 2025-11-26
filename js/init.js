@@ -17,7 +17,7 @@ if (!chrome.downloads) {
             a.href = options.url;
             a.download = options.filename;
             a.click();
-            delete a;
+            a = null;
             callback && callback();
         },
         onChanged: { addListener: function () { } },
@@ -25,6 +25,14 @@ if (!chrome.downloads) {
         show: function () { },
     }
 }
+// 兼容 114版本以下没有chrome.sidePanel
+if (!chrome.sidePanel || !chrome.sidePanel.setPanelBehavior) {
+    chrome.sidePanel = {
+        setOptions: function (options) { },
+        setPanelBehavior: function (options) { },
+    }
+}
+
 // 简写翻译函数
 const i18n = new Proxy(chrome.i18n.getMessage, {
     get: function (target, key) {
@@ -41,6 +49,13 @@ G.blackList = new Set();    // 正则屏蔽资源列表
 G.blockUrlSet = new Set();    // 屏蔽网址列表
 G.requestHeaders = new Map();   // 临时储存请求头
 G.urlMap = new Map();   // url查重map
+G.deepSearchTemporarilyClose = null; // 深度搜索临时变量
+
+// 避免抓取列表
+G.damnUrl = [
+    /^https:\/\/.*\.douyin\.com\/.*$/i,
+];
+G.damnUrlSet = new Set();
 
 // 初始化当前tabId
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -87,6 +102,8 @@ G.OptionLists = {
         { "ext": "mpd", "size": 0, "state": true },
         { "ext": "weba", "size": 0, "state": true },
         { "ext": "opus", "size": 0, "state": true },
+        { "ext": "srt", "size": 0, "state": false },
+        { "ext": "vtt", "size": 0, "state": false },
     ],
     Type: [
         { "type": "audio/*", "size": 0, "state": true },
@@ -102,6 +119,8 @@ G.OptionLists = {
     Regex: [
         { "type": "ig", "regex": "https://cache\\.video\\.[a-z]*\\.com/dash\\?tvid=.*", "ext": "json", "state": false },
         { "type": "ig", "regex": ".*\\.bilivideo\\.(com|cn).*\\/live-bvc\\/.*m4s", "ext": "", "blackList": true, "state": false },
+        { "type": "ig", "regex": "(^https://scontent[a-z0-9-]*\\.cdninstagram\\.com/.*)&bytestart=.*", "ext": "", "blackList": false, "state": false },
+        { "type": "ig", "regex": "(^https://.*\\.fbcdn\\.net/.*)&bytestart=.*", "ext": "", "blackList": false, "state": false },
     ],
     TitleName: false,
     Player: "",
@@ -123,7 +142,7 @@ G.OptionLists = {
     checkDuplicates: true,
     enable: true,
     downActive: !G.isMobile,    // 手机端默认不启用 后台下载
-    downAutoClose: false,
+    downAutoClose: true,
     downStream: false,
     aria2Rpc: "http://localhost:6800/jsonrpc",
     enableAria2Rpc: false,
@@ -138,6 +157,7 @@ G.OptionLists = {
     send2localBody: '{"action": "${action}", "data": ${data}, "tabId": "${tabId}"}',
     send2localType: 0,
     popup: false,
+    popupMode: 0, // 0:preview.html 1:popup.html 2:window preview.html 3: window popup.html
     invoke: false,
     invokeText: `m3u8dlre:"\${url}" --save-dir "%USERPROFILE%\\Downloads" --del-after-done --save-name "\${title}_\${now}" --auto-select \${referer|exists:'-H "Referer: *"'}`,
     invokeConfirm: false,
@@ -156,12 +176,32 @@ G.OptionLists = {
     blockUrlWhite: false,
     maxLength: G.isMobile ? 999 : 9999,
     sidePanel: false,   // 侧边栏
+    deepSearch: false, // 常开深度搜索
+    // MQTT 配置
+    send2MQTT: false,
+    mqttEnable: false,
+    mqttBroker: "test.mosquitto.org",
+    mqttPort: 8081,
+    mqttPath: "/mqtt",
+    mqttProtocol: "wss",
+    mqttClientId: "cat-catch-client",
+    mqttUser: "",
+    mqttPassword: "",
+    mqttTopic: "cat-catch/media",
+    mqttQos: 0,
+    mqttTitleLength: 100,
+    mqttDataFormat: "",
+    getHtmlDOM: false,
+    damn: false
 };
+
 // 本地储存的配置
 G.LocalVar = {
     featMobileTabId: [],
     featAutoDownTabId: [],
-    mediaControl: { tabid: 0, index: -1 }
+    mediaControl: { tabid: 0, index: -1 },
+    previewShowTitle: false, // 是否显示标题
+    previewDeleteDuplicateFilenames: false, // 是否删除重复文件名
 };
 
 // 102版本以上 非Firefox 开启更多功能
@@ -183,13 +223,13 @@ G.ffmpegConfig = {
     cacheData: [],
     version: 1,
     get url() {
-        return G.onlineServiceAddress == 0 ? "https://ffmpeg.bmmmd.com/" : "https://ffmpeg2.bmmmd.com/";
+        return G.onlineServiceAddress == 0 ? "https://ffmpeg.bmmmd.com/" : "https://ffmpeg.94cat.com/";
     }
 }
 // streamSaver 边下边存
 G.streamSaverConfig = {
     get url() {
-        return G.onlineServiceAddress == 0 ? "https://stream.bmmmd.com/mitm.html" : "https://stream2.bmmmd.com/mitm.html";
+        return G.onlineServiceAddress == 0 ? "https://stream.bmmmd.com/mitm.html" : "https://ffmpeg.94cat.com/mitm.html";
     }
 }
 
@@ -263,15 +303,16 @@ function InitOptions() {
         }
 
         // 侧边栏
-        !G.isFirefox && chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: items.sidePanel });
+        chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: items.sidePanel });
 
         G = { ...items, ...G };
 
         // 初始化 G.blockUrlSet
         (typeof isLockUrl == 'function') && chrome.tabs.query({}, function (tabs) {
             for (const tab of tabs) {
-                if (tab.url && isLockUrl(tab.url)) {
-                    G.blockUrlSet.add(tab.id);
+                if (tab.url) {
+                    isLockUrl(tab.url) && G.blockUrlSet.add(tab.id);
+                    isDamnUrl(tab.url) && G.damnUrlSet.add(tab.id);
                 }
             }
         });

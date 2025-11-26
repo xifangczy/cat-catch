@@ -48,6 +48,12 @@
     },
     "clear": {
       "description": "__MSG_clear__"
+    },
+    "reboot": {
+      "description": "__MSG_restartExtension__"
+    },
+    "deepSearch": {
+      "description": "__MSG_deepSearch__"
     }
   },
   "browser_specific_settings": {
@@ -73,16 +79,6 @@
       "run_at": "document_start"
     }
   ],
-  "web_accessible_resources": [
-    {
-      "resources": [
-        "catch-script/*"
-      ],
-      "matches": [
-        "<all_urls>"
-      ]
-    }
-  ],
   "default_locale": "en",
-  "version": "2.6.1"
+  "version": "2.6.5"
 }

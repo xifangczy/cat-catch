@@ -1,18 +1,49 @@
 class FilePreview {
 
-    MAX_CONCURRENT = 3;   // 最大并行生成预览数
+    MAX_CONCURRENT = 16;   // 最大并行生成预览数
     MAX_LIST_SIZE = 128;  // 最大文件列表长度
 
     constructor() {
         this.fileItems = [];         // 文件列表
         this.originalItems = [];     // 原始文件列表
         this.regexFilters = null;    // 正则过滤
-        this.catDownloadIsProcessing = false;   // 猫抓下载器是否正在处理
         this.pushDebounce = null;   // 添加文件防抖
         this.alertTimer = null;     // 提示信息定时器
         this.isDragging = false;    // 是否正在拖动
         this.previewHLS = null;     // 全屏预览视频HLS工具
+        this.catDownloadIsProcessing = false; // 猫抓下载器是否正在处理
 
+        this.showTitle = false; // 是否显示标题
+        this.deleteDuplicateFilenames = false; // 是否删除重复文件名
+
+        this._tabId = -1; // 当前标签ID
+        this.currentRange = null; // 当前显示范围
+        this.currentPage = 1; // 当前页码
+
+        // 初始化
+        this.init();
+    }
+    /**
+     * 初始化
+     */
+    async init() {
+        this.parseParams();             // url解析参数
+        this.tab = await chrome.tabs.getCurrent();  // 获取当前标签
+        this.setupEventListeners();     // 设置事件监听
+        await this.loadFileItems();     // 载入数据
+        this.setupFilters();            // 设置 后缀/类型 筛选
+        this.setOptions();              // 设置选项
+        this.updateFileList();          // 渲染文件列表
+        this.startPreviewGeneration();  // 开始预览生成
+        this.setupSelectionBox();       // 框选
+        this.srciptList();              // 脚本列表
+        this.updateSrciptButton();      // 更新按钮状态
+        this.checkVersion();            // 检查版本
+    }
+    /**
+     * 解析参数
+     */
+    parseParams() {
         // 获取tabId
         const params = new URL(location.href).searchParams;
         this._tabId = parseInt(params.get("tabId"));
@@ -30,27 +61,7 @@ class FilePreview {
         // 分页
         this.currentPage = params.get("page");
         this.currentPage = this.currentPage ? parseInt(this.currentPage) : 1;
-
-        // 初始化
-        this.init();
     }
-    /**
-     * 初始化
-     */
-    async init() {
-        this.tab = await chrome.tabs.getCurrent();  // 获取当前标签
-        this.setupEventListeners();     // 设置事件监听
-        await this.loadFileItems();     // 载入数据
-        this.setupExtensionFilters();   // 设置扩展名筛选
-        this.setupTypeFilters();   // 设置扩展名筛选
-        this.renderFileItems();         // 渲染文件列表
-        this.startPreviewGeneration();  // 开始预览生成
-        this.setupSelectionBox();      // 框选
-        this.srciptList();         // 脚本列表
-        this.updateSrciptButton();         // 更新按钮状态
-        this.checkVersion();     // 检查版本
-    }
-
     /**
      * 设置按钮、键盘 、等事件监听
      */
@@ -108,10 +119,17 @@ class FilePreview {
         // debug
         document.querySelector('#debug').addEventListener('click', () => console.dir(this.fileItems));
         // 显示标题
-        document.querySelector('input[name="showTitle"]').addEventListener('change', (e) => {
+        document.querySelector('#showTitle').addEventListener('change', (e) => {
+            (chrome.storage.session ?? chrome.storage.local).set({ previewShowTitle: e.target.checked });
+            this.showTitle = e.target.checked;
             this.fileItems.forEach(item => {
                 item.html.querySelector('.file-title').classList.toggle('hide', !e.target.checked);
             });
+            this.updateFileList();
+        });
+        document.querySelector('#deleteDuplicateFilenames').addEventListener('change', (e) => {
+            (chrome.storage.session ?? chrome.storage.local).set({ previewDeleteDuplicateFilenames: e.target.checked });
+            this.deleteDuplicateFilenames = e.target.checked;
             this.updateFileList();
         });
         // aria2
@@ -132,7 +150,7 @@ class FilePreview {
         }
 
         // 默认弹出模式
-        document.querySelector('#defaultPopup').addEventListener('click', (e) => {
+        document.querySelector('#defaultPopup').addEventListener('change', (e) => {
             chrome.storage.sync.set({ popup: e.target.checked });
         });
     }
@@ -245,6 +263,18 @@ class FilePreview {
         navigator.clipboard.writeText(url.join("\n"));
         this.alert(i18n.copiedToClipboard);
     }
+    mqtt(data) {
+        this.alert(i18n.sending2MQTT);
+        sendToMQTT(data, { alert: this.alert }).then((success) => {
+            // 5. 已发送消息到 MQTT 服务器
+            this.alert(i18n.messageSentToMQTT || "Message sent to MQTT server", 2000);
+        }).catch((error) => {
+            // 失败时显示详细错误信息
+            const errorMsg = error ? error.toString() : (i18n.sendFailed || "Send failed");
+            this.alert(errorMsg, 10000);
+            console.error("MQTT send error:", error);
+        });
+    }
     /**
      * 下载选中
      */
@@ -291,6 +321,19 @@ class FilePreview {
      */
     updateFileList() {
         this.fileItems = [...this.originalItems];
+
+        // 删除重复的文件名
+        if (this.deleteDuplicateFilenames) {
+            const uniqueNames = new Set();
+            this.fileItems = this.fileItems.filter(item => {
+                if (uniqueNames.has(item.name)) {
+                    return false;
+                }
+                uniqueNames.add(item.name);
+                return true;
+            });
+        }
+
         // 获取勾选扩展
         const selectedExts = Array.from(document.querySelectorAll('input[name="ext"]:checked'))
             .map(checkbox => checkbox.value);
@@ -309,6 +352,16 @@ class FilePreview {
         const field = document.querySelector('input[name="sortField"]:checked').value;
         if (field === 'name') {
             this.fileItems.sort((a, b) => order * a[field].localeCompare(b[field]));
+        } else if (field == 'duration') {
+            this.fileItems.sort((a, b) => {
+                // If both have invalid duration (-1), maintain original order
+                if (a[field] === -1 && b[field] === -1) return 0;
+                // Items with duration -1 always go to the end
+                if (a[field] === -1) return 1;
+                if (b[field] === -1) return -1;
+                // Normal comparison for valid durations
+                return order * (a[field] - b[field]);
+            });
         } else {
             this.fileItems.sort((a, b) => order * (a[field] - b[field]));
         }
@@ -328,7 +381,7 @@ class FilePreview {
         item.html.setAttribute('data-index', index);
         item.html.className = 'file-item';
         item.html.innerHTML = `
-            <div class="file-title hide">${item.title}</div>
+            <div class="file-title ${this.showTitle ? "" : "hide"}">${item.title}</div>
             <div class="file-name">${item.name}</div>
             <div class="preview-container">
                 <img src="${item.favIconUrl || 'img/icon.png'}" class="preview-image icon">
@@ -341,6 +394,7 @@ class FilePreview {
                 <img src="img/copy.png" class="icon copy" title="${i18n.copy}">
                 <img src="img/delete.svg" class="icon delete" title="${i18n.delete}">
                 <img src="img/download.svg" class="icon download" title="${i18n.download}">
+                <img src="img/mqtt.svg" class="icon mqtt ${G.mqttEnable ? "" : "hide"}" title="${i18n.send2MQTT}">
             </div>`;
         // 添加文件信息
         if (item.size && item.size >= 1024) {
@@ -357,6 +411,8 @@ class FilePreview {
         item.html.querySelector('.delete').addEventListener('click', () => this.deleteItem(item));
         // 下载图标
         item.html.querySelector('.download').addEventListener('click', () => this.downloadItem(item));
+        // MQTT图标
+        item.html.querySelector('.mqtt').addEventListener('click', () => this.mqtt(item));
         // 选中状态 添加对应class
         item._selected = false;
         Object.defineProperty(item, "selected", {
@@ -432,8 +488,13 @@ class FilePreview {
      * @param {Array} items 数据项
      * @param {String} property 数据项的属性
      */
-    setupFilters(filterId, items, property) {
-        const uniqueValues = [...new Set(items.map(item => item[property]))];
+    setupFilters(filterId, property) {
+        if (arguments.length === 0) {
+            this.setupFilters('extensionFilters', 'ext');
+            this.setupFilters('typeFilters', 'type');
+            return;
+        }
+        const uniqueValues = [...new Set(this.originalItems.map(item => item[property]))];
         const filterContainer = document.querySelector(`#${filterId}`);
         uniqueValues.forEach(value => {
             if (filterContainer.querySelector(`input[value="${value}"]`)) return;
@@ -444,19 +505,17 @@ class FilePreview {
         });
     }
 
-    /**
-     * 设置扩展名复选框
-     */
-    setupExtensionFilters() {
-        this.setupFilters('extensionFilters', this.originalItems, 'ext');
+    setOptions() {
+        if (G.previewShowTitle) {
+            document.querySelector('#showTitle').checked = true;
+            this.showTitle = true;
+        }
+        if (G.previewDeleteDuplicateFilenames) {
+            document.querySelector('#deleteDuplicateFilenames').checked = true;
+            this.deleteDuplicateFilenames = true;
+        }
     }
 
-    /**
-     * 设置类型复选框
-     */
-    setupTypeFilters() {
-        this.setupFilters('typeFilters', this.originalItems, 'type');
-    }
     /**
      * 渲染文件列表
      */
@@ -470,10 +529,10 @@ class FilePreview {
         container.appendChild(fragment);
     }
     /**
-     * 修剪文件名
+     * 修整数据
      * @param {Object} data 数据
      */
-    trimFileName(data) {
+    trimData(data) {
         data._title = data.title;
         data.title = stringModify(data.title);
 
@@ -486,6 +545,7 @@ class FilePreview {
         }
         data.ext = data.ext ? data.ext : 'Unknown';
         data.type = data.type ? data.type : 'Unknown';
+        data.duration = data.duration ? data.duration : -1;
         return data;
     }
     /**
@@ -506,7 +566,7 @@ class FilePreview {
         if (this.currentRange) {
             this.originalItems = this.originalItems.slice(this.currentRange.start, this.currentRange.end ?? this.originalItems.length);
         }
-        this.originalItems = this.originalItems.map(data => this.trimFileName(data));
+        this.originalItems = this.originalItems.map(data => this.trimData(data));
         this.fileItems = [...this.originalItems];
         setHeaders(this.fileItems, null, this.tab.id);
 
@@ -561,6 +621,7 @@ class FilePreview {
                 videoInfo.width = video.videoWidth;
 
                 if (video.duration && video.duration != Infinity) {
+                    videoInfo._duration = video.duration;
                     videoInfo.duration = secToTime(video.duration);
                 }
 
@@ -656,6 +717,7 @@ class FilePreview {
         });
         // 填写时长
         if (item.previewVideo.duration) {
+            item.duration = item.previewVideo._duration;
             item.html.querySelector('.file-info').textContent += ` / ${item.previewVideo.duration}`;
         }
 
@@ -718,35 +780,25 @@ class FilePreview {
         chrome.runtime.sendMessage(chrome.runtime.id, { Message: "catDownload", data: data }, (message) => {
             // 不存在下载器或者下载器出错 新建一个下载器
             if (chrome.runtime.lastError || !message || message.message != "OK") {
-                this.createCatDownload(data, extra);
+                chrome.tabs.create({
+                    url: `/downloader.html?${new URLSearchParams({
+                        requestId: data.map(item => item.requestId).join(","),
+                        ...extra
+                    })}`,
+                    index: this.tab.index + 1,
+                    active: !G.downActive
+                }, (tab) => {
+                    const listener = (tabId, info) => {
+                        if (tab && tabId === tab.id && info.status === "complete") {
+                            chrome.tabs.onUpdated.removeListener(listener);
+                            this.catDownloadIsProcessing = false;
+                        }
+                    };
+                    chrome.tabs.onUpdated.addListener(listener);
+                });
                 return;
             }
             this.catDownloadIsProcessing = false;
-        });
-    }
-    /**
-     * 创建猫抓下载器
-     * @param {Object} data 
-     * @param {Object} extra 
-     */
-    createCatDownload(data, extra) {
-        const arg = {
-            url: `/downloader.html?${new URLSearchParams({
-                requestId: data.map(item => item.requestId).join(","),
-                ...extra
-            })}`,
-            index: this.tab.index + 1,
-            active: !G.downActive
-        };
-        chrome.tabs.create(arg, (tab) => {
-            // 循环获取tab.id 的状态 准备就绪 重置任务状态
-            const interval = setInterval(() => {
-                chrome.tabs.get(tab.id, (tab) => {
-                    if (tab.status != "complete") { return; }
-                    clearInterval(interval);
-                    this.catDownloadIsProcessing = false;
-                });
-            });
         });
     }
     /**
@@ -850,7 +902,7 @@ class FilePreview {
      * @param {String} message 提示信息
      * @param {Number} sec 显示时间
      */
-    alert(message, sec = 1000) {
+    alert = (message, sec = 1000) => {
         let toast = document.querySelector('.alert-box');
         if (!toast) {
             toast = document.createElement('div');
@@ -876,12 +928,12 @@ class FilePreview {
             return;
         }
         setHeaders(data, null, this.tab.id);
-        this.originalItems.push(this.trimFileName(data));
+        this.originalItems.push(this.trimData(data));
 
         // this.startPreviewGeneration(); 防抖
         clearTimeout(this.pushDebounce);
         this.pushDebounce = setTimeout(() => {
-            this.setupExtensionFilters();
+            this.setupFilters();
             this.updateFileList();
             this.startPreviewGeneration();
         }, 1000);
@@ -966,10 +1018,7 @@ class FilePreview {
 }
 
 awaitG(() => {
-    // 自定义css
-    const css = document.createElement('style');
-    css.textContent = G.css;
-    document.head.appendChild(css);
+    loadCSS();
 
     // 实例化 FilePreview
     const filePreview = new FilePreview();
