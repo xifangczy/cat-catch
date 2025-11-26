@@ -135,7 +135,7 @@
             }
             if (MediaRecorder.isTypeSupported(event.target.value)) {
                 option.mimeType = event.target.value;
-                $tips.textContent = event.target.value;
+                $tips.innerHTML = event.target.value;
             } else {
                 $tips.innerHTML = i18n("formatNotSupported", "不支持此格式");
             }
