@@ -3,21 +3,13 @@
 # 📑简介
 猫抓SE(cat-catch SE) 资源嗅探扩展，是[猫抓](https://github.com/xifangczy/cat-catch)的修改版本，禁用了“避免抓取列表”，更方面你浏览各网站的资源。
 
-# 📖安装地址
-## 🐴Chrome
-https://chrome.google.com/webstore/detail/jfedfbgedapdagkghmgibemcoggfppbb
-## 🦄Edge
-https://microsoftedge.microsoft.com/addons/detail/oohmdefbjalncfplafanlagojlakmjci
-## 🦊Firefox
-https://addons.mozilla.org/addon/cat-catch/ 😂需非国区IP访问
-## 📱Edge Android
-<img src="https://raw.githubusercontent.com/xifangczy/cat-catch/master/README/edgeqrcode.png" width="20%" />
-
-💔猫抓是开源的，任何人都可以下载修改上架到应用商店，已经有不少加上广告代码后上架的伪猫抓，请注意自己的数据安全。所有安装地址以github和用户文档为准。
+💔猫抓是开源的，任何人都可以下载修改後上载到各平台，已经有不少加上广告代码的伪猫抓，请密切注意自己的数据安全。
 
 # 📒用户文档
+由于猫抓SE的开发尚未完善，暂此搁置用户文档，期间可参考原版猫抓的用户文档:              
 https://o2bmm.gitbook.io/cat-catch/
 
+(需留意此用户文档并不作准，只作参考之用)
 # 🌏翻译
 [![gitlocalized ](https://gitlocalize.com/repo/9392/whole_project/badge.svg)](https://gitlocalize.com/repo/9392?utm_source=badge)
 
