@@ -1,4 +1,4 @@
-<p align="center"> [中文] | [<a href="README_en.md">English</a>] | [<a href="README_es.md">Español</a>]</p>
+<p align="center"> [中文] | [<a href="README_en.md">English</a>]
 
 # 📑简介
 猫抓SE(cat-catch SE) 资源嗅探扩展，是[猫抓](https://github.com/xifangczy/cat-catch)的修改版本，禁用了“避免抓取列表”，更方便你浏览各网站的资源。
@@ -47,9 +47,3 @@ https://o2bmm.gitbook.io/cat-catch/
 - [猫抓](https://github.com/xifangczy/cat-catch)
 # 📜License
 GPL-3.0 license
-
-1.0版 使用 MIT许可
-
-2.0版 更改为GPL v3许可
-
-为了资源嗅探扩展有良好发展，希望使用猫抓源码的扩展仍然保持开源。
