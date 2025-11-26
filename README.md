@@ -1,7 +1,7 @@
 <p align="center"> [中文] | [<a href="README_en.md">English</a>] | [<a href="README_es.md">Español</a>]</p>
 
 # 📑简介
-猫抓SE(cat-catch SE) 资源嗅探扩展，是[猫抓](https://github.com/xifangczy/cat-catch)的修改版本，禁用了“避免抓取列表”，更方面你浏览各网站的资源。
+猫抓SE(cat-catch SE) 资源嗅探扩展，是[猫抓](https://github.com/xifangczy/cat-catch)的修改版本，禁用了“避免抓取列表”，更方便你浏览各网站的资源。
 
 💔猫抓是开源的，任何人都可以下载修改後上载到各平台，已经有不少加上广告代码的伪猫抓，请密切注意自己的数据安全。
 
