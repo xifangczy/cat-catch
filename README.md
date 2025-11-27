@@ -47,3 +47,5 @@ https://o2bmm.gitbook.io/cat-catch/
 - [猫抓](https://github.com/xifangczy/cat-catch)
 # 📜License
 GPL-3.0 license
+为了资源嗅探扩展有良好发展，希望使用猫抓源码的扩展仍然保持开源。
+
