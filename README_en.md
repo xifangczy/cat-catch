@@ -6,7 +6,7 @@ Cat-catch SE is a resource sniffing extension, a modified version of [Cat-catch]
 💔Cat-catch is open source; anyone can download, modify, and upload it to various platforms. However, there are already many fake Cat-catch versions with added advertising code. Please be very careful about your data security.
 
 # 📒Documentation
-Since the development of CatCatch SE is not yet complete, user documentation is temporarily suspended. In the meantime, you can refer to the original CatCatch user documentation:
+Since the development of Cat-Catch SE is not yet complete, user documentation is temporarily suspended. In the meantime, you can refer to the original CatCatch user documentation:
 
 https://o2bmm.gitbook.io/cat-catch/
 
