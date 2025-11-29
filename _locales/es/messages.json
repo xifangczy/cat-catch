@@ -377,6 +377,18 @@
   "moreFrequent": {
     "message": "Más frecuentes"
   },
+  "dopreview": {
+    "message": "previo"
+  },
+  "dopopup": {
+    "message": "ventana emergente"
+  },
+  "winpreview": {
+    "message": "ventana previo"
+  },
+  "winpopup": {
+    "message": "ventana"
+  },
   "excludeDuplicateResources": {
     "message": "Excluir los recursos duplicados (demasiados recursos consumen mucha CPU)"
   },
