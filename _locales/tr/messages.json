@@ -1007,6 +1007,9 @@
   "alwaysSearch": {
     "message": "Her zaman derin aramayı etkinleştir"
   },
+  "alertimport": {
+  	"message": "İçe aktarma tamamlandı"
+  },
   "deleteDuplicateFilenames": {
     "message": "Yinelenen dosya adlarını sil"
   }
