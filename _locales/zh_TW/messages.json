@@ -377,6 +377,18 @@
   "moreFrequent": {
     "message": "更頻繁"
   },
+  "dopreview": {
+    "message": "preview"
+  },
+  "dopopup": {
+    "message": "popup"
+  },
+  "winpreview": {
+    "message": "window preview"
+  },
+  "winpopup": {
+    "message": "window popup"
+  },   
   "excludeDuplicateResources": {
     "message": "排除重複的資源 (資源過多會佔用大量CPU)"
   },
