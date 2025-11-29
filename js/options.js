@@ -326,7 +326,7 @@ $("#importOptionsFile").change(function () {
                 chrome.storage.sync.set({ [item]: importData[item] });
             }
         }
-        alert("导入完成");
+        alert(i18n.alertimport);
         location.reload();
     }
     const file = $("#importOptionsFile").prop('files')[0];
