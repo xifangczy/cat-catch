@@ -1008,7 +1008,7 @@
     "message": "常に深層検索を有効"
   },
   "alertimport": {
-  	"message": "インポートが完了しました"
+  	"message": "Import completed"
   },
   "deleteDuplicateFilenames": {
     "message": "重複ファイル名を削除"
