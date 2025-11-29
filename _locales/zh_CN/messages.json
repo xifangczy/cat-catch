@@ -1010,6 +1010,9 @@
   "deleteDuplicateFilenames": {
     "message": "删除重复文件名"
   },
+  "alertimport": {
+  	"message": "Import completed"
+  },
   "isBlockedSite": {
     "message": "该网站要求禁止运行本程序"
   }
