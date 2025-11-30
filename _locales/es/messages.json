@@ -1007,6 +1007,9 @@
   "alwaysSearch": {
     "message": "Activar una búsqueda profunda"
   },
+  "alertimport": {
+  	"message": "importación completada"
+  },
   "deleteDuplicateFilenames": {
     "message": "Eliminar nombres de archivo duplicados"
   }
