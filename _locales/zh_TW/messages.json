@@ -388,7 +388,7 @@
   },
   "winpopup": {
     "message": "window popup"
-  },   
+  },
   "excludeDuplicateResources": {
     "message": "排除重複的資源 (資源過多會佔用大量CPU)"
   },
@@ -1011,7 +1011,7 @@
     "message": "删除重複檔名"
   },
   "alertimport": {
-  	"message": "Import completed"
+    "message": "導入完成"
   },
   "isBlockedSite": {
     "message": "該網站要求禁止運行本程式"

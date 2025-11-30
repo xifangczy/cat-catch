@@ -388,7 +388,7 @@
   },
   "winpopup": {
     "message": "window popup"
-  },   
+  },
   "excludeDuplicateResources": {
     "message": "重複リソース除外(CPU高負荷注意)"
   },
