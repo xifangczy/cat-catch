@@ -714,7 +714,7 @@ function parseTs(data) {
         let _iv = decryptdata.iv.toString();
         if (_iv != iv && _iv != iv2) {
             iv = "0x" + ArrayBufferToHexString(decryptdata.iv.buffer);
-            $("#tips").append('<div class="key flex"><div>偏移量(IV): <input type="text" value="' + iv + '" spellcheck="false" readonly="readonly" class="offset"></div></div>');
+            $("#tips").append('<div class="key flex"><div>Offset(IV): <input type="text" value="' + iv + '" spellcheck="false" readonly="readonly" class="offset"></div></div>');
         }
     }
 }
