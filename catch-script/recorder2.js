@@ -6,15 +6,7 @@
     if (!navigator.mediaDevices) {
         alert("当前网页不支持屏幕分享");
         return;
-    }
-
-    let language = navigator.language.replace("-", "_");
-    if (window.CatCatchI18n) {
-        if (!window.CatCatchI18n.languages.includes(language)) {
-            language = language.split("_")[0];
-            if (!window.CatCatchI18n.languages.includes(language)) {
-                language = "en";
-            }
+   
         }
     }
 
