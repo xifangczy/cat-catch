@@ -1314,7 +1314,7 @@ function downloadNew(start = 0, end = _fragments.length) {
     if (downSet.mp4 && !down.mapTag) {
         let tempBuffer = null;
         let head = true;
-        transmuxer = new muxjs.mp4.Transmuxer({ keepOriginalTimestamps: true, remux: !downSet.onlyAudio });    // mux.js 对象
+        transmuxer = new muxjs.mp4.Transmuxer({ keepOriginalTimestamps: false, remux: !downSet.onlyAudio });    // mux.js 对象
         transmuxer.on('data', function (segment) {
             if (downSet.onlyAudio && segment.type != "audio") { return; }
             if (head) {
