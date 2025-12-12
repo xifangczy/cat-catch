@@ -127,7 +127,7 @@ G.OptionLists = {
     ShowWebIco: !G.isMobile,
     MobileUserAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1",
     m3u8dl: 0,
-    m3u8dlArg: `"\${url}"  -H "${userAgent}" --save-dir "%USERPROFILE%\\Downloads\\m3u8dl" --save-name "\${title}_\${now}" \${referer|exists:'-H "Referer:*"'} \${cookie|exists:'-H "Cookie:*"'} -mt -M mkv:muxer=mkvmerge --no-log`,
+    m3u8dlArg: `"\${url}" -H "${userAgent}" --save-dir "%USERPROFILE%\\Downloads\\m3u8dl" --save-name "\${title}_\${now}" \${referer|exists:'-H "Referer:*"'} \${cookie|exists:'-H "Cookie:*"'} -mt -M mkv:muxer=mkvmerge --no-log`,
     m3u8dlConfirm: false,
     playbackRate: 2,
     copyM3U8: "${url}",
