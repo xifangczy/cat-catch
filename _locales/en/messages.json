@@ -388,7 +388,7 @@
   },
   "winpopup": {
     "message": "window popup"
-  },   
+  },
   "excludeDuplicateResources": {
     "message": "Exclude duplicate resources (too many resources will consume a lot of CPU)"
   },
@@ -1007,8 +1007,14 @@
   "alwaysSearch": {
     "message": "Always enable deep search"
   },
+  "sideurlprotocol": {
+    "message": "Protocolo URL m3u8dl"
+  },
   "deleteDuplicateFilenames": {
     "message": "Delete duplicate filenames"
+  },
+  "alertimport": {
+    "message": "Import completed"
   },
   "isBlockedSite": {
     "message": "This site requires blocking the operation of this extension"

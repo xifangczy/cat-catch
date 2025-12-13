@@ -1007,6 +1007,9 @@
   "alwaysSearch": {
     "message": "始終開啟深度搜索"
   },
+  "sideurlprotocol": {
+    "message": "m3u8dl 自訂協定"
+  },
   "deleteDuplicateFilenames": {
     "message": "删除重複檔名"
   },
