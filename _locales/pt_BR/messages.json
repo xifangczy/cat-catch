@@ -84,7 +84,7 @@
     "message": "Formatador JSON"
   },
   "expandAll": {
-    "message": "Expandir Todos"
+    "message": "Expandir Tudo"
   },
   "expandPlayable": {
     "message": "Expandir Reproduzível"
@@ -93,7 +93,7 @@
     "message": "Expandir Selecionado"
   },
   "collapseAll": {
-    "message": "Agrupar Todos"
+    "message": "Agrupar Tudo"
   },
   "videoRecording": {
     "message": "Gravar Vídeo"
@@ -126,7 +126,7 @@
     "message": "Selecionar Tudo"
   },
   "invertSelection": {
-    "message": "Inverter Seleção"
+    "message": "Alternar"
   },
   "filter": {
     "message": "Filtrar"
@@ -225,7 +225,7 @@
     "message": "Adicionar Tipo"
   },
   "typeTip": {
-    "message": "Insira o tipo de conteúdo correto; se nenhuma filtragem de tamanho for necessária, preencha com 0."
+    "message": "Inserir o tipo de conteúdo correto; se nenhuma filtragem de tamanho for necessária, preencha com 0."
   },
   "addTypeError": {
     "message": "O formato do tipo de captura está incorreto, verifique"
@@ -378,16 +378,16 @@
     "message": "Mais Freqüente"
   },
   "dopreview": {
-    "message": "preview"
+    "message": "prévia"
   },
   "dopopup": {
-    "message": "popup"
+    "message": "balão"
   },
   "winpreview": {
-    "message": "window preview"
+    "message": "janela da prévia"
   },
   "winpopup": {
-    "message": "window popup"
+    "message": "janela do balão"
   },   
   "excludeDuplicateResources": {
     "message": "Excluir recursos duplicados (consome muitos recursos da CPU)"
@@ -594,10 +594,10 @@
     "message": "Invocar M3U8DL"
   },
   "copyCommand": {
-    "message": "Comando Copiar"
+    "message": "Copiar Comando"
   },
   "previewCommand": {
-    "message": "Comando Prévia"
+    "message": "Prévia do Comando"
   },
   "addSettingParameters": {
     "message": "Adicionar Parâmetros de Configuração"
@@ -618,7 +618,7 @@
     "message": "MP4"
   },
   "downloadWhileSaving": {
-    "message": "Download da Stream"
+    "message": "Baixar Stream"
   },
   "audioOnly": {
     "message": "Somente Áudio"
@@ -845,10 +845,10 @@
     "message": "Correspondência de expressão regular ou de pesquisa profunda"
   },
   "downloadWithRequestHeader": {
-    "message": "Baixe com parâmetros de cabeçalho de solicitação."
+    "message": "Baixar com parâmetros de cabeçalho de solicitação."
   },
   "m3u8Playlist": {
-    "message": "Lista de reprodução M3U8"
+    "message": "Lista de Reprodução M3U8"
   },
   "copiedToClipboard": {
     "message": "Copiar para Área de Transferência"
@@ -966,10 +966,10 @@
     "message": "Transmissão automática de dados"
   },
   "requestMethod": {
-    "message": "Método de pedido"
+    "message": "Método do Pedido"
   },
   "requestBody": {
-    "message": "Corpo pedido"
+    "message": "Corpo do Pedido"
   },
   "sort": {
     "message": "Ordenar"
@@ -1007,11 +1007,14 @@
   "alwaysSearch": {
     "message": "Sempre habilitar pesquisa profunda"
   },
-  "alertimport": {
-  	"message": "importação concluída"
+  "sideurlprotocol": {
+  	"message": "Protocolo URL m3u8dl"
   },
   "deleteDuplicateFilenames": {
     "message": "Excluir nomes de arquivos duplicados"
+  },
+  "alertimport": {
+    "message": "Importação concluída"
   },
   "isBlockedSite": {
     "message": "Este site exige bloquear a operação desta extensão"
