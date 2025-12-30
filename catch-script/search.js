@@ -790,4 +790,33 @@
             CATCH_SEARCH_DEBUG && console.error("Error processing Vimeo stream:", e);
         }
     }
+
+
+    // 等待页面加载完毕 读取网页中的脚本
+    document.addEventListener("DOMContentLoaded", async function () {
+        if (!isRunningInWorker) {
+            const patterns = [
+                /["']((?:(?:https?:)?\/\/)?[^"'\s]*?\.(?:m3u8|mp4|flv)(?:\?[^"'\s]*)?)["']/gi
+            ];
+            document.querySelectorAll('script:not([src])').forEach((script) => {
+                if (script.textContent) {
+                    patterns.forEach((pattern) => {
+                        let match;
+                        while ((match = pattern.exec(script.textContent)) !== null) {
+                            let url = match[1] || match[0];
+                            // 清理URL
+                            url = url.replace(/['"]/g, '').trim();
+                            if (url && !url.startsWith('http')) {
+                                // 补全协议
+                                url = window.location.protocol + '//' + url.replace(/^\/\//, '');
+                            }
+                            if (url && isUrl(url)) {
+                                postData({ action: "catCatchAddMedia", url: url, href: location.href, ext: "m3u8" });
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    });
 })();
