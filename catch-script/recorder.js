@@ -78,6 +78,40 @@
     // 页面插入Shadow DOM
     document.getElementsByTagName('html')[0].appendChild(divShadow);
 
+
+    // 处理 sandbox iframe
+    setupIframeProcessing = () => {
+        document.addEventListener('DOMContentLoaded', () => {
+            const processIframe = (iframe) => {
+                if (iframe && iframe.hasAttribute && iframe.hasAttribute('sandbox')) {
+                    const clonedIframe = iframe.cloneNode(true);
+                    clonedIframe.removeAttribute('sandbox');
+                    if (iframe.parentNode) {
+                        iframe.parentNode.replaceChild(clonedIframe, iframe);
+                    }
+                }
+            };
+
+            document.querySelectorAll('iframe').forEach(processIframe);
+
+            const observer = new MutationObserver((mutationsList) => {
+                for (const mutation of mutationsList) {
+                    if (mutation.type === 'childList') {
+                        mutation.addedNodes.forEach(node => {
+                            if (node.nodeName === 'IFRAME') {
+                                processIframe(node);
+                            } else if (node.querySelectorAll) {
+                                node.querySelectorAll('iframe').forEach(processIframe);
+                            }
+                        });
+                    }
+                }
+            });
+            observer.observe(document.body || document.documentElement, { childList: true, subtree: true });
+        });
+    }
+    setupIframeProcessing();
+
     const $tips = CatCatch.querySelector("#tips");
     const $videoList = CatCatch.querySelector("#videoList");
     const $mimeTypeList = CatCatch.querySelector("#mimeTypeList");
