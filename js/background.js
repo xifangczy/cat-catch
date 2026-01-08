@@ -580,6 +580,7 @@ chrome.windows.onFocusChanged.addListener(function (activeInfo) {
  */
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (isSpecialPage(tab.url) || tabId <= 0 || !G.initSyncComplete) { return; }
+    // console.log('onUpdated', tabId, changeInfo, tab);
     if (changeInfo.status && changeInfo.status == "loading" && G.autoClearMode == 2) {
         G.urlMap.delete(tabId);
         chrome.alarms.get("save", function (alarm) {
@@ -618,9 +619,10 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
  */
 chrome.webNavigation.onCommitted.addListener(function (details) {
     if (isSpecialPage(details.url) || details.tabId <= 0 || !G.initSyncComplete) { return; }
+    // console.log('onCommitted', details);
 
     // 刷新页面 检查是否在屏蔽列表中
-    if (details.frameId == 0 && details.transitionType == "reload") {
+    if (details.frameId == 0) {
         G.blockUrlSet.delete(details.tabId);
         if (isLockUrl(details.url)) {
             G.blockUrlSet.add(details.tabId);
@@ -686,6 +688,7 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
     });
     if (G.initSyncComplete) {
         G.blockUrlSet.has(tabId) && G.blockUrlSet.delete(tabId);
+        G.damnUrlSet.has(tabId) && G.damnUrlSet.delete(tabId);
     }
 });
 
