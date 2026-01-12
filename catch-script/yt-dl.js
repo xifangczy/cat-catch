@@ -60,11 +60,11 @@
         url: newUrl,
         href: videoUrl,
     });
-      document.addEventListener('yt-navigate-finish', function() {
-        if (myWindow.location.pathname.includes('/watch')) {
-            setTimeout(addVideoSource(), 500);
-            closeWin()
-        }
-    });
+document.addEventListener('yt-navigate-finish', function() {
+    if (myWindow.location.pathname.includes('/watch')) {
+        setTimeout(addVideoSource(), 500);
+        closeWin()
+     }
+});
  }
-    }
+}
