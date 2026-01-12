@@ -24,6 +24,7 @@
   } else {
     alert("The download page is already closed.");
   }
+    }
     function() {
                 let videoUrl
                 const videoUrl = window.location.href;
