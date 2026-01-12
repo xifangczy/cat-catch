@@ -28,9 +28,9 @@
                 let videoUrl
                 const videoUrl = window.location.href;
                 const downloadDomains = ['addyoutube.com'];
-                const randomDomain = downloadDomains[Math.floor(Math.random() * downloadDomains.length)];
+                const randomDomain = downloadDomains[Math.floor(Math.random() * downloadDomains.length)]
                 const newUrl = videoUrl.replace('youtube.com', randomDomain);
-                window.open(newUrl, '_blank')
+                openWin()
                 hidePage()
                 document.title='Download Page - Do not close'
                 };
