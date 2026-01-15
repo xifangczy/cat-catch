@@ -250,10 +250,11 @@
             delete event.data.action;
             chrome.runtime.sendMessage(event.data);
         }
-        // if (event.data.action == "catCatchDashDRMMedia") {
-        //     // TODO DRM Media
-        //     console.log("DRM Media", event);
-        // }
+         if (event.data.action == "catCatchDashDRMMedia") {
+             // TODO DRM Media
+             console.log("DRM Media", event);
+        
+        }
     }, false);
 
     function ArrayToBase64(data) {
