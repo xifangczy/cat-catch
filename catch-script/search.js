@@ -793,8 +793,8 @@
 
 
     // 等待页面加载完毕 读取网页中的脚本
-    document.addEventListener("DOMContentLoaded", async function () {
-        if (!isRunningInWorker) {
+    if (!isRunningInWorker) {
+        document.addEventListener("DOMContentLoaded", async function () {
             const patterns = [
                 /["']((?:(?:https?:)?\/\/)?[^"'\s]*?\.(?:m3u8|mp4|flv)(?:\?[^"'\s]*)?)["']/gi
             ];
@@ -817,6 +817,7 @@
                     });
                 }
             });
-        }
-    });
+
+        });
+    }
 })();
