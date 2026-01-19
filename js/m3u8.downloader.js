@@ -209,6 +209,13 @@ class Downloader {
         // 下载前触发事件
         this.emit('start', fragment, options);
 
+        // 存在byteRange 添加请求头
+        if (fragment.byteRange && fragment.byteRange.length == 2) {
+            options.headers = {
+                'Range': `bytes=${fragment.byteRange[0]}-${fragment.byteRange[1] - 1}`
+            };
+        }
+
         // 开始下载
         fetch(fragment.url, options)
             .then(response => {

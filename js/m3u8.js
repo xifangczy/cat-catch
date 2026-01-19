@@ -597,7 +597,15 @@ function parseTs(data) {
         if (data.fragments[i].initSegment && !initData.get(data.fragments[i].initSegment.url)) {
             initSegment = data.fragments[i].initSegment;
             initData.set(data.fragments[i].initSegment.url, true);
-            fetch(data.fragments[i].initSegment.url)
+
+            const options = {};
+            if (data.fragments[i].initSegment.byteRange && data.fragments[i].initSegment.byteRange.length == 2) {
+                const [start, end] = data.fragments[i].initSegment.byteRange;
+                options.headers = {
+                    'Range': `bytes=${start}-${end - 1}`
+                };
+            }
+            fetch(data.fragments[i].initSegment.url, options)
                 .then(response => response.arrayBuffer())
                 .then(function (buffer) {
                     initData.set(data.fragments[i].initSegment.url, buffer);
@@ -627,6 +635,7 @@ function parseTs(data) {
             sn: data.fragments[i].sn,
             cc: data.fragments[i].cc,
             live: data.live,
+            byteRange: data.fragments[i].byteRange
         });
     }
     /* 
