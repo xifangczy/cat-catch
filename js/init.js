@@ -205,7 +205,8 @@ G.LocalVar = {
 };
 
 // 102版本以上 非Firefox 开启更多功能
-G.isFirefox = (typeof browser == "object");
+// G.isFirefox = (typeof browser == "object");
+G.isFirefox = navigator.userAgent.includes('Firefox');
 G.version = navigator.userAgent.match(/(Chrome|Firefox)\/([\d]+)/);
 G.version = G.version && G.version[2] ? parseInt(G.version[2]) : 93;
 
