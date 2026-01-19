@@ -1,5 +1,21 @@
 ## 更新说明
 
+### 2.6.6
+
+[Updated] 感谢 @Oleada1 完善翻译
+
+[Updated] 增强 深度搜索 现在可以找到更多资源
+
+[Fixed] 修复 firefox无法视频录制问题
+
+[Fixed] 修复 录制视频 无法弹出下载问题
+
+[Fixed] 修复 深度搜索 导致网页无法正常使用问题
+
+[Fixed] 修复 屏蔽列表 失效问题
+
+[Fixed] 修复 edge Brave等浏览器 使用在线ffmpeg 文件为空问题
+
 ### 2.6.5
 
 [Added] 部分网站不希望被本扩展抓取 添加 全局强制屏蔽 [屏蔽列表](https://o2bmm.gitbook.io/cat-catch/blockedsite)
