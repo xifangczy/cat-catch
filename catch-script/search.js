@@ -793,7 +793,7 @@
 
 
     // 等待页面加载完毕 读取网页中的脚本
-    if (!isRunningInWorker) {
+    if (!isRunningInWorker && typeof document !== "undefined") {
         document.addEventListener("DOMContentLoaded", async function () {
             const patterns = [
                 /["']((?:(?:https?:)?\/\/)?[^"'\s]*?\.(?:m3u8|mp4|flv)(?:\?[^"'\s]*)?)["']/gi
