@@ -427,7 +427,7 @@ hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
         video.autoplay = false;
         hls.attachMedia(video);
         hls.on(Hls.Events.MEDIA_ATTACHED, function () {
-            video.play();
+            video && video.play();
         });
         video.oncanplay = function () {
             hls.detachMedia(video);
@@ -669,7 +669,7 @@ function parseTs(data) {
     if (data.live) {
         autoDown && highlight();
         $("#recorder").show();
-        $("#count").html(i18n.liveHLS);
+        $(".videoInfo #info").html(i18n.liveHLS);
     } else {
         estimateSize(_fragments); // 估算文件大小
         $("#count").append(i18n("m3u8Info", [_fragments.length, secToTime(data.totalduration)]));
