@@ -1,5 +1,6 @@
 // 兼容Firefox
 if (typeof (browser) == "object") {
+    if (typeof (G) == "object" && !G.isFirefox) { return; }
     function importScripts() {
         for (let script of arguments) {
             const js = document.createElement('script');
