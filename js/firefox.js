@@ -1,23 +1,25 @@
 // 兼容Firefox
-if (typeof (browser) == "object") {
-    if (typeof (G) == "object" && !G.isFirefox) { return; }
-    function importScripts() {
-        for (let script of arguments) {
-            const js = document.createElement('script');
-            js.src = script;
-            document.head.appendChild(js);
+(function () {
+    if (typeof (browser) == "object") {
+        if (typeof (G) == "object" && !G.isFirefox) { return; }
+        function importScripts() {
+            for (let script of arguments) {
+                const js = document.createElement('script');
+                js.src = script;
+                document.head.appendChild(js);
+            }
         }
+
+        // browser.windows.onFocusChanged.addListener 少一个参数
+        const _onFocusChanged = chrome.windows.onFocusChanged.addListener;
+        chrome.windows.onFocusChanged.addListener = function (listener, option) {
+            _onFocusChanged(listener);
+        };
+
+        browser.runtime.onInstalled.addListener(({ reason }) => {
+            if (reason == "install") {
+                browser.tabs.create({ url: "install.html" });
+            }
+        });
     }
-
-    // browser.windows.onFocusChanged.addListener 少一个参数
-    const _onFocusChanged = chrome.windows.onFocusChanged.addListener;
-    chrome.windows.onFocusChanged.addListener = function (listener, option) {
-        _onFocusChanged(listener);
-    };
-
-    browser.runtime.onInstalled.addListener(({ reason }) => {
-        if (reason == "install") {
-            browser.tabs.create({ url: "install.html" });
-        }
-    });
-}
+})();
