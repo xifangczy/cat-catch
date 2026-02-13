@@ -323,6 +323,24 @@
   "customSaveFileName": {
     "message": "自定义保存文件名"
   },
+  "cssSelectorOption": {
+    "message": "CSS选择器 (提取元素文本到${selectorText})"
+  },
+  "cssSelectorTips": {
+    "message": "根据网址匹配规则设置不同的CSS选择器，支持通配符 * 和 ?"
+  },
+  "cssSelectorUrlTips": {
+    "message": "匹配模式，如: *example.com/watch*"
+  },
+  "urlMatchPattern": {
+    "message": "URL匹配模式"
+  },
+  "cssSelector": {
+    "message": "CSS选择器"
+  },
+  "addSelector": {
+    "message": "添加选择器"
+  },
   "userAgentTip": {
     "message": "留空默认为当前浏览器 User Agent"
   },
@@ -358,6 +376,9 @@
   },
   "customFilenameOption": {
     "message": "使用自定义文件名保存文件(默认为网页标题)"
+  },
+  "getHtmlDOMOption": {
+    "message": "允许获取页面DOM(用于CSS/XPath选择器提取文件名)"
   },
   "saveAsOption": {
     "message": "下载完选择保存目录"

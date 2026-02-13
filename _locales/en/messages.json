@@ -323,6 +323,24 @@
   "customSaveFileName": {
     "message": "Custom Save File Name"
   },
+  "cssSelectorOption": {
+    "message": "CSS Selector (extract element text to ${selectorText})"
+  },
+  "cssSelectorTips": {
+    "message": "Set different CSS selectors based on URL patterns, supports wildcards * and ?"
+  },
+  "cssSelectorUrlTips": {
+    "message": "Pattern, e.g.: *example.com/watch*"
+  },
+  "urlMatchPattern": {
+    "message": "URL Match Pattern"
+  },
+  "cssSelector": {
+    "message": "CSS Selector"
+  },
+  "addSelector": {
+    "message": "Add Selector"
+  },
   "userAgentTip": {
     "message": "Default to the current browser's User Agent"
   },
@@ -358,6 +376,9 @@
   },
   "customFilenameOption": {
     "message": "Use a custom filename to save the file (the default is the webpage title)"
+  },
+  "getHtmlDOMOption": {
+    "message": "Allow fetching page DOM (for CSS/XPath selector filename extraction)"
   },
   "saveAsOption": {
     "message": "Choose the save directory after downloading"

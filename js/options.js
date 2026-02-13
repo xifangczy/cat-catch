@@ -32,6 +32,10 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
     for (let key in items.blockUrl) {
         $blockUrlList.append(Gethtml("blockUrl", { url: items.blockUrl[key].url, state: items.blockUrl[key].state }));
     }
+    const $cssSelectorList = $("#cssSelectorList");
+    for (let key in items.cssSelector) {
+        $cssSelectorList.append(Gethtml("cssSelector", { url: items.cssSelector[key].url, selector: items.cssSelector[key].selector, state: items.cssSelector[key].state }));
+    }
     setTimeout(() => {
         for (let key in items) {
             if (key == "Ext" || key == "Type" || key == "Regex") { continue; }
@@ -60,6 +64,10 @@ $("#AddRegex").bind("click", function () {
 $("#blockAddUrl").bind("click", function () {
     $("#blockUrlList").append(Gethtml("blockUrl", { state: true }));
     $("#blockUrlList [name=url]").last().focus();
+});
+$("#addCssSelector").bind("click", function () {
+    $("#cssSelectorList").append(Gethtml("cssSelector", { state: true }));
+    $("#cssSelectorList [name=url]").last().focus();
 });
 $("#version").html(i18n.catCatch + " v" + chrome.runtime.getManifest().version);
 
@@ -105,6 +113,10 @@ function Gethtml(Type, Param = new Object()) {
             break;
         case "blockUrl":
             html = `<td><input type="text" value="${Param.url ? Param.url : ""}" name="url" placeholder="${i18n.blockUrlTips}" class="width100"></td>`
+            break;
+        case "cssSelector":
+            html = `<td><input type="text" value="${Param.url ? Param.url : ""}" name="url" placeholder="${i18n.cssSelectorUrlTips}" class="width100"></td>`
+            html += `<td><input type="text" value="${Param.selector ? Param.selector : ""}" name="selector" placeholder="${i18n.cssSelector}" class="width100"></td>`
             break;
     }
     html = $(`<tr data-type="${Type}">
@@ -192,6 +204,8 @@ $("#allDisable, #allEnable").bind("click", function () {
         query = $("#regexList [name=state]");
     } else if (obj == "blockUrl") {
         query = $("#blockUrlList [name=state]");
+    } else if (obj == "cssSelector") {
+        query = $("#cssSelectorList [name=state]");
     }
     query.each(function () {
         $(this).prop("checked", state);
@@ -403,6 +417,19 @@ function Save(option, sec = 0) {
                 blockUrl.push({ url: url, state: GetState });
             });
             chrome.storage.sync.set({ blockUrl: blockUrl });
+            return;
+        }
+        if (option == "cssSelector") {
+            let cssSelector = new Array();
+            $("#cssSelectorList tr").each(function () {
+                const _this = $(this);
+                let url = _this.find("[name=url]").val();
+                let selector = _this.find("[name=selector]").val();
+                let GetState = _this.find("[name=state]").prop("checked");
+                if (isEmpty(url) || isEmpty(selector)) { return true; }
+                cssSelector.push({ url: url, selector: selector, state: GetState });
+            });
+            chrome.storage.sync.set({ cssSelector: cssSelector });
             return;
         }
     }, sec);

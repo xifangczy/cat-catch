@@ -55,7 +55,7 @@ chrome.downloads.onChanged.addListener(function (item) {
 let checkboxState = true;
 
 // 生成资源DOM
-function AddMedia(data, currentTab = true) {
+async function AddMedia(data, currentTab = true) {
     data._title = data.title;
     data.title = stringModify(data.title);
     //文件名
@@ -66,6 +66,10 @@ function AddMedia(data, currentTab = true) {
         trimName = trimName.substr(0, 20) + '...' + trimName.substr(-30);
     }
     //添加下载文件名
+    // 确保 pageDOM 已加载（如果启用了 DOM 获取）
+    if (G.getHtmlDOM && !pageDOM) {
+        pageDOM = await getPageDOM();
+    }
     Object.defineProperty(data, "pageDOM", {
         get() { return pageDOM; }
     });
@@ -475,13 +479,13 @@ $(".Tabs .TabButton").click(function () {
 });
 // 其他页面
 $('#allTab').click(function () {
-    !allCount && chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getAllData" }, function (data) {
+    !allCount && chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getAllData" }, async function (data) {
         if (!data) { return; }
         for (let key in data) {
             if (key == G.tabId) { continue; }
             allCount += data[key].length;
             for (let i = 0; i < data[key].length; i++) {
-                $all.append(AddMedia(data[key][i], false));
+                $all.append(await AddMedia(data[key][i], false));
             }
         }
         allCount && $allMediaList.append($all);
@@ -779,7 +783,7 @@ const interval = setInterval(async function () {
         pageDOM = await getPageDOM();
     }
     // 填充数据
-    chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getData", tabId: G.tabId }, function (data) {
+    chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getData", tabId: G.tabId }, async function (data) {
         if (!data || data === "OK") {
             $tips.html(i18n.noData);
             $tips.attr("data-i18n", "noData");
@@ -792,7 +796,7 @@ const interval = setInterval(async function () {
             return;
         }
         for (let key = 0; key < currentCount; key++) {
-            $current.append(AddMedia(data[key]));
+            $current.append(await AddMedia(data[key]));
         }
         $mediaList.append($current);
         UItoggle();
@@ -802,17 +806,19 @@ const interval = setInterval(async function () {
         if (!Message.Message || !Message.data) { return; }
         // 添加资源
         if (Message.Message == "popupAddData") {
-            const html = AddMedia(Message.data, Message.data.tabId == G.tabId);
-            if (Message.data.tabId == G.tabId) {
-                !currentCount && $mediaList.append($current);
-                currentCount++;
-                $current.append(html);
-                UItoggle();
-            } else if (allCount) {
-                allCount++;
-                $all.append(html);
-                UItoggle();
-            }
+            (async () => {
+                const html = await AddMedia(Message.data, Message.data.tabId == G.tabId);
+                if (Message.data.tabId == G.tabId) {
+                    !currentCount && $mediaList.append($current);
+                    currentCount++;
+                    $current.append(html);
+                    UItoggle();
+                } else if (allCount) {
+                    allCount++;
+                    $all.append(html);
+                    UItoggle();
+                }
+            })();
             sendResponse("OK");
             return true;
         }

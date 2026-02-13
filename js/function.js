@@ -261,6 +261,9 @@ function templatesFunction(text, action, data) {
             }
         } else if (action == "find") {
             text = "";
+            // 支持 CSS 选择器和 XPath
+            const selector = arg[0];
+            const type = arg[1] || "css";  // 第二个参数指定类型: css 或 xpath
             if (data.pageDOM) {
                 try {
                     text = data.pageDOM.querySelector(arg[0]).innerText?.trim();
@@ -310,6 +313,7 @@ function templates(text, data) {
         pageDOM: data.pageDOM,
         cookie: data.cookie ?? "",
         tabId: data.tabId ?? 0,
+        selectorText: data.selectorText ?? "",
 
         // 时间相关
         year: date.getFullYear(),

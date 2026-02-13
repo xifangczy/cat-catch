@@ -38,30 +38,30 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
 // onBeforeRequest 浏览器发送请求之前使用正则匹配发送请求的URL
 // chrome.webRequest.onBeforeRequest.addListener(
 //     function (data) {
-//         try { findMedia(data, true); } catch (e) { console.log(e); }
+//         try { await findMedia(data, true); } catch (e) { console.log(e); }
 //     }, { urls: ["<all_urls>"] }, ["requestBody"]
 // );
 // 保存requestHeaders
 chrome.webRequest.onSendHeaders.addListener(
-    function (data) {
+    async function (data) {
         if (G && G.initSyncComplete && !G.enable) { return; }
         if (data.requestHeaders) {
             G.requestHeaders.set(data.requestId, data.requestHeaders);
             data.allRequestHeaders = data.requestHeaders;
         }
-        try { findMedia(data, true); } catch (e) { console.log(e); }
+        try { await findMedia(data, true); } catch (e) { console.log(e); }
     }, { urls: ["<all_urls>"] }, ['requestHeaders',
         chrome.webRequest.OnBeforeSendHeadersOptions.EXTRA_HEADERS].filter(Boolean)
 );
 // onResponseStarted 浏览器接收到第一个字节触发，保证有更多信息判断资源类型
 chrome.webRequest.onResponseStarted.addListener(
-    function (data) {
+    async function (data) {
         try {
             data.allRequestHeaders = G.requestHeaders.get(data.requestId);
             if (data.allRequestHeaders) {
                 G.requestHeaders.delete(data.requestId);
             }
-            findMedia(data);
+            await findMedia(data);
         } catch (e) { console.log(e, data); }
     }, { urls: ["<all_urls>"] }, ["responseHeaders"]
 );
@@ -73,7 +73,7 @@ chrome.webRequest.onErrorOccurred.addListener(
     }, { urls: ["<all_urls>"] }
 );
 
-function findMedia(data, isRegex = false, filter = false, timer = false) {
+async function findMedia(data, isRegex = false, filter = false, timer = false) {
     // Service Worker被强行杀死之后重新自我唤醒，等待全局变量初始化完成。
     if (!G || !G.initSyncComplete || !G.initLocalComplete || G.tabId == undefined || cacheData.init) {
         if (timer) { return; }
@@ -124,7 +124,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
             }
             data.extraExt = G.Regex[key].ext ? G.Regex[key].ext : undefined;
             if (result.length == 1) {
-                findMedia(data, true, true);
+                await findMedia(data, true, true);
                 return;
             }
             result.shift();
@@ -133,7 +133,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
                 result[0] = urlParsing.protocol + "//" + data.url;
             }
             data.url = result.join("");
-            findMedia(data, true, true);
+            await findMedia(data, true, true);
             return;
         }
         return;
@@ -245,6 +245,40 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         info.title = webInfo?.title ?? "NULL";
         info.favIconUrl = webInfo?.favIconUrl;
         info.webUrl = webInfo?.url;
+
+        // 查询 CSS 选择器获取额外文本
+        info.selectorText = "";
+        if (G.cssSelector?.length && data.tabId > 0 && info.webUrl) {
+            // 查找匹配当前URL的规则
+            let matchedSelector = "";
+            for (let rule of G.cssSelector) {
+                if (!rule.state) { continue; }
+                rule.url.lastIndex = 0;
+                if (rule.url.test(info.webUrl)) {
+                    matchedSelector = rule.selector;
+                    break;
+                }
+            }
+            if (matchedSelector) {
+                try {
+                    const [result] = await chrome.scripting.executeScript({
+                        target: { tabId: data.tabId },
+                        func: (selector) => {
+                            try {
+                                const el = document.querySelector(selector);
+                                return el?.innerText?.trim() || el?.textContent?.trim() || "";
+                            } catch (e) { return ""; }
+                        },
+                        args: [matchedSelector]
+                    });
+                    info.selectorText = result?.result || "";
+                } catch (e) {
+                    console.log("CSS selector query failed:", e);
+                    info.selectorText = "";
+                }
+            }
+        }
+
         // 屏蔽资源
         if (!isRegex && G.blackList.has(data.requestId)) {
             G.blackList.delete(data.requestId);
@@ -496,14 +530,14 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     }
     // 从 content-script 或 catch-script 传来的媒体url
     if (Message.Message == "addMedia") {
-        chrome.tabs.query({}, function (tabs) {
+        chrome.tabs.query({}, async function (tabs) {
             for (let item of tabs) {
                 if (item.url == Message.href) {
-                    findMedia({ url: Message.url, tabId: item.id, extraExt: Message.extraExt, mime: Message.mime, requestId: Message.requestId, requestHeaders: Message.requestHeaders }, true, true);
+                    await findMedia({ url: Message.url, tabId: item.id, extraExt: Message.extraExt, mime: Message.mime, requestId: Message.requestId, requestHeaders: Message.requestHeaders }, true, true);
                     return true;
                 }
             }
-            findMedia({ url: Message.url, tabId: -1, extraExt: Message.extraExt, mime: Message.mime, requestId: Message.requestId, initiator: Message.href, requestHeaders: Message.requestHeaders }, true, true);
+            await findMedia({ url: Message.url, tabId: -1, extraExt: Message.extraExt, mime: Message.mime, requestId: Message.requestId, initiator: Message.href, requestHeaders: Message.requestHeaders }, true, true);
         });
         sendResponse("ok");
         return true;
@@ -752,8 +786,8 @@ chrome.webNavigation.onCompleted.addListener(function (details) {
 
 /**
  * 检查扩展名和大小
- * @param {String} ext 
- * @param {Number} size 
+ * @param {String} ext
+ * @param {Number} size
  * @returns {Boolean|String}
  */
 function CheckExtension(ext, size) {
@@ -766,8 +800,8 @@ function CheckExtension(ext, size) {
 
 /**
  * 检查类型和大小
- * @param {String} dataType 
- * @param {Number} dataSize 
+ * @param {String} dataType
+ * @param {Number} dataSize
  * @returns {Boolean|String}
  */
 function CheckType(dataType, dataSize) {
@@ -780,7 +814,7 @@ function CheckType(dataType, dataSize) {
 
 /**
  * 获取文件名及扩展名
- * @param {String} pathname 
+ * @param {String} pathname
  * @returns {Array}
  */
 function fileNameParse(pathname) {
@@ -792,7 +826,7 @@ function fileNameParse(pathname) {
 
 /**
  * 获取响应头信息
- * @param {Object} data 
+ * @param {Object} data
  * @returns {Object}
  */
 function getResponseHeadersValue(data) {
@@ -818,7 +852,7 @@ function getResponseHeadersValue(data) {
 
 /**
  * 获取请求头
- * @param {Object} data 
+ * @param {Object} data
  * @returns {Object|Boolean}
  */
 function getRequestHeaders(data) {

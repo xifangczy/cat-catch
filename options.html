@@ -450,6 +450,24 @@
             <textarea id="downFileName" save="input" type="text" class="width100"></textarea>
           </div>
           <div class="item">
+            <div data-i18n="cssSelectorOption"></div>
+            <span class="explain" data-i18n="cssSelectorTips"></span>
+          </div>
+          <table id="cssSelectorList">
+            <tr>
+              <th data-i18n="urlMatchPattern"></th>
+              <th data-i18n="cssSelector"></th>
+              <th data-i18n="enable"></th>
+              <th data-i18n="delete"></th>
+            </tr>
+          </table>
+          <div class="flex-end">
+            <button type="button" id="addCssSelector" class="button2" data-i18n="addSelector" title="add Selector"></button>
+            <button type="button" id="ResetCssSelector" data-reset="cssSelector" data-i18n="resetSettings" title="reset CSS Selector"></button>
+            <button type="button" id="allDisableCssSelector" data-switch="cssSelector" data-i18n="disableAll" title="disable All CSS Selector"></button>
+            <button type="button" id="allEnableCssSelector" data-switch="cssSelector" data-i18n="enableAll" title="enable All CSS Selector"></button>
+          </div>
+          <div class="item">
             <div>${userAgent} <span data-i18n-outer="userAgentTip"></span></div>
             <textarea id="userAgent" save="input" type="text" class="width100"></textarea>
           </div>
@@ -652,6 +670,16 @@
             <div class="switch">
               <label class="switchLabel switchRadius">
                 <input type="checkbox" save="click" id="TitleName" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="getHtmlDOMOption"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" save="click" id="getHtmlDOM" class="switchInput" />
                 <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
               </label>
             </div>

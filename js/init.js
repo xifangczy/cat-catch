@@ -138,6 +138,7 @@ G.OptionLists = {
     saveAs: false,
     userAgent: "",
     downFileName: "${title}.${ext}",
+    cssSelector: [],    // CSS选择器规则列表，每项包含 url(匹配模式), selector(CSS选择器), state(是否启用)
     css: "",
     checkDuplicates: true,
     enable: true,
@@ -283,6 +284,10 @@ function InitOptions() {
         items.blockUrl = items.blockUrl.map(item => {
             return { url: wildcardToRegex(item.url), state: item.state }
         });
+        // 预编译CSS选择器URL匹配规则
+        items.cssSelector = items.cssSelector.map(item => {
+            return { url: wildcardToRegex(item.url), selector: item.selector, state: item.state }
+        });
 
         // 兼容旧配置
         if (items.copyM3U8.includes('$url$')) {
@@ -355,6 +360,12 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
         if (key == "blockUrl") {
             G.blockUrl = newValue.map(item => {
                 return { url: wildcardToRegex(item.url), state: item.state }
+            });
+            continue;
+        }
+        if (key == "cssSelector") {
+            G.cssSelector = newValue.map(item => {
+                return { url: wildcardToRegex(item.url), selector: item.selector, state: item.state }
             });
             continue;
         }
