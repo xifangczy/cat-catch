@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>titleJson</title>
+  <link rel="stylesheet" type="text/css" href="css/public.css" media="all" />
+  <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
+  <script src="lib/jquery.min.js"></script>
+  <script src="js/init.js"></script>
+  <script src="js/firefox.js"></script>
+  <script src="lib/jquery.json-viewer.js"></script>
+  <script src="js/function.js"></script>
+  <script src="js/json.js"></script>
+</head>
+
+<body>
+  <div class="wrapper1024">
+
+    <section id="jsonCustom" class="hide">
+      <h1 class="optionsTitle" data-i18n="titleJson"></h1>
+      <div class="optionBox">
+        <span class="explain">json</span>
+        <textarea id="jsonText" spellcheck="false" data-type="link" class="width100"></textarea>
+        <div class="line"></div>
+        <span class="explain">json url</span>
+        <input type="text" id="jsonUrl" placeholder="jsonURL" class="fullInput" />
+        <button id="format" type="button" data-i18n="jsonFormatter"></button>
+      </div>
+    </section>
+
+    <section id="main">
+      <h1 class="optionsTitle" data-i18n="titleJson"></h1>
+      <div class="optionBox">
+        <div class="block">
+          <pre id="json-renderer" data-i18n="fileLoading"></pre>
+        </div>
+        <button id="collapsed" data-i18n="expandAllNodes"></button>
+      </div>
+    </section>
+  </div>
+  <script src="js/i18n.js"></script>
+</body>
+
+</html>

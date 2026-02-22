@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>filter</title>
+    <link rel="stylesheet" type="text/css" href="css/public.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="css/preview.css" media="all" />
+    <script src="js/init.js"></script>
+    <script src="js/firefox.js"></script>
+    <script src="js/function.js"></script>
+</head>
+
+<body>
+    <div class="play-container preview-container hide">
+        <video controls id="video-player"></video>
+    </div>
+    <div class="image-container preview-container hide">
+        <img src="" id="image-player" />
+    </div>
+    <div class="container">
+        <!-- 筛选条件 -->
+        <div class="filters">
+            <div class="filter-row">
+                <span data-i18n="suffix"></span>
+                <div id="extensionFilters"></div>
+            </div>
+
+            <div class="filter-row">
+                <span data-i18n="type"></span>
+                <div id="typeFilters"></div>
+            </div>
+
+            <div class="filter-row">
+                <span data-i18n="sort"></span>
+                <div class="sort-options">
+                    <div class="sort-group">
+                        <label><input type="radio" name="sortField" value="getTime" checked>
+                            <i18n>getTime</i18n>
+                        </label>
+                        <label><input type="radio" name="sortField" value="size">
+                            <i18n>fileSize</i18n>
+                        </label>
+                        <label><input type="radio" name="sortField" value="duration">
+                            <i18n>duration</i18n>
+                        </label>
+                        <!-- <label><input type="radio" name="sortField" value="name">
+                            文件名
+                        </label> -->
+                    </div>
+                    <div class="sort-order">
+                        <label><input type="radio" name="sortOrder" value="asc" data-i18n="asc" checked>
+                            <i18n>asc</i18n>
+                        </label>
+                        <label><input type="radio" name="sortOrder" value="desc" data-i18n="desc">
+                            <i18n>desc</i18n>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-row">
+                <span data-i18n="option"></span>
+                <label><input type="checkbox" id="showTitle">
+                    <i18n>title</i18n>
+                </label>
+                <label><input type="checkbox" id="deleteDuplicateFilenames">
+                    <i18n>deleteDuplicateFilenames</i18n>
+                </label>
+            </div>
+
+            <div class="filter-row">
+                <span data-i18n="regex"></span>
+                <input type="text" data-i18n-placeholder="regularFilterPlaceholder" id="regular" />
+            </div>
+
+            <div class="filter-row">
+                <span data-i18n="operation"></span>
+                <button id="select-all" class="button" data-i18n="selectAll"></button>
+                <button id="select-reverse" class="button" data-i18n="invertSelection"></button>
+                <button id="download-selected" class="button2" data-i18n="download" disabled></button>
+                <button id="merge-download" class="button2" data-i18n="onlineMerge" disabled></button>
+                <button id="copy-selected" class="button2" data-i18n="copy" disabled></button>
+                <button id="delete-selected" class="button2" data-i18n="delete" disabled></button>
+                <button id="aria2-selected" class="button2 hide" disabled>aria2</button>
+                <button id="send-selected" class="button2 hide" data-i18n="send2local" disabled></button>
+                <button id="clear" class="button" data-i18n="clear"></button>
+                <button id="debug" class="button">debug</button>
+                <button id="search" class="button2" type="script" data-i18n="deepSearch"></button>
+                <button id="catch" class="button2" type="script" data-i18n="cacheCapture"></button>
+                <label>
+                    <input type="checkbox" name="defaultPopup" id="defaultPopup">
+                    <i18n>defaultPopup</i18n>
+                </label>
+            </div>
+        </div>
+
+
+        <!-- 媒体列表 -->
+        <div id="file-container" class="file-grid"></div>
+        <div id="selection-box"></div>
+
+        <!-- 分页 -->
+        <div class="pagination hide">
+            <button class="button" id="prev-page" disabled>&lt;&lt;</button>
+            <div class="page-numbers"></div>
+            <button class="button" id="next-page" disabled>&gt;&gt;</button>
+        </div>
+    </div>
+
+    <script src="lib/base64.js"></script>
+    <script src="lib/hls.min.js"></script>
+    <script src="lib/mqtt.min.js"></script>
+    <script src="js/pupup-utils.js"></script>
+    <script src="js/preview.js"></script>
+    <script src="js/i18n.js"></script>
+</body>
+
+</html>

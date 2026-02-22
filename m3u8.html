@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>titleM3U8</title>
+  <link rel="stylesheet" type="text/css" href="css/public.css" media="all" />
+  <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
+  <script src="lib/jquery.min.js"></script>
+  <script src="js/init.js"></script>
+  <script src="js/firefox.js"></script>
+  <script src="lib/mux.min.js"></script>
+  <script src="js/function.js"></script>
+</head>
+
+<body>
+  <div class="m3u8_wrapper wrapper1080">
+
+    <section id="loading">
+      <div class="optionBox" data-i18n="loading"></div>
+    </section>
+
+    <section id="m3u8Custom" class="hide">
+      <h1 class="optionsTitle" data-i18n="titleM3U8"></h1>
+      <div class="optionBox">
+        <textarea id="m3u8Text" spellcheck="false" data-type="link" data-i18n-placeholder="m3u8Placeholder"
+          class="width100"></textarea>
+        <input type="text" id="baseUrl" placeholder="BaseURL" class="fullInput" />
+        <div class="line"></div>
+        <input type="text" id="referer" placeholder="Referer" class="fullInput" />
+        <button id="parse" type="button" data-i18n="parser"></button>
+        <input id="uploadM3U8" type="file" />
+      </div>
+    </section>
+
+    <section id="more_m3u8" class="hide">
+      <h1 class="optionsTitle" data-i18n="selectVideo"></h1>
+      <span class="explain" data-i18n="nextLevelTip"></span>
+      <div class="optionBox">
+        <div id="next_m3u8"></div>
+      </div>
+    </section>
+    <section id="more_audio" class="hide">
+      <h1 class="optionsTitle" data-i18n="selectAudio"></h1>
+      <span class="explain" data-i18n="multipleAudiosTip"></span>
+      <div class="optionBox">
+        <div id="next_audio"></div>
+      </div>
+    </section>
+    <section id="more_subtitle" class="hide">
+      <h1 class="optionsTitle" data-i18n="multipleSubtitles"></h1>
+      <span class="explain" data-i18n="multipleSubtitlesTip"></span>
+      <div class="optionBox">
+        <div id="next_subtitle"></div>
+      </div>
+    </section>
+
+    <section id="more_options" class="hide">
+      <div class="optionBox">
+        <button id="more_options_merge" class="button2" data-i18n="onlineMerge"></button>
+      </div>
+    </section>
+
+    <section id="m3u8" class="hide">
+      <h1 class="optionsTitle" data-i18n="titleM3U8"></h1>
+      <span class="explain" id="key"></span>
+      <div class="optionBox">
+        <div class="block">
+          <p data-i18n-outer="m3u8Url"></p>
+          <p><a id="m3u8_url"></a></p>
+        </div>
+
+        <div class="block" id="tips"></div>
+        <div class="block hide" id="maybeKey">
+          <select class="m3u8Key select">
+            <option value="tips" data-i18n="possibleKey"></option>
+          </select>
+          <button id="searchingForRealKey" data-i18n="searchingForRealKey"></button>
+        </div>
+
+        <div class="videoInfo flex">
+          <div id="count"></div>
+          <div id="info"></div>
+          <div id="estimateFileSize"></div>
+        </div>
+        <div class="block" id="textarea">
+          <details>
+            <summary data-i18n="viewSlices" class="button"></summary>
+            <textarea id="media_file" spellcheck="false" data-type="link" class="width100"
+              data-i18n="loading"></textarea>
+            <div id="downList" data-i18n="waitDownload"></div>
+            <div class="merge">
+              <button id="downText" data-i18n="downloadSegmentList"></button>
+              <button id="originalM3U8" data-i18n="originalM3u8"></button>
+              <button id="localFile" class="hide" data-i18n="localM3u8"></button>
+              <button id="downProgress" data-i18n="downloadProgress"></button>
+              <button id="getTs" data-i18n="segmentList"></button>
+            </div>
+          </details>
+        </div>
+        <video id="video" class="hide" controls></video>
+        <div class="block" id="button">
+          <div class="merge">
+            <button id="tsAddArg" data-i18n="getParameters"></button>
+            <button id="setRequestHeaders" data-i18n="requestHeaders"></button>
+            <button id="play" data-switch="on" data-i18n="play"></button>
+            <button id="m3u8DL" class="button2" data-i18n="invokeM3u8DL"></button>
+            <button id="copyM3U8dl" class="hide" data-i18n="copyCommand"></button>
+            <button id="setM3u8dl" data-i18n="previewCommand"></button>
+            <label class="m3u8checkbox textColor">
+              <p data-i18n-outer="addSettingParameters"></p><input type="checkbox" id="addParam" save="change" />
+            </label>
+            <button id="invoke" class="button2" data-i18n="invoke"></button>
+            <button class="openDir hide" data-i18n="downloadDir"></button>
+            <button id="sendFfmpeg" class="hide button" data-i18n="sendFfmpeg"></button>
+          </div>
+          <textarea id="m3u8dlArg" type="text" class="m3u8dlArg hide"></textarea>
+          <div class="line"></div>
+          <div class="merge customKey">
+            <input type="text" id="customFilename" spellcheck="false" data-i18n-placeholder="customSaveFileName"
+              size="30" />
+            <input type="text" id="customKey" spellcheck="false" data-i18n-placeholder="customKeyPlaceholder"
+              size="60" />
+            <input type="text" id="customIV" spellcheck="false" placeholder="IV" size="30" />
+            <button id="uploadKey" data-i18n="uploadKey"></button>
+            <input id="uploadKeyFile" type="file" class="hide" />
+          </div>
+          <div class="merge" id="mergeDown">
+            <div id="threadDiv" class="textColor">
+              <p data-i18n-outer="downloadThreads"></p> <input type="number" value="6" id="thread" spellcheck="false"
+                style="width: 35px;" step="1" min="1" max="256" save="change" />
+            </div>
+            <label class="m3u8checkbox textColor">
+              <p data-i18n-outer="ffmpegTranscoding"></p><input type="checkbox" id="ffmpeg" save="change" />
+            </label>
+            <label class="m3u8checkbox textColor">
+              <p data-i18n-outer="mp4Format"></p><input type="checkbox" id="mp4" save="change" />
+            </label>
+            <label class="m3u8checkbox textColor firefoxHide">
+              <p data-i18n-outer="downloadWhileSaving"></p><input type="checkbox" id="StreamSaver" save="change" />
+            </label>
+            <label class="m3u8checkbox textColor">
+              <p data-i18n-outer="audioOnly"></p><input type="checkbox" id="onlyAudio" save="change" />
+            </label>
+            <label class="m3u8checkbox textColor">
+              <p data-i18n-outer="saveAs"></p><input type="checkbox" id="saveAs" save="change" />
+            </label>
+            <label class="m3u8checkbox textColor">
+              <p data-i18n-outer="skipDecryption"></p><input type="checkbox" id="skipDecrypt" save="change" />
+            </label>
+            <label class="m3u8checkbox textColor">
+              <p data-i18n-outer="autoClosePageAfterDownload"></p><input type="checkbox" id="autoClose" save="change" />
+            </label>
+            <div class="rangeDown textColor">
+              <p data-i18n-outer="downloadRange"></p>
+              <select id="cc" class="hide">
+                <option disabled selected hidden>playlist</option>
+              </select>
+              <div class="merge">
+                <input type="text" id="rangeStart" spellcheck="false" data-i18n-placeholder="start" value="1" />
+                <input type="text" id="rangeEnd" spellcheck="false" data-i18n-placeholder="end" />
+              </div>
+            </div>
+            <button id="recorder" class="button2 hide" data-switch="on" data-switch="on"
+              data-i18n="recordLive"></button>
+            <div class="textColor m3u8checkbox">
+              <p data-i18n-outer="retryCount"></p>(test) <input type="number" value="0" id="retryCount"
+                spellcheck="false" style="width: 35px;" step="1" min="0" />
+            </div>
+            <button id="mergeTs" class="button2" data-i18n="mergeDownloads"></button>
+            <button id="errorDownload" class="hide button2" data-i18n="redownloadFailedItems"></button>
+            <button id="ForceDownload" class="hide button2" data-i18n="downloadExistingData"></button>
+            <button id="stopDownload" class="hide button2" data-i18n="stopDownload"></button>
+          </div>
+          <div style="display: flex; margin-top: 10px;">
+            <div id="progress"></div>
+            <div id="fileSize"></div>
+            <div id="fileDuration"></div>
+          </div>
+          <div class="block hide" id="errorTsList"></div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+  <script src="lib/m3u8-decrypt.js"></script>
+  <script src="lib/hls.min.js"></script>
+  <script src="lib/base64.js"></script>
+  <script src="lib/StreamSaver.js"></script>
+  <script src="js/m3u8.downloader.js"></script>
+  <script src="js/m3u8.js"></script>
+  <script src="js/i18n.js"></script>
+</body>
+
+</html>

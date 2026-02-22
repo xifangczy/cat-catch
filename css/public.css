@@ -1,0 +1,211 @@
+:root {
+  /* 两个背景色 两个文字以及链接文字配色 */
+  --background-color: #fff;
+  --background-color-opacity: #ffffffea;
+  --background-color-two: #f5f5f5;
+  --text-color: #000;
+  --text-error-color: #ff0000;
+  --text2-color: rgb(26, 115, 232);
+  --link-color: #3079ed;
+
+  /* 设置页面 设置box 背景色 */
+  --optionBox-color: var(--background-color);
+
+  /* 两个按钮 配色 边框 */
+  --button-color: #fff;
+  --button-text-color: rgb(26, 115, 232);
+  --button-border: solid 1px #c7c7c780;
+  --button-hover-color: rgb(66 133 244 / 4%);
+  --button-active-color: rgb(66 133 244 / 10%);
+
+  --button2-color: rgb(26, 115, 232);
+  --button2-text-color: #fff;
+  --button2-border: solid 1px #c7c7c780;
+  --button2-hover-color: rgb(26 115 232 / 90%);
+  --button2-active-color: rgb(26 115 232 / 50%);
+
+  /* 滚动条配色 */
+  --scrollbar-track-color: #f5f5f500;
+  --scrollbar-thumb-color: #1a73e8;
+
+  /* 设置页面 滑动开关配色 */
+  --switch-off-color: rgb(189, 193, 198);
+  --switch-on-color: rgb(26, 115, 232);
+  --switch-round-color: #fff;
+
+  /* input textarea select 边框配色 */
+  --input-border: solid 1px #000;
+}
+html {
+  color: var(--text-color);
+  background: var(--background-color);
+  scrollbar-width: thin;
+}
+input,
+textarea,
+select {
+  color: var(--text-color);
+  background: var(--background-color);
+  scrollbar-width: thin;
+  border: var(--input-border);
+}
+a,
+a:link,
+a:visited {
+  color: var(--link-color);
+}
+button,
+.button,
+.button2 {
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0 0 3px 0;
+  user-select: none;
+}
+button,
+.button {
+  background: var(--button-color);
+  border: var(--button-border);
+  color: var(--button-text-color);
+}
+button:hover,
+.button:hover {
+  background: var(--button-hover-color);
+}
+button:active,
+.button:active {
+  background: var(--button-active-color);
+}
+.button2 {
+  background: var(--button2-color);
+  border: var(--button2-border);
+  color: var(--button2-text-color);
+}
+.button2:hover {
+  background: var(--button2-hover-color);
+}
+.button2:active {
+  background: var(--button2-active-color);
+}
+button:disabled,
+.button:disabled,
+.button2:disabled,
+.disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.bold {
+  font-weight: bold;
+}
+.hide {
+  display: none;
+}
+.textColor {
+  color: var(--text2-color);
+}
+.width100 {
+  width: 100%;
+}
+.height100 {
+  height: 100%;
+}
+.line {
+  border-top: solid 1px rgb(0 0 0 / 50%);
+  margin: 10px 0 10px 0;
+}
+.no-drop {
+  background-color: #ccc !important;
+  cursor: no-drop;
+  color: var(--button2-text-color);
+}
+.icon {
+  -webkit-user-drag: none;
+}
+/*定义整个滚动条高宽及背景：高宽分别对应横竖滚动条的尺寸*/
+::-webkit-scrollbar {
+  width: 5px;
+}
+/*定义滚动条轨道：内阴影+圆角*/
+::-webkit-scrollbar-track {
+  background-color: var(--scrollbar-track-color);
+}
+/*定义滑块：内阴影+圆角*/
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: var(--scrollbar-thumb-color);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #0f172a;
+    --background-color-opacity: #0f172aea;
+    --background-color-two: #1e293b;
+    --text-color: #fff;
+    --text-error-color: #ff0000;
+    --text2-color: #fff;
+    --link-color: #94a3b8;
+
+    --optionBox-color: var(--background-color-two);
+
+    --button-color: #161b22;
+    --button-border: solid 1px #c7c7c780;
+    --button-text-color: #fff;
+    --button-hover-color: rgb(66 133 244 / 4%);
+    --button-active-color: rgb(66 133 244 / 10%);
+
+    --button2-color: rgb(26 115 232 / 50%);
+    --button2-border: solid 1px #c7c7c780;
+    --button2-text-color: #fff;
+    --button2-hover-color: rgb(26 115 232 / 90%);
+    --button2-active-color: rgb(26 115 232 / 50%);
+
+    --scrollbar-track-color: #f5f5f500;
+    --scrollbar-thumb-color: #1a73e8;
+
+    --switch-off-color: rgb(189, 193, 198);
+    --switch-on-color: rgb(26 115 232 / 50%);
+    --switch-round-color: #fff;
+
+    --input-border: solid 1px #ffffffb6;
+  }
+  img.regex {
+    content: url(../img/regex-dark.png);
+  }
+  img.copy {
+    content: url(../img/copy-dark.png);
+  }
+  img.parsing {
+    content: url(../img/parsing-dark.png);
+  }
+  img.play {
+    content: url(../img/play-dark.png);
+  }
+  img.download {
+    content: url(../img/download-dark.svg);
+  }
+  img.qrcode {
+    content: url(../img/qrcode-dark.png);
+  }
+  img.cat-down {
+    content: url(../img/cat-down-dark.png);
+  }
+  img.aria2 {
+    content: url(../img/aria2-dark.png);
+  }
+  img.invoke {
+    content: url(../img/invoke-dark.svg);
+  }
+  img.send {
+    content: url(../img/send-dark.svg);
+  }
+  img.delete {
+    content: url(../img/delete-dark.svg);
+  }
+  img.mqtt {
+    content: url(../img/mqtt-dark.svg);
+  }
+  img.send2ffmpeg {
+    content: url(../img/send2ffmpeg-dark.svg);
+  }
+}

@@ -1,0 +1,16 @@
+.popupBody {
+  width: 100%;
+}
+
+.wrapper.options {
+  margin-right: 10px;
+}
+
+.m3u8_wrapper #mergeTs {
+  font-size: 2rem;
+}
+
+.newDownload {
+  width: 100%;
+  padding: 0 2rem;
+}

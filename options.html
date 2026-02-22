@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>titleOption</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="css/public.css" media="all" />
+  <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
+  <script src="lib/jquery.min.js" defer></script>
+  <script src="js/init.js" defer></script>
+  <script src="js/function.js" defer></script>
+</head>
+
+<body>
+  <!-- 添加导航栏 -->
+  <nav class="sidebar" aria-label="Main Navigation">
+    <ul>
+      <li><a href="#anchorSuffix" data-i18n="suffix" title="suffix"></a></li>
+      <li><a href="#anchorType" data-i18n="type" title="type"></a></li>
+      <li><a href="#anchorRegexMatch" data-i18n="regexMatch" title="regexMatch"></a></li>
+      <li><a href="#anchorBlockUrl" data-i18n="blockUrl" title="blockUrl"></a></li>
+      <li><a href="#anchorScriptSettings" data-i18n="Script" title="Script"></a></li>
+      <li><a href="#anchorCopy" data-i18n="copy" title="copy"></a></li>
+      <li><a href="#anchorAria2Rpc" title="Aria2 RPC">Aria2 RPC</a></li>
+      <li><a href="#anchorSend2local" data-i18n="send2local" title="send2local"></a></li>
+      <li><a href="#anchorM3u8dl" data-i18n="sideurlprotocol" title="URL Protocol m3u8dl"></a></li>
+      <li><a href="#anchorInvokeApp" data-i18n="invokeApp" title="invokeApp"></a></li>
+      <li><a href="#anchorReplaceTags" data-i18n="replaceTags" title="replaceTags"></a></li>
+      <li><a href="#anchorDownloader" data-i18n="downloader" title="downloader"></a></li>
+      <li><a href="#anchorM3u8Parser" data-i18n="m3u8Parser" title="m3u8Parser"></a></li>
+      <li><a href="#anchorOtherSettings" data-i18n="otherSettings" title="otherSettings"></a></li>
+      <li><a href="#anchorCustomCSS" data-i18n="customCSS" title="customCSS"></a></li>
+      <li><a href="#anchorMQTT" data-i18n="MQTT" title="MQTT"></a></li>
+      <li><a href="#anchorOperation" data-i18n="operation" title="operation"></a></li>
+      <li><a href="#anchorAbout" data-i18n="about" title="about"></a></li>
+    </ul>
+  </nav>
+
+  <div class="wrapper options">
+
+    <!-- 抓取后缀 -->
+    <section id="anchorSuffix">
+      <h1 class="optionsTitle" data-i18n="suffix"></h1>
+      <div class="optionBox">
+        <span class="explain" data-i18n="suffixTip"></span>
+        <table id="extList">
+          <tr>
+            <th data-i18n="suffix"></th>
+            <th data-i18n="filterSize"></th>
+            <th data-i18n="enable"></th>
+            <th data-i18n="delete"></th>
+          </tr>
+        </table>
+        <div class="flex-end">
+          <button type="button" id="AddExt" class="button2" data-i18n="addSuffix" title="add Suffix"></button>
+          <button type="button" id="ResetExt" data-reset="Ext" data-i18n="resetSettings" title="reset Suffixs"></button>
+          <button type="button" id="allDisable" data-switch="Ext" data-i18n="disableAll"
+            title="disable All Ext"></button>
+          <button type="button" id="allEnable" data-switch="Ext" data-i18n="enableAll" title="enable All Ext"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 抓取类型 -->
+    <section id="anchorType">
+      <h1 class="optionsTitle" data-i18n="type"></h1>
+      <div class="optionBox">
+        <span class="explain" data-i18n="typeTip"></span>
+        <table id="typeList">
+          <tr>
+            <th data-i18n="type"></th>
+            <th data-i18n="filterSize"></th>
+            <th data-i18n="enable"></th>
+            <th data-i18n="delete"></th>
+          </tr>
+        </table>
+        <div class="flex-end">
+          <button type="button" id="AddType" class="button2" data-i18n="addType" title="add Type"></button>
+          <button type="button" id="ResetType" data-reset="Type" data-i18n="resetSettings" title="reset Types"></button>
+          <button type="button" id="allDisable" data-switch="Type" data-i18n="disableAll"
+            title="disable All Types"></button>
+          <button type="button" id="allEnable" data-switch="Type" data-i18n="enableAll"
+            title="enable All Types"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 正则匹配 -->
+    <section id="anchorRegexMatch">
+      <h1 class="optionsTitle">
+        <img src="img/regex.png" style="width: 18px" class="regex" /><span data-i18n-outer="regexMatch"></span> / <span
+          data-i18n-outer="blockResource"></span>
+      </h1>
+      <div class="optionBox">
+        <span class="explain"><b data-i18n="blockResource"></b>
+          <p data-i18n-outer="blockResourceTip"></p>
+        </span><br>
+        <span class="explain"><b data-i18n="flag"></b>
+
+        </span><br>
+        <span class="explain"><b data-i18n="suffix"></b>
+          <p data-i18n-outer="regexSuffixTip"></p>
+        </span><br>
+        <span class="explain"><b data-i18n="regexTip"></b></span><br><br>
+        <table id="regexList">
+          <tr>
+            <th data-i18n="flag"></th>
+            <th data-i18n="regexExpression"></th>
+            <th data-i18n="suffix"></th>
+            <th data-i18n="blockResource"></th>
+            <th data-i18n="enable"></th>
+            <th data-i18n="delete"></th>
+          </tr>
+        </table>
+        <div class="flex-end">
+          <button type="button" id="AddRegex" class="button2" data-i18n="addRegex" title="add Regex"></button>
+          <button type="button" id="ResetRegex" data-reset="Regex" data-i18n="resetSettings"
+            title="reset Regex"></button>
+          <button type="button" id="allDisable" data-switch="Regex" data-i18n="disableAll"
+            title="disable All Regex"></button>
+          <button type="button" id="allEnable" data-switch="Regex" data-i18n="enableAll"
+            title="enable All Regex"></button>
+        </div>
+        <span style="font-weight: bold; font-size: 15px" data-i18n="regexTest"></span><br />
+        <label for="testUrl">URL</label><br />
+        <input type="text" id="testUrl" style="width: 590px" /><br />
+        <label for="testRegex" data-i18n="regex"></label><br />
+        <input type="text" id="testRegex" style="width: 590px" /><br />
+        <label for="testFlag" data-i18n="flag"></label><br />
+        <input type="text" id="testFlag" style="width: 20px" value="ig" maxlength="4" />
+        <span style="color: #ff0000" id="testResult" data-i18n="noMatch"></span>
+      </div>
+    </section>
+
+    <!-- 屏蔽网站 -->
+    <section id="anchorBlockUrl">
+      <h1 class="optionsTitle" data-i18n="blockUrl"></h1>
+      <div class="optionBox">
+        <div class="item">
+          <div data-i18n="setWhiteList"></div>
+          <div class="switch">
+            <label class="switchLabel switchRadius">
+              <input type="checkbox" id="blockUrlWhite" save="click" class="switchInput" />
+              <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+            </label>
+          </div>
+        </div>
+        <span class="explain" data-i18n="blockUrlTips"></span>
+        <table id="blockUrlList">
+          <tr>
+            <th>URL</th>
+            <th data-i18n="enable"></th>
+            <th data-i18n="delete"></th>
+          </tr>
+        </table>
+        <div class="flex-end">
+          <button type="button" id="blockAddUrl" class="button2" data-i18n="addUrl" title="add Url"></button>
+          <button type="button" id="ResetBlockUrl" data-reset="blockUrl" data-i18n="resetSettings"
+            title="reset block Url"></button>
+          <button type="button" id="allDisable" data-switch="blockUrl" data-i18n="disableAll"
+            title="disable All block Url"></button>
+          <button type="button" id="allEnable" data-switch="blockUrl" data-i18n="enableAll"
+            title="enable All block Url"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 脚本设置 -->
+    <section id="anchorScriptSettings">
+      <h1 class="optionsTitle" data-i18n="Script"></h1>
+      <div class="optionBox" id="scriptOption">
+        <div class="list loose">
+
+          <div class="item">
+            <div data-i18n="alwaysSearch"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" save="click" id="deepSearch" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+        <div class="flex-end">
+          <button type="button" class="resetOption" data-i18n="resetSettings"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 复制选项 -->
+    <section id="anchorCopy">
+      <h1 class="optionsTitle">
+        <img src="img/copy.png" style="width: 18px" class="copy" alt="Copy icon" />
+        <p data-i18n-outer="copy"></p>
+      </h1>
+      <div class="optionBox">
+        <span class="explain">
+          <p data-i18n-outer="copyTip"></p><br />
+          <a href="https://o2bmm.gitbook.io/cat-catch/docs/tag" target="_blank" data-i18n="replaceKeywordList"></a><br /><br />
+        </span>
+        <div class="item">
+          <div>HLS m3u8</div>
+          <textarea id="copyM3U8" save="input" type="text" class="width100"></textarea>
+        </div>
+        <div class="item" style="margin-top: 10px;">
+          <div>DASH mpd</div>
+          <textarea id="copyMPD" save="input" type="text" class="width100"></textarea>
+        </div>
+        <div class="item" style="margin-top: 10px;">
+          <div data-i18n="otherFiles"></div>
+          <textarea id="copyOther" save="input" type="text" class="width100"></textarea>
+        </div>
+        <div class="flex-end">
+          <button type="button" class="resetOption" data-i18n="resetSettings"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Aria2 RPC -->
+    <section id="anchorAria2Rpc">
+      <h1 class="optionsTitle">
+        <img src="img/aria2.png" style="width: 18px" class="aria2" />
+        Aria2 RPC
+      </h1>
+      <div class="optionBox">
+        <span class="explain">
+          <p data-i18n-outer="aria2Tip"></p>
+          <a href="https://aria2.github.io/manual/en/html/aria2c.html#rpc-interface" target="_blank"
+            data-i18n="documentation"></a>
+        </span>
+        <div class="list">
+          <div class="item">
+            <div><span data-i18n-outer="enable"></span> Aria2 RPC</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="enableAria2Rpc" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+          <div class="item">
+            <div data-i18n="autoSetRefererCookieParams"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="enableAria2RpcReferer" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+          <div class="item">
+            <div data-i18n="secretKey"></div>
+            <input id="aria2RpcToken" save="input" type="password" class="width100">
+          </div>
+          <div class="item">
+            <div>Aria2 RPC <span data-i18n-outer="address"></span></div>
+            <input id="aria2Rpc" save="input" type="text" class="width100">
+          </div>
+          <div class="flex-end">
+            <button type="button" class="resetOption" data-i18n="resetSettings"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 发送数据 -->
+    <section id="anchorSend2local">
+      <h1 class="optionsTitle">
+        <img src="img/send.svg" style="width: 18px" class="regex" alt="Send icon" />
+        <p data-i18n-outer="send2local"></p>
+      </h1>
+      <div class="optionBox">
+        <span class="explain">
+          <a href="https://o2bmm.gitbook.io/cat-catch/docs/settings#send" target="_blank" data-i18n="documentation"></a>
+        </span>
+        <div class="list">
+          <div class="item">
+            <div><span data-i18n-outer="autoSend"></span></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="send2local" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div><span data-i18n="manualSend"></span></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="send2localManual" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div><span data-i18n-outer="requestMethod"></span> </div>
+            <div class="switch switchSelect">
+              <select id="send2localMethod" class="select" save="select">
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="item">
+            <div><span>Content-Type</span> </div>
+            <div class="switch switchSelect send2localType">
+              <select id="send2localType" class="select" save="select">
+                <option value="0">application/json;charset=utf-8</option>
+                <option value="1">multipart/form-data</option>
+                <option value="2">application/x-www-form-urlencoded</option>
+                <option value="3">text/plain</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="item">
+            <div><span data-i18n-outer="address"></span></div>
+            <input id="send2localURL" save="input" type="text" class="width100">
+          </div>
+
+          <div class="item">
+            <div>
+              <p data-i18n="requestBody"></p>
+              <a href="https://o2bmm.gitbook.io/cat-catch/docs/tag" target="_blank" data-i18n="replaceKeywordList"></a>
+            </div>
+            <textarea id="send2localBody" save="input" class="width100 break-all" rows="3"></textarea>
+          </div>
+
+          <div class="flex-end">
+            <button type="button" class="resetOption" data-i18n="resetSettings"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- m3u8DL -->
+    <section id="anchorM3u8dl">
+      <h1 class="optionsTitle" data-i18n="sideurlprotocol">URL Protocol m3u8dl</h1>
+      <div class="optionBox" id="m3u8dlOption">
+        <span class="explain">
+          <a href="https://github.com/nilaoda/N_m3u8DL-CLI" target="_blank">N_m3u8DL-CLI</a> / <a
+            href="https://github.com/nilaoda/N_m3u8DL-RE" target="_blank">N_m3u8DL-RE</a>
+          <p data-i18n-outer="m3u8DLTips"></p>
+          <a href="https://o2bmm.gitbook.io/cat-catch/docs/m3u8dl" target="_blank" data-i18n="documentation"></a>
+        </span>
+        <div class="list">
+          <div class="item">
+            <div><span data-i18n-outer="enable"></span> m3u8dl:// <span data-i18n-outer="download"></span> m3u8 or mpd
+            </div>
+            <div class="switch m3u8DL">
+              <select id="m3u8dl" class="select" save="select">
+                <option value="0" data-i18n="disable"></option>
+                <option value="1">N_m3u8DL-CLI</option>
+                <option value="2">N_m3u8DL-RE</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="confirmParameters"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="m3u8dlConfirm" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- <div class="item"></div> -->
+
+          <div class="item">
+            <div style="margin-bottom: 5px;margin-top: 5px;">
+              <p data-i18n="parameterSetting"></p>
+
+              <a href="https://o2bmm.gitbook.io/cat-catch/docs/tag" target="_blank" data-i18n="replaceKeywordList"></a>
+              <a href="https://nilaoda.github.io/N_m3u8DL-CLI/Advanced.html" target="_blank"
+                style="margin-left: 10px;">N_m3u8DL-CLI <span data-i18n-outer="parameter"></span></a>
+
+              <a href="https://github.com/nilaoda/N_m3u8DL-RE?tab=readme-ov-file#%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%82%E6%95%B0"
+                target="_blank" style="margin-left: 10px;">N_m3u8DL-RE <span data-i18n-outer="parameter"></span></a>
+            </div>
+            <textarea id="m3u8dlArg" save="input" type="text" class="width100 break-all" rows="3"></textarea>
+          </div>
+          <div class="flex-end">
+            <button type="button" class="resetOption" data-i18n="resetSettings"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第三方本地程序调用 -->
+    <section id="anchorInvokeApp">
+      <h1 class="optionsTitle">
+        <img src="img/invoke.svg" style="width: 18px" class="invoke" />
+        <p data-i18n-outer="invokeApp"></p>
+      </h1>
+      <div class="optionBox" id="invokeOption">
+        <div class="list">
+          <div class="item">
+            <div data-i18n="enable"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="invoke" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="confirmParameters"></div>
+            <br>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="invokeConfirm" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item" style="margin-bottom: 5px;margin-top: 5px;">
+            <div>
+              <p data-i18n="parameterSetting"></p>
+              <a href="https://o2bmm.gitbook.io/cat-catch/docs/tag" target="_blank" data-i18n="replaceKeywordList"></a>
+            </div>
+            <textarea id="invokeText" save="input" type="text" class="width100 break-all" rows="3"></textarea>
+          </div>
+          <div class="flex-end">
+            <button type="button" class="resetOption" data-i18n="resetSettings"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 替换标签 -->
+    <section id="anchorReplaceTags">
+      <h1 class="optionsTitle" data-i18n="replaceTags"></h1>
+      <div class="optionBox" id="tag">
+        <span class="explain"></span>
+        <div style="margin-bottom: 5px;">
+          <a href="https://o2bmm.gitbook.io/cat-catch/docs/tag" target="_blank" data-i18n="replaceKeywordList"></a>
+        </div>
+        <div class="list">
+          <div class="item">
+            <div data-i18n="customSaveFileName"></div>
+            <textarea id="downFileName" save="input" type="text" class="width100"></textarea>
+          </div>
+          <div class="item">
+            <div>${userAgent} <span data-i18n-outer="userAgentTip"></span></div>
+            <textarea id="userAgent" save="input" type="text" class="width100"></textarea>
+          </div>
+          <div class="item">
+            <div>${mobileUserAgent} / <span data-i18n-outer="simulateMobile"></span>User Agent</div>
+            <textarea id="MobileUserAgent" save="input" type="text" class="width100"></textarea>
+          </div>
+          <div id="testTag" class="hide break-all">
+            <div class="item">
+              <div>
+                <p data-i18n="test"></p>
+              </div>
+              <textarea id="testTextarea" class="width100 break-all"
+                rows="3">${url} ${referer|exists:'--headers "Referer:*"'} ${url|regexp:"(https?://[^?]*)"|replace:"http://","https://"|to:base64}</textarea>
+            </div>
+            <label for="url">${url}</label><input type="text" class="width100" value="https://bmmmd.com/test.m3u8"
+              id="url">
+            <label for="referer">${referer}</label><input type="text" class="width100" value="https://bmmmd.com/"
+              id="referer">
+            <label for="initiator">${initiator}</label><input type="text" class="width100" value="https://bmmmd.com"
+              id="initiator">
+            <label for="webUrl">${webUrl}</label><input type="text" class="width100" value="https://bmmmd.com/test.html"
+              id="webUrl">
+            <label for="title">${title}</label><input type="text" class="width100" value="test Video" id="title">
+            <span data-i18n-outer="result"></span>:<br><span id="tagTestResult"></span>
+          </div>
+          <div class="flex-end">
+            <button type="button" id="showTestTag" data-i18n="test"></button>
+            <button type="button" class="resetOption" data-i18n="resetSettings"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 下载器 -->
+    <section id="anchorDownloader">
+      <h1 class="optionsTitle">
+        <img src="img/cat-down.png" style="width: 18px" class="cat-down" alt="Downloader icon" />
+        <p data-i18n-outer="downloader"></p>
+      </h1>
+      <div class="optionBox" id="downOption">
+        <span class="explain" data-i18n="downloaderTip"></span>
+        <div class="list">
+          <div class="item">
+            <div data-i18n="alwaysDisableCatCatcher"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="catDownload" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="autoClosePageAfterDownload"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="downAutoClose" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="openDownloaderPageInBackground"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="downActive" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="downloadWhileSaving"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="downStream" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="flex-end">
+            <button type="button" class="resetOption" data-i18n="resetSettings"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- m3u8解析器 -->
+    <section id="anchorM3u8Parser">
+      <h1 class="optionsTitle">
+        <img src="img/parsing.png" style="width: 18px" class="parsing" alt="Parser icon" />
+        <p data-i18n-outer="m3u8Parser"></p>
+      </h1>
+      <div class="optionBox" id="m3u8Option">
+        <div class="list">
+
+          <div class="item">
+            <div><img src="img/download.svg" style="width: 18px" class="download"> <span
+                data-i18n-outer="autoDownM3u8Tip"></span></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="m3u8AutoDown" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="downloadThreads"></div>
+            <div class="switch">
+              <input id="M3u8Thread" save="input" type="number" min="1" max="32" class="width3rem">
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="mp4Format"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="M3u8Mp4" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="audioOnly"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="M3u8OnlyAudio" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="skipDecryption"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="M3u8SkipDecrypt" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="downloadWhileSaving"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="M3u8StreamSaver" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="ffmpegTranscoding"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="M3u8Ffmpeg" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="autoClosePageAfterDownload"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="M3u8AutoClose" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="flex-end">
+            <button type="button" class="resetOption" data-i18n="resetSettings"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 其他设置 -->
+    <section id="anchorOtherSettings">
+      <h1 class="optionsTitle" data-i18n="otherSettings"></h1>
+      <div class="optionBox" id="OtherOption">
+        <div class="list loose">
+          <div class="item">
+            <div>
+              <span data-i18n-outer="previewMode"></span> <select id="PlayerTemplate" class="select"></select>
+            </div>
+            <input id="Player" save="input" type="text" class="width100"
+              data-i18n-placeholder="previewModePlaceholder" />
+          </div>
+
+          <div class="item">
+            <div data-i18n="customFilenameOption"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" save="click" id="TitleName" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="saveAsOption"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="saveAs" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="badgeNumber"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="badgeNumber" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="iconOption"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" save="click" id="ShowWebIco" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="clearOption"></div>
+            <div class="switch switchSelect">
+              <select id="autoClearMode" class="select" save="select">
+                <option value="0" data-i18n="doNotClear"></option>
+                <option value="1" data-i18n="normalClear"></option>
+                <option value="2" data-i18n="moreFrequent"></option>
+              </select>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="excludeDuplicateResources"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="checkDuplicates" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="onlineServiceAddress"></div>
+            <div class="switch switchSelect">
+              <select id="onlineServiceAddress" class="select" save="select">
+                <option value="0" data-i18n="withinChina"></option>
+                <option value="1">cloudflare</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="defaultPopup"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="popup" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="selectWebpage" style="margin-left: 2rem;"></div>
+            <div class="switch switchSelect">
+              <select id="popupMode" class="select" save="select">
+                <option value="0" data-i18n="dopreview"></option>
+                <option value="1" data-i18n="dopopup"></option>
+                <option value="2" data-i18n="winpreview"></option>
+                <option value="3" data-i18n="winpopup"></option>
+              </select>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="useSidePanel"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="sidePanel" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+        <div class="flex-end">
+          <button type="button" class="resetOption" data-i18n="resetSettings"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 自定义css -->
+    <section id="anchorCustomCSS">
+      <h1 class="optionsTitle" data-i18n="customCSS"></h1>
+      <div class="optionBox">
+        <div class="item">
+          <textarea id="css" save="input" type="text" class="width100" rows="10"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- MQTT Configuration -->
+    <section id="anchorMQTT">
+      <h1 class="optionsTitle">
+        <img src="img/mqtt.svg" style="width: 18px" class="mqtt" />
+        <i18n>MQTT</i18n>
+      </h1>
+      <div class="optionBox" id="mqttOption">
+        <div class="list loose">
+          <div class="item">
+            <div data-i18n="enable"></div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="mqttEnable" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="mqttBroker"></div>
+            <input id="mqttBroker" save="input" type="text" class="width100" placeholder="test.mosquitto.org"
+              data-i18n-placeholder="mqttBrokerHelp" />
+          </div>
+
+          <div class="item">
+            <div data-i18n="port"></div>
+            <input id="mqttPort" save="input" type="number" min="1" max="65535" class="width100" placeholder="8081" />
+          </div>
+
+          <div class="item">
+            <div data-i18n="mqttPath"></div>
+            <input id="mqttPath" save="input" type="text" class="width100" placeholder="/mqtt"
+              data-i18n-placeholder="mqttPathHelp" />
+          </div>
+
+          <div class="item">
+            <div data-i18n="mqttProtocol"></div>
+            <div class="switch switchSelect">
+              <select id="mqttProtocol" class="select" save="select">
+                <option value="wss" data-i18n="mqttProtocolWss"></option>
+                <option value="ws" data-i18n="mqttProtocolWs"></option>
+              </select>
+            </div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="mqttClientId"></div>
+            <input id="mqttClientId" save="input" type="text" class="width100" placeholder="cat-catch-client"
+              data-i18n-placeholder="mqttClientIdHelp" />
+          </div>
+
+          <div class="item">
+            <div data-i18n="mqttTitleLength"></div>
+            <input id="mqttTitleLength" save="input" type="number" min="1" max="1000" class="width100" value="100"
+              data-i18n-placeholder="mqttTitleLengthHelp" />
+          </div>
+
+          <div class="item">
+            <div data-i18n="mqttUsername"></div>
+            <input id="mqttUser" save="input" type="text" class="width100"
+              data-i18n-placeholder="mqttCredentialsHelp" />
+          </div>
+
+          <div class="item">
+            <div data-i18n="mqttPassword"></div>
+            <input id="mqttPassword" save="input" type="password" class="width100"
+              data-i18n-placeholder="mqttCredentialsHelp" />
+          </div>
+
+          <div class="item">
+            <div data-i18n="mqttTopic"></div>
+            <input id="mqttTopic" save="input" type="text" class="width100" placeholder="cat-catch/media"
+              data-i18n-placeholder="mqttTopicHelp" />
+          </div>
+
+          <div class="item">
+            <div data-i18n="mqttQos"></div>
+            <div class="switch switchSelect">
+              <select id="mqttQos" class="select" save="select">
+                <option value="0">0 <span data-i18n="mqttQos0"></span></option>
+                <option value="1">1 <span data-i18n="mqttQos1"></span></option>
+                <option value="2">2 <span data-i18n="mqttQos2"></span></option>
+              </select>
+            </div>
+            <div class="help-text" data-i18n="mqttQosHelp"></div>
+          </div>
+
+          <div class="item">
+            <div data-i18n="mqttDataFormat"></div>
+            <textarea id="mqttDataFormat" save="input" class="width100" rows="4"
+              data-i18n-placeholder="mqttDataFormatHelp"></textarea>
+            <div class="help-text">
+              <a href="https://o2bmm.gitbook.io/cat-catch/docs/tag" target="_blank" data-i18n="replaceKeywordList"></a>
+              <span data-i18n="mqttDataFormatDefault"></span>
+            </div>
+          </div>
+
+          <div class="flex-end">
+            <button type="button" class="resetOption" data-i18n="resetSettings"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 操作按钮 -->
+    <section id="anchorOperation">
+      <h1 class="optionsTitle" data-i18n="operation"></h1>
+      <div class="optionBox">
+        <div class="flex-end" style="justify-content: center">
+          <input id="importOptionsFile" type="file" class="hide" />
+          <button type="button" id="exportOptions" data-i18n="exportSettings"></button>
+          <button type="button" id="importOptions" data-i18n="importConfiguration"></button>
+          <button type="button" id="ClearData" data-i18n="clearCapturedData"></button>
+          <button type="button" id="ResetAllOption" data-i18n="resetAllSettings"></button>
+          <button type="button" id="extensionReload" data-i18n="restartExtension"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 关于 -->
+    <section id="anchorAbout">
+      <h1 class="optionsTitle" data-i18n="about"></h1>
+      <div class="optionBox">
+        <div class="item">
+          <div id="version"></div>
+        </div>
+        <div class="item">
+          <span data-i18n-outer="documentation"></span>:
+          <a href="https://o2bmm.gitbook.io/cat-catch/" target="_blank">https://o2bmm.gitbook.io/cat-catch/</a>
+        </div>
+        <div class="item">
+          Github:
+          <a href="https://github.com/xifangczy/cat-catch" target="_blank">https://github.com/xifangczy/cat-catch</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="lib/base64.js" defer></script>
+  <script src="js/options.js" defer></script>
+  <script src="js/i18n.js" defer></script>
+</body>
+
+</html>

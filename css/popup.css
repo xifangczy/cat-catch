@@ -1,0 +1,267 @@
+a {
+  text-decoration: none;
+  word-break: break-all;
+}
+a:hover {
+  text-decoration: underline;
+}
+body {
+  font-family: arial, sans-serif;
+  font-size: 0.8rem;
+  width: 40rem;
+  overflow-x: hidden;
+  background: var(--background-color);
+  margin: 0;
+}
+.fixFirefoxRight {
+  margin-right: 5px;
+}
+.panel {
+  border: 1px solid #ddd0;
+  margin-bottom: 1px;
+}
+.panel-heading {
+  padding: 5px 5px 5px 5px;
+  background-color: var(--background-color-two);
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.panel-heading .name {
+  flex: auto;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  margin-right: 0.2rem;
+}
+.panel .url,
+.panel .confirm {
+  padding: 5px;
+}
+.icon,
+.favicon {
+  transition: all 0.1s;
+  width: 1.5rem;
+  height: 1.5rem;
+  cursor: pointer;
+}
+.faviconFlag {
+  display: none;
+}
+.icon:hover {
+  transform: scale(1.1);
+}
+.icon:active {
+  transform: scale(0.9);
+}
+.icon.mqtt-sending {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.icon.mqtt-sending:hover {
+  transform: none;
+}
+.panel-heading .icon {
+  padding-left: 2px;
+}
+.favicon {
+  padding-right: 2px;
+}
+.panel-heading .size {
+  float: right;
+  font-weight: bold;
+}
+#Tips,
+#TipsFixed {
+  left: 0;
+  right: 0;
+  text-align: center;
+  z-index: 9999;
+  pointer-events: none;
+  color: var(--text2-color);
+  font-weight: bold;
+  border: 1px solid #cdcdcd12;
+  border-radius: 2px;
+  background: var(--background-color-two);
+  padding: 0 10px;
+  margin-bottom: 1px;
+}
+#TipsFixed {
+  position: fixed;
+  display: none;
+}
+#preview {
+  max-height: 300px;
+  max-width: 100%;
+  text-align: center;
+}
+button,
+.button2 {
+  padding: 3px 3px 3px 3px;
+  /* font-size: 0.9rem; */
+}
+.Tabs {
+  display: flex;
+}
+.TabButton {
+  text-align: center;
+  border: solid 1px #c7c7c700;
+  color: var(--text2-color);
+  border-radius: 5px 5px 0 0;
+  cursor: pointer;
+  width: 50%;
+  /* display: flex; */
+  padding: 3px;
+  margin: 1px 2px 0 2px;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: center;
+  user-select: none;
+}
+.flex {
+  display: flex;
+}
+.TabButton.Active {
+  background-color: var(--background-color-two);
+  border-bottom-color: transparent;
+  font-weight: bold;
+}
+.TabButton.Active div {
+  font-weight: bold;
+}
+.DownCheck {
+  margin: 0 2px 0 0;
+  width: 1.2rem;
+  height: 1.2rem;
+  flex: 0 0 auto;
+}
+.TabShow {
+  display: block !important;
+}
+#down,
+.more {
+  display: flex;
+  flex-wrap: wrap;
+  position: fixed;
+  width: 100%;
+  z-index: 999;
+  background-color: var(--background-color-opacity);
+}
+#down {
+  bottom: 0;
+  justify-content: space-evenly;
+}
+.more {
+  display: none;
+  bottom: 26px;
+  justify-content: flex-start;
+  padding-bottom: 2px;
+  padding-top: 2px;
+  z-index: 9999;
+}
+.more button {
+  margin-left: 0.1rem;
+  font-size: 12px;
+}
+#filter {
+  flex-wrap: wrap;
+}
+#filter #regular button {
+  margin-left: 0px;
+}
+#filter #regular input {
+  width: 98%;
+}
+#filter .regular {
+  margin-left: 5px;
+}
+#filter #ext {
+  display: flex;
+  color: var(--text-color);
+}
+#filter div {
+  margin-left: 5px;
+}
+.flexFilter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.container {
+  margin-bottom: 30px;
+}
+#screenshots {
+  max-width: 100%;
+  max-height: 260px;
+  cursor: pointer;
+  margin: auto;
+}
+.flex-end {
+  justify-content: flex-end;
+}
+#otherOptions {
+  margin: 5px;
+}
+#PlayControl {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+}
+#PlayControl .button2,
+#PlayControl .button {
+  margin-left: 2px;
+}
+#PlayControl #playbackRate {
+  width: 3em;
+  height: 20px;
+}
+#otherOptions select {
+  margin-top: 2px;
+  margin-bottom: 2px;
+  width: 100%;
+}
+#PlayControl .loop {
+  margin: 0 5px 0 5px;
+}
+label {
+  cursor: pointer;
+  user-select: none;
+}
+#PlayControl .volume {
+  width: 100px;
+}
+.flexColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.flexRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.nowrap {
+  word-break: keep-all;
+}
+.otherScript .button2,
+.otherFeat .button2 {
+  width: 100%;
+  margin-right: 10px;
+  text-align: center;
+}
+.otherTips {
+  text-align: center;
+  color: var(--text2-color);
+  font-weight: bold;
+}
+.moreButton {
+  display: flex;
+}
+.moreButton div {
+  margin-right: 3px;
+}
+.panel .confirm {
+  text-align: center;
+}

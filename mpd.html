@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>titledash</title>
+  <link rel="stylesheet" type="text/css" href="css/public.css" media="all" />
+  <link rel="stylesheet" type="text/css" href="css/options.css" media="all" />
+  <script src="lib/jquery.min.js"></script>
+  <script src="js/init.js"></script>
+  <script src="js/firefox.js"></script>
+  <script src="lib/mpd-parser.min.js"></script>
+  <script src="js/function.js"></script>
+  <script src="js/mpd.js"></script>
+</head>
+
+<body>
+  <div class="wrapper1024 dash">
+    <section id="loading">
+      <div class="optionBox" data-i18n="loading"></div>
+    </section>
+
+    <section id="mpdCustom" class="hide">
+      <h1 class="optionsTitle" data-i18n="titledash"></h1>
+      <div class="optionBox">
+        <input type="text" id="mpdUrl" placeholder="mpd URL" class="fullInput" />
+        <input type="text" id="referer" placeholder="Referer" class="fullInput" />
+        <button id="parse" type="button" data-i18n="parser"></button>
+      </div>
+    </section>
+
+    <section id="main" class="hide">
+      <h1 class="optionsTitle" data-i18n="titledash"></h1>
+      <div class="optionBox">
+        <div class="block">
+          mpd url
+          <p><a id="mpd_url"></a></p>
+        </div>
+        <div class="block" id="tips"></div>
+        <div class="videoInfo flex">
+          <div id="count"></div>
+          <div id="info"></div>
+        </div>
+        <div class="block" id="textarea">
+          <textarea id="media_file" spellcheck="false" data-type="link" class="width100"></textarea>
+        </div>
+        <div class="flex">
+          <div>
+            <p data-i18n-outer="selectVideo"></p>: <select id="mpdVideoLists" class="select"></select>
+          </div>
+          <button id="getVideo" data-i18n="extractSlices"></button>
+          <button id="videoToM3u8" data-i18n="convertToM3U8"></button>
+        </div>
+        <div class="line"></div>
+        <div class="flex">
+          <div>
+            <p data-i18n-outer="selectAudio"></p>: <select id="mpdAudioLists" class="select"></select>
+          </div>
+          <button id="getAudio" data-i18n="extractSlices"></button>
+          <button id="audioToM3u8" data-i18n="convertToM3U8"></button>
+        </div>
+        <div style="display: flex; margin-top: 10px;">
+          <div id="progress"></div>
+          <div id="fileSize"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script src="js/i18n.js"></script>
+</body>
+
+</html>

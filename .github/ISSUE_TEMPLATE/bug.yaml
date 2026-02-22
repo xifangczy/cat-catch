@@ -1,0 +1,49 @@
+name: Bug 报告 Bug Report
+description: 创建一个bug报告. File a bug report
+body:
+  - type: input
+    id: version
+    attributes:
+      label: 扩展版本号 extension version
+      placeholder: e.g. vX.Y.Z
+  - type: dropdown
+    id: browser
+    attributes:
+      label: 浏览器 browser
+      options:
+        - Google Chrome
+        - Microsoft Edge
+        - Microsoft Edge (Android)
+        - Firefox
+        - Firefox (Android)
+        - Chromium
+        - 360浏览器
+        - 其他基于 Chromium 的浏览器 / Other Chromium-based browsers
+    validations:
+      required: true
+  - type: input
+    id: browserVersion
+    attributes:
+      label: 浏览器版本号 browser version
+      placeholder: e.g. vX.Y.Z
+  - type: input
+    id: url
+    attributes:
+      label: 涉及网址 related URL
+      placeholder: e.g. https://example.com
+      description: 请提供发生问题的网址 需要授权登陆才能播放的请通过邮箱提交bug
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: 我已在 [issues](https://github.com/xifangczy/cat-catch/issues) 通过搜索, 未找到解决办法。 The issue observed is not already reported by searching on Github under [issues](https://github.com/xifangczy/cat-catch/issues)
+          required: true
+        - label: 我已查看 [FAQ](https://github.com/xifangczy/cat-catch/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98-FAQ) 未找到解决办法。 I've checked the [FAQ](https://github.com/xifangczy/cat-catch/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98-FAQ) but couldn't find a solution.
+          required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: 请详细描述问题 What actually happened?
+    validations:
+      required: true
