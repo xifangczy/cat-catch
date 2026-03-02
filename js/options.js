@@ -18,11 +18,17 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
     $(`<style>${items.css}</style>`).appendTo("head");
     const $extList = $("#extList");
     for (let key in items.Ext) {
-        $extList.append(Gethtml("Ext", { ext: items.Ext[key].ext, size: items.Ext[key].size, state: items.Ext[key].state }));
+        if (items.Ext[key].operator === undefined) {
+            items.Ext[key].operator = ">=";
+        }
+        $extList.append(Gethtml("Ext", { ext: items.Ext[key].ext, size: items.Ext[key].size, operator: items.Ext[key].operator, state: items.Ext[key].state }));
     }
     const $typeList = $("#typeList");
     for (let key in items.Type) {
-        $typeList.append(Gethtml("Type", { type: items.Type[key].type, size: items.Type[key].size, state: items.Type[key].state }));
+        if (items.Type[key].operator === undefined) {
+            items.Type[key].operator = ">=";
+        }
+        $typeList.append(Gethtml("Type", { type: items.Type[key].type, size: items.Type[key].size, operator: items.Type[key].operator, state: items.Type[key].state }));
     }
     const $regexList = $("#regexList");
     for (let key in items.Regex) {
@@ -84,11 +90,11 @@ function Gethtml(Type, Param = new Object()) {
     switch (Type) {
         case "Ext":
             html = `<td><input type="text" value="${Param.ext ? Param.ext : ""}" name="text" placeholder="${i18n.suffix}" class="ext"></td>`
-            html += `<td><input type="number" value="${Param.size ? Param.size : 0}" class="size" name="size">KB</td>`
+            html += `<td><input type="text" value="${Param.operator == ">=" || Param.operator == "~" ? "" : Param.operator}${Param.size ? Param.size : 0}" class="size" name="size">KB</td>`
             break;
         case "Type":
             html = `<td><input type="text" value="${Param.type ? Param.type : ""}" name="text" placeholder="${i18n.type}" class="type"></td>`
-            html += `<td><input type="number" value="${Param.size ? Param.size : 0}" class="size" name="size">KB</td>`
+            html += `<td><input type="text" value="${Param.operator == ">=" || Param.operator == "~" ? "" : Param.operator}${Param.size ? Param.size : 0}" class="size" name="size">KB</td>`
             break;
         case "Regex":
             html = `<td><input type="text" value="${Param.type ? Param.type : ""}" name="type" class="regexType"></td>`
@@ -336,37 +342,64 @@ $("#importOptions").bind("click", function () {
     $("#importOptionsFile").click();
 });
 
+function SaveGetVal(Obj) {
+    let text = Obj.find("[name=text]").val()?.trim();
+    let size = Obj.find("[name=size]").val()?.trim();
+    let state = Obj.find("[name=state]").prop("checked");
+
+    // size 只保留操作符号 和 数字 和 范围符号 - 和 中间的空格
+    size = size.replace(/[^\d><=!-\s]/g, "");
+
+    let operator = ">=";    // 默认使用大于等于符号
+
+    // 判断是否范围格式 如果存在 - 则分离 前后
+    const rangeMatch = size.match(/^(\d+)-(\d+)$/);
+    if (rangeMatch) { operator = "~"; }
+
+    // 比较符号
+    const operatorMatch = size.match(/^(>=|<=|>|<|=|!=)/);
+    if (operatorMatch) {
+        operator = operatorMatch[0];
+        size = parseInt(size.replace(operator, ""));
+    }
+    if (operator != "~") {
+        size = parseInt(size);
+        if (isNaN(size)) { size = 0; }
+    }
+    if (isEmpty(size)) { size = 0; }
+    text = text.toLowerCase();
+
+    return { text, size, operator, state };
+}
+
 // 保存 后缀 类型 正则 配置
 function Save(option, sec = 0) {
     clearTimeout(debounce);
     debounce = setTimeout(() => {
         if (option == "Ext") {
             let Ext = new Array();
-            $("#extList tr").each(function () {
-                const _this = $(this);
-                let GetText = _this.find("[name=text]").val();
-                let GetSize = parseInt(_this.find("[name=size]").val());
-                let GetState = _this.find("[name=state]").prop("checked");
-                if (isEmpty(GetText)) { return true; }
-                if (isEmpty(GetSize)) { GetSize = 0; }
-                Ext.push({ ext: GetText.toLowerCase(), size: GetSize, state: GetState });
+            $("#extList tr").each(function (index) {
+                if (index === 0) return true;
+
+                const { text, size, operator, state } = SaveGetVal($(this));
+
+                if (isEmpty(text)) { return true; }
+                Ext.push({ ext: text, size, operator, state });
             });
             chrome.storage.sync.set({ Ext: Ext });
             return;
         }
         if (option == "Type") {
             let Type = new Array();
-            $("#typeList tr").each(function () {
-                const _this = $(this);
-                let GetText = _this.find("[name=text]").val();
-                let GetSize = parseInt(_this.find("[name=size]").val());
-                let GetState = _this.find("[name=state]").prop("checked");
-                if (isEmpty(GetText)) { return true; }
-                if (isEmpty(GetSize)) { GetSize = 0; }
-                GetText = GetText.trim();
-                const test = GetText.split("/");
+            $("#typeList tr").each(function (index) {
+                if (index === 0) return true;
+
+                const { text, size, operator, state } = SaveGetVal($(this));
+
+                if (isEmpty(text)) { return true; }
+                const test = text.split("/");
                 if (test.length == 2 && !isEmpty(test[0]) && !isEmpty(test[1])) {
-                    Type.push({ type: GetText.toLowerCase(), size: GetSize, state: GetState });
+                    Type.push({ type: text, size, operator, state });
                 }
             });
             chrome.storage.sync.set({ Type: Type });
@@ -374,7 +407,9 @@ function Save(option, sec = 0) {
         }
         if (option == "Regex") {
             let Regex = new Array();
-            $("#regexList tr").each(function () {
+            $("#regexList tr").each(function (index) {
+                if (index === 0) return true;
+
                 const _this = $(this);
                 let GetType = _this.find("[name=type]").val();
                 let GetRegex = _this.find("[name=regex]").val();
@@ -395,7 +430,9 @@ function Save(option, sec = 0) {
         }
         if (option == "blockUrl") {
             let blockUrl = new Array();
-            $("#blockUrlList tr").each(function () {
+            $("#blockUrlList tr").each(function (index) {
+                if (index === 0) return true;
+
                 const _this = $(this);
                 let url = _this.find("[name=url]").val();
                 let GetState = _this.find("[name=state]").prop("checked");

@@ -72,49 +72,49 @@ G.isMobile = /Mobile|Android|iPhone|iPad/i.test(navigator.userAgent);
 // 所有设置变量 默认值
 G.OptionLists = {
     Ext: [
-        { "ext": "flv", "size": 0, "state": true },
-        { "ext": "hlv", "size": 0, "state": true },
-        { "ext": "f4v", "size": 0, "state": true },
-        { "ext": "mp4", "size": 0, "state": true },
-        { "ext": "mp3", "size": 0, "state": true },
-        { "ext": "wma", "size": 0, "state": true },
-        { "ext": "wav", "size": 0, "state": true },
-        { "ext": "m4a", "size": 0, "state": true },
-        { "ext": "ts", "size": 0, "state": false },
-        { "ext": "webm", "size": 0, "state": true },
-        { "ext": "ogg", "size": 0, "state": true },
-        { "ext": "ogv", "size": 0, "state": true },
-        { "ext": "acc", "size": 0, "state": true },
-        { "ext": "mov", "size": 0, "state": true },
-        { "ext": "mkv", "size": 0, "state": true },
-        { "ext": "m4s", "size": 0, "state": true },
-        { "ext": "m3u8", "size": 0, "state": true },
-        { "ext": "m3u", "size": 0, "state": true },
-        { "ext": "mpeg", "size": 0, "state": true },
-        { "ext": "avi", "size": 0, "state": true },
-        { "ext": "wmv", "size": 0, "state": true },
-        { "ext": "asf", "size": 0, "state": true },
-        { "ext": "movie", "size": 0, "state": true },
-        { "ext": "divx", "size": 0, "state": true },
-        { "ext": "mpeg4", "size": 0, "state": true },
-        { "ext": "vid", "size": 0, "state": true },
-        { "ext": "aac", "size": 0, "state": true },
-        { "ext": "mpd", "size": 0, "state": true },
-        { "ext": "weba", "size": 0, "state": true },
-        { "ext": "opus", "size": 0, "state": true },
-        { "ext": "srt", "size": 0, "state": false },
-        { "ext": "vtt", "size": 0, "state": false },
+        { "ext": "flv", "size": 0, "operator": ">=", "state": true },
+        { "ext": "hlv", "size": 0, "operator": ">=", "state": true },
+        { "ext": "f4v", "size": 0, "operator": ">=", "state": true },
+        { "ext": "mp4", "size": 0, "operator": ">=", "state": true },
+        { "ext": "mp3", "size": 0, "operator": ">=", "state": true },
+        { "ext": "wma", "size": 0, "operator": ">=", "state": true },
+        { "ext": "wav", "size": 0, "operator": ">=", "state": true },
+        { "ext": "m4a", "size": 0, "operator": ">=", "state": true },
+        { "ext": "ts", "size": 0, "operator": ">=", "state": false },
+        { "ext": "webm", "size": 0, "operator": ">=", "state": true },
+        { "ext": "ogg", "size": 0, "operator": ">=", "state": true },
+        { "ext": "ogv", "size": 0, "operator": ">=", "state": true },
+        { "ext": "acc", "size": 0, "operator": ">=", "state": true },
+        { "ext": "mov", "size": 0, "operator": ">=", "state": true },
+        { "ext": "mkv", "size": 0, "operator": ">=", "state": true },
+        { "ext": "m4s", "size": 0, "operator": ">=", "state": true },
+        { "ext": "m3u8", "size": 0, "operator": ">=", "state": true },
+        { "ext": "m3u", "size": 0, "operator": ">=", "state": true },
+        { "ext": "mpeg", "size": 0, "operator": ">=", "state": true },
+        { "ext": "avi", "size": 0, "operator": ">=", "state": true },
+        { "ext": "wmv", "size": 0, "operator": ">=", "state": true },
+        { "ext": "asf", "size": 0, "operator": ">=", "state": true },
+        { "ext": "movie", "size": 0, "operator": ">=", "state": true },
+        { "ext": "divx", "size": 0, "operator": ">=", "state": true },
+        { "ext": "mpeg4", "size": 0, "operator": ">=", "state": true },
+        { "ext": "vid", "size": 0, "operator": ">=", "state": true },
+        { "ext": "aac", "size": 0, "operator": ">=", "state": true },
+        { "ext": "mpd", "size": 0, "operator": ">=", "state": true },
+        { "ext": "weba", "size": 0, "operator": ">=", "state": true },
+        { "ext": "opus", "size": 0, "operator": ">=", "state": true },
+        { "ext": "srt", "size": 0, "operator": ">=", "state": false },
+        { "ext": "vtt", "size": 0, "operator": ">=", "state": false },
     ],
     Type: [
-        { "type": "audio/*", "size": 0, "state": true },
-        { "type": "video/*", "size": 0, "state": true },
-        { "type": "application/ogg", "size": 0, "state": true },
-        { "type": "application/vnd.apple.mpegurl", "size": 0, "state": true },
-        { "type": "application/x-mpegurl", "size": 0, "state": true },
-        { "type": "application/mpegurl", "size": 0, "state": true },
-        { "type": "application/octet-stream-m3u8", "size": 0, "state": true },
-        { "type": "application/dash+xml", "size": 0, "state": true },
-        { "type": "application/m4s", "size": 0, "state": true },
+        { "type": "audio/*", "size": 0, "operator": ">=", "state": true },
+        { "type": "video/*", "size": 0, "operator": ">=", "state": true },
+        { "type": "application/ogg", "size": 0, "operator": ">=", "state": true },
+        { "type": "application/vnd.apple.mpegurl", "size": 0, "operator": ">=", "state": true },
+        { "type": "application/x-mpegurl", "size": 0, "operator": ">=", "state": true },
+        { "type": "application/mpegurl", "size": 0, "operator": ">=", "state": true },
+        { "type": "application/octet-stream-m3u8", "size": 0, "operator": ">=", "state": true },
+        { "type": "application/dash+xml", "size": 0, "operator": ">=", "state": true },
+        { "type": "application/m4s", "size": 0, "operator": ">=", "state": true },
     ],
     Regex: [
         { "type": "ig", "regex": "https://cache\\.video\\.[a-z]*\\.com/dash\\?tvid=.*", "ext": "json", "state": false },
@@ -269,10 +269,26 @@ function InitOptions() {
                 items[key] = G.OptionLists[key];
             }
         }
-        // Ext的Array转为Map类型
-        items.Ext = new Map(items.Ext.map(item => [item.ext, item]));
-        // Type的Array转为Map类型
-        items.Type = new Map(items.Type.map(item => [item.type, { size: item.size, state: item.state }]));
+        // Ext的Array转为Map类型 如果是范围 增加min max属性
+        items.Ext = new Map(items.Ext.map(item => {
+            if (item.operator === undefined) { item.operator = ">="; }
+            if (item.operator === "~") {
+                const [min, max] = item.size.split("-");
+                item.min = min ? parseInt(min) : 0;
+                item.max = max ? parseInt(max) : 0;
+            }
+            return [item.ext, item];
+        }));
+        // Type的Array转为Map类型 如果是范围 增加min max属性
+        items.Type = new Map(items.Type.map(item => {
+            if (item.operator === undefined) { item.operator = ">="; }
+            if (item.operator === "~") {
+                const [min, max] = item.size.split("-");
+                item.min = min ? parseInt(min) : 0;
+                item.max = max ? parseInt(max) : 0;
+            }
+            return [item.type, item];
+        }));
         // 预编译正则匹配
         items.Regex = items.Regex.map(item => {
             let reg = undefined;
@@ -337,11 +353,25 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
         newValue ??= G.OptionLists[key];
         if (key == "Ext") {
-            G.Ext = new Map(newValue.map(item => [item.ext, item]));
+            G.Ext = new Map(newValue.map(item => {
+                if (item.operator === "~") {
+                    const [min, max] = item.size.split("-");
+                    item.min = min ? parseInt(min) : 0;
+                    item.max = max ? parseInt(max) : 0;
+                }
+                return [item.ext, item];
+            }));
             continue;
         }
         if (key == "Type") {
-            G.Type = new Map(newValue.map(item => [item.type, { size: item.size, state: item.state }]));
+            G.Type = new Map(newValue.map(item => {
+                if (item.operator === "~") {
+                    const [min, max] = item.size.split("-");
+                    item.min = min ? parseInt(min) : 0;
+                    item.max = max ? parseInt(max) : 0;
+                }
+                return [item.type, item];
+            }));
             continue;
         }
         if (key == "Regex") {

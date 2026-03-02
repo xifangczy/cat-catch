@@ -755,6 +755,29 @@ chrome.webNavigation.onCompleted.addListener(function (details) {
     }
 });
 
+// 操作符检查
+function operatorCheck(size, Obj) {
+    const targetSize = Obj.size * 1024;
+    switch (Obj.operator) {
+        case "=":
+            return size == targetSize;
+        case "<":
+            return size < targetSize;
+        case ">":
+            return size > targetSize;
+        case "<=":
+            return size <= targetSize;
+        case ">=":
+            return size >= targetSize;
+        case "!=":
+            return size != targetSize;
+        case "~":
+            return (Obj.min ? size >= Obj.min * 1024 : true) && (Obj.max ? size <= Obj.max * 1024 : true);
+        default:
+            return size <= targetSize;
+    }
+}
+
 /**
  * 检查扩展名和大小
  * @param {String} ext 
@@ -765,7 +788,10 @@ function CheckExtension(ext, size) {
     const Ext = G.Ext.get(ext);
     if (!Ext) { return false; }
     if (!Ext.state) { return "break"; }
-    if (Ext.size != 0 && size != undefined && size <= Ext.size * 1024) { return "break"; }
+    // if (Ext.size != 0 && size != undefined && size <= Ext.size * 1024) { return "break"; }
+    if (Ext.size != 0 && size != undefined && !operatorCheck(size, Ext)) {
+        return "break";
+    }
     return true;
 }
 
@@ -779,7 +805,9 @@ function CheckType(dataType, dataSize) {
     const typeInfo = G.Type.get(dataType.split("/")[0] + "/*") || G.Type.get(dataType);
     if (!typeInfo) { return false; }
     if (!typeInfo.state) { return "break"; }
-    if (typeInfo.size != 0 && dataSize != undefined && dataSize <= typeInfo.size * 1024) { return "break"; }
+    if (typeInfo.size != 0 && dataSize != undefined && !operatorCheck(dataSize, typeInfo)) {
+        return "break";
+    }
     return true;
 }
 
