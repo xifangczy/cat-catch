@@ -5,7 +5,7 @@
 
 # 📖安装地址
 ## 🐴Chrome
-https://chrome.google.com/webstore/detail/jfedfbgedapdagkghmgibemcoggfppbb
+https://chromewebstore.google.com/detail/jfedfbgedapdagkghmgibemcoggfppbb
 ## 🦄Edge
 https://microsoftedge.microsoft.com/addons/detail/oohmdefbjalncfplafanlagojlakmjci
 ## 🦊Firefox
