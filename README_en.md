@@ -5,7 +5,7 @@ Cat-Catch is a resource sniffing extension that can help you filter and list the
 
 # 📖Installation
 ## 🐴Chrome
-https://chrome.google.com/webstore/detail/jfedfbgedapdagkghmgibemcoggfppbb
+https://chromewebstore.google.com/detail/jfedfbgedapdagkghmgibemcoggfppbb
 ## 🦄Edge
 https://microsoftedge.microsoft.com/addons/detail/oohmdefbjalncfplafanlagojlakmjci
 ## 🦊Firefox
