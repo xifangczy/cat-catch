@@ -56,7 +56,7 @@ let checkboxState = true;
 
 // 生成资源DOM
 function AddMedia(data, currentTab = true) {
-    data._title = data.title;
+    data._title = data.title.replace(/[/\\]/g, "_");
     data.title = stringModify(data.title);
     //文件名
     data.name = isEmpty(data.name) ? data.title + '.' + data.ext : decodeURIComponent(stringModify(data.name));
