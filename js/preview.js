@@ -533,7 +533,7 @@ class FilePreview {
      * @param {Object} data 数据
      */
     trimData(data) {
-        data._title = data.title;
+        data._title = data.title.replace(/[/\\]/g, "_");
         data.title = stringModify(data.title);
 
         data.name = isEmpty(data.name) ? data.title + '.' + data.ext : decodeURIComponent(stringModify(data.name));
