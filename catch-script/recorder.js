@@ -199,11 +199,13 @@
     // #endregion 获取视频列表
 
     // 获取兼容的 captureStream 方法
+    let isMozCaptureStream = false;
     function getCaptureStreamMethod(element) {
         if (element.captureStream) {
             return element.captureStream.bind(element);
         }
         if (element.mozCaptureStream) {
+            isMozCaptureStream = true;
             return element.mozCaptureStream.bind(element);
         }
         if (element.webkitCaptureStream) {
@@ -228,6 +230,13 @@
                     throw new Error(i18n("recordingNotSupported", "不支持录制"));
                 }
                 stream = frameRate ? captureStream(frameRate) : captureStream();
+
+                // Firefox 的 captureStream 录制时没有声音，这里使用 Web Audio API 绕过修补问题
+                if (isMozCaptureStream) {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const source = audioCtx.createMediaStreamSource(stream);
+                    source.connect(audioCtx.destination);
+                }
             } catch (e) {
                 console.log(e);
                 $tips.innerHTML = i18n("recordingNotSupported", "不支持录制");
