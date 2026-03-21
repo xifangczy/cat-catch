@@ -757,7 +757,15 @@ chrome.webNavigation.onCompleted.addListener(function (details) {
 
 // 操作符检查
 function operatorCheck(size, Obj) {
-    const targetSize = Obj.size * 1024;
+    const unitNumber = {
+        "B": 1,
+        "BYTE": 1,
+        "KB": 1024,
+        "MB": 1048576,
+        "GB": 1073741824
+    };
+    const unit = (Obj.unit || "B");
+    const targetSize = Obj.size * (unitNumber[unit] || 1);
     switch (Obj.operator) {
         case "=":
             return size == targetSize;
@@ -772,7 +780,7 @@ function operatorCheck(size, Obj) {
         case "!=":
             return size != targetSize;
         case "~":
-            return (Obj.min ? size >= Obj.min * 1024 : true) && (Obj.max ? size <= Obj.max * 1024 : true);
+            return (Obj.min ? size >= Obj.min * (unitNumber[unit] || 1) : true) && (Obj.max ? size <= Obj.max * (unitNumber[unit] || 1) : true);
         default:
             return size <= targetSize;
     }
@@ -788,7 +796,6 @@ function CheckExtension(ext, size) {
     const Ext = G.Ext.get(ext);
     if (!Ext) { return false; }
     if (!Ext.state) { return "break"; }
-    // if (Ext.size != 0 && size != undefined && size <= Ext.size * 1024) { return "break"; }
     if (Ext.size != 0 && size != undefined && !operatorCheck(size, Ext)) {
         return "break";
     }
