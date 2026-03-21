@@ -333,6 +333,10 @@ function templates(text, data) {
         mobileUserAgent: G.MobileUserAgent,
         userAgent: G.userAgent ? G.userAgent : navigator.userAgent,
     }
+
+    // 替换标题中的路径分隔符 避免作为文件名解析为路径
+    trimData.title = trimData.title.replace(/[/\\]/g, "_");
+
     const _data = { ...data, ...trimData };
     text = text.replace(reTemplates, function (original, tag, action) {
         tag = tag.trim();
