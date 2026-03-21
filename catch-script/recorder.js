@@ -20,38 +20,41 @@
     const CatCatch = document.createElement("div");
     CatCatch.setAttribute("id", "catCatchRecorder");
     CatCatch.innerHTML = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAAKlBMVEUAAADLlROxbBlRAD16GS5oAjWWQiOCIytgADidUx/95gHqwwTx0gDZqwT6kfLuAAAACnRSTlMA/vUejV7kuzi8za0PswAAANpJREFUGNNjwA1YSxkYTEqhnKZLLi6F1w0gnKA1shdvHYNxdq1atWobjLMKCOAyC3etlVrUAOH4HtNZmLgoAMKpXX37zO1FwcZAwMDguGq1zKpFmTNnzqx0Bpp2WvrU7ttn9py+I8JgLn1R8Pad22vurNkjwsBReHv33junzuyRnOnMwNCSeFH27K5dq1SNgcZxFMnuWrNq1W5VkNntihdv7ToteGcT0C7mIkE1qbWCYjJnM4CqEoWKdoslChXuUgXJqIcLebiphSgCZRhaPDhcDFhdmUMCGIgEAFA+Uc02aZg9AAAAAElFTkSuQmCC" style="-webkit-user-drag: none;width: 20px;">
-    <div id="tips"></div>
-    <span data-i18n="selectVideo">选择视频</span> <select id="videoList" style="max-width: 200px;"></select>
-    <span data-i18n="recordEncoding">录制编码</span> <select id="mimeTypeList" style="max-width: 200px;"></select>
-    <label><input type="checkbox" id="ffmpeg" ${checkboxStyle}><span data-i18n="ffmpeg">使用ffmpeg转码</span></label>
-    <label>
-        <select id="videoBits">
-            <option value="2500000" data-i18n="videoBits">视频码率</option>
-            <option value="2500000">2.5 Mbps</option>
-            <option value="5000000">5 Mbps</option>
-            <option value="8000000">8 Mbps</option>
-            <option value="16000000">16 Mbps</option>
-        </select>
-        <select id="audioBits">
-            <option value="128000" data-i18n="audioBits">视频码率</option>
-            <option value="128000">128 kbps</option>
-            <option value="256000">256 kbps</option>
-        </select>
-        <select id="frameRate">
-            <option value="0" data-i18n="frameRate">帧率</option>
-            <option value="25">25 FPS</option>
-            <option value="30">30 FPS</option>
-            <option value="60">60 FPS</option>
-            <option value="120">120 FPS</option>
-        </select>
-    </label>
-    <div>
-        <button id="getVideo" ${buttonStyle} data-i18n="readVideo">读取视频</button>
-        <button id="start" ${buttonStyle} data-i18n="startRecording">开始录制</button>
-        <button id="stop" ${buttonStyle} data-i18n="stopRecording">停止录制</button>
-        <button id="hide" ${buttonStyle} data-i18n="hide">隐藏</button>
-        <button id="close" ${buttonStyle} data-i18n="close">关闭</button>
-    </div>`;
+    <div id="catCatchRecorderContent" style="display: flex; flex-direction: column; align-items: flex-start;">
+        <div id="tips"></div>
+        <span data-i18n="selectVideo">选择视频</span> <select id="videoList" style="max-width: 200px;"></select>
+        <span data-i18n="recordEncoding">录制编码</span> <select id="mimeTypeList" style="max-width: 200px;"></select>
+        <label><input type="checkbox" id="ffmpeg" ${checkboxStyle}><span data-i18n="ffmpeg">使用ffmpeg转码</span></label>
+        <label>
+            <select id="videoBits">
+                <option value="2500000" data-i18n="videoBits">视频码率</option>
+                <option value="2500000">2.5 Mbps</option>
+                <option value="5000000">5 Mbps</option>
+                <option value="8000000">8 Mbps</option>
+                <option value="16000000">16 Mbps</option>
+            </select>
+            <select id="audioBits">
+                <option value="128000" data-i18n="audioBits">视频码率</option>
+                <option value="128000">128 kbps</option>
+                <option value="256000">256 kbps</option>
+            </select>
+            <select id="frameRate">
+                <option value="0" data-i18n="frameRate">帧率</option>
+                <option value="25">25 FPS</option>
+                <option value="30">30 FPS</option>
+                <option value="60">60 FPS</option>
+                <option value="120">120 FPS</option>
+            </select>
+        </label>
+        <div>
+            <button id="getVideo" ${buttonStyle} data-i18n="readVideo">读取视频</button>
+            <button id="start" ${buttonStyle} data-i18n="startRecording">开始录制</button>
+            <button id="stop" ${buttonStyle} data-i18n="stopRecording">停止录制</button>
+            <button id="hide" ${buttonStyle} data-i18n="hide">隐藏</button>
+            <button id="close" ${buttonStyle} data-i18n="close">关闭</button>
+        </div>
+    </div>
+    `;
     CatCatch.style = `
         position: fixed;
         z-index: 999999;
@@ -123,8 +126,19 @@
     let option = { mimeType: 'video/webm;codecs=vp9,opus' };
 
     CatCatch.querySelector("#hide").addEventListener('click', function (event) {
-        CatCatch.style.display = "none";
+        const content = CatCatch.querySelector("#catCatchRecorderContent").style;
+        if (content.display === "none") {
+            content.display = "flex";
+            CatCatch.style.opacity = "";
+        } else {
+            content.display = "none";
+            CatCatch.style.opacity = "0.5";
+        }
     });
+    CatCatch.querySelector("img").addEventListener('click', function (event) {
+        CatCatch.querySelector("#hide").click();
+    });
+
     CatCatch.querySelector("#close").addEventListener('click', function (event) {
         recorder?.state && recorder.stop();
         CatCatch.style.display = "none";
