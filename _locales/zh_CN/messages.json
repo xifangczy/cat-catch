@@ -1018,5 +1018,11 @@
   },
   "isBlockedSite": {
     "message": "该网站要求禁止运行本程序"
+  },
+  "onlineFFmpeg": {
+    "message": "在线ffmpeg"
+  },
+  "ffmpegIsNotReady": {
+    "message": "在线ffmpeg服务未就绪, 请稍后再试"
   }
 }

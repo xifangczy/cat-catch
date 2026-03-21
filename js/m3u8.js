@@ -838,20 +838,17 @@ $("#localFile").click(function () {
 // 播放m3u8
 $("#play").click(function () {
     if ($(this).data("switch") == "on") {
-        $("#video").show();
+        showTab("#video");
         hls.attachMedia($("#video")[0]);
-        $media_file.hide();
-        $("#downList").hide();
         $(this).html(i18n.close).data("switch", "off");
         hls.on(Hls.Events.MEDIA_ATTACHED, function () {
             video.play();
         });
         return;
     }
-    $("#video").hide();
     hls.detachMedia($("#video")[0]);
-    $media_file.show();
     $(this).html(i18n.play).data("switch", "on");
+    showTab("#media_file");
 });
 // 调用m3u8DL下载
 $("#m3u8DL").click(function () {
@@ -1145,8 +1142,10 @@ $("#tsAddArg").click(function () {
 });
 // 下载进度
 $("#downProgress").click(function () {
-    $media_file.hide();
-    $("#downList").show();
+    showTab("#downList");
+});
+$("#onlineFFmpeg").click(function () {
+    showTab("#iframeBox");
 });
 // 设置请求头
 $(document).on("click", "#setRequestHeaders, #setRequestHeadersError", function () {
@@ -1575,16 +1574,16 @@ function mergeTsNew(down) {
 
         // 使用iframe传输
         if (G.iframeFFmpeg) {
+            document.querySelector("#onlineFFmpeg").style.display = "block";
             // 转数据结构
             const fileData = {
                 ...data,
                 data: fileBlob,
                 version: G.ffmpegConfig.version
             };
-            // 创建一个隐藏的iframe来发送消息给 G.ffmpegConfig.url
             if (!iframeFFmpeg) {
                 iframeFFmpeg = document.createElement('iframe');
-                document.querySelector("#iframeFFmpeg").appendChild(iframeFFmpeg);
+                document.querySelector("#iframeBox").appendChild(iframeFFmpeg);
                 iframeFFmpeg.onload = function () {
                     iframeFFmpegReady = true;
                     iframeFFmpeg.contentWindow.postMessage(fileData, '*');
@@ -1593,11 +1592,9 @@ function mergeTsNew(down) {
             } else if (iframeFFmpegReady) {
                 iframeFFmpeg.contentWindow.postMessage(fileData, '*');
             } else {
-                alert('error: iframe not ready');
+                alert(i18n.ffmpegIsNotReady);
             }
-            document.querySelector("#downList").style.display = "none";
-            document.querySelector("#media_file").style.display = "none";
-            document.querySelector("#iframeFFmpeg").style.display = "block";
+            showTab("#iframeBox");
             return;
         }
         chrome.runtime.sendMessage(data, function (response) {
@@ -1768,8 +1765,7 @@ function timeToIndex(time) {
 }
 // 写入ts链接
 function writeText(text) {
-    $media_file.show();
-    $("#downList").hide();
+    showTab("#media_file");
     if (typeof text == "object") {
         let url = [];
         for (let key in text) {
@@ -1961,6 +1957,14 @@ function highlight() {
     autoDown = false;
     chrome.tabs.getCurrent(function name(params) {
         chrome.tabs.highlight({ tabs: params.index });
+    });
+}
+
+// 显示面板
+function showTab(Obj) {
+    const panels = ["#iframeBox", "#media_file", "#downList", "#video"];
+    panels.forEach(sel => {
+        sel === Obj ? $(sel).show() : $(sel).hide();
     });
 }
 

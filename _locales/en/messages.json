@@ -1018,5 +1018,11 @@
   },
   "isBlockedSite": {
     "message": "This site requires blocking the operation of this extension"
+  },
+  "onlineFFmpeg": {
+    "message": "Online FFmpeg"
+  },
+  "ffmpegIsNotReady": {
+    "message": "Online FFmpeg service is not ready, please try again later"
   }
 }

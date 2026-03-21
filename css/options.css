@@ -527,13 +527,13 @@ a.json-placeholder:hover {
   border: solid 1px var(--text-color);
 }
 
-.iframeFFmpeg {
+.iframeBox {
   height: 60vh;
   display: none;
   width: 100%;
   border: solid 1px var(--text-color);
 }
-.iframeFFmpeg iframe {
+.iframeBox iframe {
   width: 100%;
   height: 100%;
   border: none;
