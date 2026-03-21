@@ -1024,5 +1024,8 @@
   },
   "ffmpegIsNotReady": {
     "message": "在线ffmpeg服务未就绪, 请稍后再试"
+  },
+  "iframeFFmpeg": {
+    "message": "嵌套在线ffmpeg"
   }
 }

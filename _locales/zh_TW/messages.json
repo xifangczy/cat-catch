@@ -1024,5 +1024,8 @@
   },
   "ffmpegIsNotReady": {
     "message": "在線ffmpeg服務未就緒, 請稍後再試"
+  },
+  "iframeFFmpeg": {
+    "message": "內嵌ffmpeg服務"
   }
 }

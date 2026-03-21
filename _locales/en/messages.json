@@ -1024,5 +1024,8 @@
   },
   "ffmpegIsNotReady": {
     "message": "Online FFmpeg service is not ready, please try again later"
+  },
+  "iframeFFmpeg": {
+    "message": "Use iframe to call FFmpeg"
   }
 }
