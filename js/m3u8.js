@@ -99,6 +99,10 @@ const $fileDuration = $("#fileDuration");   // 下载总时长
 const $m3u8dlArg = $("#m3u8dlArg"); // m3u8DL 参数
 const $media_file = $("#media_file");   // 切片列表
 
+/* 框架ffmpeg */
+let iframeFFmpeg = null;
+let iframeFFmpegReady = false;
+
 /**
  * 初始化函数，界面默认配置 loadSource载入 m3u8 url
  */
@@ -1567,6 +1571,34 @@ function mergeTsNew(down) {
         }
         if (_taskId) {
             data.taskId = _taskId;
+        }
+
+        // 使用iframe传输
+        if (G.iframeFFmpeg) {
+            // 转数据结构
+            const fileData = {
+                ...data,
+                data: fileBlob,
+                version: G.ffmpegConfig.version
+            };
+            // 创建一个隐藏的iframe来发送消息给 G.ffmpegConfig.url
+            if (!iframeFFmpeg) {
+                iframeFFmpeg = document.createElement('iframe');
+                document.querySelector("#iframeFFmpeg").appendChild(iframeFFmpeg);
+                iframeFFmpeg.onload = function () {
+                    iframeFFmpegReady = true;
+                    iframeFFmpeg.contentWindow.postMessage(fileData, '*');
+                };
+                iframeFFmpeg.src = G.ffmpegConfig.url;
+            } else if (iframeFFmpegReady) {
+                iframeFFmpeg.contentWindow.postMessage(fileData, '*');
+            } else {
+                alert('error: iframe not ready');
+            }
+            document.querySelector("#downList").style.display = "none";
+            document.querySelector("#media_file").style.display = "none";
+            document.querySelector("#iframeFFmpeg").style.display = "block";
+            return;
         }
         chrome.runtime.sendMessage(data, function (response) {
             if (!chrome.runtime?.lastError && response && response == "ok") {

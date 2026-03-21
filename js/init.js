@@ -192,7 +192,8 @@ G.OptionLists = {
     mqttTitleLength: 100,
     mqttDataFormat: "",
     getHtmlDOM: false,
-    damn: false
+    damn: false,
+    iframeFFmpeg: false,
 };
 
 // 本地储存的配置
