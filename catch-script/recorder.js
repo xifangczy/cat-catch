@@ -158,14 +158,14 @@
             const supported = [];
             types.forEach((type) => {
                 const mimeType = `${media}/${type}`;
+                if (MediaRecorder.isTypeSupported(mimeType)) {
+                    supported.push(mimeType);
+                }
                 codecs.forEach((codec) => [`${mimeType};codecs=${codec}`].forEach(variation => {
                     if (MediaRecorder.isTypeSupported(variation)) {
                         supported.push(variation);
                     }
                 }));
-                if (MediaRecorder.isTypeSupported(mimeType)) {
-                    supported.push(mimeType);
-                }
             });
             return supported;
         };
