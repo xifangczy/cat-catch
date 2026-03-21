@@ -1585,6 +1585,7 @@ function mergeTsNew(down) {
                 iframeFFmpeg = document.createElement('iframe');
                 document.querySelector("#iframeBox").appendChild(iframeFFmpeg);
                 iframeFFmpeg.onload = function () {
+                    $progress.html(i18n.sendFfmpeg);
                     iframeFFmpegReady = true;
                     iframeFFmpeg.contentWindow.postMessage(fileData, '*');
                 };
