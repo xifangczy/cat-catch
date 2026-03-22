@@ -761,7 +761,7 @@ const interval = setInterval(async function () {
     clearInterval(interval);
 
     if (G.popup && !_tabId) {
-        closeTab();
+        window.close();
         $("#popup").click();
         return;
     }
