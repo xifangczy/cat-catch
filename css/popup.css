@@ -40,7 +40,8 @@ body {
   padding: 5px;
 }
 .icon,
-.favicon {
+.favicon,
+.regex {
   transition: all 0.1s;
   width: 1.5rem;
   height: 1.5rem;
@@ -50,27 +51,22 @@ body {
   display: none;
 }
 .icon:hover {
-  transform: scale(1.1);
+  transform: scale(1.2);
 }
 .icon:active {
   transform: scale(0.9);
 }
-.icon.mqtt-sending {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-.icon.mqtt-sending:hover {
-  transform: none;
-}
 .panel-heading .icon {
   padding-left: 2px;
 }
-.favicon {
+.favicon,
+.regex {
   padding-right: 2px;
 }
 .panel-heading .size {
   float: right;
   font-weight: bold;
+  color: #666;
 }
 #Tips,
 #TipsFixed {
