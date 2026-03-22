@@ -95,7 +95,15 @@ class FilePreview {
         });
         // 排序按钮
         document.querySelectorAll('.sort-options input').forEach(input => {
-            input.addEventListener('change', () => this.updateFileList());
+            input.addEventListener('change', () => {
+                // 时长需要尝试播放获取，无法直接初始时长排序，不记忆时长排序选项
+                if (input.name == "sortField" && input.value != "duration") {
+                    sessionStorage.setItem("previewSort", input.value);
+                } else if (input.name == "sortOrder") {
+                    sessionStorage.setItem("previewOrder", input.value);
+                }
+                this.updateFileList();
+            });
         });
         // 正则过滤 监听回车
         document.querySelector('#regular').addEventListener('keypress', (e) => {
@@ -494,15 +502,46 @@ class FilePreview {
             this.setupFilters('typeFilters', 'type');
             return;
         }
-        const uniqueValues = [...new Set(this.originalItems.map(item => item[property]))];
+        const currentUniqueValues = [...new Set(this.originalItems.map(item => item[property]))];
+
+        // sessionStorage结构 [{value: '...', checked: true}, ...]
+        let savedData = JSON.parse(sessionStorage.getItem(`preview_${property}_filters`)) || [];
+
+        // 填充记忆的选项状态
+        currentUniqueValues.forEach(val => {
+            const exists = savedData.find(item => item.value === val);
+            if (!exists) {
+                savedData.push({ value: val, checked: true });
+            }
+        });
+
+        //排序 多页中 统一后缀和类型顺序
+        savedData.sort((a, b) => {
+            if (a.value === 'Unknown') return 1;
+            if (b.value === 'Unknown') return -1;
+            return a.value.localeCompare(b.value);
+        });
+
         const filterContainer = document.querySelector(`#${filterId}`);
-        uniqueValues.forEach(value => {
-            if (filterContainer.querySelector(`input[value="${value}"]`)) return;
+        savedData.forEach(item => {
+            if (filterContainer.querySelector(`input[value="${item.value}"]`)) return;
+
             const label = document.createElement('label');
-            label.innerHTML = `<input type="checkbox" name="${property}" value="${value}" checked>${value == 'Unknown' ? value : value.toLowerCase()}`;
-            label.querySelector('input').addEventListener('click', () => this.updateFileList());
+            const isChecked = item.checked ? 'checked' : '';
+            const displayText = item.value === 'Unknown' ? item.value : item.value.toLowerCase();
+            label.innerHTML = `<input type="checkbox" name="${property}" value="${item.value}" ${isChecked}>${displayText}`;
+            const checkbox = label.querySelector('input');
+            checkbox.addEventListener('click', (e) => {
+                const targetItem = savedData.find(d => d.value === e.target.value);
+                if (targetItem) {
+                    targetItem.checked = e.target.checked;
+                }
+                sessionStorage.setItem(`preview_${property}_filters`, JSON.stringify(savedData));
+                this.updateFileList();
+            });
             filterContainer.appendChild(label);
         });
+        sessionStorage.setItem(`preview_${property}_filters`, JSON.stringify(savedData));
     }
 
     setOptions() {
@@ -514,6 +553,13 @@ class FilePreview {
             document.querySelector('#deleteDuplicateFilenames').checked = true;
             this.deleteDuplicateFilenames = true;
         }
+        const previewSort = sessionStorage.getItem("previewSort");
+        const previewOrder = sessionStorage.getItem("previewOrder");
+        document.querySelectorAll(".sort-options input").forEach(input => {
+            if (input.value === previewSort || input.value === previewOrder) {
+                input.checked = true;
+            }
+        });
     }
 
     /**
