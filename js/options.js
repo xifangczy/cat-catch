@@ -52,11 +52,11 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
 
 //新增格式
 $("#AddExt").bind("click", function () {
-    $("#extList").append(Gethtml("Ext", { state: true }));
+    $("#extList").append(Gethtml("Ext", { operator: ">=", state: true }));
     $("#extList [name=text]").last().focus();
 });
 $("#AddType").bind("click", function () {
-    $("#typeList").append(Gethtml("Type", { state: true }));
+    $("#typeList").append(Gethtml("Type", { operator: ">=", state: true }));
     $("#typeList [name=text]").last().focus();
 });
 $("#AddRegex").bind("click", function () {
