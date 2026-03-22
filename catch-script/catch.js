@@ -511,6 +511,7 @@
             if (result == null) return;
 
             if (result == "") {
+                this.clearFileName("regular");
                 this.clearFileName("selector");
                 return;
             }
@@ -881,9 +882,24 @@
                 if (regularKey) {
                     const str = name == "" ? document.documentElement.outerHTML : name;
                     const reg = new RegExp(regularKey, "g");
-                    let result = str.match(reg);
-                    if (result) {
-                        result = result.filter((item) => item !== "");
+
+                    const matches = str.matchAll(reg);
+                    const result = [];
+                    for (const match of matches) {
+                        if (match.length > 1) {
+                            const captured = match.slice(1)
+                                .filter(val => val !== undefined && val.trim() !== "")
+                                .map(val => val.trim());
+                            if (captured.length > 0) {
+                                result.push(captured.join("-"));
+                            }
+                        } else {
+                            if (match[0] && match[0].trim() !== "") {
+                                result.push(match[0].trim());
+                            }
+                        }
+                    }
+                    if (result.length > 0) {
                         name = result.join("_");
                     }
                 }
