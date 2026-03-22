@@ -73,15 +73,30 @@ awaitG(() => {
     });
 });
 
-function start() {
+const createIframeFFmpeg = () => {
+    if (!iframeFFmpeg) {
+        iframeFFmpeg = document.createElement('iframe');
+        document.querySelector("#iframeBox").appendChild(iframeFFmpeg);
+        iframeFFmpeg.onload = function () {
+            iframeFFmpegReady = true;
+        };
+        iframeFFmpeg.src = G.ffmpegConfig.url + '?_=' + new Date().getTime();
+    }
+    return iframeFFmpeg;
+}
 
+function start() {
     // 提前打开ffmpeg页面
-    if (_ffmpeg && !G.iframeFFmpeg) {
-        chrome.runtime.sendMessage({
-            Message: "catCatchFFmpeg",
-            action: "openFFmpeg",
-            extra: i18n.waitingForMedia
-        });
+    if (_ffmpeg) {
+        if (G.iframeFFmpeg) {
+            createIframeFFmpeg();
+        } else {
+            chrome.runtime.sendMessage({
+                Message: "catCatchFFmpeg",
+                action: "openFFmpeg",
+                extra: i18n.waitingForMedia
+            });
+        }
     }
 
     $("#autoClose").prop("checked", G.downAutoClose);
@@ -319,19 +334,21 @@ function start() {
         }
 
         // 以下为在线ffmpeg返回结果
-        if (Message.Message != "catCatchFFmpegResult" || Message.state != "ok" || _tabId == 0 || Message.tabId != _tabId) { return; }
+        if (Message.Message != "catCatchFFmpegResult" || _tabId == 0 || Message.tabId != _tabId) { return; }
 
         // 发送状态提示
-        const $dom = itemDOM.get(Message.index);
-        $dom && $dom.progressText.html(i18n.hasSent);
-        down.buffer[Message.index] = null; //清空buffer
+        if (Message.state == "ok") {
+            const $dom = itemDOM.get(Message.index);
+            $dom && $dom.progressText.html(i18n.hasSent);
+            down.buffer[Message.index] = null; //清空buffer
+        }
 
         // 全部发送完成 检查自动关闭
-        if (down.success == down.total) {
+        if (down.success == down.total && Message.state == "done") {
             if ($("#autoClose").prop("checked")) {
                 setTimeout(() => {
                     closeTab();
-                }, Math.ceil(Math.random() * 999));
+                }, 1000);
             }
         }
     });
@@ -355,7 +372,7 @@ function start() {
             if ($("#autoClose").prop("checked")) {
                 setTimeout(() => {
                     closeTab();
-                }, Math.ceil(Math.random() * 999));
+                }, 1000);
             }
         }
     });
@@ -396,20 +413,16 @@ function sendFile(action, data, fragment) {
             title: stringModify(fragment.title),
             tabId: _tabId,
             data: data,
-            version: G.ffmpegConfig.version
+            version: G.ffmpegConfig.version,
+            index: fragment.index
         };
         if (action === "merge") {
             baseData.taskId = _taskId;
             baseData.quantity = _data.length;
         }
         if (!iframeFFmpeg) {
-            iframeFFmpeg = document.createElement('iframe');
-            document.querySelector("#iframeBox").appendChild(iframeFFmpeg);
-            iframeFFmpeg.onload = function () {
-                iframeFFmpegReady = true;
-                iframeFFmpeg.contentWindow.postMessage(baseData, '*');
-            };
-            iframeFFmpeg.src = G.ffmpegConfig.url;
+            createIframeFFmpeg();
+            setTimeout(sendFile, 1000, action, data, fragment);
         } else if (iframeFFmpegReady) {
             iframeFFmpeg.contentWindow.postMessage(baseData, '*');
         } else {

@@ -1589,7 +1589,7 @@ function mergeTsNew(down) {
                     iframeFFmpegReady = true;
                     iframeFFmpeg.contentWindow.postMessage(fileData, '*');
                 };
-                iframeFFmpeg.src = G.ffmpegConfig.url;
+                iframeFFmpeg.src = G.ffmpegConfig.url + '?_=' + new Date().getTime();
             } else if (iframeFFmpegReady) {
                 iframeFFmpeg.contentWindow.postMessage(fileData, '*');
             } else {
@@ -1980,8 +1980,9 @@ function autoMerge() {
 
 // 接收 catCatchFFmpegResult
 chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
-    if (!Message.Message || Message.Message != "catCatchFFmpegResult" || Message.state != "ok" || currentTabId == 0 || Message.tabId != currentTabId) { return; }
+    // if (!Message.Message || Message.Message != "catCatchFFmpegResult" || Message.state != "ok" || currentTabId == 0 || Message.tabId != currentTabId || G.iframeFFmpeg) { return; }
+    if (!Message.Message || Message.Message != "catCatchFFmpegResult" || Message.state != "done" || currentTabId == 0 || Message.tabId != currentTabId) { return; }
     setTimeout(() => {
         $("#autoClose").prop("checked") && closeTab();
-    }, Math.ceil(Math.random() * 500));
+    }, 1000);
 });
