@@ -104,7 +104,7 @@ function AddMedia(data, currentTab = true) {
             <div class="panel-heading">
                 <input type="checkbox" class="DownCheck"/>
                 ${G.ShowWebIco ? `<img class="favicon ${!data.favIconUrl ? "faviconFlag" : ""}" requestId="${data.requestId}" src="${data.favIconUrl}"/>` : ""}
-                <img src="img/regex.png" class="favicon regex ${data.isRegex ? "" : "hide"}" title="${i18n.regexTitle}"/>
+                <img src="img/regex.png" class="regex ${data.isRegex ? "" : "hide"}" title="${i18n.regexTitle}"/>
                 <span class="name ${data.parsing || data.isRegex || data.tabId == -1 ? "bold" : ""}">${trimName}</span>
                 <span class="size ${data.size ? "" : "hide"}">${data.size}</span>
                 <img src="img/copy.png" class="icon copy" id="copy" title="${i18n.copy}"/>
@@ -701,23 +701,25 @@ $("#enable").click(function () {
 });
 // 弹出窗口
 $("#popup").click(function () {
-    switch (G.popupMode) {
-        case 0:
-            chrome.tabs.create({ url: `preview.html?tabId=${G.tabId}` });
-            break;
-        case 1:
-            chrome.tabs.create({ url: `popup.html?tabId=${G.tabId}&type=tab` });
-            break;
-        case 2:
-            chrome.windows.create({ url: `preview.html?tabId=${G.tabId}`, type: "popup", height: 1080, width: 1920 });
-            break;
-        case 3:
-            chrome.windows.create({ url: `popup.html?tabId=${G.tabId}&type=window`, type: "popup", height: 1080, width: 1920 });
-            break;
-        default:
-            chrome.tabs.create({ url: `preview.html?tabId=${G.tabId}` });
-            break;
-    }
+    chrome.tabs.get(G.tabId, function (tab) {
+        switch (G.popupMode) {
+            case 0:
+                chrome.tabs.create({ url: `preview.html?tabId=${G.tabId}`, index: tab.index + 1 });
+                break;
+            case 1:
+                chrome.tabs.create({ url: `popup.html?tabId=${G.tabId}&type=tab`, index: tab.index + 1 });
+                break;
+            case 2:
+                chrome.windows.create({ url: `preview.html?tabId=${G.tabId}`, type: "popup", height: 1080, width: 1920 });
+                break;
+            case 3:
+                chrome.windows.create({ url: `popup.html?tabId=${G.tabId}&type=window`, type: "popup", height: 1080, width: 1920 });
+                break;
+            default:
+                chrome.tabs.create({ url: `preview.html?tabId=${G.tabId}`, index: tab.index + 1 });
+                break;
+        }
+    });
 });
 $("#currentPage").click(function () {
     chrome.tabs.query({ active: true, currentWindow: false }, function (tabs) {
