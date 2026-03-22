@@ -11,6 +11,9 @@ let _index = null;  // 当前页面 tab index
 // 是否表单提交下载 表单提交 不使用自定义文件名
 const downloadData = localStorage.getItem('downloadData') ? JSON.parse(localStorage.getItem('downloadData')) : [];
 
+let iframeFFmpeg = null; // iframe FFmpeg窗口对象
+let iframeFFmpegReady = false; // iframe FFmpeg是否准备就绪
+
 awaitG(() => {
     loadCSS();
     // 获取当前标签信息
@@ -73,7 +76,7 @@ awaitG(() => {
 function start() {
 
     // 提前打开ffmpeg页面
-    if (_ffmpeg) {
+    if (_ffmpeg && !G.iframeFFmpeg) {
         chrome.runtime.sendMessage({
             Message: "catCatchFFmpeg",
             action: "openFFmpeg",
@@ -384,6 +387,37 @@ function sendFile(action, data, fragment) {
     if (data instanceof ArrayBuffer) {
         data = ArrayBufferToBlob(data, { type: fragment.contentType });
     }
+
+    // 嵌套在线ffmpeg模式
+    if (G.iframeFFmpeg) {
+        document.querySelector("#iframeBox").style.display = "block";
+        const baseData = {
+            action: action,
+            title: stringModify(fragment.title),
+            tabId: _tabId,
+            data: data,
+            version: G.ffmpegConfig.version
+        };
+        if (action === "merge") {
+            baseData.taskId = _taskId;
+            baseData.quantity = _data.length;
+        }
+        if (!iframeFFmpeg) {
+            iframeFFmpeg = document.createElement('iframe');
+            document.querySelector("#iframeBox").appendChild(iframeFFmpeg);
+            iframeFFmpeg.onload = function () {
+                iframeFFmpegReady = true;
+                iframeFFmpeg.contentWindow.postMessage(baseData, '*');
+            };
+            iframeFFmpeg.src = G.ffmpegConfig.url;
+        } else if (iframeFFmpegReady) {
+            iframeFFmpeg.contentWindow.postMessage(baseData, '*');
+        } else {
+            setTimeout(sendFile, 500, action, data, fragment);
+        }
+        return;
+    }
+
     chrome.tabs.query({ url: G.ffmpegConfig.url + "*" }, function (tabs) {
         // 等待ffmpeg 打开并且可用
         if (tabs.length === 0) {
@@ -415,7 +449,6 @@ function sendFile(action, data, fragment) {
             baseData.taskId = _taskId;
             baseData.quantity = _data.length;
         }
-
         chrome.runtime.sendMessage(baseData);
     });
 }
