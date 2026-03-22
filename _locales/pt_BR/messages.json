@@ -351,7 +351,7 @@
     "message": "Use o protocolo de chamada do player local para abrir visualizações de vídeo"
   },
   "previewModePlaceholder": {
-    "message": "Deixe em branco para desativá-lo. O padrão é usar a página pop-up para visualizar o vídeo"
+    "message": "Deixe em branco para desativá-lo. O padrão é usar a página popup para visualizar o vídeo"
   },
   "preview": {
     "message": "Prévia"
@@ -666,7 +666,7 @@
     "message": "Taxa de bits"
   },
   "ADTSerror": {
-    "message": "Não foi possível localizar o cabeçalho ADTS. Pode ser um recurso criptografado AES-128-ECB, que atualmente não é compatível com descriptografia. Usar software de mesclagem de terceiros."
+    "message": "Não é possível localizar o cabeçalho ADTS. Pode ser um recurso criptografado AES-128-ECB, que atualmente não é compatível com descriptografia. Use software de mesclagem de terceiros."
   },
   "m3u8Error": {
     "message": "Há erros na análise ou reprodução do arquivo M3U8. Verifique o console para obter informações detalhadas sobre erros"
@@ -728,7 +728,7 @@
     "message": "O parâmetro M3U8DL é muito longo."
   },
   "runningCannotChangeSettings": {
-    "message": "Em execução, não é possível alterar as configurações"
+    "message": "Em Execução, Não É Possível Alterar As Configurações"
   },
   "streamSaverTip": {
     "message": "A função de 'baixar enquanto salva' não oferece suporte à conversão de formato online ffmpeg, não suporta download novamente de fatias erradas e não suporta 'salvar como'."
@@ -1018,5 +1018,14 @@
   },
   "isBlockedSite": {
     "message": "Este site exige bloquear a operação desta extensão"
+  },
+  "onlineFFmpeg": {
+    "message": "FFmpeg Online"
+  },
+  "ffmpegIsNotReady": {
+    "message": "O serviço online FFmpeg não está pronto, tente novamente mais tarde"
+  },
+  "iframeFFmpeg": {
+    "message": "Use iframe to call FFmpeg"
   }
 }
