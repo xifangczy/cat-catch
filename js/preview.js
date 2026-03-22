@@ -199,11 +199,13 @@ class FilePreview {
      * 合并下载
      */
     mergeDownload() {
-        chrome.runtime.sendMessage({
-            Message: "catCatchFFmpeg",
-            action: "openFFmpeg",
-            extra: i18n.waitingForMedia
-        });
+        if (!G.iframeFFmpeg) {
+            chrome.runtime.sendMessage({
+                Message: "catCatchFFmpeg",
+                action: "openFFmpeg",
+                extra: i18n.waitingForMedia
+            });
+        }
         const checkedData = this.getSelectedItems();
         // 都是m3u8 自动合并并发送到ffmpeg
         if (checkedData.every(data => isM3U8(data))) {
