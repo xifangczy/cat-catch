@@ -73,12 +73,13 @@ awaitG(() => {
     });
 });
 
-const createIframeFFmpeg = () => {
+const createIframeFFmpeg = (callback) => {
     if (!iframeFFmpeg) {
         iframeFFmpeg = document.createElement('iframe');
         document.querySelector("#iframeBox").appendChild(iframeFFmpeg);
         iframeFFmpeg.onload = function () {
             iframeFFmpegReady = true;
+            callback && callback();
         };
         iframeFFmpeg.src = G.ffmpegConfig.url + '?_=' + new Date().getTime();
     }
@@ -421,8 +422,9 @@ function sendFile(action, data, fragment) {
             baseData.quantity = _data.length;
         }
         if (!iframeFFmpeg) {
-            createIframeFFmpeg();
-            setTimeout(sendFile, 1000, action, data, fragment);
+            createIframeFFmpeg(() => {
+                iframeFFmpeg.contentWindow.postMessage(baseData, '*');
+            });
         } else if (iframeFFmpegReady) {
             iframeFFmpeg.contentWindow.postMessage(baseData, '*');
         } else {
