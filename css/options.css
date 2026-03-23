@@ -488,7 +488,7 @@ textarea {
 }
 
 #mergeTs {
-  width: 66%;
+  flex: 1;
 }
 
 /* MPD*/
@@ -716,7 +716,7 @@ a.json-placeholder:hover {
   display: inline-block;
   min-width: 0.5rem;
   font-weight: bold;
-  color: var(--text2-color);
+  color: var(--text-color);
   border-right: 1px solid rgba(0, 0, 0, 0.1);
   margin-right: 10px;
   padding-right: 5px;
@@ -729,8 +729,12 @@ a.json-placeholder:hover {
   box-shadow: 0 0 0 1px var(--button2-color);
 }
 
+.media-item.selected::before {
+  color: var(--text2-color);
+}
+
 .media-item .url-text {
-  flex: 1; /* 撑满中间剩余空间 */
+  flex: 1;
   word-break: break-all;
   /* margin-right: 2px; */
 }
