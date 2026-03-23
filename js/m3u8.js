@@ -102,6 +102,7 @@ const $media_file = $("#media_file");   // 切片列表
 /* 框架ffmpeg */
 let iframeFFmpeg = null;
 let iframeFFmpegReady = false;
+let iframeFFmpegReadyRetryCount = 0;
 
 /**
  * 初始化函数，界面默认配置 loadSource载入 m3u8 url
@@ -1105,6 +1106,12 @@ $("#mergeTs").click(async function () {
     }
     $("#stopDownload").show();
 
+    // 提前打开ffmpeg
+    // _ffmpeg && createIframeFFmpeg();
+    if (_ffmpeg || $("#ffmpeg").prop("checked")) {
+        createIframeFFmpeg();
+    }
+
     downloadNew();
 });
 
@@ -1617,18 +1624,24 @@ function mergeTsNew(down) {
                 version: G.ffmpegConfig.version
             };
             if (!iframeFFmpeg) {
-                iframeFFmpeg = document.createElement('iframe');
-                document.querySelector("#iframeBox").appendChild(iframeFFmpeg);
-                iframeFFmpeg.onload = function () {
-                    $progress.html(i18n.sendFfmpeg);
-                    iframeFFmpegReady = true;
+                createIframeFFmpeg(() => {
                     iframeFFmpeg.contentWindow.postMessage(fileData, '*');
-                };
-                iframeFFmpeg.src = G.ffmpegConfig.url + '?_=' + new Date().getTime();
+                });
             } else if (iframeFFmpegReady) {
                 iframeFFmpeg.contentWindow.postMessage(fileData, '*');
             } else {
-                alert(i18n.ffmpegIsNotReady);
+                const timer = setInterval(() => {
+                    if (iframeFFmpegReady) {
+                        iframeFFmpeg.contentWindow.postMessage(fileData, '*');
+                        clearInterval(timer);
+                    } else {
+                        iframeFFmpegReadyRetryCount++;
+                        if (iframeFFmpegReadyRetryCount > 10) {
+                            clearInterval(timer);
+                            $progress.html(i18n.ffmpegIsNotReady);
+                        }
+                    }
+                }, 5000);
             }
             showTab("#iframeBox");
             return;
@@ -2050,6 +2063,19 @@ function autoMerge() {
     autoMergeTimer = setTimeout(() => {
         $("#mergeTs").click();
     }, 1000);
+}
+
+function createIframeFFmpeg(callback) {
+    if (!iframeFFmpeg) {
+        iframeFFmpeg = document.createElement('iframe');
+        document.querySelector("#iframeBox").appendChild(iframeFFmpeg);
+        iframeFFmpeg.onload = function () {
+            iframeFFmpegReady = true;
+            callback && callback();
+        };
+        iframeFFmpeg.src = G.ffmpegConfig.url + '?_=' + new Date().getTime();
+    }
+    return iframeFFmpeg;
 }
 
 // 接收 catCatchFFmpegResult
