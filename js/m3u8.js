@@ -63,7 +63,6 @@ const allOption = {
     fold: !G.isMobile,
     m3u8dlRE: false,
 };
-let _m3u8Content;   // 储存m3u8文件内容
 /* m3u8 解析工具 */
 const hls = new Hls({
     enableWorker: false,
@@ -88,6 +87,7 @@ const downSet = {};   // 下载时 储存设置
 /* 录制相关 */
 let recorder = false; // 开关
 let recorderLast = "";  // 最后下载的url
+
 
 /* mp4 转码工具 */
 let transmuxer = undefined;
@@ -545,7 +545,7 @@ function parseTs(data) {
     let isEncrypted = false;
     _fragments.splice(0);   // 清空 防止直播HLS无限添加
     /* 获取 m3u8文件原始内容 MANIFEST_PARSED也能获取但偶尔会为空(BUG?) 放在LEVEL_LOADED获取更安全*/
-    _m3u8Content = data.m3u8;
+    document.querySelector("#m3u8Content").value = data.m3u8;
 
     // #EXT-X-DISCONTINUITY
     let discontinuity = { start: 0, cc: 0 };
@@ -639,29 +639,31 @@ function parseTs(data) {
             sn: data.fragments[i].sn,
             cc: data.fragments[i].cc,
             live: data.live,
-            byteRange: data.fragments[i].byteRange
+            byteRange: data.fragments[i].byteRange,
+            selected: true,
         });
     }
+    writeText(_fragments);   // 写入ts链接到列表
+
     /* 
     * 录制直播
     * 直播是持续更新的m3u8 
-    * recorderLast保存下载的最后一个url 以便下次更新时判断从哪个切片开始继续下载
+    * recorderLast保存下载的最后一个sn 以便下次更新时判断从哪个切片开始继续下载
     */
     if (recorder) {
         let indexLast = _fragments.findIndex((fragment) => {
-            return fragment.url == recorderLast;
+            return fragment.sn == recorderLast;
         });
-        recorderLast = _fragments[_fragments.length - 1].url;
+        recorderLast = _fragments[_fragments.length - 1].sn;
         downloadNew(indexLast + 1);
     }
 
-    writeText(_fragments);   // 写入ts链接到textarea
 
     // 提示加密
     isEncrypted && $("#count").append(` (${i18n.encryptedHLS})`);
 
     // SAMPLE 加密算法
-    if (_m3u8Content.includes("#EXT-X-KEY:METHOD=SAMPLE-AES-CTR")) {
+    if (data.m3u8.includes("#EXT-X-KEY:METHOD=SAMPLE-AES-CTR")) {
         $("#count").append(' <b>' + i18n.encryptedSAMPLE + '</b>');
     }
 
@@ -808,33 +810,14 @@ $("#downText").click(function () {
 });
 // 原始m3u8
 $("#originalM3U8").click(function () {
-    writeText(_m3u8Content);
+    showTab("#m3u8Content");
 });
 // 提取ts
 $("#getTs").click(function () {
-    writeText(_fragments);
+    // writeText(_fragments);
+    showTab("#mediaList");
 });
-//把远程文件替换成本地文件
-$("#localFile").click(function () {
-    writeText("");
-    let textarea = "";
-    let m3u8_split = _m3u8Content.split("\n");
-    for (let key in m3u8_split) {
-        if (isEmpty(m3u8_split[key])) { continue; }
-        if (m3u8_split[key].includes("URI=")) {
-            let KeyURL = /URI="(.*)"/.exec(m3u8_split[key]);
-            if (KeyURL && KeyURL[1]) {
-                KeyURL = GetFile(KeyURL[1]);
-                m3u8_split[key] = m3u8_split[key].replace(/URI="(.*)"/, 'URI="' + KeyURL + '"');
-            }
-        }
-        if (!m3u8_split[key].includes("#")) {
-            m3u8_split[key] = GetFile(m3u8_split[key]);
-        }
-        textarea += m3u8_split[key] + "\n";
-    }
-    writeText(textarea);
-});
+
 // 播放m3u8
 $("#play").click(function () {
     if ($(this).data("switch") == "on") {
@@ -848,7 +831,7 @@ $("#play").click(function () {
     }
     hls.detachMedia($("#video")[0]);
     $(this).html(i18n.play).data("switch", "on");
-    showTab("#media_file");
+    showTab("#mediaList");
 });
 // 调用m3u8DL下载
 $("#m3u8DL").click(function () {
@@ -1114,14 +1097,15 @@ $("#mergeTs").click(async function () {
     // 流式下载
     if ($("#StreamSaver").prop("checked")) {
         fileStream = createStreamSaver(_fragments[0].url);
-        downloadNew(start, end + 1);
+        downloadNew();
         $("#ffmpeg").prop("checked", false);
         $("#saveAs").prop("checked", false);
         $("#stopDownload").show();
         return;
     }
     $("#stopDownload").show();
-    downloadNew(start, end + 1);
+
+    downloadNew();
 });
 
 // 添加ts 参数
@@ -1140,10 +1124,52 @@ $("#tsAddArg").click(function () {
         window.location.href += "&tsAddArg=" + encodeURIComponent(arg);
     }
 });
-// 下载进度
-$("#downProgress").click(function () {
-    showTab("#downList");
+
+
+// 确认范围
+$("#rangeConfirm").click(function () {
+    let rangeStart = $("#rangeStart").val();
+    let rangeEnd = $("#rangeEnd").val();
+    if (rangeStart.includes(":")) {
+        rangeStart = timeToIndex(rangeStart);
+    } else {
+        rangeStart = parseInt(rangeStart);
+        rangeStart = rangeStart ? rangeStart - 1 : 0;
+    }
+    if (rangeEnd.includes(":")) {
+        rangeEnd = timeToIndex(rangeEnd);
+    } else {
+        rangeEnd = parseInt(rangeEnd);
+        rangeEnd = rangeEnd ? rangeEnd - 1 : _fragments.length - 1;
+    }
+    if (rangeStart == -1 || rangeEnd == -1) {
+        $progress.html(`<b>${i18n.sNumError}</b>`);
+        return;
+    }
+    if (rangeStart > rangeEnd) {
+        $progress.html(`<b>${i18n.startGTend}</b>`);
+        return;
+    }
+    if (rangeStart > _fragments.length - 1 || rangeEnd > _fragments.length - 1) {
+        $progress.html(`<b>${i18n("sNumMax", _fragments.length)}</b>`);
+        return;
+    }
+    $m3u8dlArg.val(getM3u8DlArg());
+
+    // 便利ts列表 在不再范围的切片上取消选中状态
+    const list = document.querySelector("#mediaList");
+    list.querySelectorAll(".media-item").forEach((item, index) => {
+        if (index >= rangeStart && index <= rangeEnd) {
+            item.classList.add("selected");
+            _fragments[index].selected = true;
+        } else {
+            item.classList.remove("selected");
+            _fragments[index].selected = false;
+        }
+    });
 });
+
+
 $("#onlineFFmpeg").click(function () {
     showTab("#iframeBox");
 });
@@ -1281,7 +1307,9 @@ function downloadNew(start = 0, end = _fragments.length) {
     buttonState("#mergeTs", false);
 
     // 切片下载器
-    const down = new Downloader(_fragments, parseInt($("#thread").val()));
+    // 过滤掉未选择的 _fragments
+    const selectedFragments = recorder ? _fragments.slice(start) : _fragments.filter(fragment => fragment.selected);
+    const down = new Downloader(selectedFragments, parseInt($("#thread").val()));
 
     // 储存切片所需 DOM 提高性能
     const itemDOM = new Map();
@@ -1350,17 +1378,11 @@ function downloadNew(start = 0, end = _fragments.length) {
         $("#ForceDownload").show(); // 强制下载
         $("#errorDownload").show(); // 重下所有失败项
 
-        // const $dom = $(`#downItem${fragment.index}`);
-        // $dom.find(".percentage").addClass('error').html(i18n.downloadFailed);
-        itemDOM.get(fragment.index).percentage.addClass('error').html(i18n.downloadFailed);
-        $button = itemDOM.get(fragment.index).button;
-        $button.html(i18n.retryDownload).data("action", "start");
-        if (down.isErrorItem(fragment)) {
-            const count = parseInt($button.data("count")) + 1;
-            $button.data("count", count).html(`${i18n.retryDownload}(${count})`);
-        } else {
-            $button.data("count", 0);
-        }
+        const item = itemDOM.get(fragment.index);
+        item.root.classList.add("error");
+        item.retryBtn.style.display = "inline";
+        item.stopBtn.style.display = "none";
+
     });
     // 切片下载完成
     down.on('completed', function (buffer, fragment) {
@@ -1370,7 +1392,13 @@ function downloadNew(start = 0, end = _fragments.length) {
             $fileDuration.html(i18n.recordingDuration + ":" + secToTime(downDuration));
             return;
         }
-        itemDOM.get(fragment.index).root.remove();
+
+        const item = itemDOM.get(fragment.index);
+        item.root.style.setProperty("--progress", "100%");
+        item.stopBtn.style.display = "none";
+        item.retryBtn.style.display = "none";
+        item.copyBtn.style.display = "inline";
+
         $progress.html(`${down.success}/${down.total}`);
         $fileSize.html(i18n.downloaded + ":" + byteToSize(down.buffersize));
         $fileDuration.html(i18n.downloadedVideoLength + ":" + secToTime(down.duration));
@@ -1398,7 +1426,7 @@ function downloadNew(start = 0, end = _fragments.length) {
     let lastEmitted = Date.now();
     down.on('itemProgress', function (fragment, state, receivedLength, contentLength) {
         if (Date.now() - lastEmitted >= 233) {
-            itemDOM.get(fragment.index).percentage.html((receivedLength / contentLength * 100).toFixed(2) + "%");
+            itemDOM.get(fragment.index).root.style.setProperty("--progress", (receivedLength / contentLength * 100).toFixed(2) + "%");
             lastEmitted = Date.now();
         }
     });
@@ -1415,44 +1443,52 @@ function downloadNew(start = 0, end = _fragments.length) {
     });
 
     // 开始下载
-    down.start(start, end);
+    down.start();
 
-    // 单项进度
-    const tempDOM = $("<div>");
+    // 缓存操作DOM
     down.fragments.forEach((fragment) => {
-        const html = $(`<div id="downItem${fragment.index}">
-            <a href="${fragment.url}" target="_blank">${fragment.url}</a>
-            <div class="itemProgress">
-            <span>${i18n.downloadProgress}: </span>
-            <span class="percentage">${i18n.waitDownload}</span>
-            <button data-action="stop">${i18n.stopDownload}</button>
-            </div>
-        </div>`);
+        const root = document.querySelector(`#media-item-${fragment.sn}`);
+        if (!root) { return; }
 
-        const $button = html.find("button");
+        // 停止按钮
+        const stopBtn = document.createElement("img");
+        stopBtn.classList.add("icon", "stop");
+        stopBtn.title = i18n.stopDownload;
+        stopBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            root.classList.remove("error");
+            down.stop(fragment.index);
+            down.downloader();
+            stopBtn.style.display = "none";
+            retryBtn.style.display = "inline";
+        });
+        root.appendChild(stopBtn);
 
-        // 保存进程 DOM 更新下载进度提升性能
+        // 重下按钮
+        const retryBtn = document.createElement("img");
+        retryBtn.classList.add("icon", "retry", "hide");
+        retryBtn.title = i18n.retryDownload;
+        retryBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            root.classList.remove("error");
+            down.downloader(fragment);
+            stopBtn.style.display = "inline";
+            retryBtn.style.display = "none";
+        });
+        root.appendChild(retryBtn);
+
+        // 隐藏复制按钮
+        const copyBtn = root.querySelector(".copy");
+        copyBtn.style.display = "none";
+
         itemDOM.set(fragment.index, {
-            root: html,
-            percentage: html.find(".percentage"),
-            button: $button,
+            root: document.querySelector(`#media-item-${fragment.sn}`),
+            stopBtn: stopBtn,
+            retryBtn: retryBtn,
+            copyBtn: copyBtn
         });
 
-        $button.click(function () {
-            html.find(".percentage").removeClass('error');
-            if ($(this).data("action") == "stop") {
-                down.stop(fragment.index);
-                down.downloader();  // 停止当前下载器 重新开一个下载器保持线程数量
-                $(this).html(i18n.retryDownload).data("action", "start");
-            } else {
-                down.downloader(fragment);
-                $(this).html(i18n.stopDownload).data("action", "stop");
-            }
-        });
-        tempDOM.append(html);
     });
-    $media_file.hide();
-    $("#downList").html("").show().append(tempDOM);
 
     // 强制下载
     $("#ForceDownload").off("click").click(function () {
@@ -1462,9 +1498,8 @@ function downloadNew(start = 0, end = _fragments.length) {
     // 重新下载
     $("#errorDownload").off("click").click(function () {
         down.errorItem.forEach(function (fragment, index) {
-            const button = $(`#downItem${fragment.index} button`);
             setTimeout(() => {
-                button.click();
+                itemDOM.get(fragment.index)?.retryBtn.click();
             }, index * 233);
         });
     });
@@ -1642,6 +1677,16 @@ function initDownload() {
     // 避免下载中途 更改设置 暂时储存下载配置
     downSet.mp4 = $("#mp4").prop("checked");
     downSet.onlyAudio = $("#onlyAudio").prop("checked");
+
+    // 恢复切片UI状态
+    const list = document.querySelector("#mediaList");
+    list.querySelectorAll(".media-item").forEach((item, index) => {
+        item.style.setProperty("--progress", "0%");
+        item.classList.remove("error");
+        item.querySelector(".copy").style.display = "inline";
+        item.querySelector(".stop")?.remove();
+        item.querySelector(".retry")?.remove();
+    });
 }
 
 // 流式下载
@@ -1766,18 +1811,47 @@ function timeToIndex(time) {
 }
 // 写入ts链接
 function writeText(text) {
-    showTab("#media_file");
+    const list = document.querySelector("#mediaList");
+    list.innerHTML = "";
+
     if (typeof text == "object") {
-        let url = [];
-        for (let key in text) {
-            url.push(text[key].url + "\n");
-        }
-        $media_file.val(url.join("\n"));
-        $media_file.data("type", "link");
-        return;
+        text.forEach((data, index) => {
+            const item = document.createElement("div");
+            item.classList.add("media-item");
+            item.classList.add("selected");
+            item.dataset.index = index;
+            item.dataset.sn = data.sn;
+            item.id = `media-item-${data.sn}`;
+
+            // URL
+            const urlSpan = document.createElement("span");
+            urlSpan.classList.add("url-text");
+            urlSpan.textContent = data.url;
+
+            // tips
+            const statusSpan = document.createElement("span");
+            statusSpan.classList.add("error-tip");
+
+            // 复制图标
+            const copyBtn = document.createElement("img");
+            copyBtn.classList.add("icon", "copy");
+
+            // 复制点击事件
+            copyBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                navigator.clipboard.writeText(data.url);
+            });
+            item.addEventListener("click", (e) => {
+                const idx = e.currentTarget.dataset.index;
+                _fragments[idx].selected = !_fragments[idx].selected;
+                item.classList.toggle("selected");
+            });
+            item.appendChild(urlSpan);
+            item.appendChild(statusSpan);
+            item.appendChild(copyBtn);
+            list.appendChild(item);
+        });
     }
-    $media_file.val(text);
-    $media_file.data("type", "m3u8");
 }
 // 获取文件名
 function GetFile(str) {
@@ -1963,7 +2037,7 @@ function highlight() {
 
 // 显示面板
 function showTab(Obj) {
-    const panels = ["#iframeBox", "#media_file", "#downList", "#video"];
+    const panels = ["#iframeBox", "#m3u8Content", "#downList", "#video", "#mediaList"];
     panels.forEach(sel => {
         sel === Obj ? $(sel).show() : $(sel).hide();
     });

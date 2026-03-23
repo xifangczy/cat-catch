@@ -233,24 +233,16 @@ textarea {
   max-width: 100%;
 }
 
-#media_file {
+#m3u8Content {
   word-break: break-all;
 }
 
-#media_file,
+#m3u8Content,
 #jsonText,
 #m3u8Text {
   height: 55vh;
 }
 
-/* #media_file {
-  font-size: 12px;
-  font-family: "Microsoft YaHei", "Helvetica", "Arial", sans-serif;
-  height: 700px;
-  overflow-y: auto;
-  border: solid 1.5px rgb(0 0 0 / 50%);
-  word-break: break-all;
-} */
 #formatStr {
   width: 145px;
 }
@@ -364,18 +356,18 @@ textarea {
 } */
 .rangeDown {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  margin-right: 10px;
+  /* margin-right: 10px; */
+  margin-left: auto;
 }
-
-.rangeDown .merge {
-  margin-top: 0;
+.rangeDown #cc {
+  margin-left: 2px;
 }
 
 #rangeStart,
 #rangeEnd {
-  width: 55px;
+  width: 66px;
   /* text-align:center;
   vertical-align:middle; */
   margin-left: 2px;
@@ -613,4 +605,127 @@ a.json-placeholder:hover {
 }
 .item .send2localType select {
   width: 15rem;
+}
+
+/* 切片列表容器 */
+#mediaList {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 3px;
+  background: var(--background-color);
+  /* border: var(--input-border); */
+  border-radius: 4px;
+  height: 60vh;
+  overflow-y: auto;
+  counter-reset: ts-counter;
+}
+
+/* 切片单条样式 */
+.media-item {
+  display: flex;
+  align-items: center;
+  padding: 4px 6px;
+  /* background: var(--background-color-two); */
+  border: 1px solid #6c6c6c;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.15s ease-in-out;
+  color: var(--text-color);
+  user-select: none;
+  text-align: left;
+}
+
+.media-item:hover {
+  background: var(--button-hover-color);
+}
+
+.media-item.selected {
+  --progress: 0%;
+  background: linear-gradient(
+    to right,
+    rgba(26, 115, 232, 0.2) var(--progress),
+    var(--background-color-two) var(--progress)
+  );
+}
+
+/* 序号生成（最左侧展示） */
+.media-item::before {
+  counter-increment: ts-counter;
+  content: counter(ts-counter);
+  display: inline-block;
+  min-width: 0.5rem;
+  font-weight: bold;
+  color: var(--text2-color);
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  margin-right: 10px;
+  padding-right: 5px;
+  flex-shrink: 0; /* 保证序号不被压缩 */
+}
+
+.media-item.selected {
+  /* background: var(--background-color-two); */
+  border-color: var(--button2-color);
+  box-shadow: 0 0 0 1px var(--button2-color);
+}
+
+.media-item .url-text {
+  flex: 1; /* 撑满中间剩余空间 */
+  word-break: break-all;
+  /* margin-right: 2px; */
+}
+
+.media-item .icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  cursor: pointer;
+  flex-shrink: 0; /* 防止被挤压 */
+  opacity: 0.6;
+  transition:
+    opacity 0.2s,
+    transform 0.1s;
+}
+
+.media-item .icon.copy {
+  content: url(../img/copy.png);
+}
+.media-item .icon.stop {
+  content: url(../img/stop.svg);
+}
+.media-item .icon.retry {
+  content: url(../img/retry.svg);
+}
+
+.media-item .icon:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.media-item .icon:active {
+  transform: scale(0.9);
+}
+
+.media-item.error {
+  /* 边框 */
+  border-color: var(--text-error-color) !important;
+  box-shadow: 0 0 0 1px var(--text-error-color) !important;
+
+  /* 提示 */
+  color: var(--text-error-color) !important;
+
+  /* 进度条 */
+  background: linear-gradient(
+    to right,
+    rgba(255, 0, 0, 0.15) var(--progress),
+    var(--background-color-two) var(--progress)
+  ) !important;
+}
+
+.media-item .error-tip {
+  font-size: 11px;
+  color: var(--text-error-color);
+  margin-left: 8px;
+  /* font-weight: bold; */
+  flex-shrink: 0;
 }

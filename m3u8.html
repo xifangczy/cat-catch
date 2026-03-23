@@ -86,17 +86,30 @@
         <div class="block" id="textarea">
           <details>
             <summary data-i18n="viewSlices" class="button"></summary>
-            <textarea id="media_file" spellcheck="false" data-type="link" class="width100"
+            <textarea id="m3u8Content" spellcheck="false" data-type="link" class="width100 hide"
               data-i18n="loading"></textarea>
+            <div id="mediaList" class="width100" data-i18n="loading"></div>
             <div id="downList" data-i18n="waitDownload"></div>
             <div class="iframeBox" id="iframeBox"></div>
             <div class="merge">
               <button id="downText" data-i18n="downloadSegmentList"></button>
               <button id="originalM3U8" data-i18n="originalM3u8"></button>
-              <button id="localFile" class="hide" data-i18n="localM3u8"></button>
-              <button id="downProgress" data-i18n="downloadProgress"></button>
+              <!-- <button id="downProgress" data-i18n="downloadProgress"></button> -->
               <button id="getTs" data-i18n="segmentList"></button>
               <button id="onlineFFmpeg" data-i18n="onlineFFmpeg" class="hide"></button>
+
+              <!-- 下载范围 -->
+              <div class="rangeDown textColor">
+                <p data-i18n-outer="downloadRange"></p>
+                <select id="cc" class="hide">
+                  <option disabled selected hidden>playlist</option>
+                </select>
+                <input type="text" id="rangeStart" spellcheck="false" data-i18n-placeholder="start" value="1" />
+                <input type="text" id="rangeEnd" spellcheck="false" data-i18n-placeholder="end" />
+
+                <button id="rangeConfirm" data-i18n="confirm"></button>
+              </div>
+
             </div>
           </details>
         </div>
@@ -153,7 +166,7 @@
             <label class="m3u8checkbox textColor">
               <p data-i18n-outer="autoClosePageAfterDownload"></p><input type="checkbox" id="autoClose" save="change" />
             </label>
-            <div class="rangeDown textColor">
+            <!-- <div class="rangeDown textColor">
               <p data-i18n-outer="downloadRange"></p>
               <select id="cc" class="hide">
                 <option disabled selected hidden>playlist</option>
@@ -162,7 +175,7 @@
                 <input type="text" id="rangeStart" spellcheck="false" data-i18n-placeholder="start" value="1" />
                 <input type="text" id="rangeEnd" spellcheck="false" data-i18n-placeholder="end" />
               </div>
-            </div>
+            </div> -->
             <button id="recorder" class="button2 hide" data-switch="on" data-switch="on"
               data-i18n="recordLive"></button>
             <div class="textColor m3u8checkbox">
