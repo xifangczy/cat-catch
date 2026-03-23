@@ -113,34 +113,53 @@
             </div>
           </details>
         </div>
+        <div class="line"></div>
         <video id="video" class="hide" controls></video>
         <div class="block" id="button">
+
           <div class="merge">
             <button id="tsAddArg" data-i18n="getParameters"></button>
             <button id="setRequestHeaders" data-i18n="requestHeaders"></button>
             <button id="play" data-switch="on" data-i18n="play"></button>
-            <button id="m3u8DL" class="button2" data-i18n="invokeM3u8DL"></button>
-            <button id="copyM3U8dl" class="hide" data-i18n="copyCommand"></button>
-            <button id="setM3u8dl" data-i18n="previewCommand"></button>
-            <label class="m3u8checkbox textColor">
-              <p data-i18n-outer="addSettingParameters"></p><input type="checkbox" id="addParam" save="change" />
-            </label>
-            <button id="invoke" class="button2" data-i18n="invoke"></button>
             <button class="openDir hide" data-i18n="downloadDir"></button>
             <button id="sendFfmpeg" class="hide button" data-i18n="sendFfmpeg"></button>
+
+            <!-- 调用 -->
+            <div class="dl-container">
+              <div class="m3u8DLBox hide">
+                <div class="m3u8DL">
+                  <button id="m3u8DL" class="button2" data-i18n="invokeM3u8DL"></button>
+                  <button id="setM3u8dl" data-i18n="previewCommand"></button>
+                  <label class="m3u8checkbox textColor">
+                    <p data-i18n-outer="addSettingParameters"></p><input type="checkbox" id="addParam" save="change" />
+                  </label>
+                  <button id="invoke" class="button2" data-i18n="invoke"></button>
+                </div>
+              </div>
+              <button id="openM3U8DL" class="button" data-i18n="invokeM3u8DL"></button>
+            </div>
+
+
+            <div class="dl-container">
+              <div class="keyBox hide">
+                <div class=" customKey">
+                  <input type="text" id="customKey" spellcheck="false" data-i18n-placeholder="customKeyPlaceholder"
+                    size="60" />
+                  <input type="text" id="customIV" spellcheck="false" placeholder="IV" size="30" />
+                  <button id="uploadKey" data-i18n="uploadKey"></button>
+                  <input id="uploadKeyFile" type="file" class="hide" />
+                </div>
+              </div>
+              <button id="openKey" class="button" data-i18n="key"></button>
+            </div>
+
           </div>
+
           <textarea id="m3u8dlArg" type="text" class="m3u8dlArg hide"></textarea>
           <div class="line"></div>
-          <div class="merge customKey">
+          <div class="merge" id="mergeDown">
             <input type="text" id="customFilename" spellcheck="false" data-i18n-placeholder="customSaveFileName"
               size="30" />
-            <input type="text" id="customKey" spellcheck="false" data-i18n-placeholder="customKeyPlaceholder"
-              size="60" />
-            <input type="text" id="customIV" spellcheck="false" placeholder="IV" size="30" />
-            <button id="uploadKey" data-i18n="uploadKey"></button>
-            <input id="uploadKeyFile" type="file" class="hide" />
-          </div>
-          <div class="merge" id="mergeDown">
             <div id="threadDiv" class="textColor">
               <p data-i18n-outer="downloadThreads"></p> <input type="number" value="6" id="thread" spellcheck="false"
                 style="width: 35px;" step="1" min="1" max="256" save="change" />
@@ -166,33 +185,26 @@
             <label class="m3u8checkbox textColor">
               <p data-i18n-outer="autoClosePageAfterDownload"></p><input type="checkbox" id="autoClose" save="change" />
             </label>
-            <!-- <div class="rangeDown textColor">
-              <p data-i18n-outer="downloadRange"></p>
-              <select id="cc" class="hide">
-                <option disabled selected hidden>playlist</option>
-              </select>
-              <div class="merge">
-                <input type="text" id="rangeStart" spellcheck="false" data-i18n-placeholder="start" value="1" />
-                <input type="text" id="rangeEnd" spellcheck="false" data-i18n-placeholder="end" />
-              </div>
-            </div> -->
             <button id="recorder" class="button2 hide" data-switch="on" data-switch="on"
               data-i18n="recordLive"></button>
             <div class="textColor m3u8checkbox">
               <p data-i18n-outer="retryCount"></p>(test) <input type="number" value="0" id="retryCount"
                 spellcheck="false" style="width: 35px;" step="1" min="0" />
             </div>
-            <button id="mergeTs" class="button2" data-i18n="mergeDownloads"></button>
+          </div>
+          <div class="merge">
+            <div class="m3u8Tips">
+              <div id="progress"></div>
+              <div id="fileSize"></div>
+              <div id="fileDuration"></div>
+            </div>
+          </div>
+          <div class="merge">
+            <button id="mergeTs" class="button2 width100" data-i18n="mergeDownloads"></button>
             <button id="errorDownload" class="hide button2" data-i18n="redownloadFailedItems"></button>
             <button id="ForceDownload" class="hide button2" data-i18n="downloadExistingData"></button>
             <button id="stopDownload" class="hide button2" data-i18n="stopDownload"></button>
           </div>
-          <div style="display: flex; margin-top: 10px;">
-            <div id="progress"></div>
-            <div id="fileSize"></div>
-            <div id="fileDuration"></div>
-          </div>
-          <div class="block hide" id="errorTsList"></div>
         </div>
 
       </div>

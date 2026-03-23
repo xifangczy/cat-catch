@@ -306,6 +306,15 @@ textarea {
   border-radius: 3px;
 }
 
+.m3u8Tips {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  align-content: center;
+  margin-top: 5px;
+}
+
 #fileSize,
 #fileDuration {
   margin-left: 20px;
@@ -342,13 +351,20 @@ textarea {
 
 .merge {
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   margin-top: 5px;
   align-items: center;
+  align-content: center;
 }
 
 .customKey input {
-  margin-right: 5px;
+  /* margin-right: 5px; */
+  margin-top: 3px;
+}
+.customKey {
+  display: flex;
+  margin-top: 5px;
+  flex-direction: column;
 }
 
 /* .wrapper .button {
@@ -359,7 +375,7 @@ textarea {
   flex-direction: row;
   align-items: center;
   /* margin-right: 10px; */
-  margin-left: auto;
+  /* margin-left: auto; */
 }
 .rangeDown #cc {
   margin-left: 2px;
@@ -421,15 +437,58 @@ textarea {
   width: 100%;
 }
 
-.m3u8DL {
+.options .m3u8DL {
   margin-right: 70px !important;
 }
 
-/* .m3u8DL #m3u8dl{
-  width: 8rem;
-} */
+.m3u8_wrapper .m3u8DL {
+  display: flex;
+  margin-top: 5px;
+  width: 23rem;
+  align-items: center;
+  justify-content: space-around;
+}
+
+/* 确保包裹层是定位基准 */
+.dl-container {
+  position: relative;
+  display: inline-block; /* 保持按钮原有的行内块特性 */
+}
+
+/* 悬浮窗面板 */
+.m3u8DLBox,
+.keyBox {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+
+  background: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 999;
+  white-space: nowrap;
+}
+.m3u8DLBox::after,
+.keyBox::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px 6px 0;
+  border-style: solid;
+  border-color: #ffffff transparent transparent;
+}
+
 .break-all {
   word-break: break-all;
+}
+
+#mergeTs {
+  width: 66%;
 }
 
 /* MPD*/

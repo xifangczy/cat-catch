@@ -742,7 +742,7 @@ function parseTs(data) {
 async function estimateSize(fragments) {
     if (!fragments || fragments.length === 0) return;
 
-    const samplesToCheck = Math.min(3, fragments.length);
+    const samplesToCheck = Math.min(5, fragments.length);
     let totalSize = 0;
     let successfulFetches = 0;
 
@@ -834,6 +834,7 @@ $("#play").click(function () {
     $(this).html(i18n.play).data("switch", "on");
     showTab("#mediaList");
 });
+
 // 调用m3u8DL下载
 $("#m3u8DL").click(function () {
     if (_m3u8Url.startsWith("blob:")) {
@@ -849,16 +850,26 @@ $("#m3u8DL").click(function () {
     }
     chrome.tabs.update({ url: m3u8dl });
 });
+$("#openM3U8DL").click(function (e) {
+    e.stopPropagation();
+    $(".m3u8DLBox").toggle();
+});
+$(".m3u8DLBox").click(function (e) {
+    e.stopPropagation();
+});
+
+$("#openKey").click(function (e) {
+    e.stopPropagation();
+    $(".keyBox").toggle();
+});
+$(".keyBox").click(function (e) {
+    e.stopPropagation();
+});
+
 // 调用自定义协议
 $("#invoke").click(function () {
     const url = getTemplates(G.invokeText);
     chrome.tabs.update({ url: url });
-});
-// 复制m3u8DL命令
-$("#copyM3U8dl").click(function () {
-    const m3u8dlArg = getM3u8DlArg();
-    $m3u8dlArg.val(m3u8dlArg);
-    navigator.clipboard.writeText(m3u8dlArg);
 });
 // 显示m3u8DL命令
 $("#setM3u8dl").click(function () {
@@ -1188,6 +1199,11 @@ $(document).on("click", "#setRequestHeaders, #setRequestHeadersError", function 
         params.append("requestHeaders", arg);
         window.location.href = window.location.origin + window.location.pathname + "?" + params.toString();
     }
+});
+
+document.addEventListener('click', function () {
+    $(".m3u8DLBox").hide();
+    $(".keyBox").hide();
 });
 
 // #EXT-X-DISCONTINUITY 范围选择
@@ -1626,13 +1642,16 @@ function mergeTsNew(down) {
             if (!iframeFFmpeg) {
                 createIframeFFmpeg(() => {
                     iframeFFmpeg.contentWindow.postMessage(fileData, '*');
+                    $progress.html(i18n.sendFfmpeg);
                 });
             } else if (iframeFFmpegReady) {
                 iframeFFmpeg.contentWindow.postMessage(fileData, '*');
+                $progress.html(i18n.sendFfmpeg);
             } else {
                 const timer = setInterval(() => {
                     if (iframeFFmpegReady) {
                         iframeFFmpeg.contentWindow.postMessage(fileData, '*');
+                        $progress.html(i18n.sendFfmpeg);
                         clearInterval(timer);
                     } else {
                         iframeFFmpegReadyRetryCount++;
@@ -2083,6 +2102,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     // if (!Message.Message || Message.Message != "catCatchFFmpegResult" || Message.state != "ok" || currentTabId == 0 || Message.tabId != currentTabId || G.iframeFFmpeg) { return; }
     if (!Message.Message || Message.Message != "catCatchFFmpegResult" || Message.state != "done" || currentTabId == 0 || Message.tabId != currentTabId) { return; }
     setTimeout(() => {
+        $progress.html(i18n.downloadComplete);
         $("#autoClose").prop("checked") && closeTab();
     }, 1000);
 });
