@@ -95,21 +95,17 @@
         <!-- 切片列表和部分操作按钮 可折叠 -->
         <div class="block" id="textarea">
           <details>
+            <!-- 折叠按钮 -->
             <summary data-i18n="viewSlices" class="button"></summary>
-
             <!-- m3u8原始内容 -->
             <textarea id="m3u8Content" spellcheck="false" data-type="link" class="width100 hide"
               data-i18n="loading"></textarea>
-
             <!-- 切片列表 -->
             <div id="mediaList" class="width100" data-i18n="loading"></div>
-
             <!-- 下载列表 已弃用 -->
             <div id="downList" data-i18n="waitDownload"></div>
-
             <!-- 在线ffmpeg -->
             <div class="iframeBox" id="iframeBox"></div>
-
             <!-- 视频预览 -->
             <video id="video" class="hide" controls></video>
 
@@ -117,12 +113,10 @@
             <div class="merge">
               <!-- 预览播放 -->
               <button id="play" data-switch="on" data-i18n="play"></button>
-              <!-- 下载切片列表 隐藏 -->
-              <button id="downText" data-i18n="downloadSegmentList" class="hide"></button>
-
+              <!-- 原始m3u8 -->
               <button id="originalM3U8" data-i18n="originalM3u8"></button>
+              <!-- 切片列表 -->
               <button id="getTs" data-i18n="segmentList"></button>
-
               <!-- 在线ffmpeg -->
               <button id="onlineFFmpeg" data-i18n="onlineFFmpeg"></button>
 
@@ -160,8 +154,9 @@
               <!-- 更多功能 -->
               <div class="dl-container">
                 <div class="m3u8Popup" id="moreFeaturesBox">
+                  <button id="downText" data-i18n="downloadSegmentList"></button>
                   <button id="tsAddArg" data-i18n="getParameters"></button>
-                  <button id="setRequestHeaders" data-i18n="requestHeaders"></button>
+                  <button id="setRequestHeaders" data-i18n="setRequestHeaders"></button>
                   <button id="sendFfmpeg" class="hide button" data-i18n="sendFfmpeg"></button>
                 </div>
                 <button id="moreFeatures" data-i18n="moreFeatures"></button>
