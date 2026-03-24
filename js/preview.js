@@ -21,6 +21,7 @@ class FilePreview {
         this.currentPage = 1; // 当前页码
         this.sourcePageDOM = null; // 源页面DOM
 
+        this.ctrlKeyPressed = false; // Ctrl键状态
 
         // 初始化
         this.init();
@@ -90,10 +91,20 @@ class FilePreview {
                 this.closePreview();
                 return;
             }
-            // ctrl + a
+            // ctrl + a 全选
             if ((event.ctrlKey || event.metaKey) && event.key === 'a' && event.target.tagName != "INPUT") {
                 this.toggleSelection('all');
                 event.preventDefault();
+            }
+            // 检查到Ctrl键状态 用于框选时 取消其他选中
+            if (event.key === 'Control') {
+                if (event.repeat) { return; }
+                this.ctrlKeyPressed = true;
+            }
+        });
+        document.addEventListener('keyup', (event) => {
+            if (event.key === 'Control') {
+                this.ctrlKeyPressed = false;
             }
         });
         // 排序按钮
@@ -917,7 +928,7 @@ class FilePreview {
                     rect.top + window.scrollY < top + height &&
                     rect.top + rect.height + window.scrollY > top) {
                     item.selected = true;
-                } else {
+                } else if (!this.ctrlKeyPressed) {
                     item.selected = false;
                 }
             });
