@@ -426,13 +426,13 @@
     "message": "QoS Level"
   },
   "mqttQos0": {
-    "message": "(At most once)"
+    "message": "0(At most once)"
   },
   "mqttQos1": {
-    "message": "(At least once)"
+    "message": "1(At least once)"
   },
   "mqttQos2": {
-    "message": "(Exactly once)"
+    "message": "2(Exactly once)"
   },
   "mqttDataFormat": {
     "message": "Data Format"

@@ -388,7 +388,7 @@
   },
   "winpopup": {
     "message": "janela do balão"
-  },   
+  },
   "excludeDuplicateResources": {
     "message": "Excluir recursos duplicados (consome muitos recursos da CPU)"
   },
@@ -426,13 +426,13 @@
     "message": "Nível de QoS"
   },
   "mqttQos0": {
-    "message": "(No Máximo Uma Vez)"
+    "message": "0(No Máximo Uma Vez)"
   },
   "mqttQos1": {
-    "message": "(Pelo Menos Uma Vez)"
+    "message": "1(Pelo Menos Uma Vez)"
   },
   "mqttQos2": {
-    "message": "(Exatamente Uma Vez)"
+    "message": "2(Exatamente Uma Vez)"
   },
   "mqttDataFormat": {
     "message": "Formato dos Dados"
@@ -1008,7 +1008,7 @@
     "message": "Sempre habilitar pesquisa profunda"
   },
   "sideurlprotocol": {
-  	"message": "Protocolo URL m3u8dl"
+    "message": "Protocolo URL m3u8dl"
   },
   "deleteDuplicateFilenames": {
     "message": "Excluir nomes de arquivos duplicados"

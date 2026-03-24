@@ -426,13 +426,13 @@
     "message": "QoS级别"
   },
   "mqttQos0": {
-    "message": "(最多一次)"
+    "message": "0(最多一次)"
   },
   "mqttQos1": {
-    "message": "(至少一次)"
+    "message": "1(至少一次)"
   },
   "mqttQos2": {
-    "message": "(确保一次)"
+    "message": "2(确保一次)"
   },
   "mqttDataFormat": {
     "message": "数据格式"

@@ -426,13 +426,13 @@
     "message": "Mức QoS"
   },
   "mqttQos0": {
-    "message": "(Tối đa một lần)"
+    "message": "0(Tối đa một lần)"
   },
   "mqttQos1": {
-    "message": "(Ít nhất một lần)"
+    "message": "1(Ít nhất một lần)"
   },
   "mqttQos2": {
-    "message": "(Chính xác một lần)"
+    "message": "2(Chính xác một lần)"
   },
   "mqttDataFormat": {
     "message": "Định dạng dữ liệu"

@@ -388,7 +388,7 @@
   },
   "winpopup": {
     "message": "window popup"
-  },   
+  },
   "excludeDuplicateResources": {
     "message": "Yinelenen kaynakları hariç tut (çok fazla kaynak çok fazla CPU tüketecektir)"
   },
@@ -426,13 +426,13 @@
     "message": "QoS Düzeyi"
   },
   "mqttQos0": {
-    "message": "(En çok bir kez)"
+    "message": "0(En çok bir kez)"
   },
   "mqttQos1": {
-    "message": "(En az bir kez)"
+    "message": "1(En az bir kez)"
   },
   "mqttQos2": {
-    "message": "(Tam olarak bir kez)"
+    "message": "2(Tam olarak bir kez)"
   },
   "mqttDataFormat": {
     "message": "Veri Biçimi"
@@ -1008,7 +1008,7 @@
     "message": "Her zaman derin aramayı etkinleştir"
   },
   "alertimport": {
-  	"message": "İçe aktarma tamamlandı"
+    "message": "İçe aktarma tamamlandı"
   },
   "deleteDuplicateFilenames": {
     "message": "Yinelenen dosya adlarını sil"

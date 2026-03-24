@@ -426,13 +426,13 @@
     "message": "QoSレベル"
   },
   "mqttQos0": {
-    "message": "(最大1回)"
+    "message": "0(最大1回)"
   },
   "mqttQos1": {
-    "message": "(少なくとも1回)"
+    "message": "1(少なくとも1回)"
   },
   "mqttQos2": {
-    "message": "(1回のみ確実に配信)"
+    "message": "2(1回のみ確実に配信)"
   },
   "mqttDataFormat": {
     "message": "データ形式"

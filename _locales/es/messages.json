@@ -426,13 +426,13 @@
     "message": "Nivel QoS"
   },
   "mqttQos0": {
-    "message": "(Como máximo una vez)"
+    "message": "0(Como máximo una vez)"
   },
   "mqttQos1": {
-    "message": "(Al menos una vez)"
+    "message": "1(Al menos una vez)"
   },
   "mqttQos2": {
-    "message": "(Exactamente una vez)"
+    "message": "2(Exactamente una vez)"
   },
   "mqttDataFormat": {
     "message": "Formato datos"
@@ -1008,11 +1008,11 @@
     "message": "Activar una búsqueda profunda"
   },
   "alertimport": {
-  	"message": "importación completada"
+    "message": "importación completada"
   },
   "sideurlprotocol": {
     "message": "Protocolo URL m3u8dl"
-  }, 
+  },
   "deleteDuplicateFilenames": {
     "message": "Eliminar nombres de archivo duplicados"
   }
