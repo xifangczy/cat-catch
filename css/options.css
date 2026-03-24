@@ -377,6 +377,7 @@ textarea {
   /* margin-right: 10px; */
   /* margin-left: auto; */
 }
+
 .rangeDown #cc {
   margin-left: 2px;
 }
@@ -434,7 +435,7 @@ textarea {
   margin-top: 10px;
   height: 100px;
   word-break: break-all;
-  width: 100%;
+  width: 50vw;
 }
 
 .options .m3u8DL {
@@ -447,6 +448,7 @@ textarea {
   width: 23rem;
   align-items: center;
   justify-content: space-around;
+  margin: auto;
 }
 
 /* 确保包裹层是定位基准 */
@@ -456,8 +458,8 @@ textarea {
 }
 
 /* 悬浮窗面板 */
-.m3u8DLBox,
-.keyBox {
+.m3u8Popup {
+  display: none;
   position: absolute;
   bottom: calc(100% + 12px);
   left: 50%;
@@ -471,8 +473,7 @@ textarea {
   z-index: 999;
   white-space: nowrap;
 }
-.m3u8DLBox::after,
-.keyBox::after {
+.m3u8Popup::after {
   content: "";
   position: absolute;
   bottom: -6px;

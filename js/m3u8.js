@@ -809,15 +809,21 @@ $("#downText").click(function () {
         filename: filename
     });
 });
+
 // 原始m3u8
 $("#originalM3U8").click(function () {
     showTab("#m3u8Content");
 });
-// 提取ts
+// 切片列表
 $("#getTs").click(function () {
-    // writeText(_fragments);
     showTab("#mediaList");
 });
+// 在线ffmpeg
+$("#onlineFFmpeg").click(function () {
+    !iframeFFmpeg && createIframeFFmpeg();
+    showTab("#iframeBox");
+});
+
 
 // 播放m3u8
 $("#play").click(function () {
@@ -850,21 +856,31 @@ $("#m3u8DL").click(function () {
     }
     chrome.tabs.update({ url: m3u8dl });
 });
-$("#openM3U8DL").click(function (e) {
-    e.stopPropagation();
-    $(".m3u8DLBox").toggle();
-});
-$(".m3u8DLBox").click(function (e) {
-    e.stopPropagation();
-});
 
-$("#openKey").click(function (e) {
+// 折叠按钮
+const $popupBox = $("#openM3U8DLBox, #openKeyBox, #moreFeaturesBox");
+$("#openM3U8DL, #openKey, #moreFeatures").click(function (e) {
     e.stopPropagation();
-    $(".keyBox").toggle();
+    const $box = $(`#${e.target.id}Box`);
+    if ($box.is(":visible")) {
+        $box.hide();
+        return;
+    }
+    $popupBox.hide();
+    $box.show();
+
+    // 点击其他区域关闭窗口
+    $(document).off("click.closeBox").on("click.closeBox", function () {
+        hideAllBoxes();
+    });
 });
-$(".keyBox").click(function (e) {
-    e.stopPropagation();
+$popupBox.click(function (e) {
+    e.target.id != "setRequestHeaders" && e.stopPropagation();
 });
+function hideAllBoxes() {
+    $popupBox.hide();
+    $(document).off("click.closeBox");
+}
 
 // 调用自定义协议
 $("#invoke").click(function () {
@@ -962,11 +978,15 @@ $("#rangeStart, #rangeEnd, #thread").keyup(function () {
                 $(this).val(_fragments.length);
                 break;
             case 'thread':
-                $(this).val(32);
+                $(this).val(6);
                 break;
         }
+        return;
     }
 });
+
+
+
 // 储存设置
 $("#addParam").on("change", function () {
     allOption.addParam = $("#addParam").prop("checked");
@@ -1044,7 +1064,7 @@ $("#mergeTs").click(async function () {
         return;
     }
     if (start > _fragments.length - 1 || end > _fragments.length - 1) {
-        $progress.html(`<b>${i18n("sNumMax", _fragments.length)}</b>`);
+        $progress.html(`<b>${i18n("sNumMax", [_fragments.length])}</b>`);
         return;
     }
     /* 设定自定义密钥和IV */
@@ -1099,7 +1119,6 @@ $("#mergeTs").click(async function () {
         }
     }
     skipDecrypt = $("#skipDecrypt").prop("checked");    // 是否跳过解密
-    $progress.html(`0/${end - start + 1}`); // 进度显示
 
     // 估算检查文件大小
     if (!$("#StreamSaver").prop("checked") && estimateFileSize > G.chromeLimitSize && confirm(i18n("fileTooLargeStream", ["2G"]))) {
@@ -1169,7 +1188,7 @@ $("#rangeConfirm").click(function () {
         return;
     }
     if (rangeStart > _fragments.length - 1 || rangeEnd > _fragments.length - 1) {
-        $progress.html(`<b>${i18n("sNumMax", _fragments.length)}</b>`);
+        $progress.html(`<b>${i18n("sNumMax", [_fragments.length])}</b>`);
         return;
     }
     $m3u8dlArg.val(getM3u8DlArg());
@@ -1187,10 +1206,6 @@ $("#rangeConfirm").click(function () {
     });
 });
 
-
-$("#onlineFFmpeg").click(function () {
-    showTab("#iframeBox");
-});
 // 设置请求头
 $(document).on("click", "#setRequestHeaders, #setRequestHeadersError", function () {
     const arg = window.prompt(i18n.addParameters, JSON.stringify(requestHeaders));
@@ -1199,11 +1214,6 @@ $(document).on("click", "#setRequestHeaders, #setRequestHeadersError", function 
         params.append("requestHeaders", arg);
         window.location.href = window.location.origin + window.location.pathname + "?" + params.toString();
     }
-});
-
-document.addEventListener('click', function () {
-    $(".m3u8DLBox").hide();
-    $(".keyBox").hide();
 });
 
 // #EXT-X-DISCONTINUITY 范围选择
@@ -1333,6 +1343,7 @@ function downloadNew(start = 0, end = _fragments.length) {
     // 过滤掉未选择的 _fragments
     const selectedFragments = recorder ? _fragments.slice(start) : _fragments.filter(fragment => fragment.selected);
     const down = new Downloader(selectedFragments, parseInt($("#thread").val()));
+    $progress.html(`${down.success}/${down.total}`);
 
     // 储存切片所需 DOM 提高性能
     const itemDOM = new Map();
@@ -2069,7 +2080,7 @@ function highlight() {
 
 // 显示面板
 function showTab(Obj) {
-    const panels = ["#iframeBox", "#m3u8Content", "#downList", "#video", "#mediaList"];
+    const panels = ["#iframeBox", "#m3u8Content", "#video", "#mediaList"];
     panels.forEach(sel => {
         sel === Obj ? $(sel).show() : $(sel).hide();
     });
