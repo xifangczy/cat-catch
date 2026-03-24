@@ -19,6 +19,8 @@ class FilePreview {
         this._tabId = -1; // 当前标签ID
         this.currentRange = null; // 当前显示范围
         this.currentPage = 1; // 当前页码
+        this.sourcePageDOM = null; // 源页面DOM
+
 
         // 初始化
         this.init();
@@ -30,6 +32,7 @@ class FilePreview {
         this.parseParams();             // url解析参数
         this.tab = await chrome.tabs.getCurrent();  // 获取当前标签
         this.setupEventListeners();     // 设置事件监听
+        await this.getSourcePageDOM();  // 获取源页面DOM
         await this.loadFileItems();     // 载入数据
         this.setupFilters();            // 设置 后缀/类型 筛选
         this.setOptions();              // 设置选项
@@ -586,6 +589,10 @@ class FilePreview {
 
         data.name = isEmpty(data.name) ? data.title + '.' + data.ext : decodeURIComponent(stringModify(data.name));
 
+        Object.defineProperty(data, "pageDOM", {
+            get: () => { return this.sourcePageDOM; }
+        });
+
         data.downFileName = G.TitleName ? templates(G.downFileName, data) : data.name;
         data.downFileName = filterFileName(data.downFileName);
         if (isEmpty(data.downFileName)) {
@@ -1061,6 +1068,19 @@ class FilePreview {
     checkVersion() {
         if (G.version < 102 || (G.isFirefox && G.version < 128)) {
             document.querySelectorAll("[type='script']").forEach(script => script.style.display = 'none');
+        }
+    }
+
+    // 获取源页面DOM
+    async getSourcePageDOM() {
+        if (!G.getHtmlDOM) { return; }
+        try {
+            const response = await chrome.tabs.sendMessage(this._tabId, { Message: "getPage" }, { frameId: 0 });
+            this.sourcePageDOM = new DOMParser().parseFromString(response, 'text/html');
+            return this.sourcePageDOM;
+        } catch (error) {
+            console.warn("Failed to get source page DOM:", error);
+            throw error;
         }
     }
 }
