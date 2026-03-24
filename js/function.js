@@ -186,90 +186,81 @@ function splitString(text, separator) {
 }
 
 /**
- * 模板的函数处理
+ * 模板的函数处理处理器映射表
+ */
+const processors = {
+    slice: (txt, arg) => txt.slice(...arg),
+    replace: (txt, arg) => txt.replace(...arg),
+    replaceAll: (txt, arg) => txt.replaceAll(...arg),
+    regexp: (txt, arg) => {
+        const match = txt.match(new RegExp(...arg));
+        if (!match) return "";
+        return match.slice(1).filter(Boolean).map(s => s.trim()).join("");
+    },
+    exists: (txt, arg) => txt ? arg[0]?.replaceAll("*", txt) : (arg[1]?.replaceAll("*", txt) || ""),
+    prepend: (txt, arg) => (arg[0] || "") + txt,
+    concat: (txt, arg) => txt + (arg[0] || ""),
+    to: (txt, arg) => {
+        const type = arg[0];
+        switch (type) {
+            case "base64":
+                try {
+                    return btoa(encodeURIComponent(txt).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode(parseInt(p1, 16))));
+                } catch { return txt; }
+            case "urlEncode":
+                return encodeURIComponent(txt);
+            case "urlDecode":
+                return decodeURIComponent(txt);
+            case "lowerCase":
+                return txt.toLowerCase();
+            case "upperCase":
+                return txt.toUpperCase();
+            case "trim":
+                return txt.trim();
+            case "filter":
+                return stringModify(txt.trim());
+            default:
+                return txt;
+        }
+    },
+    find: (txt, arg, data) => {
+        if (data?.pageDOM) {
+            try {
+                return data.pageDOM.querySelector(arg[0])?.innerText?.trim() || "";
+            } catch { return ""; }
+        }
+        return "";
+    },
+    filter: (txt, arg) => stringModify(txt, arg[0]),
+    prompt: (txt) => window.prompt("", txt) || ""
+};
+
+/**
+ * 模板的函数链式处理
  * @param {String} text 文本
- * @param {String} action 函数名
- * @param {Object} data 填充的数据
+ * @param {String} actionStr 函数链管道字符串 (如 "slice:0,5 | to:upperCase")
+ * @param {Object} data 外部传入的数据对象
  * @returns {String} 返回处理后的字符串
  */
-function templatesFunction(text, action, data) {
-    text = isEmpty(text) ? "" : text.toString();
-    action = splitString(action, "|");
-    for (let item of action) {
-        let action = item.trim();   // 函数
-        let arg = [];   //参数
-        // 查找 ":" 区分函数与参数
-        const colon = item.indexOf(":");
-        if (colon != -1) {
-            action = item.slice(0, colon).trim();
-            arg = splitString(item.slice(colon + 1).trim(), ",").map(item => {
-                // return item.trim().replace(/^['"]|['"]$/g, "");
-                return item.trim().replace(/^(['"])([\s\S]*)\1$/, '$2');
+function templatesFunction(text, actionStr, data) {
+    text = isEmpty(text) ? "" : String(text);
+    const actions = splitString(actionStr, "|");
+
+    for (const item of actions) {
+        let actionName = item.trim();
+        let args = [];
+        const colonIndex = item.indexOf(":");
+
+        if (colonIndex !== -1) {
+            actionName = item.slice(0, colonIndex).trim();
+            args = splitString(item.slice(colonIndex + 1).trim(), ",").map(arg => {
+                return arg.trim().replace(/^(['"])([\s\S]*)\1$/, '$2');
             });
         }
-        // 字符串不允许为空 除非 exists find prompt函数
-        if (isEmpty(text) && !["exists", "find", "prompt"].includes(action)) { return "" };
-        // 参数不能为空 除非 filter prompt函数
-        if (arg.length == 0 && !["filter", "prompt"].includes(action)) { return text }
-
-        if (action == "slice") {
-            text = text.slice(...arg);
-        } else if (action == "replace") {
-            text = text.replace(...arg);
-        } else if (action == "replaceAll") {
-            text = text.replaceAll(...arg);
-        } else if (action == "regexp") {
-            const result = text.match(new RegExp(...arg));
-            text = "";
-            if (result && result.length >= 2) {
-                for (let i = 1; i < result.length; i++) {
-                    if (result[i]) {
-                        text += result[i].trim();
-                    }
-                }
-            }
-        } else if (action == "exists") {
-            if (text) {
-                text = arg[0].replaceAll("*", text);
-                continue;
-            }
-            if (arg[1]) {
-                text = arg[1].replaceAll("*", text);
-                continue;
-            }
-            text = "";
-        } else if (action == "prepend") {
-            text = arg[0] + text;
-        } else if (action == "concat") {
-            text = text + arg[0];
-        } else if (action == "to") {
-            if (arg[0] == "base64") {
-                text = window.Base64 ? Base64.encode(text) : btoa(unescape(encodeURIComponent(text)));
-            } else if (arg[0] == "urlEncode") {
-                text = encodeURIComponent(text);
-            } else if (arg[0] == "urlDecode") {
-                text = decodeURIComponent(text);
-            } else if (arg[0] == "lowerCase") {
-                text = text.toLowerCase();
-            } else if (arg[0] == "upperCase") {
-                text = text.toUpperCase();
-            } else if (arg[0] == "trim") {
-                if (text) { text = text.trim(); }
-            } else if (arg[0] == "filter") {
-                if (text) { text = text.trim(); }
-                text = stringModify(text);
-            }
-        } else if (action == "find") {
-            text = "";
-            if (data.pageDOM) {
-                try {
-                    text = data.pageDOM.querySelector(arg[0]).innerText?.trim();
-                } catch (e) { text = ""; }
-            }
-        } else if (action == "filter") {
-            text = stringModify(text, arg[0]);
-        } else if (action == "prompt") {
-            text = window.prompt("", text);
+        if (isEmpty(text) && !["exists", "find", "prompt"].includes(actionName)) { return ""; }
+        if (args.length === 0 && !["filter", "prompt"].includes(actionName)) { return text; }
+        if (processors[actionName]) {
+            text = processors[actionName](text, args, data);
         }
     }
     return text;
@@ -322,7 +313,7 @@ function templates(text, data) {
         minutes: appendZero(date.getMinutes()),
         seconds: appendZero(date.getSeconds()),
         now: Date.now(),
-        timestamp: new Date().toISOString(),
+        timestamp: date.toISOString(),
 
         // 文件名
         fullFileName: data.fullFileName ? data.fullFileName : "",
