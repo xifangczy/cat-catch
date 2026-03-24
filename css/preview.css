@@ -18,7 +18,7 @@ body {
   background: var(--background-color-two);
   padding: 10px;
   border-radius: 8px;
-  z-index: 999;
+  z-index: 5;
   position: sticky;
   top: 0;
 }
@@ -171,7 +171,7 @@ input[type="checkbox"] {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 4;
+  z-index: 6;
 }
 
 .play-container.hide,
