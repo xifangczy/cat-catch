@@ -188,7 +188,7 @@ function splitString(text, separator) {
 /**
  * 模板的函数处理处理器映射表
  */
-const processors = {
+const templatesProcessors = {
     slice: (txt, arg) => txt.slice(...arg),
     replace: (txt, arg) => txt.replace(...arg),
     replaceAll: (txt, arg) => txt.replaceAll(...arg),
@@ -259,8 +259,8 @@ function templatesFunction(text, actionStr, data) {
         }
         if (isEmpty(text) && !["exists", "find", "prompt"].includes(actionName)) { return ""; }
         if (args.length === 0 && !["filter", "prompt"].includes(actionName)) { return text; }
-        if (processors[actionName]) {
-            text = processors[actionName](text, args, data);
+        if (templatesProcessors[actionName]) {
+            text = templatesProcessors[actionName](text, args, data);
         }
     }
     return text;
