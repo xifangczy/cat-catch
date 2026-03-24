@@ -189,7 +189,7 @@ button,
   min-height: 35px;
 }
 
-#m3u8_url,
+/* #m3u8_url, */
 #mpd_url,
 .test_url {
   overflow: hidden;
@@ -197,6 +197,27 @@ button,
   text-overflow: ellipsis;
   word-break: break-all;
   color: var(--text2-color);
+}
+#m3u8_url {
+  overflow: hidden;
+  display: block;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  white-space: nowrap;
+  color: var(--text2-color);
+}
+/* 悬停0.5秒后显示完整URL */
+#m3u8_url:hover {
+  animation: delayShow 0.5s forwards;
+}
+@keyframes delayShow {
+  0%,
+  99% {
+    white-space: nowrap;
+  }
+  100% {
+    white-space: normal;
+  }
 }
 
 .block {
@@ -235,12 +256,16 @@ textarea {
 
 #m3u8Content {
   word-break: break-all;
+  box-sizing: border-box;
+  border-radius: 4px;
+  font-family: monospace;
+  padding: 10px;
 }
 
 #m3u8Content,
 #jsonText,
 #m3u8Text {
-  height: 55vh;
+  height: 60vh;
 }
 
 #formatStr {
@@ -492,6 +517,10 @@ textarea {
   flex: 1;
 }
 
+#customFilename {
+  margin-right: 0.5rem;
+}
+
 /* MPD*/
 .dash .select {
   padding-right: 20px;
@@ -580,7 +609,7 @@ a.json-placeholder:hover {
 }
 
 .iframeBox {
-  height: 75vh;
+  height: 60vh;
   display: none;
   width: 100%;
   border: solid 1px var(--text-color);
@@ -737,7 +766,13 @@ a.json-placeholder:hover {
 .media-item .url-text {
   flex: 1;
   word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   /* margin-right: 2px; */
+}
+#mediaList.expand-all .media-item .url-text {
+  white-space: normal;
 }
 
 .media-item .icon {
@@ -786,10 +821,10 @@ a.json-placeholder:hover {
   ) !important;
 }
 
-.media-item .error-tip {
-  font-size: 11px;
+.media-item .media-tip {
+  font-size: 12px;
   color: var(--text-error-color);
-  margin-left: 8px;
-  /* font-weight: bold; */
+  margin: 0 4px 0 4px;
+  font-weight: bold;
   flex-shrink: 0;
 }
