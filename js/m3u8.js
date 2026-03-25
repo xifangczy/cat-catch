@@ -104,6 +104,9 @@ let iframeFFmpeg = null;
 let iframeFFmpegReady = false;
 let iframeFFmpegReadyRetryCount = 0;
 
+// 自动合并
+let autoMergeTimer = null;
+
 /**
  * 初始化函数，界面默认配置 loadSource载入 m3u8 url
  */
@@ -586,7 +589,7 @@ function parseTs(data) {
                         if (buffer.byteLength == 16) {
                             keyContent.set(data.fragments[i].decryptdata.uri, buffer); // 储存密钥
                             showKeyInfo(buffer, data.fragments[i].decryptdata, i);
-                            autoMerge();
+                            !autoMergeTimer && autoMerge();
                             return;
                         }
                         showKeyInfo(false, data.fragments[i].decryptdata, i);
@@ -614,7 +617,7 @@ function parseTs(data) {
                 .then(response => response.arrayBuffer())
                 .then(function (buffer) {
                     initData.set(data.fragments[i].initSegment.url, buffer);
-                    autoMerge();
+                    !autoMergeTimer && autoMerge();
                 }).catch(function (error) { console.log(error); });
             $("#tips").append('EXT-X-MAP: <input type="text" class="keyUrl" value="' + data.fragments[i].initSegment.url + '" spellcheck="false" readonly="readonly">');
         }
@@ -684,7 +687,7 @@ function parseTs(data) {
         $("#retryCount").parent().hide();
     }
     if (!_fragments.some(fragment => fragment.initSegment) && autoDown) {
-        $("#mergeTs").click();
+        !autoMergeTimer && autoMerge();
     }
 
     if (tabId && tabId != -1) {
@@ -1645,7 +1648,7 @@ function mergeTsNew(down) {
         }
 
         // 使用iframe传输
-        if (G.iframeFFmpeg) {
+        if (G.iframeFFmpeg && (typeof _ffmpeg === 'undefined' || _ffmpeg !== 'merge')) {
             document.querySelector("#onlineFFmpeg").style.display = "block";
             // 转数据结构
             const fileData = {
@@ -2077,7 +2080,6 @@ function showTab(Obj) {
     });
 }
 
-let autoMergeTimer = null;
 function autoMerge() {
     if (!autoDown) { return; }
     clearTimeout(autoMergeTimer);
