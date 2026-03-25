@@ -208,4 +208,10 @@ button:disabled,
   img.send2ffmpeg {
     content: url(../img/send2ffmpeg-dark.svg);
   }
+  img.stop {
+    content: url(../img/stop-dark.svg);
+  }
+  img.retry {
+    content: url(../img/retry-dark.svg);
+  }
 }

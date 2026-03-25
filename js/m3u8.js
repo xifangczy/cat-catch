@@ -701,7 +701,7 @@ function parseTs(data) {
                     }
                     $("#maybeKey").show();
                     maybeKey.change(function () {
-                        this.value != "tips" && $("#customKey").val(this.value);
+                        $("#customKey").val(this.value != "tips" ? this.value : "");
                         $m3u8dlArg.val(getM3u8DlArg());
                     });
                 });
@@ -1485,6 +1485,7 @@ function downloadNew(start = 0, end = _fragments.length) {
         // 停止按钮
         const stopBtn = document.createElement("img");
         stopBtn.classList.add("icon", "stop");
+        stopBtn.src = "img/stop.svg";
         stopBtn.title = i18n.stopDownload;
         stopBtn.addEventListener("click", function (e) {
             e.stopPropagation();
@@ -1499,6 +1500,7 @@ function downloadNew(start = 0, end = _fragments.length) {
         // 重下按钮
         const retryBtn = document.createElement("img");
         retryBtn.classList.add("icon", "retry", "hide");
+        retryBtn.src = "img/retry.svg";
         retryBtn.title = i18n.retryDownload;
         retryBtn.addEventListener("click", function (e) {
             e.stopPropagation();
@@ -1864,7 +1866,7 @@ function writeText(text) {
         <div class="media-item selected" data-index="${index}" id="media-item-${data.sn}">
             <span class="url-text" title="${data.url}">${data.url}</span>
             <span class="media-tip"></span>
-            <img class="icon copy" />
+            <img class="icon copy" src="img/copy.png"/>
         </div>`).join('');
 }
 document.querySelector("#mediaList").addEventListener("click", (e) => {
