@@ -299,7 +299,7 @@ channel.onmessage = (event) => {
         createIframeFFmpeg(data.data);
         channel.postMessage({ Message: "mergeDataReceived", taskId: data.data?.taskId });
     }
-    if (data.Message == "mergeDataReceived" && _isMaster != 1) {
+    if (data.Message == "mergeDataReceived" && _isMaster == 0) {
         setTimeout(() => {
             $progress.html(i18n.sendFfmpeg);
             $("#autoClose").prop("checked") && closeTab();
