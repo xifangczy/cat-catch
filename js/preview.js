@@ -959,7 +959,7 @@ class FilePreview {
             tabid: data.tabId == -1 ? this._tabId : data.tabId,
             initiator: data.initiator,
             requestHeaders: data.requestHeaders ? JSON.stringify(data.requestHeaders) : undefined,
-            ...Object.fromEntries(Object.entries(options).map(([key, value]) => [key, typeof value === 'boolean' ? 1 : value])),
+            ...Object.fromEntries(Object.entries(options).map(([key, value]) => [key, typeof value === 'boolean' ? (value ? 1 : 0) : value])),
         })}`
         chrome.tabs.create({ url: url, index: this.tab.index + 1, active: !options.autoDown });
     }
