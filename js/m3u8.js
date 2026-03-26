@@ -589,7 +589,7 @@ function parseTs(data) {
                         if (buffer.byteLength == 16) {
                             keyContent.set(data.fragments[i].decryptdata.uri, buffer); // 储存密钥
                             showKeyInfo(buffer, data.fragments[i].decryptdata, i);
-                            !autoMergeTimer && autoMerge();
+                            autoMerge();
                             return;
                         }
                         showKeyInfo(false, data.fragments[i].decryptdata, i);
@@ -617,7 +617,7 @@ function parseTs(data) {
                 .then(response => response.arrayBuffer())
                 .then(function (buffer) {
                     initData.set(data.fragments[i].initSegment.url, buffer);
-                    !autoMergeTimer && autoMerge();
+                    autoMerge();
                 }).catch(function (error) { console.log(error); });
             $("#tips").append('EXT-X-MAP: <input type="text" class="keyUrl" value="' + data.fragments[i].initSegment.url + '" spellcheck="false" readonly="readonly">');
         }
@@ -687,7 +687,7 @@ function parseTs(data) {
         $("#retryCount").parent().hide();
     }
     if (!_fragments.some(fragment => fragment.initSegment) && autoDown) {
-        !autoMergeTimer && autoMerge();
+        autoMerge();
     }
 
     if (tabId && tabId != -1) {
@@ -2084,6 +2084,7 @@ function autoMerge() {
     if (!autoDown) { return; }
     clearTimeout(autoMergeTimer);
     autoMergeTimer = setTimeout(() => {
+        autoDown = false;   // 避免重复调用
         $("#mergeTs").click();
     }, 1000);
 }
