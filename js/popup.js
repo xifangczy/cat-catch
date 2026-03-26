@@ -531,8 +531,8 @@ $mergeDown.click(function () {
     const taskId = Date.parse(new Date());
     // 都是m3u8 自动合并并发送到ffmpeg
     if (checkedData.every(data => isM3U8(data))) {
-        checkedData.forEach(function (data) {
-            openParser(data, { ffmpeg: "merge", quantity: checkedData.length, taskId: taskId, autoDown: true, autoClose: true });
+        checkedData.forEach(function (data, index) {
+            openParser(data, { ffmpeg: "merge", quantity: checkedData.length, taskId: taskId, autoDown: true, autoClose: true, isMaster: index === 0 });
         });
         return true;
     }

@@ -702,7 +702,7 @@ function openParser(data, options = {}) {
             tabid: data.tabId == -1 ? G.tabId : data.tabId,
             initiator: data.initiator,
             requestHeaders: data.requestHeaders ? JSON.stringify(data.requestHeaders) : undefined,
-            ...Object.fromEntries(Object.entries(options).map(([key, value]) => [key, typeof value === 'boolean' ? 1 : value])),
+            ...Object.fromEntries(Object.entries(options).map(([key, value]) => [key, typeof value === 'boolean' ? (value ? 1 : 0) : value])),
         })}`
         chrome.tabs.create({
             url: url,

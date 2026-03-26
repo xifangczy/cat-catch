@@ -224,8 +224,8 @@ class FilePreview {
         // 都是m3u8 自动合并并发送到ffmpeg
         if (checkedData.every(data => isM3U8(data))) {
             const taskId = Date.parse(new Date());
-            checkedData.forEach((data) => {
-                this.openM3U8(data, { ffmpeg: "merge", quantity: checkedData.length, taskId: taskId, autoDown: true, autoClose: true });
+            checkedData.forEach((data, index) => {
+                this.openM3U8(data, { ffmpeg: "merge", quantity: checkedData.length, taskId: taskId, autoDown: true, autoClose: true, isMaster: index === 0 });
             });
             return;
         }
