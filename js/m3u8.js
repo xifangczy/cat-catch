@@ -294,12 +294,12 @@ function init() {
 const channel = new BroadcastChannel('m3u8Channel');
 channel.onmessage = (event) => {
     const data = event.data;
-    if (data.Message == "mergeData" && data.data && _isMaster == 1) {
+    if (data.Message == "mergeData" && data.data && _isMaster == 1 && _taskId == data.data.taskId) {
         data.data.tabId = currentTabId;
         createIframeFFmpeg(data.data);
-        channel.postMessage({ Message: "mergeDataReceived", taskId: data.data?.taskId });
+        channel.postMessage({ Message: "mergeDataReceived", taskId: data.data.taskId });
     }
-    if (data.Message == "mergeDataReceived" && _isMaster == 0) {
+    if (data.Message == "mergeDataReceived" && _isMaster == 0 && _taskId == data.taskId) {
         setTimeout(() => {
             $progress.html(i18n.sendFfmpeg);
             $("#autoClose").prop("checked") && closeTab();
