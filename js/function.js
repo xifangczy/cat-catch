@@ -607,6 +607,14 @@ function send2local(action, data, tabId = 0) {
                 }[G.send2localType];
                 option.headers = { 'Content-Type': contentType };
 
+                if (G.send2localHeaders) {
+                    let customHeaders = templates(G.send2localHeaders, data);
+                    customHeaders = JSONparse(customHeaders);
+                    for (let key in customHeaders) {
+                        option.headers[key] = customHeaders[key];
+                    }
+                }
+
                 switch (contentType) {
                     case 'application/json;charset=utf-8':
                         option.body = JSON.stringify(postData);

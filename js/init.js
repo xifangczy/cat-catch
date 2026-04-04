@@ -156,6 +156,7 @@ G.OptionLists = {
     send2localMethod: 'POST',
     send2localBody: '{"action": "${action}", "data": ${data}, "tabId": "${tabId}"}',
     send2localType: 0,
+    send2localHeaders: "",
     popup: false,
     popupMode: 0, // 0:preview.html 1:popup.html 2:window preview.html 3: window popup.html
     invoke: false,
