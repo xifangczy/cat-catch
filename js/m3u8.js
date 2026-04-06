@@ -1280,6 +1280,20 @@ $("#regular").keyup(function (event) {
     }
 });
 
+// 反选
+$("#invertSelection").click(function () {
+    const list = document.querySelector("#mediaList");
+    list.querySelectorAll(".media-item").forEach((item, index) => {
+        if (item.classList.contains("selected")) {
+            item.classList.remove("selected");
+            _fragments[index].selected = false;
+        } else {
+            item.classList.add("selected");
+            _fragments[index].selected = true;
+        }
+    });
+});
+
 
 // 找到真密钥
 $("#searchingForRealKey").click(function () {

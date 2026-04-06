@@ -820,3 +820,7 @@ a.json-placeholder:hover {
   font-weight: bold;
   flex-shrink: 0;
 }
+
+.m3u8Regular {
+  width: 20rem;
+}
