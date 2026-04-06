@@ -297,7 +297,7 @@ function templates(text, data) {
         origin: data.requestHeaders?.origin ?? "",
         initiator: data.requestHeaders?.referer ? data.requestHeaders.referer : data.initiator,
         webUrl: data.webUrl ?? "",
-        title: data._title ?? data.title,
+        title: data._title ?? data.title ?? "NULL",
         pageDOM: data.pageDOM,
         cookie: data.cookie ?? "",
         tabId: data.tabId ?? 0,
@@ -332,7 +332,11 @@ function templates(text, data) {
     text = text.replace(reTemplates, function (original, tag, action) {
         tag = tag.trim();
         // 特殊标签 data 返回所有数据
-        if (tag == 'data') { return JSON.stringify(trimData); }
+        if (tag == 'data') {
+            // 删除一些不必要发送的数据
+            const { pageDOM, year, month, date, day, fullDate, time, hours, minutes, seconds, mobileUserAgent, ...filtered } = trimData;
+            return JSON.stringify(filtered);
+        }
         if (action) {
             return templatesFunction(_data[tag], action.trim(), _data);
         }
@@ -559,37 +563,20 @@ function flattenObject(obj, prefix = '') {
 }
 
 /**
- * 发送数据到本地
- * @param {String} action 发送类型
- * @param {Object|Srting} data 发送的数据
- * @param {Number} tabId 发送数据的标签页ID
+ * 核心发送请求逻辑 (公共函数)
+ * @param {Object|String} postData 最终组装好要发送的 Payload 数据
+ * @param {Object} templateContext 用于替换 URL 和 Header 模板的上下文变量 (包含 tabId, action 等)
  */
-function send2local(action, data, tabId = 0) {
+function executeCoreRequest(postData, templateContext) {
     return new Promise((resolve, reject) => {
-
-        // 请求方式
         const option = { method: G.send2localMethod };
 
-        // 处理替换模板
-        let body = G.send2localBody;
-        // 处理 addKey 请求
-        if (action == 'addKey' || typeof data === 'string') {
-            body = G.send2localBody.replaceAll('${data}', `"${data}"`);
-            data = { tabId: tabId };
-        }
-
-        data.action = action;
-        let postData = templates(body, data);
-
-        // 转为对象
-        postData = JSONparse(postData, { action, data, tabId });
-
         try {
-            // 处理URL中的模板字符串并检查合法性
-            let send2localURL = templates(G.send2localURL, data);
+            // 1. 处理 URL 模板并检查合法性
+            let send2localURL = templates(G.send2localURL, templateContext);
             send2localURL = new URL(send2localURL);
 
-            // GET请求拼接参数
+            // 2. 处理 GET 请求的参数拼接
             if (option.method === 'GET') {
                 const flattenedObj = flattenObject(postData);
                 const urlParams = new URLSearchParams(flattenedObj);
@@ -597,7 +584,7 @@ function send2local(action, data, tabId = 0) {
                     ? `${send2localURL.search}&${urlParams}`
                     : `?${urlParams}`;
             }
-            // 非GET请求处理不同Content-Type
+            // 3. 处理非 GET 请求的不同 Content-Type
             else {
                 const contentType = {
                     0: 'application/json;charset=utf-8',
@@ -605,6 +592,7 @@ function send2local(action, data, tabId = 0) {
                     2: 'application/x-www-form-urlencoded',
                     3: 'text/plain'
                 }[G.send2localType];
+
                 option.headers = { 'Content-Type': contentType };
 
                 switch (contentType) {
@@ -618,7 +606,7 @@ function send2local(action, data, tabId = 0) {
                             formData.append(key, value);
                         });
                         option.body = formData;
-                        delete option.headers['Content-Type']; // 浏览器自动生成boundary
+                        delete option.headers['Content-Type']; // 让浏览器自动生成 boundary
                         break;
                     case 'application/x-www-form-urlencoded':
                         const flattenedObj = flattenObject(postData);
@@ -636,23 +624,65 @@ function send2local(action, data, tabId = 0) {
                 }
             }
 
+            // 4. 处理自定义 Headers
             if (G.send2localHeaders) {
-                let customHeaders = templates(G.send2localHeaders, data);
+                let customHeaders = templates(G.send2localHeaders, templateContext);
                 customHeaders = JSONparse(customHeaders);
                 if (!option.headers) { option.headers = {}; }
                 for (let key in customHeaders) {
                     option.headers[key] = customHeaders[key];
                 }
             }
-
-            send2localURL = send2localURL.toString();
-            fetch(send2localURL, option)
+            // 5. 发起请求
+            fetch(send2localURL.toString(), option)
                 .then(response => resolve(response))
                 .catch(error => reject(error));
+
         } catch (e) {
             reject(e);
         }
     });
+}
+
+/**
+ * 发送单条数据到本地
+ * @param {String} action 发送类型
+ * @param {Object|String} data 发送的数据
+ * @param {Number} tabId 发送数据的标签页ID
+ */
+function send2local(action, data, tabId = 0) {
+    let body = G.send2localBody;
+
+    // 处理 addKey 请求 或 字符串数据
+    if (action === 'addKey' || typeof data === 'string') {
+        body = G.send2localBody.replaceAll('${data}', `"${data}"`);
+        data = { tabId: tabId };
+    }
+    data.action = action;
+    let postData = templates(body, data);
+    postData = JSONparse(postData, { action, data, tabId });
+    return executeCoreRequest(postData, data);
+}
+
+/**
+ * 批量发送对象数组到本地 (一次性发送)
+ * @param {String} action 发送类型
+ * @param {Array} arrayData 发送的对象数组 (例: [{id: 1}, {id: 2}])
+ * @param {Number} tabId 发送数据的标签页ID
+ */
+function send2localArray(action, arrayData, tabId = 0) {
+    if (!Array.isArray(arrayData)) {
+        arrayData = [arrayData];
+    }
+
+    const results = [];
+    arrayData.forEach((item, index) => {
+        results.push(templates("${data}", { ...item, action, index, tabId }));
+    });
+    let body = G.send2localBody.replaceAll('${data}', `[${results.join(",")}]`);
+    let postData = templates(body, { action, tabId });
+    postData = JSONparse(postData, arrayData[0]);
+    return executeCoreRequest(postData, { action, tabId });
 }
 
 function isDamnUrl(url) {

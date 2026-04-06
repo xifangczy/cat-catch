@@ -727,8 +727,22 @@ $("#currentPage").click(function () {
     });
 });
 
-// 手动发送
+// 发送到本地 多个
 $("#send2localSelect").click(function () {
+    if (window.confirm(i18n("send2localTips")) && getData().size > 1) {
+        const checkedData = [];
+        getData().forEach(function (item) {
+            if (item.checked) {
+                checkedData.push(item);
+            }
+        });
+        send2localArray("catch", checkedData, G.tabId).then(function (success) {
+            success && success?.ok && Tips(i18n.hasSent, 1000);
+        }).catch(function (error) {
+            error ? Tips(error, 1000) : Tips(i18n.sendFailed, 1000);
+        });
+        return;
+    }
     getData().forEach(function (item) {
         if (item.checked) {
             send2local("catch", item, item.tabId).then(function (success) {

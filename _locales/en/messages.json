@@ -1027,5 +1027,8 @@
   },
   "iframeFFmpeg": {
     "message": "Use iframe to call FFmpeg"
+  },
+  "send2localTips": {
+    "message": "Merge data before sending? Click 'OK' to merge, or 'Cancel' to send individually."
   }
 }

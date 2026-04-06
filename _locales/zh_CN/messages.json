@@ -1027,5 +1027,8 @@
   },
   "iframeFFmpeg": {
     "message": "嵌套在线ffmpeg"
+  },
+  "send2localTips": {
+    "message": "是否合并数据发送？点击【确定】合并，点击【取消】逐条发送。"
   }
 }
