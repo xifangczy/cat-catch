@@ -1263,6 +1263,24 @@ $("#sendFfmpeg").click(function () {
     $("#mergeTs").click();
 });
 
+// 监听 正则过滤 回车
+$("#regular").keyup(function (event) {
+    if (event.key === "Enter") {
+        const list = document.querySelector("#mediaList");
+        const reg = new RegExp($("#regular").val());
+        list.querySelectorAll(".media-item").forEach((item, index) => {
+            if (reg.test(_fragments[index].url)) {
+                item.classList.add("selected");
+                _fragments[index].selected = true;
+            } else {
+                item.classList.remove("selected");
+                _fragments[index].selected = false;
+            }
+        });
+    }
+});
+
+
 // 找到真密钥
 $("#searchingForRealKey").click(function () {
     const keys = $('#maybeKey option').map(function () {
