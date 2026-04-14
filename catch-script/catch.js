@@ -140,6 +140,7 @@
                 <label><input type="checkbox" id="autoToBuffered" ${checkboxStyle}><span data-i18n="autoToBuffered">自动跳转缓冲尾</span></label>
                 <label><input type="checkbox" id="checkHead" ${checkboxStyle}><span data-i18n="checkHead">清理多余头部数据</span></label>
                 <label><input type="checkbox" id="completeClearCache" ${localStorage.getItem("CatCatchCatch_completeClearCache") || ""} ${checkboxStyle}><span data-i18n="completeClearCache">下载完成后清空数据</span></label>
+                <label><input type="checkbox" id="save1GB" ${localStorage.getItem("CatCatchCatch_save1GB") || ""} ${checkboxStyle}><span data-i18n="save1GB">每1GB保存一次</span></label>
                 <details>
                     <summary data-i18n="fileName" id="summary">文件名设置</summary>
                     <div style="font-weight:bold;"><span data-i18n="fileName">文件名</span>: </div><div id="fileName"></div>
@@ -303,6 +304,11 @@
 
             const completeClearCache = this.catCatch.querySelector("#completeClearCache");
             if (completeClearCache) completeClearCache.addEventListener('click', this.handleCompleteClearCache.bind(this));
+
+            const save1GB = this.catCatch.querySelector("#save1GB");
+            if (save1GB) save1GB.addEventListener('click', (event) => {
+                localStorage.setItem("CatCatchCatch_save1GB", event.target.checked ? "checked" : "");
+            });
 
             // 自动跳转到缓冲节点
             // this.autoToBufferedFlag = true;
@@ -580,6 +586,11 @@
 
                                 if (this.enable && argumentsList[0]) {
                                     this.mediaSize += argumentsList[0].byteLength || 0;
+                                    if (this.mediaSize >= 1024 * 1024 * 1024 && localStorage.getItem("CatCatchCatch_save1GB") == "checked") {
+                                        this.catchDownload();
+                                        this.clearCache();
+
+                                    }
                                     if (this.tips) {
                                         this.tips.innerHTML = this.i18n("capturingData", "捕获数据中...") + ": " + this.byteToSize(this.mediaSize);
                                     }

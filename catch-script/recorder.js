@@ -25,6 +25,7 @@
         <span data-i18n="selectVideo">选择视频</span> <select id="videoList" style="max-width: 200px;"></select>
         <span data-i18n="recordEncoding">录制编码</span> <select id="mimeTypeList" style="max-width: 200px;"></select>
         <label><input type="checkbox" id="ffmpeg" ${checkboxStyle}><span data-i18n="ffmpeg">使用ffmpeg转码</span></label>
+        <label><input type="checkbox" id="autoSave1"} ${checkboxStyle} data-i18n="save1hour">1小时保存一次</label>
         <label>
             <select id="videoBits">
                 <option value="2500000" data-i18n="videoBits">视频码率</option>
@@ -146,6 +147,7 @@
     });
 
     function init() {
+        clearInterval(autoSave1Timer);
         getVideo();
         $start.style.display = 'inline';
         $stop.style.display = 'none';
@@ -228,6 +230,9 @@
         return null;
     }
 
+    // 每1小时 保存一次
+    let autoSave1Timer = null;
+
     CatCatch.querySelector("#start").addEventListener('click', function (event) {
         if (!MediaRecorder.isTypeSupported(option.mimeType)) {
             $tips.innerHTML = i18n("formatNotSupported", "不支持此格式");
@@ -283,8 +288,13 @@
                 $stop.style.display = 'inline';
                 $start.style.display = 'none';
                 $tips.innerHTML = i18n("recording", "视频录制中");
+
+                if (CatCatch.querySelector("#autoSave1").checked) {
+                    autoSave1();
+                }
             }
             recorder.onstop = function (event) {
+                clearInterval(autoSave1Timer);
                 $tips.innerHTML = i18n("stopRecording", "停止录制");
                 init();
             }
@@ -312,6 +322,19 @@
             $tips.innerHTML = i18n("noVideoDetected", "请确认视频是否存在");
         }
     });
+
+    CatCatch.querySelector("#autoSave1").addEventListener('change', autoSave1);
+    function autoSave1() {
+        clearInterval(autoSave1Timer);
+        if (CatCatch.querySelector("#autoSave1").checked && recorder?.state === 'recording') {
+            autoSave1Timer = setInterval(function () {
+                if (recorder) {
+                    recorder.stop();
+                    recorder.start();
+                }
+            }, 3600000);
+        }
+    }
 
     // #region 移动逻辑
     let x, y;
