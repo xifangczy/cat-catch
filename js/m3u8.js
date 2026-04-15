@@ -435,6 +435,8 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
         const name = GetFile(rawUrl);
         const params = new URLSearchParams(window.location.search);
         params.set('url', rawUrl);
+        params.delete('autoDown');
+        params.delete('ffmpeg');
         const newUrl = `/m3u8.html?${params.toString()}`;
         return [name, newUrl];
     }
