@@ -431,16 +431,11 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
         return;
     }
     function getNewUrl(item) {
-        const url = encodeURIComponent(item.uri ?? item.url);
-        const referer = requestHeaders.referer ? "&requestHeaders=" + encodeURIComponent(JSON.stringify(requestHeaders)) : "&initiator=" + (_initiator ? encodeURIComponent(_initiator) : "");
-        const title = _title ? encodeURIComponent(_title) : "";
-        const fileName = _fileName ? encodeURIComponent(_fileName) : "";
-        const name = GetFile(item.uri ?? item.url);
-        let newUrl = `/m3u8.html?url=${url}${referer}`;
-        if (title) { newUrl += `&title=${title}`; }
-        if (fileName) { newUrl += `&filename=${fileName}`; }
-        if (tabId) { newUrl += `&tabid=${tabId}`; }
-        if (key) { newUrl += `&key=${key}`; }
+        const rawUrl = item.uri ?? item.url;
+        const name = GetFile(rawUrl);
+        const params = new URLSearchParams(window.location.search);
+        params.set('url', rawUrl);
+        const newUrl = `/m3u8.html?${params.toString()}`;
         return [name, newUrl];
     }
 });
