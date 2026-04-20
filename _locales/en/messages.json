@@ -1008,7 +1008,7 @@
     "message": "Always enable deep search"
   },
   "sideurlprotocol": {
-    "message": "Protocolo URL m3u8dl"
+    "message": "m3u8dl URL Protocol"
   },
   "deleteDuplicateFilenames": {
     "message": "Delete duplicate filenames"
