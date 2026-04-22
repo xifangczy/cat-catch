@@ -502,7 +502,13 @@ function clearRedundant() {
 function stringModify(str, text) {
     if (!str) { return str; }
     str = filterFileName(str, text);
-    return str.replaceAll("\\", "&bsol;").replaceAll("/", "&sol;");
+    str = str.replace(/[\\/]/g, function (match) {
+        return text || {
+            '\\': '&bsol;',
+            '/': '&sol;'
+        }[match];
+    });
+    return str;
 }
 
 /**
