@@ -199,7 +199,7 @@
         "catCatchFFmpegResult"
     ]);
     window.addEventListener("message", (event) => {
-        if (!event.data || !event.data.action) { return; }
+        if (!event.data || !event.data.action || event.origin !== window.location.origin) { return; }
         if (event.data.action == "catCatchAddMedia") {
             if (!event.data.url) { return; }
             chrome.runtime.sendMessage({
