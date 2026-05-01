@@ -48,7 +48,7 @@
         <button id="stop" ${buttonStyle} data-i18n="stopRecording">停止录制</button>
         <button id="save" ${buttonStyle} data-i18n="save">保存</button>
         <button id="hide" ${buttonStyle} data-i18n="hide">隐藏</button>
-        <button id="close" ${buttonStyle} data-i18n="close">关闭</button>
+        <!--button id="close" ${buttonStyle} data-i18n="close">关闭</button-->
     </div>`;
     CatCatch.style = `
         position: fixed;

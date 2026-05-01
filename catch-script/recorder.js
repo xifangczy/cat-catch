@@ -52,7 +52,7 @@
             <button id="start" ${buttonStyle} data-i18n="startRecording">开始录制</button>
             <button id="stop" ${buttonStyle} data-i18n="stopRecording">停止录制</button>
             <button id="hide" ${buttonStyle} data-i18n="hide">隐藏</button>
-            <button id="close" ${buttonStyle} data-i18n="close">关闭</button>
+            <!--button id="close" ${buttonStyle} data-i18n="close">关闭</button-->
         </div>
     </div>
     `;

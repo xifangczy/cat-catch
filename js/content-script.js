@@ -193,6 +193,11 @@
         time += sec;
         return time;
     }
+
+    const PAGE_ALLOWED_MESSAGES = new Set([
+        "addMedia",
+        "catCatchFFmpegResult"
+    ]);
     window.addEventListener("message", (event) => {
         if (!event.data || !event.data.action) { return; }
         if (event.data.action == "catCatchAddMedia") {
@@ -246,10 +251,10 @@
             if (!event.data.state || !event.data.tabId) { return; }
             chrome.runtime.sendMessage({ Message: "catCatchFFmpegResult", ...event.data });
         }
-        if (event.data.action == "catCatchToBackground") {
-            delete event.data.action;
-            chrome.runtime.sendMessage(event.data);
-        }
+        // if (event.data.action == "catCatchToBackground") {
+        //     delete event.data.action;
+        //     chrome.runtime.sendMessage(event.data);
+        // }
         // if (event.data.action == "catCatchDashDRMMedia") {
         //     // TODO DRM Media
         //     console.log("DRM Media", event);
