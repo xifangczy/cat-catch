@@ -1007,13 +1007,28 @@
   "alwaysSearch": {
     "message": "Activar una búsqueda profunda"
   },
-  "alertimport": {
-    "message": "importación completada"
-  },
   "sideurlprotocol": {
     "message": "Protocolo URL m3u8dl"
   },
   "deleteDuplicateFilenames": {
     "message": "Eliminar nombres de archivo duplicados"
+  },    
+  "alertimport": {
+    "message": "importación completada"
+  },
+  "isBlockedSite": {
+    "message": "Este sitio web requiere que se prohíba la ejecución de este programa."
+  },
+  "onlineFFmpeg": {
+    "message": "ffmpeg en línea"
+  },
+  "ffmpegIsNotReady": {
+    "message": "El servicio ffmpeg en línea no está listo, inténtelo más tarde."
+  },
+  "iframeFFmpeg": {
+    "message": "Fffmpeg anidado en línea"
+  },
+  "send2localTips": {
+    "message": "¿Deben combinarse y enviarse los datos? Haga clic en [Aceptar] para fusionar y haga clic en [Cancelar] para enviarlos uno por uno."
   }
 }
