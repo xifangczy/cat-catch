@@ -1030,5 +1030,8 @@
   },
   "send2localTips": {
     "message": "在發送前合併數據？點擊【確定】合併，或點擊【取消】逐條發送。"
+  },
+  "removeFailedPreviewFiles": {
+    "message": "移除無法預覽的檔案"
   }
 }

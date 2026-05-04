@@ -136,6 +136,8 @@ class FilePreview {
         document.querySelector('#copy-selected').addEventListener('click', () => this.copy());
         // 清理数据
         document.querySelector('#clear').addEventListener('click', () => this.clearData());
+        // 删除预览失败的文件
+        document.querySelector('#removeFailedPreviewFiles').addEventListener('click', () => this.removeFailedPreviewFiles());
         // 删除
         document.querySelector('#delete-selected').addEventListener('click', () => this.deleteItem());
         // debug
@@ -1044,6 +1046,12 @@ class FilePreview {
         chrome.runtime.sendMessage({ Message: "ClearIcon", type: true, tabId: this._tabId });
         this.originalItems = [];
         document.querySelector('#extensionFilters').innerHTML = '';
+        this.updateFileList();
+    }
+
+    // 删除预览失败的文件
+    removeFailedPreviewFiles() {
+        this.originalItems = this.originalItems.filter(item => !item.previewVideoError);
         this.updateFileList();
     }
 

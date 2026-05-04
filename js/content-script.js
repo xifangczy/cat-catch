@@ -193,11 +193,6 @@
         time += sec;
         return time;
     }
-
-    const PAGE_ALLOWED_MESSAGES = new Set([
-        "addMedia",
-        "catCatchFFmpegResult"
-    ]);
     window.addEventListener("message", (event) => {
         if (!event.data || !event.data.action || event.origin !== window.location.origin) { return; }
         if (event.data.action == "catCatchAddMedia") {

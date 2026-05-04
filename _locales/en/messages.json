@@ -1030,5 +1030,8 @@
   },
   "send2localTips": {
     "message": "Merge data before sending? Click 'OK' to merge, or 'Cancel' to send individually."
+  },
+  "removeFailedPreviewFiles": {
+    "message": "Remove failed preview files"
   }
 }
