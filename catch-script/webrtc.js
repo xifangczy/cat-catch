@@ -17,39 +17,42 @@
     const checkboxStyle = 'style="-webkit-appearance: auto;"';
     const CatCatch = document.createElement("div");
     CatCatch.innerHTML = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAAKlBMVEUAAADLlROxbBlRAD16GS5oAjWWQiOCIytgADidUx/95gHqwwTx0gDZqwT6kfLuAAAACnRSTlMA/vUejV7kuzi8za0PswAAANpJREFUGNNjwA1YSxkYTEqhnKZLLi6F1w0gnKA1shdvHYNxdq1atWobjLMKCOAyC3etlVrUAOH4HtNZmLgoAMKpXX37zO1FwcZAwMDguGq1zKpFmTNnzqx0Bpp2WvrU7ttn9py+I8JgLn1R8Pad22vurNkjwsBReHv33junzuyRnOnMwNCSeFH27K5dq1SNgcZxFMnuWrNq1W5VkNntihdv7ToteGcT0C7mIkE1qbWCYjJnM4CqEoWKdoslChXuUgXJqIcLebiphSgCZRhaPDhcDFhdmUMCGIgEAFA+Uc02aZg9AAAAAElFTkSuQmCC" style="-webkit-user-drag: none;width: 20px;">
-    <div id="tips" data-i18n="waiting">正在等待视频流..."</div>
-    <div id="time"></div>
-    ${i18n("selectVideo", "选择视频")}:
-        <select id="videoTrack">
-            <option value="-1">${i18n("selectVideo", "选择视频")}</option>
-        </select>
-    ${i18n("selectAudio", "选择音频")}:
-        <select id="audioTrack">
-            <option value="-1">${i18n("selectAudio", "选择视频")}</option>
-        </select>
-    ${i18n("recordEncoding", "录制编码")}: <select id="mimeTypeList" style="max-width: 200px;"></select>
-    <label><input type="checkbox" id="autoSave1"} ${checkboxStyle} data-i18n="save1hour">1小时保存一次</label>
-    <label>
-        <select id="videoBits">
-            <option value="2500000" data-i18n="videoBits">视频码率</option>
-            <option value="2500000">2.5 Mbps</option>
-            <option value="5000000">5 Mbps</option>
-            <option value="8000000">8 Mbps</option>
-            <option value="16000000">16 Mbps</option>
-        </select>
-        <select id="audioBits">
-            <option value="128000" data-i18n="audioBits">音频码率</option>
-            <option value="128000">128 kbps</option>
-            <option value="256000">256 kbps</option>
-        </select>
-    </label>
-    <div>
-        <button id="start" ${buttonStyle} data-i18n="startRecording">开始录制</button>
-        <button id="stop" ${buttonStyle} data-i18n="stopRecording">停止录制</button>
-        <button id="save" ${buttonStyle} data-i18n="save">保存</button>
-        <button id="hide" ${buttonStyle} data-i18n="hide">隐藏</button>
-        <!--button id="close" ${buttonStyle} data-i18n="close">关闭</button-->
-    </div>`;
+    <div id="catCatchWebRTC" style="display: flex; flex-direction: column; align-items: flex-start;">
+        <div id="tips" data-i18n="waiting">正在等待视频流..."</div>
+        <div id="time"></div>
+        ${i18n("selectVideo", "选择视频")}:
+            <select id="videoTrack">
+                <option value="-1">${i18n("selectVideo", "选择视频")}</option>
+            </select>
+        ${i18n("selectAudio", "选择音频")}:
+            <select id="audioTrack">
+                <option value="-1">${i18n("selectAudio", "选择音频")}</option>
+            </select>
+        ${i18n("recordEncoding", "录制编码")}: <select id="mimeTypeList" style="max-width: 200px;"></select>
+        <label><input type="checkbox" id="autoSave1"} ${checkboxStyle} data-i18n="save1hour">1小时保存一次</label>
+        <label>
+            <select id="videoBits">
+                <option value="2500000" data-i18n="videoBits">视频码率</option>
+                <option value="2500000">2.5 Mbps</option>
+                <option value="5000000">5 Mbps</option>
+                <option value="8000000">8 Mbps</option>
+                <option value="16000000">16 Mbps</option>
+            </select>
+            <select id="audioBits">
+                <option value="128000" data-i18n="audioBits">音频码率</option>
+                <option value="128000">128 kbps</option>
+                <option value="256000">256 kbps</option>
+            </select>
+        </label>
+        <div>
+            <button id="start" ${buttonStyle} data-i18n="startRecording">开始录制</button>
+            <button id="stop" ${buttonStyle} data-i18n="stopRecording">停止录制</button>
+            <button id="save" ${buttonStyle} data-i18n="save">保存</button>
+            <button id="hide" ${buttonStyle} data-i18n="hide">隐藏</button>
+            <!--button id="close" ${buttonStyle} data-i18n="close">关闭</button-->
+        </div>
+    </div>
+    `;
     CatCatch.style = `
         position: fixed;
         z-index: 999999;
@@ -101,7 +104,18 @@
 
     // 隐藏
     CatCatch.querySelector("#hide").addEventListener('click', function (event) {
-        CatCatch.style.display = "none";
+        // CatCatch.style.display = "none";
+        const content = CatCatch.querySelector("#catCatchWebRTC").style;
+        if (content.display === "none") {
+            content.display = "flex";
+            CatCatch.style.opacity = "";
+        } else {
+            content.display = "none";
+            CatCatch.style.opacity = "0.5";
+        }
+    });
+    CatCatch.querySelector("img").addEventListener('click', function (event) {
+        CatCatch.querySelector("#hide").click();
     });
 
     const tracks = { video: [], audio: [] };
