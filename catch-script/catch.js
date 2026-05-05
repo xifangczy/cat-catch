@@ -287,8 +287,8 @@
             const img = this.catCatch.querySelector("img");
             if (img) img.addEventListener('click', this.handleHide.bind(this));
 
-            const close = this.catCatch.querySelector("#close");
-            if (close) close.addEventListener('click', this.handleClose.bind(this));
+            // const close = this.catCatch.querySelector("#close");
+            // if (close) close.addEventListener('click', this.handleClose.bind(this));
 
             const restart = this.catCatch.querySelector("#restart");
             if (restart) restart.addEventListener('click', this.handleRestart.bind(this));

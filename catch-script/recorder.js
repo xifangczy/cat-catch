@@ -140,11 +140,11 @@
         CatCatch.querySelector("#hide").click();
     });
 
-    CatCatch.querySelector("#close").addEventListener('click', function (event) {
-        recorder?.state && recorder.stop();
-        CatCatch.style.display = "none";
-        window.postMessage({ action: "catCatchToBackground", Message: "script", script: "recorder.js", refresh: false });
-    });
+    // CatCatch.querySelector("#close").addEventListener('click', function (event) {
+    //     recorder?.state && recorder.stop();
+    //     CatCatch.style.display = "none";
+    //     window.postMessage({ action: "catCatchToBackground", Message: "script", script: "recorder.js", refresh: false });
+    // });
 
     function init() {
         clearInterval(autoSave1Timer);

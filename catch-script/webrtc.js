@@ -93,11 +93,11 @@
     $stop.style.display = 'none';
 
     // 关闭
-    CatCatch.querySelector("#close").addEventListener('click', function (event) {
-        recorder?.state && recorder.stop();
-        CatCatch.style.display = "none";
-        window.postMessage({ action: "catCatchToBackground", Message: "script", script: "webrtc.js", refresh: true });
-    });
+    // CatCatch.querySelector("#close").addEventListener('click', function (event) {
+    //     recorder?.state && recorder.stop();
+    //     CatCatch.style.display = "none";
+    //     window.postMessage({ action: "catCatchToBackground", Message: "script", script: "webrtc.js", refresh: true });
+    // });
 
     // 隐藏
     CatCatch.querySelector("#hide").addEventListener('click', function (event) {
