@@ -610,7 +610,7 @@ a.json-placeholder:hover {
 }
 
 .iframeBox {
-  height: 60vh;
+  height: 75vh;
   display: none;
   width: 100%;
   /* border: solid 1px var(--text-color); */

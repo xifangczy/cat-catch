@@ -68,7 +68,6 @@ $("#blockAddUrl").bind("click", function () {
     $("#blockUrlList [name=url]").last().focus();
 });
 $("#version").html(i18n.catCatch + " v" + chrome.runtime.getManifest().version);
-$("#extensionID").html(`ID: ${chrome.runtime.id}`);
 
 // 自定义播放调用模板
 playerList = new Map();
