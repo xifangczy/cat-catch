@@ -1030,5 +1030,8 @@
   },
   "send2localTips": {
     "message": "¿Deben combinarse y enviarse los datos? Haga clic en [Aceptar] para fusionar y haga clic en [Cancelar] para enviarlos uno por uno."
+  },
+  "removeFailedPreviewFiles": {
+    "message": "Eliminar archivos que no se pueden previsualizar"
   }
 }
