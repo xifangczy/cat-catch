@@ -702,13 +702,7 @@
         if (filter.has(value)) { return false; }
         filter.add(value);
         data.requestId = Date.now().toString() + filter.size;
-
-        /*
-         * 有部分奇怪的网站 监听message data如果有href属性 会跳转到href属性的值
-         * 把数据包装成内部格式 避免以上情况
-         * "LOVEPUPU" 特殊字符 为识别扩展数据，在 content-script中识别到这个特殊字符后再转发数据 要修改，需同步修改 content-script 监听函数中的校验
-         */
-        _postMessage({ action: "LOVEPUPU", catCatchData: data });
+        _postMessage(data);
     }
     function ArrayToBase64(data) {
         try {

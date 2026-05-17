@@ -194,22 +194,25 @@
         return time;
     }
     window.addEventListener("message", (event) => {
-        if (!event.data || !event.data.catCatchData || !event.data.catCatchData.action || event.origin !== window.location.origin || event.data.action !== "LOVEPUPU") { return; }
-        const eventData = event.data.catCatchData;
-        if (eventData.action == "catCatchAddMedia") {
-            if (!eventData.url) { return; }
+        const action = ["catCatchAddMedia", "catCatchAddKey", "catCatchFFmpeg", "catCatchFFmpegResult"];
+        if (!event.data || !event.data.action || event.origin !== window.location.origin || !action.includes(event.data.action)) { return; }
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+
+        if (event.data.action == "catCatchAddMedia") {
+            if (!event.data.url) { return; }
             chrome.runtime.sendMessage({
                 Message: "addMedia",
-                url: eventData.url,
-                href: eventData.href ?? event.source.location.href,
-                extraExt: eventData.ext,
-                mime: eventData.mime,
-                requestHeaders: { referer: eventData.referer },
-                requestId: eventData.requestId
+                url: event.data.url,
+                href: event.data.href ?? event.source.location.href,
+                extraExt: event.data.ext,
+                mime: event.data.mime,
+                requestHeaders: { referer: event.data.referer },
+                requestId: event.data.requestId
             });
         }
-        if (eventData.action == "catCatchAddKey") {
-            let key = eventData.key;
+        if (event.data.action == "catCatchAddKey") {
+            let key = event.data.key;
             if (key instanceof ArrayBuffer || key instanceof Array) {
                 key = ArrayToBase64(key);
             }
@@ -223,16 +226,13 @@
             chrome.runtime.sendMessage({
                 Message: "popupAddKey",
                 data: key,
-                url: eventData.url,
+                url: event.data.url,
             });
         }
-    }, false);
-    window.addEventListener("message", (event) => {
-        if (!event.data || !event.data.action || event.origin !== window.location.origin) { return; }
         if (event.data.action == "catCatchFFmpeg") {
             if (!event.data.use ||
                 !event.data.files ||
-                !(event.data.files instanceof Array) ||
+                !event.data.files instanceof Array ||
                 event.data.files.length == 0
             ) { return; }
             event.data.title = event.data.title ?? document.title ?? new Date().getTime().toString();
@@ -250,7 +250,8 @@
             if (!event.data.state || !event.data.tabId) { return; }
             chrome.runtime.sendMessage({ Message: "catCatchFFmpegResult", ...event.data });
         }
-    }, false);
+
+    }, { capture: true });
 
     function ArrayToBase64(data) {
         try {
