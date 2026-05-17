@@ -226,7 +226,7 @@
                     postData({ action: "catCatchAddKey", key: arrayBuffer, href: location.href, ext: "key" });
                     return;
                 }
-                let text = new TextDecoder().decode(arrayBuffer);
+                let text = _textDecoder.call(new TextDecoder(), arrayBuffer);
                 if (text == "") { return; }
                 if (typeof input == "object") { input = input.url; }
                 let isJson = isJSON(text);
@@ -254,6 +254,20 @@
     fetch.toString = function () {
         return _fetch.toString();
     }
+
+    // TextDecoder
+    const _textDecoder = TextDecoder.prototype.decode;
+    TextDecoder.prototype.decode = function (v, options) {
+        const result = _textDecoder.call(this, v, options);
+        if (result.startsWith("#EXTM3U") || result.toUpperCase().includes("#EXTM3U")) {
+            let blobUrl = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(result)]));
+            postData({ action: "catCatchAddMedia", url: blobUrl, href: location.href, ext: "m3u8" });
+        }
+        return result;
+    };
+    TextDecoder.prototype.decode.toString = function () {
+        return _textDecoder.toString();
+    };
 
     // Array.prototype.slice
     const _slice = Array.prototype.slice;
@@ -688,7 +702,13 @@
         if (filter.has(value)) { return false; }
         filter.add(value);
         data.requestId = Date.now().toString() + filter.size;
-        _postMessage(data);
+
+        /*
+         * 有部分奇怪的网站 监听message data如果有href属性 会跳转到href属性的值
+         * 把数据包装成内部格式 避免以上情况
+         * "LOVEPUPU" 特殊字符 为识别扩展数据，在 content-script中识别到这个特殊字符后再转发数据 要修改，需同步修改 content-script 监听函数中的校验
+         */
+        _postMessage({ action: "LOVEPUPU", catCatchData: data });
     }
     function ArrayToBase64(data) {
         try {
