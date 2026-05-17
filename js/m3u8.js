@@ -730,34 +730,34 @@ function parseTs(data) {
         });
     }
     function showKeyInfo(buffer, decryptdata, i) {
-        $("#tips").append(i18n.keyAddress + ': <input type="text" value="' + decryptdata.uri + '" spellcheck="false" readonly="readonly" class="keyUrl">');
-        if (buffer) {
-            $("#tips").append(`
-                <div class="key flex">
-                    <div class="method">${i18n.encryptionAlgorithm}: <input type="text" value="${decryptdata.method ? decryptdata.method : "NONE"}" spellcheck="false" readonly="readonly"></div>
-                    <div>${i18n.key}(Hex): <input type="text" value="${ArrayBufferToHexString(buffer)}" spellcheck="false" readonly="readonly"></div>
-                    <div>${i18n.key}(Base64): <input type="text" value="${ArrayBufferToBase64(buffer)}" spellcheck="false" readonly="readonly"></div>
-                </div>`);
-        } else {
-            $("#tips").append(`
-                <div class="key flex">
-                    <div class="method">${i18n.encryptionAlgorithm}: <input type="text" value="${decryptdata.method ? decryptdata.method : "NONE"}" spellcheck="false" readonly="readonly"></div>
-                    <div>${i18n.key}(Hex): <input type="text" value="${i18n.keyDownloadFailed}" spellcheck="false" readonly="readonly"></div>
-                </div>`);
+        const $tips = $("#tips");
+        $tips.append(`${i18n.keyAddress}: <input type="text" value="${decryptdata.uri}" spellcheck="false" readonly="readonly" class="keyUrl">`);
+        // 准备算法及密钥字段
+        const method = decryptdata.method || "NONE";
+        const keyHex = buffer ? ArrayBufferToHexString(buffer) : i18n.keyDownloadFailed;
+        const keyBase64 = buffer ? ArrayBufferToBase64(buffer) : null; // buffer 为空时不显示 Base64
+        // 构建 key 区块（包含算法、Hex、可能的 Base64）
+        let keyBlock = `
+        <div class="method">${i18n.encryptionAlgorithm}: <input type="text" value="${method}" spellcheck="false" readonly="readonly"></div>
+        <div>${i18n.key}(Hex): <input type="text" value="${keyHex}" spellcheck="false" readonly="readonly"></div>`;
+        if (keyBase64 !== null) {
+            keyBlock += `<div>${i18n.key}(Base64): <input type="text" value="${keyBase64}" spellcheck="false" readonly="readonly"></div>`;
         }
-        // 如果是默认iv 则不显示
-        let iv = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i + 1]).toString();
-        let iv2 = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i]).toString();
-        let _iv = decryptdata.iv.toString();
-        if (_iv != iv && _iv != iv2) {
-            iv = "0x" + ArrayBufferToHexString(decryptdata.iv.buffer);
-            $("#tips").append('<div class="key flex"><div>Offset(IV): <input type="text" value="' + iv + '" spellcheck="false" readonly="readonly" class="offset"></div></div>');
+        // 检查 IV 是否为默认值（常见 MPEG-DASH 的默认 IV：末尾为 i 或 i+1）
+        const defaultIv1 = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i + 1]).toString();
+        const defaultIv2 = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i]).toString();
+        const currentIv = decryptdata.iv.toString();
+        if (currentIv !== defaultIv1 && currentIv !== defaultIv2) {
+            const ivHex = "0x" + ArrayBufferToHexString(decryptdata.iv.buffer);
+            keyBlock += `<div>Offset(IV): <input type="text" value="${ivHex}" spellcheck="false" readonly="readonly" class="offset"></div>`;
         }
+        // 整体放入同一个 flex 容器
+        $tips.append(`<div class="key flex">${keyBlock}</div>`);
     }
 }
 /**
  * 估算整个视频大小
- * 获取3个切片大小 取平均值 * 切片数量
+ * 获取几个切片大小 取平均值 * 切片数量
  * @param {Array} url ts对象数组
  */
 async function estimateSize(fragments) {
