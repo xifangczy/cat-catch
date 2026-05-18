@@ -285,7 +285,17 @@ function init() {
             });
         }
     } else {
-        hls.loadSource(_m3u8Url);
+        /*
+        * firefox 不允许直接下载跨域blob内容 由content-script获取blob内容发回页面
+        */
+        if (_m3u8Url.startsWith("blob:") && G.isFirefox) {
+            chrome.tabs.sendMessage(tabId, { Message: "getM3u8Text", url: _m3u8Url }, function (result) {
+                const blobUrl = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(result)]));
+                hls.loadSource(blobUrl);
+            });
+        } else {
+            hls.loadSource(_m3u8Url);
+        }
     }
 
     G.saveAs && $("#saveAs").prop("checked", true);

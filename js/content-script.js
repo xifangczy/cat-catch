@@ -2,6 +2,7 @@
     var _videoObj = [];
     var _videoSrc = [];
     var _key = new Set();
+    var m3u8Text = new Map();
     chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         if (chrome.runtime.lastError) { return; }
         // 获取页面视频对象
@@ -169,6 +170,14 @@
             sendResponse(document.documentElement.outerHTML);
             return true;
         }
+        if (Message.Message == "getM3u8Text") {
+            if (Message.url && m3u8Text.has(Message.url)) {
+                sendResponse(m3u8Text.get(Message.url));
+                return true;
+            }
+            sendResponse("");
+            return true;
+        }
     });
 
     // Heart Beat
@@ -193,6 +202,18 @@
         time += sec;
         return time;
     }
+    const isFirefox = navigator.userAgent.includes('Firefox');
+    const sendAddMedia = (data) => {
+        chrome.runtime.sendMessage({
+            Message: "addMedia",
+            url: data.url,
+            href: data.href ?? location.href,
+            extraExt: data.ext,
+            mime: data.mime,
+            requestHeaders: { referer: data.referer },
+            requestId: data.requestId
+        });
+    };
     window.addEventListener("message", (event) => {
         const action = ["catCatchAddMedia", "catCatchAddKey", "catCatchFFmpeg", "catCatchFFmpegResult"];
         if (!event.data || !event.data.action || event.origin !== window.location.origin || !action.includes(event.data.action)) { return; }
@@ -201,15 +222,21 @@
 
         if (event.data.action == "catCatchAddMedia") {
             if (!event.data.url) { return; }
-            chrome.runtime.sendMessage({
-                Message: "addMedia",
-                url: event.data.url,
-                href: event.data.href ?? event.source.location.href,
-                extraExt: event.data.ext,
-                mime: event.data.mime,
-                requestHeaders: { referer: event.data.referer },
-                requestId: event.data.requestId
-            });
+
+            /*
+             * firefox 不允许直接下载跨域blob内容
+             * fetch获取文本内容并缓存到m3u8Text中，供 m3u8.html调用获取。
+             */
+            if (event.data.url.startsWith("blob:") && isFirefox) {
+                fetch(event.data.url)
+                    .then(response => response.text())
+                    .then(text => {
+                        m3u8Text.set(event.data.url, text);
+                        sendAddMedia(event.data);
+                    });
+                return;
+            }
+            sendAddMedia(event.data);
         }
         if (event.data.action == "catCatchAddKey") {
             let key = event.data.key;
