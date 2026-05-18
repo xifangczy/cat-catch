@@ -349,6 +349,7 @@
     }
 
     // fromCharCode
+    let m3u8Text = '';
     const _fromCharCode = String.fromCharCode;
     const proxyFromCharCode = new Proxy(_fromCharCode, {
         apply(target, thisArg, argumentsList) {
