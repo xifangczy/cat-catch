@@ -1033,5 +1033,11 @@
 	  },
   "removeFailedPreviewFiles": {
     "message": "Remover arquivos de prévias com falha"
+  },
+  "save": {
+    "message": "Salvar"
+  },
+  "contextMenus": {
+    "message": "Menu do botão direito"
   }
 }
