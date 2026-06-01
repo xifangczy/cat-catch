@@ -1033,5 +1033,11 @@
   },
   "removeFailedPreviewFiles": {
     "message": "Remove failed preview files"
+  },
+  "save": {
+    "message": "Save"
+  },
+  "contextMenus": {
+    "message": "Right-click menu"
   }
 }

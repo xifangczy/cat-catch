@@ -1033,5 +1033,11 @@
   },
   "removeFailedPreviewFiles": {
     "message": "删除无法预览的文件"
+  },
+  "save": {
+    "message": "保存"
+  },
+  "contextMenus": {
+    "message": "右键菜单"
   }
 }

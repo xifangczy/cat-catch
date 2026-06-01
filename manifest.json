@@ -32,7 +32,8 @@
     "alarms",
     "declarativeNetRequest",
     "scripting",
-    "sidePanel"
+    "sidePanel",
+    "contextMenus"
   ],
   "commands": {
     "_execute_action": {},

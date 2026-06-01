@@ -195,6 +195,7 @@ G.OptionLists = {
     getHtmlDOM: false,
     damn: false,
     iframeFFmpeg: false,
+    contextMenus: false,
 };
 
 // 本地储存的配置
@@ -246,6 +247,19 @@ const reJSONparse = /([{,]\s*)([\w-]+)(\s*:)/g;
 let debounce = undefined;
 let debounceCount = 0;
 let debounceTime = 0;
+
+// 安装右键菜单
+const installContextMenus = (status) => {
+    if (status) {
+        chrome.contextMenus.create({
+            id: "image-save",
+            title: i18n.save,
+            contexts: ["image"]
+        });
+    } else {
+        chrome.contextMenus.remove("image-save");
+    }
+};
 
 // Init
 InitOptions();
@@ -323,6 +337,9 @@ function InitOptions() {
         // 侧边栏
         chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: items.sidePanel });
 
+        // 右键菜单注册
+        installContextMenus(items.contextMenus);
+
         G = { ...items, ...G };
 
         // 初始化 G.blockUrlSet
@@ -396,6 +413,10 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
         }
         if (key == "sidePanel" && !G.isFirefox) {
             chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: newValue });
+            continue;
+        }
+        if (key == "contextMenus") {
+            installContextMenus(newValue);
             continue;
         }
         G[key] = newValue;

@@ -1033,5 +1033,11 @@
   },
   "removeFailedPreviewFiles": {
     "message": "移除無法預覽的檔案"
+  },
+  "save": {
+    "message": "儲存"
+  },
+  "contextMenus": {
+    "message": "右鍵菜單"
   }
 }

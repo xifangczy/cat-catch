@@ -742,6 +742,20 @@ chrome.commands.onCommand.addListener(function (command) {
 });
 
 /**
+ * 监听 右键菜单事件
+ */
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+    if (info.menuItemId === "image-save") {
+        chrome.downloads.download({
+            url: info.srcUrl,
+            saveAs: G.saveAs
+        }, () => {
+            chrome.runtime.lastError && console.error(chrome.runtime.lastError);
+        });
+    }
+});
+
+/**
  * 监听 页面完全加载完成 判断是否在线ffmpeg页面
  * 如果是在线ffmpeg 则发送数据
  */
