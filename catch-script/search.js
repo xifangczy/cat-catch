@@ -4,10 +4,15 @@
     const CATCH_SEARCH_DEBUG = false; // 开发调试日志
     // 防止 console.log 被劫持
     if (!isRunningInWorker && CATCH_SEARCH_DEBUG && console.log.toString() != 'function log() { [native code] }') {
-        const newIframe = top.document.createElement("iframe");
-        newIframe.style.display = "none";
-        top.document.body.appendChild(newIframe);
-        window.console.log = newIframe.contentWindow.console.log;
+        try {
+            const newIframe = top.document.createElement("iframe");
+            newIframe.style.display = "none";
+            top.document.body.appendChild(newIframe);
+            window.console.log = newIframe.contentWindow.console.log;
+        } catch (e) {
+            // 跨域无法访问 top.document，此时无法恢复 console.log
+        }
+
     }
     // 防止 window.postMessage 被劫持
     const _postMessage = self.postMessage;
@@ -90,7 +95,7 @@
                     continue;
                 }
                 if (depth > 10) { continue; }  // 防止死循环 最大深度
-                findMedia(data[key], ++depth);
+                findMedia(data[key], depth + 1);
                 continue;
             }
             if (typeof data[key] == "string") {
@@ -483,7 +488,7 @@
     }
 
     const uint32ArrayToUint8Array_ = (array) => {
-        const newArray = new Uint8Array(16);
+        const newArray = new _Uint8Array(16);
         for (let i = 0; i < 4; i++) {
             newArray[i * 4] = (array[i] >> 24) & 0xff;
             newArray[i * 4 + 1] = (array[i] >> 16) & 0xff;
@@ -493,7 +498,7 @@
         return newArray;
     }
     const uint16ArrayToUint8Array_ = (array) => {
-        const newArray = new Uint8Array(16);
+        const newArray = new _Uint8Array(16);
         for (let i = 0; i < 8; i++) {
             newArray[i * 2] = (array[i] >> 8) & 0xff;
             newArray[i * 2 + 1] = array[i] & 0xff;
