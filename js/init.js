@@ -248,54 +248,6 @@ let debounce = undefined;
 let debounceCount = 0;
 let debounceTime = 0;
 
-// 安装右键菜单
-const installContextMenus = (status) => {
-    chrome.contextMenus.removeAll();
-    if (status) {
-        chrome.contextMenus.create({
-            id: "cat-catch",
-            title: i18n.catCatch,
-            contexts: ["page", "image"]
-        });
-        chrome.contextMenus.create({
-            id: "image-save",
-            parentId: "cat-catch",
-            title: i18n.save,
-            contexts: ["image"]
-        });
-        chrome.contextMenus.create({
-            id: "enable",
-            parentId: "cat-catch",
-            title: `${i18n.enable} / ${i18n.disable}`,
-            contexts: ["page", "image"]
-        });
-        chrome.contextMenus.create({
-            id: "preview",
-            parentId: "cat-catch",
-            title: i18n.preview,
-            contexts: ["page", "image"]
-        });
-        chrome.contextMenus.create({
-            id: "deepSearch",
-            parentId: "cat-catch",
-            title: i18n.deepSearch,
-            contexts: ["page", "image"]
-        });
-        chrome.contextMenus.create({
-            id: "catch",
-            parentId: "cat-catch",
-            title: i18n.cacheCapture,
-            contexts: ["page", "image"]
-        });
-        chrome.contextMenus.create({
-            id: "auto_down",
-            parentId: "cat-catch",
-            title: i18n.autoDownload,
-            contexts: ["page", "image"]
-        });
-    }
-};
-
 // Init
 InitOptions();
 
@@ -373,8 +325,11 @@ function InitOptions() {
         chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: items.sidePanel });
 
         // 右键菜单注册
-        installContextMenus(items.contextMenus);
-
+        chrome.contextMenus.update("cat-catch", {
+            visible: items.contextMenus
+        }, () => {
+            chrome.runtime.lastError && console.log(chrome.runtime.lastError);
+        });
         G = { ...items, ...G };
 
         // 初始化 G.blockUrlSet
@@ -451,7 +406,11 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
             continue;
         }
         if (key == "contextMenus") {
-            installContextMenus(newValue);
+            chrome.contextMenus.update("cat-catch", {
+                visible: newValue
+            }, () => {
+                chrome.runtime.lastError && console.error(chrome.runtime.lastError);
+            });
             continue;
         }
         G[key] = newValue;
@@ -473,6 +432,52 @@ chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason == "install") {
         chrome.tabs.create({ url: "install.html" });
     }
+
+    // 注册右键
+    chrome.contextMenus.removeAll(() => {
+        chrome.contextMenus.create({
+            id: "cat-catch",
+            title: i18n.catCatch,
+            contexts: ["page", "image"],
+            visible: false
+        });
+        chrome.contextMenus.create({
+            id: "image-save",
+            parentId: "cat-catch",
+            title: i18n.save,
+            contexts: ["image"]
+        });
+        chrome.contextMenus.create({
+            id: "enable",
+            parentId: "cat-catch",
+            title: `${i18n.enable} / ${i18n.disable}`,
+            contexts: ["page", "image"]
+        });
+        chrome.contextMenus.create({
+            id: "preview",
+            parentId: "cat-catch",
+            title: i18n.preview,
+            contexts: ["page", "image"]
+        });
+        chrome.contextMenus.create({
+            id: "deepSearch",
+            parentId: "cat-catch",
+            title: i18n.deepSearch,
+            contexts: ["page", "image"]
+        });
+        chrome.contextMenus.create({
+            id: "catch",
+            parentId: "cat-catch",
+            title: i18n.cacheCapture,
+            contexts: ["page", "image"]
+        });
+        chrome.contextMenus.create({
+            id: "auto_down",
+            parentId: "cat-catch",
+            title: i18n.autoDownload,
+            contexts: ["page", "image"]
+        });
+    });
 });
 
 /**
