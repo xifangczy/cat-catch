@@ -698,7 +698,7 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
 });
 
 // 右键菜单 和 快捷键 复用函数
-const runCommands = (command) => {
+const runCommands = (command, data) => {
     if (command == "auto_down") {
         if (G.featAutoDownTabId.has(G.tabId)) {
             G.featAutoDownTabId.delete(G.tabId);
@@ -738,13 +738,23 @@ const runCommands = (command) => {
         chrome.tabs.create({ url: `preview.html?tabId=${G.tabId}` });
     } else if (command == "image-save") {
         chrome.downloads.download({
-            url: info.srcUrl,
+            url: data.srcUrl,
             saveAs: G.saveAs
         }, () => {
             chrome.runtime.lastError && console.error(chrome.runtime.lastError);
+            G.downDataImageSave = data;
         });
     }
 }
+chrome.downloads.onChanged.addListener(function (item) {
+    if (G.catDownload) { delete G.downDataImageSave; return; }
+    const errorList = ["SERVER_BAD_CONTENT", "SERVER_UNAUTHORIZED", "SERVER_FORBIDDEN", "SERVER_UNREACHABLE", "SERVER_CROSS_ORIGIN_REDIRECT", "SERVER_FAILED", "NETWORK_FAILED"];
+    if (item.error && errorList.includes(item.error.current) && G.downDataImageSave) {
+        const rclickData = { requestHeaders: { referer: G.downDataImageSave.pageUrl }, requestId: G.tabId, url: G.downDataImageSave.srcUrl };
+        chrome.tabs.create({ url: `downloader.html?JSON=${JSON.stringify(rclickData)}`, active: false });
+        delete G.downDataImageSave;
+    }
+});
 
 /**
  * 浏览器 扩展快捷键
@@ -757,7 +767,7 @@ chrome.commands.onCommand.addListener(function (command) {
  * 监听 右键菜单事件
  */
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-    runCommands(info.menuItemId);
+    runCommands(info.menuItemId, info);
 });
 
 /**

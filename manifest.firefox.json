@@ -30,7 +30,8 @@
     "webNavigation",
     "alarms",
     "scripting",
-    "declarativeNetRequest"
+    "declarativeNetRequest",
+    "contextMenus"
   ],
   "commands": {
     "_execute_browser_action": {},
