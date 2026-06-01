@@ -250,14 +250,49 @@ let debounceTime = 0;
 
 // 安装右键菜单
 const installContextMenus = (status) => {
+    chrome.contextMenus.removeAll();
     if (status) {
         chrome.contextMenus.create({
+            id: "cat-catch",
+            title: i18n.catCatch,
+            contexts: ["page", "image"]
+        });
+        chrome.contextMenus.create({
             id: "image-save",
+            parentId: "cat-catch",
             title: i18n.save,
             contexts: ["image"]
         });
-    } else {
-        chrome.contextMenus.remove("image-save");
+        chrome.contextMenus.create({
+            id: "enable",
+            parentId: "cat-catch",
+            title: `${i18n.enable} / ${i18n.disable}`,
+            contexts: ["page", "image"]
+        });
+        chrome.contextMenus.create({
+            id: "preview",
+            parentId: "cat-catch",
+            title: i18n.preview,
+            contexts: ["page", "image"]
+        });
+        chrome.contextMenus.create({
+            id: "deepSearch",
+            parentId: "cat-catch",
+            title: i18n.deepSearch,
+            contexts: ["page", "image"]
+        });
+        chrome.contextMenus.create({
+            id: "catch",
+            parentId: "cat-catch",
+            title: i18n.cacheCapture,
+            contexts: ["page", "image"]
+        });
+        chrome.contextMenus.create({
+            id: "auto_down",
+            parentId: "cat-catch",
+            title: i18n.autoDownload,
+            contexts: ["page", "image"]
+        });
     }
 };
 

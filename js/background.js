@@ -697,10 +697,8 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
     }
 });
 
-/**
- * 浏览器 扩展快捷键
- */
-chrome.commands.onCommand.addListener(function (command) {
+// 右键菜单 和 快捷键 复用函数
+const runCommands = (command) => {
     if (command == "auto_down") {
         if (G.featAutoDownTabId.has(G.tabId)) {
             G.featAutoDownTabId.delete(G.tabId);
@@ -738,14 +736,7 @@ chrome.commands.onCommand.addListener(function (command) {
         chrome.tabs.reload(G.tabId, { bypassCache: true });
     } else if (command == "preview") {
         chrome.tabs.create({ url: `preview.html?tabId=${G.tabId}` });
-    }
-});
-
-/**
- * 监听 右键菜单事件
- */
-chrome.contextMenus.onClicked.addListener((info, tab) => {
-    if (info.menuItemId === "image-save") {
+    } else if (command == "image-save") {
         chrome.downloads.download({
             url: info.srcUrl,
             saveAs: G.saveAs
@@ -753,6 +744,20 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
             chrome.runtime.lastError && console.error(chrome.runtime.lastError);
         });
     }
+}
+
+/**
+ * 浏览器 扩展快捷键
+ */
+chrome.commands.onCommand.addListener(function (command) {
+    runCommands(command);
+});
+
+/**
+ * 监听 右键菜单事件
+ */
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+    runCommands(info.menuItemId);
 });
 
 /**
