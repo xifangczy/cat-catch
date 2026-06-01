@@ -750,8 +750,8 @@ chrome.downloads.onChanged.addListener(function (item) {
     if (G.catDownload) { delete G.downDataImageSave; return; }
     const errorList = ["SERVER_BAD_CONTENT", "SERVER_UNAUTHORIZED", "SERVER_FORBIDDEN", "SERVER_UNREACHABLE", "SERVER_CROSS_ORIGIN_REDIRECT", "SERVER_FAILED", "NETWORK_FAILED"];
     if (item.error && errorList.includes(item.error.current) && G.downDataImageSave) {
-        const rclickData = { requestHeaders: { referer: G.downDataImageSave.pageUrl }, requestId: G.tabId, url: G.downDataImageSave.srcUrl };
-        chrome.tabs.create({ url: `downloader.html?JSON=${JSON.stringify(rclickData)}`, active: false });
+        const data = { requestHeaders: { referer: G.downDataImageSave.pageUrl }, requestId: G.tabId, url: G.downDataImageSave.srcUrl };
+        chrome.tabs.create({ url: `downloader.html?JSON=${JSON.stringify(data)}&autoClose=true`, active: false });
         delete G.downDataImageSave;
     }
 });

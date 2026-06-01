@@ -4,6 +4,7 @@ const _requestId = params.get("requestId") ? params.get("requestId").split(",") 
 const _JSON = params.get("JSON") ? JSON.parse(params.get("JSON")) : null;   // 直接传递数据的参数
 const _ffmpeg = params.get("ffmpeg");   // 启用在线FFmpeg
 let _downStream = params.get("downStream"); // 启用边下边存 流式下载
+const _autoClose = params.get("autoClose"); // 下载完成后自动关闭页面
 const _data = [];   // 通过_requestId获取得到得数据
 const _taskId = Date.parse(new Date()); // 配合ffmpeg使用的任务ID 以便在线ffmpeg通过ID知道文件属于哪些任务
 let _tabId = null;  // 当前页面tab id
@@ -105,7 +106,7 @@ function start() {
         }
     }
 
-    $("#autoClose").prop("checked", G.downAutoClose);
+    $("#autoClose").prop("checked", _autoClose || G.downAutoClose);
     streamSaver.mitm = G.streamSaverConfig.url;
 
     const $downBox = $("#downBox"); // 下载列表容器
