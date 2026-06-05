@@ -478,6 +478,42 @@ hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
         }
     }
     currentLevel = data.level;
+
+    //自定义文件名 下拉选项
+    const $options = $("#name-options");
+    // 标题
+    if (_title) {
+        let title = _title;
+        if (title.length >= 150) {
+            title = title.substring(title.length - 150);
+        }
+        $options.append(`<option value="${title}">${title}</option>`);
+    }
+
+    // 文件名
+    if (_fileName) {
+        let fileName = _fileName;
+        if (fileName.length >= 150) {
+            fileName = fileName.substring(fileName.length - 150);
+        }
+        $options.append(`<option value="${fileName}">${fileName}</option>`);
+    }
+
+    // m3u8链接最后一部分
+    if (_m3u8Url) {
+        let fileName = GetFileNameNoExt(_m3u8Url);
+        if (fileName != "NULL" && fileName.length != 0) {
+            $options.append(`<option value="${stringModify(fileName)}">${stringModify(fileName)}</option>`);
+        }
+    }
+
+    // map链接最后一部分
+    if (_fragments[0]?.initSegment?.url) {
+        let mapFileName = GetFileNameNoExt(_fragments[0].initSegment.url);
+        if (mapFileName != "NULL" && mapFileName.length != 0) {
+            $options.append(`<option value="${stringModify(mapFileName)}">${stringModify(mapFileName)}</option>`);
+        }
+    }
 });
 
 // 监听 ERROR m3u8解析错误
@@ -1941,6 +1977,23 @@ document.querySelector("#mediaList").addEventListener("click", (e) => {
     mediaItem.classList.toggle("selected");
 });
 
+// 获取文件名不带扩展名
+function GetFileNameNoExt(url) {
+    url = GetFile(url);
+    url = url.split(".");
+    if (url.length > 1) {
+        url.pop();
+    }
+    url = url.join(".");
+    if (url.length >= 150) {
+        url = url.substring(url.length - 150);
+    }
+    if (url.length == 0) {
+        url = "NULL";
+    }
+    return stringModify(url);
+}
+
 // 获取文件名
 function GetFile(str) {
     str = str.split("?")[0];
@@ -1961,18 +2014,9 @@ function GetFileName(url) {
         }
         return _title;
     }
-    url = GetFile(url);
-    url = url.split(".");
-    url.length > 1 && url.pop();
-    url = url.join(".");
-    if (url.length >= 150) {
-        url = url.substring(url.length - 150);
-    }
-    if (url.length == 0) {
-        url = "NULL";
-    }
-    return stringModify(url);
+    return GetFileNameNoExt(url);
 }
+
 // 获取扩展名
 function GetExt(url) {
     let fileName = GetFile(url);
