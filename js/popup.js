@@ -753,6 +753,18 @@ $("#send2localSelect").click(function () {
         }
     });
 });
+
+// 复制所有疑似密钥
+$("#maybeKeyCopy").click(function () {
+    const keys = [];
+    $("#maybeKey .name").each(function () {
+        keys.push(`base64: ${$(this).text()}\nhex: ${base64ToHex($(this).text())}`);
+    });
+    if (keys.length == 0) { return; }
+    navigator.clipboard.writeText(keys.join("\n\n"));
+    Tips(i18n.copiedToClipboard);
+});
+
 async function getPageDOM() {
     try {
         const result = await new Promise((resolve, reject) => {
@@ -846,7 +858,7 @@ const interval = setInterval(async function () {
                 if (tabId == -1 || tabId == G.tabId) {
                     $maybeKey.append(AddKey(Message.data));
                 }
-                !$("#maybeKey .panel").length && $("#maybeKey").append($maybeKey);
+                !$("#maybeKey .panel").length && $("#maybeKeyCopy").before($maybeKey);
             });
             sendResponse("OK");
             return true;
@@ -873,7 +885,7 @@ const interval = setInterval(async function () {
                 for (let key of result) {
                     $maybeKey.append(AddKey(key));
                 }
-                $("#maybeKey").append($maybeKey);
+                $("#maybeKeyCopy").before($maybeKey);
                 UItoggle();
             });
         }
