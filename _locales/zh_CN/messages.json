@@ -519,7 +519,7 @@
     "message": "打开下载目录"
   },
   "downloadDir": {
-    "message": "打载目录"
+    "message": "下载目录"
   },
   "sendFfmpeg": {
     "message": "发送到在线ffmpeg"
