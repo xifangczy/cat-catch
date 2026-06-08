@@ -429,22 +429,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     }
 });
 
-// 扩展升级，清空本地储存
-chrome.runtime.onInstalled.addListener(function (details) {
-    if (details.reason == "update") {
-        chrome.storage.local.clear(function () {
-            if (chrome.storage.session) {
-                chrome.storage.session.clear(InitOptions);
-            } else {
-                InitOptions();
-            }
-        });
-        chrome.alarms.create("nowClear", { when: Date.now() + 3000 });
-    }
-    if (details.reason == "install") {
-        chrome.tabs.create({ url: "install.html" });
-    }
-
+function contextMenusInit() {
     // 注册右键
     chrome.contextMenus.removeAll(() => {
         chrome.contextMenus.create({
@@ -490,6 +475,24 @@ chrome.runtime.onInstalled.addListener(function (details) {
             contexts: ["page", "image"]
         });
     });
+}
+
+// 扩展升级，清空本地储存
+chrome.runtime.onInstalled.addListener(function (details) {
+    if (details.reason == "update") {
+        chrome.storage.local.clear(function () {
+            if (chrome.storage.session) {
+                chrome.storage.session.clear(InitOptions);
+            } else {
+                InitOptions();
+            }
+        });
+        chrome.alarms.create("nowClear", { when: Date.now() + 3000 });
+    }
+    if (details.reason == "install") {
+        chrome.tabs.create({ url: "install.html" });
+    }
+    contextMenusInit();
 });
 
 /**
