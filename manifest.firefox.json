@@ -83,6 +83,9 @@
       "run_at": "document_start"
     }
   ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
   "default_locale": "en",
   "version": "2.6.9"
 }
