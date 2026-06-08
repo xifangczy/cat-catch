@@ -507,12 +507,10 @@ hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
         }
     }
 
-    // map链接最后一部分
-    if (_fragments[0]?.initSegment?.url) {
-        let mapFileName = GetFileNameNoExt(_fragments[0].initSegment.url);
-        if (mapFileName != "NULL" && mapFileName.length != 0) {
-            $options.append(`<option value="${stringModify(mapFileName)}">${stringModify(mapFileName)}</option>`);
-        }
+    // 第一个ts链接文件名
+    let mapFileName = GetFileNameNoExt(_fragments[0].initSegment?.url ?? _fragments[0].url);
+    if (mapFileName != "NULL" && mapFileName.length != 0) {
+        $options.append(`<option value="${stringModify(mapFileName)}">${stringModify(mapFileName)}</option>`);
     }
 });
 
@@ -1391,6 +1389,7 @@ $("#searchingForRealKey").click(function () {
                 return true;
             }
         }
+        return false;
     }
     const decryptor = new AESDecryptor();
     fetch(_fragments[0].url)
