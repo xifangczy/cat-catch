@@ -195,13 +195,24 @@
     setMimeType();
     // #endregion 视频编码选择
 
+    // 判断是否是真实的媒体元素，过滤掉一些没有实际内容的占位元素
+    const isRealMediaElement = (media) => {
+        return (media.src || media.currentSrc) ||               // 有地址
+            media.currentTime > 0 ||                          // 有播放进度
+            media.readyState >= 2 ||                          // 已经加载了部分数据
+            (media.videoWidth > 0 || media.videoHeight > 0) || // 有视频尺寸
+            media.networkState !== 3;                           // 网络状态不是 NETWORK_NO_SOURCE
+    }
+
     // #region 获取视频列表
     function getVideo() {
         videoList = [];
         $videoList.options.length = 0;
         document.querySelectorAll("video, audio").forEach(function (video, index) {
-            if (video.currentSrc) {
-                const src = video.currentSrc.split("/").pop();
+            if (isRealMediaElement(video)) {
+                let src = video.currentSrc || video.src;
+                src = src.split("/").pop();
+                src = src ? src : i18n("video", "视频") + (index + 1);
                 videoList.push(video);
                 $videoList.options.add(new Option(src, index));
             }

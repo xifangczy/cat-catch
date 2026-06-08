@@ -296,6 +296,11 @@
             en: "Clear data after downloading",
             es: "Borrar datos después de descargar",
             zh: "下载完成后清空数据"
+        },
+        video: {
+            en: "Video",
+            es: "Vídeo",
+            zh: "视频"
         }
     };
 })();
