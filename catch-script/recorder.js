@@ -210,9 +210,12 @@
         $videoList.options.length = 0;
         document.querySelectorAll("video, audio").forEach(function (video, index) {
             if (isRealMediaElement(video)) {
-                let src = video.currentSrc || video.src;
-                src = src.split("/").pop();
-                src = src ? src : i18n("video", "视频") + (index + 1);
+                const rawSrc = video.currentSrc || video.src || "";
+                const fileName = rawSrc
+                    .split(/[?#]/)[0]
+                    .split("/")
+                    .pop();
+                const src = fileName || `${i18n("video", "视频")}${index + 1}`;
                 videoList.push(video);
                 $videoList.options.add(new Option(src, index));
             }
