@@ -65,6 +65,9 @@ function aria2AddUri(data, success, error) {
         json.params.push(`token:${G.aria2RpcToken}`);
     }
     const params = { out: data.downFileName };
+    if (G.aria2RpcDir) {
+        params.dir = G.aria2RpcDir;
+    }
     if (G.enableAria2RpcReferer) {
         params.header = [];
         params.header.push("User-Agent: " + (G.userAgent ? G.userAgent : navigator.userAgent));

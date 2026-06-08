@@ -144,12 +144,18 @@ G.OptionLists = {
     downActive: !G.isMobile,    // 手机端默认不启用 后台下载
     downAutoClose: true,
     downStream: false,
+
+    // Aria2
     aria2Rpc: "http://localhost:6800/jsonrpc",
     enableAria2Rpc: false,
     enableAria2RpcReferer: true,
     aria2RpcToken: "",
+    aria2RpcDir: "",
+
     m3u8AutoDown: true,
     badgeNumber: true,
+
+    // 发送到本地
     send2local: false,
     send2localManual: false,
     send2localURL: "http://127.0.0.1:8000/",
@@ -157,11 +163,15 @@ G.OptionLists = {
     send2localBody: '{"action": "${action}", "data": ${data}, "tabId": "${tabId}"}',
     send2localType: 0,
     send2localHeaders: "",
+
     popup: false,
     popupMode: 0, // 0:preview.html 1:popup.html 2:window preview.html 3: window popup.html
+
+    // 远程调用
     invoke: false,
     invokeText: `m3u8dlre:"\${url}" --save-dir "%USERPROFILE%\\Downloads" --del-after-done --save-name "\${title}_\${now}" --auto-select \${referer|exists:'-H "Referer: *"'}`,
     invokeConfirm: false,
+
     // m3u8解析器默认参数
     M3u8Thread: 6,
     M3u8Mp4: false,
@@ -170,6 +180,7 @@ G.OptionLists = {
     M3u8StreamSaver: false,
     M3u8Ffmpeg: true,
     M3u8AutoClose: false,
+
     // 第三方服务地址
     onlineServiceAddress: 0,
     chromeLimitSize: 1.8 * 1024 * 1024 * 1024,
@@ -192,6 +203,7 @@ G.OptionLists = {
     mqttQos: 0,
     mqttTitleLength: 100,
     mqttDataFormat: "",
+
     getHtmlDOM: false,
     damn: false,
     iframeFFmpeg: false,
