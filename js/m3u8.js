@@ -2186,6 +2186,7 @@ function autoMerge() {
 function createIframeFFmpeg(fileData) {
     if (!iframeFFmpeg) {
         iframeFFmpeg = document.createElement('iframe');
+        iframeFFmpeg.allow = "fullscreen";
         document.querySelector("#iframeBox").appendChild(iframeFFmpeg);
         iframeFFmpeg.onload = function () {
             iframeFFmpegReady = true;
