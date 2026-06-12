@@ -23,6 +23,18 @@ function secToTime(sec) {
 }
 
 /**
+* 格式化比特率
+* @param {Number} bps 比特率
+* @return {String} 格式化后的比特率字符串
+*/
+function formatBitrate(bps) {
+    if (bps >= 1000 * 1000) {
+        return (bps / 1000 / 1000).toFixed(2) + ' Mbps';
+    }
+    return (bps / 1000).toFixed(2) + ' kbps';
+}
+
+/**
  * 字节转换成大小
  * @param {Number} byte 大小
  * @returns {String} 格式化后的文件大小
@@ -785,4 +797,39 @@ function trimData(originalData) {
     data.urlPanel = undefined;
     data.urlPanelShow = undefined;
     return data;
+}
+
+/**
+ * 获取文件大小
+ * @param {String} url 
+ * @returns {Promise<number>} 文件大小（字节）
+ * 先尝试使用 HEAD 请求获取 Content-Length，如果失败则使用 GET+ Range 请求并解析 Content-Range 来获取大小
+ */
+function getRemoteFileSize(url) {
+    return fetch(url, { method: "HEAD" })
+        .then(function (res) {
+            const size = parseInt(res.headers.get("content-length"), 10);
+            if (size && !isNaN(size)) return size;
+            throw new Error("HEAD no content-length");
+        })
+        .catch(function () {
+            return fetch(url, {
+                method: "GET",
+                headers: {
+                    Range: "bytes=0-0"
+                }
+            }).then(function (res) {
+                const contentRange = res.headers.get("content-range");
+                if (contentRange) {
+                    const match = contentRange.match(/\/(\d+)$/);
+                    if (match) {
+                        const size = parseInt(match[1], 10);
+                        if (size && !isNaN(size)) return size;
+                    }
+                }
+                const size = parseInt(res.headers.get("content-length"), 10);
+                if (size && !isNaN(size)) return size;
+                throw new Error("GET range no size");
+            });
+        });
 }

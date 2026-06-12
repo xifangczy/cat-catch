@@ -174,6 +174,25 @@ function AddMedia(data, currentTab = true) {
                         mediaInfo.append(`<br><b>${i18n.m3u8Playlist}</b>`);
                     }
                 });
+                // 通过前5个片段的下载大小和下载时间来估算码率
+                const fragments = [];
+                function onFragLoaded(event, data) {
+                    const frag = data.frag;
+                    const stats = frag && frag.stats;
+                    if (!frag || !stats || !frag.duration) return;
+                    const bytes = stats.total || stats.loaded || 0;
+                    const duration = frag.duration || 0;
+                    if (!bytes || !duration) return;
+                    fragments.push({ bytes, duration });
+                    if (fragments.length >= 5) {
+                        const totalBytes = fragments.reduce((sum, item) => sum + item.bytes, 0);
+                        const totalDuration = fragments.reduce((sum, item) => sum + item.duration, 0);
+                        const bps = totalBytes * 8 / totalDuration;
+                        mediaInfo.append(`<br><b>${i18n.bitrate}:</b> ${formatBitrate(bps)}`);
+                        hls.off(Hls.Events.FRAG_LOADED, onFragLoaded);
+                    }
+                }
+                hls.on(Hls.Events.FRAG_LOADED, onFragLoaded);
             } else if (data.isPlay) {
                 setRequestHeaders(data.requestHeaders, function () {
                     preview.attr("src", data.url);
@@ -190,13 +209,22 @@ function AddMedia(data, currentTab = true) {
                 preview.show();
                 if (this.duration && this.duration != Infinity) {
                     data.duration = this.duration;
-                    mediaInfo.append(`<br><b>${i18n.duration}:</b> ` + secToTime(this.duration));
+                    mediaInfo.append(`<br><b>${i18n.duration}:</b> ${secToTime(this.duration)}`);
                 }
                 if (this.videoHeight && this.videoWidth) {
-                    mediaInfo.append(`<br><b>${i18n.resolution}:</b> ` + this.videoWidth + "x" + this.videoHeight);
+                    mediaInfo.append(`<br><b>${i18n.resolution}:</b> ${this.videoWidth}x${this.videoHeight}`);
                     data.videoWidth = this.videoWidth;
                     data.videoHeight = this.videoHeight;
                 }
+                getRemoteFileSize(data.url)
+                    .then(function (size) {
+                        if (!size || isNaN(size) || size < 1024) return;
+                        const bps = (size * 8) / data.duration;
+                        mediaInfo.append(`<br><b>${i18n.bitrate}:</b> ${formatBitrate(bps)}`);
+                    })
+                    .catch(function (error) {
+                        console.warn(error);
+                    });
             });
         }
         if (event.target.id == "play") {
@@ -874,7 +902,7 @@ const interval = setInterval(async function () {
 
     const observer = new MutationObserver(updateDownHeight);
     observer.observe($down[0], { childList: true, subtree: true, attributes: true });
-    setInterval(() => { updateDownHeight(); }, 233);
+    setTimeout(updateDownHeight, 500);
     // 疑似密钥
     chrome.webNavigation.getAllFrames({ tabId: G.tabId }, function (frames) {
         if (!frames) { return; }
