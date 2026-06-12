@@ -743,7 +743,7 @@ function parseTs(data) {
         $("#recorder").show();
         $(".videoInfo #info").html(i18n.liveHLS);
     } else {
-        estimateSize(_fragments); // 估算文件大小
+        estimateFileInfo(_fragments, data.totalduration); // 估算文件大小
         $("#count").append(i18n("m3u8Info", [_fragments.length, secToTime(data.totalduration)]));
         $("#sendFfmpeg").show();
         $("#retryCount").parent().hide();
@@ -803,11 +803,12 @@ function parseTs(data) {
  * 估算整个视频大小
  * 获取几个切片大小 取平均值 * 切片数量
  * @param {Array} url ts对象数组
+ * @param {number} duration 视频总时长
  */
-async function estimateSize(fragments) {
+async function estimateFileInfo(fragments, duration) {
     if (!fragments || fragments.length === 0) return;
 
-    const samplesToCheck = Math.min(5, fragments.length);
+    const samplesToCheck = Math.min(10, fragments.length);
     let totalSize = 0;
     let successfulFetches = 0;
 
@@ -837,6 +838,8 @@ async function estimateSize(fragments) {
     if (successfulFetches > 0) {
         estimateFileSize = totalSize / successfulFetches * fragments.length;
         $("#estimateFileSize").append(` ${i18n.estimateSize}: ${byteToSize(estimateFileSize)}`);
+        const bitrate = (estimateFileSize * 8) / duration;
+        $("#estimateBitrate").append(` ${i18n.bitrate}: ${formatBitrate(bitrate)}`);
     }
 }
 /**************************** 监听 / 按钮绑定 ****************************/
