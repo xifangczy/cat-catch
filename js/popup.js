@@ -216,7 +216,7 @@ function AddMedia(data, currentTab = true) {
                     data.videoWidth = this.videoWidth;
                     data.videoHeight = this.videoHeight;
                 }
-                getRemoteFileSize(data.url)
+                !isM3U8(data) && getRemoteFileSize(data.url)
                     .then(function (size) {
                         if (!size || isNaN(size) || size < 1024) return;
                         const bps = (size * 8) / data.duration;
