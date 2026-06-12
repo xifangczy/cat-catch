@@ -2,7 +2,7 @@
 if (chrome.i18n.getMessage === undefined) {
     chrome.i18n.getMessage = (key) => key;
     fetch(chrome.runtime.getURL("_locales/zh_CN/messages.json")).then(res => res.json()).then(data => {
-        chrome.i18n.getMessage = (key) => data[key].messages;
+        chrome.i18n.getMessage = (key) => data[key].message;
     }).catch((e) => { console.error(e); });
 }
 /**
