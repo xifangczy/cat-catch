@@ -337,11 +337,8 @@ function InitOptions() {
         chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: items.sidePanel });
 
         // 右键菜单注册
-        chrome.contextMenus.update("cat-catch", {
-            visible: items.contextMenus
-        }, () => {
-            chrome.runtime.lastError && console.log(chrome.runtime.lastError);
-        });
+        contextMenusInit(items.contextMenus);
+
         G = { ...items, ...G };
 
         // 初始化 G.blockUrlSet
@@ -418,25 +415,21 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
             continue;
         }
         if (key == "contextMenus") {
-            chrome.contextMenus.update("cat-catch", {
-                visible: newValue
-            }, () => {
-                chrome.runtime.lastError && console.error(chrome.runtime.lastError);
-            });
+            contextMenusInit(newValue);
             continue;
         }
         G[key] = newValue;
     }
 });
 
-function contextMenusInit() {
+function contextMenusInit(visible = false) {
     // 注册右键
     chrome.contextMenus.removeAll(() => {
         chrome.contextMenus.create({
             id: "cat-catch",
             title: i18n.catCatch,
             contexts: ["page", "image"],
-            visible: false
+            visible: visible
         });
         chrome.contextMenus.create({
             id: "image-save",
@@ -492,7 +485,6 @@ chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason == "install") {
         chrome.tabs.create({ url: "install.html" });
     }
-    contextMenusInit();
 });
 
 /**

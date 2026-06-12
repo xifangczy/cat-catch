@@ -18,6 +18,5 @@ if (typeof (browser) == "object" && !(typeof (G) == "object" && !G.isFirefox)) {
         if (reason == "install") {
             browser.tabs.create({ url: "install.html" });
         }
-        contextMenusInit && contextMenusInit();
     });
 }
