@@ -236,7 +236,7 @@
     }
 
     // i18n
-    if (window.CatCatchI18n) {
+    if (window.CatCatchI18n && CatCatch) {
         CatCatch.querySelectorAll('[data-i18n]').forEach(function (element) {
             const translation = window.CatCatchI18n[element.dataset.i18n]?.[language];
             if (translation) {
@@ -251,7 +251,7 @@
         });
     }
     function i18n(key, original = "") {
-        if (!window.CatCatchI18n) { return original };
+        if (!window.CatCatchI18n || !CatCatch) { return original };
         return window.CatCatchI18n[key][language];
     }
 })();

@@ -68,7 +68,7 @@
 
     async function findMedia(data, depth = 0) {
         CATCH_SEARCH_DEBUG && console.log(data);
-        let index = 0;
+        // let index = 0;
         if (!data) { return; }
         if (data instanceof Array && data.length == 16) {
             const isKey = data.every(function (value) {
@@ -84,7 +84,7 @@
             return;
         }
         for (let key in data) {
-            if (index != 0) { depth = 0; } index++;
+            // if (index != 0) { depth = 0; } index++;
             if (typeof data[key] == "object") {
                 // 查找疑似key
                 if (data[key] instanceof Array && data[key].length == 16) {
@@ -94,8 +94,10 @@
                     isKey && postData({ action: "catCatchAddKey", key: data[key], href: location.href, ext: "key" });
                     continue;
                 }
-                if (depth > 10) { continue; }  // 防止死循环 最大深度
-                findMedia(data[key], depth + 1);
+                // 防止死循环 最大深度
+                if (depth <= 20) {
+                    findMedia(data[key], depth + 1);
+                }
                 continue;
             }
             if (typeof data[key] == "string") {

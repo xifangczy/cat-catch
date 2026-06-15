@@ -367,7 +367,7 @@
     // #endregion 移动逻辑
 
     // i18n
-    if (window.CatCatchI18n) {
+    if (window.CatCatchI18n && CatCatch) {
         CatCatch.querySelectorAll('[data-i18n]').forEach(function (element) {
             element.innerHTML = window.CatCatchI18n[element.dataset.i18n][language];
         });
@@ -376,7 +376,7 @@
         });
     }
     function i18n(key, original = "") {
-        if (!window.CatCatchI18n) { return original };
+        if (!window.CatCatchI18n || !CatCatch) { return original };
         return window.CatCatchI18n[key][language];
     }
 })();
