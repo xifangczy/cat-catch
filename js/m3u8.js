@@ -325,21 +325,6 @@ hls.on(Hls.Events.MANIFEST_LOADED, function (event, data) {
     $("#m3u8_url").attr("href", data.url).html(data.url);
 });
 
-/**
- * 跳转到新解析器
- * @param {Object} item m3u8 url对象
- * @returns 文件名和新链接 字符串数组
- */
-function getNewUrl(item) {
-    const rawUrl = item.uri ?? item.url;
-    const name = GetFile(rawUrl);
-    const params = new URLSearchParams(window.location.search);
-    params.set('url', rawUrl);
-    params.delete('autoDown');
-    params.delete('ffmpeg');
-    const newUrl = `/m3u8.html?${params.toString()}`;
-    return [name, newUrl];
-}
 
 // 监听 MANIFEST_PARSED m3u8解析完成
 hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
@@ -457,6 +442,22 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
         $("#m3u8").hide();
         // $("button").hide();
         return;
+    }
+
+    /**
+     * 跳转到新m3u8解析器
+     * @param {Object} item m3u8 url对象
+     * @returns 文件名和新链接 字符串数组
+     */
+    function getNewUrl(item) {
+        const rawUrl = item.uri ?? item.url;
+        const name = GetFile(rawUrl);
+        const params = new URLSearchParams(window.location.search);
+        params.set('url', rawUrl);
+        params.delete('autoDown');
+        params.delete('ffmpeg');
+        const newUrl = `/m3u8.html?${params.toString()}`;
+        return [name, newUrl];
     }
 });
 
