@@ -12,6 +12,7 @@ const key = params.get("key");  // 自定义密钥
 let autoDown = params.get("autoDown");  //是否自动下载
 const autoClose = params.get("autoClose");  // 下载完是否关闭页面
 let retryCount = parseInt(params.get("retryCount"));  // 重试次数
+const _getMpdId = parseInt(params.get("getMpdId"));  // 从mpd页面传入的 m3u8 解析
 
 const _isMaster = params.get("isMaster");   // 是否为主任务
 
@@ -58,6 +59,7 @@ setRequestHeaders(requestHeaders, () => {
         }
     });
 });
+
 
 // 默认设置
 const allOption = {
@@ -161,7 +163,7 @@ function init() {
     // 填充重试次数
     retryCount && $("#retryCount").val(retryCount);
 
-    if (isEmpty(_m3u8Url)) {
+    if (isEmpty(_m3u8Url) || _getMpdId) {
         $("#loading").hide(); $("#m3u8Custom").show();
 
         $("#uploadM3U8").change(function (event) {
@@ -275,10 +277,10 @@ function init() {
             hls.loadSource(_m3u8Url);
             $("#m3u8Custom").hide();
         });
+
         // 从mpd解析器读取数据
-        const getId = parseInt(params.get("getId"));
-        if (getId) {
-            chrome.tabs.sendMessage(getId, "getM3u8", function (result) {
+        if (_getMpdId) {
+            chrome.tabs.sendMessage(_getMpdId, "getM3u8", function (result) {
                 $("#m3u8Text").val(result.m3u8Content);
                 $("#parse").click();
                 $("#info").html(result.mediaInfo);
@@ -322,6 +324,22 @@ channel.onmessage = (event) => {
 hls.on(Hls.Events.MANIFEST_LOADED, function (event, data) {
     $("#m3u8_url").attr("href", data.url).html(data.url);
 });
+
+/**
+ * 跳转到新解析器
+ * @param {Object} item m3u8 url对象
+ * @returns 文件名和新链接 字符串数组
+ */
+function getNewUrl(item) {
+    const rawUrl = item.uri ?? item.url;
+    const name = GetFile(rawUrl);
+    const params = new URLSearchParams(window.location.search);
+    params.set('url', rawUrl);
+    params.delete('autoDown');
+    params.delete('ffmpeg');
+    const newUrl = `/m3u8.html?${params.toString()}`;
+    return [name, newUrl];
+}
 
 // 监听 MANIFEST_PARSED m3u8解析完成
 hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
@@ -440,16 +458,6 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
         // $("button").hide();
         return;
     }
-    function getNewUrl(item) {
-        const rawUrl = item.uri ?? item.url;
-        const name = GetFile(rawUrl);
-        const params = new URLSearchParams(window.location.search);
-        params.set('url', rawUrl);
-        params.delete('autoDown');
-        params.delete('ffmpeg');
-        const newUrl = `/m3u8.html?${params.toString()}`;
-        return [name, newUrl];
-    }
 });
 
 // 监听 LEVEL_LOADED 所有切片载入完成
@@ -516,6 +524,25 @@ hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
 
 // 监听 ERROR m3u8解析错误
 hls.on(Hls.Events.ERROR, function (event, data) {
+
+    // m3u8清单 获取错误 尝试从缓存获取文件内容
+    if (data.type == 'networkError' && data.details == "manifestLoadError" && data.url.startsWith("http")) {
+        if (data.response && (data.response.code === 403 || data.response.code === 404) && tabId && tabId != -1) {
+            chrome.tabs.sendMessage(tabId, {
+                Message: "getM3u8Cache",
+                url: data.url
+            }, (response) => {
+                if (!response || !response.success || !response.data) { return; }
+                const baseUrl = data.url.substring(0, data.url.lastIndexOf("/") + 1);
+                const m3u8Text = addBashUrl(baseUrl, response.data);
+                const blobUrl = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(m3u8Text)]));
+
+                hls.stopLoad();
+                hls.loadSource(blobUrl);
+            });
+        }
+    }
+
     autoDown && highlight();
     console.log(data);
     if (data.details == "bufferStalledError") {

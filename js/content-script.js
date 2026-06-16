@@ -178,6 +178,13 @@
             sendResponse("");
             return true;
         }
+        if (Message.Message == "getM3u8Cache") {
+            fetch(Message.url, { method: "GET", cache: "force-cache" })
+                .then(response => response.text())
+                .then(text => sendResponse({ success: true, data: text }))
+                .catch(() => sendResponse({ success: false, error: "Failed to fetch" }));
+            return true;
+        }
     });
 
     // Heart Beat
