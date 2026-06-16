@@ -83,7 +83,7 @@ function init() {
         m3u8Content += "#EXT-X-ENDLIST";
         // $("#media_file").html(m3u8Content); return;
         chrome.tabs.getCurrent(function (tabs) {
-            chrome.tabs.create({ url: "m3u8.html?getId=" + tabs.id });
+            chrome.tabs.create({ url: "m3u8.html?getMpdId=" + tabs.id });
         });
     });
 }
