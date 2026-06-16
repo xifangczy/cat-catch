@@ -525,22 +525,30 @@ hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
 // 监听 ERROR m3u8解析错误
 hls.on(Hls.Events.ERROR, function (event, data) {
 
-    // m3u8清单 获取错误 尝试从缓存获取文件内容
-    if (data.type == 'networkError' && data.details == "manifestLoadError" && data.url.startsWith("http")) {
-        if (data.response && (data.response.code === 403 || data.response.code === 404) && tabId && tabId != -1) {
-            chrome.tabs.sendMessage(tabId, {
-                Message: "getM3u8Cache",
-                url: data.url
-            }, (response) => {
-                if (!response || !response.success || !response.data) { return; }
-                const baseUrl = data.url.substring(0, data.url.lastIndexOf("/") + 1);
-                const m3u8Text = addBashUrl(baseUrl, response.data);
-                const blobUrl = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(m3u8Text)]));
+    /**
+     * 如果m3u8清单获取错误 尝试从缓存获取 解决部分网站一次性url问题
+     * 仅限于第一次加载m3u8文件时发生错误(使用hls.levels.length判断) 其他情况不处理
+     */
+    if (data.type == 'networkError' &&
+        data.details == "manifestLoadError" &&
+        data.url.startsWith("http") &&
+        data.response &&
+        // (data.response.code === 403 || data.response.code === 404) &&
+        tabId &&
+        tabId != -1 &&
+        !hls.levels.length) {
+        chrome.tabs.sendMessage(tabId, {
+            Message: "getM3u8Cache",
+            url: data.url
+        }, (response) => {
+            if (!response || !response.success || !response.data) { return; }
+            const baseUrl = data.url.substring(0, data.url.lastIndexOf("/") + 1);
+            const m3u8Text = addBashUrl(baseUrl, response.data);
+            const blobUrl = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(m3u8Text)]));
 
-                hls.stopLoad();
-                hls.loadSource(blobUrl);
-            });
-        }
+            hls.stopLoad();
+            hls.loadSource(blobUrl);
+        });
     }
 
     autoDown && highlight();
