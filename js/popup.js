@@ -174,6 +174,10 @@ function AddMedia(data, currentTab = true) {
                         mediaInfo.append(`<br><b>${i18n.m3u8Playlist}</b>`);
                     }
                 });
+                let totalFragments = 0;
+                hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
+                    totalFragments = data.details.fragments.length;
+                });
                 // 通过前5个片段的下载大小和下载时间来估算码率
                 const fragments = [];
                 function onFragLoaded(event, data) {
@@ -189,6 +193,7 @@ function AddMedia(data, currentTab = true) {
                         const totalDuration = fragments.reduce((sum, item) => sum + item.duration, 0);
                         const bps = totalBytes * 8 / totalDuration;
                         mediaInfo.append(`<br><b>${i18n.bitrate}:</b> ${formatBitrate(bps)}`);
+                        totalFragments && mediaInfo.append(`<br><b>${i18n.estimateSize}:</b> ${byteToSize(totalBytes / fragments.length * totalFragments)}`);
                         hls.off(Hls.Events.FRAG_LOADED, onFragLoaded);
                     }
                 }
