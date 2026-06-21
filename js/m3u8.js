@@ -810,6 +810,16 @@ function parseTs(data) {
             });
         });
     }
+
+    /**
+     * 是否需要数据预处理。
+     * 判断是否非常见切片格式。否则勾选预处理。
+     */
+    if (!["ts", "mp4", "m4s", "aac", "ac3", "webm"].includes(GetExt(_fragments[0].url))) {
+        document.querySelector("#dataPreprocessing").checked = true;
+    }
+
+
     function showKeyInfo(buffer, decryptdata, i) {
         const $tips = $("#tips");
         $tips.append(`${i18n.keyAddress}: <input type="text" value="${decryptdata.uri}" spellcheck="false" readonly="readonly" class="keyUrl">`);
@@ -1487,16 +1497,8 @@ function downloadNew(start = 0, end = _fragments.length) {
     // 储存切片所需 DOM 提高性能
     const itemDOM = new Map();
 
-    // 是否预处理数据
-    const dataPreprocessingCheckbox = document.querySelector("#dataPreprocessing");
-    let dataPreprocessing = dataPreprocessingCheckbox.checked;
-    if (!dataPreprocessing && !["ts", "mp4", "m4s", "aac", "ac3", "webm"].includes(GetExt(selectedFragments[0].url))) {
-        dataPreprocessing = !!_autoDown ? true : confirm(i18n.extensionAnomalyDetected);
-        dataPreprocessingCheckbox.checked = dataPreprocessing;
-    }
-
-    // 修剪函数 去掉ts前可能存在的图片数据
-    dataPreprocessing && down.setTrim(function (buffer, fragment) {
+    // 数据预处理 切片数据伪装PNG 剔除PNG数据
+    document.querySelector("#dataPreprocessing").checked && down.setTrim(function (buffer, fragment) {
         const view = new Uint8Array(buffer);
         const len = view.length;
         let tsStartIndex = -1;

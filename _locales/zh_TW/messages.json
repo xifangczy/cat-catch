@@ -1042,8 +1042,5 @@
   },
   "dataPreprocessing": {
     "message": "資料預處理"
-  },
-  "extensionAnomalyDetected": {
-    "message": "偵測到副檔名非正常格式，是否開啟資料預處理？"
   }
 }

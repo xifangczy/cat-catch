@@ -1042,8 +1042,5 @@
   },
   "dataPreprocessing": {
     "message": "Data Preprocessing"
-  },
-  "extensionAnomalyDetected": {
-    "message": "Non-standard file extension detected. Enable data preprocessing?"
   }
 }
