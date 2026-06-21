@@ -1488,9 +1488,11 @@ function downloadNew(start = 0, end = _fragments.length) {
     const itemDOM = new Map();
 
     // 是否预处理数据
-    let dataPreprocessing = false;
-    if (!["ts", "mp4", "m4s", "aac", "ac3", "webm"].includes(GetExt(selectedFragments[0].url))) {
-        dataPreprocessing = _autoDown ? true : confirm(i18n.extensionAnomalyDetected);
+    const dataPreprocessingCheckbox = document.querySelector("#dataPreprocessing");
+    let dataPreprocessing = dataPreprocessingCheckbox.checked;
+    if (!dataPreprocessing && !["ts", "mp4", "m4s", "aac", "ac3", "webm"].includes(GetExt(selectedFragments[0].url))) {
+        dataPreprocessing = !!_autoDown ? true : confirm(i18n.extensionAnomalyDetected);
+        dataPreprocessingCheckbox.checked = dataPreprocessing;
     }
 
     // 修剪函数 去掉ts前可能存在的图片数据
