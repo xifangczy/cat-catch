@@ -1039,5 +1039,11 @@
   },
   "contextMenus": {
     "message": "右键菜单"
+  },
+  "dataPreprocessing": {
+    "message": "数据预处理"
+  },
+  "extensionAnomalyDetected": {
+    "message": "检测到扩展非正常格式, 是否打开数据预处理?"
   }
 }

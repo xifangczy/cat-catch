@@ -1486,8 +1486,14 @@ function downloadNew(start = 0, end = _fragments.length) {
     // 储存切片所需 DOM 提高性能
     const itemDOM = new Map();
 
+    // 是否预处理数据
+    let dataPreprocessing = false;
+    if (!["ts", "mp4", "m4s", "aac", "ac3", "webm"].includes(GetExt(selectedFragments[0].url))) {
+        dataPreprocessing = confirm(i18n.extensionAnomalyDetected);
+    }
+
     // 修剪函数 去掉ts前可能存在的图片数据
-    GetExt(selectedFragments[0].url) === 'png' && down.setTrim(function (buffer, fragment) {
+    dataPreprocessing && down.setTrim(function (buffer, fragment) {
         const view = new Uint8Array(buffer);
         const len = view.length;
         let tsStartIndex = -1;
