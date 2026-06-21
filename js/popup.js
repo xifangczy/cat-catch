@@ -831,7 +831,6 @@ const interval = setInterval(async function () {
         G.tabId = _tabId;
         $("body").css("width", "100%");
         $("#down").css("justify-content", "center").find("button").css("margin-left", "5px");
-        $("#popup").hide();
         _type == "window" && $("#currentPage").show();
     }
 
