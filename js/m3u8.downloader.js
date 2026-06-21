@@ -62,6 +62,13 @@ class Downloader {
         this.transcode = callback;
     }
     /**
+     * 设定切片裁剪函数 适用于伪装图切片 需要返回一个新的buffer
+     * @param {Function} callback
+     */
+    setTrim(callback) {
+        this.trim = callback;
+    }
+    /**
      * 停止下载 没有目标 停止所有线程
      * @param {number} index 停止下载目标
      */
@@ -254,6 +261,11 @@ class Downloader {
             })
             .then(buffer => {
                 this.emit('rawBuffer', buffer, fragment);
+                // 存在裁剪函数 调用裁剪函数 否则直接返回buffer
+                return this.trim ? this.trim(buffer, fragment) : buffer;
+            })
+            .then(buffer => {
+                this.emit('trimBuffer', buffer, fragment);
                 // 存在解密函数 调用解密函数 否则直接返回buffer
                 return this.decrypt ? this.decrypt(buffer, fragment) : buffer;
             })

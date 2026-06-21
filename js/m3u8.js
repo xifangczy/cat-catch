@@ -1463,6 +1463,7 @@ $("#searchingForRealKey").click(function () {
         });
 });
 
+
 /**
  * 调用新下载器的方法
  * @param {number} start 下载范围 开始索引
@@ -1484,6 +1485,31 @@ function downloadNew(start = 0, end = _fragments.length) {
 
     // 储存切片所需 DOM 提高性能
     const itemDOM = new Map();
+
+    // 修剪函数 去掉ts前可能存在的图片数据
+    GetExt(selectedFragments[0].url) === 'png' && down.setTrim(function (buffer, fragment) {
+        const view = new Uint8Array(buffer);
+        const len = view.length;
+        let tsStartIndex = -1;
+        // 检测PNG
+        if (view[0] === 0x89 && view[1] === 0x50 && view[2] === 0x4E && view[3] === 0x47) {
+            // 找到PNG结束标志IEND
+            for (let i = 0; i < len - 4; i++) {
+                if (view[i] === 73 && view[i + 1] === 69 &&
+                    view[i + 2] === 78 && view[i + 3] === 68) {
+                    // IEND(4字节) + CRC(4字节) = 8字节
+                    tsStartIndex = i + 8;
+                    break;
+                }
+            }
+        }
+        // 未找到头 或者 找不到结束标志 则返回原buffer
+        if (tsStartIndex === -1 || tsStartIndex >= len) {
+            return buffer;
+        }
+        // 返回切除图片头部后的buffer
+        return buffer.slice(tsStartIndex);
+    });
 
     // 解密函数
     down.setDecrypt(function (buffer, fragment) {
