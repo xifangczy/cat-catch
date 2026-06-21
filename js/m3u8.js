@@ -9,6 +9,7 @@ let tsAddArg = params.get("tsAddArg");  // 自定义 切片参数
 let autoReferer = params.get("autoReferer");    // 是否已经自动调整 referer
 const tabId = parseInt(params.get("tabid"));    // 资源所在的标签页ID 用来获取密钥
 const key = params.get("key");  // 自定义密钥
+const _autoDown = params.get("autoDown");  //是否自动下载
 let autoDown = params.get("autoDown");  //是否自动下载
 const autoClose = params.get("autoClose");  // 下载完是否关闭页面
 let retryCount = parseInt(params.get("retryCount"));  // 重试次数
@@ -1489,7 +1490,7 @@ function downloadNew(start = 0, end = _fragments.length) {
     // 是否预处理数据
     let dataPreprocessing = false;
     if (!["ts", "mp4", "m4s", "aac", "ac3", "webm"].includes(GetExt(selectedFragments[0].url))) {
-        dataPreprocessing = confirm(i18n.extensionAnomalyDetected);
+        dataPreprocessing = _autoDown ? true : confirm(i18n.extensionAnomalyDetected);
     }
 
     // 修剪函数 去掉ts前可能存在的图片数据
