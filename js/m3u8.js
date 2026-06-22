@@ -1498,7 +1498,7 @@ function downloadNew(start = 0, end = _fragments.length) {
     const itemDOM = new Map();
 
     // 数据预处理 切片数据伪装PNG 剔除PNG数据
-    document.querySelector("#dataPreprocessing").checked && down.setTrim(function (buffer, fragment) {
+    document.querySelector("#dataPreprocessing").checked && down.use(function (buffer, fragment) {
         const view = new Uint8Array(buffer);
         const len = view.length;
         let tsStartIndex = -1;
@@ -1520,10 +1520,10 @@ function downloadNew(start = 0, end = _fragments.length) {
         }
         // 返回切除图片头部后的buffer
         return buffer.slice(tsStartIndex);
-    });
+    }, 'preprocess');
 
     // 解密函数
-    down.setDecrypt(function (buffer, fragment) {
+    down.use(function (buffer, fragment) {
         return new Promise(function (resolve, reject) {
             // 跳过解密 录制模式 切片不存在加密 跳过解密 直接返回
             if (skipDecrypt || recorder || !fragment.encrypted || !fragment.decryptdata) {
@@ -1557,7 +1557,7 @@ function downloadNew(start = 0, end = _fragments.length) {
             }
             resolve(buffer);
         });
-    });
+    }, 'decrypt');
     // 转码函数 如果存在down.mapTag 跳过转码
     if (downSet.mp4 && !down.mapTag) {
         let tempBuffer = null;
@@ -1574,12 +1574,12 @@ function downloadNew(start = 0, end = _fragments.length) {
             }
             tempBuffer = segment.data;
         });
-        down.setTranscode(async function (buffer, fragment) {
+        down.use(async function (buffer, fragment) {
             head = fragment.index == 0;
             transmuxer.push(new Uint8Array(buffer));
             transmuxer.flush();
             return tempBuffer ? tempBuffer.buffer : buffer;
-        });
+        }, 'transcode');
     }
     // 下载错误
     down.on('downloadError', function (fragment, error) {

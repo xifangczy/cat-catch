@@ -4,8 +4,7 @@ class Downloader {
         this.allFragments = fragments;   // 储存所有原始切片列表
         this.thread = thread;            // 线程数
         this.events = {};                // events
-        this.decrypt = null;             // 解密函数
-        this.transcode = null;           // 转码函数
+        this.pipeline = [];             // 数据处理管线
         this.init();
     }
     /**
@@ -48,25 +47,25 @@ class Downloader {
         }
     }
     /**
-     * 设定解密函数
-     * @param {Function} callback 
+     * 注册一个处理步骤
+     * @param {Function} fn      处理函数 (buffer, fragment) => buffer
+     * @param {string}   name    步骤名称（可选，用于触发 pipe:name 事件）
+     * @returns {Downloader}     返回自身，支持链式调用
      */
-    setDecrypt(callback) {
-        this.decrypt = callback;
+    use(fn, name = '') {
+        this.pipeline.push({ fn, name });
+        return this;
     }
     /**
-     * 设定转码函数
-     * @param {Function} callback 
+     * 移除某个处理步骤
+     * @param {string|Function} target  步骤名称或函数引用
      */
-    setTranscode(callback) {
-        this.transcode = callback;
-    }
-    /**
-     * 设定切片裁剪函数 适用于伪装图切片 需要返回一个新的buffer
-     * @param {Function} callback
-     */
-    setTrim(callback) {
-        this.trim = callback;
+    removeProcessor(target) {
+        if (typeof target === 'string') {
+            this.pipeline = this.pipeline.filter(p => p.name !== target);
+        } else {
+            this.pipeline = this.pipeline.filter(p => p.fn !== target);
+        }
     }
     /**
      * 停止下载 没有目标 停止所有线程
@@ -259,20 +258,14 @@ class Downloader {
                 }
                 return pump();
             })
-            .then(buffer => {
+            // 数据处理函数
+            .then(async (buffer) => {
                 this.emit('rawBuffer', buffer, fragment);
-                // 存在裁剪函数 调用裁剪函数 否则直接返回buffer
-                return this.trim ? this.trim(buffer, fragment) : buffer;
-            })
-            .then(buffer => {
-                this.emit('trimBuffer', buffer, fragment);
-                // 存在解密函数 调用解密函数 否则直接返回buffer
-                return this.decrypt ? this.decrypt(buffer, fragment) : buffer;
-            })
-            .then(buffer => {
-                this.emit('decryptedData', buffer, fragment);
-                // 存在转码函数 调用转码函数 否则直接返回buffer
-                return this.transcode ? this.transcode(buffer, fragment) : buffer;
+                for (const { fn, name } of this.pipeline) {
+                    buffer = await fn(buffer, fragment);
+                    this.emit(name ? `pipe:${name}` : 'processedBuffer', buffer, fragment);
+                }
+                return buffer;
             })
             .then(buffer => {
                 // 储存解密/转码后的buffer
@@ -345,8 +338,7 @@ class Downloader {
         this.allFragments = [];
         this.thread = 6;
         this.events = {};
-        this.decrypt = null;
-        this.transcode = null;
+        this.pipeline = [];
         this.init();
     }
 }
