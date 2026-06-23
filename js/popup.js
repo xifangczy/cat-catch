@@ -836,7 +836,12 @@ const interval = setInterval(async function () {
 
     // 获取页面DOM
     if (G.getHtmlDOM) {
-        pageDOM = getPageDOM();
+        // pageDOM = getPageDOM();
+        getPageDOM().then(dom => {
+            pageDOM = dom;
+        }).catch(error => {
+            console.error('Error getting page DOM:', error);
+        });
     }
     // 填充数据
     chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getData", tabId: G.tabId }, function (data) {
