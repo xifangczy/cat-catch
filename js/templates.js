@@ -233,7 +233,7 @@ class TemplateEvaluator {
             value = this.data[tagNode.varName];
         }
 
-        // 2. 如果没有管道，直接返回
+        // 2. 没有管道直接返回
         if (!tagNode.pipes.length) {
             return value !== undefined ? String(value) : '${' + tagNode.varName + '}';
         }
@@ -241,21 +241,32 @@ class TemplateEvaluator {
         // 3. 依次应用管道
         let current = value !== undefined ? String(value) : '';
         for (const pipe of tagNode.pipes) {
-            // 先对管道的每个参数进行求值（因为它们可能包含嵌套标签）
+            // 3.1 求值参数（嵌套标签 → 纯字符串数组）
             const resolvedArgs = pipe.args.map(arg => {
                 if (Array.isArray(arg)) {
-                    // 是节点数组（来自嵌套解析）
                     const subEval = new TemplateEvaluator(this.data, this.trimData);
                     return subEval.evaluate(arg);
                 } else if (arg instanceof TextNode) {
                     return arg.value;
-                } else {
-                    return arg; // should not happen
                 }
+                return arg;
             });
 
-            // 调用现有的 templatesFunction
-            current = templatesFunction(current, pipe.name + (resolvedArgs.length ? ':' + resolvedArgs.join(',') : ''), this.data);
+            // 3.2 空值/无参的校验（沿用旧逻辑）
+            // 当前值为空且不是允许空输入的处理器 → 直接返回空
+            if (isEmpty(current) && !['exists', 'find', 'prompt'].includes(pipe.name)) {
+                return '';
+            }
+            // 无参数且不是不需要参数的处理器 → 保持原值跳过
+            if (resolvedArgs.length === 0 && !['filter', 'prompt'].includes(pipe.name)) {
+                break; // 不应用此管道，直接继续（或返回 current）
+            }
+
+            // 3.3 直接调用处理器，不再拼字符串
+            const processor = templatesProcessors[pipe.name];
+            if (processor) {
+                current = processor(current, resolvedArgs, this.data);
+            }
         }
         return current;
     }
@@ -338,37 +349,6 @@ const templatesProcessors = {
     filter: (txt, arg) => stringModify(txt, arg[0]),
     prompt: (txt) => window.prompt("", txt) || ""
 };
-
-/**
- * 模板的函数链式处理
- * @param {String} text 文本
- * @param {String} actionStr 函数链管道字符串 (如 "slice:0,5 | to:upperCase")
- * @param {Object} data 外部传入的数据对象
- * @returns {String} 返回处理后的字符串
- */
-function templatesFunction(text, actionStr, data) {
-    text = isEmpty(text) ? "" : String(text);
-    const actions = splitString(actionStr, "|");
-
-    for (const item of actions) {
-        let actionName = item.trim();
-        let args = [];
-        const colonIndex = item.indexOf(":");
-
-        if (colonIndex !== -1) {
-            actionName = item.slice(0, colonIndex).trim();
-            args = splitString(item.slice(colonIndex + 1).trim(), ",").map(arg => {
-                return arg.trim().replace(/^(['"])([\s\S]*)\1$/, '$2');
-            });
-        }
-        if (isEmpty(text) && !["exists", "find", "prompt"].includes(actionName)) { return ""; }
-        if (args.length === 0 && !["filter", "prompt"].includes(actionName)) { return text; }
-        if (templatesProcessors[actionName]) {
-            text = templatesProcessors[actionName](text, args, data);
-        }
-    }
-    return text;
-}
 
 /**
  * 模板替换
