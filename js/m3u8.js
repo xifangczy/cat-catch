@@ -190,48 +190,58 @@ function init() {
 
             if (m3u8Text == "") { return; }
 
-            // // 批量生成切片链接 解析range标签
+            // 批量生成切片链接 解析range标签
             if (m3u8Text.includes('${range:')) {
-                const rangePattern = /\$\{range:(\d+)-(\d+|\?),?(\d+)?\}/;
-                const match = m3u8Text.match(rangePattern);
-                if (!match) { return; }
-                const start = parseInt(match[1]);
-                let end = match[2];
-                const padding = match[3] ? parseInt(match[3]) : 0;
+                const rangePattern = /\$\{range:(\d+)-(\d+|\?),?(\d+)?\}/g;
+                const matches = [...m3u8Text.matchAll(rangePattern)];
+                if (!matches.length) return;
+
+                const tags = matches.map(m => ({
+                    start: parseInt(m[1]),
+                    end: m[2] === '?' ? Infinity : parseInt(m[2]),
+                    pad: m[3] ? parseInt(m[3]) : 0,
+                    isOpen: m[2] === '?'
+                }));
+
+                const hasOpen = tags.some(t => t.isOpen);
                 const urls = [];
+                const generatedSet = new Set();
+                let n = 0;
+                const maxUrls = 9999;
+
                 $("#m3u8Text").val(i18n.loadingData);
 
-                if (end === "?") {
-                    let i = start;
-                    while (true) {
-                        let number = i.toString();
-                        if (padding > 0) {
-                            number = number.padStart(padding, '0');
+                while (urls.length < maxUrls) {
+                    const values = tags.map(t => {
+                        if (t.isOpen) {
+                            return (t.start + n).toString().padStart(t.pad, '0');
+                        } else {
+                            const len = t.end - t.start + 1;
+                            return (t.start + (n % len)).toString().padStart(t.pad, '0');
                         }
-                        const url = m3u8Text.replace(rangePattern, number);
+                    });
+
+                    let idx = 0;
+                    const url = m3u8Text.replace(rangePattern, () => values[idx++]);
+
+                    if (generatedSet.has(url)) break;
+                    generatedSet.add(url);
+
+                    // 探查模式需要fetch验证
+                    if (hasOpen) {
                         try {
                             const response = await fetch(url, { method: 'HEAD' });
-                            if (!response.ok) {
-                                break;
-                            }
-                            urls.push(url);
-                        } catch (error) { break; }
-
-                        i++;
-                        // 防止死循环 最大9999个
-                        if (urls.length >= 9999) { break; }
-                    }
-                } else {
-                    end = parseInt(end);
-                    for (let i = start; i <= end; i++) {
-                        let number = i.toString();
-                        if (padding > 0) {
-                            number = number.padStart(padding, '0');
+                            if (!response.ok) break;
+                        } catch {
+                            break;
                         }
-                        urls.push(m3u8Text.replace(rangePattern, number));
                     }
+
+                    urls.push(url);
+                    n++;
                 }
-                if (urls && urls.length) {
+
+                if (urls.length) {
                     m3u8Text = urls.join("\n\n");
                     $("#m3u8Text").val(m3u8Text);
                 } else {
