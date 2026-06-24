@@ -288,7 +288,7 @@ function AddMedia(data, currentTab = true) {
                     confirm.find("#confirm").click(function () {
                         const textarea = confirm.find("textarea").val();
                         const url = 'm3u8dl:' + (G.m3u8dl == 1 ? Base64.encode(textarea) : textarea);
-                        confirm.hide();
+                        confirm.remove();
                         if (G.isFirefox) {
                             window.location.href = url;
                             return false;
@@ -336,7 +336,7 @@ function AddMedia(data, currentTab = true) {
                     </div>`);
             confirm.find("#confirm").click(function () {
                 const url = confirm.find("textarea").val();
-                confirm.hide();
+                confirm.remove();
                 if (G.isFirefox) {
                     window.location.href = url;
                     return false;
