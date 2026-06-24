@@ -270,7 +270,7 @@ function AddMedia(data, currentTab = true) {
     data.html.find('#download').click(function (event) {
         if (G.m3u8dl && (isM3U8(data) || isMPD(data))) {
             if (!data.url.startsWith("blob:")) {
-                const m3u8dlArg = data.m3u8dlArg ?? templates(G.m3u8dlArg, data);
+                const m3u8dlArg = templates(G.m3u8dlArg, data);
                 const url = 'm3u8dl:' + (G.m3u8dl == 1 ? Base64.encode(m3u8dlArg) : m3u8dlArg);
                 if (url.length >= 2046) {
                     navigator.clipboard.writeText(m3u8dlArg);
@@ -278,7 +278,7 @@ function AddMedia(data, currentTab = true) {
                     return false;
                 }
                 // 下载前确认参数
-                if (G.m3u8dlConfirm && event.originalEvent && event.originalEvent.isTrusted) {
+                if (G.m3u8dlConfirm) {
                     data.html.find('.confirm').remove();
                     const confirm = $(`<div class="confirm">
                         <textarea type="text" class="width100" rows="10">${m3u8dlArg}</textarea>
@@ -286,9 +286,15 @@ function AddMedia(data, currentTab = true) {
                         <button class="button2" id="close">${i18n.close}</button>
                     </div>`);
                     confirm.find("#confirm").click(function () {
-                        data.m3u8dlArg = confirm.find("textarea").val();
-                        data.html.find('#download').click();
+                        const textarea = confirm.find("textarea").val();
+                        const url = 'm3u8dl:' + (G.m3u8dl == 1 ? Base64.encode(textarea) : textarea);
                         confirm.hide();
+                        if (G.isFirefox) {
+                            window.location.href = url;
+                            return false;
+                        }
+                        chrome.tabs.update({ url: url });
+                        return false;
                     });
                     confirm.find("#close").click(function () {
                         confirm.remove();
@@ -318,10 +324,10 @@ function AddMedia(data, currentTab = true) {
     });
     // 调用
     data.html.find('.invoke').click(function (event) {
-        const url = data.invoke ?? templates(G.invokeText, data);
+        const url = templates(G.invokeText, data);
 
         // 下载前确认参数
-        if (G.invokeConfirm && event.originalEvent && event.originalEvent.isTrusted) {
+        if (G.invokeConfirm) {
             data.html.find('.confirm').remove();
             const confirm = $(`<div class="confirm">
                         <textarea type="text" class="width100" rows="10">${url}</textarea>
@@ -329,9 +335,14 @@ function AddMedia(data, currentTab = true) {
                         <button class="button2" id="close">${i18n.close}</button>
                     </div>`);
             confirm.find("#confirm").click(function () {
-                data.invoke = confirm.find("textarea").val();
-                data.html.find('.invoke').click();
+                const url = confirm.find("textarea").val();
                 confirm.hide();
+                if (G.isFirefox) {
+                    window.location.href = url;
+                    return false;
+                }
+                chrome.tabs.update({ url: url });
+                return false;
             });
             confirm.find("#close").click(function () {
                 confirm.remove();
@@ -342,9 +353,9 @@ function AddMedia(data, currentTab = true) {
 
         if (G.isFirefox) {
             window.location.href = url;
-        } else {
-            chrome.tabs.update({ url: url });
+            return false;
         }
+        chrome.tabs.update({ url: url });
         return false;
     });
     //播放
