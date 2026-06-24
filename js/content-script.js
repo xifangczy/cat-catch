@@ -46,7 +46,8 @@
                     loop: video.loop,
                     speed: video.playbackRate,
                     muted: video.muted,
-                    type: video.tagName.toLowerCase()
+                    type: video.tagName.toLowerCase(),
+                    videoStatus: videoObj.map(v => v.paused ? 1 : 0)
                 });
                 return true;
             }
