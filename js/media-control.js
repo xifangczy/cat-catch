@@ -180,6 +180,7 @@
     $("#videoIndex, #videoTabIndex").change(function () {
         if (this.id === "videoTabIndex") {
             _tabId = parseInt($("#videoTabIndex").val());
+            _index = 0;
         } else {
             _index = parseInt($("#videoIndex").val());
         }
