@@ -273,7 +273,7 @@ function init() {
                 m3u8Text += "#EXT-X-TARGETDURATION:233\n";
                 for (let ts of tsList) {
                     if (ts) {
-                        m3u8Text += "#EXTINF:1\n";
+                        m3u8Text += "#EXTINF:15\n";
                         m3u8Text += ts + "\n";
                     }
                 }
