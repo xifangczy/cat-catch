@@ -423,7 +423,7 @@ class FilePreview {
                 <img src="img/mqtt.svg" class="icon mqtt ${G.mqttEnable ? "" : "hide"}" title="${i18n.send2MQTT}">
             </div>`;
         // 添加文件信息
-        if (item.size && item.size >= 1024) {
+        if (item.size && item.size >= 1024 && !isM3U8(item)) {
             item.html.querySelector('.file-info').textContent += ` / ${byteToSize(item.size)}`;
         }
         item.html.addEventListener('click', (event) => {
