@@ -823,7 +823,6 @@ async function getPageDOM() {
 
         return new DOMParser().parseFromString(result, 'text/html');
     } catch (error) {
-        console.error('Error getting page:', error);
         return null;
     }
 }

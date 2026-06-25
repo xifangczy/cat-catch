@@ -218,7 +218,7 @@
     });
 
     // 画中画
-    $("#pip").click(() => {
+    $("#pip").click(function () {
         if (_index < 0 || _tabId < 0) return;
         chrome.tabs.sendMessage(_tabId, { Message: "pip", index: _index }, (state) => {
             if (chrome.runtime.lastError) return;
@@ -227,7 +227,7 @@
     });
 
     // 全屏
-    $("#fullScreen").click(() => {
+    $("#fullScreen").click(function () {
         if (_index < 0 || _tabId < 0) return;
         chrome.tabs.get(_tabId, (tab) => {
             chrome.tabs.highlight({ tabs: tab.index }, () => {
@@ -251,13 +251,13 @@
     });
 
     // 调节音量 / 进度时暂停定时器
-    $("#volume, #time").mousedown(() => {
+    $("#volume, #time").mousedown(function () {
         if (_index < 0 || _tabId < 0) return;
         clearInterval(VideoStateTimer);
     });
 
     // 音量提交
-    $("#volume").mouseup(() => {
+    $("#volume").mouseup(function () {
         if (_index < 0 || _tabId < 0) return;
         chrome.tabs.sendMessage(_tabId, { Message: "setVolume", volume: $(this).val(), index: _index }, () => {
             if (!chrome.runtime.lastError) setVideoStateTimer();
@@ -265,7 +265,7 @@
     });
 
     // 进度提交
-    $("#time").mouseup(() => {
+    $("#time").mouseup(function () {
         if (_index < 0 || _tabId < 0) return;
         chrome.tabs.sendMessage(_tabId, { Message: "setTime", time: $(this).val(), index: _index }, () => {
             if (!chrome.runtime.lastError) setVideoStateTimer();
@@ -273,7 +273,7 @@
     });
 
     // 截图
-    $("#screenshot").click(() => {
+    $("#screenshot").click(function () {
         if (_index < 0 || _tabId < 0) return;
         chrome.tabs.sendMessage(_tabId, { Message: "screenshot", index: _index });
     });

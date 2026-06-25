@@ -56,7 +56,9 @@
         }
         // 速度控制
         if (Message.Message == "speed") {
-            _videoObj[Message.index].playbackRate = Message.speed;
+            if (_videoObj[Message.index]?.playbackRate !== undefined) {
+                _videoObj[Message.index].playbackRate = Message.speed;
+            }
             return true;
         }
         // 画中画
@@ -85,34 +87,41 @@
         }
         // 播放
         if (Message.Message == "play") {
-            _videoObj[Message.index].play();
+            _videoObj[Message.index]?.play();
             return true;
         }
         // 暂停
         if (Message.Message == "pause") {
-            _videoObj[Message.index].pause();
+            _videoObj[Message.index]?.pause();
             return true;
         }
         // 循环播放
         if (Message.Message == "loop") {
-            _videoObj[Message.index].loop = Message.action;
+            if (_videoObj[Message.index]?.loop !== undefined) {
+                _videoObj[Message.index].loop = Message.action;
+            }
             return true;
         }
         // 设置音量
         if (Message.Message == "setVolume") {
-            _videoObj[Message.index].volume = Message.volume;
+            if (_videoObj[Message.index]?.volume !== undefined) {
+                _videoObj[Message.index].volume = Message.volume;
+            }
             sendResponse("ok");
             return true;
         }
         // 静音
         if (Message.Message == "muted") {
-            _videoObj[Message.index].muted = Message.action;
+            if (_videoObj[Message.index]?.muted !== undefined) {
+                _videoObj[Message.index].muted = Message.action;
+            }
             return true;
         }
         // 设置视频进度
         if (Message.Message == "setTime") {
-            const time = Message.time * _videoObj[Message.index].duration / 100;
-            _videoObj[Message.index].currentTime = time;
+            if (_videoObj[Message.index]?.currentTime !== undefined && _videoObj[Message.index]?.duration !== undefined) {
+                _videoObj[Message.index].currentTime = Message.time * _videoObj[Message.index].duration / 100;
+            }
             sendResponse("ok");
             return true;
         }
