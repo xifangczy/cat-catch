@@ -821,7 +821,7 @@ async function getPageDOM() {
             });
         });
 
-        return new DOMParser().parseFromString(result, 'text/html');
+        return result ? new DOMParser().parseFromString(result, 'text/html') : null;
     } catch (error) {
         return null;
     }
