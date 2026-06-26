@@ -143,7 +143,7 @@
     CatCatch.querySelector("#close").addEventListener('click', function (event) {
         recorder?.state && recorder.stop();
         CatCatch.style.display = "none";
-        window.postMessage({ action: "catCatchToBackground", Message: "script", script: "recorder.js", refresh: false });
+        window.postMessage({ action: "catCatchCloseScript", script: "recorder.js" });
     });
 
     function init() {
