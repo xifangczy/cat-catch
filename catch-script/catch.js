@@ -134,7 +134,7 @@
                 <div id="tips"></div>
                 <button id="download" ${buttonStyle} data-i18n="downloadCapturedData">下载已捕获的数据</button>
                 <button id="clean" ${buttonStyle} data-i18n="deleteCapturedData">删除已捕获数据</button>
-                <div><button id="hide" ${buttonStyle} data-i18n="hide">隐藏</button><!--button id="close" ${buttonStyle} data-i18n="close">关闭</button--></div>
+                <div><button id="hide" ${buttonStyle} data-i18n="hide">隐藏</button><button id="close" ${buttonStyle} data-i18n="close">关闭</button></div>
                 <label><input type="checkbox" id="autoDown" ${localStorage.getItem("CatCatchCatch_autoDown") || ""} ${checkboxStyle}><span data-i18n="automaticDownload">完成捕获自动下载</span></label>
                 <label><input type="checkbox" id="ffmpeg" ${localStorage.getItem("CatCatchCatch_ffmpeg") || ""} ${checkboxStyle}><span data-i18n="ffmpeg">使用ffmpeg合并</span></label>
                 <label><input type="checkbox" id="autoToBuffered" ${checkboxStyle}><span data-i18n="autoToBuffered">自动跳转缓冲尾</span></label>
@@ -287,8 +287,8 @@
             const img = this.catCatch.querySelector("img");
             if (img) img.addEventListener('click', this.handleHide.bind(this));
 
-            // const close = this.catCatch.querySelector("#close");
-            // if (close) close.addEventListener('click', this.handleClose.bind(this));
+            const close = this.catCatch.querySelector("#close");
+            if (close) close.addEventListener('click', this.handleClose.bind(this));
 
             const restart = this.catCatch.querySelector("#restart");
             if (restart) restart.addEventListener('click', this.handleRestart.bind(this));
@@ -442,7 +442,7 @@
                 this.clearCache();
                 this.enable = false;
                 this.catCatch.style.display = "none";
-                window.postMessage({ action: "catCatchToBackground", Message: "script", script: "catch.js", refresh: false });
+                window.postMessage({ action: "catCatchCloseScript", script: "catch.js" });
             }
         }
 

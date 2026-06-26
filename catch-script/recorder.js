@@ -52,7 +52,7 @@
             <button id="start" ${buttonStyle} data-i18n="startRecording">开始录制</button>
             <button id="stop" ${buttonStyle} data-i18n="stopRecording">停止录制</button>
             <button id="hide" ${buttonStyle} data-i18n="hide">隐藏</button>
-            <!--button id="close" ${buttonStyle} data-i18n="close">关闭</button-->
+            <button id="close" ${buttonStyle} data-i18n="close">关闭</button>
         </div>
     </div>
     `;
@@ -140,11 +140,11 @@
         CatCatch.querySelector("#hide").click();
     });
 
-    // CatCatch.querySelector("#close").addEventListener('click', function (event) {
-    //     recorder?.state && recorder.stop();
-    //     CatCatch.style.display = "none";
-    //     window.postMessage({ action: "catCatchToBackground", Message: "script", script: "recorder.js", refresh: false });
-    // });
+    CatCatch.querySelector("#close").addEventListener('click', function (event) {
+        recorder?.state && recorder.stop();
+        CatCatch.style.display = "none";
+        window.postMessage({ action: "catCatchToBackground", Message: "script", script: "recorder.js", refresh: false });
+    });
 
     function init() {
         clearInterval(autoSave1Timer);

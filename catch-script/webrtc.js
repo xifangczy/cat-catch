@@ -49,7 +49,7 @@
             <button id="stop" ${buttonStyle} data-i18n="stopRecording">停止录制</button>
             <button id="save" ${buttonStyle} data-i18n="save">保存</button>
             <button id="hide" ${buttonStyle} data-i18n="hide">隐藏</button>
-            <!--button id="close" ${buttonStyle} data-i18n="close">关闭</button-->
+            <button id="close" ${buttonStyle} data-i18n="close">关闭</button>
         </div>
     </div>
     `;
@@ -96,11 +96,11 @@
     $stop.style.display = 'none';
 
     // 关闭
-    // CatCatch.querySelector("#close").addEventListener('click', function (event) {
-    //     recorder?.state && recorder.stop();
-    //     CatCatch.style.display = "none";
-    //     window.postMessage({ action: "catCatchToBackground", Message: "script", script: "webrtc.js", refresh: true });
-    // });
+    CatCatch.querySelector("#close").addEventListener('click', function (event) {
+        recorder?.state && recorder.stop();
+        CatCatch.style.display = "none";
+        window.postMessage({ action: "catCatchToBackground", Message: "script", script: "webrtc.js", refresh: true });
+    });
 
     // 隐藏
     CatCatch.querySelector("#hide").addEventListener('click', function (event) {

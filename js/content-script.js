@@ -232,7 +232,7 @@
         });
     };
     window.addEventListener("message", (event) => {
-        const action = ["catCatchAddMedia", "catCatchAddKey", "catCatchFFmpeg", "catCatchFFmpegResult"];
+        const action = ["catCatchAddMedia", "catCatchAddKey", "catCatchFFmpeg", "catCatchFFmpegResult", "catCatchCloseScript"];
         if (!event.data || !event.data.action || event.origin !== window.location.origin || !action.includes(event.data.action)) { return; }
         event.stopPropagation();
         event.stopImmediatePropagation();
@@ -293,6 +293,10 @@
         if (event.data.action == "catCatchFFmpegResult") {
             if (!event.data.state || !event.data.tabId) { return; }
             chrome.runtime.sendMessage({ Message: "catCatchFFmpegResult", ...event.data });
+        }
+        if (event.data.action == "catCatchCloseScript") {
+            if (!event.data.script || !event.isTrusted) { return; }
+            chrome.runtime.sendMessage({ Message: "closeScript", ...event.data });
         }
 
     }, { capture: true });

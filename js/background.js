@@ -545,6 +545,19 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         sendResponse(G.damnUrlSet.has(Message.tabId));
         return true;
     }
+    if (Message.Message == "closeScript") {
+        if (!G.scriptList.has(Message.script)) {
+            sendResponse("error");
+            return false;
+        }
+        const script = G.scriptList.get(Message.script);
+        const scriptTabid = script.tabId;
+        if (scriptTabid.has(Message.tabId)) {
+            scriptTabid.delete(Message.tabId);
+        }
+        sendResponse("ok");
+        return true;
+    }
 });
 
 // 选定标签 更新G.tabId
