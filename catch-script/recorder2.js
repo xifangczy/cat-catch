@@ -123,6 +123,7 @@
     cat.querySelector("#catCatchRecorderClose").onclick = function () {
         recorder && recorder.stop();
         cat.remove();
+        window.postMessage({ action: "catCatchCloseScript", script: "recorder2.js" });
     }
 
     // 拖动div
