@@ -269,10 +269,13 @@ class FilePreview {
     deleteItem(data = null) {
         data = data ? [data] : this.getSelectedItems();
         data.forEach(item => {
-            const index = this.originalItems.findIndex(originalItem => originalItem.requestId === item.requestId);
-            if (index !== -1) {
-                this.originalItems.splice(index, 1);
-            }
+            let index = -1
+            do {
+                index = this.originalItems.findIndex(originalItem => originalItem.requestId === item.requestId || (this.deleteDuplicateFilenames && originalItem.name === item.name));
+                if (index !== -1) {
+                    this.originalItems.splice(index, 1);
+                }
+            } while (index !== -1);
         });
         this.updateFileList();
     }
