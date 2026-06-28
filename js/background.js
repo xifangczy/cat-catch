@@ -546,7 +546,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         return true;
     }
     if (Message.Message == "closeScript") {
-        if (!Message.script && !G.scriptList.has(Message.script)) {
+        if (!Message.script || !G.scriptList.has(Message.script)) {
             sendResponse("error");
             return false;
         }
