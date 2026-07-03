@@ -654,6 +654,12 @@
     }
     function toUrl(text, ext = "m3u8") {
         if (!text) { return; }
+        if (ext == 'mpd') {
+            let url = URL.createObjectURL(new Blob([new TextEncoder("utf-8").encode(text)]));
+            postData({ action: "catCatchAddMedia", url: url, href: location.href, ext: ext });
+            return;
+        }
+
         // 处理ts地址无protocol
         text = TsProtocol(text);
         if (isFullM3u8(text)) {
