@@ -252,7 +252,8 @@ function init() {
             }
 
             // 只有一个链接 后缀为m3u8 直接解析
-            if (m3u8Text.split("\n").length == 1 && (GetExt(m3u8Text) == "m3u8" || GetExt(m3u8Text) == "txt")) {
+            const urlExt = GetExt(m3u8Text);
+            if (m3u8Text.split("\n").length == 1 && (urlExt == "m3u8" || urlExt == "m3u" || urlExt == "txt")) {
                 let url = "m3u8.html?url=" + encodeURIComponent(m3u8Text);
                 if (referer) {
                     if (referer.startsWith("http")) {
