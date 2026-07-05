@@ -1,4 +1,4 @@
-<p align="center"> [<a href="README.md">中文</a>] | [English] | [<a href="README_es.md">Español</a>]</p>
+<p align="center"> [<a href="README.md">中文</a>] | [English] | [<a href="README_es.md">Español</a>] | [<a href="README_ru.md">Русский</a>]</p>
 
 # 📑Introduction
 Cat-Catch is a resource sniffing extension that can help you filter and list the resources of the current page.

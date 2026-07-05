@@ -1,4 +1,4 @@
-<p align="center"> [中文] | [<a href="README_en.md">English</a>] | [<a href="README_es.md">Español</a>] | [<a href="README_ru.md">Русский</a>]</p>
+<p align="center"> [<a href="README.md">中文</a>] | [<a href="README_en.md">English</a>] | [<a href="README_es.md">Español</a>] | [Русский]</p>
 
 # 📑 Описание
 
