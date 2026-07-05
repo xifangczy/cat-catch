@@ -16,7 +16,7 @@ https://addons.mozilla.org/addon/cat-catch/ 😂Se requiere IP que no sea china 
 💔Cat-Catch es de código abierto, cualquiera puede descargarlo, modificarlo y incluirlo en la tienda de aplicaciones. Ya hay bastantes extensiones falsas de Cat-Catch listadas con códigos publicitarios agregados; preste atención a la seguridad de sus datos. Todas las URL de instalación están sujetas a github y a la documentación del usuario.
 
 # 📒Documentación
-https://o2bmm.gitbook.io/cat-catch/
+https://cat-catch.94cat.com/
 
 # 🌏Traducciones
 [![gitlocalized ](https://gitlocalize.com/repo/9392/whole_project/badge.svg)](https://gitlocalize.com/repo/9392?utm_source=badge)

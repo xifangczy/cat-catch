@@ -1,4 +1,4 @@
-<p align="center"> [<a href="README.md">中文</a>] | [English] | [<a href="README_es.md">Español</a>] | [<a href="README_ru.md">Русский</a>]</p>
+https://cat-catch.94cat.com/<p align="center"> [<a href="README.md">中文</a>] | [English] | [<a href="README_es.md">Español</a>] | [<a href="README_ru.md">Русский</a>]</p>
 
 # 📑Introduction
 Cat-Catch is a resource sniffing extension that can help you filter and list the resources of the current page.
@@ -16,7 +16,7 @@ https://addons.mozilla.org/addon/cat-catch/ 😂Non-China IP required for access
 💔Cat-Catch is open source, anyone can download, modify, and list it in the app store. There are already quite a few fake Cat-Catch extensions listed with added ad codes, please pay attention to your data security. All installation URLs are subject to github and user documentation.
 
 # 📒Documentation
-https://o2bmm.gitbook.io/cat-catch/
+https://cat-catch.94cat.com/
 
 # 🌏Translations
 [![gitlocalized ](https://gitlocalize.com/repo/9392/whole_project/badge.svg)](https://gitlocalize.com/repo/9392?utm_source=badge)

@@ -21,7 +21,7 @@ https://addons.mozilla.org/addon/cat-catch/ 😂Требуется доступ 
 💔 **Кошачья Лапа (cat-catch)** — это полностью открытый проект. Любой может скачать, изменить и выложить его в магазин. Уже появилось немало поддельных версий с рекламой и вредоносным кодом. Пожалуйста, заботьтесь о своей безопасности. Все официальные ссылки для установки — только с GitHub и официальной документации.
 
 # 📒 Документация пользователя
-https://o2bmm.gitbook.io/cat-catch/
+https://cat-catch.94cat.com/
 
 # 🌏 Переводы
 [![gitlocalized ](https://gitlocalize.com/repo/9392/whole_project/badge.svg)](https://gitlocalize.com/repo/9392?utm_source=badge)
