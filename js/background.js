@@ -1,4 +1,4 @@
-importScripts("/js/function.js", "/js/templates.js", "/js/init.js");
+importScripts("/js/polyfill.js", "/js/function.js", "/js/templates.js", "/js/init.js");
 
 // Service Worker 5分钟后会强制终止扩展
 // https://bugs.chromium.org/p/chromium/issues/detail?id=1271154
@@ -18,6 +18,12 @@ chrome.runtime.onConnect.addListener(function (Port) {
         if (chrome.runtime.lastError) { return; }
     });
 });
+
+// 全局变量
+let debounce = undefined;
+let debounceCount = 0;
+let debounceTime = 0;
+const reFilename = /filename="?([^"]+)"?/;
 
 /**
  *  定时任务
