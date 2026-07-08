@@ -381,6 +381,7 @@ function SaveGetVal(Obj) {
 }
 
 // 保存 后缀 类型 正则 配置
+let debounce = undefined;
 function Save(option, sec = 0) {
     clearTimeout(debounce);
     debounce = setTimeout(() => {

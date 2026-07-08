@@ -208,13 +208,9 @@
     // 倍速按钮
     $("#speed").click(function () {
         if (_index < 0 || _tabId < 0) return;
-        if ($(this).data("switch") === "speed") {
-            const speed = parseFloat($("#playbackRate").val());
-            chrome.tabs.sendMessage(_tabId, { Message: "speed", speed, index: _index });
-            chrome.storage.sync.set({ playbackRate: speed });
-        } else {
-            chrome.tabs.sendMessage(_tabId, { Message: "speed", speed: 1, index: _index });
-        }
+        const speed = parseFloat($("#playbackRate").val());
+        chrome.storage.sync.set({ playbackRate: speed });
+        chrome.tabs.sendMessage(_tabId, { Message: "speed", speed: $(this).data("switch") === "speed" ? speed : 1, index: _index });
     });
 
     // 画中画
