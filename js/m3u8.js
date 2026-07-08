@@ -1513,6 +1513,9 @@ function downloadNew(start = 0, end = _fragments.length) {
         const view = new Uint8Array(buffer);
         const len = view.length;
         let tsStartIndex = -1;
+
+        if (len < 8) { return buffer; }
+
         // 检测PNG
         if (view[0] === 0x89 && view[1] === 0x50 && view[2] === 0x4E && view[3] === 0x47) {
             // 找到PNG结束标志IEND
@@ -1521,6 +1524,16 @@ function downloadNew(start = 0, end = _fragments.length) {
                     view[i + 2] === 78 && view[i + 3] === 68) {
                     // IEND(4字节) + CRC(4字节) = 8字节
                     tsStartIndex = i + 8;
+                    break;
+                }
+            }
+        }
+        // 检测JPG
+        else if (view[0] === 0xFF && view[1] === 0xD8 && view[2] === 0xFF) {
+            // 找到JPG结束标志FFD9
+            for (let i = 0; i < len - 2; i++) {
+                if (view[i] === 0xFF && view[i + 1] === 0xD9) {
+                    tsStartIndex = i + 2;
                     break;
                 }
             }
