@@ -1035,7 +1035,25 @@ function clearRedundant() {
     });
 }
 
+// 扩展升级，清空本地储存
+chrome.runtime.onInstalled.addListener(function (details) {
+    if (details.reason == "update") {
+        chrome.storage.local.clear(function () {
+            if (chrome.storage.session) {
+                chrome.storage.session.clear(InitOptions);
+            } else {
+                InitOptions();
+            }
+        });
+        chrome.alarms.create("nowClear", { when: Date.now() + 3000 });
+    }
+    if (details.reason == "install") {
+        chrome.tabs.create({ url: "install.html" });
+    }
+});
+
 // 测试
-// chrome.storage.local.get(function (data) { console.log(data.MediaData) });
-// chrome.declarativeNetRequest.getSessionRules(function (rules) { console.log(rules); });
-// chrome.tabs.query({}, function (tabs) { for (let item of tabs) { console.log(item.id); } });
+// chrome.storage.local.get(function (data) { console.log("storageLocal", data.MediaData) });
+// chrome.storage.session.get(function (data) { console.log("storageSession", data.MediaData) });
+// chrome.declarativeNetRequest.getSessionRules(function (rules) { console.log("sessionRules", rules); });
+// chrome.tabs.query({}, function (tabs) { for (let item of tabs) { console.log("tabId", item.id); } });

@@ -81,28 +81,34 @@ G.OptionLists = {
         { "type": "ig", "regex": "(^https://scontent[a-z0-9-]*\\.cdninstagram\\.com/.*)&bytestart=.*", "ext": "", "blackList": false, "state": false },
         { "type": "ig", "regex": "(^https://.*\\.fbcdn\\.net/.*)&bytestart=.*", "ext": "", "blackList": false, "state": false },
     ],
-    TitleName: false,
-    Player: "",
-    ShowWebIco: !G.isMobile,
-    MobileUserAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",
-    m3u8dl: 0,
+    TitleName: false,   // 使用自定义文件名保存文件(默认为网页标题)
+    Player: "", // 使用本地播放器调用协议打开视频预览
+    ShowWebIco: !G.isMobile,    // 显示网页图标
+    MobileUserAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",   // 模拟手机浏览器UA
+
+    // m3u8dl: 协议
+    m3u8dl: 0,  // 0:禁用 1:CIL 2:RE
     m3u8dlArg: `"\${url}" --save-dir "%USERPROFILE%\\Downloads\\m3u8dl" --save-name "\${title}_\${now}" \${referer|exists:'-H "Referer:*"'} \${cookie|exists:'-H "Cookie:*"'} --no-log`,
-    m3u8dlConfirm: false,
-    playbackRate: 2,
+    m3u8dlConfirm: false, // 点击下载后是否提示 确认参数
+
+    playbackRate: 2,    // 默认播放倍率
+
+    // 复制
     copyM3U8: "${url}",
     copyMPD: "${url}",
     copyOther: "${url}",
-    autoClearMode: 1,
-    catDownload: false,
-    saveAs: false,
+
+    autoClearMode: 1,   // 清理模式 0:不清理 1:正常清理 2:更频繁
+    catDownload: false, // 始终不启用猫抓下载器
+    saveAs: false,  // 下载完选择保存目录 另存为
     userAgent: "",
-    downFileName: "${title}.${ext}",
-    css: "",
-    checkDuplicates: true,
-    enable: true,
+    downFileName: "${title}.${ext}",    // 默认下载文件名
+    css: "",    // 自定义css
+    checkDuplicates: true,  // 检查重复项
+    enable: true,   // 启用总开关
     downActive: !G.isMobile,    // 手机端默认不启用 后台下载
-    downAutoClose: true,
-    downStream: false,
+    downAutoClose: true,    // 下载后自动关闭
+    downStream: false,  // 边下边存
 
     // Aria2
     aria2Rpc: "http://localhost:6800/jsonrpc",
@@ -111,8 +117,8 @@ G.OptionLists = {
     aria2RpcToken: "",
     aria2RpcDir: "",
 
-    m3u8AutoDown: true,
-    badgeNumber: true,
+    m3u8AutoDown: true, // m3u8自动下载
+    badgeNumber: true,  // 显示数字徽章
 
     // 发送到本地
     send2local: false,
@@ -123,7 +129,7 @@ G.OptionLists = {
     send2localType: 0,
     send2localHeaders: "",
 
-    popup: false,
+    popup: false,   // 是否默认弹出模式
     popupMode: 0, // 0:preview.html 1:popup.html 2:window preview.html 3: window popup.html
 
     // 远程调用
@@ -148,6 +154,7 @@ G.OptionLists = {
     maxLength: G.isMobile ? 999 : 9999,
     sidePanel: false,   // 侧边栏
     deepSearch: false, // 常开深度搜索
+
     // MQTT 配置
     send2MQTT: false,
     mqttEnable: false,
@@ -163,10 +170,12 @@ G.OptionLists = {
     mqttTitleLength: 100,
     mqttDataFormat: "",
 
-    getHtmlDOM: false,
-    damn: false,
-    iframeFFmpeg: false,
-    contextMenus: false,
+    getHtmlDOM: false,  // 实验项 获取当前网页DOM
+
+    damn: false,    // 强制屏蔽网站开关
+
+    iframeFFmpeg: false,    // 潜入在线ffmpeg
+    contextMenus: false,    // 右键菜单
 };
 
 // 本地储存的配置
@@ -174,6 +183,8 @@ G.LocalVar = {
     featMobileTabId: [],
     featAutoDownTabId: [],
     mediaControl: { tabid: 0, index: -1 },
+
+    // 预览页面
     previewShowTitle: false, // 是否显示标题
     previewDeleteDuplicateFilenames: false, // 是否删除重复文件名
 };
@@ -420,23 +431,6 @@ function contextMenusInit(visible = false) {
         });
     });
 }
-
-// 扩展升级，清空本地储存
-chrome.runtime.onInstalled.addListener(function (details) {
-    if (details.reason == "update") {
-        chrome.storage.local.clear(function () {
-            if (chrome.storage.session) {
-                chrome.storage.session.clear(InitOptions);
-            } else {
-                InitOptions();
-            }
-        });
-        chrome.alarms.create("nowClear", { when: Date.now() + 3000 });
-    }
-    if (details.reason == "install") {
-        chrome.tabs.create({ url: "install.html" });
-    }
-});
 
 /**
  * 将用户输入的URL（可能包含通配符）转换为正则表达式
