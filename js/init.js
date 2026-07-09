@@ -4,11 +4,7 @@ G.initSyncComplete = false;
 G.initLocalComplete = false;
 // 缓存数据
 var cacheData = { init: true };
-G.blackList = new Set();    // 正则屏蔽资源列表
 G.blockUrlSet = new Set();    // 屏蔽网址列表
-G.requestHeaders = new Map();   // 临时储存请求头
-G.urlMap = new Map();   // url查重map
-G.deepSearchTemporarilyClose = null; // 深度搜索临时变量
 
 // 避免抓取列表
 G.damnUrl = [

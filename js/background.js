@@ -6,6 +6,11 @@ let debounceCount = 0;
 let debounceTime = 0;
 const reFilename = /filename="?([^"]+)"?/;
 
+G.deepSearchTemporarilyClose = null; // 深度搜索临时变量
+G.urlMap = new Map();   // url查重map
+G.requestHeaders = new Map();   // 临时储存请求头
+G.blackList = new Set();    // 正则屏蔽资源列表
+
 /**
  *  定时任务
  *  nowClear clear 清理冗余数据
