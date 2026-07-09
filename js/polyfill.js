@@ -16,6 +16,7 @@ chrome.runtime.onConnect.addListener(function (Port) {
         if (chrome.runtime.lastError) { return; }
     });
 });
+setInterval(chrome.runtime.getPlatformInfo, 25 * 1000);
 
 // 低版本chrome manifest v3协议 会有 getMessage 函数不存在的bug
 if (chrome.i18n.getMessage === undefined) {

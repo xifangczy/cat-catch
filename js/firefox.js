@@ -13,10 +13,4 @@ if (typeof (browser) == "object" && !(typeof (G) == "object" && !G.isFirefox)) {
     chrome.windows.onFocusChanged.addListener = function (listener, option) {
         _onFocusChanged(listener);
     };
-
-    browser.runtime.onInstalled.addListener(({ reason }) => {
-        if (reason == "install") {
-            browser.tabs.create({ url: "install.html" });
-        }
-    });
 }
