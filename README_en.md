@@ -67,11 +67,11 @@ The extension collects and processes all information locally without sending it 
 - [hls.js](https://github.com/video-dev/hls.js)
 - [jQuery](https://github.com/jquery/jquery)
 - [mux.js](https://github.com/videojs/mux.js)
-- [js-base64](https://github.com/dankogai/js-base64)
 - [jquery.json-viewer](https://github.com/abodelot/jquery.json-viewer)
 - [Momo707577045](https://github.com/Momo707577045)
 - [mpd-parser](https://github.com/videojs/mpd-parser)
 - [StreamSaver.js](https://github.com/jimmywarting/StreamSaver.js)
+- [MQTT.js](https://github.com/mqttjs/MQTT.js)
 
 # 📜License
 GPL-3.0 license
