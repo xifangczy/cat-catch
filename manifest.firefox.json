@@ -87,5 +87,5 @@
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
   "default_locale": "en",
-  "version": "2.6.9"
+  "version": "2.7.0"
 }
