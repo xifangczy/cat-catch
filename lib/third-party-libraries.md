@@ -9,9 +9,9 @@ Build:
 lib/mpd-parser.min.js
 Source: https://github.com/videojs/mpd-parser
 License: Apache-2.0 license
-Version: 1.3.1
+Version: 1.4.1
 Download:
-`https://github.com/videojs/mpd-parser/releases/tag/v1.3.1` -> `mpd-parser.min.js`
+`https://github.com/videojs/mpd-parser/releases/tag/v1.4.1` -> `mpd-parser.min.js`
 
 lib/jquery.qrcode.min.js
 Source: https://github.com/jeromeetienne/jquery-qrcode
