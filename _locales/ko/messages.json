@@ -1,0 +1,1046 @@
+{
+  "catCatch": {
+    "message": "cat-catch"
+  },
+  "description": {
+    "message": "웹 미디어 스니핑 도구"
+  },
+  "confirm": {
+    "message": "확인"
+  },
+  "currentPage": {
+    "message": "현재 페이지"
+  },
+  "otherPage": {
+    "message": "다른 페이지"
+  },
+  "otherFeatures": {
+    "message": "기타 기능"
+  },
+  "mediaControl": {
+    "message": "미디어 제어"
+  },
+  "loadingData": {
+    "message": "데이터 불러오는 중..."
+  },
+  "selectWebpage": {
+    "message": "웹페이지:"
+  },
+  "selectMedia": {
+    "message": "미디어:"
+  },
+  "noMediaDetected": {
+    "message": "웹페이지에서 감지된 미디어가 없습니다"
+  },
+  "noControllableMediaDetected": {
+    "message": "제어 가능한 미디어가 없습니다"
+  },
+  "multiplier": {
+    "message": "배속:"
+  },
+  "speedPlayback": {
+    "message": "배속 재생"
+  },
+  "play": {
+    "message": "재생"
+  },
+  "normalPlay": {
+    "message": "일반 재생"
+  },
+  "pictureInPicture": {
+    "message": "화면 속 화면"
+  },
+  "fullscreen": {
+    "message": "전체 화면"
+  },
+  "screenshot": {
+    "message": "스크린샷"
+  },
+  "loop": {
+    "message": "반복 재생"
+  },
+  "mute": {
+    "message": "음소거"
+  },
+  "volume": {
+    "message": "음량"
+  },
+  "functionEntry": {
+    "message": "기능 메뉴"
+  },
+  "downloader": {
+    "message": "다운로더"
+  },
+  "parser": {
+    "message": "파서"
+  },
+  "m3u8Parser": {
+    "message": "M3U8 파서"
+  },
+  "mpdParser": {
+    "message": "MPD 파서"
+  },
+  "jsonFormatter": {
+    "message": "JSON 포맷터"
+  },
+  "expandAll": {
+    "message": "전체 펼치기"
+  },
+  "expandPlayable": {
+    "message": "재생 가능 항목 펼치기"
+  },
+  "expandSelected": {
+    "message": "선택 항목 펼치기"
+  },
+  "collapseAll": {
+    "message": "전체 접기"
+  },
+  "videoRecording": {
+    "message": "화면 녹화"
+  },
+  "closeRecording": {
+    "message": "녹화 닫기"
+  },
+  "recordWebRTC": {
+    "message": "WebRTC 녹화"
+  },
+  "screenCapture": {
+    "message": "화면 캡처"
+  },
+  "simulateMobile": {
+    "message": "모바일 환경 시뮬레이션"
+  },
+  "autoDownload": {
+    "message": "자동 다운로드"
+  },
+  "onlineMerge": {
+    "message": "병합"
+  },
+  "download": {
+    "message": "다운로드"
+  },
+  "copy": {
+    "message": "복사"
+  },
+  "selectAll": {
+    "message": "전체 선택"
+  },
+  "invertSelection": {
+    "message": "선택 반전"
+  },
+  "filter": {
+    "message": "필터"
+  },
+  "clear": {
+    "message": "지우기"
+  },
+  "deepSearch": {
+    "message": "검색"
+  },
+  "closeSearch": {
+    "message": "검색 닫기"
+  },
+  "cacheCapture": {
+    "message": "캡처"
+  },
+  "closeCapture": {
+    "message": "캡처 닫기"
+  },
+  "moreFeatures": {
+    "message": "더보기"
+  },
+  "pause": {
+    "message": "일시정지"
+  },
+  "settings": {
+    "message": "설정"
+  },
+  "closeSimulation": {
+    "message": "시뮬레이션 닫기"
+  },
+  "closeDownload": {
+    "message": "다운로드 닫기"
+  },
+  "enable": {
+    "message": "활성화"
+  },
+  "disable": {
+    "message": "비활성화"
+  },
+  "noData": {
+    "message": "포착된 리소스가 없습니다"
+  },
+  "regularFilterPlaceholder": {
+    "message": "정규식 필터, 리소스 URL과 일치시키며 Enter를 눌러 확인합니다"
+  },
+  "option": {
+    "message": "옵션"
+  },
+  "titleOption": {
+    "message": "cat-catch 옵션"
+  },
+  "titleDownload": {
+    "message": "cat-catch 다운로드"
+  },
+  "titleM3U8": {
+    "message": "cat-catch M3U8 파서"
+  },
+  "titleJson": {
+    "message": "cat-catch JSON 포맷터"
+  },
+  "titledash": {
+    "message": "cat-catch Dash 파서"
+  },
+  "suffix": {
+    "message": "확장자"
+  },
+  "suffixTip": {
+    "message": "'.'을 포함하지 않는 확장자를 입력하세요. 크기 필터링이 필요 없으면 0을 입력하세요."
+  },
+  "extensionName": {
+    "message": "확장자 이름"
+  },
+  "filterSize": {
+    "message": "필터 크기"
+  },
+  "delete": {
+    "message": "삭제"
+  },
+  "addSuffix": {
+    "message": "확장자 추가"
+  },
+  "extension": {
+    "message": "확장자"
+  },
+  "disableAll": {
+    "message": "전체 비활성화"
+  },
+  "enableAll": {
+    "message": "전체 활성화"
+  },
+  "type": {
+    "message": "유형"
+  },
+  "addType": {
+    "message": "유형 추가"
+  },
+  "typeTip": {
+    "message": "올바른 content-type을 입력하세요. 크기 필터링이 필요 없으면 0을 입력하세요."
+  },
+  "addTypeError": {
+    "message": "캡처 유형의 형식이 올바르지 않습니다. 확인해주세요"
+  },
+  "regexMatch": {
+    "message": "정규식 일치"
+  },
+  "blockResource": {
+    "message": "리소스 차단"
+  },
+  "alert": {
+    "message": "알림"
+  },
+  "regexExpression": {
+    "message": "정규식 표현식"
+  },
+  "addRegex": {
+    "message": "정규식 추가"
+  },
+  "regexTest": {
+    "message": "정규식 테스트"
+  },
+  "regex": {
+    "message": "정규식"
+  },
+  "flag": {
+    "message": "플래그"
+  },
+  "result": {
+    "message": "결과"
+  },
+  "match": {
+    "message": "일치"
+  },
+  "noMatch": {
+    "message": "일치 없음"
+  },
+  "blockResourceTip": {
+    "message": "표시되지 않기를 원하는 리소스를 차단합니다"
+  },
+  "flagTip": {
+    "message": "i: 대소문자 무시, g: 전역 검색. 비워둘 수도 있습니다"
+  },
+  "regexSuffixTip": {
+    "message": "가져온 URL에 확장자를 지정합니다. 비워두면 확장자가 자동으로 잘립니다(많은 파일에는 확장자가 없습니다)"
+  },
+  "regexTip": {
+    "message": "정규식은 리소스를 많이 소모하므로 필요하지 않다면 신중하게 사용하세요"
+  },
+  "copyTip": {
+    "message": "타사 애플리케이션 사용 편의를 위해 복사 버튼으로 클립보드에 기록되는 내용을 사용자 지정합니다"
+  },
+  "replaceKeywordList": {
+    "message": "키워드 치환 목록"
+  },
+  "otherFiles": {
+    "message": "기타 파일"
+  },
+  "resetCopySettings": {
+    "message": "복사 설정 초기화"
+  },
+  "autoSetRefererCookieParams": {
+    "message": "Referer 및 Cookie 매개변수 자동 설정"
+  },
+  "secretKey": {
+    "message": "비밀 키"
+  },
+  "address": {
+    "message": "주소"
+  },
+  "documentation": {
+    "message": "문서"
+  },
+  "aria2Tip": {
+    "message": "뛰어난 다운로드 도구입니다. 사용법을 확인해보세요"
+  },
+  "m3u8DLTips": {
+    "message": "뛰어난 타사 m3u8/mpd 다운로드 도구입니다. 사용법을 확인해보세요"
+  },
+  "invoke": {
+    "message": "호출"
+  },
+  "parameter": {
+    "message": "매개변수"
+  },
+  "parameterSetting": {
+    "message": "매개변수 설정"
+  },
+  "test": {
+    "message": "테스트"
+  },
+  "replaceTags": {
+    "message": "태그 치환"
+  },
+  "customSaveFileName": {
+    "message": "사용자 지정 파일 이름 저장"
+  },
+  "userAgentTip": {
+    "message": "기본값은 현재 브라우저의 User Agent입니다"
+  },
+  "alwaysDisableCatCatcher": {
+    "message": "Cat-Catch 다운로더 항상 비활성화"
+  },
+  "autoClosePageAfterDownload": {
+    "message": "다운로드 후 페이지 자동 닫기"
+  },
+  "openDownloaderPageInBackground": {
+    "message": "다운로더 페이지를 백그라운드에서 열기"
+  },
+  "downloaderTip": {
+    "message": "리소스 다운로드에 실패하면 다운로더를 자동으로 활성화하여 다시 시도합니다."
+  },
+  "autoDownM3u8Tip": {
+    "message": "다운로드 버튼을 클릭하면 m3u8 파서를 사용해 즉시 병합 및 다운로드를 시작합니다"
+  },
+  "otherSettings": {
+    "message": "기타 설정"
+  },
+  "resetOtherSettings": {
+    "message": "기타 설정 초기화"
+  },
+  "previewMode": {
+    "message": "로컬 플레이어의 호출 프로토콜을 사용해 동영상 미리보기 열기"
+  },
+  "previewModePlaceholder": {
+    "message": "비워두면 비활성화됩니다. 기본값은 팝업 페이지로 동영상을 미리보는 것입니다"
+  },
+  "preview": {
+    "message": "미리보기"
+  },
+  "customFilenameOption": {
+    "message": "사용자 지정 파일 이름으로 저장(기본값은 웹페이지 제목)"
+  },
+  "saveAsOption": {
+    "message": "다운로드 후 저장 디렉터리 선택"
+  },
+  "iconOption": {
+    "message": "웹사이트 아이콘 표시"
+  },
+  "clearOption": {
+    "message": "새로고침 또는 새 페이지 이동 시 현재 탭에서 캡처한 데이터 지우기"
+  },
+  "doNotClear": {
+    "message": "지우지 않음"
+  },
+  "normalClear": {
+    "message": "일반 지우기"
+  },
+  "moreFrequent": {
+    "message": "더 자주"
+  },
+  "dopreview": {
+    "message": "미리보기"
+  },
+  "dopopup": {
+    "message": "팝업"
+  },
+  "winpreview": {
+    "message": "창 미리보기"
+  },
+  "winpopup": {
+    "message": "창 팝업"
+  },
+  "excludeDuplicateResources": {
+    "message": "중복 리소스 제외(리소스가 너무 많으면 CPU를 많이 소모합니다)"
+  },
+  "customCSS": {
+    "message": "사용자 지정 CSS"
+  },
+  "MQTT": {
+    "message": "MQTT"
+  },
+  "mqttBroker": {
+    "message": "브로커 주소"
+  },
+  "mqttPath": {
+    "message": "경로"
+  },
+  "mqttProtocol": {
+    "message": "프로토콜"
+  },
+  "mqttClientId": {
+    "message": "클라이언트 ID"
+  },
+  "mqttTitleLength": {
+    "message": "제목 최대 길이"
+  },
+  "mqttUsername": {
+    "message": "사용자 이름"
+  },
+  "mqttPassword": {
+    "message": "비밀번호"
+  },
+  "mqttTopic": {
+    "message": "토픽"
+  },
+  "mqttQos": {
+    "message": "QoS 레벨"
+  },
+  "mqttQos0": {
+    "message": "0(최대 한 번)"
+  },
+  "mqttQos1": {
+    "message": "1(최소 한 번)"
+  },
+  "mqttQos2": {
+    "message": "2(정확히 한 번)"
+  },
+  "mqttDataFormat": {
+    "message": "데이터 형식"
+  },
+  "mqttDataFormatHelp": {
+    "message": "{\"url\": \"$${url}\", \"title\": \"$${title}\", \"type\": \"$${type}\", \"ext\": \"$${ext}\", \"timestamp\": \"$${timestamp}\"}"
+  },
+  "mqttDataFormatVars": {
+    "message": "사용 가능한 변수"
+  },
+  "mqttDataFormatDefault": {
+    "message": "비워두면 기본 JSON 형식을 사용합니다"
+  },
+  "mqttProtocolWss": {
+    "message": "WSS(보안)"
+  },
+  "mqttProtocolWs": {
+    "message": "WS(비보안)"
+  },
+  "mqttTitleLengthHelp": {
+    "message": "MQTT 메시지로 전송할 제목의 최대 길이"
+  },
+  "mqttBrokerHelp": {
+    "message": "MQTT 브로커의 호스트 이름 또는 IP 주소"
+  },
+  "mqttPathHelp": {
+    "message": "웹소켓 경로(보통 /mqtt 또는 /ws)"
+  },
+  "mqttClientIdHelp": {
+    "message": "이 연결을 위한 고유 클라이언트 식별자"
+  },
+  "mqttTopicHelp": {
+    "message": "메시지를 게시할 MQTT 토픽"
+  },
+  "mqttQosHelp": {
+    "message": "서비스 품질 수준(0=최대 한 번, 1=최소 한 번, 2=정확히 한 번)"
+  },
+  "mqttCredentialsHelp": {
+    "message": "필요하지 않다면 사용자 이름/비밀번호를 비워두세요"
+  },
+  "operation": {
+    "message": "작업"
+  },
+  "exportSettings": {
+    "message": "설정 내보내기"
+  },
+  "importConfiguration": {
+    "message": "설정 가져오기"
+  },
+  "clearCapturedData": {
+    "message": "캡처한 데이터 지우기"
+  },
+  "resetSettings": {
+    "message": "설정 초기화"
+  },
+  "resetAllSettings": {
+    "message": "모든 설정 초기화"
+  },
+  "restartExtension": {
+    "message": "확장 프로그램 재시작"
+  },
+  "about": {
+    "message": "정보"
+  },
+  "confirmReset": {
+    "message": "정말로 초기화하시겠습니까?"
+  },
+  "invokeProtocolTemplate": {
+    "message": "호출 프로토콜 템플릿"
+  },
+  "customVLCProtocol": {
+    "message": "사용자 지정 VLC 프로토콜"
+  },
+  "systemShare": {
+    "message": "시스템 공유"
+  },
+  "default": {
+    "message": "기본값"
+  },
+  "goBack": {
+    "message": "뒤로 가기"
+  },
+  "openDir": {
+    "message": "디렉터리 열기"
+  },
+  "downloadDir": {
+    "message": "다운로드 디렉터리"
+  },
+  "sendFfmpeg": {
+    "message": "온라인 ffmpeg로 전송"
+  },
+  "autoCloserDownload": {
+    "message": "다운로드 후 페이지 자동 닫기"
+  },
+  "openInBgDownload": {
+    "message": "다운로더 페이지를 백그라운드에서 열기"
+  },
+  "m3u8Placeholder": {
+    "message": "m3u8 링크 / m3u8 내용 / 세그먼트 목록 / $${range} 태그를 입력하세요"
+  },
+  "m3u8Url": {
+    "message": "m3u8 URL"
+  },
+  "nextLevel": {
+    "message": "다음 레벨"
+  },
+  "nextLevelTip": {
+    "message": "이 M3U8 파일은 여러 개의 M3U8 파일을 중첩하고 있습니다."
+  },
+  "multipleAudios": {
+    "message": "다중 오디오"
+  },
+  "multipleAudiosTip": {
+    "message": "이 M3U8 파일은 여러 개의 오디오를 중첩하고 있습니다"
+  },
+  "multipleSubtitles": {
+    "message": "다중 자막"
+  },
+  "multipleSubtitlesTip": {
+    "message": "이 M3U8 파일은 여러 개의 자막을 중첩하고 있습니다."
+  },
+  "possibleKey": {
+    "message": "가능한 키를 찾았습니다"
+  },
+  "loading": {
+    "message": "불러오는 중..."
+  },
+  "waitDownload": {
+    "message": "다운로드 대기 중..."
+  },
+  "downloadSegmentList": {
+    "message": "다운로드 목록"
+  },
+  "originalM3u8": {
+    "message": "원본 M3U8"
+  },
+  "localM3u8": {
+    "message": "로컬 M3U8"
+  },
+  "segmentList": {
+    "message": "세그먼트"
+  },
+  "downloadProgress": {
+    "message": "다운로드 진행 상황"
+  },
+  "getParameters": {
+    "message": "GET 매개변수"
+  },
+  "restoreGetParameters": {
+    "message": "GET 매개변수 복원"
+  },
+  "requestHeaders": {
+    "message": "요청 헤더"
+  },
+  "setRequestHeaders": {
+    "message": "요청 헤더를 설정합니다."
+  },
+  "invokeM3u8DL": {
+    "message": "M3U8DL 호출"
+  },
+  "copyCommand": {
+    "message": "명령어 복사"
+  },
+  "previewCommand": {
+    "message": "명령어 미리보기"
+  },
+  "addSettingParameters": {
+    "message": "설정 매개변수 추가"
+  },
+  "customKeyPlaceholder": {
+    "message": "키를 16진수 또는 base64로, 혹은 키 주소로 지정하세요"
+  },
+  "uploadKey": {
+    "message": "키 업로드"
+  },
+  "downloadThreads": {
+    "message": "스레드 수"
+  },
+  "ffmpegTranscoding": {
+    "message": "FFmpeg 트랜스코딩"
+  },
+  "mp4Format": {
+    "message": "MP4"
+  },
+  "downloadWhileSaving": {
+    "message": "스트림 다운로드"
+  },
+  "audioOnly": {
+    "message": "오디오만"
+  },
+  "saveAs": {
+    "message": "다른 이름으로 저장"
+  },
+  "skipDecryption": {
+    "message": "복호화 건너뛰기"
+  },
+  "newDownloader": {
+    "message": "새 다운로더"
+  },
+  "downloadRange": {
+    "message": "다운로드 범위"
+  },
+  "recordLive": {
+    "message": "녹화"
+  },
+  "mergeDownloads": {
+    "message": "병합 다운로드"
+  },
+  "redownloadFailedItems": {
+    "message": "실패한 항목 다시 다운로드"
+  },
+  "downloadExistingData": {
+    "message": "기존 데이터 다운로드"
+  },
+  "stopDownload": {
+    "message": "다운로드 중지"
+  },
+  "start": {
+    "message": "시작"
+  },
+  "end": {
+    "message": "종료"
+  },
+  "resolution": {
+    "message": "해상도"
+  },
+  "duration": {
+    "message": "재생 시간"
+  },
+  "bitrate": {
+    "message": "비트레이트"
+  },
+  "ADTSerror": {
+    "message": "ADTS 헤더를 찾을 수 없습니다. AES-128-ECB로 암호화된 리소스일 수 있으며, 현재 복호화를 지원하지 않습니다. 타사 병합 소프트웨어를 사용하세요."
+  },
+  "m3u8Error": {
+    "message": "M3U8 파일을 파싱하거나 재생하는 중 오류가 발생했습니다. 자세한 오류 정보는 콘솔을 확인하세요"
+  },
+  "noAudio": {
+    "message": "오디오 없음"
+  },
+  "noVideo": {
+    "message": "비디오 없음"
+  },
+  "hevcTip": {
+    "message": "HEVC/H.265로 인코딩된 조각 파일은 온라인 ffmpeg 트랜스코딩만 지원합니다"
+  },
+  "hevcPreviewTip": {
+    "message": "HEVC/H.265로 인코딩된 조각 파일은 미리보기를 지원하지 않습니다."
+  },
+  "m3u8Info": {
+    "message": "총 $num$개 파일, 총 재생 시간 $time$.",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      },
+      "time": {
+        "content": "$2"
+      }
+    }
+  },
+  "encryptedHLS": {
+    "message": "암호화된 HLS"
+  },
+  "encryptedSAMPLE": {
+    "message": "SAMPLE-AES-CTR로 암호화된 리소스는 현재 처리할 수 없습니다."
+  },
+  "liveHLS": {
+    "message": "라이브 HLS"
+  },
+  "keyAddress": {
+    "message": "키 주소"
+  },
+  "key": {
+    "message": "키"
+  },
+  "encryptionAlgorithm": {
+    "message": "방식"
+  },
+  "keyDownloadFailed": {
+    "message": "키 다운로드 실패"
+  },
+  "savePrompt": {
+    "message": "디스크에 저장되었습니다. 브라우저에서 다운로드한 내용을 확인해주세요."
+  },
+  "close": {
+    "message": "닫기"
+  },
+  "blobM3u8DLError": {
+    "message": "Blob URL은 M3U8DL을 호출하여 다운로드할 수 없습니다"
+  },
+  "M3U8DLparameterLong": {
+    "message": "M3U8DL 매개변수가 너무 깁니다."
+  },
+  "runningCannotChangeSettings": {
+    "message": "실행 중에는 설정을 변경할 수 없습니다"
+  },
+  "streamSaverTip": {
+    "message": "'스트림 다운로드' 기능은 ffmpeg 온라인 형식 변환, 오류가 발생한 조각의 재다운로드, '다른 이름으로 저장'을 지원하지 않습니다."
+  },
+  "stopRecording": {
+    "message": "녹화 중지"
+  },
+  "waitingForLiveData": {
+    "message": "라이브 데이터 대기 중"
+  },
+  "sNumError": {
+    "message": "일련번호 오류"
+  },
+  "startGTend": {
+    "message": "시작 번호는 종료 번호보다 클 수 없습니다"
+  },
+  "sNumMax": {
+    "message": "일련번호는 $num$을(를) 초과할 수 없습니다",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      }
+    }
+  },
+  "incorrectKey": {
+    "message": "잘못된 키"
+  },
+  "addParameters": {
+    "message": "매개변수 추가"
+  },
+  "decryptionError": {
+    "message": "복호화 오류"
+  },
+  "downloadFailed": {
+    "message": "다운로드 실패"
+  },
+  "retryDownload": {
+    "message": "다운로드 재시도"
+  },
+  "recordingDuration": {
+    "message": "녹화 시간"
+  },
+  "downloaded": {
+    "message": "다운로드됨"
+  },
+  "downloadedVideoLength": {
+    "message": "다운로드된 동영상 길이"
+  },
+  "downloadComplete": {
+    "message": "다운로드 완료"
+  },
+  "retryingDownload": {
+    "message": "다운로드 재시도 중"
+  },
+  "merging": {
+    "message": "병합 중"
+  },
+  "fileTooLarge": {
+    "message": "파일이 너무 큽니다. $size$보다 큰 파일입니다",
+    "placeholders": {
+      "size": {
+        "content": "$1"
+      }
+    }
+  },
+  "fileTooLargeStream": {
+    "message": "파일이 $size$보다 큽니다. 스트림 다운로드를 사용하시겠습니까?",
+    "placeholders": {
+      "size": {
+        "content": "$1"
+      }
+    }
+  },
+  "formatConversionError": {
+    "message": "형식 변환 오류"
+  },
+  "streamOnbeforeunload": {
+    "message": "스트리밍이 진행 중입니다. 닫으면 다운로드가 중지됩니다"
+  },
+  "fileLoading": {
+    "message": "파일 불러오는 중"
+  },
+  "expandAllNodes": {
+    "message": "모든 JSON 노드 펼치기"
+  },
+  "collapseAllNodes": {
+    "message": "모든 JSON 노드 접기"
+  },
+  "fileRetrievalFailed": {
+    "message": "파일 가져오기 실패"
+  },
+  "selectVideo": {
+    "message": "동영상 선택"
+  },
+  "extractSlices": {
+    "message": "조각 추출"
+  },
+  "convertToM3U8": {
+    "message": "M3U8 파싱으로 변환"
+  },
+  "selectAudio": {
+    "message": "오디오 선택"
+  },
+  "audio": {
+    "message": "오디오"
+  },
+  "video": {
+    "message": "비디오"
+  },
+  "DRMerror": {
+    "message": "이 미디어는 DRM으로 보호되어 있습니다. 타사 도구를 사용해 다운로드하세요"
+  },
+  "regexTitle": {
+    "message": "정규식 일치 또는 심층 검색 결과"
+  },
+  "downloadWithRequestHeader": {
+    "message": "요청 헤더 매개변수와 함께 다운로드합니다."
+  },
+  "m3u8Playlist": {
+    "message": "M3U8 재생 목록"
+  },
+  "copiedToClipboard": {
+    "message": "클립보드에 복사됨"
+  },
+  "hasSent": {
+    "message": "전송됨"
+  },
+  "sendFailed": {
+    "message": "전송 실패"
+  },
+  "confirmDownload": {
+    "message": "총 $num$개 파일입니다. 다운로드하시겠습니까?",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmLoading": {
+    "message": "총 $num$개의 리소스가 있습니다. 불러오기를 취소하시겠습니까?",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      }
+    }
+  },
+  "waitingForMedia": {
+    "message": "미디어 파일 수신을 기다리는 중입니다... 이 페이지를 닫지 마세요."
+  },
+  "exit": {
+    "message": "종료"
+  },
+  "unknownSize": {
+    "message": "알 수 없는 크기"
+  },
+  "saving": {
+    "message": "저장 중"
+  },
+  "saveFailed": {
+    "message": "저장 실패"
+  },
+  "badgeNumber": {
+    "message": "아이콘 배지 알림 표시"
+  },
+  "viewSlices": {
+    "message": "모든 조각 및 다운로드 진행 상황 보기"
+  },
+  "send2local": {
+    "message": "데이터 전송"
+  },
+  "send2MQTT": {
+    "message": "MQTT로 전송"
+  },
+  "sendingToMQTT": {
+    "message": "MQTT 서버로 전송 중..."
+  },
+  "connectingToMQTT": {
+    "message": "MQTT 서버에 연결 중..."
+  },
+  "sendingMessageToMQTT": {
+    "message": "MQTT 서버로 메시지 전송 중..."
+  },
+  "messageSentToMQTT": {
+    "message": "MQTT 서버로 메시지가 전송되었습니다"
+  },
+  "popup": {
+    "message": "팝업"
+  },
+  "defaultPopup": {
+    "message": "기본 팝업 모드"
+  },
+  "invokeApp": {
+    "message": "애플리케이션 호출"
+  },
+  "onlineServiceAddress": {
+    "message": "온라인 서비스 주소"
+  },
+  "withinChina": {
+    "message": "중국 내"
+  },
+  "dataFetchFailed": {
+    "message": "데이터 가져오기 실패"
+  },
+  "confirmParameters": {
+    "message": "매개변수 확인"
+  },
+  "searchingForRealKey": {
+    "message": "실제 키 검색 중"
+  },
+  "verifying": {
+    "message": "확인 중"
+  },
+  "realKeyNotFound": {
+    "message": "실제 키를 찾을 수 없습니다"
+  },
+  "blockUrl": {
+    "message": "URL 차단"
+  },
+  "addUrl": {
+    "message": "URL 추가"
+  },
+  "wildcards": {
+    "message": "와일드카드"
+  },
+  "blockUrlTips": {
+    "message": "와일드카드 * 및 ?를 지원합니다"
+  },
+  "setWhiteList": {
+    "message": "화이트리스트로 설정"
+  },
+  "autoSend": {
+    "message": "자동 데이터 전송"
+  },
+  "manualSend": {
+    "message": "수동 데이터 전송"
+  },
+  "requestMethod": {
+    "message": "요청 메서드"
+  },
+  "requestBody": {
+    "message": "요청 본문"
+  },
+  "sort": {
+    "message": "정렬"
+  },
+  "asc": {
+    "message": "오름차순"
+  },
+  "desc": {
+    "message": "내림차순"
+  },
+  "getTime": {
+    "message": "가져온 시간"
+  },
+  "fileSize": {
+    "message": "파일 크기"
+  },
+  "title": {
+    "message": "제목"
+  },
+  "noKeyIsRequired": {
+    "message": "키가 필요하지 않습니다"
+  },
+  "estimateSize": {
+    "message": "예상 크기"
+  },
+  "retryCount": {
+    "message": "재시도 횟수"
+  },
+  "useSidePanel": {
+    "message": "사이드 패널 사용"
+  },
+  "Script": {
+    "message": "스크립트"
+  },
+  "alwaysSearch": {
+    "message": "심층 검색 항상 활성화"
+  },
+  "sideurlprotocol": {
+    "message": "m3u8dl URL 프로토콜"
+  },
+  "deleteDuplicateFilenames": {
+    "message": "중복 파일 이름 삭제"
+  },
+  "alertimport": {
+    "message": "가져오기 완료"
+  },
+  "isBlockedSite": {
+    "message": "이 사이트는 확장 프로그램 작동 차단이 필요합니다"
+  },
+  "onlineFFmpeg": {
+    "message": "온라인 FFmpeg"
+  },
+  "ffmpegIsNotReady": {
+    "message": "온라인 FFmpeg 서비스가 준비되지 않았습니다. 나중에 다시 시도해주세요"
+  },
+  "iframeFFmpeg": {
+    "message": "iframe을 사용해 FFmpeg 호출"
+  },
+  "send2localTips": {
+    "message": "전송 전에 데이터를 병합할까요? '확인'을 클릭하면 병합하고, '취소'를 클릭하면 개별적으로 전송합니다."
+  },
+  "removeFailedPreviewFiles": {
+    "message": "미리보기 실패한 파일 제거"
+  },
+  "save": {
+    "message": "저장"
+  },
+  "contextMenus": {
+    "message": "우클릭 메뉴"
+  },
+  "dataPreprocessing": {
+    "message": "데이터 전처리"
+  }
+}
