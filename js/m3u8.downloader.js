@@ -68,6 +68,13 @@ class Downloader {
         }
     }
     /**
+     * 检查是否有某个步骤存在
+     * @param {string}   name 步骤名称
+     */
+    findPipeline(name){
+        return this.pipeline.findIndex(p => p.name === name) > -1;
+    }
+    /**
      * 停止下载 没有目标 停止所有线程
      * @param {number} index 停止下载目标
      */
