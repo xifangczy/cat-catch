@@ -72,7 +72,7 @@ class Downloader {
      * @param {string}   name 步骤名称
      */
     findPipeline(name){
-        return this.pipeline.findIndex(p => p.name === name) > -1;
+        return this.pipeline.some(p => p.name === name);
     }
     /**
      * 停止下载 没有目标 停止所有线程
