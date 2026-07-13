@@ -5,7 +5,8 @@ class Downloader {
         this.allFragments = fragments;   // 储存所有原始切片列表
         this.thread = thread;            // 线程数
         this.events = {};                // events
-        this.pipeline = [];             // 数据处理管线
+        this.pipeline = [];              // 数据处理管线
+        this.autoRetry = false;          // 默认不会自动重试
         this.init();
     }
     /**
@@ -320,13 +321,15 @@ class Downloader {
                     this.emit('stop', fragment, error);
                     return;
                 }
-                fragment.retryCount = (fragment.retryCount || 0) + 1;
-                if (fragment.retryCount <= this.MAX_RETRIES) {
-                    this.emit('retry', fragment, error);
-                    // this.downloader(fragment);
-                    // 延迟重试
-                    setTimeout(() => this.downloader(fragment), 500 * fragment.retryCount);
-                    return;
+                if (this.autoRetry) {
+                    fragment.retryCount = (fragment.retryCount || 0) + 1;
+                    if (fragment.retryCount <= this.MAX_RETRIES) {
+                        this.emit('retry', fragment, error);
+                        // this.downloader(fragment);
+                        // 延迟重试
+                        setTimeout(() => this.downloader(fragment), 500 * fragment.retryCount);
+                        return;
+                    }
                 }
                 this.emit('downloadError', fragment, error);
                 // 储存下载错误切片

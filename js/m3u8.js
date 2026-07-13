@@ -1503,6 +1503,7 @@ function downloadNew(start = 0, end = _fragments.length) {
     // 过滤掉未选择的 _fragments
     const selectedFragments = recorder ? _fragments.slice(start) : _fragments.filter(fragment => fragment.selected);
     const down = new Downloader(selectedFragments, parseInt($("#thread").val()));
+    down.autoRetry = true;  // 开启自动重试
     $progress.html(`${down.success}/${down.total}`);
 
     // 储存切片所需 DOM 提高性能
