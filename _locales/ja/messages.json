@@ -1007,7 +1007,40 @@
   "alwaysSearch": {
     "message": "常に深層検索を有効"
   },
+  "sideurlprotocol": {
+    "message": "m3u8dl URL プロトコル"
+  },
   "deleteDuplicateFilenames": {
     "message": "重複ファイル名を削除"
+  },
+  "alertimport": {
+    "message": "インポートが完了しました"
+  },
+  "isBlockedSite": {
+    "message": "このサイトは本拡張機能の実行を禁止することを要求しています"
+  },
+  "onlineFFmpeg": {
+    "message": "オンライン FFmpeg"
+  },
+  "ffmpegIsNotReady": {
+    "message": "オンライン FFmpeg サービスの準備ができていません。後でもう一度お試しください"
+  },
+  "iframeFFmpeg": {
+    "message": "オンライン FFmpeg の埋め込み"
+  },
+  "send2localTips": {
+    "message": "送信前にデータを統合しますか？【OK】をクリックで統合、【キャンセル】をクリックで個別に送信します。"
+  },
+  "removeFailedPreviewFiles": {
+    "message": "プレビューできないファイルを削除"
+  },
+  "save": {
+    "message": "保存"
+  },
+  "contextMenus": {
+    "message": "右クリックメニュー"
+  },
+  "dataPreprocessing": {
+    "message": "データ前処理"
   }
 }

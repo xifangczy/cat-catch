@@ -27,7 +27,7 @@
     "message": "Trang web:"
   },
   "selectMedia": {
-    "message": "Media:"
+    "message": "Phương tiện:"
   },
   "noMediaDetected": {
     "message": "Không tìm thấy Media nào trên trang web"
@@ -408,7 +408,7 @@
     "message": "Giao thức"
   },
   "mqttClientId": {
-    "message": "Client ID"
+    "message": "ID khách hàng"
   },
   "mqttTitleLength": {
     "message": "Độ dài tiêu đề tối đa"
@@ -707,7 +707,7 @@
     "message": "Địa chỉ Key"
   },
   "key": {
-    "message": "Key"
+    "message": "Khóa"
   },
   "encryptionAlgorithm": {
     "message": "Phương thức"
@@ -915,7 +915,7 @@
     "message": "Tin nhắn đã gửi đến máy chủ MQTT"
   },
   "popup": {
-    "message": "Popup"
+    "message": "Cửa sổ bật lên"
   },
   "defaultPopup": {
     "message": "Chế độ Popup mặc định"
@@ -969,7 +969,7 @@
     "message": "Phương thức Request"
   },
   "requestBody": {
-    "message": "Request Body"
+    "message": "Nội dung yêu cầu"
   },
   "sort": {
     "message": "Sắp xếp"
@@ -1002,7 +1002,7 @@
     "message": "Sử dụng bảng điều khiển bên (Side Panel)"
   },
   "Script": {
-    "message": "Script"
+    "message": "Kịch bản"
   },
   "alwaysSearch": {
     "message": "Luôn bật tìm kiếm sâu"
@@ -1018,5 +1018,29 @@
   },
   "isBlockedSite": {
     "message": "Trang web này yêu cầu chặn hoạt động của tiện ích mở rộng này"
+  },
+  "onlineFFmpeg": {
+    "message": "FFmpeg trực tuyến"
+  },
+  "ffmpegIsNotReady": {
+    "message": "Dịch vụ FFmpeg trực tuyến chưa sẵn sàng, vui lòng thử lại sau"
+  },
+  "iframeFFmpeg": {
+    "message": "FFmpeg trực tuyến nhúng"
+  },
+  "send2localTips": {
+    "message": "Bạn có muốn gộp dữ liệu trước khi gửi không? Nhấn 'OK' để gộp, hoặc 'Hủy' để gửi từng mục."
+  },
+  "removeFailedPreviewFiles": {
+    "message": "Xóa các tệp không thể xem trước"
+  },
+  "save": {
+    "message": "Lưu"
+  },
+  "contextMenus": {
+    "message": "Trình đơn chuột phải"
+  },
+  "dataPreprocessing": {
+    "message": "Tiền xử lý dữ liệu"
   }
 }

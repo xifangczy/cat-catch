@@ -573,7 +573,7 @@
     "message": "Yerel M3U8"
   },
   "segmentList": {
-    "message": "Segment"
+    "message": "Parçalar"
   },
   "downloadProgress": {
     "message": "İndirme İlerleme Durumu"
@@ -1007,10 +1007,40 @@
   "alwaysSearch": {
     "message": "Her zaman derin aramayı etkinleştir"
   },
-  "alertimport": {
-    "message": "İçe aktarma tamamlandı"
+  "sideurlprotocol": {
+    "message": "m3u8dl URL protokolü"
   },
   "deleteDuplicateFilenames": {
     "message": "Yinelenen dosya adlarını sil"
+  },
+  "alertimport": {
+    "message": "İçe aktarma tamamlandı"
+  },
+  "isBlockedSite": {
+    "message": "Bu site, bu uzantının çalıştırılmasını engellemenizi gerektirir"
+  },
+  "onlineFFmpeg": {
+    "message": "Çevrimiçi FFmpeg"
+  },
+  "ffmpegIsNotReady": {
+    "message": "Çevrimiçi FFmpeg hizmeti hazır değil, lütfen daha sonra tekrar deneyin"
+  },
+  "iframeFFmpeg": {
+    "message": "Gömülü çevrimiçi FFmpeg"
+  },
+  "send2localTips": {
+    "message": "Göndermeden önce verileri birleştirmek ister misiniz? Birleştirmek için 'Tamam'a, tek tek göndermek için 'İptal'e tıklayın."
+  },
+  "removeFailedPreviewFiles": {
+    "message": "Önizlenemeyen dosyaları kaldır"
+  },
+  "save": {
+    "message": "Kaydet"
+  },
+  "contextMenus": {
+    "message": "Sağ tık menüsü"
+  },
+  "dataPreprocessing": {
+    "message": "Veri ön işleme"
   }
 }

@@ -510,7 +510,7 @@
     "message": "Compartir sistema"
   },
   "default": {
-    "message": "Default"
+    "message": "Predeterminado"
   },
   "goBack": {
     "message": "Atrás"
@@ -663,7 +663,7 @@
     "message": "Duración"
   },
   "bitrate": {
-    "message": "Bitrate"
+    "message": "Tasa de bits"
   },
   "ADTSerror": {
     "message": "No se encuentra la cabecera ADTS. Puede ser un recurso encriptado AES-128-ECB, que actualmente no sea compatible. Usar software de fusión de terceros."
@@ -1012,7 +1012,7 @@
   },
   "deleteDuplicateFilenames": {
     "message": "Eliminar nombres de archivo duplicados"
-  },    
+  },
   "alertimport": {
     "message": "importación completada"
   },
@@ -1033,5 +1033,14 @@
   },
   "removeFailedPreviewFiles": {
     "message": "Eliminar archivos que no se pueden previsualizar"
+  },
+  "save": {
+    "message": "Guardar"
+  },
+  "contextMenus": {
+    "message": "Menú contextual"
+  },
+  "dataPreprocessing": {
+    "message": "Preprocesamiento de datos"
   }
 }
