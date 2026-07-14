@@ -763,6 +763,7 @@ $("#popup").click(function () {
                 chrome.tabs.create({ url: `preview.html?tabId=${G.tabId}`, index: tab.index + 1 });
                 break;
         }
+        window.close();
     });
 });
 $("#currentPage").click(function () {
@@ -832,7 +833,6 @@ const interval = setInterval(async function () {
     clearInterval(interval);
 
     if (G.popup && !_tabId) {
-        window.close();
         $("#popup").click();
         return;
     }
