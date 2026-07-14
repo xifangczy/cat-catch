@@ -31,7 +31,22 @@
 
     // Worker
     const _Worker = Worker;
+    // 检测是否能够正常加载 Blob URL 的 Worker
+    let supportsBlobWorker = true;
+    try {
+        const testBlob = new Blob([''], { type: 'text/javascript' });
+        const testUrl = URL.createObjectURL(testBlob);
+        const testWorker = new _Worker(testUrl);
+        testWorker.addEventListener("error", function () {
+            testWorker.terminate();
+            URL.revokeObjectURL(testUrl);
+            supportsBlobWorker = false;
+        });
+    } catch (e) {
+        supportsBlobWorker = false;
+    }
     self.Worker = function (scriptURL, options) {
+        if (!supportsBlobWorker) { return new _Worker(scriptURL, options); }
         try {
             const xhr = new XMLHttpRequest();
             xhr.open('GET', scriptURL, false);
