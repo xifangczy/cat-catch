@@ -1,7 +1,10 @@
 {
   "background": {
     "scripts": [
-      "js/firefox.js",
+      "js/polyfill.js",
+      "js/function.js",
+      "js/templates.js",
+      "js/init.js",
       "js/background.js"
     ]
   },
@@ -12,8 +15,8 @@
   },
   "description": "__MSG_description__",
   "icons": {
-    "64": "img/icon.png",
-    "128": "img/icon128.png"
+    "64": "/img/icon.png",
+    "128": "/img/icon128.png"
   },
   "manifest_version": 3,
   "name": "__MSG_catCatch__",

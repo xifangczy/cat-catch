@@ -12,8 +12,8 @@
   },
   "description": "__MSG_description__",
   "icons": {
-    "64": "img/icon.png",
-    "128": "img/icon128.png"
+    "64": "/img/icon.png",
+    "128": "/img/icon128.png"
   },
   "manifest_version": 3,
   "minimum_chrome_version": "93",

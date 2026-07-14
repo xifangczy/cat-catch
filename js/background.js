@@ -1,4 +1,11 @@
-importScripts("/js/polyfill.js", "/js/function.js", "/js/templates.js", "/js/init.js");
+/**
+ * chrome 使用v3 background.service_worker 加载模式
+ * firefox 使用v2 background.scripts 加载模式
+ * firefox 在 manifest 文件中已经加载以下脚本，如果已经加载 G 变量存在，不再加载。
+ */
+if (typeof G === 'undefined') {
+    importScripts("/js/polyfill.js", "/js/function.js", "/js/templates.js", "/js/init.js");
+}
 
 // 全局变量
 let debounce = undefined;
@@ -581,7 +588,7 @@ chrome.windows.onFocusChanged.addListener(function (activeInfo) {
             G.tabId = -1;
         }
     });
-}, { filters: ["normal"] });
+});
 
 /**
  * 监听 标签页面更新
@@ -655,7 +662,7 @@ chrome.webNavigation.onCommitted.addListener(function (details) {
     // chrome内核版本 102 以下不支持 chrome.scripting.executeScript API
     if (G.version < 102) { return; }
 
-    if (G.deepSearch && G.deepSearchTemporarilyClose != details.tabId) {
+    if (!G.blockUrlSet.has(details.tabId) && G.deepSearch && G.deepSearchTemporarilyClose != details.tabId) {
         G.scriptList.get("search.js").tabId.add(details.tabId);
         G.deepSearchTemporarilyClose = null;
     }
