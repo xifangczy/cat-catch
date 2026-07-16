@@ -2294,7 +2294,8 @@ function createIframeFFmpeg(fileData) {
             fileData && iframeFFmpeg.contentWindow.postMessage(fileData, '*');
             $progress.html(i18n.sendFfmpeg);
         };
-        iframeFFmpeg.src = G.ffmpegConfig.url + '?_=' + new Date().getTime();
+        // iframeFFmpeg.src = G.ffmpegConfig.url + '?_=' + new Date().getTime();
+        iframeFFmpeg.src = G.ffmpegConfig.url + '?_=iframe';
     } else if (iframeFFmpegReady) {
         fileData && iframeFFmpeg.contentWindow.postMessage(fileData, '*');
         $progress.html(i18n.sendFfmpeg);
