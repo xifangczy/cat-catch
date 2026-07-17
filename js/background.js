@@ -7,6 +7,26 @@ if (typeof G === 'undefined') {
     importScripts("/js/polyfill.js", "/js/function.js", "/js/templates.js", "/js/init.js");
 }
 
+// Service Worker 5分钟后会强制终止扩展
+// https://bugs.chromium.org/p/chromium/issues/detail?id=1271154
+// https://stackoverflow.com/questions/66618136/persistent-service-worker-in-chrome-extension/70003493#70003493
+chrome.webNavigation.onBeforeNavigate.addListener(function () { return; });
+chrome.webNavigation.onHistoryStateUpdated.addListener(function () { return; });
+chrome.runtime.onConnect.addListener(function (Port) {
+    if (chrome.runtime.lastError || Port.name !== "HeartBeat") return;
+    Port.postMessage("HeartBeat");
+    Port.onMessage.addListener(function (message, Port) { return; });
+    const interval = setInterval(function () {
+        clearInterval(interval);
+        Port.disconnect();
+    }, 250000);
+    Port.onDisconnect.addListener(function () {
+        interval && clearInterval(interval);
+        if (chrome.runtime.lastError) { return; }
+    });
+});
+setInterval(chrome.runtime.getPlatformInfo, 25 * 1000);
+
 // 全局变量
 let debounce = undefined;
 let debounceCount = 0;
