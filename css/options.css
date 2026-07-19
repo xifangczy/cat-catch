@@ -620,22 +620,21 @@ a.json-placeholder:hover {
 
 /* 下载器页面进度条 */
 .progress {
-  height: 100%;
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--progress);
   background-color: var(--text2-color);
-  border-radius: 3px;
-  width: 0;
-  transition: width 0.3s;
+  transition: width 0.3s ease;
 }
 .progress-bar {
+  --progress: 0%;
   position: relative;
-  height: 15px;
-  border-radius: 3px;
+  height: 20px;
   margin: 3px;
   overflow: hidden;
-  border: 1px solid var(--text2-color);
   box-sizing: border-box;
+  border: 1px solid var(--text2-color);
   border-radius: 5px;
-  height: 20px;
 }
 .progress-container {
   display: flex;
@@ -644,16 +643,26 @@ a.json-placeholder:hover {
 }
 .progress-text {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  color: var(--text2-color);
   font-size: 12px;
   font-weight: bold;
   line-height: 1;
-  pointer-events: none;
   white-space: nowrap;
-  z-index: 2;
-  color: var(--text2-color);
+  pointer-events: none;
+}
+.progress-text::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--background-color);
+  clip-path: inset(0 calc(100% - var(--progress)) 0 0);
+  transition: clip-path 0.3s ease;
 }
 .progress-wrapper {
   flex: 1;
