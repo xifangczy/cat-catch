@@ -4,3 +4,4 @@ dist/
 *.crx
 *.zip
 *.pem
+/.workbuddy/memory
