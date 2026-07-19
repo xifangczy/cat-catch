@@ -317,21 +317,6 @@ textarea {
   word-break: break-all;
 }
 
-.progress-bar {
-  height: 15px;
-  background-color: rgb(189, 193, 198);
-  border-radius: 3px;
-  margin: 3px;
-  margin-bottom: 10px;
-}
-
-.progress {
-  width: 0px;
-  height: 100%;
-  background-color: var(--text2-color);
-  border-radius: 3px;
-}
-
 .m3u8Tips {
   display: flex;
   justify-content: center;
@@ -633,12 +618,43 @@ a.json-placeholder:hover {
   margin-left: 0.5rem;
 }
 
+/* 下载器页面进度条 */
+.progress {
+  height: 100%;
+  background-color: var(--text2-color);
+  border-radius: 3px;
+  width: 0;
+  transition: width 0.3s;
+}
+.progress-bar {
+  position: relative;
+  height: 15px;
+  border-radius: 3px;
+  margin: 3px;
+  overflow: hidden;
+  border: 1px solid var(--text2-color);
+  box-sizing: border-box;
+  border-radius: 5px;
+  height: 20px;
+}
 .progress-container {
   display: flex;
   align-items: center;
   gap: 10px;
 }
-
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 2;
+  color: var(--text2-color);
+}
 .progress-wrapper {
   flex: 1;
 }
@@ -647,19 +663,8 @@ a.json-placeholder:hover {
   margin-bottom: 1rem;
 }
 
-.newDownload .downItem .progress-bar {
-  margin-bottom: 0;
-  height: 20px;
-}
-
 .newDownload .downItem button {
   margin: 0;
-}
-
-.newDownload .downItem .progress {
-  color: var(--background-color-two);
-  text-align: center;
-  transition: width 0.2s;
 }
 
 /** 导航条 **/
