@@ -1041,9 +1041,9 @@
     "message": "Menú contextual"
   },
   "dataPreprocessing": {
-    "message": "Preprocesamiento de datos"
+    "message": "Preprocesar datos"
   },
   "reverse": {
-    "message": "Orden inverso"
+    "message": "Invertir orden"
   }
 }
