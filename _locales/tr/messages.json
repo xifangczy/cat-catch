@@ -1042,5 +1042,8 @@
   },
   "dataPreprocessing": {
     "message": "Veri ön işleme"
+  },
+  "reverse": {
+    "message": "Ters sıralama"
   }
 }

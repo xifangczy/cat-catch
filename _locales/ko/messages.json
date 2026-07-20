@@ -1042,5 +1042,8 @@
   },
   "dataPreprocessing": {
     "message": "데이터 전처리"
+  },
+  "reverse": {
+    "message": "역순"
   }
 }

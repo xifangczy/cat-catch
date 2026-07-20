@@ -1042,5 +1042,8 @@
   },
   "dataPreprocessing": {
     "message": "資料預處理"
+  },
+  "reverse": {
+    "message": "倒序排列"
   }
 }

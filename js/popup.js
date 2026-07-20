@@ -525,7 +525,7 @@ $('#allTab').click(function () {
             if (key == G.tabId) { continue; }
             allCount += data[key].length;
             for (let i = 0; i < data[key].length; i++) {
-                $all.append(AddMedia(data[key][i], false));
+                $all[G.reverse ? 'prepend' : 'append'](AddMedia(data[key][i], false));
             }
         }
         allCount && $allMediaList.append($all);
@@ -846,7 +846,6 @@ const interval = setInterval(async function () {
 
     // 获取页面DOM
     if (G.getHtmlDOM) {
-        // pageDOM = getPageDOM();
         getPageDOM().then(dom => {
             pageDOM = dom;
         }).catch(error => {
@@ -867,7 +866,7 @@ const interval = setInterval(async function () {
             return;
         }
         for (let key = 0; key < currentCount; key++) {
-            $current.append(AddMedia(data[key]));
+            $current[G.reverse ? 'prepend' : 'append'](AddMedia(data[key]))
         }
         $mediaList.append($current);
         UItoggle();
@@ -881,11 +880,11 @@ const interval = setInterval(async function () {
             if (Message.data.tabId == G.tabId) {
                 !currentCount && $mediaList.append($current);
                 currentCount++;
-                $current.append(html);
+                $current[G.reverse ? 'prepend' : 'append'](html);
                 UItoggle();
             } else if (allCount) {
                 allCount++;
-                $all.append(html);
+                $all[G.reverse ? 'prepend' : 'append'](html);
                 UItoggle();
             }
             sendResponse("OK");
