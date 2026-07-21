@@ -749,8 +749,14 @@ a.json-placeholder:hover {
   background: var(--button-hover-color);
 }
 
+@property --progress {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
 .media-item.selected {
   --progress: 0%;
+  transition: --progress 0.3s ease;
   background: linear-gradient(
     to right,
     rgba(26, 115, 232, 0.2) var(--progress),
