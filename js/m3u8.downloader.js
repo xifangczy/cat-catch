@@ -95,10 +95,10 @@ class Downloader {
      */
     stop(index = undefined) {
         if (index !== undefined) {
-            this.controller[index] && this.controller[index].abort();
+            this.controller[index] && this.controller[index]?.abort();
             return;
         }
-        this.controller.forEach(controller => { controller.abort() });
+        this.controller.forEach(controller => { controller?.abort() });
         this.state = 'abort';
     }
     /**
