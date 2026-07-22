@@ -67,6 +67,7 @@ const allOption = {
     addParam: false,
     fold: !G.isMobile,
     m3u8dlRE: false,
+    M3u8HideDownloadedSegments: false,
 };
 /* m3u8 解析工具 */
 const hls = new Hls({
@@ -1111,8 +1112,6 @@ $("#rangeStart, #rangeEnd, #thread").keyup(function () {
     }
 });
 
-
-
 // 储存设置
 $("#addParam").on("change", function () {
     allOption.addParam = $("#addParam").prop("checked");
@@ -1398,6 +1397,12 @@ $("#invertSelection").click(function () {
     });
 });
 
+// 隐藏下载成功的切片
+$("#M3u8HideDownloadedSegments").click(function () {
+    allOption.M3u8HideDownloadedSegments = this.checked;
+    chrome.storage.local.set(allOption);
+});
+
 
 // 找到真密钥
 $("#searchingForRealKey").click(function () {
@@ -1616,6 +1621,7 @@ function downloadNew(start = 0, end = _fragments.length) {
         item.retryBtn.style.display = "inline";
         item.stopBtn.style.display = "none";
         item.root.scrollIntoView({ behavior: "smooth", block: "center" });
+        item.status = 3; // 下载失败
 
     });
     // 切片下载完成
@@ -1632,10 +1638,15 @@ function downloadNew(start = 0, end = _fragments.length) {
         item.stopBtn.style.display = "none";
         item.retryBtn.style.display = "none";
         item.copyBtn.style.display = "inline";
+        item.status = 2; // 下载完成
 
         $progress.html(`${down.success}/${down.total}`);
         $fileSize.html(i18n.downloaded + ":" + byteToSize(down.buffersize));
         $fileDuration.html(i18n.downloadedVideoLength + ":" + secToTime(down.duration));
+
+        if (allOption.M3u8HideDownloadedSegments) {
+            item.root.style.display = "none";
+        }
     });
     // 全部下载完成
     down.on('allCompleted', async function (buffer) {
@@ -1671,6 +1682,10 @@ function downloadNew(start = 0, end = _fragments.length) {
     }
     down.on('error', function (error) {
         console.log(error);
+    });
+    down.on('start', function (fragment, options) {
+        const item = itemDOM.get(fragment.index);
+        item.status = 1; // 下载中
     });
     down.on('stop', function (fragment, error) {
         console.log(error);
@@ -1718,7 +1733,8 @@ function downloadNew(start = 0, end = _fragments.length) {
             root: document.querySelector(`#media-item-${fragment.sn}`),
             stopBtn: stopBtn,
             retryBtn: retryBtn,
-            copyBtn: copyBtn
+            copyBtn: copyBtn,
+            status: 0,  // 0:未下载 1:下载中 2:下载完成 3:下载失败
         });
     });
 
@@ -1726,12 +1742,12 @@ function downloadNew(start = 0, end = _fragments.length) {
     down.start();
 
     // 强制下载
-    $("#ForceDownload").off("click").click(function () {
+    $("#ForceDownload").off().click(function () {
         mergeTsNew(down);
     });
 
     // 重新下载
-    $("#errorDownload").off("click").click(function () {
+    $("#errorDownload").off().click(function () {
         down.errorItem.forEach(function (fragment, index) {
             setTimeout(() => {
                 itemDOM.get(fragment.index)?.retryBtn.click();
@@ -1740,7 +1756,7 @@ function downloadNew(start = 0, end = _fragments.length) {
     });
 
     // 停止下载
-    $("#stopDownload").off("click").click(function () {
+    $("#stopDownload").off().click(function () {
         down.stop();
         setTimeout(() => {
             fileStream && fileStream.close();
@@ -1751,6 +1767,17 @@ function downloadNew(start = 0, end = _fragments.length) {
             $fileDuration.html("");
             initDownload();
         }, 1000);
+    });
+
+    // 隐藏下载成功的切片
+    $("#M3u8HideDownloadedSegments").off().click(function () {
+        itemDOM.forEach((item) => {
+            if (item.status == 2) {
+                item.root.style.display = this.checked ? "none" : "flex";
+            }
+        });
+        allOption.M3u8HideDownloadedSegments = this.checked;
+        chrome.storage.local.set(allOption);
     });
 }
 function addInitSegmentData(buffer, initSegment) {

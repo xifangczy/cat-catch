@@ -1045,5 +1045,8 @@
   },
   "reverse": {
     "message": "Thứ tự ngược"
+  },
+  "hideDownloadedSegments": {
+    "message": "Ẩn các phân đoạn đã tải xuống"
   }
 }

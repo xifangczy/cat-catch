@@ -847,3 +847,7 @@ a.json-placeholder:hover {
 .m3u8Regular {
   width: 20rem;
 }
+
+.inline-flex {
+  display: inline-flex;
+}

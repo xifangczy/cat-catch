@@ -1045,5 +1045,8 @@
   },
   "reverse": {
     "message": "Обратный порядок"
+  },
+  "hideDownloadedSegments": {
+    "message": "Скрыть загруженные сегменты"
   }
 }

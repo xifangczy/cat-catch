@@ -184,6 +184,8 @@ G.LocalVar = {
     // 预览页面
     previewShowTitle: false, // 是否显示标题
     previewDeleteDuplicateFilenames: false, // 是否删除重复文件名
+
+    M3u8HideDownloadedSegments: false, // m3u8下载完成后隐藏已下载的切片
 };
 
 // 102版本以上 非Firefox 开启更多功能
