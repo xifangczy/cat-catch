@@ -2077,7 +2077,7 @@ function timeToIndex(time) {
 function writeText(text) {
     if (!Array.isArray(text)) return;
     document.querySelector("#mediaList").innerHTML = text.map((data, index) => `
-        <div class="media-item selected" data-index="${index}" id="media-item-${data.sn}">
+        <div class="media-item selected" data-index="${index}" data-number="${index + 1}" id="media-item-${data.sn}">
             <span class="url-text" title="${data.url}">${data.url}</span>
             <span class="media-tip"></span>
             <img class="icon copy" src="img/copy.png"/>

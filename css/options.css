@@ -766,8 +766,7 @@ a.json-placeholder:hover {
 
 /* 序号生成（最左侧展示） */
 .media-item::before {
-  counter-increment: ts-counter;
-  content: counter(ts-counter);
+  content: attr(data-number);
   display: inline-block;
   min-width: 0.5rem;
   font-weight: bold;
