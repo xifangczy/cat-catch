@@ -18,7 +18,7 @@
                 <option value="-1">${i18n("selectAudio", "选择音频")}</option>
             </select>
         ${i18n("recordEncoding", "录制编码")}: <select id="mimeTypeList" style="max-width: 200px;"></select>
-        <label><input type="checkbox" id="autoSave1"} ${checkboxStyle} data-i18n="save1hour">1小时保存一次</label>
+        <label><input type="checkbox" id="autoSave1"} ${checkboxStyle} ><span data-i18n="save1hour">1小时保存一次</span></label>
         <label>
             <select id="videoBits">
                 <option value="2500000" data-i18n="videoBits">视频码率</option>

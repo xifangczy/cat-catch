@@ -227,16 +227,16 @@
     }
 
     // i18n
-    if (window.CatCatchI18n && CatCatch) {
-        CatCatch.querySelectorAll('[data-i18n]').forEach(function (element) {
+    if (window.CatCatchI18n && cat) {
+        cat.querySelectorAll('[data-i18n]').forEach(function (element) {
             element.innerHTML = window.CatCatchI18n[element.dataset.i18n] || element.innerHTML;
         });
-        CatCatch.querySelectorAll('[data-i18n-outer]').forEach(function (element) {
+        cat.querySelectorAll('[data-i18n-outer]').forEach(function (element) {
             element.outerHTML = window.CatCatchI18n[element.dataset.i18nOuter] || element.outerHTML;
         });
     }
     function i18n(key, original = "") {
-        if (!window.CatCatchI18n || !CatCatch) { return original };
+        if (!window.CatCatchI18n || !cat) { return original };
         return window.CatCatchI18n[key] || original;
     }
 })();
