@@ -2,17 +2,6 @@
     console.log("webrtc.js Start");
     if (document.getElementById("catCatchWebRTC")) { return; }
 
-    // 多语言
-    let language = navigator.language.replace("-", "_");
-    if (window.CatCatchI18n) {
-        if (!window.CatCatchI18n.languages.includes(language)) {
-            language = language.split("_")[0];
-            if (!window.CatCatchI18n.languages.includes(language)) {
-                language = "en";
-            }
-        }
-    }
-
     const buttonStyle = 'style="border:solid 1px #000;margin:2px;padding:2px;background:#fff;border-radius:4px;border:solid 1px #c7c7c780;color:#000;"';
     const checkboxStyle = 'style="-webkit-appearance: auto;"';
     const CatCatch = document.createElement("div");
@@ -321,14 +310,14 @@
     // i18n
     if (window.CatCatchI18n && CatCatch) {
         CatCatch.querySelectorAll('[data-i18n]').forEach(function (element) {
-            element.innerHTML = window.CatCatchI18n[element.dataset.i18n][language];
+            element.innerHTML = window.CatCatchI18n[element.dataset.i18n] || element.innerHTML;
         });
         CatCatch.querySelectorAll('[data-i18n-outer]').forEach(function (element) {
-            element.outerHTML = window.CatCatchI18n[element.dataset.i18nOuter][language];
+            element.outerHTML = window.CatCatchI18n[element.dataset.i18nOuter] || element.outerHTML;
         });
     }
     function i18n(key, original = "") {
         if (!window.CatCatchI18n || !CatCatch) { return original };
-        return window.CatCatchI18n[key][language];
+        return window.CatCatchI18n[key] || original;
     }
 })();

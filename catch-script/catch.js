@@ -16,16 +16,6 @@
             this.x = 0;
             this.y = 0;
 
-            // 初始化语言
-            if (window.CatCatchI18n) {
-                if (!window.CatCatchI18n.languages.includes(this.language)) {
-                    this.language = this.language.split("-")[0];
-                    if (!window.CatCatchI18n.languages.includes(this.language)) {
-                        this.language = "en";
-                    }
-                }
-            }
-
             // 初始化组件
             // 删除iframe sandbox属性 避免 issues #576
             this.setupIframeProcessing();
@@ -333,12 +323,12 @@
             if (window.CatCatchI18n) {
                 this.catCatch.querySelectorAll('[data-i18n]').forEach((element) => {
                     if (element && element.dataset && element.dataset.i18n) {
-                        element.innerHTML = window.CatCatchI18n[element.dataset.i18n][this.language] || element.innerHTML;
+                        element.innerHTML = window.CatCatchI18n[element.dataset.i18n] || element.innerHTML;
                     }
                 });
                 this.catCatch.querySelectorAll('[data-i18n-outer]').forEach((element) => {
                     if (element && element.dataset && element.dataset.i18nOuter) {
-                        element.outerHTML = window.CatCatchI18n[element.dataset.i18nOuter][this.language] || element.outerHTML;
+                        element.outerHTML = window.CatCatchI18n[element.dataset.i18nOuter] || element.outerHTML;
                     }
                 });
             }
@@ -352,7 +342,7 @@
          */
         i18n(key, original = "") {
             if (!window.CatCatchI18n || !key || !window.CatCatchI18n[key]) { return original; }
-            return window.CatCatchI18n[key][this.language] || original;
+            return window.CatCatchI18n[key] || original;
         }
 
         /**

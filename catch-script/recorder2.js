@@ -8,16 +8,6 @@
         return;
     }
 
-    let language = navigator.language.replace("-", "_");
-    if (window.CatCatchI18n) {
-        if (!window.CatCatchI18n.languages.includes(language)) {
-            language = language.split("_")[0];
-            if (!window.CatCatchI18n.languages.includes(language)) {
-                language = "en";
-            }
-        }
-    }
-
     // 添加style
     const style = document.createElement("style");
     style.innerHTML = `
@@ -239,20 +229,14 @@
     // i18n
     if (window.CatCatchI18n && CatCatch) {
         CatCatch.querySelectorAll('[data-i18n]').forEach(function (element) {
-            const translation = window.CatCatchI18n[element.dataset.i18n]?.[language];
-            if (translation) {
-                element.innerHTML = translation;
-            }
+            element.innerHTML = window.CatCatchI18n[element.dataset.i18n] || element.innerHTML;
         });
         CatCatch.querySelectorAll('[data-i18n-outer]').forEach(function (element) {
-            const outerTranslation = window.CatCatchI18n[element.dataset.i18nOuter]?.[language];
-            if (outerTranslation) {
-                element.outerHTML = outerTranslation;
-            }
+            element.outerHTML = window.CatCatchI18n[element.dataset.i18nOuter] || element.outerHTML;
         });
     }
     function i18n(key, original = "") {
         if (!window.CatCatchI18n || !CatCatch) { return original };
-        return window.CatCatchI18n[key][language];
+        return window.CatCatchI18n[key] || original;
     }
 })();
