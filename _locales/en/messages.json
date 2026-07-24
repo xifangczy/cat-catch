@@ -30,7 +30,7 @@
     "message": "Media:"
   },
   "noMediaDetected": {
-    "message": "No Media Detected on Webpage"
+    "message": "No Webpages with Media Detected"
   },
   "noControllableMediaDetected": {
     "message": "No Controllable Media Detected"
@@ -39,7 +39,7 @@
     "message": "Multiplier:"
   },
   "speedPlayback": {
-    "message": "Speed Playback"
+    "message": "Playback Speed"
   },
   "play": {
     "message": "Play"
@@ -48,7 +48,7 @@
     "message": "Normal Playback"
   },
   "pictureInPicture": {
-    "message": "Picture in Picture"
+    "message": "Picture-in-Picture"
   },
   "fullscreen": {
     "message": "Fullscreen"
@@ -66,7 +66,7 @@
     "message": "Volume"
   },
   "functionEntry": {
-    "message": "Function Entry"
+    "message": "Tools"
   },
   "downloader": {
     "message": "Downloader"
@@ -108,7 +108,7 @@
     "message": "Screen Capture"
   },
   "simulateMobile": {
-    "message": "Simulate Mobile"
+    "message": "Emulate Mobile"
   },
   "autoDownload": {
     "message": "Auto Download"
@@ -171,37 +171,37 @@
     "message": "No Fish"
   },
   "regularFilterPlaceholder": {
-    "message": "Regular expression filter, match resource URL, press Enter to confirm"
+    "message": "Filter resource URLs using a regular expression. Press Enter to apply."
   },
   "option": {
     "message": "Option"
   },
   "titleOption": {
-    "message": "cat-catch Option"
+    "message": "cat-catch Options"
   },
   "titleDownload": {
     "message": "cat-catch Download"
   },
   "titleM3U8": {
-    "message": "cat-catch m3u8 Parser"
+    "message": "cat-catch M3U8 Parser"
   },
   "titleJson": {
-    "message": "cat-catch json formatter"
+    "message": "cat-catch JSON Formatter"
   },
   "titledash": {
-    "message": "cat-catch Dash Parser"
+    "message": "cat-catch DASH Parser"
   },
   "suffix": {
     "message": "Suffix"
   },
   "suffixTip": {
-    "message": "Fill in the suffix that does not contain '.', if no size filtering is needed, fill in 0."
+    "message": "Enter a suffix without '.'. Enter 0 to disable size filtering."
   },
   "extensionName": {
-    "message": "Extension Name"
+    "message": "File Extension"
   },
   "filterSize": {
-    "message": "Filter Size"
+    "message": "Size Filter"
   },
   "delete": {
     "message": "Delete"
@@ -225,10 +225,10 @@
     "message": "Add Type"
   },
   "typeTip": {
-    "message": "Enter the correct content-type, if no size filtering is needed, fill in 0."
+    "message": "Enter a valid Content-Type. Enter 0 to disable size filtering."
   },
   "addTypeError": {
-    "message": "The format of the capture type is incorrect, please check"
+    "message": "Invalid capture type format. Please check your input."
   },
   "regexMatch": {
     "message": "Regex Match"
@@ -246,10 +246,10 @@
     "message": "Add Regex"
   },
   "regexTest": {
-    "message": "Regex test"
+    "message": "Regex Test"
   },
   "regex": {
-    "message": "regex"
+    "message": "Regex"
   },
   "flag": {
     "message": "Flag"
@@ -270,13 +270,13 @@
     "message": "i: ignore case, g: global search. It can also be left blank"
   },
   "regexSuffixTip": {
-    "message": "Assign a suffix to the obtained URL. It can be left blank, and the suffix will be automatically truncated (many files do not have a suffix)"
+    "message": "Assign a suffix to the obtained URL. It can be left blank, and the file extension will be detected automatically (many files do not have a suffix)"
   },
   "regexTip": {
-    "message": "Regular expressions consume a lot of resources, use them carefully if not necessary"
+    "message": "Regular expressions are resource-intensive. Use them only when necessary."
   },
   "copyTip": {
-    "message": "For the convenience of using third-party applications, customize the content written to the clipboard by the copy button"
+    "message": "Customize the content copied to the clipboard for use with third-party applications."
   },
   "replaceKeywordList": {
     "message": "Replace the Keyword List"
@@ -300,10 +300,10 @@
     "message": "Documentation"
   },
   "aria2Tip": {
-    "message": "An excellent download tool, see how to use"
+    "message": "An excellent download tool. View the documentation for usage instructions."
   },
   "m3u8DLTips": {
-    "message": "An excellent third-party m3u8 and mpd download tool, see how to use"
+    "message": "An excellent third-party tool for downloading M3U8 and MPD streams. View the documentation for usage instructions."
   },
   "invoke": {
     "message": "Invoke"
@@ -312,7 +312,7 @@
     "message": "Parameter"
   },
   "parameterSetting": {
-    "message": "Parameter Setting"
+    "message": "Parameter Settings"
   },
   "test": {
     "message": "Test"
@@ -324,10 +324,10 @@
     "message": "Custom Save File Name"
   },
   "userAgentTip": {
-    "message": "Default to the current browser's User Agent"
+    "message": "Defaults to the current browser's User-Agent."
   },
   "alwaysDisableCatCatcher": {
-    "message": "Always Disable Cat-Catch Downloader"
+    "message": "Never Enable Cat-Catch Downloader"
   },
   "autoClosePageAfterDownload": {
     "message": "Automatically Close Page After Download"
@@ -339,7 +339,7 @@
     "message": "If the resource download fails, automatically enable the downloader to try again."
   },
   "autoDownM3u8Tip": {
-    "message": "Click the download button and use the m3u8 parser to start merging and downloading immediately"
+    "message": "Click Download to immediately merge and download using the M3U8 parser."
   },
   "otherSettings": {
     "message": "Other Settings"
@@ -348,10 +348,10 @@
     "message": "Reset Other Settings"
   },
   "previewMode": {
-    "message": "Use the local player's call protocol to open video previews"
+    "message": "Use a custom protocol to open video previews in a local player."
   },
   "previewModePlaceholder": {
-    "message": "Leave it blank to disable it. The default is to use the popup page to preview the video"
+    "message": "Leave blank to disable. By default, previews open in a popup."
   },
   "preview": {
     "message": "Preview"
@@ -366,7 +366,7 @@
     "message": "Display the website icon"
   },
   "clearOption": {
-    "message": "Refresh, navigate to a new page, and clear the data captured by the current tab"
+    "message": "Clear captured data on refresh or navigation"
   },
   "doNotClear": {
     "message": "Do Not Clear"
@@ -426,13 +426,13 @@
     "message": "QoS Level"
   },
   "mqttQos0": {
-    "message": "0(At most once)"
+    "message": "0 (At most once)"
   },
   "mqttQos1": {
-    "message": "1(At least once)"
+    "message": "1 (At least once)"
   },
   "mqttQos2": {
-    "message": "2(Exactly once)"
+    "message": "2 (Exactly once)"
   },
   "mqttDataFormat": {
     "message": "Data Format"
@@ -522,7 +522,7 @@
     "message": "Download Directory"
   },
   "sendFfmpeg": {
-    "message": "Send to Online ffmpeg"
+    "message": "Send to Online FFmpeg"
   },
   "autoCloserDownload": {
     "message": "Automatically Close Page After Download"
@@ -531,10 +531,10 @@
     "message": "Open Downloader Page in Background"
   },
   "m3u8Placeholder": {
-    "message": "Please enter m3u8 link / m3u8 content / segment list / $${range} tag"
+    "message": "Enter an M3U8 URL, M3U8 content, segment list, or $${range} tag"
   },
   "m3u8Url": {
-    "message": "m3u8 URL"
+    "message": "M3U8 URL"
   },
   "nextLevel": {
     "message": "Next Level"
@@ -543,19 +543,19 @@
     "message": "This M3U8 file nests multiple M3U8 files."
   },
   "multipleAudios": {
-    "message": "Multiple Audios"
+    "message": "Audio Tracks"
   },
   "multipleAudiosTip": {
-    "message": "This M3U8 file nests multiple audios"
+    "message": "This M3U8 file contains multiple audio tracks."
   },
   "multipleSubtitles": {
-    "message": "Multiple Subtitles"
+    "message": "Subtitle Tracks"
   },
   "multipleSubtitlesTip": {
-    "message": "This M3U8 file nests multiple subtitles."
+    "message": "This M3U8 file contains multiple subtitle tracks."
   },
   "possibleKey": {
-    "message": "Found possible keys"
+    "message": "Possible Key Found"
   },
   "loading": {
     "message": "Loading..."
@@ -564,7 +564,7 @@
     "message": "Waiting for download..."
   },
   "downloadSegmentList": {
-    "message": "Download list"
+    "message": "Download List"
   },
   "originalM3u8": {
     "message": "Original M3U8"
@@ -573,16 +573,16 @@
     "message": "Local M3U8"
   },
   "segmentList": {
-    "message": "Segment"
+    "message": "Segments"
   },
   "downloadProgress": {
     "message": "Download Progress"
   },
   "getParameters": {
-    "message": "GET Parameters"
+    "message": "Query Parameters"
   },
   "restoreGetParameters": {
-    "message": "Restore GET Parameters"
+    "message": "Restore Query Parameters"
   },
   "requestHeaders": {
     "message": "Request Headers"
@@ -600,25 +600,25 @@
     "message": "Preview Command"
   },
   "addSettingParameters": {
-    "message": "Add Setting Parameters"
+    "message": "Add Configured Parameters"
   },
   "customKeyPlaceholder": {
-    "message": "Customize the key in hexadecimal or base64, or the key address"
+    "message": "Enter a custom key in hexadecimal or Base64, or enter the key URL."
   },
   "uploadKey": {
-    "message": "Upload key"
+    "message": "Upload Key"
   },
   "downloadThreads": {
     "message": "Threads"
   },
   "ffmpegTranscoding": {
-    "message": "FFmpeg transcod"
+    "message": "FFmpeg Transcode"
   },
   "mp4Format": {
     "message": "MP4"
   },
   "downloadWhileSaving": {
-    "message": "Stream download"
+    "message": "Streaming Download"
   },
   "audioOnly": {
     "message": "Audio Only"
@@ -639,7 +639,7 @@
     "message": "Record"
   },
   "mergeDownloads": {
-    "message": "Merge Downloads"
+    "message": "Merge and Download"
   },
   "redownloadFailedItems": {
     "message": "Redownload Failed Items"
@@ -669,7 +669,7 @@
     "message": "Cannot find the ADTS header. It may be an AES-128-ECB encrypted resource, which is not currently supported for decryption. Please use third-party merging software."
   },
   "m3u8Error": {
-    "message": "There are errors in parsing or playing the M3U8 file, check the console for detailed error information"
+    "message": "Failed to parse or play the M3U8 file. Check the console for details."
   },
   "noAudio": {
     "message": "No Audio"
@@ -678,13 +678,13 @@
     "message": "No Video"
   },
   "hevcTip": {
-    "message": "HEVC/H.265 encoded fragment files are only supported for online ffmpeg transcoding"
+    "message": "HEVC/H.265 segments are supported only through Online FFmpeg transcoding."
   },
   "hevcPreviewTip": {
     "message": "HEVC/H.265 encoded fragment files are not supported for preview."
   },
   "m3u8Info": {
-    "message": "A total of $num$ file, with a total duration of $time$.",
+    "message": "Total: $num$ files; duration: $time$.",
     "placeholders": {
       "num": {
         "content": "$1"
@@ -710,28 +710,28 @@
     "message": "Key"
   },
   "encryptionAlgorithm": {
-    "message": "Method"
+    "message": "Encryption Method"
   },
   "keyDownloadFailed": {
     "message": "Key Download Failed"
   },
   "savePrompt": {
-    "message": "Saved to disk, please check the downloaded content in the browser."
+    "message": "Saved to disk. Check your browser's downloads."
   },
   "close": {
     "message": "Close"
   },
   "blobM3u8DLError": {
-    "message": "Blob URLs cannot invoke M3U8DL for download"
+    "message": "M3U8DL cannot download Blob URLs."
   },
   "M3U8DLparameterLong": {
-    "message": "The M3U8DL parameter is too long."
+    "message": "Parameters too long. Copy them to M3U8DL manually."
   },
   "runningCannotChangeSettings": {
-    "message": "Running, Cannot Change Settings"
+    "message": "Cannot Change Settings While Running"
   },
   "streamSaverTip": {
-    "message": "The function of 'download while saving' does not support ffmpeg online format conversion, does not support re-downloading erroneous slices, and does not support 'save as'."
+    "message": "Streaming download does not support Online FFmpeg conversion, failed-segment retries, or Save As."
   },
   "stopRecording": {
     "message": "Stop Recording"
@@ -775,7 +775,7 @@
     "message": "Downloaded"
   },
   "downloadedVideoLength": {
-    "message": "Downloaded Video Length"
+    "message": "Downloaded Video Duration"
   },
   "downloadComplete": {
     "message": "Download Complete"
@@ -787,7 +787,7 @@
     "message": "Merging"
   },
   "fileTooLarge": {
-    "message": "File Too Large, File larger than $size$",
+    "message": "The file is larger than $size$ and cannot be processed by Online FFmpeg. The merged file is being downloaded instead; please wait, as this may take some time.",
     "placeholders": {
       "size": {
         "content": "$1"
@@ -795,7 +795,7 @@
     }
   },
   "fileTooLargeStream": {
-    "message": "File larger than $size$, enable stream download?",
+    "message": "The file is larger than $size$. Enable streaming download?",
     "placeholders": {
       "size": {
         "content": "$1"
@@ -803,13 +803,13 @@
     }
   },
   "formatConversionError": {
-    "message": "Format Conversion Error"
+    "message": "Format conversion failed. Disable MP4 conversion and download again."
   },
   "streamOnbeforeunload": {
-    "message": "Streaming is in progress, the download will stop after closing"
+    "message": "A streaming download is in progress. Closing this page will stop the download."
   },
   "fileLoading": {
-    "message": "File Loading"
+    "message": "Loading File"
   },
   "expandAllNodes": {
     "message": "Expand all JSON nodes"
@@ -824,10 +824,10 @@
     "message": "Select Video"
   },
   "extractSlices": {
-    "message": "Extract Slices"
+    "message": "Extract Segments"
   },
   "convertToM3U8": {
-    "message": "Convert to M3U8 Parsing"
+    "message": "Parse as M3U8"
   },
   "selectAudio": {
     "message": "Select Audio"
@@ -839,13 +839,13 @@
     "message": "Video"
   },
   "DRMerror": {
-    "message": "The media has DRM protection, please use third-party tools for download"
+    "message": "This media is DRM-protected. Please use a third-party tool to download it."
   },
   "regexTitle": {
-    "message": "Regular expression match or from deep search"
+    "message": "Matched by a regular expression or found through Deep Search"
   },
   "downloadWithRequestHeader": {
-    "message": "Download with request header parameters."
+    "message": "Download with custom request headers"
   },
   "m3u8Playlist": {
     "message": "M3U8 Playlist"
@@ -860,7 +860,7 @@
     "message": "Send Failed"
   },
   "confirmDownload": {
-    "message": "$num$ files in total, confirm download?",
+    "message": "Download all $num$ files?",
     "placeholders": {
       "num": {
         "content": "$1"
@@ -891,13 +891,13 @@
     "message": "Save failed"
   },
   "badgeNumber": {
-    "message": "Show icon badge prompt"
+    "message": "Show Badge Count"
   },
   "viewSlices": {
-    "message": "View all slices and download progress"
+    "message": "View all segments and download progress"
   },
   "send2local": {
-    "message": "Data transmission"
+    "message": "Send Data"
   },
   "send2MQTT": {
     "message": "Send to MQTT"
@@ -927,7 +927,7 @@
     "message": "Online Service Address"
   },
   "withinChina": {
-    "message": "Within China"
+    "message": "Mainland China"
   },
   "dataFetchFailed": {
     "message": "Data fetch failed"
@@ -951,19 +951,19 @@
     "message": "Add URL"
   },
   "wildcards": {
-    "message": "wildcards"
+    "message": "Wildcards"
   },
   "blockUrlTips": {
-    "message": "Support wildcards * and ?"
+    "message": "Supports wildcards * and ?"
   },
   "setWhiteList": {
-    "message": "Set to whitelist"
+    "message": "Add to Allowlist"
   },
   "autoSend": {
-    "message": "Automatic data transmission"
+    "message": "Auto Send"
   },
   "manualSend": {
-    "message": "Manual data transmission"
+    "message": "Manual Send"
   },
   "requestMethod": {
     "message": "Request Method"
@@ -981,7 +981,7 @@
     "message": "Descending"
   },
   "getTime": {
-    "message": "Retrieval Time"
+    "message": "Capture Time"
   },
   "fileSize": {
     "message": "File Size"
@@ -1011,28 +1011,28 @@
     "message": "m3u8dl URL Protocol"
   },
   "deleteDuplicateFilenames": {
-    "message": "Delete duplicate filenames"
+    "message": "Remove Duplicate Filenames"
   },
   "alertimport": {
     "message": "Import completed"
   },
   "isBlockedSite": {
-    "message": "This site requires blocking the operation of this extension"
+    "message": "This website requires the extension to be disabled"
   },
   "onlineFFmpeg": {
     "message": "Online FFmpeg"
   },
   "ffmpegIsNotReady": {
-    "message": "Online FFmpeg service is not ready, please try again later"
+    "message": "Online FFmpeg is not ready. Please try again later."
   },
   "iframeFFmpeg": {
-    "message": "Use iframe to call FFmpeg"
+    "message": "Embed Online FFmpeg in an iframe"
   },
   "send2localTips": {
     "message": "Merge data before sending? Click 'OK' to merge, or 'Cancel' to send individually."
   },
   "removeFailedPreviewFiles": {
-    "message": "Remove failed preview files"
+    "message": "Remove Files That Cannot Be Previewed"
   },
   "save": {
     "message": "Save"
