@@ -83,6 +83,12 @@ body {
   padding: 0 10px;
   margin-bottom: 1px;
 }
+#Tips {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
+}
 #TipsFixed {
   position: fixed;
   display: none;

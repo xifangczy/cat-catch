@@ -632,16 +632,16 @@ $('#unfoldAll, #unfoldPlay, #unfoldFilter, #fold').click(function () {
 // 捕捉/录制 展开按钮 筛选按钮 按钮
 // $('#Catch, #openUnfold, #openFilter, #more').click(function () {
 $('#openFilter, #more').click(function () {
-    // const _height = parseInt($(".container").css("margin-bottom"));
-    // $(".container").css("margin-bottom", ($down[0].offsetHeight + 26) + "px");
     const $panel = $(`#${this.getAttribute("panel")}`);
     $panel.css("bottom", $down[0].offsetHeight + "px");
     $(".more").not($panel).hide();
     if ($panel.is(":hidden")) {
         $panel.css("display", "flex");
+        // const _height = $panel[0].offsetHeight + $down[0].offsetHeight;
+        // $(".container").css("margin-bottom", _height);
         return;
     }
-    // $(".container").css("margin-bottom", _height);
+    // $(".container").css("margin-bottom", $down[0].offsetHeight + "px");
     $panel.hide();
 });
 
