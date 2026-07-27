@@ -169,14 +169,17 @@ button,
 #filter {
   flex-wrap: wrap;
 }
-#filter #regular button {
-  margin-left: 0px;
-}
 #filter #regular input {
   width: 98%;
 }
-#filter .regular {
+#filter #regular {
   margin-left: 5px;
+  display: flex;
+  align-items: center;
+}
+#filter button {
+  width: 10rem;
+  margin-left: 1rem;
 }
 #filter #ext {
   display: flex;

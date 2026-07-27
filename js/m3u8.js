@@ -1634,7 +1634,7 @@ function downloadNew(start = 0, end = _fragments.length) {
         }
 
         const item = itemDOM.get(fragment.index);
-        item.root.style.setProperty("--progress", "100%");
+        item.root.style.setProperty("--m3u8-progress", "100%");
         item.stopBtn.style.display = "none";
         item.retryBtn.style.display = "none";
         item.copyBtn.style.display = "inline";
@@ -1671,7 +1671,7 @@ function downloadNew(start = 0, end = _fragments.length) {
     let lastEmitted = Date.now();
     down.on('itemProgress', function (fragment, state, receivedLength, contentLength) {
         if (Date.now() - lastEmitted >= 233) {
-            itemDOM.get(fragment.index).root.style.setProperty("--progress", (receivedLength / contentLength * 100).toFixed(2) + "%");
+            itemDOM.get(fragment.index).root.style.setProperty("--m3u8-progress", (receivedLength / contentLength * 100).toFixed(2) + "%");
             lastEmitted = Date.now();
         }
     });
@@ -1941,7 +1941,7 @@ function initDownload() {
     // 恢复切片UI状态
     const list = document.querySelector("#mediaList");
     list.querySelectorAll(".media-item").forEach((item, index) => {
-        item.style.setProperty("--progress", "0%");
+        item.style.setProperty("--m3u8-progress", "0%");
         item.classList.remove("error");
         item.querySelector(".copy").style.display = "inline";
         item.querySelector(".stop")?.remove();

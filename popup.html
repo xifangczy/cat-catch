@@ -25,7 +25,9 @@
       <div id="quantity"></div>
     </div>
     <div id="otherTab" class="TabButton" title="Other Features / Media Control">
-      <span data-i18n-outer="otherFeatures"></span> / <span data-i18n-outer="mediaControl"></span>
+      <!-- <i18n>otherFeatures</i18n> / -->
+      <i18n>mediaControl</i18n> /
+      <i18n>settings</i18n>
     </div>
     <div id="maybeKeyTab" class="TabButton hide" title="Possible Key">
       <span data-i18n-outer="possibleKey"></span>
@@ -82,6 +84,7 @@
       <button go="mpd.html" class="button2" data-i18n="mpdParser" title="MPD Parser"></button>
       <button go="json.html" class="button2" data-i18n="jsonFormatter" title="JSON Formatter"></button>
       <button go="ffmpegURL" class="button2" title="FFmpeg">FFmpeg</button>
+      <button go="options.html" class="button2" data-i18n="settings" title="Open settings"></button>
     </div>
   </div>
   <div id="maybeKey" class="container hide">
@@ -89,8 +92,9 @@
   </div>
   <div id="filter" class="more">
     <span id="regular" class="width100 regular">
-      <input type="text" data-i18n-placeholder="regularFilterPlaceholder" title="Regular Filter" /><button
-        id="regularFilter" class="hide" data-i18n="confirm" title="Confirm"></button>
+      <input type="text" data-i18n-placeholder="regularFilterPlaceholder" title="Regular Filter" id="regularText" />
+      <button id="filter-duplicateFilenames" class="button2" data-i18n="deleteDuplicateFilenames"
+        title="Delete Duplicate Filenames"></button>
     </span>
     <div id="ext" title="Extensions"></div>
   </div>
@@ -99,7 +103,7 @@
     <button id="unfoldPlay" data-i18n="expandPlayable" title="Expand Playable" class="hide"></button>
     <button id="unfoldFilter" data-i18n="expandSelected" title="Expand Selected" class="hide"></button>
     <button id="fold" data-i18n="collapseAll" title="Collapse All" class="hide"></button>
-    <button id="duplicateFilenames" class="button2" data-i18n="deleteDuplicateFilenames"
+    <button id="features-duplicateFilenames" class="button2 hide" data-i18n="deleteDuplicateFilenames"
       title="Delete Duplicate Filenames"></button>
     <button id="recorder" class="button2 hide firefoxHideScript" type="script" data-i18n="videoRecording"
       title="Start video recording"></button>
@@ -128,7 +132,7 @@
       title="Capture cached content"></button>
     <button id="more" class="button2" panel="features" data-i18n="moreFeatures" title="Show more features"></button>
     <button id="enable" class="button2" data-i18n="pause" title="Pause/Resume capturing"></button>
-    <button id="Options" go="options.html" class="button2" data-i18n="settings" title="Open settings"></button>
+    <button id="Options" go="options.html" class="button2 hide" data-i18n="settings" title="Open settings"></button>
     <button id="popup" class="button2" data-i18n="popup" title="Open in popup window"></button>
     <button id="currentPage" class="hide" data-i18n="currentPage" title="Switch to current page"></button>
   </div>
