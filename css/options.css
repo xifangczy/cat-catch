@@ -495,6 +495,10 @@ textarea {
   border-color: var(--background-color) transparent transparent;
 }
 
+#openM3U8DLBox.m3u8Popup {
+  white-space: normal;
+}
+
 .break-all {
   word-break: break-all;
 }
@@ -749,18 +753,18 @@ a.json-placeholder:hover {
   background: var(--button-hover-color);
 }
 
-@property --progress {
+@property --m3u8-progress {
   syntax: "<percentage>";
   inherits: false;
   initial-value: 0%;
 }
 .media-item.selected {
-  --progress: 0%;
-  transition: --progress 0.3s ease;
+  --m3u8-progress: 0%;
+  transition: --m3u8-progress 0.3s ease;
   background: linear-gradient(
     to right,
-    rgba(26, 115, 232, 0.2) var(--progress),
-    var(--background-color-two) var(--progress)
+    rgba(26, 115, 232, 0.2) var(--m3u8-progress),
+    var(--background-color-two) var(--m3u8-progress)
   );
 }
 
@@ -830,8 +834,8 @@ a.json-placeholder:hover {
   /* 进度条 */
   background: linear-gradient(
     to right,
-    rgba(255, 0, 0, 0.15) var(--progress),
-    var(--background-color-two) var(--progress)
+    rgba(255, 0, 0, 0.15) var(--m3u8-progress),
+    var(--background-color-two) var(--m3u8-progress)
   ) !important;
 }
 
