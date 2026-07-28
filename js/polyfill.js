@@ -39,3 +39,13 @@ const i18n = new Proxy(chrome.i18n.getMessage, {
         return chrome.i18n.getMessage(key);
     }
 });
+
+// 手机浏览器不支持右键菜单
+if (!chrome.contextMenus) {
+    chrome.contextMenus = {
+        create: function () { },
+        remove: function () { },
+        removeAll: function () { },
+        onClicked: { addListener: function () { } },
+    }
+}
