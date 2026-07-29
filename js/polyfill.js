@@ -49,3 +49,15 @@ if (!chrome.contextMenus) {
         onClicked: { addListener: function () { } },
     }
 }
+
+// 手机浏览器没有windows API 只能使用tabs API
+if (!chrome.windows) {
+    chrome.windows = {
+        onFocusChanged: { addListener: function () { } },
+        create: function (obj, callback) {
+            chrome.tabs.create({ url: obj.url }, function (tab) {
+                callback && callback(tab);
+            });
+        },
+    }
+}
