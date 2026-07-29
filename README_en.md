@@ -26,7 +26,7 @@ https://addons.mozilla.org/addon/cat-catch/ 😂Non-China IP required for access
 
 # 📒Documentation
 
-https://cat-catch.94cat.com/
+https://cat-catch.94cat.com/en/
 
 # 📘 Installation Methods
 
