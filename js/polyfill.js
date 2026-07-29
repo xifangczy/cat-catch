@@ -61,3 +61,9 @@ if (!chrome.windows) {
         },
     }
 }
+// 手机浏览器木有快捷键
+if (!chrome.commands) {
+    chrome.commands = {
+        onCommand: { addListener: function () { } }
+    }
+}
