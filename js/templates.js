@@ -59,7 +59,7 @@ class Template {
             origin: data.requestHeaders?.origin ?? "",
             initiator: data.requestHeaders?.referer ? data.requestHeaders.referer : data.initiator,
             webUrl: data.webUrl ?? "",
-            title: data._title ?? data.title ?? "NULL",
+            title: data._title || data.title || "NULL",
             pageDOM: data.pageDOM,
             cookie: data.cookie ?? "",
             tabId: data.tabId ?? 0,
@@ -78,7 +78,7 @@ class Template {
             fileName: data.fileName ?? "",
             ext: data.ext ?? "",
             mobileUserAgent: G.MobileUserAgent,
-            userAgent: G.userAgent ?? navigator.userAgent,
+            userAgent: G.userAgent || navigator.userAgent,
         };
         trimData.title = trimData.title.replace(/[/\\]/g, "_");
         const _data = { ...data, ...trimData };
