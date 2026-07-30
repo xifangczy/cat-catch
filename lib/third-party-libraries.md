@@ -24,9 +24,9 @@ https://github.com/jeromeetienne/jquery-qrcode/releases/tag/v1.0
 lib/jquery.min.js
 Source: https://github.com/jquery/jquery
 License: MIT license
-Version: 4.0.0
+Version: 3.7.1
 Download:
-`https://jquery.com/download/` -> `https://code.jquery.com/jquery-4.0.0.min.js`
+`https://jquery.com/download/` -> `https://code.jquery.com/jquery-3.7.1.min.js`
 
 lib/hls.min.js
 Source: https://github.com/video-dev/hls.js
