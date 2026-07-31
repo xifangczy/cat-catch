@@ -927,29 +927,38 @@ function getResponseHeadersValue(data) {
  * @param {Object} data 
  * @returns {Object|Boolean}
  */
+const DIRECT_INCLUDE_HEADERS = new Set([
+    "referer",
+    "origin",
+    "cookie",
+    "authorization",
+    "auth",
+    "token",
+    "key",
+    "access-token",
+    "api-key",
+    "app-token",
+    "authtoken",
+    "session-id"
+]);
+const X_AUTH_KEYWORD_REG = /(auth|token|sign|key|ticket|session)/;
 function getRequestHeaders(data) {
-    if (data.allRequestHeaders == undefined || data.allRequestHeaders.length == 0) { return false; }
+    if (!data?.allRequestHeaders?.length) {
+        return false;
+    }
     const header = {};
     for (let item of data.allRequestHeaders) {
-        item.name = item.name.toLowerCase();
-        if (item.name == "referer") {
-            header.referer = item.value;
-        } else if (item.name == "origin") {
-            header.origin = item.value;
-        } else if (item.name == "cookie") {
-            header.cookie = item.value;
-        } else if (item.name == "authorization") {
-            header.authorization = item.value;
-        } else if (item.name.startsWith("x-")) {
-            if (item.name.includes("auth") || item.name.includes("token") || item.name.includes("sign")) {
-                header[item.name] = item.value;
-            }
+        if (!item.name || !item.value) continue;
+        const lowerName = item.name.toLowerCase();
+        if (DIRECT_INCLUDE_HEADERS.has(lowerName)) {
+            header[lowerName] = item.value;
+            continue;
+        }
+        if (lowerName.startsWith("x-") && X_AUTH_KEYWORD_REG.test(lowerName)) {
+            header[lowerName] = item.value;
         }
     }
-    if (Object.keys(header).length) {
-        return header;
-    }
-    return false;
+    return Object.keys(header).length > 0 ? header : false;
 }
 //设置扩展图标
 function SetIcon(obj) {
