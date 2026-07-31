@@ -8,7 +8,7 @@ Cat-Catch is a resource sniffing extension that can help you filter and list the
 
 ## 🐴Chrome
 
-https://chrome.google.com/webstore/detail/jfedfbgedapdagkghmgibemcoggfppbb
+https://chromewebstore.google.com/detail/cat-catch/jfedfbgedapdagkghmgibemcoggfppbb
 
 ## 🦄Edge
 

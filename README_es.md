@@ -8,7 +8,7 @@ Cat-Catch es una extensión de rastreo de recursos que puede ayudarlo a filtrar 
 
 ## 🐴Chrome
 
-https://chrome.google.com/webstore/detail/jfedfbgedapdagkghmgibemcoggfppbb
+https://chromewebstore.google.com/detail/cat-catch/jfedfbgedapdagkghmgibemcoggfppbb
 
 ## 🦄Edge
 

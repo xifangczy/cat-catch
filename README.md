@@ -8,7 +8,7 @@
 
 ## 🐴Chrome
 
-https://chrome.google.com/webstore/detail/jfedfbgedapdagkghmgibemcoggfppbb
+https://chromewebstore.google.com/detail/cat-catch/jfedfbgedapdagkghmgibemcoggfppbb
 
 ## 🦄Edge
 
