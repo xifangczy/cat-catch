@@ -112,6 +112,9 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         return;
     }
 
+    // OPTIONS 请求不处理
+    if (data.method && data.method == "OPTIONS") { return; }
+
     data.getTime = Date.now();
 
     if (!isRegex && G.blackList.has(data.requestId)) {
@@ -937,6 +940,10 @@ function getRequestHeaders(data) {
             header.cookie = item.value;
         } else if (item.name == "authorization") {
             header.authorization = item.value;
+        } else if (item.name.startsWith("x-")) {
+            if (item.name.includes("auth") || item.name.includes("token") || item.name.includes("sign")) {
+                header[item.name] = item.value;
+            }
         }
     }
     if (Object.keys(header).length) {
