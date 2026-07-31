@@ -67,7 +67,7 @@ const allOption = {
     addParam: false,
     fold: !G.isMobile,
     m3u8dlRE: false,
-    M3u8HideDownloadedSegments: false,
+    M3u8HideDownloadedSegments: true,
 };
 /* m3u8 解析工具 */
 const hls = new Hls({
