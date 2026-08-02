@@ -335,7 +335,9 @@ class Downloader {
                 // 储存下载错误切片
                 this.errorIndexes.add(fragment.index);
             }).finally(() => {
-                this.controller[fragment.index] = null;
+                if (this.controller[fragment.index] === controller) {
+                    this.controller[fragment.index] = null;
+                }
                 this.running--;
                 // 下载下一个切片
                 if (!directDownload && this.index < this.fragments.length) {
