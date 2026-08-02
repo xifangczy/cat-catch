@@ -106,14 +106,16 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         return;
     }
 
-    // 检查 是否启用 是否在当前标签是否在屏蔽列表中
+    /**
+     * 以下情况不处理
+     * 是否全局启用
+     * 当前标签是否在屏蔽列表中
+     * OPTIONS 请求不处理
+     */
     const blockUrlFlag = data.tabId && data.tabId > 0 && G.blockUrlSet.has(data.tabId);
-    if (!G.enable || (G.blockUrlWhite ? !blockUrlFlag : blockUrlFlag)) {
+    if (!G.enable || (G.blockUrlWhite ? !blockUrlFlag : blockUrlFlag) || data?.method == "OPTIONS") {
         return;
     }
-
-    // OPTIONS 请求不处理
-    if (data.method && data.method == "OPTIONS") { return; }
 
     data.getTime = Date.now();
 
