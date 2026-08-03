@@ -215,12 +215,15 @@ function start() {
             return;
         }
 
+        // 获取编码
+        const codec = getMP4CodecType(buffer);
+
         // 转为blob
-        const blob = ArrayBufferToBlob(buffer, { type: fragment.contentType });
+        const blob = ArrayBufferToBlob(buffer, { type: codec?.type ?? fragment.contentType });
 
         // 发送到ffmpeg
         if (_ffmpeg) {
-            sendFile(_ffmpeg, blob, fragment);
+            sendFile(_ffmpeg, blob, fragment, codec);
             $dom.downFileProgress(i18n.sendFfmpeg);
             return;
         }
@@ -409,10 +412,10 @@ function start() {
  * @param {Object} fragment 数据对象
  */
 let isCreatingTab = false;
-function sendFile(action, data, fragment) {
+function sendFile(action, data, fragment, codec = null) {
     // 转 blob
     if (data instanceof ArrayBuffer) {
-        data = ArrayBufferToBlob(data, { type: fragment.contentType });
+        data = ArrayBufferToBlob(data, { type: codec?.type ?? fragment.contentType });
     }
 
     // 嵌套在线ffmpeg模式
@@ -424,7 +427,8 @@ function sendFile(action, data, fragment) {
             tabId: _tabId,
             data: data,
             version: G.ffmpegConfig.version,
-            index: fragment.index
+            index: fragment.index,
+            codec: codec?.codec ?? undefined,
         };
         if (action === "merge") {
             baseData.taskId = _taskId;
@@ -465,9 +469,10 @@ function sendFile(action, data, fragment) {
         const baseData = {
             Message: "catCatchFFmpeg",
             action: action,
-            files: [{ data: G.isFirefox ? data : URL.createObjectURL(data), name: getUrlFileName(fragment.url), index: fragment.index }],
+            files: [{ data: G.isFirefox ? data : URL.createObjectURL(data), name: getUrlFileName(fragment.url), index: fragment.index, type: codec?.type ?? fragment.contentType }],
             title: stringModify(fragment.title),
-            tabId: _tabId
+            tabId: _tabId,
+            codec: codec?.codec ?? undefined,
         };
         if (action === "merge") {
             baseData.taskId = _taskId;

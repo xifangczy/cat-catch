@@ -568,3 +568,52 @@ function getRemoteFileSize(url) {
             });
         });
 }
+
+/**
+ * 极速检测 MP4 的视频编码 (H.264 / H.265 / AV1 / VP9)
+ * @param {ArrayBuffer} buffer - 视频前 1MB 的 ArrayBuffer
+ * @returns {string|false} - 成功返回 'h265', 'h264', 'av1', 'vp9'，失败返回 false
+ */
+function getMP4CodecType(buffer) {
+    if (!buffer || buffer.byteLength < 8) return null;
+
+    const bytes = new Uint8Array(buffer);
+    const len = Math.min(bytes.length, 1024 * 1024); // 只扫前 1MB
+
+    // 预编译各编码对应的 FourCC 字节特征 (Hex)
+    const codecMap = [
+        // 视频
+        { type: 'video/mp4', codec: 'hvc1', bytes: [0x68, 0x76, 0x63, 0x31] },
+        { type: 'video/mp4', codec: 'hev1', bytes: [0x68, 0x65, 0x76, 0x31] },
+        { type: 'video/mp4', codec: 'avc1', bytes: [0x61, 0x76, 0x63, 0x31] },
+        { type: 'video/mp4', codec: 'avc3', bytes: [0x61, 0x76, 0x63, 0x33] },
+        { type: 'video/mp4', codec: 'av01', bytes: [0x61, 0x76, 0x30, 0x31] },
+        { type: 'video/mp4', codec: 'vp09', bytes: [0x76, 0x70, 0x30, 0x39] },
+
+        // 音频
+        { type: 'audio/mp4', codec: 'mp4a', bytes: [0x6D, 0x70, 0x34, 0x61] },
+        { type: 'audio/mp4', codec: 'ac-3', bytes: [0x61, 0x63, 0x2D, 0x33] },
+        { type: 'audio/mp4', codec: 'ec-3', bytes: [0x65, 0x63, 0x2D, 0x33] },
+        { type: 'audio/mp4', codec: 'dtsc', bytes: [0x64, 0x74, 0x73, 0x63] },
+        { type: 'audio/mp4', codec: 'dtsh', bytes: [0x64, 0x74, 0x73, 0x68] },
+        { type: 'audio/mp4', codec: 'opus', bytes: [0x6F, 0x70, 0x75, 0x73] },
+        { type: 'audio/mp4', codec: 'flac', bytes: [0x66, 0x6C, 0x61, 0x63] }
+    ];
+
+    // 极速滑动窗口字节扫描
+    for (let i = 0; i < len - 4; i++) {
+        for (let c = 0; c < codecMap.length; c++) {
+            const target = codecMap[c].bytes;
+            if (
+                bytes[i] === target[0] &&
+                bytes[i + 1] === target[1] &&
+                bytes[i + 2] === target[2] &&
+                bytes[i + 3] === target[3]
+            ) {
+                return codecMap[c];
+            }
+        }
+    }
+
+    return null;
+}
