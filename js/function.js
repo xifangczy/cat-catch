@@ -589,19 +589,14 @@ function getMP4CodecType(buffer) {
     // 预编译各编码对应的 FourCC 字节特征 (Hex)
     const codecMap = [
         // 视频
+        { type: 'video/mp4', codec: 'avc1', bytes: [0x61, 0x76, 0x63, 0x31] },
         { type: 'video/mp4', codec: 'hvc1', bytes: [0x68, 0x76, 0x63, 0x31] },
         { type: 'video/mp4', codec: 'hev1', bytes: [0x68, 0x65, 0x76, 0x31] },
-        { type: 'video/mp4', codec: 'avc1', bytes: [0x61, 0x76, 0x63, 0x31] },
-        { type: 'video/mp4', codec: 'avc3', bytes: [0x61, 0x76, 0x63, 0x33] },
         { type: 'video/mp4', codec: 'av01', bytes: [0x61, 0x76, 0x30, 0x31] },
         { type: 'video/mp4', codec: 'vp09', bytes: [0x76, 0x70, 0x30, 0x39] },
 
         // 音频
         { type: 'audio/mp4', codec: 'mp4a', bytes: [0x6D, 0x70, 0x34, 0x61] },
-        { type: 'audio/mp4', codec: 'ac-3', bytes: [0x61, 0x63, 0x2D, 0x33] },
-        { type: 'audio/mp4', codec: 'ec-3', bytes: [0x65, 0x63, 0x2D, 0x33] },
-        { type: 'audio/mp4', codec: 'dtsc', bytes: [0x64, 0x74, 0x73, 0x63] },
-        { type: 'audio/mp4', codec: 'dtsh', bytes: [0x64, 0x74, 0x73, 0x68] },
         { type: 'audio/mp4', codec: 'opus', bytes: [0x4F, 0x70, 0x75, 0x73] },
         { type: 'audio/mp4', codec: 'flac', bytes: [0x66, 0x6C, 0x61, 0x43] },
         { type: 'audio/flac', codec: 'flac', bytes: [0x66, 0x4C, 0x61, 0x43] }
