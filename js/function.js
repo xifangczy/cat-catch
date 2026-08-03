@@ -617,3 +617,35 @@ function getMP4CodecType(buffer) {
     }
     return null;
 }
+
+/**
+ * 检查TS文件是否是H265编码
+ * @param {ArrayBuffer} buffer - TS 文件的头部 Buffer
+ * @returns {Boolean}
+ */
+function tsIsH265(buffer) {
+    if (!buffer || buffer.byteLength < 188) return false;
+
+    const bytes = new Uint8Array(buffer);
+    if (bytes[0] !== 0x47 && bytes[188] !== 0x47) return false;
+
+    const len = Math.min(bytes.length, 100 * 1024);
+
+    for (let i = 0; i < len - 5; i++) {
+        if (bytes[i] === 0x00 && bytes[i + 1] === 0x00) {
+            let nalIdx = -1;
+            if (bytes[i + 2] === 0x01) {
+                nalIdx = i + 3;
+            } else if (bytes[i + 2] === 0x00 && bytes[i + 3] === 0x01) {
+                nalIdx = i + 4;
+            }
+
+            if (nalIdx !== -1 && nalIdx < len) {
+                const hevcType = (bytes[nalIdx] >> 1) & 0x3F;
+                if (hevcType === 32 || hevcType === 33) return true;
+            }
+        }
+    }
+
+    return false;
+}
