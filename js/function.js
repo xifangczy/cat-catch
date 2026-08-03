@@ -578,6 +578,12 @@ function getMP4CodecType(buffer) {
     if (!buffer || buffer.byteLength < 8) return null;
 
     const bytes = new Uint8Array(buffer);
+
+    // 检查ftyp 确定mp4文件
+    if (!(bytes[4] === 0x66 && bytes[5] === 0x74 && bytes[6] === 0x79 && bytes[7] === 0x70)) {
+        return null;
+    }
+
     const len = Math.min(bytes.length, 1024 * 1024); // 只扫前 1MB
 
     // 预编译各编码对应的 FourCC 字节特征 (Hex)
@@ -596,10 +602,10 @@ function getMP4CodecType(buffer) {
         { type: 'audio/mp4', codec: 'ec-3', bytes: [0x65, 0x63, 0x2D, 0x33] },
         { type: 'audio/mp4', codec: 'dtsc', bytes: [0x64, 0x74, 0x73, 0x63] },
         { type: 'audio/mp4', codec: 'dtsh', bytes: [0x64, 0x74, 0x73, 0x68] },
-        { type: 'audio/mp4', codec: 'opus', bytes: [0x6F, 0x70, 0x75, 0x73] },
-        { type: 'audio/mp4', codec: 'flac', bytes: [0x66, 0x6C, 0x61, 0x63] }
+        { type: 'audio/mp4', codec: 'opus', bytes: [0x4F, 0x70, 0x75, 0x73] },
+        { type: 'audio/mp4', codec: 'flac', bytes: [0x66, 0x6C, 0x61, 0x43] },
+        { type: 'audio/flac', codec: 'flac', bytes: [0x66, 0x4C, 0x61, 0x43] }
     ];
-
     // 极速滑动窗口字节扫描
     for (let i = 0; i < len - 4; i++) {
         for (let c = 0; c < codecMap.length; c++) {
@@ -610,10 +616,9 @@ function getMP4CodecType(buffer) {
                 bytes[i + 2] === target[2] &&
                 bytes[i + 3] === target[3]
             ) {
-                return codecMap[c];
+                return { type: codecMap[c].type, codec: codecMap[c].codec };
             }
         }
     }
-
     return null;
 }
