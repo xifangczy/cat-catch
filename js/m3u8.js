@@ -1796,8 +1796,6 @@ function addInitSegmentData(buffer, initSegment) {
 function mergeTsNew(down) {
     $progress.html(i18n.merging);
 
-    const isH265 = tsIsH265(down.buffer[0]);
-
     // 创建Blob
     const fileBlob = new Blob(down.buffer, { type: down.findPipeline('transcode') ? "video/mp4" : "video/MP2T" });
 
@@ -1865,7 +1863,6 @@ function mergeTsNew(down) {
             active: G.isMobile || !autoDown,
             tabId: currentTabId
         };
-        if (isH265) { data.codec = "hvc1"; }
         if (_quantity) {
             data.quantity = parseInt(_quantity);
         }
