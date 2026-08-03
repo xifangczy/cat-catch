@@ -640,9 +640,29 @@ function tsIsH265(buffer) {
                 nalIdx = i + 4;
             }
 
-            if (nalIdx !== -1 && nalIdx < len) {
-                const hevcType = (bytes[nalIdx] >> 1) & 0x3F;
-                if (hevcType === 32 || hevcType === 33) return true;
+            if (nalIdx !== -1 && nalIdx < len - 1) {
+                const b1 = bytes[nalIdx];
+                const b2 = bytes[nalIdx + 1];
+
+                // 严格防御 1：最高位 (forbidden_zero_bit) 必须为 0
+                if ((b1 & 0x80) !== 0) continue;
+
+                // 严格提取：H.264 NAL Type 与 H.265 NAL Type
+                const h264Type = b1 & 0x1F;
+                const h265Type = (b1 >> 1) & 0x3F;
+
+                // 严格防御 2：如果符合 H.264 的核心 Nal Type (1, 5, 7, 8)，优先识别为 H.264，直接排除
+                if (h264Type === 7 || h264Type === 8 || h264Type === 5 || h264Type === 1) {
+                    continue;
+                }
+
+                // 严格校验 3：H.265 专属帧 NALU 检查 (VPS:32, SPS:33, PPS:34, IDR:19/20)
+                // 配合第二个字节的 Layer ID 检查 ((b1 & 1) << 5 | (b2 >> 3))
+                if (h265Type === 32 || h265Type === 33 || h265Type === 34 || h265Type === 19 || h265Type === 20) {
+                    // H.265 规范中 nuh_layer_id 通常为 0
+                    const layerId = ((b1 & 1) << 5) | (b2 >> 3);
+                    if (layerId === 0) return true;
+                }
             }
         }
     }
