@@ -343,7 +343,7 @@
         if (base64.length == 24 && base64.substring(22, 24) == "==") {
             postData({ action: "catCatchAddKey", key: base64, href: location.href, ext: "base64Key" });
         }
-        if (data.substring(0, 7).toUpperCase() == "#EXTM3U") {
+        if (data && data.substring(0, 7).toUpperCase() == "#EXTM3U") {
             toUrl(data);
         }
         return base64;
@@ -358,10 +358,10 @@
         if (base64.length == 24 && base64.substring(22, 24) == "==") {
             postData({ action: "catCatchAddKey", key: base64, href: location.href, ext: "base64Key" });
         }
-        if (data.substring(0, 7).toUpperCase() == "#EXTM3U") {
+        if (data && data.substring(0, 7).toUpperCase() == "#EXTM3U") {
             toUrl(data);
         }
-        if (data.endsWith("</MPD>")) {
+        if (data && data.endsWith("</MPD>")) {
             toUrl(data, "mpd");
         }
         return data;
