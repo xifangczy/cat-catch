@@ -106,6 +106,7 @@
                 $("#playbackRate").val(state.speed);
             }
 
+            let playOptionIndex = 0;
             // 更新视频下拉菜单，带播放状态图标
             if (state.videoStatus) {
                 let currentOptions = $("#videoIndex option");
@@ -123,7 +124,12 @@
                 if (needUpdate) {
                     $("#videoIndex").empty();
                     state.videoStatus.forEach((isPaused, i) => {
-                        const prefix = isPaused ? "" : "▶ ";
+                        // const prefix = isPaused ? "" : "▶ ";
+                        let prefix = "";
+                        if (!isPaused) {
+                            prefix = "▶ ";
+                            playOptionIndex = i;
+                        }
                         const src = truncateSrc(state.src[i]);
                         $(`<option value="${i}">${prefix}${src}</option>`).appendTo("#videoIndex");
                     });
@@ -131,7 +137,7 @@
             }
 
             // 确保下拉菜单选中当前索引
-            _index = _index === -1 ? 0 : _index;
+            _index = _index === -1 ? playOptionIndex : _index;
             $("#videoIndex").val(_index);
         });
     }
