@@ -66,7 +66,8 @@
             closeConfirmation: "Are you sure you want to close?",
             completeClearCache: "Clear data after downloading",
             video: "Video",
-            downloadError: "Download error, please check the network or try again later"
+            downloadError: "Download error, please check the network or try again later",
+            AutoToBufferedConfirm: "In some websites it may cause capture errors, are you sure to enable it?"
         },
 
         es: {
@@ -129,7 +130,8 @@
             closeConfirmation: "¿Seguro que quieres cerrar?",
             completeClearCache: "Borrar datos después de descargar",
             video: "Vídeo",
-            downloadError: "Error de descarga, compruebe la red o inténtelo de nuevo más tarde"
+            downloadError: "Error de descarga, compruebe la red o inténtelo de nuevo más tarde",
+            AutoToBufferedConfirm: "En algunos sitios web puede causar errores de captura, ¿seguro que desea habilitarlo?"
         },
 
         zh: {
@@ -192,7 +194,8 @@
             closeConfirmation: "确定要关闭吗?",
             completeClearCache: "下载完成后清空数据",
             video: "视频",
-            downloadError: "下载出错，请检查网络或稍后再试"
+            downloadError: "下载出错，请检查网络或稍后再试",
+            AutoToBufferedConfirm: "在某些网站可能会造成捕获错误，确定开启？"
         }
     };
 

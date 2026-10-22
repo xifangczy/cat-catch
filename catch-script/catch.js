@@ -487,11 +487,13 @@
          * @param {MouseEvent} event 
          */
         handleAutoToBuffered(event) {
-            // if (!this.autoToBufferedFlag) return;
-            // this.autoToBufferedFlag = false;
-
             const $autoToBuffered = this.catCatch.querySelector("#autoToBuffered");
             if (!$autoToBuffered) return;
+
+            if (event.target.checked && !window.confirm(this.i18n("AutoToBufferedConfirm", "在某些网站可能会造成捕获错误，确定开启？"))) {
+                event.target.checked = false;
+                return;
+            }
 
             localStorage.setItem("CatCatchCatch_autoToBuffered", event.target.checked ? "checked" : "");
 
@@ -502,7 +504,7 @@
                         if (video.buffered && video.buffered.length > 0) {
                             const bufferedEnd = video.buffered.end(0);
                             if ($autoToBuffered.checked && bufferedEnd < video.duration) {
-                                video.currentTime = bufferedEnd - 5;
+                                video.currentTime = bufferedEnd - 8;
                             }
                         }
                     } catch (error) {
