@@ -1,4 +1,22 @@
 (function () {
+
+    // ===== Function.prototype.toString 伪装 =====
+    const __origToString = Function.prototype.toString;
+    const __nativeStrMap = new WeakMap();   // 钩子函数(Proxy) -> 原生 toString 串
+    let __toStringPatched = false;
+    function patchToString() {
+        if (__toStringPatched) return;
+        __toStringPatched = true;
+        Function.prototype.toString = new Proxy(__origToString, {
+            apply(target, thisArg, args) {
+                const nativeStr = __nativeStrMap.get(thisArg);
+                if (nativeStr !== undefined) return nativeStr;
+                return Reflect.apply(target, thisArg, args);
+            }
+        });
+    }
+    patchToString();
+
     class CatCatcher {
         constructor() {
             console.log("catch.js Start");
@@ -556,8 +574,14 @@
          * 核心函数 代理MediaSource方法
          */
         proxyMediaSourceMethods() {
+            // 伪装注册辅助: 让钩子(Proxy)在 Function.prototype.toString 下返回原生串
+            const registerNativeStr = (proxy, nativeFn) => {
+                __nativeStrMap.set(proxy, __origToString.call(nativeFn));
+                return proxy;
+            };
+
             // 代理 addSourceBuffer 方法
-            window.MediaSource.prototype.addSourceBuffer = new Proxy(window.MediaSource.prototype.addSourceBuffer, {
+            window.MediaSource.prototype.addSourceBuffer = registerNativeStr(new Proxy(window.MediaSource.prototype.addSourceBuffer, {
                 apply: (target, thisArg, argumentsList) => {
                     try {
                         const result = Reflect.apply(target, thisArg, argumentsList);
@@ -570,7 +594,7 @@
                         const index = this.catchMedia.length - 1;
 
                         // 代理 appendBuffer 方法
-                        result.appendBuffer = new Proxy(result.appendBuffer, {
+                        result.appendBuffer = registerNativeStr(new Proxy(result.appendBuffer, {
                             apply: (target, thisArg, argumentsList) => {
                                 Reflect.apply(target, thisArg, argumentsList);
 
@@ -587,7 +611,7 @@
                                     this.catchMedia[index].bufferList.push(argumentsList[0]);
                                 }
                             }
-                        });
+                        }), result.appendBuffer);
 
                         return result;
                     } catch (error) {
@@ -595,10 +619,10 @@
                         return Reflect.apply(target, thisArg, argumentsList);
                     }
                 }
-            });
+            }), window.MediaSource.prototype.addSourceBuffer);
 
             // 代理 endOfStream 方法
-            window.MediaSource.prototype.endOfStream = new Proxy(window.MediaSource.prototype.endOfStream, {
+            window.MediaSource.prototype.endOfStream = registerNativeStr(new Proxy(window.MediaSource.prototype.endOfStream, {
                 apply: (target, thisArg, argumentsList) => {
                     try {
                         Reflect.apply(target, thisArg, argumentsList);
@@ -618,7 +642,7 @@
                         return Reflect.apply(target, thisArg, argumentsList);
                     }
                 }
-            });
+            }), window.MediaSource.prototype.endOfStream);
         }
 
         /**
