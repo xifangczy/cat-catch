@@ -465,7 +465,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             chrome.tabs.reload(Message.tabId, { bypassCache: true });
         } else {
             const files = [`catch-script/${Message.script}`];
-            script.i18n && files.unshift("catch-script/i18n.js");
+            script.file && files.unshift(...script.file);
             chrome.scripting.executeScript({
                 target: { tabId: Message.tabId, allFrames: script.allFrames },
                 files: files,
@@ -715,7 +715,7 @@ chrome.webNavigation.onCommitted.addListener(function (details) {
         if (!item.tabId.has(details.tabId) || !item.allFrames) { return true; }
 
         const files = [`catch-script/${script}`];
-        item.i18n && files.unshift("catch-script/i18n.js");
+        item.file && files.unshift(...item.file);
         chrome.scripting.executeScript({
             target: { tabId: details.tabId, frameIds: [details.frameId] },
             files: files,
