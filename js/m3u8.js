@@ -538,6 +538,12 @@ hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
 
 // 监听 ERROR m3u8解析错误
 hls.on(Hls.Events.ERROR, function (event, data) {
+    /*
+    * hls.js 1.7.0+ detachMedia/stopLoad 中止正在加载的切片时会同步触发
+    * details == "aborted" (INTERNAL_ABORTED) 的非致命错误 属于正常流程 忽略
+    * 否则会被当成下载失败 显示错误面板甚至自动刷新页面
+    */
+    if (!data.fatal && data.details == "aborted") { return; }
 
     /**
      * 如果m3u8清单获取错误 尝试从缓存获取 解决部分网站一次性url问题
@@ -959,7 +965,9 @@ $("#play").click(function () {
         hls.attachMedia($("#video")[0]);
         $(this).html(i18n.close).data("switch", "off");
         hls.on(Hls.Events.MEDIA_ATTACHED, function () {
-            video.play();
+            // 探测结束后 stream controller 已停止 1.7+ 重新attach不会自动恢复加载 需要手动startLoad
+            hls.startLoad();
+            $("#video")[0].play();
         });
         return;
     }
