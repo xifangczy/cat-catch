@@ -1157,7 +1157,7 @@ class FilePreview {
         if (!G.getHtmlDOM) { return; }
         try {
             const response = await chrome.tabs.sendMessage(this._tabId, { Message: "getPage" }, { frameId: 0 });
-            this.sourcePageDOM = new DOMParser().parseFromString(response, 'text/html');
+            this.sourcePageDOM = new DOMParser().parseFromString(sanitizeHtmlString(response), 'text/html');
             return this.sourcePageDOM;
         } catch (error) {
             console.warn("Failed to get source page DOM:", error);

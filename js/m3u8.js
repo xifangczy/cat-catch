@@ -120,8 +120,8 @@ function init() {
     // 获取页面DOM
     if (tabId && tabId != -1) {
         chrome.tabs.sendMessage(parseInt(tabId), { Message: "getPage" }, { frameId: 0 }, function (result) {
-            if (chrome.runtime.lastError) { return; }
-            _data.pageDOM = new DOMParser().parseFromString(result, 'text/html');
+            if (chrome.runtime.lastError || isEmpty(result)) { return; }
+            _data.pageDOM = new DOMParser().parseFromString(sanitizeHtmlString(result), 'text/html');
         });
     }
     loadCSS();

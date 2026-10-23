@@ -573,17 +573,17 @@ function getRemoteFileSize(url) {
  * 劫持 JSON.stringify，使得对象上不可枚举的 downFileName 属性也能被序列化
  */
 const JSONStringify = JSON.stringify;
-function includeDownFileName(obj) {
-    if (obj === null || typeof obj !== 'object') {
-        return obj;
-    }
-    if (!('downFileName' in obj)) {
-        return obj;
-    }
-    const downFileName = obj.downFileName;
-    return { ...obj, downFileName: downFileName };
-}
 JSON.stringify = function (value, replacer, space) {
+    const includeDownFileName = (obj) => {
+        if (obj === null || typeof obj !== 'object') {
+            return obj;
+        }
+        if (!('downFileName' in obj)) {
+            return obj;
+        }
+        const downFileName = obj.downFileName;
+        return { ...obj, downFileName: downFileName };
+    }
     if (Array.isArray(value)) {
         value = value.map(function (item) {
             return includeDownFileName(item);
@@ -594,3 +594,19 @@ JSON.stringify = function (value, replacer, space) {
     }
     return JSONStringify(value, replacer, space);
 };
+
+/**
+ * 过滤不安全的HTML标签和属性
+ * @param {String} htmlStr html字符串
+ * @returns {String} 处理后的安全HTML字符串
+ */
+function sanitizeHtmlString(htmlStr) {
+    if (typeof htmlStr !== 'string') return '';
+    return htmlStr
+        // 移除 <script>...</script> 标签及其中内容
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        // 移除所有 on* 事件属性（如 onclick="...", onerror='...'）
+        .replace(/\s+on[a-z]+\s*=\s*(['"][^'"]*['"]|[^\s>]+)/gi, '')
+        // 移除 href 或 src 属性中的 javascript: 协议
+        .replace(/(href|src)\s*=\s*(['"])\s*javascript:[^'"]*\2/gi, '$1="#"');
+}
