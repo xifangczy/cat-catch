@@ -675,7 +675,8 @@ class FilePreview {
                     downFileName = data.name;
                 }
                 return downFileName;
-            }
+            },
+            configurable: true
         });
         data.ext = data.ext ? data.ext : 'Unknown';
         data.type = data.type ? data.type : 'Unknown';

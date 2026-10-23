@@ -568,3 +568,29 @@ function getRemoteFileSize(url) {
             });
         });
 }
+
+
+const JSONStringify = JSON.stringify;
+function setDownFileName(value) {
+    if (!value || typeof value !== 'object') {
+        return;
+    }
+    if (Array.isArray(value)) {
+        value.forEach(item => setDownFileName(item));
+        return;
+    }
+    if ('downFileName' in value) {
+        const downFileName = value.downFileName;
+        delete value.downFileName;
+        value.downFileName = downFileName;
+    }
+    for (const key in value) {
+        if (Object.prototype.hasOwnProperty.call(value, key)) {
+            setDownFileName(value[key]);
+        }
+    }
+}
+JSON.stringify = function (value, replacer, space) {
+    setDownFileName(value);
+    return JSONStringify(value, replacer, space);
+};

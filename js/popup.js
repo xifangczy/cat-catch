@@ -78,7 +78,8 @@ function AddMedia(data, currentTab = true) {
         downFileName = data.name;
       }
       return downFileName;
-    }
+    },
+    configurable: true
   });
 
   // 文件大小单位转换
