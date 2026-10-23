@@ -260,7 +260,8 @@ function AddMedia(data, currentTab = true) {
     catDownload(data, { ffmpeg: "addFile" });
   });
   //点击复制网址
-  data.html.find('#copy').click(async function () {
+  data.html.find('#copy').click(async function (event) {
+    event.stopPropagation();
     await getClipboardText(data);
     const text = copyLink(data);
     navigator.clipboard.writeText(text);
@@ -268,7 +269,8 @@ function AddMedia(data, currentTab = true) {
     return false;
   });
   // 发送到Aria2
-  data.html.find('#aria2').click(async function () {
+  data.html.find('#aria2').click(async function (event) {
+    event.stopPropagation();
     await getClipboardText(data);
     aria2AddUri(data, function (data) {
       Tips(i18n.hasSent + JSON.stringify(data), 2000);
@@ -280,6 +282,7 @@ function AddMedia(data, currentTab = true) {
   });
   // 下载
   data.html.find('#download').click(async function (event) {
+    event.stopPropagation();
     await getClipboardText(data);
     if (G.m3u8dl && (isM3U8(data) || isMPD(data))) {
       if (!data.url.startsWith("blob:")) {
@@ -337,6 +340,7 @@ function AddMedia(data, currentTab = true) {
   });
   // 调用
   data.html.find('.invoke').click(async function (event) {
+    event.stopPropagation();
     await getClipboardText(data);
     const url = templates(G.invokeText, data);
 
@@ -411,7 +415,8 @@ function AddMedia(data, currentTab = true) {
     }
   });
   // 数据发送
-  data.html.find("#send2local").click(async function () {
+  data.html.find("#send2local").click(async function (event) {
+    event.stopPropagation();
     await getClipboardText(data);
     send2local("catch", data, data.tabId).then(function (success) {
       success && success?.ok && Tips(i18n.hasSent, 1000);
@@ -422,7 +427,8 @@ function AddMedia(data, currentTab = true) {
   });
 
   // MQTT 发送
-  data.html.find("#mqtt").click(async function () {
+  data.html.find("#mqtt").click(async function (event) {
+    event.stopPropagation();
     const $mqttButton = $(this);
 
     // 防止重复点击
@@ -589,8 +595,11 @@ $('#DownFile').click(function () {
   };
 });
 // 合并下载
-$mergeDown.click(function () {
+$mergeDown.click(async function () {
   const [checkedData, maxSize] = getCheckedData();
+  // for (let data of checkedData) {
+  //   await getClipboardText(data);
+  // }
   const taskId = Date.parse(new Date());
   // 都是m3u8 自动合并并发送到ffmpeg
   if (checkedData.every(data => isM3U8(data))) {
