@@ -1,6 +1,6 @@
 (function () {
 
-    // ===== Function.prototype.toString 伪装 =====
+    // ===== Function.prototype.toString =====
     const __origToString = Function.prototype.toString;
     const __nativeStrMap = new WeakMap();   // 钩子函数(Proxy) -> 原生 toString 串
     let __toStringPatched = false;
