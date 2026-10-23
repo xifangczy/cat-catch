@@ -65,15 +65,22 @@ function AddMedia(data, currentTab = true) {
   if (data.name && data.name.length >= 50 && !_tabId) {
     trimName = trimName.substr(0, 20) + '...' + trimName.substr(-30);
   }
-  //添加下载文件名
+  // 添加页面DOM引用
   Object.defineProperty(data, "pageDOM", {
     get() { return pageDOM; }
   });
-  data.downFileName = G.TitleName ? templates(G.downFileName, data) : data.name;
-  data.downFileName = filterFileName(data.downFileName);
-  if (isEmpty(data.downFileName)) {
-    data.downFileName = data.name;
-  }
+  //添加下载文件名
+  Object.defineProperty(data, "downFileName", {
+    get() {
+      let downFileName = G.TitleName ? templates(G.downFileName, data) : data.name;
+      downFileName = filterFileName(downFileName);
+      if (isEmpty(downFileName)) {
+        downFileName = data.name;
+      }
+      return downFileName;
+    }
+  });
+
   // 文件大小单位转换
   data._size = data.size;
   if (data.size) {
@@ -128,7 +135,7 @@ function AddMedia(data, currentTab = true) {
                     <div id="catDownFFmpeg"><img src="img/send2ffmpeg.svg" class="icon send2ffmpeg" title="${i18n.sendFfmpeg}"/></div>
                     <div><img src="img/invoke.svg" class="icon invoke" title="${i18n.invoke}"/></div>
                 </div>
-                <a href="${data.url}" target="_blank" download="${data.downFileName}">${data.url}</a>
+                <a href="${data.url}" target="_blank">${data.url}</a>
                 <br>
                 <img id="screenshots" class="hide"/>
                 <video id="preview" class="hide" controls></video>
@@ -244,21 +251,25 @@ function AddMedia(data, currentTab = true) {
     $(this).html("").qrcode({ width: size, height: size, text: data.url }).off("click");
   });
   // 猫抓下载器 下载
-  data.html.find("#catDown").click(function () {
+  data.html.find("#catDown").click(async function () {
+    await getClipboardText(data);
     catDownload(data);
   });
-  data.html.find("#catDownFFmpeg").click(function () {
+  data.html.find("#catDownFFmpeg").click(async function () {
+    await getClipboardText(data);
     catDownload(data, { ffmpeg: "addFile" });
   });
   //点击复制网址
-  data.html.find('#copy').click(function () {
+  data.html.find('#copy').click(async function () {
+    await getClipboardText(data);
     const text = copyLink(data);
     navigator.clipboard.writeText(text);
     Tips(i18n.copiedToClipboard);
     return false;
   });
   // 发送到Aria2
-  data.html.find('#aria2').click(function () {
+  data.html.find('#aria2').click(async function () {
+    await getClipboardText(data);
     aria2AddUri(data, function (data) {
       Tips(i18n.hasSent + JSON.stringify(data), 2000);
     }, function (errMsg) {
@@ -268,7 +279,8 @@ function AddMedia(data, currentTab = true) {
     return false;
   });
   // 下载
-  data.html.find('#download').click(function (event) {
+  data.html.find('#download').click(async function (event) {
+    await getClipboardText(data);
     if (G.m3u8dl && (isM3U8(data) || isMPD(data))) {
       if (!data.url.startsWith("blob:")) {
         const m3u8dlArg = templates(G.m3u8dlArg, data);
@@ -324,7 +336,8 @@ function AddMedia(data, currentTab = true) {
     return false;
   });
   // 调用
-  data.html.find('.invoke').click(function (event) {
+  data.html.find('.invoke').click(async function (event) {
+    await getClipboardText(data);
     const url = templates(G.invokeText, data);
 
     // 下载前确认参数
@@ -360,7 +373,8 @@ function AddMedia(data, currentTab = true) {
     return false;
   });
   //播放
-  data.html.find('#play').click(function () {
+  data.html.find('#play').click(async function () {
+    await getClipboardText(data);
     if (isEmpty(G.Player)) { return true; }
     if (G.Player == "$shareApi$" || G.Player == "${shareApi}") {
       navigator.share({ url: data.url });
@@ -397,7 +411,8 @@ function AddMedia(data, currentTab = true) {
     }
   });
   // 数据发送
-  data.html.find("#send2local").click(function () {
+  data.html.find("#send2local").click(async function () {
+    await getClipboardText(data);
     send2local("catch", data, data.tabId).then(function (success) {
       success && success?.ok && Tips(i18n.hasSent, 1000);
     }).catch(function (error) {
@@ -407,7 +422,7 @@ function AddMedia(data, currentTab = true) {
   });
 
   // MQTT 发送
-  data.html.find("#mqtt").click(function () {
+  data.html.find("#mqtt").click(async function () {
     const $mqttButton = $(this);
 
     // 防止重复点击
@@ -420,6 +435,8 @@ function AddMedia(data, currentTab = true) {
 
     // 1. 点击后，提示 正在发送到MQTT服务器
     Tips(i18n.sendingToMQTT || "Sending to MQTT server...", 2000);
+
+    await getClipboardText(data);
 
     sendToMQTT(data).then(function (success) {
       // 5. 已发送消息到 MQTT 服务器
@@ -861,6 +878,7 @@ const interval = setInterval(async function () {
       console.error('Error getting page DOM:', error);
     });
   }
+
   // 填充数据
   chrome.runtime.sendMessage(chrome.runtime.id, { Message: "getData", tabId: G.tabId }, function (data) {
     if (!data || data === "OK") {

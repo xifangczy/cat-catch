@@ -102,6 +102,7 @@ class Template {
             mobileUserAgent: G.MobileUserAgent,
             userAgent: G.userAgent || navigator.userAgent,
             br: "\n",
+            clipboard: data.clipboard ?? ""
         };
         trimData.title = trimData.title.replace(/[/\\]/g, "_");
         const _data = { ...data, ...trimData };

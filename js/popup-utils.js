@@ -236,3 +236,11 @@ function connectAndSendMQTT(data, config) {
         }
     });
 }
+
+async function getClipboardText(data) {
+    try {
+        data.clipboard = await navigator.clipboard.readText();
+    } catch (error) {
+        data.clipboard = "";
+    }
+}

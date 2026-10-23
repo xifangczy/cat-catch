@@ -33,7 +33,9 @@
     "declarativeNetRequest",
     "scripting",
     "sidePanel",
-    "contextMenus"
+    "contextMenus",
+    "clipboardRead",
+    "clipboardWrite"
   ],
   "commands": {
     "_execute_action": {},

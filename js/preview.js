@@ -494,13 +494,13 @@ class FilePreview {
             this.updateButtonStatus();
         });
         // 复制图标
-        item.html.querySelector('.copy').addEventListener('click', () => this.copy(item));
+        item.html.querySelector('.copy').addEventListener('click', async () => { await getClipboardText(item); this.copy(item); });
         // 删除图标
         item.html.querySelector('.delete').addEventListener('click', () => this.deleteItem(item));
         // 下载图标
-        item.html.querySelector('.download').addEventListener('click', () => this.downloadItem(item));
+        item.html.querySelector('.download').addEventListener('click', async () => { await getClipboardText(item); this.downloadItem(item); });
         // MQTT图标
-        item.html.querySelector('.mqtt').addEventListener('click', () => this.mqtt(item));
+        item.html.querySelector('.mqtt').addEventListener('click', async () => { await getClipboardText(item); this.mqtt(item) });
         // 选中状态 添加对应class
         item._selected = false;
         Object.defineProperty(item, "selected", {
@@ -544,7 +544,7 @@ class FilePreview {
             aria2.src = 'img/aria2.png';
             aria2.className = 'icon aria2';
             aria2.title = "aria2";
-            aria2.addEventListener('click', () => this.aria2(item));
+            aria2.addEventListener('click', async () => { await getClipboardText(item); this.aria2(item); });
             actions.appendChild(aria2);
         }
 
@@ -554,7 +554,7 @@ class FilePreview {
             invoke.src = 'img/invoke.svg';
             invoke.className = 'icon invoke';
             invoke.title = i18n.invoke;
-            invoke.addEventListener('click', () => this.invoke(item));
+            invoke.addEventListener('click', async () => { await getClipboardText(item); this.invoke(item); });
             actions.appendChild(invoke);
         }
 
@@ -564,7 +564,7 @@ class FilePreview {
             send.src = 'img/send.svg';
             send.className = 'icon send';
             send.title = i18n.send2local;
-            send.addEventListener('click', () => this.send(item));
+            send.addEventListener('click', async () => { await getClipboardText(item); this.send(item); });
             actions.appendChild(send);
         }
 
@@ -667,12 +667,16 @@ class FilePreview {
         Object.defineProperty(data, "pageDOM", {
             get: () => { return this.sourcePageDOM; }
         });
-
-        data.downFileName = G.TitleName ? templates(G.downFileName, data) : data.name;
-        data.downFileName = filterFileName(data.downFileName);
-        if (isEmpty(data.downFileName)) {
-            data.downFileName = data.name;
-        }
+        Object.defineProperty(data, "downFileName", {
+            get() {
+                let downFileName = G.TitleName ? templates(G.downFileName, data) : data.name;
+                downFileName = filterFileName(downFileName);
+                if (isEmpty(downFileName)) {
+                    downFileName = data.name;
+                }
+                return downFileName;
+            }
+        });
         data.ext = data.ext ? data.ext : 'Unknown';
         data.type = data.type ? data.type : 'Unknown';
         data.duration = data.duration ? data.duration : -1;
