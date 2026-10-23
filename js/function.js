@@ -569,28 +569,28 @@ function getRemoteFileSize(url) {
         });
 }
 
-
+/**
+ * 劫持 JSON.stringify，使得对象上不可枚举的 downFileName 属性也能被序列化
+ */
 const JSONStringify = JSON.stringify;
-function setDownFileName(value) {
-    if (!value || typeof value !== 'object') {
-        return;
+function includeDownFileName(obj) {
+    if (obj === null || typeof obj !== 'object') {
+        return obj;
     }
-    if (Array.isArray(value)) {
-        value.forEach(item => setDownFileName(item));
-        return;
+    if (!('downFileName' in obj)) {
+        return obj;
     }
-    if ('downFileName' in value) {
-        const downFileName = value.downFileName;
-        delete value.downFileName;
-        value.downFileName = downFileName;
-    }
-    for (const key in value) {
-        if (Object.prototype.hasOwnProperty.call(value, key)) {
-            setDownFileName(value[key]);
-        }
-    }
+    const downFileName = obj.downFileName;
+    return { ...obj, downFileName: downFileName };
 }
 JSON.stringify = function (value, replacer, space) {
-    setDownFileName(value);
+    if (Array.isArray(value)) {
+        value = value.map(function (item) {
+            return includeDownFileName(item);
+        });
+    }
+    else {
+        value = includeDownFileName(value);
+    }
     return JSONStringify(value, replacer, space);
 };
