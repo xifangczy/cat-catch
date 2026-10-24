@@ -534,7 +534,7 @@ class FilePreview {
             m3u8.src = 'img/parsing.png';
             m3u8.className = 'icon m3u8';
             m3u8.title = i18n.parser;
-            m3u8.addEventListener('click', () => this.openM3U8(item));
+            m3u8.addEventListener('click', async () => { await getClipboardText(item); this.openM3U8(item) });
             actions.appendChild(m3u8);
         }
 
