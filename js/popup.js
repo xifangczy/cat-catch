@@ -394,7 +394,9 @@ function AddMedia(data, currentTab = true) {
     return false;
   });
   //解析
-  data.html.find('#parsing').click(function (e) {
+  data.html.find('#parsing').click(async function (event) {
+    event.stopPropagation();
+    await getClipboardText(data);
     openParser(data);
     return false;
   });

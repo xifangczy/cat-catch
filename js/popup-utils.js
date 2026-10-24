@@ -243,4 +243,5 @@ async function getClipboardText(data) {
     } catch (error) {
         data.clipboard = "";
     }
+    return data;
 }

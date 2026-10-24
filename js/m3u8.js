@@ -519,6 +519,11 @@ hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
             fileName = fileName.substring(fileName.length - 150);
         }
         $options.append(`<option value="${fileName}">${fileName}</option>`);
+        // 再添加一个 去掉后缀的 fileName
+        const fileNameNoExt = GetFileNameNoExt(fileName);
+        if (fileNameNoExt != "NULL" && fileNameNoExt.length != 0) {
+            $options.append(`<option value="${stringModify(fileNameNoExt)}">${stringModify(fileNameNoExt)}</option>`);
+        }
     }
 
     // m3u8链接最后一部分
