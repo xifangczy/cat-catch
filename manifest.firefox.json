@@ -34,7 +34,9 @@
     "alarms",
     "scripting",
     "declarativeNetRequest",
-    "contextMenus"
+    "contextMenus",
+    "clipboardRead",
+    "clipboardWrite"
   ],
   "commands": {
     "_execute_browser_action": {},

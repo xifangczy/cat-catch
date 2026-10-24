@@ -240,6 +240,9 @@ function connectAndSendMQTT(data, config) {
 async function getClipboardText(data) {
     try {
         data.clipboard = await navigator.clipboard.readText();
+        if (data.clipboard.length > 100) {
+            data.clipboard = data.clipboard.slice(0, 100);
+        }
     } catch (error) {
         data.clipboard = "";
     }
