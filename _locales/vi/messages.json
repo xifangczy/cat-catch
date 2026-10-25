@@ -1048,5 +1048,14 @@
   },
   "hideDownloadedSegments": {
     "message": "Ẩn các phân đoạn đã tải xuống"
+  },
+  "showGroup": {
+    "message": "Hiển thị nhóm"
+  },
+  "groupTime": {
+    "message": "Thời gian nhóm"
+  },
+  "fileName": {
+    "message": "Tên tệp"
   }
 }

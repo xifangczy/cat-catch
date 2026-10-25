@@ -1054,5 +1054,8 @@
   },
   "groupTime": {
     "message": "分组时间"
+  },
+  "fileName": {
+    "message": "文件名"
   }
 }

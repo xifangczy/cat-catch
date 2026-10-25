@@ -1048,5 +1048,14 @@
   },
   "hideDownloadedSegments": {
     "message": "다운로드한 세그먼트 숨기기"
+  },
+  "showGroup": {
+    "message": "그룹 표시"
+  },
+  "groupTime": {
+    "message": "그룹 시간"
+  },
+  "fileName": {
+    "message": "파일 이름"
   }
 }

@@ -1030,7 +1030,7 @@
   },
   "send2localTips": {
     "message": "Mesclar dados antes de enviar? Clique em 'OK' para mesclar ou em 'Cancelar' para enviar individualmente."
-	  },
+  },
   "removeFailedPreviewFiles": {
     "message": "Remover arquivos de prévias com falha"
   },
@@ -1041,12 +1041,21 @@
     "message": "Menu do botão direito"
   },
   "dataPreprocessing": {
-    "message": "Pré-processamento de Dados"	
+    "message": "Pré-processamento de Dados"
   },
   "reverse": {
     "message": "Ordem inversa"
   },
   "hideDownloadedSegments": {
     "message": "Ocultar segmentos baixados"
+  },
+  "showGroup": {
+    "message": "Mostrar Grupo"
+  },
+  "groupTime": {
+    "message": "Tempo do Grupo"
+  },
+  "fileName": {
+    "message": "Nome do Arquivo"
   }
 }

@@ -1048,5 +1048,14 @@
   },
   "hideDownloadedSegments": {
     "message": "ダウンロード済みのセグメントを非表示"
+  },
+  "showGroup": {
+    "message": "グループを表示"
+  },
+  "groupTime": {
+    "message": "グループ時間"
+  },
+  "fileName": {
+    "message": "ファイル名"
   }
 }

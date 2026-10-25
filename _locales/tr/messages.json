@@ -1048,5 +1048,14 @@
   },
   "hideDownloadedSegments": {
     "message": "İndirilen segmentleri gizle"
+  },
+  "showGroup": {
+    "message": "Grubu Göster"
+  },
+  "groupTime": {
+    "message": "Grup Zamanı"
+  },
+  "fileName": {
+    "message": "Dosya Adı"
   }
 }

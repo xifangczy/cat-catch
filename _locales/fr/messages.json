@@ -1048,5 +1048,14 @@
   },
   "hideDownloadedSegments": {
     "message": "Masquer les segments téléchargés"
+  },
+  "showGroup": {
+    "message": "Afficher le Groupe"
+  },
+  "groupTime": {
+    "message": "Temps du Groupe"
+  },
+  "fileName": {
+    "message": "Nom du Fichier"
   }
 }
