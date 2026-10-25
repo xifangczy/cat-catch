@@ -111,7 +111,7 @@ class FilePreview {
         document.querySelectorAll('.sort-options input').forEach(input => {
             input.addEventListener('change', () => {
                 // 时长需要尝试播放获取，无法直接初始时长排序，不记忆时长排序选项
-                if (input.name == "sortField" && input.value != "duration") {
+                if (input.name == "sortField" && input.value != "duration" && input.value != "resolution") {
                     sessionStorage.setItem("previewSort", input.value);
                 } else if (input.name == "sortOrder") {
                     sessionStorage.setItem("previewOrder", input.value);
@@ -388,6 +388,16 @@ class FilePreview {
                 if (b[field] === -1) return -1;
                 // Normal comparison for valid durations
                 return order * (a[field] - b[field]);
+            });
+        } else if (field == 'resolution') {
+            this.fileItems.sort((a, b) => {
+                const widthA = a?.previewVideo?.width ?? 0;
+                const heightA = a?.previewVideo?.height ?? 0;
+                const widthB = b?.previewVideo?.width ?? 0;
+                const heightB = b?.previewVideo?.height ?? 0;
+                const pixelsA = widthA * heightA;
+                const pixelsB = widthB * heightB;
+                return order * (pixelsA - pixelsB);
             });
         } else {
             this.fileItems.sort((a, b) => order * (a[field] - b[field]));
