@@ -195,7 +195,7 @@
     "message": "Sufixo"
   },
   "suffixTip": {
-    "message": "Preencha com sufixo que não contém '.', se nenhuma filtragem de tamanho for necessária, preencha com 0."
+    "message": "Digite um sufixo sem '.'. Digite 0 para desativar o filtro de tamanho."
   },
   "extensionName": {
     "message": "Nome da Extensão"
@@ -225,7 +225,7 @@
     "message": "Adicionar Tipo"
   },
   "typeTip": {
-    "message": "Insira o tipo de conteúdo correto; se nenhuma filtragem de tamanho for necessária, preencha com 0."
+    "message": "Insira um Content-Type válido. Digite 0 para desativar o filtro de tamanho."
   },
   "addTypeError": {
     "message": "O formato do tipo de captura está incorreto, verifique"
@@ -270,13 +270,13 @@
     "message": "i: ignorar maiúsculas e minúsculas, g: pesquisa global. Também pode ser deixado em branco"
   },
   "regexSuffixTip": {
-    "message": "Atribuir um sufixo a URL obtida. Pode ser deixado em branco e o sufixo será automaticamente truncado (muitos arquivos não possuem sufixo)"
+    "message": "Atribua um sufixo à URL obtida. Pode ser deixado em branco, e a extensão do arquivo será detectada automaticamente (muitos arquivos não têm sufixo)"
   },
   "regexTip": {
-    "message": "Expressões regulares consomem muitos recursos, use-as com cuidado se não for necessário"
+    "message": "Expressões regulares consomem muitos recursos. Use-as somente quando necessário."
   },
   "copyTip": {
-    "message": "Para maior comodidade de usar aplicativos de terceiros, personalize o conteúdo gravado na área de transferência pelo botão copiar"
+    "message": "Personalize o conteúdo copiado para a área de transferência para uso com aplicativos de terceiros."
   },
   "replaceKeywordList": {
     "message": "Lista de Substitutos para Palavras-Chaves"
@@ -288,7 +288,7 @@
     "message": "Restaurar Configuração de Copiar"
   },
   "autoSetRefererCookieParams": {
-    "message": "Definir Automaticamente Parâmetros de Referência e Cookies"
+    "message": "Definir Automaticamente os Parâmetros de Referência e Cookie"
   },
   "secretKey": {
     "message": "Chave Secreta"
@@ -300,10 +300,10 @@
     "message": "Documentação"
   },
   "aria2Tip": {
-    "message": "Uma excelente ferramenta de download, veja como usar"
+    "message": "Uma excelente ferramenta de download. Veja a documentação para instruções de uso."
   },
   "m3u8DLTips": {
-    "message": "Uma excelente ferramenta de download de m3u8 e mpd de terceiros, veja como usar"
+    "message": "Uma excelente ferramenta de terceiros para baixar streams M3U8 e MPD. Veja a documentação para instruções de uso."
   },
   "invoke": {
     "message": "Invocar"
@@ -339,7 +339,7 @@
     "message": "Se o download do recurso falhar, ative automaticamente o downloader para tentar novamente."
   },
   "autoDownM3u8Tip": {
-    "message": "Clique no botão de download e use o analisador m3u8 para iniciar a mesclagem e o download imediatamente"
+    "message": "Clique em Download para mesclar e baixar imediatamente usando o analisador M3U8."
   },
   "otherSettings": {
     "message": "Outras Configurações"
@@ -357,7 +357,7 @@
     "message": "Prévia"
   },
   "customFilenameOption": {
-    "message": "Usar um nome personalizado para salvar o arquivo (o padrão é o título da página da web)"
+    "message": "Usar um nome de arquivo personalizado para salvar o arquivo (o padrão é o título da página da web)"
   },
   "saveAsOption": {
     "message": "Escolher o diretório de salvamento após o download"
@@ -366,7 +366,7 @@
     "message": "Exibir o ícone do site"
   },
   "clearOption": {
-    "message": "Atualize, navegue para uma nova página e limpe os dados capturados pela guia atual"
+    "message": "Limpar dados capturados ao atualizar ou navegar"
   },
   "doNotClear": {
     "message": "Não Limpar"
@@ -666,10 +666,10 @@
     "message": "Taxa de bits"
   },
   "ADTSerror": {
-    "message": "Não foi possível localizar o cabeçalho ADTS. Pode ser um recurso criptografado AES-128-ECB, que atualmente não é compatível com descriptografia. Use software de mesclagem de terceiros."
+    "message": "Não é possível encontrar o cabeçalho ADTS. Pode ser um recurso criptografado com AES-128-ECB, que atualmente não é suportado para descriptografia. Por favor, use um software de fusão de terceiros."
   },
   "m3u8Error": {
-    "message": "Há erros na análise ou reprodução do arquivo M3U8. Verifique o console para obter informações detalhadas sobre erros"
+    "message": "Falha ao analisar ou reproduzir o arquivo M3U8. Verifique o console para detalhes."
   },
   "noAudio": {
     "message": "Sem Áudio"
@@ -678,7 +678,7 @@
     "message": "Sem Vídeo"
   },
   "hevcTip": {
-    "message": "Arquivos de fragmentos codificados HEVC/H.265 são suportados apenas para transcodificação ffmpeg online"
+    "message": "Segmentos HEVC/H.265 são suportados apenas através da transcodificação online com FFmpeg."
   },
   "hevcPreviewTip": {
     "message": "Arquivos de fragmentos codificados HEVC/H.265 não são suportados para visualização."
@@ -722,16 +722,16 @@
     "message": "Fechar"
   },
   "blobM3u8DLError": {
-    "message": "URLs de blob não podem invocar M3U8DL para download"
+    "message": "M3U8DL não pode baixar URLs Blob."
   },
   "M3U8DLparameterLong": {
     "message": "O parâmetro M3U8DL é muito longo."
   },
   "runningCannotChangeSettings": {
-    "message": "Em Execução, Não É Possível Alterar As Configurações"
+    "message": "Não é possível alterar as configurações enquanto em execução"
   },
   "streamSaverTip": {
-    "message": "A função de 'baixar enquanto salva' não oferece suporte à conversão de formato online ffmpeg, não suporta download novamente de fatias erradas e não suporta 'salvar como'."
+    "message": "O download em streaming não suporta conversão online com FFmpeg, tentativas de novo de segmentos com falha ou Salvar Como."
   },
   "stopRecording": {
     "message": "Parar de Gravação"
@@ -787,7 +787,7 @@
     "message": "Mesclando"
   },
   "fileTooLarge": {
-    "message": "Arquivo muito grande, arquivo maior que $size$",
+    "message": "O arquivo é maior que $size$ e não pode ser processado pelo FFmpeg Online. O arquivo mesclado está sendo baixado; por favor, aguarde, pois isso pode levar algum tempo.",
     "placeholders": {
       "size": {
         "content": "$1"
@@ -803,10 +803,10 @@
     }
   },
   "formatConversionError": {
-    "message": "Erro de Conversão de Formato"
+    "message": "Falha na conversão de formato. Desative a conversão para MP4 e baixe novamente."
   },
   "streamOnbeforeunload": {
-    "message": "A transmissão está em andamento, o download será interrompido após o fechamento"
+    "message": "Um download em streaming está em andamento. Fechar esta página interromperá o download."
   },
   "fileLoading": {
     "message": "Carregamento de Arquivo"
