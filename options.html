@@ -490,6 +490,18 @@
             <label for="title">${title}</label><input type="text" class="width100" value="test Video" id="title">
             <span data-i18n-outer="result"></span>:<br><span id="tagTestResult"></span>
           </div>
+
+          <div class="item">
+            <i18n>enable</i18n>
+            <div>${clipboard}</div>
+            <div class="switch">
+              <label class="switchLabel switchRadius">
+                <input type="checkbox" id="clipboard" save="click" class="switchInput" />
+                <span class="switchRound switchRadius"><em class="switchRoundBtn switchRadius"></em></span>
+              </label>
+            </div>
+          </div>
+
           <div class="flex-end">
             <button type="button" id="showTestTag" data-i18n="test"></button>
             <button type="button" class="resetOption" data-i18n="resetSettings"></button>

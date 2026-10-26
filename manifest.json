@@ -33,9 +33,10 @@
     "declarativeNetRequest",
     "scripting",
     "sidePanel",
-    "contextMenus",
-    "clipboardRead",
-    "clipboardWrite"
+    "contextMenus"
+  ],
+  "optional_permissions": [
+    "clipboardRead"
   ],
   "commands": {
     "_execute_action": {},
