@@ -38,9 +38,9 @@ Download:
 lib/mqtt.min.js
 Source: https://github.com/mqttjs/MQTT.js
 License: MIT license
-Version: 5.15.2
+Version: 5.16.1
 Build:
-`https://github.com/mqttjs/MQTT.js/releases/tag/v5.15.2`
+`https://github.com/mqttjs/MQTT.js/releases/tag/v5.16.1`
 `Source code` -> `npm run build` -> `dist/mqtt.min.js`
 
 lib/jquery.json-viewer.js
