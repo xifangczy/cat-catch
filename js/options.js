@@ -181,19 +181,19 @@ $("[save='input']").on("input", function () {
 // 调试模式 使用网页标题做文件名 使用PotPlayer预览 显示网站图标 刷新自动清理
 $("[save='click']").bind("click", async function () {
     if (this.id == 'clipboard') {
-        if (this.checked) {
-            const granted = await chrome.permissions.request({ permissions: ['clipboardRead'] });
-            if (!granted) {
-                this.checked = false;
-                return;
-            }
-        } else {
-            try {
+        try {
+            if (this.checked) {
+                await chrome.permissions.request({ permissions: ['clipboardRead'] });
+            } else {
                 await chrome.permissions.remove({ permissions: ['clipboardRead'] });
-            } catch (e) {
-                console.error(e);
             }
+        } catch (e) {
+            console.error(e);
         }
+        chrome.permissions.contains({ permissions: ["clipboardRead"] }).then(function (result) {
+            $("#clipboard").prop("checked", result);
+        });
+        return;
     }
     chrome.storage.sync.set({ [this.id]: this.checked });
 });

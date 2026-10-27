@@ -175,9 +175,7 @@ G.OptionLists = {
     reverse: false, // 倒叙排序
 
     showGroup: true, // 显示分组
-    groupTime: 120, // 分组时间间隔，单位毫秒,
-
-    clipboard: false, // 是否启用剪贴板功能
+    groupTime: 120, // 分组时间间隔，单位毫秒
 };
 
 // 本地储存的配置
