@@ -378,9 +378,10 @@ function AddMedia(data, currentTab = true) {
     return false;
   });
   //播放
-  data.html.find('#play').click(async function () {
-    await getClipboardText(data);
+  data.html.find('#play').click(async function (event) {
     if (isEmpty(G.Player)) { return true; }
+    event.stopPropagation();
+    await getClipboardText(data);
     if (G.Player == "$shareApi$" || G.Player == "${shareApi}") {
       navigator.share({ url: data.url });
       return false;
