@@ -73,6 +73,9 @@ $("#blockAddUrl").bind("click", function () {
 });
 $("#version").html(i18n.catCatch + " v" + chrome.runtime.getManifest().version);
 
+$("#documentationURL").attr("href", G.documentationURL.url).text(G.documentationURL.url);
+$("#githubURL").attr("href", G.githubURL.url).text(G.githubURL.url);
+
 // 自定义播放调用模板
 playerList = new Map();
 playerList.set("tips", { name: i18n.invokeProtocolTemplate, template: "" });

@@ -220,6 +220,17 @@ G.streamSaverConfig = {
     }
 }
 
+// 在线文档
+G.documentationURL = {
+    url: "https://cat-catch.94cat.com/"
+}
+
+// github地址
+G.githubURL = {
+    url: "https://github.com/xifangczy/cat-catch"
+}
+
+
 // 正则预编译
 const reFilterFileName = /[<>:"|?*~]/g; // 过滤文件名包含的非法字符
 const reJSONparse = /([{,]\s*)([\w-]+)(\s*:)/g; // JSON.parse 解析不带引号的key

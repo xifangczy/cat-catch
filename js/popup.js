@@ -774,6 +774,10 @@ $("[go]").click(function () {
     chrome.tabs.create({ url: G.ffmpegConfig.url })
     return;
   }
+  if (url == "documentationURL") {
+    chrome.tabs.create({ url: G.documentationURL.url })
+    return;
+  }
   chrome.tabs.create({ url: url });
 });
 // 暂停 启用
