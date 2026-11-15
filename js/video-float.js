@@ -39,7 +39,7 @@
     let optionsKey = "";
     let playbackRate = 2;   // 倍速 和 popup 的媒体控制共用
     let rateTimer = 0;
-    let hlsWaiting = null;  // 等待 hls.js 注入的回调
+    const libWaiting = {};  // 等待库注入的回调 { 库名称: [回调] }
     let host = null;    // 浮窗容器 挂在 documentElement 下
     let root = null;    // 浮窗容器的 shadow root
     let anchor = null;  // 拖动后的位置 相对 video 宽高的比例 { fx, fy } 页面内所有浮窗共用
@@ -186,6 +186,13 @@
         .url a:hover { text-decoration: underline; }
         .moreButton { display: flex; margin: 2px 0; }
         .moreButton .icon { margin-right: 3px; }
+        .qrcodeBox canvas { display: block; max-width: 100%; height: auto; margin: 4px 0; padding: 6px; background: #fff; }
+        .confirm { padding: 5px; text-align: center; }
+        .confirm textarea {
+            display: block; width: 100%; margin-bottom: 4px; font: inherit; resize: vertical;
+            color: var(--text-color); background: var(--background-color); border: var(--input-border);
+        }
+        .confirm button { margin: 0 2px; }
         .preview { display: block; max-width: 100%; max-height: 200px; margin-top: 4px; background: #000; }
         .screenshots { display: block; max-width: 100%; max-height: 200px; margin: 4px auto 0; }
         details { margin-top: 2px; }
@@ -273,10 +280,10 @@
         if (bps >= 1000 * 1000) { return (bps / 1000 / 1000).toFixed(2) + " Mbps"; }
         return (bps / 1000).toFixed(2) + " kbps";
     }
-    // 去掉 hash 的绝对地址 用于比较
+    // 去掉 hash 的绝对地址 用于比较 (srcdoc / about:blank 的 frame 没有自己的地址 使用 baseURI)
     function normalize(url) {
         try {
-            const parsing = new URL(url, location.href);
+            const parsing = new URL(url, document.baseURI);
             parsing.hash = "";
             return parsing.href;
         } catch (e) {
@@ -317,22 +324,31 @@
         }
         return Promise.resolve(legacy());
     }
-    // 预览 m3u8 需要 hls.js 由后台注入到当前环境
-    function loadHls(callback) {
-        if (typeof globalThis.Hls == "function") {
+    /**
+     * 按需加载库 由后台注入到当前环境 (和页面的脚本隔离)
+     * hls: 预览 m3u8 需要 hls.js   qrcode: 二维码需要 jquery.qrcode
+     * @param {String} name 库名称
+     * @param {Function} callback 回调 参数为是否加载成功
+     */
+    function loadLib(name, callback) {
+        const ready = function () {
+            if (name == "hls") { return typeof globalThis.Hls == "function"; }
+            return typeof globalThis.jQuery == "function" && typeof globalThis.jQuery.fn.qrcode == "function";
+        };
+        if (ready()) {
             callback(true);
             return;
         }
-        if (hlsWaiting) {
-            hlsWaiting.push(callback);
+        if (libWaiting[name]) {
+            libWaiting[name].push(callback);
             return;
         }
-        hlsWaiting = [callback];
-        send({ Message: "videoFloatHls" }, function (ok) {
-            const waiting = hlsWaiting;
-            hlsWaiting = null;
-            const ready = ok === true && typeof globalThis.Hls == "function";
-            waiting.forEach(item => item(ready));
+        libWaiting[name] = [callback];
+        send({ Message: "videoFloatLib", lib: name }, function (ok) {
+            const waiting = libWaiting[name];
+            delete libWaiting[name];
+            const loaded = ok === true && ready();
+            waiting.forEach(item => item(loaded));
         });
     }
 
@@ -584,7 +600,7 @@
         for (const type of ["click", "dblclick", "mousedown", "mouseup", "pointerdown", "pointerup", "touchstart", "touchend", "contextmenu", "wheel", "keydown", "keyup", "keypress", "input", "change"]) {
             float.el.addEventListener(type, function (event) {
                 event.stopPropagation();
-                if (type == "mousedown" && !event.target.closest(".url, input")) {
+                if (type == "mousedown" && !event.target.closest(".url, input, textarea")) {
                     event.preventDefault();
                 }
             }, { passive: type != "mousedown" });
@@ -890,6 +906,10 @@
         options.aria2 && add(heading, "aria2", "Aria2", "aria2");
         options.invoke && add(heading, "invoke", i18n("invoke"), "invoke");
         options.send && add(heading, "send", i18n("send2local"), "send2local");
+        options.mqtt && add(heading, "mqtt", i18n("send2MQTT"), function () {
+            tip(float, i18n("sendingToMQTT"));
+            action(float, "mqtt", [row.item]);
+        });
 
         // 详情 标题 类型 地址 更多操作 以及预览
         const build = function () {
@@ -901,6 +921,24 @@
             }
             item.type && addInfo(row, "MIME", item.type);
             const more = h("div", "moreButton");
+            // 二维码 点击显示 / 隐藏
+            row.qrcode = h("div", "qrcodeBox");
+            row.qrcode.style.display = "none";
+            add(more, "qrcode", "QR Code", function () {
+                if (row.qrcode.style.display != "none") {
+                    row.qrcode.style.display = "none";
+                    reposition();
+                    return;
+                }
+                loadLib("qrcode", function (ready) {
+                    if (!ready) { return; }
+                    const size = row.item.url.length >= 300 ? 400 : 256;
+                    row.qrcode.replaceChildren();
+                    globalThis.jQuery(row.qrcode).qrcode({ width: size, height: size, text: row.item.url });
+                    row.qrcode.style.display = "";
+                    reposition();
+                });
+            });
             add(more, "cat-down", i18n("downloadWithRequestHeader"), "catDown");
             add(more, "send2ffmpeg", i18n("sendFfmpeg"), "ffmpeg");
             add(more, "invoke", i18n("invoke"), "invoke");
@@ -908,7 +946,7 @@
             link.href = item.url;
             link.target = "_blank";
             link.rel = "noreferrer noopener";
-            row.detail.append(row.info, more, link);
+            row.detail.append(row.info, more, row.qrcode, link);
             if (item.picture) {
                 row.image = h("img", "screenshots");
                 row.image.style.display = "none";
@@ -982,7 +1020,7 @@
             video.src = item.url;
             return;
         }
-        loadHls(function (ready) {
+        loadLib("hls", function (ready) {
             const Hls = globalThis.Hls;
             if (!ready || !row.loaded || !Hls.isSupported()) { return; }
             const hls = new Hls({ enableWorker: false });
@@ -1137,11 +1175,48 @@
         }, 2000);
     }
 
-    // 操作交给后台执行 和 popup 的操作保持一致
-    function action(float, name, items) {
-        send({ Message: "videoFloatAction", action: name, items: items.map(item => ({ requestId: item.requestId, url: item.url })) }, function (result) {
+    /**
+     * 调用 m3u8dl / 程序 前确认参数 和 popup 一致 可以修改参数后再调用
+     * @param {Object} float 浮窗
+     * @param {Object} item 资源
+     * @param {String} text 参数
+     * @param {String} kind m3u8dl | invoke
+     */
+    function showConfirm(float, item, text, kind) {
+        const row = float.rows.get(item.key);
+        if (!row) { return; }
+        row.confirm && row.confirm.remove();
+        const confirm = h("div", "confirm");
+        const textarea = h("textarea");
+        textarea.rows = 6;
+        textarea.value = text;
+        const remove = function () {
+            confirm.remove();
+            row.confirm = null;
+            reposition();
+        };
+        confirm.append(
+            textarea,
+            textButton("button2", i18n("confirm"), function () {
+                remove();
+                action(float, "protocol", [item], { kind: kind, text: textarea.value });
+            }),
+            textButton("button2", i18n("close"), remove)
+        );
+        row.panel.appendChild(confirm);
+        row.confirm = confirm;
+        reposition();
+    }
+
+    // 操作交给后台执行 和 popup 的操作保持一致 extra 为附加参数
+    function action(float, name, items, extra) {
+        send({ Message: "videoFloatAction", action: name, items: items.map(item => ({ requestId: item.requestId, url: item.url })), ...extra }, function (result) {
             if (!result || result === "error") {
                 tip(float, i18n("dataFetchFailed"));
+                return;
+            }
+            if (typeof result.confirm == "string") {
+                showConfirm(float, items[0], result.confirm, result.kind);
                 return;
             }
             if (typeof result.copy == "string") {
@@ -1344,8 +1419,13 @@
     }
     try {
         chrome.storage.onChanged.addListener(function (changes, namespace) {
-            if (namespace == "sync" && (changes.videoFloat || changes.enable)) {
+            if (namespace != "sync") { return; }
+            if (changes.videoFloat || changes.enable) {
                 readOption();
+            } else if (running) {
+                // 其他设置有变化 (例如开启了 Aria2 / 调用) 重新获取 更新浮窗里的操作图标
+                stale = true;
+                requestData(300);
             }
         });
         // 后台通知资源列表有变化

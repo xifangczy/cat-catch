@@ -628,15 +628,16 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         });
         return true;
     }
-    // 视频浮窗 预览 m3u8 需要 hls.js 注入到浮窗所在的 frame (和 content-script 同一个环境)
-    if (Message.Message == "videoFloatHls") {
-        if (!sender.tab || !chrome.scripting) {
+    // 视频浮窗 按需把库注入到浮窗所在的 frame (和 content-script 同一个环境) 预览 m3u8 需要 hls.js 二维码需要 jquery.qrcode
+    if (Message.Message == "videoFloatLib") {
+        const files = VIDEO_FLOAT_LIBS[Message.lib];
+        if (!files || !sender.tab || !chrome.scripting) {
             sendResponse(false);
             return true;
         }
         chrome.scripting.executeScript({
             target: { tabId: sender.tab.id, frameIds: [sender.frameId ?? 0] },
-            files: ["lib/hls.min.js"]
+            files: files
         }, function () {
             sendResponse(!chrome.runtime.lastError);
         });
@@ -1066,7 +1067,6 @@ function getRequestHeaders(data) {
     }
     return Object.keys(header).length > 0 ? header : false;
 }
-//设置扩展图标
 
 /**
  * 没有标签的请求 (Service Worker 等发起) 在同域名的标签里找出它属于哪个标签
@@ -1104,6 +1104,7 @@ function getFetchDest(data) {
     }
     return undefined;
 }
+//设置扩展图标
 function SetIcon(obj) {
     if (obj?.number == 0 || obj?.number == undefined) {
         chrome.action.setBadgeText({ text: "", tabId: obj?.tabId ?? G.tabId }, function () { if (chrome.runtime.lastError) { return; } });
@@ -1239,8 +1240,15 @@ const VIDEO_FLOAT_ICONS = [
     "copy-dark.png", "parsing-dark.png", "play-dark.png", "download-dark.svg", "aria2-dark.png", "invoke-dark.svg", "send-dark.svg", "cat-down-dark.png", "send2ffmpeg-dark.svg", "regex-dark.png",
     // 媒体控制
     "pause.svg", "volume.svg", "mute.svg", "loop.svg", "speed.svg", "screenshot.svg", "pip.svg", "fullscreen.svg",
-    "pause-dark.svg", "volume-dark.svg", "mute-dark.svg", "loop-dark.svg", "speed-dark.svg", "screenshot-dark.svg", "pip-dark.svg", "fullscreen-dark.svg"
+    "pause-dark.svg", "volume-dark.svg", "mute-dark.svg", "loop-dark.svg", "speed-dark.svg", "screenshot-dark.svg", "pip-dark.svg", "fullscreen-dark.svg",
+    // 二维码 MQTT
+    "qrcode.png", "qrcode-dark.png", "mqtt.svg", "mqtt-dark.svg"
 ];
+// 浮窗按需注入的库
+const VIDEO_FLOAT_LIBS = {
+    hls: ["lib/hls.min.js"],
+    qrcode: ["lib/jquery.min.js", "lib/jquery.qrcode.min.js"]
+};
 let videoFloatIcons = undefined;
 
 /**
@@ -1312,6 +1320,7 @@ function videoFloatGetData(sender) {
         invoke: !!G.invoke,
         send: !!(G.send2localManual || G.send2local),
         player: !isEmpty(G.Player),
+        mqtt: !!G.mqttEnable,
         mergeLimit: G.isFirefox ? 0 : G.chromeLimitSize
     };
     // 媒体控制的倍速 和 popup 共用
@@ -1468,6 +1477,10 @@ function videoFloatDownload(data, tabId, batch = false) {
         if (url.length >= 2046) {
             return { ok: false, copy: m3u8dlArg, message: i18n.M3U8DLparameterLong };
         }
+        // 下载前确认参数 交给浮窗显示 确认后再调用
+        if (G.m3u8dlConfirm) {
+            return { ok: true, confirm: m3u8dlArg, kind: "m3u8dl" };
+        }
         return videoFloatProtocol(url, tabId);
     }
     if (G.m3u8AutoDown && data.parsing == "m3u8") {
@@ -1476,6 +1489,7 @@ function videoFloatDownload(data, tabId, batch = false) {
     }
     const options = { url: data.url, filename: data.downFileName };
     if (!batch) { options.saveAs = G.saveAs; }
+    if (data.method == "POST") { options.method = "POST"; }
     chrome.downloads.download(options, function (id) {
         if (chrome.runtime.lastError || id === undefined) {
             !G.catDownload && videoFloatCatDownload(data);
@@ -1489,7 +1503,6 @@ function videoFloatDownload(data, tabId, batch = false) {
 /**
  * 浮窗的操作 和 popup 资源列表的操作保持一致
  * @param {Object} Message 消息 action: 操作名 items: [{ requestId, url }]
-    if (data.method == "POST") { options.method = "POST"; }
  * @param {Object} sender 消息发送者
  * @param {Function} sendResponse 回复函数
  */
@@ -1567,8 +1580,38 @@ function videoFloatAction(Message, sender, sendResponse) {
             });
             return;
         // 调用程序
-        case "invoke":
-            sendResponse(videoFloatProtocol(templates(G.invokeText, data), tabId));
+        case "invoke": {
+            const url = templates(G.invokeText, data);
+            // 调用前确认参数 交给浮窗显示 确认后再调用
+            if (G.invokeConfirm) {
+                sendResponse({ ok: true, confirm: url, kind: "invoke" });
+                return;
+            }
+            sendResponse(videoFloatProtocol(url, tabId));
+            return;
+        }
+        // 浮窗里确认过参数后的调用 m3u8dl / 调用程序
+        case "protocol": {
+            const text = String(Message.text ?? "");
+            if (!text) { break; }
+            if (Message.kind == "m3u8dl") {
+                sendResponse(videoFloatProtocol('m3u8dl:' + (G.m3u8dl == 1 ? videoFloatBase64(text) : text), tabId));
+                return;
+            }
+            // 只允许调用设置里的协议 页面无法借此跳转到其他地址
+            if (Message.kind == "invoke" && text.split(":")[0] == String(G.invokeText).split(":")[0]) {
+                sendResponse(videoFloatProtocol(text, tabId));
+                return;
+            }
+            break;
+        }
+        // 发送到 MQTT
+        case "mqtt":
+            videoFloatMQTT(data).then(function () {
+                sendResponse({ ok: true, message: i18n.messageSentToMQTT });
+            }).catch(function (error) {
+                sendResponse({ ok: false, message: error?.message ? "MQTT: " + error.message : i18n.sendFailed });
+            });
             return;
         // 数据发送
         case "send2local":
@@ -1594,6 +1637,114 @@ function videoFloatAction(Message, sender, sendResponse) {
             return;
     }
     sendResponse({ ok: false });
+}
+
+/**
+ * 发送资源到 MQTT 服务器 配置和消息内容与 popup 的 MQTT 发送一致
+ * popup 使用 lib/mqtt.min.js 该库无法在 service worker 中按需加载
+ * 这里只需要 连接 + 发布一条消息 直接按 MQTT 3.1.1 (over WebSocket) 实现
+ * @param {Object} data 资源对象
+ * @returns {Promise}
+ */
+function videoFloatMQTT(data) {
+    return new Promise(function (resolve, reject) {
+        if (!G.mqttEnable) {
+            reject(new Error("MQTT is not enabled"));
+            return;
+        }
+        if (!G.mqttProtocol || !G.mqttBroker || !G.mqttPort || !G.mqttPath) {
+            reject(new Error("MQTT connection parameters are missing"));
+            return;
+        }
+        // 消息内容
+        data.title = (data.title ?? "").slice(0, G.mqttTitleLength || 100);
+        data.action = "media_found";
+        const message = G.mqttDataFormat?.trim() ? templates(G.mqttDataFormat, data) : JSON.stringify(data);
+        const topic = G.mqttTopic || "cat-catch/media";
+        const qos = [0, 1, 2].includes(parseInt(G.mqttQos)) ? parseInt(G.mqttQos) : 0;
+
+        // 报文 = 类型 + 剩余长度(变长) + 内容
+        const encoder = new TextEncoder();
+        const text = function (value) {
+            const bytes = encoder.encode(value);
+            return [bytes.length >> 8, bytes.length & 0xff, ...bytes];
+        };
+        const packet = function (type, body) {
+            const length = [];
+            let size = body.length;
+            do {
+                let byte = size % 128;
+                size = Math.floor(size / 128);
+                if (size > 0) { byte |= 0x80; }
+                length.push(byte);
+            } while (size > 0);
+            return new Uint8Array([type, ...length, ...body]);
+        };
+        // CONNECT 协议名 MQTT 版本 4 清理会话 保持连接 60 秒 客户端ID 用户名 密码
+        let flags = 0x02;
+        const payload = text(`${G.mqttClientId || "cat-catch-client"}-${Math.random().toString(16).slice(2)}`);
+        if (G.mqttUser) {
+            flags |= 0x80;
+            payload.push(...text(G.mqttUser));
+            if (G.mqttPassword) {
+                flags |= 0x40;
+                payload.push(...text(G.mqttPassword));
+            }
+        }
+        const connect = packet(0x10, [...text("MQTT"), 0x04, flags, 0x00, 0x3c, ...payload]);
+        // PUBLISH QoS 大于 0 时带报文标识
+        const publish = packet(0x30 | (qos << 1), [...text(topic), ...(qos ? [0x00, 0x01] : []), ...encoder.encode(message)]);
+
+        let socket;
+        let done = false;
+        const finish = function (error) {
+            if (done) { return; }
+            done = true;
+            clearTimeout(timer);
+            try {
+                // DISCONNECT
+                !error && socket.send(new Uint8Array([0xe0, 0x00]));
+                socket.close();
+            } catch (e) { }
+            error ? reject(error) : resolve();
+        };
+        const timer = setTimeout(function () { finish(new Error("connection timeout")); }, 10000);
+        try {
+            socket = new WebSocket(`${G.mqttProtocol}://${G.mqttBroker}:${G.mqttPort}${G.mqttPath}`, ["mqtt"]);
+        } catch (e) {
+            finish(e);
+            return;
+        }
+        socket.binaryType = "arraybuffer";
+        socket.onopen = function () { socket.send(connect); };
+        socket.onerror = function () { finish(new Error("connection error")); };
+        socket.onclose = function () { finish(new Error("connection closed")); };
+        socket.onmessage = function (event) {
+            const bytes = new Uint8Array(event.data);
+            // 控制报文都很短 一帧里可能有多个
+            for (let i = 0; i + 1 < bytes.length; i += 2 + bytes[i + 1]) {
+                const type = bytes[i] >> 4;
+                if (type == 2) {
+                    // CONNACK 返回码不为 0 是服务器拒绝连接
+                    if (bytes[i + 3] !== 0) {
+                        finish(new Error("connection refused: " + bytes[i + 3]));
+                        return;
+                    }
+                    socket.send(publish);
+                    qos == 0 && finish();
+                } else if (type == 4 && qos == 1) {
+                    // PUBACK
+                    finish();
+                } else if (type == 5 && qos == 2) {
+                    // PUBREC 回复 PUBREL
+                    socket.send(new Uint8Array([0x62, 0x02, 0x00, 0x01]));
+                } else if (type == 7 && qos == 2) {
+                    // PUBCOMP
+                    finish();
+                }
+            }
+        };
+    });
 }
 
 // 扩展升级，清空本地储存
