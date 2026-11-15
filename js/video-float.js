@@ -1,6 +1,6 @@
 /**
  * 视频浮窗
- * 开启 设置 - 其他设置 - 在视频旁显示下载浮窗 (videoFloat) 后
+ * 开关在 设置 - 其他设置 - 在视频旁显示下载浮窗 (videoFloat) 默认开启
  * 在页面的 video 角上显示猫抓图标和这个 video 的资源数量 点击图标展开浮窗
  * 浮窗只管它所在的这个 video:
  *   媒体控制 和 popup 的媒体控制一致 直接控制这个 video
@@ -1444,7 +1444,7 @@
     // 读取设置 开关 和 扩展总开关
     function readOption() {
         try {
-            chrome.storage.sync.get({ videoFloat: false, enable: true }, function (items) {
+            chrome.storage.sync.get({ videoFloat: true, enable: true }, function (items) {
                 if (chrome.runtime.lastError || !items) { return; }
                 items.videoFloat && items.enable ? start() : stop();
             });

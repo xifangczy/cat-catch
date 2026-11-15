@@ -177,7 +177,7 @@ G.OptionLists = {
     showGroup: true, // 显示分组
     groupTime: 120, // 分组时间间隔，单位毫秒
 
-    videoFloat: false,  // 在视频旁显示下载列表浮窗
+    videoFloat: true,  // 在视频旁显示下载列表浮窗
     umpDecode: true,  // 解码 YouTube 的 UMP 媒体流 (页面内解码 轨道以 blob 地址加入资源列表)
 };
 
