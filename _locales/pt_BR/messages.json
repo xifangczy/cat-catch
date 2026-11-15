@@ -1057,5 +1057,25 @@
   },
   "fileName": {
     "message": "Nome do Arquivo"
+  },
+  "videoFloat": {
+    "message": "Mostrar um painel de download ao lado dos vídeos"
+  },
+  "videoFloatOther": {
+    "message": "Outros recursos desta página"
+  },
+  "videoFloatDownloadStarted": {
+    "message": "Download iniciado"
+  },
+  "videoFloatLimit": {
+    "message": "Mostrando $show$ de $total$ recursos",
+    "placeholders": {
+      "show": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
   }
 }

@@ -76,7 +76,8 @@
         "http://*/*"
       ],
       "js": [
-        "js/content-script.js"
+        "js/content-script.js",
+        "js/video-float.js"
       ],
       "run_at": "document_start",
       "all_frames": true

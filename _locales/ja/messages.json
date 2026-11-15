@@ -1057,5 +1057,25 @@
   },
   "fileName": {
     "message": "ファイル名"
+  },
+  "videoFloat": {
+    "message": "動画の横にダウンロードパネルを表示"
+  },
+  "videoFloatOther": {
+    "message": "このページの他のリソース"
+  },
+  "videoFloatDownloadStarted": {
+    "message": "ダウンロードを開始しました"
+  },
+  "videoFloatLimit": {
+    "message": "$total$ 個中 $show$ 個のリソースを表示",
+    "placeholders": {
+      "show": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
   }
 }

@@ -1057,5 +1057,25 @@
   },
   "fileName": {
     "message": "Tên tệp"
+  },
+  "videoFloat": {
+    "message": "Hiển thị bảng tải xuống bên cạnh video"
+  },
+  "videoFloatOther": {
+    "message": "Tài nguyên khác trên trang này"
+  },
+  "videoFloatDownloadStarted": {
+    "message": "Đã bắt đầu tải xuống"
+  },
+  "videoFloatLimit": {
+    "message": "Đang hiển thị $show$ / $total$ tài nguyên",
+    "placeholders": {
+      "show": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
   }
 }
