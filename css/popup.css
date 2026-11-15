@@ -211,34 +211,162 @@ button,
 #otherOptions {
   margin: 5px;
 }
-#PlayControl {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: space-evenly;
-}
-#PlayControl .button2,
-#PlayControl .button {
-  margin-left: 2px;
-}
-#PlayControl #playbackRate {
-  width: 3em;
-  height: 20px;
-}
 #otherOptions select {
   margin-top: 2px;
   margin-bottom: 2px;
   width: 100%;
 }
-#PlayControl .loop {
-  margin: 0 5px 0 5px;
-}
 label {
   cursor: pointer;
   user-select: none;
 }
-#PlayControl .volume {
-  width: 100px;
+/* 媒体控制 */
+#PlayControl {
+  --media-accent: #1a73e8;
+  --media-track: rgb(26 115 232 / 22%);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 4px 0 2px 0;
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: var(--background-color-two);
+}
+/* 没有可操控的媒体 */
+#PlayControl.mediaIdle .mediaProgress,
+#PlayControl.mediaIdle .mediaButtons {
+  opacity: 0.45;
+}
+#PlayControl .mediaProgress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#PlayControl .mediaTime {
+  min-width: 3.2em;
+  text-align: center;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+#PlayControl .mediaButtons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+#PlayControl .mediaGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+#PlayControl .icon {
+  flex: none;
+}
+/* 播放 / 暂停 */
+#PlayControl #control {
+  width: 2rem;
+  height: 2rem;
+}
+/* 开关 循环 静音 */
+#PlayControl .mediaToggle {
+  display: flex;
+  position: relative;
+}
+#PlayControl .mediaToggle input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+#PlayControl .mediaToggle input:focus-visible ~ .icon {
+  outline: 2px solid var(--media-accent);
+  outline-offset: 1px;
+}
+/* 未开启的 循环 倍速 图标变淡 */
+#PlayControl .mediaToggle input:not(:checked) ~ .loop,
+#PlayControl .mediaOff {
+  opacity: 0.4;
+}
+#PlayControl .mediaToggle .mute,
+#PlayControl .mediaToggle input:checked ~ .volume {
+  display: none;
+}
+#PlayControl .mediaToggle input:checked ~ .mute {
+  display: block;
+}
+/* 进度 音量 滑块 --pct 为已播放/当前音量的百分比 由 media-control.js 设置 */
+#PlayControl .mediaRange {
+  --pct: 0%;
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  min-width: 0;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+#PlayControl .mediaRange:focus {
+  outline: none;
+}
+#PlayControl .mediaRange::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--media-accent) var(--pct), var(--media-track) var(--pct));
+}
+#PlayControl .mediaRange::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  margin-top: -4px;
+  border-radius: 50%;
+  background: var(--media-accent);
+  transition: transform 0.1s;
+}
+#PlayControl .mediaRange:hover::-webkit-slider-thumb,
+#PlayControl .mediaRange:focus-visible::-webkit-slider-thumb {
+  transform: scale(1.3);
+}
+#PlayControl .mediaRange::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--media-track);
+}
+#PlayControl .mediaRange::-moz-range-progress {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--media-accent);
+}
+#PlayControl .mediaRange::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--media-accent);
+}
+#PlayControl .mediaVolume {
+  flex: none;
+  width: 80px;
+}
+/* 倍速 */
+#PlayControl #playbackRate {
+  width: 3.4em;
+  height: 20px;
+  margin-right: -3px;
+}
+#PlayControl .mediaSpeedUnit {
+  margin-right: 4px;
+  font-weight: bold;
+}
+@media (prefers-color-scheme: dark) {
+  #PlayControl {
+    --media-track: rgb(255 255 255 / 22%);
+  }
 }
 .flexColumn {
   display: flex;

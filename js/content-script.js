@@ -46,6 +46,7 @@
                     loop: video.loop,
                     speed: video.playbackRate,
                     muted: video.muted,
+                    pip: video.ownerDocument.pictureInPictureElement === video,
                     type: video.tagName.toLowerCase(),
                     videoStatus: videoObj.map(v => v.paused ? 1 : 0)
                 });

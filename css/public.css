@@ -214,4 +214,28 @@ button:disabled,
   img.retry {
     content: url(../img/retry-dark.svg);
   }
+  img.pause {
+    content: url(../img/pause-dark.svg);
+  }
+  img.volume {
+    content: url(../img/volume-dark.svg);
+  }
+  img.mute {
+    content: url(../img/mute-dark.svg);
+  }
+  img.loop {
+    content: url(../img/loop-dark.svg);
+  }
+  img.speed {
+    content: url(../img/speed-dark.svg);
+  }
+  img.screenshot {
+    content: url(../img/screenshot-dark.svg);
+  }
+  img.pip {
+    content: url(../img/pip-dark.svg);
+  }
+  img.fullscreen {
+    content: url(../img/fullscreen-dark.svg);
+  }
 }
