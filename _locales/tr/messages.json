@@ -1077,5 +1077,19 @@
         "content": "$2"
       }
     }
+  },
+  "umpDecode": {
+    "message": "YouTube medya akışlarını çöz (UMP)"
+  },
+  "umpProgress": {
+    "message": "$total$ parçadan $received$ tanesi alındı; oynatma ilerledikçe artar",
+    "placeholders": {
+      "received": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
   }
 }

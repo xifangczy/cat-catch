@@ -615,6 +615,12 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         sendResponse("ok");
         return true;
     }
+    // 页面内解码 UMP 得到的轨道 (catch-script/ump.js) 登记 / 更新 / 移除
+    if (Message.Message == "umpMedia") {
+        umpMedia(Message, sender);
+        sendResponse("ok");
+        return true;
+    }
     // 视频浮窗 获取发送者所在frame的资源列表 icons 为 true 时同时返回图标
     if (Message.Message == "videoFloatGetData") {
         const result = videoFloatGetData(sender);
@@ -768,6 +774,9 @@ chrome.webNavigation.onCommitted.addListener(function (details) {
         (chrome.storage.session ?? chrome.storage.local).set({ MediaData: cacheData });
         SetIcon({ tabId: details.tabId });
     }
+
+    // 页面内解码得到的轨道是页面自己的 blob 地址 frame 重新载入后失效 随之清理
+    umpClear(details.tabId, details.frameId);
 
     // chrome内核版本 102 以下不支持 chrome.scripting.executeScript API
     if (G.version < 102) { return; }
@@ -1351,7 +1360,9 @@ function videoFloatGetData(sender) {
             parsing: videoFloatParsing(item),
             merge: videoFloatMergeable(item),
             isPlay: videoFloatIsPlay(item),
-            picture: isPicture(item)
+            picture: isPicture(item),
+            // 页面内解码得到的轨道 地址会随接收进度更新
+            capture: item.ump ? { received: item.ump.received, total: item.ump.total, complete: item.ump.complete, mime: item.ump.mime } : undefined
         };
     });
     return result;
@@ -1511,7 +1522,8 @@ function videoFloatAction(Message, sender, sendResponse) {
     const cache = tabId && Array.isArray(cacheData[tabId]) ? cacheData[tabId] : [];
     const list = [];
     for (const item of Array.isArray(Message.items) ? Message.items : []) {
-        const info = cache.find(data => data.requestId == item.requestId && data.url == item.url);
+        // 页面内解码得到的轨道 地址随接收进度更新 只按 requestId 匹配 使用最新的地址
+        const info = cache.find(data => data.requestId == item.requestId && (data.url == item.url || data.ump));
         info && list.push(videoFloatData(info));
     }
     if (!list.length) {
@@ -1769,3 +1781,139 @@ chrome.runtime.onInstalled.addListener(function (details) {
 // chrome.storage.session.get(function (data) { console.log("storageSession", data.MediaData) });
 // chrome.declarativeNetRequest.getSessionRules(function (rules) { console.log("sessionRules", rules); });
 // chrome.tabs.query({}, function (tabs) { for (let item of tabs) { console.log("tabId", item.id); } });
+
+/******************** UMP 解码 (YouTube) ********************/
+// UMP 的响应体只有页面能读到 解码在页面内完成 (js/ump.js + catch-script/ump.js)
+// 这里负责 注入脚本 以及 把解出的轨道登记到资源列表
+const UMP_SCRIPT_ID = "ump";
+const UMP_MATCHES = ["*://*.youtube.com/*", "*://*.youtube-nocookie.com/*", "*://*.youtubekids.com/*"];
+
+/**
+ * 按设置注册 / 注销页面内的解码脚本
+ * 播放器的第一个响应里带着各轨道的头部 必须赶在它之前注入 所以注册成 document_start 的脚本
+ * firefox 的后台无法下载页面的 blob 地址 不启用
+ */
+function umpRegister() {
+    if (G.isFirefox || !chrome.scripting?.registerContentScripts) { return; }
+    if (!G.initSyncComplete) {
+        setTimeout(umpRegister, 500);
+        return;
+    }
+    // 排队执行 每次都在查询结果回来之后再读取设置 避免先后两次调用交错 把已经关闭的开关又注册上
+    umpRegisterQueue = umpRegisterQueue.then(async function () {
+        const scripts = await chrome.scripting.getRegisteredContentScripts({ ids: [UMP_SCRIPT_ID] });
+        const want = !!(G.enable && G.umpDecode);
+        if (want && !scripts.length) {
+            await chrome.scripting.registerContentScripts([{
+                id: UMP_SCRIPT_ID,
+                matches: UMP_MATCHES,
+                js: ["js/ump.js", "catch-script/ump.js"],
+                runAt: "document_start",
+                world: "MAIN",
+                allFrames: true
+            }]);
+        } else if (!want && scripts.length) {
+            await chrome.scripting.unregisterContentScripts({ ids: [UMP_SCRIPT_ID] });
+        }
+    }).catch(function (error) {
+        console.log(error);
+    });
+}
+let umpRegisterQueue = Promise.resolve();
+umpRegister();
+chrome.storage.onChanged.addListener(function (changes, namespace) {
+    // init.js 的监听先执行 G 已经是新值
+    if (namespace == "sync" && (changes.umpDecode || changes.enable)) {
+        setTimeout(umpRegister, 0);
+    }
+});
+
+/**
+ * 登记 / 更新 / 移除 页面内解码得到的轨道
+ * 轨道在资源列表里和其他资源一样 地址是页面的 blob 随着播放器请求的数据增多 轨道变完整 地址也随之更新
+ * @param {Object} Message 消息 key: 轨道标识 remove: 是否移除 其余为轨道信息
+ * @param {Object} sender 消息发送者
+ */
+function umpMedia(Message, sender) {
+    const tabId = sender.tab?.id;
+    if (!tabId || tabId <= 0 || !G.enable || !G.umpDecode || cacheData.init) { return; }
+    const blockUrlFlag = G.blockUrlSet.has(tabId);
+    if (G.blockUrlWhite ? !blockUrlFlag : blockUrlFlag) { return; }
+
+    const requestId = "ump:" + String(Message.key).slice(0, 300);
+    const find = () => Array.isArray(cacheData[tabId]) ? cacheData[tabId].findIndex(item => item.requestId == requestId) : -1;
+    if (Message.remove) {
+        const index = find();
+        if (index == -1) { return; }
+        cacheData[tabId].splice(index, 1);
+        save(tabId);
+        videoFloatNotify(tabId);
+        return;
+    }
+    // 只接受发送者页面自己的 blob 地址
+    let origin = sender.origin;
+    if (!origin) {
+        try { origin = new URL(sender.url).origin; } catch (e) { return; }
+    }
+    if (typeof Message.url != "string" || !Message.url.startsWith(`blob:${origin}/`)) { return; }
+
+    chrome.tabs.get(tabId, function (webInfo) {
+        if (chrome.runtime.lastError) { return; }
+        cacheData[tabId] ??= [];
+        const index = find();
+        const old = cacheData[tabId][index];
+        // 资源数量已经到上限时不再登记新的轨道
+        if (!old && cacheData[tabId].length > G.maxLength) { return; }
+        const mime = String(Message.mime ?? "").slice(0, 120);
+        const info = {
+            name: String(Message.name ?? "").slice(0, 200),
+            url: Message.url,
+            size: Number(Message.size) || 0,
+            ext: String(Message.ext ?? "").replace(/\W/g, "").slice(0, 8) || "mp4",
+            type: mime.split(";")[0].trim() || undefined,
+            tabId: tabId,
+            frameId: sender.frameId ?? 0,
+            isRegex: false,
+            requestId: requestId,
+            initiator: sender.url ?? webInfo?.url,
+            requestHeaders: {},
+            getTime: old?.getTime ?? Date.now(),
+            title: webInfo?.title ?? "NULL",
+            favIconUrl: webInfo?.favIconUrl,
+            webUrl: webInfo?.url,
+            ump: {
+                videoId: String(Message.videoId ?? "").slice(0, 32),
+                itag: Number(Message.itag) || 0,
+                mime: mime,
+                received: Number(Message.received) || 0,
+                total: Number(Message.total) || 0,
+                complete: !!Message.complete
+            }
+        };
+        if (old) {
+            cacheData[tabId][index] = info;
+        } else {
+            cacheData[tabId].push(info);
+            chrome.runtime.sendMessage({ Message: "popupAddData", data: info }, function () {
+                if (chrome.runtime.lastError) { return; }
+            });
+        }
+        videoFloatNotify(tabId);
+        save(tabId);
+    });
+}
+
+/**
+ * frame 重新载入后 它之前登记的轨道已经失效 从资源列表移除
+ * @param {Number} tabId 标签ID
+ * @param {Number} frameId 重新载入的frame 主框架重新载入时整个标签的轨道都失效
+ */
+function umpClear(tabId, frameId) {
+    const list = cacheData[tabId];
+    if (!Array.isArray(list)) { return; }
+    const keep = list.filter(item => !item.ump || (frameId != 0 && (item.frameId ?? 0) != frameId));
+    if (keep.length == list.length) { return; }
+    cacheData[tabId] = keep;
+    save(tabId);
+    videoFloatNotify(tabId);
+}

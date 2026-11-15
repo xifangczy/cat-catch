@@ -1077,5 +1077,19 @@
         "content": "$2"
       }
     }
+  },
+  "umpDecode": {
+    "message": "Decodificar os fluxos de mídia do YouTube (UMP)"
+  },
+  "umpProgress": {
+    "message": "$received$ de $total$ segmentos recebidos; aumenta conforme a reprodução avança",
+    "placeholders": {
+      "received": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
   }
 }

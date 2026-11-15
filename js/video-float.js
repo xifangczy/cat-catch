@@ -401,7 +401,8 @@
             list = result.enable ? result.data : [];
             total = result.enable ? result.total : 0;
             for (const item of list) {
-                item.key = item.requestId + "\n" + item.url;
+                // 页面内解码得到的轨道 地址随接收进度更新 用 requestId 标识 已有的行才不会被重建
+                item.key = item.capture ? item.requestId : item.requestId + "\n" + item.url;
                 item.href = normalize(item.url);
             }
             update();
@@ -447,11 +448,14 @@
         }
 
         // 2. 其余资源交给没有匹配到地址的媒体元素
+        // 页面内解码得到的轨道就是播放器正在播放的内容 有它们时 其他没有匹配到地址的资源 (例如页面的提示音) 不再算作 video 的
+        const captured = pool.filter(item => item.capture);
+        const rest = captured.length ? captured : pool;
         const candidates = medias.filter(media => !media.direct);
         if (candidates.length == 1) {
-            pool.forEach(item => candidates[0].own.add(item));
+            rest.forEach(item => candidates[0].own.add(item));
         } else if (candidates.length > 1) {
-            for (const item of pool) {
+            for (const item of rest) {
                 owners(item.getTime || 0, candidates).forEach(media => media.own.add(item));
             }
         }
@@ -885,8 +889,11 @@
         const name = h("span", item.parsing || item.isRegex ? "name bold" : "name", item.name);
         name.title = item.name;
         heading.appendChild(name);
-        const size = byteToSize(item.size);
-        size && heading.appendChild(h("span", "size", size));
+        const size = sizeText(item);
+        if (size || item.capture) {
+            row.size = h("span", "size", size);
+            heading.appendChild(row.size);
+        }
 
         const add = function (parent, icon, title, onClick) {
             const el = img(icon, "icon " + icon, title);
@@ -919,7 +926,8 @@
             if (item.title) {
                 row.info.append(h("b", "", i18n("title") + ": "), item.title);
             }
-            item.type && addInfo(row, "MIME", item.type);
+            const mime = item.capture?.mime || item.type;
+            mime && addInfo(row, "MIME", mime);
             const more = h("div", "moreButton");
             // 二维码 点击显示 / 隐藏
             row.qrcode = h("div", "qrcodeBox");
@@ -942,11 +950,11 @@
             add(more, "cat-down", i18n("downloadWithRequestHeader"), "catDown");
             add(more, "send2ffmpeg", i18n("sendFfmpeg"), "ffmpeg");
             add(more, "invoke", i18n("invoke"), "invoke");
-            const link = h("a", "", item.url);
-            link.href = item.url;
-            link.target = "_blank";
-            link.rel = "noreferrer noopener";
-            row.detail.append(row.info, more, row.qrcode, link);
+            row.link = h("a", "", row.item.url);
+            row.link.href = row.item.url;
+            row.link.target = "_blank";
+            row.link.rel = "noreferrer noopener";
+            row.detail.append(row.info, more, row.qrcode, row.link);
             if (item.picture) {
                 row.image = h("img", "screenshots");
                 row.image.style.display = "none";
@@ -977,7 +985,28 @@
         };
         heading.addEventListener("click", function () { toggle(); });
         row.panel.appendChild(heading);
+        refreshRow(row);
         return row;
+    }
+    // 资源大小 页面内解码得到的轨道没收全时 后面带上接收进度
+    function sizeText(item) {
+        const size = byteToSize(item.size);
+        const capture = item.capture;
+        if (!capture || capture.complete || !capture.total) { return size; }
+        return `${size} ${Math.floor(capture.received / capture.total * 100)}%`;
+    }
+    // 页面内解码得到的轨道 大小和地址随接收进度变化 更新已有的行
+    function refreshRow(row) {
+        const item = row.item;
+        if (!item.capture) { return; }
+        if (row.size) {
+            row.size.textContent = sizeText(item);
+            row.size.title = item.capture.total && !item.capture.complete ? i18n("umpProgress", [String(item.capture.received), String(item.capture.total)]) : "";
+        }
+        if (row.link) {
+            row.link.textContent = item.url;
+            row.link.href = item.url;
+        }
     }
     function addInfo(row, label, value) {
         row.info.childNodes.length && row.info.appendChild(h("br"));
@@ -1007,7 +1036,8 @@
             video.style.display = "";
             if (video.duration && video.duration != Infinity) {
                 addInfo(row, i18n("duration"), secToTime(video.duration));
-                if (item.parsing != "m3u8" && item.size >= 1024) {
+                // 没收全的轨道 大小不是整个文件的 算不出码率
+                if (item.parsing != "m3u8" && item.size >= 1024 && !(item.capture && !item.capture.complete)) {
                     addInfo(row, i18n("bitrate"), formatBitrate(item.size * 8 / video.duration));
                 }
             }
@@ -1083,7 +1113,10 @@
                 row = createRow(float, item, float.checked.get(item.key) ?? checked);
                 float.rows.set(item.key, row);
             }
-            row.item = item;
+            if (row.item !== item) {
+                row.item = item;
+                refreshRow(row);
+            }
             used.add(item.key);
             return row.panel;
         });
@@ -1111,7 +1144,9 @@
 
         const shownOwn = limit(own, MAX_ROWS);
         const shownOther = float.details.open ? limit(other, MAX_ROWS) : [];
-        const signature = shownOwn.map(item => item.key).join("\n") + "\n\n" + shownOther.map(item => item.key).join("\n") + "\n\n" + own.length + "/" + other.length;
+        // 页面内解码得到的轨道 key 不变但内容会变 把地址也算进去
+        const sign = item => item.capture ? item.key + "\t" + item.url : item.key;
+        const signature = shownOwn.map(sign).join("\n") + "\n\n" + shownOther.map(sign).join("\n") + "\n\n" + own.length + "/" + other.length;
         if (signature == float.signature) { return; }
         float.signature = signature;
         float.shownOwn = shownOwn;

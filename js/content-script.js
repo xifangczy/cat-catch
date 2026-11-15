@@ -233,7 +233,7 @@
         });
     };
     window.addEventListener("message", (event) => {
-        const action = ["catCatchAddMedia", "catCatchAddKey", "catCatchFFmpeg", "catCatchFFmpegResult", "catCatchCloseScript"];
+        const action = ["catCatchAddMedia", "catCatchAddKey", "catCatchFFmpeg", "catCatchFFmpegResult", "catCatchCloseScript", "catCatchUmp"];
         if (!event.data || !event.data.action || event.origin !== window.location.origin || !action.includes(event.data.action)) { return; }
         event.stopPropagation();
         event.stopImmediatePropagation();
@@ -255,6 +255,12 @@
                 return;
             }
             sendAddMedia(event.data);
+        }
+        // 页面内解码 UMP 得到的轨道 (catch-script/ump.js) 交给后台登记到资源列表
+        if (event.data.action == "catCatchUmp") {
+            if (!event.data.key) { return; }
+            chrome.runtime.sendMessage({ ...event.data, Message: "umpMedia", action: undefined });
+            return;
         }
         if (event.data.action == "catCatchAddKey") {
             let key = event.data.key;

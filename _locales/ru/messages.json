@@ -1077,5 +1077,19 @@
         "content": "$2"
       }
     }
+  },
+  "umpDecode": {
+    "message": "Декодировать медиапотоки YouTube (UMP)"
+  },
+  "umpProgress": {
+    "message": "Получено сегментов: $received$ из $total$; растёт по мере воспроизведения",
+    "placeholders": {
+      "received": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
   }
 }
