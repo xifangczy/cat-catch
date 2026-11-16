@@ -27,6 +27,11 @@ chrome.runtime.onConnect.addListener(function (Port) {
 });
 setInterval(chrome.runtime.getPlatformInfo, 25 * 1000);
 
+// UMP 解码 (YouTube) 的后台部分 代码内开关 G.umpSupport 在 js/init.js firefox 不启用
+if (G.umpSupport && !G.isFirefox) {
+    importScripts("/js/ump.background.js");
+}
+
 // 全局变量
 let debounce = undefined;
 let debounceCount = 0;

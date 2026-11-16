@@ -12,6 +12,10 @@ G.damnUrl = [
 ];
 G.damnUrlSet = new Set();
 
+// UMP 解码 (YouTube) 的代码内开关 商店发行版改为 false
+// 关闭后 不加载 js/ump.background.js 不注入解码脚本 设置页不显示对应的开关
+G.umpSupport = true;
+
 // 初始化当前tabId
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     if (tabs[0] && tabs[0].id) {
@@ -150,6 +154,7 @@ G.OptionLists = {
     maxLength: G.isMobile ? 999 : 9999,
     sidePanel: false,   // 侧边栏
     deepSearch: false, // 常开深度搜索
+    umpDecode: true,  // 解码 YouTube 的 UMP 媒体流 (页面内解码 轨道以 blob 地址加入资源列表)
 
     // MQTT 配置
     send2MQTT: false,
