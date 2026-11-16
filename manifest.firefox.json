@@ -25,6 +25,11 @@
     "page": "options.html",
     "open_in_tab": true
   },
+  "sidebar_action": {
+    "default_icon": "img/icon.png",
+    "default_title": "__MSG_catCatch__",
+    "default_panel": "popup.html"
+  },
   "permissions": [
     "tabs",
     "webRequest",

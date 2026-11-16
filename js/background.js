@@ -669,6 +669,11 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
         tabId,
         path: "popup.html?tabId=" + tabId
     });
+
+    G.isFirefox && browser.sidebarAction.setPanel({
+        tabId,
+        panel: "popup.html?tabId=" + tabId
+    });
 });
 
 /**
