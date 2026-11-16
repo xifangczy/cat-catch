@@ -4,6 +4,37 @@
     let VideoTagTimer;             // 标签列表刷新定时器
     let VideoStateTimer;           // 视频状态刷新定时器
     let tabOptions = {};           // 记录已添加的标签下拉选项 {tabId: true}
+    let _duration = 0;             // 当前媒体的时长 拖动进度条时用来预览时间
+
+    // ========== 图形化控件 ==========
+    // 设置滑块的值 并更新已播放 / 当前音量部分的填充
+    function setRange(selector, value) {
+        const range = $(selector)[0];
+        if (value !== undefined && !isNaN(value)) {
+            range.value = value;
+        }
+        const min = parseFloat(range.min) || 0;
+        const max = parseFloat(range.max) || 100;
+        range.style.setProperty("--pct", `${(range.value - min) / (max - min) * 100}%`);
+    }
+    // 画中画按钮状态
+    function setPip(active) {
+        $("#pip").attr("title", active ? `${i18n.exit} ${i18n.pictureInPicture}` : i18n.pictureInPicture);
+    }
+    // 播放 / 暂停 图标 状态有变化才切换
+    function setControl(paused) {
+        const action = paused ? "play" : "pause";
+        const $control = $("#control");
+        if ($control.data("switch") === action && $control.hasClass(action)) { return; }
+        $control.attr("src", paused ? "img/play.png" : "img/pause.svg")
+            .removeClass("play pause").addClass(action)
+            .data("switch", action)
+            .attr("title", paused ? i18n.play : i18n.pause);
+    }
+    // 没有可操控的媒体 控件变灰
+    function setIdle(idle) {
+        $("#PlayControl").toggleClass("mediaIdle", idle);
+    }
 
     // ========== 视频标签下拉列表管理 ==========
     function setVideoTagTimer() {
@@ -67,37 +98,53 @@
     function getVideoState(setSpeed = false) {
         if (_tabId === -1) {
             let currentTabId = $("#videoTabIndex").val();
-            if (!currentTabId || currentTabId == -1) return;
+            if (!currentTabId || currentTabId == -1) {
+                setIdle(true);
+                return;
+            }
             _tabId = parseInt(currentTabId);
         }
 
         chrome.tabs.sendMessage(_tabId, { Message: "getVideoState", index: _index }, { frameId: 0 }, (state) => {
-            if (chrome.runtime.lastError || !state || state.count === 0) return;
+            if (chrome.runtime.lastError || !state || state.count === 0) {
+                setIdle(true);
+                return;
+            }
+            setIdle(false);
 
-            // 如果是纯音频，隐藏画中画和截图按钮
+            // 如果是纯音频，隐藏画中画 截图 全屏按钮
             if (state.type === "audio") {
-                $("#pip, #screenshot").hide();
+                $("#pip, #screenshot, #fullScreen").hide();
             } else {
-                if (!G.isFirefox) $("#pip").show();
+                if (!G.isFirefox) $("#pip, #fullScreen").show();
                 $("#screenshot").show();
             }
 
             // 更新音量进度
-            $("#volume").val(state.volume);
+            setRange("#volume", state.volume);
             if (state.duration && state.duration !== Infinity) {
-                $("#timeShow").html(`${secToTime(state.currentTime)} / ${secToTime(state.duration)}`);
-                $("#time").val(state.time);
+                _duration = state.duration;
+                $("#timeCurrent").text(secToTime(state.currentTime));
+                $("#timeDuration").text(secToTime(state.duration));
+                setRange("#time", state.time);
+            } else {
+                // 直播等没有时长的媒体
+                _duration = 0;
+                $("#timeCurrent").text(secToTime(state.currentTime || 0));
+                $("#timeDuration").text("--:--");
+                setRange("#time", 0);
             }
 
             // 播放/暂停按钮
-            state.paused
-                ? $("#control").html(i18n.play).data("switch", "play")
-                : $("#control").html(i18n.pause).data("switch", "pause");
+            setControl(state.paused);
 
-            // 倍速按钮
-            state.speed === 1
-                ? $("#speed").html(i18n.speedPlayback).data("switch", "speed")
-                : $("#speed").html(i18n.normalPlay).data("switch", "normal");
+            // 倍速按钮 未开启倍速时图标变淡
+            $("#speed").toggleClass("mediaOff", state.speed === 1)
+                .data("switch", state.speed === 1 ? "speed" : "normal")
+                .attr("title", state.speed === 1 ? i18n.speedPlayback : i18n.normalPlay);
+
+            // 画中画
+            state.pip !== undefined && setPip(state.pip);
 
             $("#loop").prop("checked", state.loop);
             $("#muted").prop("checked", state.muted);
@@ -223,8 +270,8 @@
     $("#pip").click(function () {
         if (_index < 0 || _tabId < 0) return;
         chrome.tabs.sendMessage(_tabId, { Message: "pip", index: _index }, (state) => {
-            if (chrome.runtime.lastError) return;
-            $("#pip").html(state.state ? i18n.exit : i18n.pictureInPicture);
+            if (chrome.runtime.lastError || !state) return;
+            setPip(state.state);
         });
     });
 
@@ -252,23 +299,46 @@
         chrome.tabs.sendMessage(_tabId, { Message: this.id, action, index: _index });
     });
 
+    // 键盘调节滑块的按键
+    const rangeKeys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End", "PageUp", "PageDown"];
+
     // 调节音量 / 进度时暂停定时器
-    $("#volume, #time").mousedown(function () {
+    $("#volume, #time").on("mousedown touchstart keydown", function (event) {
         if (_index < 0 || _tabId < 0) return;
+        if (event.type === "keydown" && !rangeKeys.includes(event.key)) return;
         clearInterval(VideoStateTimer);
     });
 
-    // 音量提交
-    $("#volume").mouseup(function () {
+    // 拖动音量 实时生效
+    $("#volume").on("input", function () {
+        setRange("#volume");
         if (_index < 0 || _tabId < 0) return;
+        chrome.tabs.sendMessage(_tabId, { Message: "setVolume", volume: $(this).val(), index: _index }, () => {
+            if (chrome.runtime.lastError) return;
+        });
+    });
+
+    // 拖动进度 预览要跳转到的时间
+    $("#time").on("input", function () {
+        setRange("#time");
+        if (_duration) {
+            $("#timeCurrent").text(secToTime($(this).val() * _duration / 100));
+        }
+    });
+
+    // 音量提交
+    $("#volume").on("mouseup touchend keyup", function (event) {
+        if (_index < 0 || _tabId < 0) return;
+        if (event.type === "keyup" && !rangeKeys.includes(event.key)) return;
         chrome.tabs.sendMessage(_tabId, { Message: "setVolume", volume: $(this).val(), index: _index }, () => {
             if (!chrome.runtime.lastError) setVideoStateTimer();
         });
     });
 
     // 进度提交
-    $("#time").mouseup(function () {
+    $("#time").on("mouseup touchend keyup", function (event) {
         if (_index < 0 || _tabId < 0) return;
+        if (event.type === "keyup" && !rangeKeys.includes(event.key)) return;
         chrome.tabs.sendMessage(_tabId, { Message: "setTime", time: $(this).val(), index: _index }, () => {
             if (!chrome.runtime.lastError) setVideoStateTimer();
         });

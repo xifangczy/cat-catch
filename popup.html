@@ -52,28 +52,48 @@
         <option value="-1" id="videoIndexTips" data-i18n="noControllableMediaDetected"></option>
       </select>
     </div>
-    <div id="PlayControl" class="textColor">
-      <span data-i18n-outer="multiplier"></span><input id="playbackRate" type="number" value="2" min="0.1" max="16"
-        title="Play Back Rate" step="1" />
-      <button id="speed" class="button2" data-i18n="speedPlayback" title="Adjust playback speed"></button>
-      <button id="control" data-switch="play" data-i18n="play" title="Play/Pause media"></button>
-      <button id="pip" class="firefoxHide" data-i18n="pictureInPicture" title="Toggle picture-in-picture mode"></button>
-      <button id="fullScreen" class="firefoxHide" data-i18n="fullscreen" title="Toggle fullscreen mode"></button>
-      <button id="screenshot" data-switch="play" data-i18n="screenshot"
-        title="Take screenshot of current frame"></button>
-      <label class="flexColumn loop" title="Loop">
-        <div data-i18n="loop"></div><input type="checkbox" id="loop" placeholder="Loop">
-      </label>
-      <label class="flexColumn muted" title="Mute">
-        <div data-i18n="mute"></div><input type="checkbox" id="muted" placeholder="Mute">
-      </label>
-      <div class="flexColumn">
-        <div data-i18n="volume" title="Volume"></div><input type="range" id="volume" class="volume" min="0" max="1"
-          value="1" step="0.01" title="Volume Control" />
+    <!-- 媒体控制 -->
+    <div id="PlayControl" class="textColor mediaIdle">
+      <!-- 进度条 -->
+      <div class="mediaProgress">
+        <span id="timeCurrent" class="mediaTime">00:00</span>
+        <input type="range" id="time" class="mediaRange" min="0" max="100" value="0" step="0.1" title="Time Control" />
+        <span id="timeDuration" class="mediaTime">00:00</span>
       </div>
-      <div class="flexColumn width100">
-        <div id="timeShow" title="Time"></div><input type="range" id="time" class="width100" min="0" max="100" value="0"
-          step="1" title="Time Control" />
+      <div class="mediaButtons">
+        <div class="mediaGroup">
+          <!-- 播放 / 暂停 -->
+          <img src="img/play.png" class="icon play" id="control" data-switch="play" data-i18n-title="play"
+            title="Play/Pause media" />
+          <!-- 静音 音量 -->
+          <label class="mediaToggle muted" data-i18n-title="mute" title="Mute">
+            <input type="checkbox" id="muted">
+            <img src="img/volume.svg" class="icon volume" /><img src="img/mute.svg" class="icon mute" />
+          </label>
+          <input type="range" id="volume" class="mediaRange mediaVolume" min="0" max="1" value="1" step="0.01"
+            data-i18n-title="volume" title="Volume Control" />
+          <!-- 循环 -->
+          <label class="mediaToggle loop" data-i18n-title="loop" title="Loop">
+            <input type="checkbox" id="loop">
+            <img src="img/loop.svg" class="icon loop" />
+          </label>
+        </div>
+        <div class="mediaGroup">
+          <!-- 倍速 -->
+          <img src="img/speed.svg" class="icon speed" id="speed" data-switch="speed" data-i18n-title="speedPlayback"
+            title="Adjust playback speed" />
+          <input id="playbackRate" type="number" value="2" min="0.1" max="16" step="1"
+            data-i18n-title="speedPlayback" title="Play Back Rate" /><span class="mediaSpeedUnit">×</span>
+          <!-- 截图 -->
+          <img src="img/screenshot.svg" class="icon screenshot" id="screenshot" data-switch="play"
+            data-i18n-title="screenshot" title="Take screenshot of current frame" />
+          <!-- 画中画 -->
+          <img src="img/pip.svg" class="icon pip firefoxHide" id="pip" data-i18n-title="pictureInPicture"
+            title="Toggle picture-in-picture mode" />
+          <!-- 全屏 -->
+          <img src="img/fullscreen.svg" class="icon fullscreen firefoxHide" id="fullScreen"
+            data-i18n-title="fullscreen" title="Toggle fullscreen mode" />
+        </div>
       </div>
     </div>
     <div class="line"></div>

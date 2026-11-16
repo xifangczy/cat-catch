@@ -46,7 +46,9 @@
                     loop: video.loop,
                     speed: video.playbackRate,
                     muted: video.muted,
-                    type: video.tagName.toLowerCase(),
+                    pip: video.ownerDocument.pictureInPictureElement === video,
+                    // 只有音轨的 video (浏览器直接打开音频文件时用的就是 video) 也按音频处理
+                    type: video.tagName == "AUDIO" || (video.readyState >= 1 && !video.videoWidth && !video.videoHeight) ? "audio" : "video",
                     videoStatus: videoObj.map(v => v.paused ? 1 : 0)
                 });
                 return true;
