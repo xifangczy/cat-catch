@@ -195,7 +195,22 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
     if (!filter) { return; }
 
     // 谜之原因 获取得资源 tabId可能为 -1 firefox中则正常
-    // 检查是 -1 使用当前激活标签得tabID
+    // Service Worker 等发起的请求没有标签 先按发起者的域名找到对应的标签
+    if (data.tabId == -1 && !data.tabResolved && data.initiator && data.initiator != "null" && !isSpecialPage(data.initiator)) {
+        data.tabResolved = true;
+        let origin;
+        try { origin = new URL(data.initiator).origin; } catch (e) { origin = undefined; }
+        if (origin) {
+            chrome.tabs.query({ url: origin + "/*" }, function (tabs) {
+                if (!chrome.runtime.lastError && tabs && tabs.length) {
+                    data.tabId = findInitiatorTab(tabs, data).id;
+                }
+                findMedia(data, isRegex, filter, timer);
+            });
+            return;
+        }
+    }
+    // 找不到对应的标签 使用当前激活标签得tabID
     data.tabId = data.tabId == -1 ? G.tabId : data.tabId;
 
     cacheData[data.tabId] ??= [];
@@ -204,6 +219,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
     // 缓存数据大于9999条 清空缓存 避免内存占用过多
     if (cacheData[data.tabId].length > G.maxLength) {
         cacheData[data.tabId] = [];
+        G.urlMap.delete(data.tabId);
         (chrome.storage.session ?? chrome.storage.local).set({ MediaData: cacheData });
         return;
     }
@@ -218,16 +234,14 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
     //     }
     // }
 
-    if (G.checkDuplicates && cacheData[data.tabId].length <= 500) {
+    // 使用 Set 查重 不随资源数量变慢 整个标签的资源都参与查重 (缓存清空时一起清空)
+    if (G.checkDuplicates) {
         const tabFingerprints = G.urlMap.get(data.tabId) || new Set();
         if (tabFingerprints.has(data.url)) {
             return; // 找到重复，直接返回
         }
         tabFingerprints.add(data.url);
         G.urlMap.set(data.tabId, tabFingerprints);
-        if (tabFingerprints.size >= 500) {
-            tabFingerprints.clear();
-        }
     }
 
     chrome.tabs.get(data.tabId, async function (webInfo) {
@@ -256,6 +270,14 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         // 不存在扩展使用类型
         if (info.ext === undefined && info.type !== undefined) {
             info.ext = info.type.split("/")[1];
+            // application/octet-stream 等通用类型不是真正的格式 按请求的用途使用常见的格式
+            if (GENERIC_SUBTYPES.has(info.ext)) {
+                info.ext = getFetchDest(data) == "audio" ? "mp3" : "mp4";
+            }
+        }
+        // 记录非 GET 的请求方法 下载时使用相同的方法
+        if (data.method && data.method != "GET") {
+            info.method = data.method;
         }
         // 正则匹配的备注扩展
         if (data.extraExt) {
@@ -285,10 +307,9 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
                     } else {
                         fileName = downDir + fileName;
                     }
-                    chrome.downloads.download({
-                        url: info.url,
-                        filename: fileName
-                    });
+                    const options = { url: info.url, filename: fileName };
+                    if (info.method == "POST") { options.method = "POST"; }
+                    chrome.downloads.download(options);
                 } catch (e) { return; }
             }
             if (chrome.runtime.lastError) { return; }
@@ -966,7 +987,15 @@ const DIRECT_INCLUDE_HEADERS = new Set([
     "authtoken",
     "session-id"
 ]);
-const X_AUTH_KEYWORD_REG = /(auth|token|sign|key|ticket|session)/;
+// 浏览器自己管理的请求头 不需要保存 下载时由浏览器重新生成
+const BROWSER_HEADERS = new Set([
+    "accept", "accept-charset", "accept-encoding", "accept-language",
+    "access-control-request-headers", "access-control-request-method",
+    "cache-control", "connection", "content-length", "content-type", "dnt", "expect", "host",
+    "if-match", "if-modified-since", "if-none-match", "if-range", "if-unmodified-since",
+    "keep-alive", "pragma", "priority", "purpose", "range", "save-data", "te", "trailer",
+    "transfer-encoding", "upgrade", "upgrade-insecure-requests", "user-agent", "via", "x-client-data"
+]);
 function getRequestHeaders(data) {
     if (!data?.allRequestHeaders?.length) {
         return false;
@@ -979,11 +1008,49 @@ function getRequestHeaders(data) {
             header[lowerName] = item.value;
             continue;
         }
-        if (lowerName.startsWith("x-") && X_AUTH_KEYWORD_REG.test(lowerName)) {
+        // 网站自定义的请求头都保存 资源可能依赖它们才能下载 (不只是 x- 开头带 token / sign 的)
+        if (!BROWSER_HEADERS.has(lowerName) && !lowerName.startsWith("sec-") && !lowerName.startsWith("proxy-") && !lowerName.startsWith(":")) {
             header[lowerName] = item.value;
         }
     }
     return Object.keys(header).length > 0 ? header : false;
+}
+
+/**
+ * 没有标签的请求 (Service Worker 等发起) 在同域名的标签里找出它属于哪个标签
+ * @param {Array} tabs 和发起者同域名的标签
+ * @param {Object} data 请求数据
+ * @returns {Object} 标签
+ */
+function findInitiatorTab(tabs, data) {
+    const referer = data.allRequestHeaders?.find(item => item.name?.toLowerCase() == "referer")?.value;
+    if (referer) {
+        // 页面的请求被 Service Worker 原样转发 referer 是页面地址
+        const page = tabs.filter(tab => tab.url && tab.url.split("#")[0] == referer);
+        // Service Worker 自己发起的请求 referer 是它的脚本地址 它管理的页面默认在脚本所在目录下
+        const scope = referer.substring(0, referer.lastIndexOf("/") + 1);
+        const inScope = tabs.filter(tab => tab.url && tab.url.startsWith(scope));
+        tabs = page.length ? page : (inScope.length ? inScope : tabs);
+    }
+    // 还有多个标签 优先当前激活的 其次最近使用过的
+    return tabs.find(tab => tab.id == G.tabId) ?? [...tabs].sort((a, b) => (b.lastAccessed ?? 0) - (a.lastAccessed ?? 0))[0];
+}
+
+// application/octet-stream 等通用类型 取 "/" 后面的部分不能当作扩展名
+const GENERIC_SUBTYPES = new Set(["octet-stream", "binary", "x-binary", "force-download", "download", "x-download", "unknown", "x-unknown"]);
+/**
+ * 获取请求的用途 video / audio / empty 等 (请求头 sec-fetch-dest)
+ * @param {Object} data
+ * @returns {String|undefined}
+ */
+function getFetchDest(data) {
+    if (!data?.allRequestHeaders?.length) { return undefined; }
+    for (let item of data.allRequestHeaders) {
+        if (item.name && item.name.toLowerCase() == "sec-fetch-dest") {
+            return item.value;
+        }
+    }
+    return undefined;
 }
 //设置扩展图标
 function SetIcon(obj) {

@@ -27,6 +27,15 @@
     const videoSet = new Set();
     const base64Regex = /^[A-Za-z0-9+/]+={0,2}$/;
     const hexRegex = /^[A-Fa-f0-9]+$/;
+    const FETCH_TEXT_LIMIT = 16 * 1024 * 1024;  // fetch 响应最多读取的大小 清单 接口等文本不会超过
+    const FETCH_BINARY_LIMIT = 64 * 1024;       // 开头是二进制数据的响应 (媒体 / 直播流) 读到这个大小就停止
+    const MEDIA_MIN_SIZE = 1024 * 1024;         // 通过文件头识别的媒体 大于这个大小才当作完整的媒体文件
+    // 通过地址后缀查找的格式 不包含 ts m4s 等分片
+    const mediaExtensions = new Set([
+        "m3u8", "m3u", "mpd", "key",
+        "mp4", "m4v", "mov", "webm", "mkv", "flv", "f4v", "avi", "wmv",
+        "mp3", "m4a", "aac", "wav", "ogg", "oga", "ogv", "opus", "flac", "weba"
+    ]);
     extractBaseUrl(location.href);
 
     // Worker
@@ -165,6 +174,11 @@
                 if (this.responseURL.includes(".ts")) {
                     extractBaseUrl(this.responseURL);
                 }
+                // 没有后缀的媒体文件 通过文件头识别
+                if (method == "GET" && this.response.byteLength >= MEDIA_MIN_SIZE) {
+                    const ext = getMediaExt(this.response);
+                    ext && isUrl(this.responseURL) && postData({ action: "catCatchAddMedia", url: this.responseURL, href: location.href, ext: ext });
+                }
             }
             if (typeof this.response == "object") {
                 findMedia(this.response);
@@ -207,6 +221,15 @@
                     return;
                 }
             }
+            // dash 清单 没有 mpd 后缀也能找到
+            if (isMPD(responseUpper)) {
+                if (method == "GET") {
+                    postData({ action: "catCatchAddMedia", url: this.responseURL, href: location.href, ext: "mpd" });
+                    return;
+                }
+                toUrl(this.response, "mpd");
+                return;
+            }
             // dash DRM
             // if (responseUpper.includes("<MPD") && responseUpper.includes("</MPD>")) {
             //     _postMessage({
@@ -241,25 +264,41 @@
         }
         const clone = response.clone();
         CATCH_SEARCH_DEBUG && console.log(response);
-        response.arrayBuffer()
-            .then(arrayBuffer => {
+        // 请求方法 以及补全后的地址 (input 可能是相对地址)
+        const method = (init?.method ?? (typeof input == "object" ? input.method : undefined) ?? "GET").toUpperCase();
+        let url = response.url;
+        if (!url) {
+            try { url = new URL(typeof input == "object" ? input.url : input, location.href).href; } catch (e) { url = ""; }
+        }
+        readResponse(response)
+            .then(({ arrayBuffer, complete }) => {
                 CATCH_SEARCH_DEBUG && console.log({ arrayBuffer, input });
-                if (arrayBuffer.byteLength == 16) {
+                if (complete && arrayBuffer.byteLength == 16) {
                     postData({ action: "catCatchAddKey", key: arrayBuffer, href: location.href, ext: "key" });
                     return;
                 }
+                // 没有后缀的媒体文件 通过文件头识别 只认完整的媒体文件 不认分片
+                const mediaExt = getMediaExt(arrayBuffer);
+                if (mediaExt) {
+                    const length = parseInt(response.headers.get("content-range")?.split("/")[1] ?? response.headers.get("content-length"));
+                    if (method == "GET" && isUrl(url) && (isNaN(length) || length >= MEDIA_MIN_SIZE)) {
+                        postData({ action: "catCatchAddMedia", url: url, href: location.href, ext: mediaExt });
+                    }
+                    return;
+                }
+                // 没有读完的响应 (媒体数据 / 直播流 / 超大文本) 不再处理
+                if (!complete) { return; }
                 let text = _textDecoder.call(new TextDecoder(), arrayBuffer);
                 if (text == "") { return; }
-                if (typeof input == "object") { input = input.url; }
                 let isJson = isJSON(text);
                 if (isJson) {
                     findMedia(isJson);
                     return;
                 }
                 if (text.substring(0, 7).toUpperCase() == "#EXTM3U") {
-                    if (init?.method == undefined || (init.method && init.method.toUpperCase() == "GET")) {
-                        toUrl(addBaseUrl(getBaseUrl(input), text));
-                        postData({ action: "catCatchAddMedia", url: input, href: location.href, ext: "m3u8" });
+                    if (method == "GET" && isUrl(url)) {
+                        toUrl(addBaseUrl(getBaseUrl(url), text));
+                        postData({ action: "catCatchAddMedia", url: url, href: location.href, ext: "m3u8" });
                         return;
                     }
                     toUrl(text);
@@ -270,7 +309,17 @@
                     data && toUrl(data);
                     return;
                 }
-            });
+                // dash 清单 没有 mpd 后缀也能找到
+                if (isMPD(text.substring(0, 4096).toUpperCase())) {
+                    if (method == "GET" && isUrl(url)) {
+                        postData({ action: "catCatchAddMedia", url: url, href: location.href, ext: "mpd" });
+                        return;
+                    }
+                    toUrl(text, "mpd");
+                    return;
+                }
+            })
+            .catch(() => { });
         return clone;
     }
     self.fetch.toString = function () {
@@ -657,14 +706,84 @@
         ext = ext.pathname.split(".");
         if (ext.length == 1) { return undefined; }
         ext = ext[ext.length - 1].toLowerCase();
-        if (ext == "m3u8" ||
-            ext == "m3u" ||
-            ext == "mpd" ||
-            ext == "mp4" ||
-            ext == "mp3" ||
-            ext == "flv" ||
-            ext == "key"
-        ) { return ext; }
+        if (mediaExtensions.has(ext)) { return ext; }
+        return false;
+    }
+    // 是否 dash 清单 参数为转成大写的文本
+    function isMPD(upperText) {
+        return upperText.includes("<MPD") && upperText.includes("URN:MPEG:DASH:SCHEMA:MPD");
+    }
+    /**
+     * 通过文件头判断媒体格式 用于没有后缀 类型又是 octet-stream 的媒体
+     * 只识别完整文件的文件头 fmp4 / ts 分片不会被识别
+     * @param {ArrayBuffer} buffer 文件开头的数据
+     * @returns {String|undefined} 扩展名
+     */
+    function getMediaExt(buffer) {
+        if (!buffer || buffer.byteLength < 12) { return undefined; }
+        const head = new _Uint8Array(buffer, 0, Math.min(buffer.byteLength, 64));
+        const text = (start, length) => {
+            let out = "";
+            for (let i = start; i < start + length && i < head.length; i++) { out += _fromCharCode(head[i]); }
+            return out;
+        };
+        if (text(4, 4) == "ftyp") {
+            const brand = text(8, 4);
+            if (brand.startsWith("M4A")) { return "m4a"; }
+            if (brand.startsWith("qt")) { return "mov"; }
+            return "mp4";
+        }
+        if (head[0] == 0x1A && head[1] == 0x45 && head[2] == 0xDF && head[3] == 0xA3) {
+            return text(0, 64).includes("webm") ? "webm" : "mkv";
+        }
+        if (text(0, 3) == "FLV" && head[3] == 0x01) { return "flv"; }
+        if (text(0, 4) == "OggS") { return "ogg"; }
+        if (text(0, 4) == "fLaC") { return "flac"; }
+        if (text(0, 3) == "ID3") { return "mp3"; }
+        if (text(0, 4) == "RIFF" && text(8, 4) == "WAVE") { return "wav"; }
+        return undefined;
+    }
+    /**
+     * 读取 fetch 的响应 用于查找 m3u8 / mpd / 密钥
+     * 开头是二进制数据的 (媒体文件 / 直播流) 读到 FETCH_BINARY_LIMIT 就停止 不把整个响应读进内存
+     * @param {Response} response
+     * @returns {Promise<Object>} { arrayBuffer: 读到的数据, complete: 是否读完 }
+     */
+    async function readResponse(response) {
+        if (!response.body || typeof response.body.getReader != "function") {
+            return { arrayBuffer: await response.arrayBuffer(), complete: true };
+        }
+        const reader = response.body.getReader();
+        const chunks = [];
+        let size = 0;
+        let complete = false;
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+                complete = true;
+                break;
+            }
+            chunks.push(value);
+            size += value.byteLength;
+            if (size > FETCH_TEXT_LIMIT || (size >= FETCH_BINARY_LIMIT && isBinary(chunks[0]))) {
+                reader.cancel().catch(() => { });
+                break;
+            }
+        }
+        const merged = new _Uint8Array(size);
+        let offset = 0;
+        for (const chunk of chunks) {
+            merged.set(chunk, offset);
+            offset += chunk.byteLength;
+        }
+        return { arrayBuffer: merged.buffer, complete: complete };
+    }
+    // 开头有 0 字节的是二进制数据 文本(m3u8 json xml)不会有
+    function isBinary(bytes) {
+        const length = Math.min(bytes.byteLength, 512);
+        for (let i = 0; i < length; i++) {
+            if (bytes[i] === 0) { return true; }
+        }
         return false;
     }
     function toUrl(text, ext = "m3u8") {
@@ -849,14 +968,16 @@
                         let match;
                         while ((match = pattern.exec(script.textContent)) !== null) {
                             let url = match[1] || match[0];
-                            // 清理URL
-                            url = url.replace(/['"]/g, '').trim();
-                            if (url && !url.startsWith('http')) {
-                                // 补全协议
-                                url = window.location.protocol + '//' + url.replace(/^\/\//, '');
-                            }
-                            if (url && isUrl(url)) {
-                                postData({ action: "catCatchAddMedia", url: url, href: location.href, ext: "m3u8" });
+                            // 清理URL JSON 里的斜杠会被转义成 \/
+                            url = url.replace(/['"]/g, '').replace(/\\\//g, '/').trim();
+                            // 不带路径的只是一个文件名 无法确定地址
+                            if (!url || !url.includes('/')) { continue; }
+                            // 相对地址按当前页面补全
+                            try { url = new URL(url, location.href).href; } catch (e) { continue; }
+                            // 扩展名按地址的实际后缀 不是全部当作 m3u8
+                            const ext = getExtension(url);
+                            if (ext && isUrl(url)) {
+                                postData({ action: "catCatchAddMedia", url: url, href: location.href, ext: ext });
                             }
                         }
                     });

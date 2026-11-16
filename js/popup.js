@@ -335,7 +335,9 @@ function AddMedia(data, currentTab = true) {
     chrome.downloads.download({
       url: data.url,
       filename: data.downFileName,
-      saveAs: G.saveAs
+      saveAs: G.saveAs,
+      // 嗅探到的是 POST 请求 使用相同的方法下载
+      ...(data.method == "POST" ? { method: "POST" } : {})
     }, function (id) { downData[id] = data; });
     return false;
   });
@@ -593,7 +595,8 @@ $('#DownFile').click(function () {
     setTimeout(function () {
       chrome.downloads.download({
         url: data.url,
-        filename: data.downFileName
+        filename: data.downFileName,
+        ...(data.method == "POST" ? { method: "POST" } : {})
       }, function (id) { downData[id] = data; });
     }, index * 100);
   };

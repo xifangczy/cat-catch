@@ -582,46 +582,60 @@
                 return proxy;
             };
 
+            if (!window.MediaSource || !window.SourceBuffer) { return; }
+
+            // SourceBuffer 对应的捕获数据
+            const sourceBuffers = new WeakMap();
+
             // 代理 addSourceBuffer 方法
             window.MediaSource.prototype.addSourceBuffer = registerNativeStr(new Proxy(window.MediaSource.prototype.addSourceBuffer, {
                 apply: (target, thisArg, argumentsList) => {
+                    const result = Reflect.apply(target, thisArg, argumentsList);
                     try {
-                        const result = Reflect.apply(target, thisArg, argumentsList);
-
                         // 标题获取
                         setTimeout(() => { this.getFileName(); }, 2000);
                         this.tips.innerHTML = this.i18n("capturingData", "捕获数据中...");
 
-                        this.catchMedia.push({ mimeType: argumentsList[0], bufferList: [] });
-                        const index = this.catchMedia.length - 1;
-
-                        // 代理 appendBuffer 方法
-                        result.appendBuffer = registerNativeStr(new Proxy(result.appendBuffer, {
-                            apply: (target, thisArg, argumentsList) => {
-                                Reflect.apply(target, thisArg, argumentsList);
-
-                                if (this.enable && argumentsList[0]) {
-                                    this.mediaSize += argumentsList[0].byteLength || 0;
-                                    if (this.mediaSize >= 1024 * 1024 * 1024 && localStorage.getItem("CatCatchCatch_save1GB") == "checked") {
-                                        this.catchDownload();
-                                        this.clearCache();
-
-                                    }
-                                    if (this.tips) {
-                                        this.tips.innerHTML = this.i18n("capturingData", "捕获数据中...") + ": " + this.byteToSize(this.mediaSize);
-                                    }
-                                    this.catchMedia[index].bufferList.push(argumentsList[0]);
-                                }
-                            }
-                        }), result.appendBuffer);
-
-                        return result;
+                        const media = { mimeType: argumentsList[0], bufferList: [] };
+                        this.catchMedia.push(media);
+                        sourceBuffers.set(result, media);
                     } catch (error) {
                         console.error("addSourceBuffer 代理错误:", error);
-                        return Reflect.apply(target, thisArg, argumentsList);
                     }
+                    return result;
                 }
             }), window.MediaSource.prototype.addSourceBuffer);
+
+            // 代理 appendBuffer 方法
+            // 挂在原型上 播放器直接调用 SourceBuffer.prototype.appendBuffer 也能捕获 (原来挂在实例上 会被绕过)
+            window.SourceBuffer.prototype.appendBuffer = registerNativeStr(new Proxy(window.SourceBuffer.prototype.appendBuffer, {
+                apply: (target, thisArg, argumentsList) => {
+                    const result = Reflect.apply(target, thisArg, argumentsList);
+                    try {
+                        const media = sourceBuffers.get(thisArg);
+                        if (media && this.enable && argumentsList[0]) {
+                            // 缓存被清空后 继续捕获的数据重新加入列表
+                            if (!this.catchMedia.includes(media)) {
+                                media.bufferList = [];
+                                this.catchMedia.push(media);
+                            }
+                            this.mediaSize += argumentsList[0].byteLength || 0;
+                            if (this.mediaSize >= 1024 * 1024 * 1024 && localStorage.getItem("CatCatchCatch_save1GB") == "checked") {
+                                this.catchDownload();
+                                this.clearCache();
+
+                            }
+                            if (this.tips) {
+                                this.tips.innerHTML = this.i18n("capturingData", "捕获数据中...") + ": " + this.byteToSize(this.mediaSize);
+                            }
+                            media.bufferList.push(argumentsList[0]);
+                        }
+                    } catch (error) {
+                        console.error("appendBuffer 代理错误:", error);
+                    }
+                    return result;
+                }
+            }), window.SourceBuffer.prototype.appendBuffer);
 
             // 代理 endOfStream 方法
             window.MediaSource.prototype.endOfStream = registerNativeStr(new Proxy(window.MediaSource.prototype.endOfStream, {
