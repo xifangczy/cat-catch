@@ -852,8 +852,11 @@
   "video": {
     "message": "Vidéo"
   },
-  "DRMerror": {
-    "message": "Ce média est protégé par DRM. Veuillez utiliser un outil tiers pour le télécharger."
+  "drmProtected": {
+    "message": "Ce média est protégé par DRM et ne peut pas être téléchargé"
+  },
+  "drmScreenshot": {
+    "message": "Impossible de faire une capture d'une vidéo protégée par DRM"
   },
   "regexTitle": {
     "message": "Correspondance par expression régulière ou trouvé via la Recherche Approfondie"

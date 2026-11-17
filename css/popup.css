@@ -71,6 +71,15 @@ body {
 .popupBody .panel .group {
   font-weight: bold;
 }
+/* 受 DRM 保护的资源 */
+.panel-heading .drm {
+  margin: 0 4px;
+  padding: 0 3px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: bold;
+}
 #Tips,
 #TipsFixed {
   left: 0;

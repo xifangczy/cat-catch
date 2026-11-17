@@ -168,6 +168,10 @@ function AddMedia(data, currentTab = true) {
     data.urlPanel.show();
     if (!mediaInfo.data("state")) {
       mediaInfo.data("state", true);
+      // 受 DRM 保护 不预览
+      if (data.drm) {
+        return false;
+      }
       if (isM3U8(data)) {
         const hls = new Hls({ enableWorker: false });
         setRequestHeaders(data.requestHeaders, function () {
@@ -433,8 +437,9 @@ function AddMedia(data, currentTab = true) {
       return data._checked;
     },
     set(newValue) {
-      data._checked = newValue;
-      data.html.find('input').prop("checked", newValue);
+      // 受 DRM 保护的资源 不能勾选 批量操作都不包含它
+      data._checked = newValue && !data.drm;
+      data.html.find('input').prop("checked", data._checked);
     }
   });
   // 数据发送
@@ -511,6 +516,9 @@ function AddMedia(data, currentTab = true) {
     data.html.find("input").prop("checked", false);
   }
   duplicateFilenamesSet && duplicateFilenamesSet.add(data.name);
+
+  // 检查所在页面有没有受 DRM 保护的媒体
+  refreshDrm(data.tabId);
 
   return data.html;
 }
@@ -1311,6 +1319,45 @@ function getAllData() {
   data.push(...allData.get(true).values());
   data.push(...allData.get(false).values());
   return data;
+}
+
+/********************DRM********************/
+/**
+ * 页面里有受 DRM 保护的媒体时 同一个 frame 的媒体和清单资源都标记为 DRM 不能下载
+ * 有新资源时重新检查 300毫秒内只检查一次
+ * @param {Number} tabId
+ */
+const drmTimer = new Map();
+function refreshDrm(tabId) {
+  if (!(tabId > 0) || drmTimer.has(tabId)) { return; }
+  drmTimer.set(tabId, setTimeout(function () {
+    drmTimer.delete(tabId);
+    chrome.webNavigation.getAllFrames({ tabId: tabId }, function (frames) {
+      if (chrome.runtime.lastError || !frames) { return; }
+      for (const frame of frames) {
+        chrome.tabs.sendMessage(tabId, { Message: "getDrm" }, { frameId: frame.frameId }, function (names) {
+          if (chrome.runtime.lastError || !names) { return; }
+          getAllData().forEach(function (data) {
+            if (data.tabId == tabId && (data.frameId ?? 0) == frame.frameId && !data.drm && (isMedia(data) || isM3U8(data) || isMPD(data))) {
+              setDrm(data, names);
+            }
+          });
+        });
+      }
+    });
+  }, 300));
+}
+// 标记为 DRM 取消勾选 只保留复制和二维码
+function setDrm(data, names) {
+  const text = drmText(names);
+  data.drm = names;
+  data.checked = false;
+  data.isPlay = false;
+  data.html.find(".DownCheck").prop("disabled", true);
+  data.html.find("#parsing, #play, #download, #umpMerge, #aria2, #invoke, #send2local, #mqtt, #catDown, #catDownFFmpeg, .moreButton .invoke").addClass("hide");
+  data.html.find(".panel-heading .name").after(`<span class="drm" title="${text}">DRM</span>`);
+  data.html.find("#mediaInfo").append(`<br><b>${text}</b>`);
+  mergeDownButton();
 }
 
 // 更新底部按钮高度
