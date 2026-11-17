@@ -4,7 +4,7 @@
  * firefox 在 manifest 文件中已经加载以下脚本，如果已经加载 G 变量存在，不再加载。
  */
 if (typeof G === 'undefined') {
-    importScripts("/js/polyfill.js", "/js/function.js", "/js/templates.js", "/js/init.js");
+    importScripts("/js/polyfill.js", "/js/function.js", "/js/templates.js", "/js/init.js", "/js/popup-utils.js", "/js/video-float.background.js");
 }
 
 // Service Worker 5分钟后会强制终止扩展
@@ -259,6 +259,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
             ext: ext,
             type: data.mime ?? data.header?.type,
             tabId: data.tabId,
+            frameId: data.frameId,  // 资源所属的frame 视频浮窗用来对应页面内的video
             isRegex: isRegex,
             requestId: data.requestId ?? Date.now().toString(),
             initiator: data.initiator,
@@ -323,6 +324,9 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
         // 储存数据
         cacheData[info.tabId] ??= [];
         cacheData[info.tabId].push(info);
+
+        // 通知视频浮窗更新
+        videoFloatNotify(info.tabId);
 
         // 当前标签媒体数量大于100 开启防抖 等待5秒储存 或 积累10个资源储存一次。
         if (cacheData[info.tabId].length >= 100 && debounceCount <= 10) {
@@ -525,6 +529,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
             delete cacheData[Message.tabId];
             (chrome.storage.session ?? chrome.storage.local).set({ MediaData: cacheData });
             clearRedundant();
+            videoFloatNotify(Message.tabId);
             sendResponse("OK");
             return true;
         }
@@ -532,6 +537,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         for (let item in cacheData) {
             if (item == Message.tabId) { continue; }
             delete cacheData[item];
+            videoFloatNotify(Number(item));
         }
         (chrome.storage.session ?? chrome.storage.local).set({ MediaData: cacheData });
         clearRedundant();
@@ -549,11 +555,16 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         chrome.tabs.query({}, function (tabs) {
             for (let item of tabs) {
                 if (item.url == Message.href) {
-                    findMedia({ url: Message.url, tabId: item.id, extraExt: Message.extraExt, mime: Message.mime, requestId: Message.requestId, requestHeaders: Message.requestHeaders }, true, true);
+                    // 资源归属的标签就是发送者所在标签时 才记录frameId
+                    const frameId = sender.tab?.id == item.id ? sender.frameId : undefined;
+                    findMedia({ url: Message.url, tabId: item.id, frameId: frameId, extraExt: Message.extraExt, mime: Message.mime, requestId: Message.requestId, requestHeaders: Message.requestHeaders }, true, true);
                     return true;
                 }
             }
-            findMedia({ url: Message.url, tabId: -1, extraExt: Message.extraExt, mime: Message.mime, requestId: Message.requestId, initiator: Message.href, requestHeaders: Message.requestHeaders }, true, true);
+            // 没有标签的地址和 href 相同 (例如来自 iframe) 资源归属发送者所在的标签 没有发送者才使用当前激活标签
+            const tabId = sender.tab?.id ?? -1;
+            const frameId = tabId == -1 ? undefined : sender.frameId;
+            findMedia({ url: Message.url, tabId: tabId, frameId: frameId, extraExt: Message.extraExt, mime: Message.mime, requestId: Message.requestId, initiator: Message.href, requestHeaders: Message.requestHeaders }, true, true);
         });
         sendResponse("ok");
         return true;
@@ -668,6 +679,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
             if (!alarm) {
                 delete cacheData[tabId];
                 SetIcon({ tabId: tabId });
+                videoFloatNotify(tabId);
                 chrome.alarms.create("save", { when: Date.now() + 1000 });
             }
         });
@@ -798,6 +810,7 @@ const runCommands = (command, data) => {
         (chrome.storage.session ?? chrome.storage.local).set({ MediaData: cacheData });
         clearRedundant();
         SetIcon({ tabId: G.tabId });
+        videoFloatNotify(G.tabId);
     } else if (command == "enable") {
         G.enable = !G.enable;
         chrome.storage.sync.set({ enable: G.enable });

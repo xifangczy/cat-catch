@@ -5,6 +5,8 @@
       "js/function.js",
       "js/templates.js",
       "js/init.js",
+      "js/popup-utils.js",
+      "js/video-float.background.js",
       "js/background.js"
     ]
   },
@@ -88,9 +90,11 @@
         "http://*/*"
       ],
       "js": [
-        "js/content-script.js"
+        "js/content-script.js",
+        "js/video-float.js"
       ],
       "all_frames": true,
+      "match_about_blank": true,
       "run_at": "document_start"
     }
   ],

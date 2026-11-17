@@ -176,6 +176,8 @@ G.OptionLists = {
 
     showGroup: true, // 显示分组
     groupTime: 120, // 分组时间间隔，单位毫秒
+
+    videoFloat: true,  // 在视频旁显示下载列表浮窗
 };
 
 // 本地储存的配置

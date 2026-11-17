@@ -1057,5 +1057,25 @@
   },
   "fileName": {
     "message": "檔名"
+  },
+  "videoFloat": {
+    "message": "在影片旁顯示下載浮窗"
+  },
+  "videoFloatOther": {
+    "message": "本頁其他資源"
+  },
+  "videoFloatDownloadStarted": {
+    "message": "已開始下載"
+  },
+  "videoFloatLimit": {
+    "message": "資源較多，僅顯示 $show$ / $total$ 個",
+    "placeholders": {
+      "show": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
   }
 }

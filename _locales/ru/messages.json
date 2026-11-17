@@ -1057,5 +1057,25 @@
   },
   "fileName": {
     "message": "Имя файла"
+  },
+  "videoFloat": {
+    "message": "Показывать панель загрузки рядом с видео"
+  },
+  "videoFloatOther": {
+    "message": "Другие ресурсы на этой странице"
+  },
+  "videoFloatDownloadStarted": {
+    "message": "Загрузка начата"
+  },
+  "videoFloatLimit": {
+    "message": "Показано ресурсов: $show$ из $total$",
+    "placeholders": {
+      "show": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
   }
 }

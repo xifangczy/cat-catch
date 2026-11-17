@@ -1057,5 +1057,25 @@
   },
   "fileName": {
     "message": "파일 이름"
+  },
+  "videoFloat": {
+    "message": "동영상 옆에 다운로드 패널 표시"
+  },
+  "videoFloatOther": {
+    "message": "이 페이지의 다른 리소스"
+  },
+  "videoFloatDownloadStarted": {
+    "message": "다운로드를 시작했습니다"
+  },
+  "videoFloatLimit": {
+    "message": "총 $total$개 중 $show$개의 리소스 표시",
+    "placeholders": {
+      "show": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
   }
 }

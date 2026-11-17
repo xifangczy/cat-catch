@@ -1057,5 +1057,25 @@
   },
   "fileName": {
     "message": "Dosya Adı"
+  },
+  "videoFloat": {
+    "message": "Videoların yanında indirme paneli göster"
+  },
+  "videoFloatOther": {
+    "message": "Bu sayfadaki diğer kaynaklar"
+  },
+  "videoFloatDownloadStarted": {
+    "message": "İndirme başlatıldı"
+  },
+  "videoFloatLimit": {
+    "message": "$total$ kaynaktan $show$ tanesi gösteriliyor",
+    "placeholders": {
+      "show": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
   }
 }
