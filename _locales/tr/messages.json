@@ -346,6 +346,31 @@
   "autoClosePageAfterDownload": {
     "message": "İndirmeden Sonra Sayfayı Otomatik Kapat"
   },
+  "m3u8Resume": {
+    "message": "İndirmeyi sürdür"
+  },
+  "resumeSaved": {
+    "message": "Geçen seferden $num$/$total$ parça kaydedildi, indirme kaldığı yerden devam edecek",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "resumeExpire": {
+    "message": "Bağlantılar $time$ tarihine kadar geçerli",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "resumeExpired": {
+    "message": "Bağlantıların süresi doldu, devam etmek için ayrıştırıcıyı özgün sayfadan yeniden açın"
+  },
   "openDownloaderPageInBackground": {
     "message": "İndirici Sayfasını Arka Planda Aç"
   },

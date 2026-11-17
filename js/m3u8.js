@@ -90,6 +90,10 @@ let downDuration = 0; // 下载媒体得时长
 let fileStream = undefined; // 流式下载文件输出流
 const downSet = {};   // 下载时 储存设置
 
+/* 断点续传 切片保存在 IndexedDB (js/m3u8.store.js) */
+let store = null;   // 当前清单的任务
+let storeReady = Promise.resolve(); // 读取上次保存的进度
+
 /* 录制相关 */
 let recorder = false; // 开关
 let recorderLast = "";  // 最后下载的url
@@ -149,6 +153,7 @@ function init() {
     $("#StreamSaver").prop("checked", G.M3u8StreamSaver);
     $("#ffmpeg").prop("checked", G.M3u8Ffmpeg);
     $("#autoClose").prop("checked", autoClose && autoClose == 1 ? true : G.M3u8AutoClose);
+    $("#resume").prop("checked", G.M3u8Resume);
 
     // 发送到ffmpeg取消边下边存设置
     _ffmpeg && $("#StreamSaver").prop("checked", false);
@@ -767,6 +772,7 @@ function parseTs(data) {
             live: data.live,
             byteRange: data.fragments[i].byteRange,
             selected: true,
+            no: i,  // 在清单里的序号 断点续传用它标识切片
         });
     }
     writeText(_fragments);   // 写入ts链接到列表
@@ -841,6 +847,9 @@ function parseTs(data) {
     if (!["ts", "mp4", "m4s", "aac", "ac3", "webm"].includes(GetExt(_fragments[0].url))) {
         document.querySelector("#dataPreprocessing").checked = true;
     }
+
+    // 断点续传 读取上次保存的进度
+    openStore(data.live);
 
 
     function showKeyInfo(buffer, decryptdata, i) {
@@ -1529,6 +1538,10 @@ async function downloadNew(start = 0, end = _fragments.length) {
     const selectedFragments = recorder ? _fragments.slice(start) : _fragments.filter(fragment => fragment.selected);
     const down = new Downloader(selectedFragments, parseInt($("#thread").val()));
     down.autoRetry = true;  // 开启自动重试
+    // 断点续传 上次保存的切片不再请求 录制直播不使用
+    await storeReady;
+    down.store = !recorder && $("#resume").prop("checked") ? store : null;
+    $("#resumeBox").hide();
     $progress.html(`${down.success}/${down.total}`);
 
     if ($("#StreamTest").prop("checked")) {
@@ -1707,6 +1720,8 @@ async function downloadNew(start = 0, end = _fragments.length) {
     // 全部下载完成
     down.on('allCompleted', async function (buffer) {
         if (recorder) { return; }
+        // 下载完成 保存的切片不再需要
+        down.store?.remove().catch(error => console.log(error));
         $("#stopDownload").hide();
         if (fileStream) {
             fileStream.close();
@@ -1822,6 +1837,7 @@ async function downloadNew(start = 0, end = _fragments.length) {
             $fileSize.html("");
             $fileDuration.html("");
             initDownload();
+            showStore();
         }, 1000);
     });
 
@@ -1981,6 +1997,39 @@ function apiDownload(fileBlob, fileName, ext) {
     });
 }
 
+/**
+ * 断点续传 打开清单对应的任务 读取上次保存的进度
+ * @param {Boolean} live 直播的切片一直在变 不使用
+ */
+function openStore(live) {
+    store = null;
+    showStore();
+    if (live || !_fragments.length || !$("#resume").prop("checked")) { return; }
+    storeReady = TaskStore.open(_fragments, _title).then(function (result) {
+        store = result;
+        showStore();
+    }).catch(function (error) { console.log(error); });
+}
+// 显示上次保存的进度 和 地址的有效期
+function showStore() {
+    if (!store?.saved.size || !$("#resume").prop("checked")) {
+        $("#resumeBox").hide();
+        return;
+    }
+    let text = i18n("resumeSaved", [store.saved.size, _fragments.length]);
+    if (store.task.expire) {
+        text += " " + (store.task.expire > Date.now() ? i18n("resumeExpire", [new Date(store.task.expire).toLocaleString()]) : i18n.resumeExpired);
+    }
+    $("#resumeTips").text(text);
+    $("#resumeBox").show();
+}
+$("#resume").on("change", function () {
+    this.checked && !store ? openStore(_fragments[0]?.live) : showStore();
+});
+// 清除保存的切片 重新下载
+$("#resumeClear").click(function () {
+    store?.remove().then(showStore).catch(error => console.log(error));
+});
 // 初始化下载变量
 function initDownload() {
     $fileSize.html("");

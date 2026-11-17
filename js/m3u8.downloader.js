@@ -7,6 +7,7 @@ class Downloader {
         this.events = {};                // events
         this.pipeline = [];              // 数据处理管线
         this.autoRetry = false;          // 默认不会自动重试
+        this.store = null;               // 切片的持久化储存 { get(fragment), put(fragment, buffer) } 用于断点续传
         this.init();
     }
     /**
@@ -246,7 +247,7 @@ class Downloader {
         }
 
         // 开始下载
-        fetch(fragment.url, options)
+        this.request(fragment, options)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(response.status, { cause: 'HTTPError' });
@@ -286,6 +287,8 @@ class Downloader {
             })
             // 数据处理函数
             .then(async (buffer) => {
+                // 保存下载到的原始数据 用于断点续传
+                this.store && !fragment.restored && !fragment.fileStream && this.store.put(fragment, buffer);
                 this.emit('rawBuffer', buffer, fragment);
                 for (const { fn, name } of this.pipeline) {
                     buffer = await fn(buffer, fragment);
@@ -344,6 +347,20 @@ class Downloader {
                     this.downloader();
                 }
             });
+    }
+    /**
+     * 请求切片 上次已经保存的切片直接读取 不再请求
+     * @param {object} fragment 切片对象
+     * @param {object} options fetch 的参数
+     * @returns {Promise<Response>}
+     */
+    async request(fragment, options) {
+        const saved = this.store && !fragment.fileStream ? await this.store.get(fragment).catch(() => undefined) : undefined;
+        fragment.restored = !!saved;
+        if (saved) {
+            return new Response(saved, { headers: { "content-length": saved.byteLength } });
+        }
+        return fetch(fragment.url, options);
     }
     /**
      * 开始下载 准备数据 调用下载器
