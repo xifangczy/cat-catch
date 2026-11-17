@@ -87,6 +87,10 @@ function AddMedia(data, currentTab = true) {
   if (data.size) {
     data.size = byteToSize(data.size);
   }
+  // 页面内解码得到的轨道 没收全时在大小后面带上接收进度
+  if (data.ump) {
+    data.size = umpSizeText(data);
+  }
   // 是否需要解析
   data.parsing = false;
   if (isM3U8(data)) {
@@ -120,6 +124,7 @@ function AddMedia(data, currentTab = true) {
                 <img src="img/parsing.png" class="icon parsing ${data.parsing ? "" : "hide"}" id="parsing" data-type="${data.parsing}" title="${i18n.parser}"/>
                 <img src="img/play.png" class="icon play ${data.isPlay ? "" : "hide"}" id="play" title="${i18n.preview}"/>
                 <img src="img/download.svg" class="icon download" id="download" title="${i18n.download}"/>
+                <img src="img/send2ffmpeg.svg" class="icon send2ffmpeg ${data.ump ? "" : "hide"}" id="umpMerge" title="${i18n.onlineMerge}"/>
                 <img src="img/aria2.png" class="icon aria2 ${G.enableAria2Rpc ? "" : "hide"}"" id="aria2" title="Aria2"/>
                 <img src="img/invoke.svg" class="icon invoke ${G.invoke ? "" : "hide"}"" id="invoke" title="${i18n.invoke}"/>
                 <img src="img/send.svg" class="icon send ${G.send2localManual || G.send2local ? "" : "hide"}"" id="send2local" title="${i18n.send2local}"/>
@@ -128,7 +133,7 @@ function AddMedia(data, currentTab = true) {
             <div class="url hide">
                 <div id="mediaInfo" data-state="false">
                     ${data.title ? `<b>${i18n.title}:</b> ${data.title}` : ""}
-                    ${data.type ? `<br><b>MIME:</b>  ${data.type}` : ""}
+                    ${data.type ? `<br><b>MIME:</b>  ${data.ump?.mime || data.type}` : ""}
                 </div>
                 <div class="moreButton">
                     <div id="qrcode"><img src="img/qrcode.png" class="icon qrcode" title="QR Code"/></div>
@@ -260,6 +265,18 @@ function AddMedia(data, currentTab = true) {
     await getClipboardText(data);
     catDownload(data, { ffmpeg: "addFile" });
   });
+  // 页面内解码得到的轨道 一键和同一个视频的另一条轨道 (视频 + 音频) 在线合并
+  data.html.find("#umpMerge").click(function (event) {
+    event.stopPropagation();
+    const other = umpCounterpart(data);
+    if (!other) {
+      Tips(umpIsAudio(data) ? i18n.noVideo : i18n.noAudio, 2000);
+      return false;
+    }
+    catDownload(umpIsAudio(data) ? [other, data] : [data, other], { ffmpeg: "merge" });
+    return false;
+  });
+  umpRefresh(data);
   //点击复制网址
   data.html.find('#copy').click(async function (event) {
     event.stopPropagation();
@@ -1009,6 +1026,32 @@ const interval = setInterval(async function () {
       sendResponse("OK");
       return true;
     }
+    // 更新资源 页面内解码得到的轨道 大小 / 进度 / 地址 随播放变化
+    if (Message.Message == "popupUpdateData") {
+      for (const list of allData.values()) {
+        const data = list.get(Message.data.requestId);
+        if (!data) { continue; }
+        data.url = Message.data.url;
+        data.ump = Message.data.ump;
+        data._size = Message.data.size;
+        umpRefresh(data);
+      }
+      sendResponse("OK");
+      return true;
+    }
+    // 移除资源 页面换了视频 之前的轨道已经失效
+    if (Message.Message == "popupRemoveData") {
+      for (const [currentTab, list] of allData) {
+        const data = list.get(Message.data.requestId);
+        if (!data) { continue; }
+        data.html.remove();
+        list.delete(Message.data.requestId);
+        currentTab ? currentCount-- : allCount--;
+      }
+      UItoggle();
+      sendResponse("OK");
+      return true;
+    }
     // 添加疑似密钥
     if (Message.Message == "popupAddKey") {
       $("#maybeKeyTab").show();
@@ -1192,6 +1235,36 @@ function UItoggle() {
     }
   });
   size >= 2 ? mergeDownButton() : $mergeDown.attr('disabled', true);
+}
+// 页面内解码得到的轨道 (YouTube) 是音频还是视频
+function umpIsAudio(data) {
+  return (data.ump?.mime || data.type || "").startsWith("audio");
+}
+// 轨道的大小 没收全时后面带上接收进度
+function umpSizeText(data) {
+  const size = data._size ? byteToSize(data._size) : "";
+  if (!data.ump || data.ump.complete || !data.ump.total) { return size; }
+  return `${size} ${Math.floor(data.ump.received / data.ump.total * 100)}%`;
+}
+// 轨道的 大小 / 进度 / 地址 有变化时 更新已有的行
+function umpRefresh(data) {
+  if (!data.ump || !data.html) { return; }
+  data.size = umpSizeText(data);
+  const incomplete = !data.ump.complete && data.ump.total;
+  data.html.find(".size").text(data.size).toggleClass("hide", !data.size)
+    .attr("title", incomplete ? i18n("umpProgress", [String(data.ump.received), String(data.ump.total)]) : "");
+  data.html.find(".url > a").attr("href", data.url).text(data.url);
+}
+// 找到同一个视频的另一条轨道 视频找音频 音频找视频 有多条时取数据最多的
+function umpCounterpart(data) {
+  if (!data.ump) { return null; }
+  const audio = umpIsAudio(data);
+  let found = null;
+  getAllData().forEach(function (item) {
+    if (item === data || !item.ump || item.tabId != data.tabId || item.ump.videoId != data.ump.videoId || umpIsAudio(item) == audio) { return; }
+    if (!found || (item._size ?? 0) > (found._size ?? 0)) { found = item; }
+  });
+  return found;
 }
 // 检查是否符合条件 更改 合并下载 按钮状态
 function mergeDownButtonCheck(data) {

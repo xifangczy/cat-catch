@@ -137,6 +137,20 @@
   "deepSearch": {
     "message": "深度搜索"
   },
+  "umpDecode": {
+    "message": "解码 YouTube 的媒体流 (UMP)"
+  },
+  "umpProgress": {
+    "message": "已获取 $received$ / $total$ 个分片，随播放进度增加",
+    "placeholders": {
+      "received": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
   "closeSearch": {
     "message": "关闭搜索"
   },

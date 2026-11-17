@@ -137,6 +137,20 @@
   "deepSearch": {
     "message": "Tìm kiếm"
   },
+  "umpDecode": {
+    "message": "Giải mã luồng phương tiện của YouTube (UMP)"
+  },
+  "umpProgress": {
+    "message": "Đã nhận $received$ / $total$ phân đoạn; tăng dần theo tiến độ phát",
+    "placeholders": {
+      "received": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
   "closeSearch": {
     "message": "Đóng tìm kiếm"
   },

@@ -57,6 +57,8 @@ awaitG(() => {
 
         // 优先从downloadData 提取任务数据
         for (let item of downloadData) {
+            // 页面内解码得到的轨道 地址随播放进度更新 不使用暂存的数据 稍后从后台获取最新的
+            if (item.ump) { continue; }
             if (_requestId.includes(item.requestId)) {
                 _data.push(item);
                 _requestId.splice(_requestId.indexOf(item.requestId), 1);

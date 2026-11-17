@@ -137,6 +137,20 @@
   "deepSearch": {
     "message": "Rechercher"
   },
+  "umpDecode": {
+    "message": "Décoder les flux multimédias de YouTube (UMP)"
+  },
+  "umpProgress": {
+    "message": "$received$ segments reçus sur $total$ ; augmente au fil de la lecture",
+    "placeholders": {
+      "received": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
   "closeSearch": {
     "message": "Fermer La Recherche"
   },

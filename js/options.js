@@ -15,6 +15,10 @@ chrome.storage.sync.get(G.OptionLists, function (items) {
     if (G.isMobile) {
         $(`<link rel="stylesheet" type="text/css" href="css/mobile.css">`).appendTo("head");
     }
+    // UMP 解码 (YouTube) 代码内开关关闭 或 firefox 不启用 不显示对应的设置
+    if (!G.umpSupport || G.isFirefox) {
+        $("#umpDecode").closest(".item").hide();
+    }
     $(`<style>${items.css}</style>`).appendTo("head");
     const $extList = $("#extList");
     for (let key in items.Ext) {

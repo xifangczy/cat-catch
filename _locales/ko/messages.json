@@ -137,6 +137,20 @@
   "deepSearch": {
     "message": "검색"
   },
+  "umpDecode": {
+    "message": "YouTube 미디어 스트림(UMP) 디코딩"
+  },
+  "umpProgress": {
+    "message": "세그먼트 $received$ / $total$개 수신됨. 재생이 진행되면 늘어납니다",
+    "placeholders": {
+      "received": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
   "closeSearch": {
     "message": "검색 닫기"
   },

@@ -137,6 +137,20 @@
   "deepSearch": {
     "message": "深層検索"
   },
+  "umpDecode": {
+    "message": "YouTube のメディアストリーム (UMP) をデコード"
+  },
+  "umpProgress": {
+    "message": "$received$ / $total$ セグメント取得済み。再生が進むと増えます",
+    "placeholders": {
+      "received": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
   "closeSearch": {
     "message": "検索終了"
   },
