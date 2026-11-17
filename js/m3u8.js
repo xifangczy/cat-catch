@@ -14,6 +14,17 @@ let autoDown = params.get("autoDown");  //是否自动下载
 const autoClose = params.get("autoClose");  // 下载完是否关闭页面
 let retryCount = parseInt(params.get("retryCount"));  // 重试次数
 const _getMpdId = parseInt(params.get("getMpdId"));  // 从mpd页面传入的 m3u8 解析
+const _mpdType = params.get("mpdType");  // 从mpd页面读取 video / audio
+
+/**
+ * SharePoint / Teams 录屏的 HLS 清单 各级播放列表之间用 EXT-X-DEFINE 传递变量 密钥和切片需要的请求头也不一样 这里解析不了
+ * 同一个地址把 format 换成 dash 就是内容相同的 dash 清单 交给 mpd 解析器
+ */
+const _toMpd = /\/transform\/videomanifest\?.*\bformat=hls/i.test(_m3u8Url ?? "");
+if (_toMpd) {
+    params.set("url", _m3u8Url.replace(/([?&]format=)hls[\w-]*/i, "$1dash"));
+    location.replace("/mpd.html?" + params.toString());
+}
 
 const _isMaster = params.get("isMaster");   // 是否为主任务
 
@@ -117,6 +128,7 @@ let autoMergeTimer = null;
  * 初始化函数，界面默认配置 loadSource载入 m3u8 url
  */
 function init() {
+    if (_toMpd) { return; }
     // 获取页面DOM
     if (tabId && tabId != -1) {
         chrome.tabs.sendMessage(parseInt(tabId), { Message: "getPage" }, { frameId: 0 }, function (result) {
@@ -293,7 +305,7 @@ function init() {
 
         // 从mpd解析器读取数据
         if (_getMpdId) {
-            chrome.tabs.sendMessage(_getMpdId, "getM3u8", function (result) {
+            chrome.tabs.sendMessage(_getMpdId, _mpdType ? { Message: "getM3u8", type: _mpdType } : "getM3u8", function (result) {
                 $("#m3u8Text").val(result.m3u8Content);
                 $("#parse").click();
                 $("#info").html(result.mediaInfo);
@@ -1536,6 +1548,7 @@ async function downloadNew(start = 0, end = _fragments.length) {
         ext = ext.split("?").shift();
         ext = ext.split(".").pop();
         ext = ext ? ext : "ts";
+        ext = fmp4Ext(ext, down);
         ext = (downSet.mp4 && !down.mapTag) ? "mp4" : ext;
         let fileName = "";
         const customFilename = $('#customFilename').val().trim();
@@ -1841,11 +1854,40 @@ function addInitSegmentData(buffer, initSegment) {
     if (!initSegmentData && initSegment.data) {
         initSegmentData = initSegment.data.buffer;
     }
+    initSegmentData = decryptInitSegment(initSegmentData, initSegment);
     const initLength = initSegmentData.byteLength;
     const newData = new Uint8Array(initLength + buffer.byteLength);
     newData.set(new Uint8Array(initSegmentData), 0);
     newData.set(new Uint8Array(buffer), initLength);
     return newData.buffer;
+}
+// 数据开头是不是 mp4 的 box
+function isMp4Data(buffer) {
+    return buffer.byteLength >= 8 && ["ftyp", "styp", "moov", "sidx", "free"].includes(String.fromCharCode(...new Uint8Array(buffer, 4, 4)));
+}
+/**
+ * EXT-X-KEY 在 EXT-X-MAP 之前时 MAP切片也是加密的 需要解密
+ * 不少网站的MAP切片实际没有加密 只有解密前不是 mp4 解密后是 mp4 才使用解密的结果
+ */
+function decryptInitSegment(initSegmentData, initSegment) {
+    const decryptdata = initSegment.encrypted && initSegment.decryptdata;
+    const key = decryptdata && keyContent.get(decryptdata.uri);
+    if (skipDecrypt || recorder || !decryptdata?.iv || !(key instanceof ArrayBuffer) || !(initSegmentData instanceof ArrayBuffer) || isMp4Data(initSegmentData)) {
+        return initSegmentData;
+    }
+    try {
+        decryptor.expandKey(key);
+        const buffer = decryptor.decrypt(initSegmentData, 0, decryptdata.iv.buffer, true);
+        if (isMp4Data(buffer)) {
+            initData.set(initSegment.url, buffer);
+            return buffer;
+        }
+    } catch (e) { console.log(e); }
+    return initSegmentData;
+}
+// fmp4 的地址不带常见的媒体后缀时 (例如 SharePoint 的 oneDrive.transcode) 文件后缀使用 mp4
+function fmp4Ext(ext, down) {
+    return down.mapTag && !/^(mp4|m4s|m4a|m4v|mov|cmfv|cmfa|aac|mp3|webm|ts)$/i.test(ext) ? "mp4" : ext;
 }
 
 // 合并下载
@@ -1860,6 +1902,7 @@ function mergeTsNew(down) {
     ext = ext.split("?").shift();
     ext = ext.split(".").pop();
     ext = ext ? ext : "ts";
+    ext = fmp4Ext(ext, down);
     ext = down.findPipeline('transcode') ? "mp4" : ext;
 
     let fileName = "";
