@@ -110,6 +110,12 @@
   "simulateMobile": {
     "message": "モバイルシミュレーション"
   },
+  "fakeNoDrm": {
+    "message": "DRM 非対応と偽装"
+  },
+  "fakeNoDrmClose": {
+    "message": "DRM 偽装を解除"
+  },
   "autoDownload": {
     "message": "自動ダウンロード"
   },

@@ -110,6 +110,12 @@
   "simulateMobile": {
     "message": "模拟手机"
   },
+  "fakeNoDrm": {
+    "message": "声称不支持 DRM"
+  },
+  "fakeNoDrmClose": {
+    "message": "停止声称不支持"
+  },
   "autoDownload": {
     "message": "自动下载"
   },

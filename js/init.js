@@ -189,6 +189,7 @@ G.OptionLists = {
 G.LocalVar = {
     featMobileTabId: [],
     featAutoDownTabId: [],
+    featFakeNoDrmTabId: [],
     mediaControl: { tabid: 0, index: -1 },
 
     // 预览页面
@@ -340,6 +341,7 @@ function InitOptions() {
     (chrome.storage.session ?? chrome.storage.local).get(G.LocalVar, function (items) {
         items.featMobileTabId = new Set(items.featMobileTabId);
         items.featAutoDownTabId = new Set(items.featAutoDownTabId);
+        items.featFakeNoDrmTabId = new Set(items.featFakeNoDrmTabId);
         G = { ...items, ...G };
         G.initLocalComplete = true;
     });
@@ -388,7 +390,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
             });
             continue;
         }
-        if (key == "featMobileTabId" || key == "featAutoDownTabId") {
+        if (key == "featMobileTabId" || key == "featAutoDownTabId" || key == "featFakeNoDrmTabId") {
             G[key] = new Set(newValue);
             continue;
         }

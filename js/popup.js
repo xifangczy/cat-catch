@@ -762,6 +762,13 @@ $("#MobileUserAgent").click(function () {
     updateButton();
   });
 });
+// 声称浏览器不支持 DRM 并重新加载 让网站给无加密版本
+$("#FakeNoDrm").click(function () {
+  chrome.runtime.sendMessage({ Message: "fakeNoDrm", tabId: G.tabId }, function () {
+    G.refreshClear && $('#Clear').click();
+    updateButton();
+  });
+});
 // 自动下载
 $("#AutoDown").click(function () {
   chrome.runtime.sendMessage({ Message: "autoDown", tabId: G.tabId }, function () {
@@ -1122,6 +1129,10 @@ function updateButton() {
       }
       if (key == "AutoDown") {
         $DOM.html(state.AutoDown ? i18n.closeDownload : i18n.autoDownload);
+        continue;
+      }
+      if (key == "FakeNoDrm") {
+        $DOM.html(state.FakeNoDrm ? i18n.fakeNoDrmClose : i18n.fakeNoDrm);
         continue;
       }
       if (key == "enable") {

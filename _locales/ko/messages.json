@@ -110,6 +110,12 @@
   "simulateMobile": {
     "message": "모바일 환경 시뮬레이션"
   },
+  "fakeNoDrm": {
+    "message": "DRM 미지원으로 위장"
+  },
+  "fakeNoDrmClose": {
+    "message": "DRM 위장 해제"
+  },
   "autoDownload": {
     "message": "자동 다운로드"
   },

@@ -110,6 +110,12 @@
   "simulateMobile": {
     "message": "Émuler un Mobile"
   },
+  "fakeNoDrm": {
+    "message": "Simuler Pas de DRM"
+  },
+  "fakeNoDrmClose": {
+    "message": "Arrêter la simulation"
+  },
   "autoDownload": {
     "message": "Téléchargement Automatique"
   },

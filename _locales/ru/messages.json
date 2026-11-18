@@ -110,6 +110,12 @@
   "simulateMobile": {
     "message": "Эмуляция мобильного"
   },
+  "fakeNoDrm": {
+    "message": "Выдать за без DRM"
+  },
+  "fakeNoDrmClose": {
+    "message": "Прекратить выдавать"
+  },
   "autoDownload": {
     "message": "Автозагрузка"
   },

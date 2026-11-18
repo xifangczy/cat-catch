@@ -110,6 +110,12 @@
   "simulateMobile": {
     "message": "Emulate Mobile"
   },
+  "fakeNoDrm": {
+    "message": "Fake No DRM"
+  },
+  "fakeNoDrmClose": {
+    "message": "Stop Faking No DRM"
+  },
   "autoDownload": {
     "message": "Auto Download"
   },

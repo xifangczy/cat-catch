@@ -443,6 +443,7 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         let state = {
             MobileUserAgent: G.featMobileTabId.has(Message.tabId),
             AutoDown: G.featAutoDownTabId.has(Message.tabId),
+            FakeNoDrm: G.featFakeNoDrmTabId.has(Message.tabId),
             enable: G.enable,
         }
         G.scriptList.forEach(function (item, key) {
@@ -454,6 +455,13 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
     // 对tabId的标签 进行模拟手机操作
     if (Message.Message == "mobileUserAgent") {
         mobileUserAgent(Message.tabId, !G.featMobileTabId.has(Message.tabId));
+        chrome.tabs.reload(Message.tabId, { bypassCache: true });
+        sendResponse("ok");
+        return true;
+    }
+    // 对tabId的标签 开启 关闭 "声称不支持 DRM" 然后重新加载
+    if (Message.Message == "fakeNoDrm") {
+        fakeNoDrm(Message.tabId, !G.featFakeNoDrmTabId.has(Message.tabId));
         chrome.tabs.reload(Message.tabId, { bypassCache: true });
         sendResponse("ok");
         return true;
@@ -766,6 +774,16 @@ chrome.webNavigation.onCommitted.addListener(function (details) {
             world: item.world
         });
     });
+
+    // 声称不支持 DRM (让网站给无加密版本)
+    if (G.initLocalComplete && G.featFakeNoDrmTabId.size > 0 && G.featFakeNoDrmTabId.has(details.tabId)) {
+        chrome.scripting.executeScript({
+            target: { tabId: details.tabId, frameIds: [details.frameId] },
+            files: ["catch-script/no-drm.js"],
+            injectImmediately: true,
+            world: "MAIN"
+        });
+    }
 
     // 模拟手机
     if (G.initLocalComplete && G.featMobileTabId.size > 0 && G.featMobileTabId.has(details.tabId)) {
@@ -1082,6 +1100,43 @@ function SetIcon(obj) {
     }
 }
 
+// 声称不支持 DRM: 开关 + declarativeNetRequest 拦常见 DRM 许可证地址
+// 用 900000001 到 900000007 这几个 id, 和 "模拟手机" 用的 tabId 原值不冲突
+const FAKE_NO_DRM_RULE_IDS = [900000001, 900000002, 900000003, 900000004, 900000005, 900000006, 900000007];
+const FAKE_NO_DRM_URL_FILTERS = [
+    "widevine",
+    "playready",
+    "fairplay",
+    "clearkey-license",
+    "licenseserver",
+    "getlicense",
+    "drm-license"
+];
+function fakeNoDrm(tabId, change = false) {
+    if (change) {
+        G.featFakeNoDrmTabId.add(tabId);
+    } else {
+        G.featFakeNoDrmTabId.delete(tabId);
+    }
+    (chrome.storage.session ?? chrome.storage.local).set({ featFakeNoDrmTabId: Array.from(G.featFakeNoDrmTabId) });
+    chrome.declarativeNetRequest.updateSessionRules({ removeRuleIds: FAKE_NO_DRM_RULE_IDS }, function () {
+        if (chrome.runtime.lastError) { return; }
+        if (G.featFakeNoDrmTabId.size == 0) { return; }
+        const tabIds = Array.from(G.featFakeNoDrmTabId);
+        const addRules = FAKE_NO_DRM_URL_FILTERS.map((urlFilter, index) => ({
+            id: FAKE_NO_DRM_RULE_IDS[index],
+            priority: 1,
+            action: { type: "block" },
+            condition: {
+                urlFilter: urlFilter,
+                tabIds: tabIds,
+                resourceTypes: ["xmlhttprequest", "main_frame", "sub_frame", "script", "other"]
+            }
+        }));
+        chrome.declarativeNetRequest.updateSessionRules({ addRules: addRules });
+    });
+}
+
 // 模拟手机端
 function mobileUserAgent(tabId, change = false) {
     if (change) {
@@ -1154,7 +1209,7 @@ function clearRedundant() {
 
         if (!G.initLocalComplete) { return; }
 
-        // 清理 declarativeNetRequest 模拟手机
+        // 清理 declarativeNetRequest 模拟手机 / 声称不支持 DRM
         chrome.declarativeNetRequest.getSessionRules(function (rules) {
             let mobileFlag = false;
             for (let item of rules) {
@@ -1174,6 +1229,20 @@ function clearRedundant() {
             }
             mobileFlag && (chrome.storage.session ?? chrome.storage.local).set({ featMobileTabId: Array.from(G.featMobileTabId) });
         });
+        // 清理 "声称不支持 DRM"
+        let fakeNoDrmFlag = false;
+        G.featFakeNoDrmTabId.forEach(function (tabId) {
+            if (!allTabId.has(tabId)) {
+                fakeNoDrmFlag = true;
+                G.featFakeNoDrmTabId.delete(tabId);
+            }
+        });
+        if (fakeNoDrmFlag) {
+            (chrome.storage.session ?? chrome.storage.local).set({ featFakeNoDrmTabId: Array.from(G.featFakeNoDrmTabId) });
+            // 剩余的 tabId 还需要规则 直接调 fakeNoDrm 重建
+            // 没剩的 fakeNoDrm 也会 remove 规则
+            fakeNoDrm(-1, false);
+        }
         // 清理自动下载
         let autoDownFlag = false;
         G.featAutoDownTabId.forEach(function (tabId) {

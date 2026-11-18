@@ -110,6 +110,12 @@
   "simulateMobile": {
     "message": "Giả lập Mobile"
   },
+  "fakeNoDrm": {
+    "message": "Giả không hỗ trợ DRM"
+  },
+  "fakeNoDrmClose": {
+    "message": "Dừng giả không hỗ trợ"
+  },
   "autoDownload": {
     "message": "Tự động tải xuống"
   },
