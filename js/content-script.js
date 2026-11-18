@@ -210,6 +210,33 @@
                     drm = [...new Set([...(drm || []), ...names])];
                 }
             });
+            // 不挂在 DOM 上的媒体元素 (比如 Spotify 的播放用 video)
+            // 主环境里 external-media.main.js 有记下来 通过 DOM attribute 作桥同步问它
+            // CustomEvent.detail 跨 world 会被 clone 走不动
+            const askExternal = (doc) => {
+                try {
+                    const bridge = doc.documentElement;
+                    if (!bridge) { return; }
+                    bridge.dataset.ccExtMediaReq = JSON.stringify({ action: "drm" });
+                    delete bridge.dataset.ccExtMediaResp;
+                    bridge.dispatchEvent(new Event("cat-catch-ext-media-req", { bubbles: false }));
+                    const raw = bridge.dataset.ccExtMediaResp;
+                    delete bridge.dataset.ccExtMediaReq;
+                    delete bridge.dataset.ccExtMediaResp;
+                    if (raw) {
+                        const ext = JSON.parse(raw);
+                        if (Array.isArray(ext)) {
+                            drm = [...new Set([...(drm || []), ...ext])];
+                        }
+                    }
+                } catch (e) { }
+            };
+            askExternal(document);
+            // 同源 iframe 的外部元素 (跨域 iframe 没法访问 contentDocument 不处理)
+            document.querySelectorAll("iframe").forEach(function (iframe) {
+                if (iframe.contentDocument == null) { return; }
+                askExternal(iframe.contentDocument);
+            });
             sendResponse(drm);
             return true;
         }
