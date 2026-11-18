@@ -60,7 +60,8 @@ test('多视频同页关联', async (c) => {
     c.check('嗅探到 4 个资源', !!sniffed && ['one.mp4', 'two.mp4', 'stream.mp4', 'extra.mp4'].every((name) => sniffed.includes(name)), sniffed);
 
     const isolated = await until(() => page.isolated(browser.extId), 5000);
-    let floats = await until(async () => { const list = await page.eval(FLOATS, isolated); return list.length == 3 && list.every((float) => float.count != '' && float.count != '0') ? list : null; }, 10000) || await page.eval(FLOATS, isolated);
+    // 浮窗是隔一会儿才向后台要一次资源列表的 最后一个资源可能晚一步到 等数量到齐再看
+    let floats = await until(async () => { const list = await page.eval(FLOATS, isolated); return list.length == 3 && list.every((float) => float.count != '' && float.count != '0') && list.some((float) => float.video == 'c' && float.count == '2') ? list : null; }, 10000) || await page.eval(FLOATS, isolated);
     console.log('    浮窗:', JSON.stringify(floats.map((float) => [float.video, float.count])));
     c.check('每个视频旁各有一个浮窗', floats.length == 3 && ['a', 'b', 'c'].every((id) => floats.some((float) => float.video == id)), floats);
     const count = Object.fromEntries(floats.map((float) => [float.video, float.count]));
