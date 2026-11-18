@@ -423,6 +423,27 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
                 </div>`;
             $("#next_subtitle").append(html);
         }
+        // 字幕可以直接下载 各段 WebVTT 合成一个 .vtt (js/m3u8.subtitle.js)
+        $("#next_subtitle .block").each(function (index) {
+            const item = data.subtitleTracks[index];
+            const url = item.uri ?? item.url;
+            const button = $(`<button type="button">${i18n.download}</button>`);
+            button.click(function () {
+                button.prop("disabled", true);
+                M3u8Subtitle.download(url, function (done, total) {
+                    button.text(`${done}/${total}`);
+                }).then(function (text) {
+                    button.text(i18n.download);
+                    apiDownload(new Blob([text], { type: "text/vtt" }), `${GetFileName(url)}.${stringModify(item.lang || item.name || "subtitle")}`, "vtt");
+                }).catch(function (error) {
+                    console.log(error);
+                    button.text(i18n.downloadFailed);
+                }).finally(function () {
+                    button.prop("disabled", false);
+                });
+            });
+            $(this).append(" ", button);
+        });
     }
 
     // 合并按钮
