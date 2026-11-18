@@ -205,8 +205,9 @@
                     .split("/")
                     .pop();
                 const src = fileName || `${i18n("video", "视频")}${index + 1}`;
+                // 选项值是 videoList 中的下标 (过滤后的数组), 不是 querySelectorAll 中的下标
+                $videoList.options.add(new Option(src, videoList.length));
                 videoList.push(video);
-                $videoList.options.add(new Option(src, index));
             }
         });
         $tips.innerHTML = videoList.length ? i18n("clickToStartRecording", "请点击开始录制") : i18n("noVideoDetected", "没有检测到视频, 请重新读取");
@@ -241,7 +242,12 @@
             $tips.innerHTML = i18n("formatNotSupported", "不支持此格式");
             return;
         }
+        // init() 会重建下拉列表并把选择重置到第一项, 先记住用户选中的媒体元素
+        const selected = videoList[$videoList.value];
         init();
+        if (selected && videoList.includes(selected)) {
+            $videoList.value = videoList.indexOf(selected);
+        }
         const index = $videoList.value;
         if (index && videoList[index]) {
             let stream = null;
