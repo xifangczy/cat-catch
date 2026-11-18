@@ -126,15 +126,43 @@
         } catch (e) { }
         return url;
     });
+    // 读到了 但还没原样喂给 SourceBuffer 的数据 播放器可能把初始化段和第一个分片拼成一块再喂
+    // 喂进去的那块对不上地址时 找最近读到的 1~3 块 长度加起来正好相等的 就是它们拼的
+    const pending = [];                  // [{ url, size, time }]
+    function remember(buffer, url) {
+        if (!url || !(buffer instanceof ArrayBuffer)) { return; }
+        bufferUrl.set(buffer, url);
+        buffer.byteLength && pending.push({ url: url, size: buffer.byteLength, time: Date.now() });
+        pending.length > 50 && pending.shift();
+    }
+    function pieces(length) {
+        const now = Date.now();
+        const list = pending.filter(item => now - item.time < 15000).slice(-12);
+        for (let i = list.length - 1; i >= 0; i--) {
+            if (list[i].size == length) { return [list[i]]; }
+        }
+        for (let i = list.length - 1; i >= 0; i--) {
+            for (let j = i - 1; j >= 0; j--) {
+                if (list[i].size + list[j].size == length) { return [list[j], list[i]]; }
+                for (let k = j - 1; k >= 0; k--) {
+                    if (list[i].size + list[j].size + list[k].size == length) { return [list[k], list[j], list[i]]; }
+                }
+            }
+        }
+        return [];
+    }
+    function consume(items) {
+        items.forEach(item => { const index = pending.indexOf(item); index != -1 && pending.splice(index, 1); });
+    }
     method(Response.prototype, "arrayBuffer", function (target, thisArg, args) {
         const promise = Reflect.apply(target, thisArg, args);
         const url = thisArg.url;
-        url && promise.then(function (buffer) { bufferUrl.set(buffer, url); }, function () { });
+        url && promise.then(function (buffer) { remember(buffer, url); }, function () { });
         return promise;
     });
     accessor(XMLHttpRequest.prototype, "response", "get", function (target, thisArg, args) {
         const result = Reflect.apply(target, thisArg, args);
-        try { result instanceof ArrayBuffer && thisArg.responseURL && bufferUrl.set(result, thisArg.responseURL); } catch (e) { }
+        try { result instanceof ArrayBuffer && !bufferUrl.has(result) && remember(result, thisArg.responseURL); } catch (e) { }
         return result;
     });
     const MediaSourceClass = window.MediaSource || window.ManagedMediaSource;
@@ -173,7 +201,14 @@
                     info.encrypted = true;    // 初始化段没认出来 媒体段带 senc 的也算
                 }
                 const url = buffer && bufferUrl.get(buffer);
-                url && info.urls.add(url);
+                if (url) {
+                    info.urls.add(url);
+                    consume(pending.filter(item => item.url == url && item.size == buffer.byteLength));
+                } else {
+                    const items = pieces(data.byteLength);
+                    items.forEach(item => info.urls.add(item.url));
+                    consume(items);
+                }
             }
         } catch (e) { }
         return Reflect.apply(target, thisArg, args);
