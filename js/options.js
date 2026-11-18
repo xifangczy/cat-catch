@@ -1,3 +1,26 @@
+/**
+ * 写入同步设置
+ * 同步储存有限制: 单项 8KB 总量 100KB 每分钟 120 次 超出了写不进去
+ * 之前写入不看结果 规则一多就悄悄保存失败 页面上还显示着新的内容 这里把失败提示出来
+ * @param {Object} items 要写入的设置
+ * @param {Function} callback 写入成功后调用
+ */
+let syncWarned = 0;
+function syncSet(items, callback) {
+    chrome.storage.sync.set(items, function () {
+        if (!chrome.runtime.lastError) {
+            callback && callback();
+            return;
+        }
+        console.log(chrome.runtime.lastError);
+        // 连续输入时每次都会保存 不要每次都弹
+        if (Date.now() - syncWarned < 5000) { return; }
+        const message = `${i18n.saveFailed}: ${Object.keys(items).join(", ")}\n${chrome.runtime.lastError.message}`;
+        alert(message);
+        syncWarned = Date.now();
+    });
+}
+
 ////////////////////// 填充数据 //////////////////////
 chrome.storage.sync.get(G.OptionLists, function (items) {
     if (chrome.runtime.lastError) {
@@ -98,19 +121,21 @@ playerList.forEach(function (item, key) {
 // 增加后缀 类型 正则表达式
 function Gethtml(Type, Param = new Object()) {
     let html = "";
+    // 规则的内容要放进 value="..." 里 引号等字符需要转义 否则带引号的正则再次打开时会被截断
+    const attr = text => String(text ?? "").replace(/[&<>"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[char]);
     switch (Type) {
         case "Ext":
-            html = `<td><input type="text" value="${Param.ext ? Param.ext : ""}" name="text" placeholder="${i18n.suffix}" class="ext"></td>`
+            html = `<td><input type="text" value="${attr(Param.ext)}" name="text" placeholder="${i18n.suffix}" class="ext"></td>`
             html += `<td><input type="text" value="${Param.operator == ">=" || Param.operator == "~" ? "" : Param.operator}${Param.size ? Param.size : 0} ${Param.unit ? Param.unit : "KB"}" class="size" name="size"></td>`
             break;
         case "Type":
-            html = `<td><input type="text" value="${Param.type ? Param.type : ""}" name="text" placeholder="${i18n.type}" class="type"></td>`
+            html = `<td><input type="text" value="${attr(Param.type)}" name="text" placeholder="${i18n.type}" class="type"></td>`
             html += `<td><input type="text" value="${Param.operator == ">=" || Param.operator == "~" ? "" : Param.operator}${Param.size ? Param.size : 0} ${Param.unit ? Param.unit : "KB"}" class="size" name="size"></td>`
             break;
         case "Regex":
-            html = `<td><input type="text" value="${Param.type ? Param.type : ""}" name="type" class="regexType"></td>`
-            html += `<td><input type="text" value="${Param.regex ? Param.regex : ""}" placeholder="${i18n.regexExpression}" name="regex" class="regex"></td>`
-            html += `<td><input type="text" value="${Param.ext ? Param.ext : ""}" name="regexExt" class="regexExt"></td>`
+            html = `<td><input type="text" value="${attr(Param.type)}" name="type" class="regexType"></td>`
+            html += `<td><input type="text" value="${attr(Param.regex)}" placeholder="${i18n.regexExpression}" name="regex" class="regex"></td>`
+            html += `<td><input type="text" value="${attr(Param.ext)}" name="regexExt" class="regexExt"></td>`
             html += `<td>
             <div class="switch">
                 <label class="switchLabel switchRadius">
@@ -121,7 +146,7 @@ function Gethtml(Type, Param = new Object()) {
         </td>`
             break;
         case "blockUrl":
-            html = `<td><input type="text" value="${Param.url ? Param.url : ""}" name="url" placeholder="${i18n.blockUrlTips}" class="width100"></td>`
+            html = `<td><input type="text" value="${attr(Param.url)}" name="url" placeholder="${i18n.blockUrlTips}" class="width100"></td>`
             break;
     }
     html = $(`<tr data-type="${Type}">
@@ -170,7 +195,7 @@ $("#PlayerTemplate").change(function () {
     if (this.id == "PlayerTemplate" && playerList.has(Value) && Value != "tips") {
         const template = playerList.get(Value).template;
         $("#Player").val(template);
-        chrome.storage.sync.set({ Player: template });
+        syncSet({ Player: template });
     }
 });
 //失去焦点 保存自动清理数 模拟手机User Agent 自定义播放调用模板
@@ -182,7 +207,7 @@ $("[save='input']").on("input", function () {
     }
     clearTimeout(debounce2);
     debounce2 = setTimeout(() => {
-        chrome.storage.sync.set({ [this.id]: val });
+        syncSet({ [this.id]: val });
     }, 300);
 });
 // 调试模式 使用网页标题做文件名 使用PotPlayer预览 显示网站图标 刷新自动清理
@@ -202,13 +227,13 @@ $("[save='click']").bind("click", async function () {
         });
         return;
     }
-    chrome.storage.sync.set({ [this.id]: this.checked });
+    syncSet({ [this.id]: this.checked });
 });
 // [save='select'] 元素 储存
 $("[save='select']").on("change", function () {
     let val = $(this).val();
     if (!isNaN(val)) { val = parseInt(val); }
-    chrome.storage.sync.set({ [this.id]: val });
+    syncSet({ [this.id]: val });
 });
 
 // 一键禁用/启用
@@ -254,7 +279,7 @@ $("#testTag input, #testTextarea").on("input", function () {
 $("[data-reset]").bind("click", function () {
     if (confirm(i18n.confirmReset)) {
         const Option = $(this).data("reset");
-        chrome.storage.sync.set({ [Option]: G.OptionLists[Option] }, () => {
+        syncSet({ [Option]: G.OptionLists[Option] }, () => {
             location.reload();
         });
     }
@@ -268,7 +293,7 @@ $(".resetOption").click(function () {
             acc[id] = G.OptionLists[id];
             return acc;
         }, {});
-        chrome.storage.sync.set(result, () => {
+        syncSet(result, () => {
             location.reload();
         });
     }
@@ -352,14 +377,21 @@ $("#importOptionsFile").change(function () {
             importData = Base64.decode(importData);
             importData = JSON.parse(importData);
         }
-        const keys = Object.keys(G.OptionLists);
-        for (let item in G.OptionLists) {
-            if (keys.includes(item) && importData[item] !== undefined) {
-                chrome.storage.sync.set({ [item]: importData[item] });
-            }
+        // 逐项写入 等全部写完再刷新 有写不进去的列出来 (单项超过 8KB 等)
+        const keys = Object.keys(G.OptionLists).filter(item => importData[item] !== undefined);
+        const failed = [];
+        let pending = keys.length;
+        const done = function () {
+            alert(failed.length ? `${i18n.saveFailed}: ${failed.join(", ")}` : i18n.alertimport);
+            location.reload();
+        };
+        pending || done();
+        for (const item of keys) {
+            chrome.storage.sync.set({ [item]: importData[item] }, function () {
+                chrome.runtime.lastError && failed.push(item);
+                --pending || done();
+            });
         }
-        alert(i18n.alertimport);
-        location.reload();
     }
     const file = $("#importOptionsFile").prop('files')[0];
     fileReader.readAsText(file);
@@ -421,7 +453,7 @@ function Save(option, sec = 0) {
                 if (isEmpty(text)) { return true; }
                 Ext.push({ ext: text, size, operator, unit, state });
             });
-            chrome.storage.sync.set({ Ext: Ext });
+            syncSet({ Ext: Ext });
             return;
         }
         if (option == "Type") {
@@ -437,7 +469,7 @@ function Save(option, sec = 0) {
                     Type.push({ type: text, size, operator, unit, state });
                 }
             });
-            chrome.storage.sync.set({ Type: Type });
+            syncSet({ Type: Type });
             return;
         }
         if (option == "Regex") {
@@ -460,7 +492,7 @@ function Save(option, sec = 0) {
                 GetExt = GetExt ? GetExt.toLowerCase() : "";
                 Regex.push({ type: GetType, regex: GetRegex, ext: GetExt, blackList: GetBlackList, state: GetState });
             });
-            chrome.storage.sync.set({ Regex: Regex });
+            syncSet({ Regex: Regex });
             return;
         }
         if (option == "blockUrl") {
@@ -474,7 +506,7 @@ function Save(option, sec = 0) {
                 if (isEmpty(url)) { return true; }
                 blockUrl.push({ url: url, state: GetState });
             });
-            chrome.storage.sync.set({ blockUrl: blockUrl });
+            syncSet({ blockUrl: blockUrl });
             return;
         }
     }, sec);
