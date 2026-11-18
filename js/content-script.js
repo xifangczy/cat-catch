@@ -43,11 +43,60 @@
      * @returns {Array|Boolean} DRM 名称 (不知道是哪种时为空数组) 没有 DRM 返回 false
      */
     function getDrm(media) {
+        // 页面外的元素以主环境的判断为准
+        if (extDrm.has(media)) { return [...extDrm.get(media)]; }
         if (!media?.mediaKeys) { return false; }
         return [...(drmNames.get(media) ?? [])];
     }
     // 同一个环境里的视频浮窗也要用
     globalThis.catCatchGetDrm = getDrm;
+
+    // ========== 不挂在 DOM 上的媒体元素 ==========
+    // 主环境的 external-media.main.js 记着 在 documentElement 上发事件同步问它
+    // 元素经 MouseEvent.relatedTarget 传过来 (DOM 节点跨 world 还是同一个) 其他数据经 CustomEvent.detail (会被复制)
+    const extDrm = new WeakMap();   // 外部元素 => DRM 名称 它们的 encrypted 事件不经过 window 这边收不到
+    function askMain(doc) {
+        const result = { nodes: [], encrypted: [], clear: [] };
+        const root = doc?.documentElement;
+        if (!root) { return result; }
+        let drm = [];
+        const onNode = function (event) {
+            const el = event.relatedTarget;
+            (el?.tagName == "VIDEO" || el?.tagName == "AUDIO") && result.nodes.push(el);
+        };
+        const onData = function (event) {
+            const detail = event.detail || {};
+            drm = detail.drm || [];
+            result.encrypted = detail.encrypted || [];
+            result.clear = detail.clear || [];
+        };
+        root.addEventListener("cat-catch-ext-media-node", onNode);
+        root.addEventListener("cat-catch-ext-media-data", onData);
+        try {
+            root.dispatchEvent(new CustomEvent("cat-catch-ext-media-req", { detail: { action: "list" } }));
+        } catch (e) { }
+        root.removeEventListener("cat-catch-ext-media-node", onNode);
+        root.removeEventListener("cat-catch-ext-media-data", onData);
+        result.nodes.forEach((el, index) => { drm[index] ? extDrm.set(el, drm[index]) : extDrm.delete(el); });
+        return result;
+    }
+    /**
+     * 本 frame 的 DRM 名称 和 已知加密 / 明文的资源地址 浮窗和弹窗用 结果缓存 1 秒
+     * @returns {{names: Array|Boolean, encrypted: Set, clear: Set}}
+     */
+    let urlsCache = null;
+    function mediaUrls(fresh = false) {
+        if (!fresh && urlsCache && Date.now() - urlsCache.time < 1000) { return urlsCache; }
+        const ext = askMain(document);
+        let names = false;
+        [...document.querySelectorAll("video, audio"), ...ext.nodes].forEach(function (media) {
+            const drm = getDrm(media);
+            if (drm) { names = [...new Set([...(names || []), ...drm])]; }
+        });
+        urlsCache = { time: Date.now(), names: names, encrypted: new Set(ext.encrypted), clear: new Set(ext.clear) };
+        return urlsCache;
+    }
+    globalThis.catCatchMediaUrls = mediaUrls;
 
     chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         if (chrome.runtime.lastError) { return; }
@@ -73,6 +122,15 @@
                     });
                 });
             }
+            // 不挂在 DOM 上的媒体 (本页和同源 iframe 的) 排在后面
+            [document, ...[...iframe].map(item => item.contentDocument)].forEach(function (doc) {
+                askMain(doc).nodes.forEach(function (video) {
+                    if (video.currentSrc && !videoObj.includes(video)) {
+                        videoObj.push(video);
+                        videoSrc.push(video.currentSrc);
+                    }
+                });
+            });
             if (videoObj.length > 0) {
                 if (videoObj.length !== _videoObj.length || videoSrc.toString() !== _videoSrc.toString()) {
                     _videoSrc = videoSrc;
@@ -201,43 +259,13 @@
             sendResponse(Array.from(_key));
             return true;
         }
-        // 本页受 DRM 保护的媒体 返回 DRM 名称 没有返回 false 弹窗用来标记资源
+        // 本页受 DRM 保护的媒体 弹窗用来标记资源
+        // names: DRM 名称 没有 DRM 是 false
+        // encrypted / clear: 已知喂给加密轨道 / 明文轨道的资源地址 (其余的按 names 整个 frame 标记)
+        // iframe 由弹窗按 frame 单独问 这里只管本 frame
         if (Message.Message == "getDrm") {
-            let drm = false;
-            document.querySelectorAll("video, audio").forEach(function (media) {
-                const names = getDrm(media);
-                if (names) {
-                    drm = [...new Set([...(drm || []), ...names])];
-                }
-            });
-            // 不挂在 DOM 上的媒体元素 (比如 Spotify 的播放用 video)
-            // 主环境里 external-media.main.js 有记下来 通过 DOM attribute 作桥同步问它
-            // CustomEvent.detail 跨 world 会被 clone 走不动
-            const askExternal = (doc) => {
-                try {
-                    const bridge = doc.documentElement;
-                    if (!bridge) { return; }
-                    bridge.dataset.ccExtMediaReq = JSON.stringify({ action: "drm" });
-                    delete bridge.dataset.ccExtMediaResp;
-                    bridge.dispatchEvent(new Event("cat-catch-ext-media-req", { bubbles: false }));
-                    const raw = bridge.dataset.ccExtMediaResp;
-                    delete bridge.dataset.ccExtMediaReq;
-                    delete bridge.dataset.ccExtMediaResp;
-                    if (raw) {
-                        const ext = JSON.parse(raw);
-                        if (Array.isArray(ext)) {
-                            drm = [...new Set([...(drm || []), ...ext])];
-                        }
-                    }
-                } catch (e) { }
-            };
-            askExternal(document);
-            // 同源 iframe 的外部元素 (跨域 iframe 没法访问 contentDocument 不处理)
-            document.querySelectorAll("iframe").forEach(function (iframe) {
-                if (iframe.contentDocument == null) { return; }
-                askExternal(iframe.contentDocument);
-            });
-            sendResponse(drm);
+            const info = mediaUrls(true);
+            sendResponse({ names: info.names, encrypted: [...info.encrypted], clear: [...info.clear] });
             return true;
         }
         if (Message.Message == "ffmpeg") {

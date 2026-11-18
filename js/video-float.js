@@ -866,6 +866,16 @@
     function drmText(drm) {
         return i18n("drmProtected") + (drm.length ? ` (${drm.join(", ")})` : "");
     }
+    // 本 frame 已知加密 / 明文的资源地址 (content-script.js) 资源行按地址判断 DRM
+    function mediaUrls() {
+        return typeof globalThis.catCatchMediaUrls == "function" ? globalThis.catCatchMediaUrls() : { names: false, encrypted: new Set(), clear: new Set() };
+    }
+    // 资源行是否标 DRM: 喂给加密轨道的一定标 喂给明文轨道的不标 其余跟着所属 video
+    function itemDrm(item, drm) {
+        const urls = mediaUrls();
+        if (urls.encrypted.has(item.url)) { return drm || urls.names || []; }
+        return drm && !urls.clear.has(item.url) ? drm : false;
+    }
     // 是否没有画面的媒体 audio 元素 或者只有音轨的 video (浏览器直接打开音频文件时用的就是 video)
     function isAudioOnly(el) {
         return el.tagName == "AUDIO" || (el.readyState >= 1 && !el.videoWidth && !el.videoHeight);
@@ -1182,13 +1192,14 @@
     function renderGroup(float, box, items, checked, used, drm) {
         const children = items.map(function (item) {
             let row = float.rows.get(item.key);
+            const rowDrm = itemDrm(item, drm);
             // 资源在 属于该 video 和 本页其他资源 之间移动 DRM 状态不同 重建这一行
-            if (row && row.drm != !!drm) {
+            if (row && row.drm != !!rowDrm) {
                 destroyRow(row);
                 row = null;
             }
             if (!row) {
-                row = createRow(float, item, float.checked.get(item.key) ?? checked, drm);
+                row = createRow(float, item, float.checked.get(item.key) ?? checked, rowDrm);
                 float.rows.set(item.key, row);
             }
             if (row.item !== item) {
@@ -1230,6 +1241,13 @@
             float.signature = "";
             float.drmNote.textContent = drm ? drmText(drm) : "";
             float.drmNote.classList.toggle("show", !!drm);
+        }
+        // 已知加密 / 明文的地址有变化 重新渲染资源行
+        const urls = mediaUrls();
+        const urlsKey = urls.encrypted.size + "/" + urls.clear.size;
+        if (urlsKey !== float.urlsKey) {
+            float.urlsKey = urlsKey;
+            float.signature = "";
         }
         if (!float.open) { return; }
         syncMedia(float);

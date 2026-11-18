@@ -1323,7 +1323,8 @@ function getAllData() {
 
 /********************DRM********************/
 /**
- * 页面里有受 DRM 保护的媒体时 同一个 frame 的媒体和清单资源都标记为 DRM 不能下载
+ * 页面里有受 DRM 保护的媒体时 同一个 frame 的媒体和清单资源标记为 DRM 不能下载
+ * 已知喂给明文轨道的资源不标 已知喂给加密轨道的资源一定标 (content-script.js 的 getDrm)
  * 有新资源时重新检查 300毫秒内只检查一次
  * @param {Number} tabId
  */
@@ -1335,11 +1336,18 @@ function refreshDrm(tabId) {
     chrome.webNavigation.getAllFrames({ tabId: tabId }, function (frames) {
       if (chrome.runtime.lastError || !frames) { return; }
       for (const frame of frames) {
-        chrome.tabs.sendMessage(tabId, { Message: "getDrm" }, { frameId: frame.frameId }, function (names) {
-          if (chrome.runtime.lastError || !names) { return; }
+        chrome.tabs.sendMessage(tabId, { Message: "getDrm" }, { frameId: frame.frameId }, function (info) {
+          if (chrome.runtime.lastError || !info) { return; }
+          const encrypted = new Set(info.encrypted ?? []);
+          const clear = new Set(info.clear ?? []);
+          if (!info.names && !encrypted.size) { return; }
           getAllData().forEach(function (data) {
             if (data.tabId == tabId && (data.frameId ?? 0) == frame.frameId && !data.drm && (isMedia(data) || isM3U8(data) || isMPD(data))) {
-              setDrm(data, names);
+              if (encrypted.has(data.url)) {
+                setDrm(data, info.names || []);
+              } else if (info.names && !clear.has(data.url)) {
+                setDrm(data, info.names);
+              }
             }
           });
         });
