@@ -4,7 +4,7 @@
         return;
     }
     if (!navigator.mediaDevices) {
-        alert("当前网页不支持屏幕分享");
+        alert((window.CatCatchI18n && window.CatCatchI18n.screenShareNotSupported) || "当前网页不支持屏幕分享");
         return;
     }
 
