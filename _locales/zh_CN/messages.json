@@ -116,6 +116,9 @@
   "fakeNoDrmClose": {
     "message": "停止声称不支持"
   },
+  "fakeNoDrmRetry": {
+    "message": "声称浏览器不支持 DRM 重新加载页面 让网站改发无加密版本"
+  },
   "autoDownload": {
     "message": "自动下载"
   },

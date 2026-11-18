@@ -116,6 +116,9 @@
   "fakeNoDrmClose": {
     "message": "DRM 偽装を解除"
   },
+  "fakeNoDrmRetry": {
+    "message": "DRM 非対応と偽装してページを再読み込み"
+  },
   "autoDownload": {
     "message": "自動ダウンロード"
   },

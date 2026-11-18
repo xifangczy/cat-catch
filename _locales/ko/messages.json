@@ -116,6 +116,9 @@
   "fakeNoDrmClose": {
     "message": "DRM 위장 해제"
   },
+  "fakeNoDrmRetry": {
+    "message": "DRM 미지원으로 위장하고 페이지 새로고침"
+  },
   "autoDownload": {
     "message": "자동 다운로드"
   },

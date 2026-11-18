@@ -116,6 +116,9 @@
   "fakeNoDrmClose": {
     "message": "Stop Faking No DRM"
   },
+  "fakeNoDrmRetry": {
+    "message": "Claim no DRM support and reload this page"
+  },
   "autoDownload": {
     "message": "Auto Download"
   },

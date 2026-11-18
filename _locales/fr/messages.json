@@ -116,6 +116,9 @@
   "fakeNoDrmClose": {
     "message": "Arrêter la simulation"
   },
+  "fakeNoDrmRetry": {
+    "message": "Simuler l'absence de DRM et recharger la page"
+  },
   "autoDownload": {
     "message": "Téléchargement Automatique"
   },

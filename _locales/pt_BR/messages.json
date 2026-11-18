@@ -116,6 +116,9 @@
   "fakeNoDrmClose": {
     "message": "Parar Fingimento DRM"
   },
+  "fakeNoDrmRetry": {
+    "message": "Fingir que não há DRM e recarregar a página"
+  },
   "autoDownload": {
     "message": "Download Automático"
   },

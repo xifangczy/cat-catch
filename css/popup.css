@@ -401,3 +401,7 @@ label {
 .panel .confirm {
   text-align: center;
 }
+/* 声称不支持 DRM 重新请求 只在标出 DRM 的资源上显示 */
+.panel-heading:not(:has(.drm)) #fakeNoDrm {
+  display: none;
+}

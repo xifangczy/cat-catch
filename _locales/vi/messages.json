@@ -116,6 +116,9 @@
   "fakeNoDrmClose": {
     "message": "Dừng giả không hỗ trợ"
   },
+  "fakeNoDrmRetry": {
+    "message": "Giả không hỗ trợ DRM và tải lại trang"
+  },
   "autoDownload": {
     "message": "Tự động tải xuống"
   },

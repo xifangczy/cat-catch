@@ -460,9 +460,9 @@ chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         return true;
     }
     // 对tabId的标签 开启 关闭 "声称不支持 DRM" 然后重新加载
+    // 资源行的按钮带 enable: true 只开不关
     if (Message.Message == "fakeNoDrm") {
-        fakeNoDrm(Message.tabId, !G.featFakeNoDrmTabId.has(Message.tabId));
-        chrome.tabs.reload(Message.tabId, { bypassCache: true });
+        fakeNoDrm(Message.tabId, Message.enable ?? !G.featFakeNoDrmTabId.has(Message.tabId));
         sendResponse("ok");
         return true;
     }
@@ -775,14 +775,12 @@ chrome.webNavigation.onCommitted.addListener(function (details) {
         });
     });
 
-    // 声称不支持 DRM (让网站给无加密版本)
-    if (G.initLocalComplete && G.featFakeNoDrmTabId.size > 0 && G.featFakeNoDrmTabId.has(details.tabId)) {
-        chrome.scripting.executeScript({
-            target: { tabId: details.tabId, frameIds: [details.frameId] },
-            files: ["catch-script/no-drm.js"],
-            injectImmediately: true,
-            world: "MAIN"
-        });
+    // 声称不支持 DRM 新 frame (跳到别的网站 / 跨域 iframe) 的 sessionStorage 里还没有标记 补上
+    // 关掉之后 别的网站的 sessionStorage 里可能还留着标记 加载时清掉
+    if (G.initLocalComplete && G.featFakeNoDrmTabId.has(details.tabId)) {
+        fakeNoDrmFrame({ tabId: details.tabId, frameIds: [details.frameId] }, true);
+    } else if (G.fakeNoDrmClean.has(details.tabId)) {
+        fakeNoDrmFrame({ tabId: details.tabId, frameIds: [details.frameId] }, false);
     }
 
     // 模拟手机
@@ -1100,40 +1098,56 @@ function SetIcon(obj) {
     }
 }
 
-// 声称不支持 DRM: 开关 + declarativeNetRequest 拦常见 DRM 许可证地址
-// 用 900000001 到 900000007 这几个 id, 和 "模拟手机" 用的 tabId 原值不冲突
-const FAKE_NO_DRM_RULE_IDS = [900000001, 900000002, 900000003, 900000004, 900000005, 900000006, 900000007];
-const FAKE_NO_DRM_URL_FILTERS = [
-    "widevine",
-    "playready",
-    "fairplay",
-    "clearkey-license",
-    "licenseserver",
-    "getlicense",
-    "drm-license"
-];
-function fakeNoDrm(tabId, change = false) {
-    if (change) {
-        G.featFakeNoDrmTabId.add(tabId);
-    } else {
-        G.featFakeNoDrmTabId.delete(tabId);
-    }
-    (chrome.storage.session ?? chrome.storage.local).set({ featFakeNoDrmTabId: Array.from(G.featFakeNoDrmTabId) });
+// 声称不支持 DRM
+// 页面里的接口由 catch-script/no-drm.js 改 (看本标签 sessionStorage 里的标记)
+// 另外用 declarativeNetRequest 拦下常见的许可证请求 只拦 fetch / XHR 不影响页面和脚本
+// 规则 id 放在 int32 的最后一段 和 "模拟手机" (tabId 原值) 以及请求头规则 都不重叠
+const FAKE_NO_DRM_FLAG = "catCatchNoDrm";
+const FAKE_NO_DRM_URL_FILTERS = ["widevine", "playready", "fairplay", "clearkey-license", "licenseserver", "getlicense", "drm-license"];
+const FAKE_NO_DRM_RULE_IDS = FAKE_NO_DRM_URL_FILTERS.map((_, index) => 2147483601 + index);
+G.fakeNoDrmClean = new Set();   // 关掉了的标签 之后加载的 frame 里残留的标记要清掉
+function fakeNoDrmRules() {
     chrome.declarativeNetRequest.updateSessionRules({ removeRuleIds: FAKE_NO_DRM_RULE_IDS }, function () {
-        if (chrome.runtime.lastError) { return; }
-        if (G.featFakeNoDrmTabId.size == 0) { return; }
+        if (chrome.runtime.lastError || G.featFakeNoDrmTabId.size == 0) { return; }
         const tabIds = Array.from(G.featFakeNoDrmTabId);
-        const addRules = FAKE_NO_DRM_URL_FILTERS.map((urlFilter, index) => ({
-            id: FAKE_NO_DRM_RULE_IDS[index],
-            priority: 1,
-            action: { type: "block" },
-            condition: {
-                urlFilter: urlFilter,
-                tabIds: tabIds,
-                resourceTypes: ["xmlhttprequest", "main_frame", "sub_frame", "script", "other"]
-            }
-        }));
-        chrome.declarativeNetRequest.updateSessionRules({ addRules: addRules });
+        chrome.declarativeNetRequest.updateSessionRules({
+            addRules: FAKE_NO_DRM_URL_FILTERS.map((urlFilter, index) => ({
+                id: FAKE_NO_DRM_RULE_IDS[index],
+                priority: 1,
+                action: { type: "block" },
+                condition: { urlFilter: urlFilter, tabIds: tabIds, resourceTypes: ["xmlhttprequest"] }
+            }))
+        });
+    });
+}
+// 在标签的 frame 里写入 / 删除标记 enable 时再执行一次 no-drm.js (标记是后写的 静态注入那次没生效)
+function fakeNoDrmFrame(target, enable, callback) {
+    chrome.scripting.executeScript({
+        target: target,
+        func: function (flag, enable) {
+            try { enable ? sessionStorage.setItem(flag, "1") : sessionStorage.removeItem(flag); } catch (e) { }
+        },
+        args: [FAKE_NO_DRM_FLAG, enable],
+        injectImmediately: true,
+        world: "MAIN"
+    }, function () {
+        chrome.runtime.lastError;
+        if (!enable) { callback && callback(); return; }
+        chrome.scripting.executeScript({ target: target, files: ["catch-script/no-drm.js"], injectImmediately: true, world: "MAIN" }, function () {
+            chrome.runtime.lastError;
+            callback && callback();
+        });
+    });
+}
+// 开关 然后重新加载 让网站重新判断
+function fakeNoDrm(tabId, enable) {
+    enable ? G.featFakeNoDrmTabId.add(tabId) : G.featFakeNoDrmTabId.delete(tabId);
+    enable ? G.fakeNoDrmClean.delete(tabId) : G.fakeNoDrmClean.add(tabId);
+    (chrome.storage.session ?? chrome.storage.local).set({ featFakeNoDrmTabId: Array.from(G.featFakeNoDrmTabId) });
+    fakeNoDrmRules();
+    // 标记写进 sessionStorage 刷新后 no-drm.js 在页面脚本之前就生效
+    fakeNoDrmFrame({ tabId: tabId, allFrames: true }, enable, function () {
+        chrome.tabs.reload(tabId, { bypassCache: true });
     });
 }
 
@@ -1209,7 +1223,7 @@ function clearRedundant() {
 
         if (!G.initLocalComplete) { return; }
 
-        // 清理 declarativeNetRequest 模拟手机 / 声称不支持 DRM
+        // 清理 declarativeNetRequest 模拟手机
         chrome.declarativeNetRequest.getSessionRules(function (rules) {
             let mobileFlag = false;
             for (let item of rules) {
@@ -1229,7 +1243,8 @@ function clearRedundant() {
             }
             mobileFlag && (chrome.storage.session ?? chrome.storage.local).set({ featMobileTabId: Array.from(G.featMobileTabId) });
         });
-        // 清理 "声称不支持 DRM"
+        // 清理 "声称不支持 DRM" 已关闭的标签 剩下的标签重建拦截规则
+        G.fakeNoDrmClean.forEach(tabId => !allTabId.has(tabId) && G.fakeNoDrmClean.delete(tabId));
         let fakeNoDrmFlag = false;
         G.featFakeNoDrmTabId.forEach(function (tabId) {
             if (!allTabId.has(tabId)) {
@@ -1239,9 +1254,7 @@ function clearRedundant() {
         });
         if (fakeNoDrmFlag) {
             (chrome.storage.session ?? chrome.storage.local).set({ featFakeNoDrmTabId: Array.from(G.featFakeNoDrmTabId) });
-            // 剩余的 tabId 还需要规则 直接调 fakeNoDrm 重建
-            // 没剩的 fakeNoDrm 也会 remove 规则
-            fakeNoDrm(-1, false);
+            fakeNoDrmRules();
         }
         // 清理自动下载
         let autoDownFlag = false;
