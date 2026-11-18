@@ -1081,6 +1081,9 @@
   "videoFloatDownloadStarted": {
     "message": "ダウンロードを開始しました"
   },
+  "videoFloatMore": {
+    "message": "さらに表示"
+  },
   "videoFloatLimit": {
     "message": "$total$ 個中 $show$ 個のリソースを表示",
     "placeholders": {

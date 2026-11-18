@@ -1081,6 +1081,9 @@
   "videoFloatDownloadStarted": {
     "message": "Téléchargement démarré"
   },
+  "videoFloatMore": {
+    "message": "Afficher plus"
+  },
   "videoFloatLimit": {
     "message": "Affichage de $show$ ressources sur $total$",
     "placeholders": {

@@ -1081,6 +1081,9 @@
   "videoFloatDownloadStarted": {
     "message": "Đã bắt đầu tải xuống"
   },
+  "videoFloatMore": {
+    "message": "Hiển thị thêm"
+  },
   "videoFloatLimit": {
     "message": "Đang hiển thị $show$ / $total$ tài nguyên",
     "placeholders": {

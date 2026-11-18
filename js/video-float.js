@@ -25,6 +25,7 @@
     const MIN_HEIGHT = 110;
     const MARGIN = 10;          // 浮窗和 video 边缘的距离
     const MAX_ROWS = 60;        // 一组资源最多显示的数量
+    const MORE_ROWS = 100;      // 点一次 显示更多 增加的数量
     const START_SLACK = 3000;   // 资源比 video 开始加载早出现 这个毫秒数以内仍然算它的
     const TICK = 500;           // 定时检查页面 video 的间隔
     const AUDIO_MIN_WIDTH = 120;    // 音频播放条小于这个尺寸 当作看不见
@@ -204,8 +205,9 @@
         .screenshots { display: block; max-width: 100%; max-height: 200px; margin: 4px auto 0; }
         details { margin-top: 2px; }
         summary { padding: 2px 0; font-weight: bold; cursor: pointer; }
-        .note { display: none; padding-top: 2px; color: var(--size-color); }
-        .note.show { display: block; }
+        .note { display: none; align-items: center; gap: 6px; padding-top: 2px; color: var(--size-color); }
+        .note.show { display: flex; }
+        .note button { padding: 1px 6px; }
         .down { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
         button {
             margin: 0; padding: 3px 6px; border-radius: 4px; font: inherit; cursor: pointer;
@@ -560,7 +562,8 @@
             rows: new Map(),        // 资源 key => 一行资源
             checked: new Map(),     // 资源 key => 手动修改过的勾选状态
             own: [], other: [],     // 属于该 video 的资源 / 本页其他资源
-            shownOwn: [], shownOther: []
+            shownOwn: [], shownOther: [],
+            maxRows: MAX_ROWS       // 一组资源最多显示的数量 点 显示更多 后增加
         };
         float.el = h("div", "CatCatchFloat");
         float.el.style.display = "none";
@@ -628,6 +631,14 @@
             float.open && syncMedia(float);
         };
         MEDIA_EVENTS.forEach(type => video.addEventListener(type, float.onMedia));
+
+        // 没有全部显示时的提示 后面是 显示更多
+        float.noteText = h("span");
+        float.note.append(float.noteText, textButton("", i18n("videoFloatMore"), function () {
+            float.maxRows += MORE_ROWS;
+            render(float);
+            reposition();
+        }));
 
         root.appendChild(float.el);
         floats.set(video, float);
@@ -1187,8 +1198,8 @@
         if (!float.open) { return; }
         syncMedia(float);
 
-        const shownOwn = limit(own, MAX_ROWS);
-        const shownOther = float.details.open ? limit(other, MAX_ROWS) : [];
+        const shownOwn = limit(own, float.maxRows);
+        const shownOther = float.details.open ? limit(other, float.maxRows) : [];
         // 页面内解码得到的轨道 key 不变但内容会变 把地址也算进去
         const sign = item => item.capture ? item.key + "\t" + item.url : item.key;
         const signature = shownOwn.map(sign).join("\n") + "\n\n" + shownOther.map(sign).join("\n") + "\n\n" + own.length + "/" + other.length;
@@ -1208,7 +1219,7 @@
         }
 
         const hidden = own.length - shownOwn.length + (float.details.open ? other.length - shownOther.length : 0);
-        float.note.textContent = hidden > 0 ? i18n("videoFloatLimit", [String(shownOwn.length + shownOther.length), String(own.length + (float.details.open ? other.length : 0))]) : "";
+        float.noteText.textContent = hidden > 0 ? i18n("videoFloatLimit", [String(shownOwn.length + shownOther.length), String(own.length + (float.details.open ? other.length : 0))]) : "";
         float.note.classList.toggle("show", hidden > 0);
         updateBar(float);
     }
