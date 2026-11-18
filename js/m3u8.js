@@ -407,7 +407,7 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
                 chrome.tabs.update({ url: url });
             });
             html.find("label").click(function () {
-                dataMerge.video = item;
+                dataMerge.audio = item;
             });
             $("#next_audio").append(html);
         }
