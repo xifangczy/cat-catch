@@ -170,7 +170,7 @@ function videoFloatData(info) {
     if (isEmpty(data.name)) {
         data.name = data.title + '.' + data.ext;
     } else {
-        try { data.name = decodeURIComponent(stringModify(data.name)); } catch (e) { data.name = stringModify(data.name); }
+        data.name = decodeName(data.name);
     }
     data._size = data.size;
     data.parsing = videoFloatParsing(data);

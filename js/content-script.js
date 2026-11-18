@@ -284,7 +284,7 @@
         if (event.data.action == "catCatchFFmpeg") {
             if (!event.data.use ||
                 !event.data.files ||
-                !event.data.files instanceof Array ||
+                !(event.data.files instanceof Array) ||
                 event.data.files.length == 0
             ) { return; }
             event.data.title = event.data.title ?? document.title ?? new Date().getTime().toString();

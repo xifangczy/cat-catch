@@ -49,7 +49,7 @@ awaitG(() => {
 
                 _downStream = $("#downStream").prop("checked");
                 _data.push(...data);
-                setHeaders(data, start(), _tabId);
+                setHeaders(data, start, _tabId);
                 $("#getURL, .newDownload").toggle();
             });
             return;
@@ -65,7 +65,7 @@ awaitG(() => {
             }
         }
         if (!_requestId.length) {
-            setHeaders(_data, start(), _tabId);
+            setHeaders(_data, start, _tabId);
             return;
         }
 
@@ -76,7 +76,7 @@ awaitG(() => {
                 return;
             }
             _data.push(...data);
-            setHeaders(data, start(), _tabId);
+            setHeaders(data, start, _tabId);
         });
     });
 });

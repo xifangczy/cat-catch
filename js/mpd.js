@@ -30,7 +30,7 @@ function init() {
                 // mpdContent = text;
                 // parseMPD(mpdContent);
                 parseMPD(text);
-                $("#mpd_url").html(_url).attr("href", _url);
+                $("#mpd_url").text(_url).attr("href", _url);
             });
     } else {
         $("#loading").hide();
@@ -140,18 +140,19 @@ function parseMPD(mpdContent) {
     }
 
     for (let key in mpdJson.playlists) {
-        $("#mpdVideoLists").append(`<option value='${key}'>${mpdJson.playlists[key].attributes.NAME
+        // 名字来自清单 按文字写入 帧率和分辨率清单里可以不写
+        $("#mpdVideoLists").append($("<option>").val(key).text(`${mpdJson.playlists[key].attributes.NAME
             } | ${(mpdJson.playlists[key].attributes.BANDWIDTH / 1024).toFixed(1)
-            } kbps |  ${mpdJson.playlists[key].attributes["FRAME-RATE"].toFixed(1)
-            } fps |  ${mpdJson.playlists[key].attributes.RESOLUTION.width
-            } x ${mpdJson.playlists[key].attributes.RESOLUTION.height
-            }</option>`);
+            } kbps |  ${mpdJson.playlists[key].attributes["FRAME-RATE"]?.toFixed(1) ?? "-"
+            } fps |  ${mpdJson.playlists[key].attributes.RESOLUTION?.width ?? "-"
+            } x ${mpdJson.playlists[key].attributes.RESOLUTION?.height ?? "-"
+            }`));
     }
     for (let key in mpdJson.mediaGroups.AUDIO.audio) {
         for (let index in mpdJson.mediaGroups.AUDIO.audio[key].playlists) {
             let item = mpdJson.mediaGroups.AUDIO.audio[key].playlists[index];
             // console.log(item);
-            $("#mpdAudioLists").append(`<option value='${key}$-bmmmd-$${index}'>${key} | ${item.attributes.NAME} | ${item.attributes.BANDWIDTH / 1000}Kbps</option>`);
+            $("#mpdAudioLists").append($("<option>").val(`${key}$-bmmmd-$${index}`).text(`${key} | ${item.attributes.NAME} | ${item.attributes.BANDWIDTH / 1000}Kbps`));
         }
     }
     $("#info").html(getInfo("video"));
@@ -179,9 +180,7 @@ function showSegment(type, index) {
 }
 
 function getInfo(type = "audio") {
-    if (type == "audio") {
-        return i18n.audio + ": " + $("#mpdAudioLists").find("option:selected").text();
-    } else {
-        return i18n.video + ": " + $("#mpdVideoLists").find("option:selected").text();
-    }
+    // 返回值会被当成 HTML 显示 (本页和 m3u8 解析器) 选项的文字来自清单 需要转义
+    const text = type == "audio" ? i18n.audio + ": " + $("#mpdAudioLists").find("option:selected").text() : i18n.video + ": " + $("#mpdVideoLists").find("option:selected").text();
+    return escapeHtml(text);
 }

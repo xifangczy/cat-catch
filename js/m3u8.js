@@ -335,7 +335,7 @@ channel.onmessage = (event) => {
 
 // 监听 MANIFEST_LOADED 装载解析的m3u8 URL
 hls.on(Hls.Events.MANIFEST_LOADED, function (event, data) {
-    $("#m3u8_url").attr("href", data.url).html(data.url);
+    $("#m3u8_url").attr("href", data.url).text(data.url);
 });
 
 
@@ -356,8 +356,8 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
             maxBandwidth = Math.max(maxBandwidth, item.attrs.BANDWIDTH);
             if (maxBandwidth == item.attrs.BANDWIDTH) { dataMerge.video = item; }   // 默选择码率最大的
             const html = $(`<div class="block">
-                    <div><label class="more_class"><input type="radio" name="more_video" ${maxBandwidth == item.attrs.BANDWIDTH ? "checked" : ""}/>${item.attrs.RESOLUTION ? i18n.resolution + ":" + item.attrs.RESOLUTION : ""}${item.attrs.BANDWIDTH ? " | " + i18n.bitrate + ":" + (parseInt(item.attrs.BANDWIDTH / 1000) + " Kbps") : ""}</label></div>
-                    <a href="${url}">${name}</a>
+                    <div><label class="more_class"><input type="radio" name="more_video" ${maxBandwidth == item.attrs.BANDWIDTH ? "checked" : ""}/>${item.attrs.RESOLUTION ? i18n.resolution + ":" + escapeHtml(item.attrs.RESOLUTION) : ""}${item.attrs.BANDWIDTH ? " | " + i18n.bitrate + ":" + (parseInt(item.attrs.BANDWIDTH / 1000) + " Kbps") : ""}</label></div>
+                    <a href="${url}">${escapeHtml(name)}</a>
                     <button id="parser" type="button">${i18n.parser}</button>
                     <button class="sendFfmpeg" type="button">${i18n.sendFfmpeg}</button>
                 </div>`);
@@ -393,8 +393,8 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
             let [name, url] = getNewUrl(item);
             if (index == 0) { dataMerge.audio = item; }     // 默选择第一个
             const html = $(`<div class="block">
-                    <div><label><input type="radio" name="more_audio" ${index == 0 ? "checked" : ""}/>${item.name ? item.name : ""} | ${item.lang ? item.lang : ""} | ${item.groupId ? item.groupId : ""}</label></div>
-                    <a href="${url}">${name}</a>
+                    <div><label><input type="radio" name="more_audio" ${index == 0 ? "checked" : ""}/>${escapeHtml(item.name)} | ${escapeHtml(item.lang)} | ${escapeHtml(item.groupId)}</label></div>
+                    <a href="${url}">${escapeHtml(name)}</a>
                     <button id="parser" type="button">${i18n.parser}</button>
                     <button class="sendFfmpeg" type="button">${i18n.sendFfmpeg}</button>
                 </div>`);
@@ -418,8 +418,8 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
         for (let item of data.subtitleTracks) {
             const [name, url] = getNewUrl(item);
             const html = `<div class="block">
-                    <div>${item.name ? item.name : ""} | ${item.lang ? item.lang : ""}</div>
-                    <a href="${url}">${name}</a>
+                    <div>${escapeHtml(item.name)} | ${escapeHtml(item.lang)}</div>
+                    <a href="${url}">${escapeHtml(name)}</a>
                 </div>`;
             $("#next_subtitle").append(html);
         }
@@ -706,7 +706,7 @@ function parseTs(data) {
                 keyContent.set(data.fragments[i].decryptdata.uri, true);
                 // 下载key
                 fetch(data.fragments[i].decryptdata.uri)
-                    .then(response => response.arrayBuffer())
+                    .then(response => response.ok ? response.arrayBuffer() : Promise.reject(response.status))
                     .then(function (buffer) {
                         if (buffer.byteLength == 16) {
                             keyContent.set(data.fragments[i].decryptdata.uri, buffer); // 储存密钥
@@ -735,13 +735,14 @@ function parseTs(data) {
                     'Range': `bytes=${start}-${end - 1}`
                 };
             }
+            // 出错的响应 (403 的页面等) 不能当成MAP切片的内容
             fetch(data.fragments[i].initSegment.url, options)
-                .then(response => response.arrayBuffer())
+                .then(response => response.ok ? response.arrayBuffer() : Promise.reject(response.status))
                 .then(function (buffer) {
                     initData.set(data.fragments[i].initSegment.url, buffer);
                     autoMerge();
                 }).catch(function (error) { console.log(error); });
-            $("#tips").append('EXT-X-MAP: <input type="text" class="keyUrl" value="' + data.fragments[i].initSegment.url + '" spellcheck="false" readonly="readonly">');
+            $("#tips").append('EXT-X-MAP: ', $('<input type="text" class="keyUrl" spellcheck="false" readonly="readonly">').val(data.fragments[i].initSegment.url));
         }
 
         if (data.live && data.fragments[i].initSegment) {
@@ -845,7 +846,7 @@ function parseTs(data) {
 
     function showKeyInfo(buffer, decryptdata, i) {
         const $tips = $("#tips");
-        $tips.append(`${i18n.keyAddress}: <input type="text" value="${decryptdata.uri}" spellcheck="false" readonly="readonly" class="keyUrl">`);
+        $tips.append(`${i18n.keyAddress}: `, $('<input type="text" spellcheck="false" readonly="readonly" class="keyUrl">').val(decryptdata.uri));
         // 准备算法及密钥字段
         const method = decryptdata.method || "NONE";
         const keyHex = buffer ? ArrayBufferToHexString(buffer) : i18n.keyDownloadFailed;
@@ -1479,7 +1480,7 @@ $("#searchingForRealKey").click(function () {
     }
     const decryptor = new AESDecryptor();
     fetch(_fragments[0].url)
-        .then(response => response.arrayBuffer())
+        .then(response => response.ok ? response.arrayBuffer() : Promise.reject(response.status))
         .then(function (buffer) {
             if (check(buffer)) {
                 $("#searchingForRealKey").html(i18n.searchingForRealKey);
@@ -1732,8 +1733,9 @@ async function downloadNew(start = 0, end = _fragments.length) {
         }
     });
     if (fileStream) {
+        // 返回写入的 Promise 下载器等它完成再下载后面的切片
         down.on('sequentialPush', function (buffer) {
-            fileStream && fileStream.write(new Uint8Array(buffer));
+            return fileStream && fileStream.write(new Uint8Array(buffer));
         });
     }
     down.on('error', function (error) {
