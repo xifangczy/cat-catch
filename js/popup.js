@@ -521,9 +521,11 @@ function createMedia(data, currentTab = true) {
 // 资源之间的关联 (js/core/media-graph.js) 当前页面和其他页面各一份
 const mediaGraph = new Map([[true, new MediaGraph()], [false, new MediaGraph()]]);
 const streamRow = new WeakMap();    // 分片流 => 归并后的那一行
+const partsRow = new WeakMap();     // 主清单 => 它名下的资源归并成的那一行
 /**
  * 生成资源的行 并按资源之间的关联归并:
  * 同一条流的分片归并成一行 点击展开 不再每个分片各占一行
+ * 主清单名下的子清单和零碎的分片 收到主清单下面 展开主清单才看得到
  * 音频和视频分开的资源 显示合并图标
  * @param {Object} data 资源对象
  * @param {Boolean} currentTab 是否当前页面的资源
@@ -539,7 +541,20 @@ function AddMedia(data, currentTab = true) {
     other.html.find("#umpMerge").removeClass("hide");
   }
   const stream = graph.owner(data);
-  if (!stream) { return data.html; }
+  if (!stream) {
+    const root = graph.root(data);
+    if (!root || !root.html) { return data.html; }
+    let parts = partsRow.get(root);
+    if (!parts) {
+      parts = createPartsRow(root, graph);
+      partsRow.set(root, parts);
+    }
+    data.checked = false;
+    data.ump || data.html.find("#umpMerge").addClass("hide");
+    data.partsRow = parts;
+    parts.add(data);
+    return $();
+  }
   let row = streamRow.get(stream);
   const created = !row;
   if (created) {
@@ -551,6 +566,9 @@ function AddMedia(data, currentTab = true) {
     item.checked = false;
     item.ump || item.html.find("#umpMerge").addClass("hide");
     row.box.append(item.html);
+    // 之前收在主清单名下的 挪走之后那边的数量要更新
+    item.partsRow && item.partsRow.update();
+    item.partsRow = null;
   }
   row.update();
   return created ? row.html : $();
@@ -600,6 +618,55 @@ function createStreamRow(stream, graph) {
       heading.find(".size").text(stream.size ? byteToSize(stream.size) : "");
       heading.find(".parsing").toggleClass("hide", !graph.manifest(stream));
     }
+  };
+}
+
+/**
+ * 主清单名下的子清单和零碎分片归并成的一行
+ * 平时不显示 主清单的名字后面写着数量 展开主清单的详情时出现在它下面
+ */
+function createPartsRow(root, graph) {
+  const html = $(`
+        <div class="panel">
+            <div class="panel-heading">
+                <input type="checkbox" class="DownCheck"/>
+                <span class="name"></span>
+            </div>
+            <div class="streamBox hide"></div>
+        </div>`);
+  const heading = html.children(".panel-heading");
+  const box = html.children(".streamBox");
+  const count = $(`<span class="size"></span>`);
+  const exts = new Set();
+  root.html.children(".panel-heading").find(".name").after(count);
+  heading.click(function () {
+    box.toggle();
+  });
+  heading.find(".DownCheck").click(function (event) {
+    event.stopPropagation();
+    for (const item of graph.parts(root)) {
+      item.checked = this.checked;
+    }
+    mergeDownButton();
+  });
+  // 跟着主清单的详情一起出现 / 收起
+  const show = function () {
+    root.urlPanelShow && box.children().length ? root.html.after(html) : html.detach();
+  };
+  root.panelHeading.click(show);
+  const update = function () {
+    const total = box.children().length;
+    count.text(total ? `+${total}` : "");
+    heading.find(".name").text(`${[...exts].join(" / ")} × ${total}`);
+    show();
+  };
+  return {
+    add: function (item) {
+      item.ext && exts.add(item.ext);
+      box.append(item.html);
+      update();
+    },
+    update: update
   };
 }
 

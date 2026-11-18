@@ -48,6 +48,7 @@ console.log('== 资源关联图 ==');
     const { graph, streams, loose } = build([master, level, other, ...segments]);
     check('HLS: ts 分片归并成 1 条流', streams.length == 1 && streams[0].nodes.length == 5 && loose.length == 3);
     check('HLS: 对应到最具体的那个清单 (同目录的画质清单 不是主清单 也不是别的视频的)', streams.length == 1 && graph.manifest(streams[0]) === level);
+    check('HLS: 画质清单算在主清单名下 别的视频的不算', graph.root(level) === master && graph.root(other) === null && graph.root(master) === null);
 }
 // DASH (ffmpeg 的命名): 两个 Representation 的分片只差编号 不能混成一条
 {
@@ -95,6 +96,46 @@ console.log('== 资源关联图 ==');
     const frames = [item('https://cdn.example.com/media/c_video.mp4', 'video/mp4', { frameId: 0 }), item('https://cdn.example.com/media/c_audio.m4a', 'audio/mp4', { frameId: 7 })];
     check('不同 frame 的资源不配对', build(frames).graph.counterpart(frames[0]) === null);
 }
+// 推特: 分片的文件名是随机的 归不成分片流 靠编号算到主清单名下
+{
+    const name = () => Math.random().toString(36).slice(2, 12) + 'Qw';
+    const tweet = (id, kind = 'amplify_video') => {
+        const base = `https://video.twimg.com/${kind}/${id}/${kind == 'ext_tw_video' ? 'pu/' : ''}`;
+        const list = [
+            item(`${base}pl/${name()}.m3u8?tag=14&v=ba2&variant_version=1`, 'application/x-mpegURL'),
+            item(`${base}pl/avc1/720x1280/${name()}.m3u8`, 'application/x-mpegURL'),
+            item(`${base}pl/mp4a/128000/${name()}.m3u8`, 'application/x-mpegURL'),
+            item(`${base}vid/avc1/0/0/720x1280/${name()}.mp4`, 'video/mp4', { size: 1200 }),
+            item(`${base}aud/mp4a/0/0/128000/${name()}.mp4`, 'audio/mp4', { size: 900 }),
+        ];
+        for (let n = 0; n < 6; n++) {
+            list.push(item(`${base}vid/avc1/${n * 3000}/${n * 3000 + 3000}/720x1280/${name()}.m4s`, 'video/mp4', { size: 400000 }));
+            list.push(item(`${base}aud/mp4a/${n * 3000}/${n * 3000 + 3000}/128000/${name()}.m4s`, 'audio/mp4', { size: 50000 }));
+        }
+        return list;
+    };
+    const a = tweet('2122609008137945088'), b = tweet('2122633919434485760', 'ext_tw_video');
+    // 两个视频的请求交错在一起
+    const mixed = [];
+    a.forEach((value, index) => mixed.push(value, b[index]));
+    const { graph, streams } = build(mixed);
+    const rows = mixed.filter((value) => !graph.owner(value) && !graph.root(value));
+    check('推特: 两个视频 34 个资源 只剩两个主清单单独成行', streams.length == 0 && rows.length == 2 && rows[0] === a[0] && rows[1] === b[0], rows.map((value) => value.url.slice(24, 80)));
+    check('推特: 子清单 / 初始化分片 / 分片 都算在自己那个视频的主清单名下', a.slice(1).every((value) => graph.root(value) === a[0]) && b.slice(1).every((value) => graph.root(value) === b[0]) && graph.parts(a[0]).length == 16);
+    check('推特: 主清单名下的资源不参与音视频配对', mixed.every((value) => !graph.counterpart(value)));
+    const big = item('https://video.twimg.com/amplify_video/2122609008137945088/vid/avc1/720x1280/progressiveFile1.mp4?tag=14', 'video/mp4', { size: 8 * 1024 * 1024 });
+    graph.add(big);
+    check('推特: 同一个编号下完整的 mp4 仍然单独成行', graph.root(big) === null && graph.owner(big) === null);
+    graph.remove(a[0]);
+    check('移除主清单后 它名下的子清单不再挂着它', a.slice(1, 3).every((value) => graph.root(value) === null));
+}
+// 同一个目录里的几个清单 分不清是不是同一个视频的 各自成行
+{
+    const base = 'https://cdn.example.com/channel20240117/';
+    const list = [item(base + 'video1.m3u8', 'application/vnd.apple.mpegurl'), item(base + 'video2.m3u8', 'application/vnd.apple.mpegurl')];
+    const { graph } = build(list);
+    check('同目录的清单: 各自成行', list.every((value) => graph.root(value) === null));
+}
 // 移除和清空
 {
     const media = Array.from({ length: 4 }, (_, n) => item(`https://cdn.example.com/x/abcdef123456/seg-${n}.m4s`, 'video/mp4'));
@@ -102,7 +143,7 @@ console.log('== 资源关联图 ==');
     graph.remove(media[0]);
     check('移除资源后 流里少一个', streams[0].nodes.length == 3 && graph.owner(media[0]) === null);
     graph.clear();
-    check('清空', graph.nodes.size == 0 && graph.streams.size == 0);
+    check('清空', graph.nodes.size == 0 && graph.streams.size == 0 && graph.roots.size == 0);
 }
 
 console.log(`${total - failed}/${total} 通过`);

@@ -79,8 +79,16 @@
         return {
             key: parsing.origin + path.join("/") + "/" + name + "?" + query.join("&"),
             number: number,
-            hint: SEGMENT_EXT.has(lower(item.ext)) || SEGMENT_WORD.test(file + parsing.search),
+            hint: segment(item),
         };
+    }
+    /**
+     * 看起来是不是分片 (分片的后缀 或者文件名 / 参数里带着分片的字样)
+     * @returns {Boolean}
+     */
+    function segment(item) {
+        const parsing = parse(item.url);
+        return SEGMENT_EXT.has(lower(item.ext)) || (!!parsing && SEGMENT_WORD.test(parsing.pathname.split("/").pop() + parsing.search));
     }
     /**
      * 是不是初始化分片 (地址里没有序号 不会被归进分片流 要另外认)
@@ -95,10 +103,10 @@
         const parsing = parse(item.url);
         return parsing ? parsing.origin + parsing.pathname.replace(/[^/]*$/, "") : "";
     }
-    // 目录里最靠后的 看起来像编号的一段 (够长 有字母有数字 不是 stream_1 这种通用的名字)
+    // 目录里最靠后的 看起来像编号的一段 (够长 有字母有数字 或者全是数字 不是 stream_1 这种通用的名字)
     function pathKey(pathname) {
         const list = pathname.split("/").slice(0, -1).map(text => { try { return decodeURIComponent(text); } catch (e) { return text; } });
-        return list.reverse().find(text => text.length >= 10 && /\d/.test(text) && /[a-z]/i.test(text) && !/^[a-z_-]+\d{1,3}$/i.test(text));
+        return list.reverse().find(text => text.length >= 10 && (/^\d+$/.test(text) || (/\d/.test(text) && /[a-z]/i.test(text) && !/^[a-z_-]+\d{1,3}$/i.test(text))));
     }
     /**
      * 资源的身份标识 用来把清单和它的分片 / 轨道对应起来 (它们常常不在同一个域名)
@@ -117,7 +125,7 @@
         return list.filter(Boolean);
     }
 
-    const MediaAsset = { role, track, stream, init, dir, keys };
+    const MediaAsset = { role, track, stream, segment, init, dir, keys };
     root.MediaAsset = MediaAsset;
     if (typeof module == "object" && module.exports) { module.exports = MediaAsset; }
 })(globalThis);

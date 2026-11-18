@@ -3,6 +3,7 @@
  * 把一个页面里零散的资源整理出它们之间的关系:
  *   分片流   同一条流的分片归并成一项 (一个视频几百个分片请求 不再各占一行)
  *   清单     分片流属于哪个 m3u8 / mpd
+ *   主清单   同一个编号下的子清单 (各画质 / 音轨) 和归不成流的零碎分片 算在最先出现的那个清单名下
  *   轨道     音频和视频分开的资源 互相配对 可以直接合并
  * 资源逐个加入 (add) 关系随时可以查询 不依赖浏览器的扩展接口
  * 只在同一个标签的同一个 frame 里建立关系
@@ -12,6 +13,7 @@
     const MIN = 3;          // 看起来像分片的资源 至少几个才算一条流
     const MIN_PLAIN = 5;    // 看不出是分片的资源 (例如 001.mp4 002.mp4) 至少几个 而且序号连续才算
     const PAIR_TIME = 5 * 60 * 1000;    // 配对的音频和视频 出现的时间相差不超过这么久
+    const PART_SIZE = 16 * 1024;        // 和清单同一个编号下 小于这个大小的媒体文件 当作它的初始化分片 (只有文件头 一般一两 KB)
 
     // 序号是不是基本连续 (间隔固定)
     function sequential(numbers) {
@@ -26,8 +28,9 @@
 
     class MediaGraph {
         constructor() {
-            this.nodes = new Map();     // 资源 => 节点 { item, role, track, scope, dir, keys, stream }
+            this.nodes = new Map();     // 资源 => 节点 { item, role, track, scope, dir, keys, stream, init, part, parent }
             this.streams = new Map();   // 分片流 标识 => { key, nodes, numbers, size, hint, active }
+            this.roots = new Map();     // frame + 身份标识 => 主清单的节点
         }
         /**
          * 加入一个资源
@@ -43,11 +46,25 @@
                 keys: MediaAsset.keys(item),
                 stream: null,
                 init: false,
+                part: false,    // 零碎的分片: 分片的后缀 / 初始化分片 / 只有文件头那么大的媒体文件
+                parent: null,   // 子清单上面的那个清单
             };
             this.nodes.set(item, node);
+            if (node.role == "manifest") {
+                // 同一个编号下最先出现的清单是主清单 它目录之下的清单是它的子清单
+                const roots = node.keys.map(key => this.roots.get(node.scope + "\n" + key)).filter(Boolean);
+                node.parent = roots.find(other => node.dir != other.dir && node.dir.startsWith(other.dir)) ?? null;
+                if (!node.parent) {
+                    for (const key of node.keys) {
+                        this.roots.has(node.scope + "\n" + key) || this.roots.set(node.scope + "\n" + key, node);
+                    }
+                }
+            }
             if (node.role != "media") { return node; }
             node.track = MediaAsset.track(item);
             node.init = MediaAsset.init(item);
+            // 大小现在就记下来 弹窗之后会把 size 换成显示用的文字
+            node.part = node.init || MediaAsset.segment(item) || (typeof item.size == "number" && item.size < PART_SIZE);
             const info = MediaAsset.stream(item);
             if (!info) { return node; }
             const key = node.scope + "\n" + info.key;
@@ -66,6 +83,12 @@
             const node = this.nodes.get(item);
             if (!node) { return; }
             this.nodes.delete(item);
+            for (const [key, other] of [...this.roots]) {
+                other === node && this.roots.delete(key);
+            }
+            for (const other of this.nodes.values()) {
+                if (other.parent === node) { other.parent = null; }
+            }
             if (node.stream) {
                 const index = node.stream.nodes.indexOf(node);
                 node.stream.nodes.splice(index, 1);
@@ -75,10 +98,38 @@
         clear() {
             this.nodes.clear();
             this.streams.clear();
+            this.roots.clear();
         }
         // 是不是完整的媒体文件 (不是分片)
         complete(node) {
-            return node.role == "media" && !node.init && !node.stream?.active && !node.stream?.hint;
+            return node.role == "media" && !node.init && !node.stream?.active && !node.stream?.hint && !this.root(node.item);
+        }
+        /**
+         * 资源算在哪个主清单名下
+         * 子清单算在它上面那个清单名下 归不成流的零碎分片 (分片的后缀 / 初始化分片) 算在同一个编号的主清单名下
+         * 有的网站分片的文件名是随机的 (推特) 归不成分片流 只能靠编号
+         * @param {Object} item 资源对象
+         * @returns {Object|null} 主清单的资源对象 自己就是主清单 或者不在任何清单名下时返回 null
+         */
+        root(item) {
+            const node = this.nodes.get(item);
+            if (!node) { return null; }
+            if (node.role == "manifest") { return node.parent ? node.parent.item : null; }
+            if (node.role != "media" || node.stream?.active) { return null; }
+            if (!node.part) { return null; }
+            for (const key of node.keys) {
+                const found = this.roots.get(node.scope + "\n" + key);
+                if (found) { return found.item; }
+            }
+            return null;
+        }
+        // 主清单名下的全部资源
+        parts(item) {
+            const list = [];
+            for (const node of this.nodes.values()) {
+                this.root(node.item) === item && list.push(node.item);
+            }
+            return list;
         }
         // 两个资源是不是同一个媒体的: 同一个 frame 里 目录相同或者身份标识相同
         related(a, b) {
