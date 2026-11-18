@@ -9,11 +9,12 @@
  *   同一个 frame 的其他资源收在 "本页其他资源" 里 默认折叠
  * 样式沿用 catch-script 的页面面板 和 popup 图标使用 img 目录的图标 (由后台提供)
  *
- * 资源和 video 的对应规则 (资源只取和 video 同一个 frame 嗅探到的):
+ * 资源和 video 的对应规则 在 js/core/media-owner.js (资源只取和 video 同一个 frame 嗅探到的):
  * 1. 资源地址和 video 的 currentSrc / src / <source> 相同 属于该 video
- * 2. 其余资源交给没有匹配到地址的 video (MSE blob 地址 / 地址被重定向 等)
- *    只有一个这样的 video 全部归它
- *    有多个时 按资源出现的时间和 video 开始加载的时间 (loadstart) 就近分配
+ * 2. 资源地址里带着 video 封面地址里独有的编号 属于该 video (信息流里靠这个区分各个视频)
+ *    其中主清单以外的子清单和分片不单独列出 排在 "本页其他资源" 的最前面
+ * 3. 其余资源按出现的时间和 video 开始加载的时间 (loadstart) 就近分配
+ *    已经从页面移除的 video 也参与比较 它们的资源不算到剩下的 video 头上
  *
  * 未开启时只读取一次设置 不监听页面 不创建任何元素
  */
@@ -55,7 +56,9 @@
     let failures = 0;   // 连续获取资源列表失败的次数
     let frame = 0;
     const floats = new Map();           // video => 浮窗
-    const startTimes = new WeakMap();   // 媒体元素 => 开始加载的时间 数组
+    const MAX_PLAYERS = 300;            // 最多记住多少个播放器
+    const records = new WeakMap();      // 媒体元素 => 播放器记录
+    let players = [];                   // 出现过的播放器 { poster, srcs, starts, present, end } 已经从页面移除的也留着 判断资源归属时要用
     const dismissed = new WeakSet();    // 被手动关闭浮窗的 video
     const activated = new WeakSet();    // 播放过的 页面里看不见的音频
     const videos = document.getElementsByTagName("video");
@@ -417,8 +420,23 @@
     }
 
     /**
-     * 把资源分配给页面内的媒体元素
-     * @returns {Array} [{ el: 媒体元素, own: Set 属于它的资源 }]
+     * 媒体元素对应的播放器记录
+     * 封面换了 说明这个元素被用来播放另一个视频 另起一条记录 原来那条留着 (它的资源不能算到新视频头上)
+     */
+    function playerOf(el) {
+        const poster = el.getAttribute("poster") ? el.poster : "";
+        let record = records.get(el);
+        if (!record || (record.poster && poster && record.poster != poster)) {
+            record = { poster: poster, srcs: new Set(), starts: [], present: false, end: undefined };
+            records.set(el, record);
+            players.push(record);
+        }
+        record.poster = poster || record.poster;
+        return record;
+    }
+    /**
+     * 把资源分配给页面内的媒体元素 规则见 js/core/media-owner.js
+     * @returns {Array} [{ el: 媒体元素, own: Set 属于它的资源, parts: Set 其中不需要单独列出的 }]
      */
     function assign() {
         const medias = [];
@@ -435,82 +453,33 @@
                 for (const source of el.getElementsByTagName("source")) {
                     source.src && srcs.add(normalize(source.src));
                 }
-                medias.push({ el: el, srcs: srcs, own: new Set(), direct: false });
+                const record = playerOf(el);
+                record.srcs = srcs;
+                medias.push({ el: el, record: record, own: new Set(), parts: new Set() });
             }
+        }
+        // 不在页面里的播放器 记下离开的时间 太多了丢掉最早离开的
+        const live = new Set(medias.map(media => media.record));
+        const now = Date.now();
+        for (const record of players) {
+            record.present = live.has(record);
+            record.end = record.present ? undefined : (record.end ?? now);
+        }
+        if (players.length > MAX_PLAYERS) {
+            const gone = players.filter(record => !record.present).slice(0, players.length - MAX_PLAYERS);
+            players = players.filter(record => !gone.includes(record));
         }
         if (!medias.length || !list.length) { return medias; }
 
-        // 1. 地址相同
-        const pool = [];
-        for (const item of list) {
-            let claimed = false;
-            for (const media of medias) {
-                if (media.srcs.has(item.href)) {
-                    media.own.add(item);
-                    media.direct = true;
-                    claimed = true;
-                }
-            }
-            !claimed && pool.push(item);
-        }
-
-        // 2. 其余资源交给没有匹配到地址的媒体元素
-        // 页面内解码得到的轨道就是播放器正在播放的内容 有它们时 其他没有匹配到地址的资源 (例如页面的提示音) 不再算作 video 的
-        const captured = pool.filter(item => item.capture);
-        const rest = captured.length ? captured : pool;
-        const candidates = medias.filter(media => !media.direct);
-        if (candidates.length == 1) {
-            rest.forEach(item => candidates[0].own.add(item));
-        } else if (candidates.length > 1) {
-            for (const item of rest) {
-                owners(item.getTime || 0, candidates).forEach(media => media.own.add(item));
-            }
+        const result = MediaOwner.assign(players.map(record => ({
+            srcs: record.srcs, hints: record.poster ? [record.poster] : [], starts: record.starts, present: record.present, end: record.end
+        })), list, { slack: START_SLACK });
+        for (const media of medias) {
+            const owned = result[players.indexOf(media.record)];
+            media.own = owned.own;
+            media.parts = owned.parts;
         }
         return medias;
-    }
-    /**
-     * 多个媒体元素时 按资源出现的时间 找出它属于谁
-     * 优先 资源出现之前(或之后很短时间内)开始加载的 取时间最近的
-     * 其次 资源出现之后才开始加载的 取最早的
-     * 最后 没有记录到开始加载时间的
-     */
-    function owners(time, candidates) {
-        let near = Infinity;
-        let later = Infinity;
-        let nearOwners = [];
-        let laterOwners = [];
-        const unknown = [];
-        for (const media of candidates) {
-            const times = startTimes.get(media.el);
-            if (!times || !times.length) {
-                unknown.push(media);
-                continue;
-            }
-            let before = Infinity;
-            let after = Infinity;
-            for (const start of times) {
-                if (start <= time + START_SLACK) {
-                    before = Math.min(before, Math.abs(time - start));
-                } else {
-                    after = Math.min(after, start - time);
-                }
-            }
-            if (before < near) {
-                near = before;
-                nearOwners = [media];
-            } else if (before == near && before != Infinity) {
-                nearOwners.push(media);
-            }
-            if (after < later) {
-                later = after;
-                laterOwners = [media];
-            } else if (after == later && after != Infinity) {
-                laterOwners.push(media);
-            }
-        }
-        if (nearOwners.length) { return nearOwners; }
-        if (laterOwners.length) { return laterOwners; }
-        return unknown;
     }
     // 资源太多时 优先保留需要解析的资源(m3u8 mpd) 再保留最新的 保持原来的顺序
     function limit(items, max) {
@@ -1439,8 +1408,9 @@
                 // 没有浮窗的媒体 尺寸不合适 或者是还没播放过的隐藏音频 就不创建
                 if (!floats.has(video) && !mediaRect(video)) { continue; }
                 const float = floats.get(video) ?? createFloat(video);
-                float.own = list.filter(item => media.own.has(item));
-                float.other = list.filter(item => !media.own.has(item));
+                // 不需要单独列出的 (子清单 / 分片) 排在其他资源的最前面
+                float.own = list.filter(item => media.own.has(item) && !media.parts.has(item));
+                float.other = list.filter(item => media.parts.has(item)).concat(list.filter(item => !media.own.has(item)));
                 render(float);
                 wanted.add(video);
             }
@@ -1466,11 +1436,7 @@
     function onLoadStart(event) {
         const media = event.target;
         if (!media || (media.tagName != "VIDEO" && media.tagName != "AUDIO")) { return; }
-        let times = startTimes.get(media);
-        if (!times) {
-            times = [];
-            startTimes.set(media, times);
-        }
+        const times = playerOf(media).starts;
         times.push(Date.now());
         times.length > 20 && times.shift();
     }
