@@ -92,10 +92,12 @@ function escapeHtml(text) {
 function setRequestHeaders(data = {}, callback = undefined) {
     chrome.declarativeNetRequest.updateSessionRules({ removeRuleIds: [1] });
     chrome.tabs.getCurrent(function (tabs) {
-        const rules = { removeRuleIds: [tabs ? tabs.id : 1] };
+        // 没有标签的页面 (弹窗 侧边栏) 用 1 号规则
+        const id = tabs ? getRuleId(tabs.id, "tab") : 1;
+        const rules = { removeRuleIds: [id] };
         if (Object.keys(data).length) {
             rules.addRules = [{
-                "id": tabs ? tabs.id : 1,
+                "id": id,
                 "priority": tabs ? tabs.id : 1,
                 "action": {
                     "type": "modifyHeaders",
@@ -171,19 +173,26 @@ function setHeaders(data, callBack, tabId = -1) {
     }
 }
 /**
- * 资源的 requestId 对应的规则编号
- * 规则编号必须是 32 位以内的正整数 requestId 不一定是 (深度搜索等加入的资源用的是 13 位的时间戳 还有带后缀的)
- * @param {String} requestId
+ * 请求头规则的编号 必须是 32 位以内的正整数
+ * 分成三段 互不重叠 免得一处的规则把另一处的替换掉或者删掉:
+ *   request 下载器 / 预览 按资源的 requestId (不一定是数字 深度搜索等加入的资源用的是 13 位的时间戳 还有带后缀的)
+ *   tab     解析器等扩展页面 按页面所在的标签
+ *   mobile  模拟手机 按网页所在的标签
+ * 1 号留给没有标签的页面 (弹窗 侧边栏)
+ * @param {String|Number} value requestId 或者 标签编号
+ * @param {String} kind request | tab | mobile
  * @returns {Number}
  */
-function getRuleId(requestId) {
-    const id = Number(requestId);
-    if (Number.isInteger(id) && id >= 1 && id <= 2147483647) { return id; }
-    let hash = 0;
-    for (const char of String(requestId)) {
-        hash = (hash * 31 + char.charCodeAt(0)) % 2147483647;
+function getRuleId(value, kind = "request") {
+    const span = 700000000;
+    let number = Number(value);
+    if (!Number.isInteger(number) || number < 0) {
+        number = 0;
+        for (const char of String(value)) {
+            number = (number * 31 + char.charCodeAt(0)) % span;
+        }
     }
-    return hash + 1;
+    return 2 + ["request", "tab", "mobile"].indexOf(kind) * span + number % span;
 }
 
 /**
