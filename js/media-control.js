@@ -83,7 +83,7 @@
             // 若下拉框无任何选项，显示提示
             if ($("#videoTabIndex option").length === 0) {
                 if ($("#videoTabTips").length === 0) {
-                    $("#videoTabIndex").after('<span id="videoTabTips">无可用媒体</span>');
+                    $("#videoTabIndex").after($("<span>", { id: "videoTabTips", text: i18n.noMediaDetected }));
                 }
             }
         });
