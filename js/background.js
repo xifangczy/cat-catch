@@ -1193,10 +1193,11 @@ function clearRedundant() {
     });
 }
 
-// 扩展升级，清空本地储存
+// 扩展升级 清掉和标签绑定的临时数据 (升级后标签的状态对不上了)
+// storage.local 里还存着 m3u8 解析器的选项 (线程数 附加参数 等) 不能整个清空 否则每次升级都要重新设置
 chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason == "update") {
-        chrome.storage.local.clear(function () {
+        chrome.storage.local.remove(["MediaData", "featMobileTabId", "featAutoDownTabId", "mediaControl"], function () {
             if (chrome.storage.session) {
                 chrome.storage.session.clear(InitOptions);
             } else {
