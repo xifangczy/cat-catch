@@ -100,9 +100,11 @@ chrome.webRequest.onErrorOccurred.addListener(
 function findMedia(data, isRegex = false, filter = false, timer = false) {
     // Service Worker被强行杀死之后重新自我唤醒，等待全局变量初始化完成。
     if (!G || !G.initSyncComplete || !G.initLocalComplete || G.tabId == undefined || cacheData.init) {
-        if (timer) { return; }
+        // 初始化可能不止 500 毫秒 最多等 10 秒 不能等一次就丢掉
+        timer = Number(timer);
+        if (timer >= 20) { return; }
         setTimeout(() => {
-            findMedia(data, isRegex, filter, true);
+            findMedia(data, isRegex, filter, timer + 1);
         }, 500);
         return;
     }
@@ -138,6 +140,8 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
     // 屏蔽特殊页面的资源
     if (isSpecialPage(data.url)) { return; }
     const urlParsing = new URL(data.url);
+    // 页面脚本传来的地址没有经过浏览器整理 可能带引号和尖括号 统一成标准的写法
+    data.url = urlParsing.href;
     let [name, ext] = fileNameParse(urlParsing.pathname);
 
     //正则匹配
@@ -262,11 +266,11 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
             url: data.url,
             size: data.header?.size,
             ext: ext,
-            type: data.mime ?? data.header?.type,
+            type: plainText(data.mime ?? data.header?.type),
             tabId: data.tabId,
             frameId: data.frameId,  // 资源所属的frame 视频浮窗用来对应页面内的video
             isRegex: isRegex,
-            requestId: data.requestId ?? Date.now().toString(),
+            requestId: plainText(data.requestId ?? Date.now().toString()),
             initiator: data.initiator,
             requestHeaders: data.requestHeaders,
             cookie: data.cookie,
@@ -307,7 +311,7 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
             if (G.featAutoDownTabId.size > 0 && G.featAutoDownTabId.has(info.tabId) && chrome.downloads?.State) {
                 try {
                     const downDir = info.title == "NULL" ? "CatCatch/" : stringModify(info.title) + "/";
-                    let fileName = isEmpty(info.name) ? stringModify(info.title) + '.' + info.ext : decodeURIComponent(stringModify(info.name));
+                    let fileName = isEmpty(info.name) ? stringModify(info.title) + '.' + info.ext : decodeName(info.name);
                     if (G.TitleName) {
                         fileName = filterFileName(templates(G.downFileName, info));
                     } else {
@@ -948,6 +952,10 @@ function CheckType(dataType, dataSize) {
     return true;
 }
 
+// 后缀 / 类型 / requestId 会被拼进页面 去掉能组成标签和属性的字符 (这些字段可能来自页面脚本和响应头)
+function plainText(text) {
+    return typeof text == "string" ? text.replace(/[<>"'&]/g, "") : text;
+}
 /**
  * 获取文件名及扩展名
  * @param {String} pathname 
@@ -956,7 +964,7 @@ function CheckType(dataType, dataSize) {
 function fileNameParse(pathname) {
     let fileName = decodeURI(pathname.split("/").pop());
     let ext = fileName.split(".");
-    ext = ext.length == 1 ? undefined : ext.pop().toLowerCase();
+    ext = ext.length == 1 ? undefined : plainText(ext.pop().toLowerCase());
     return [fileName, ext ? ext : undefined];
 }
 

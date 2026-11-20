@@ -23,6 +23,7 @@ class Downloader {
         this.pushIndex = 0;              // 推送顺序下载索引
         this.controller = [];            // 储存中断控制器
         this.running = 0;                // 正在下载数量
+        this.writing = null;             // 顺序推送的数据还没处理完 (流式保存正在写入) 时的 Promise
     }
     /**
      * 设置监听
@@ -122,7 +123,9 @@ class Downloader {
         if (!this.events["sequentialPush"]) { return; }
         for (; this.pushIndex < this.fragments.length; this.pushIndex++) {
             if (this.buffer[this.pushIndex]) {
-                this.emit('sequentialPush', this.buffer[this.pushIndex]);
+                // 监听函数可以返回 Promise (流式保存的写入) 写入跟不上下载时 用它让下载等一等
+                const results = this.events["sequentialPush"].map(callBack => callBack(this.buffer[this.pushIndex]));
+                this.writing = Promise.all([this.writing, ...results]).catch(error => console.log(error));
                 delete this.buffer[this.pushIndex];
                 continue;
             }
@@ -265,7 +268,12 @@ class Downloader {
                         if (done) { break; }
 
                         // 流式下载
-                        fragment.fileStream ? fragment.fileStream.write(new Uint8Array(value)) : chunks.push(value);
+                        // 等写入完成再读下一块 否则网络比磁盘快时数据会堆在内存里
+                        if (fragment.fileStream) {
+                            await fragment.fileStream.write(new Uint8Array(value));
+                        } else {
+                            chunks.push(value);
+                        }
 
                         receivedLength += value.length;
                         this.emit('itemProgress', fragment, false, receivedLength, contentLength, value);
@@ -339,9 +347,9 @@ class Downloader {
                     this.controller[fragment.index] = null;
                 }
                 this.running--;
-                // 下载下一个切片
+                // 下载下一个切片 流式保存时等前面的数据写完
                 if (!directDownload && this.index < this.fragments.length) {
-                    this.downloader();
+                    Promise.resolve(this.writing).then(() => this.downloader());
                 }
             });
     }

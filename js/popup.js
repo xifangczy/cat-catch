@@ -59,7 +59,7 @@ function AddMedia(data, currentTab = true) {
   data._title = data.title;
   data.title = stringModify(data.title);
   //文件名
-  data.name = isEmpty(data.name) ? data.title + '.' + data.ext : decodeURIComponent(stringModify(data.name));
+  data.name = isEmpty(data.name) ? data.title + '.' + data.ext : decodeName(data.name);
   //截取文件名长度
   let trimName = data.name;
   if (data.name && data.name.length >= 50 && !_tabId) {
@@ -133,7 +133,7 @@ function AddMedia(data, currentTab = true) {
             <div class="url hide">
                 <div id="mediaInfo" data-state="false">
                     ${data.title ? `<b>${i18n.title}:</b> ${data.title}` : ""}
-                    ${data.type ? `<br><b>MIME:</b>  ${data.ump?.mime || data.type}` : ""}
+                    ${data.type ? `<br><b>MIME:</b>  ${escapeHtml(data.ump?.mime || data.type)}` : ""}
                 </div>
                 <div class="moreButton">
                     <div id="qrcode"><img src="img/qrcode.png" class="icon qrcode" title="QR Code"/></div>

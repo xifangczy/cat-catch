@@ -1,0 +1,19 @@
+name: lint
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  eslint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # 规则在 eslint.config.mjs 只查写错的判断这类真问题 不管代码风格
+      - name: ESLint
+        run: npx --yes eslint@10 .

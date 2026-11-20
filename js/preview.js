@@ -672,7 +672,7 @@ class FilePreview {
         data._title = data.title;
         data.title = stringModify(data.title);
 
-        data.name = isEmpty(data.name) ? data.title + '.' + data.ext : decodeURIComponent(stringModify(data.name));
+        data.name = isEmpty(data.name) ? data.title + '.' + data.ext : decodeName(data.name);
 
         Object.defineProperty(data, "pageDOM", {
             get: () => { return this.sourcePageDOM; }

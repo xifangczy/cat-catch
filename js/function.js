@@ -76,6 +76,15 @@ function isEmpty(obj) {
 }
 
 /**
+ * 转义 HTML 来自网页 / 清单 / 响应头的文字 拼进 HTML 之前使用
+ * @param {String} text
+ * @returns {String}
+ */
+function escapeHtml(text) {
+    return String(text ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
+}
+
+/**
  * 修改请求头
  * @param {Object} data 请求头数据
  * @param {Function} callback 
@@ -123,7 +132,7 @@ function setRequestHeaders(data = {}, callback = undefined) {
  * @param {*} tabId 需要修改的tabId
  */
 function setHeaders(data, callBack, tabId = -1) {
-    if (!tabId == -1) {
+    if (tabId == -1) {
         tabId = G.tabId;
     }
     const rules = { removeRuleIds: [], addRules: [] };
@@ -133,7 +142,7 @@ function setHeaders(data, callBack, tabId = -1) {
     for (let item of data) {
         if (!item.requestHeaders) { continue; }
         const rule = {
-            "id": parseInt(item.requestId),
+            "id": getRuleId(item.requestId),
             "action": {
                 "type": "modifyHeaders",
                 "requestHeaders": Object.keys(item.requestHeaders).map(key => ({ header: key, operation: "set", value: item.requestHeaders[key] }))
@@ -147,12 +156,34 @@ function setHeaders(data, callBack, tabId = -1) {
         if (item.cookie) {
             rule.action.requestHeaders.push({ header: "Cookie", operation: "set", value: item.cookie });
         }
-        rules.removeRuleIds.push(parseInt(item.requestId));
+        rules.removeRuleIds.push(getRuleId(item.requestId));
         rules.addRules.push(rule);
     }
-    chrome.declarativeNetRequest.updateSessionRules(rules, () => {
+    // 规则设置失败也要继续 否则后面的下载不会开始
+    try {
+        chrome.declarativeNetRequest.updateSessionRules(rules, () => {
+            chrome.runtime.lastError && console.log(chrome.runtime.lastError);
+            callBack && callBack();
+        });
+    } catch (e) {
+        console.log(e);
         callBack && callBack();
-    });
+    }
+}
+/**
+ * 资源的 requestId 对应的规则编号
+ * 规则编号必须是 32 位以内的正整数 requestId 不一定是 (深度搜索等加入的资源用的是 13 位的时间戳 还有带后缀的)
+ * @param {String} requestId
+ * @returns {Number}
+ */
+function getRuleId(requestId) {
+    const id = Number(requestId);
+    if (Number.isInteger(id) && id >= 1 && id <= 2147483647) { return id; }
+    let hash = 0;
+    for (const char of String(requestId)) {
+        hash = (hash * 31 + char.charCodeAt(0)) % 2147483647;
+    }
+    return hash + 1;
 }
 
 /**
@@ -222,7 +253,7 @@ function ArrayBufferToBlob(buffer, options = {}) {
     if (!buffer.byteLength) {
         return new Blob();
     }
-    if (!buffer instanceof ArrayBuffer) {
+    if (!(buffer instanceof ArrayBuffer)) {
         return new Blob();
     }
     if (buffer.byteLength >= 2 * 1024 * 1024 * 1024) {
@@ -256,6 +287,16 @@ function stringModify(str, text) {
         }[match];
     });
     return str;
+}
+/**
+ * 资源的文件名 先解码 再替换不能用的字符
+ * 顺序反过来的话 编码过的字符会原样进到名字里 (%3C 变成 < 显示时被当成标签)
+ * @param {String} name
+ * @returns {String}
+ */
+function decodeName(name) {
+    try { name = decodeURIComponent(name); } catch (e) { }
+    return stringModify(name);
 }
 
 /**
