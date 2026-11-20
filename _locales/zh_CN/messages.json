@@ -1081,6 +1081,9 @@
   "videoFloatDownloadStarted": {
     "message": "已开始下载"
   },
+  "videoFloatMore": {
+    "message": "显示更多"
+  },
   "videoFloatLimit": {
     "message": "资源较多，仅显示 $show$ / $total$ 条",
     "placeholders": {

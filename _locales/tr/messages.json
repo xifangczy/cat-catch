@@ -1081,6 +1081,9 @@
   "videoFloatDownloadStarted": {
     "message": "İndirme başlatıldı"
   },
+  "videoFloatMore": {
+    "message": "Daha fazla göster"
+  },
   "videoFloatLimit": {
     "message": "$total$ kaynaktan $show$ tanesi gösteriliyor",
     "placeholders": {

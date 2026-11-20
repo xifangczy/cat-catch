@@ -1081,6 +1081,9 @@
   "videoFloatDownloadStarted": {
     "message": "Download started"
   },
+  "videoFloatMore": {
+    "message": "Show more"
+  },
   "videoFloatLimit": {
     "message": "Showing $show$ of $total$ resources",
     "placeholders": {

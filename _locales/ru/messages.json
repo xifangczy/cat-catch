@@ -1081,6 +1081,9 @@
   "videoFloatDownloadStarted": {
     "message": "Загрузка начата"
   },
+  "videoFloatMore": {
+    "message": "Показать ещё"
+  },
   "videoFloatLimit": {
     "message": "Показано ресурсов: $show$ из $total$",
     "placeholders": {

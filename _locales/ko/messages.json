@@ -1081,6 +1081,9 @@
   "videoFloatDownloadStarted": {
     "message": "다운로드를 시작했습니다"
   },
+  "videoFloatMore": {
+    "message": "더 보기"
+  },
   "videoFloatLimit": {
     "message": "총 $total$개 중 $show$개의 리소스 표시",
     "placeholders": {
