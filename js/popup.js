@@ -129,6 +129,7 @@ function AddMedia(data, currentTab = true) {
                 <img src="img/invoke.svg" class="icon invoke ${G.invoke ? "" : "hide"}"" id="invoke" title="${i18n.invoke}"/>
                 <img src="img/send.svg" class="icon send ${G.send2localManual || G.send2local ? "" : "hide"}"" id="send2local" title="${i18n.send2local}"/>
                 <img src="img/mqtt.svg" class="icon mqtt ${G.mqttEnable ? "" : "hide"}" id="mqtt" title="${i18n.send2MQTT}"/>
+                <img src="img/retry.svg" class="icon retry firefoxHideScript" id="fakeNoDrm" title="${i18n.fakeNoDrmRetry}"/>
             </div>
             <div class="url hide">
                 <div id="mediaInfo" data-state="false">
@@ -255,6 +256,15 @@ function AddMedia(data, currentTab = true) {
   data.html.find("#qrcode").click(function () {
     const size = data.url.length >= 300 ? 400 : 256;
     $(this).html("").qrcode({ width: size, height: size, text: data.url }).off("click");
+  });
+  // 受 DRM 保护的资源 声称浏览器不支持 DRM 重新加载资源所在的标签 让网站改发无加密版本
+  // (按钮只在标出 DRM 的资源上显示 见 popup.css)
+  data.html.find("#fakeNoDrm").click(function (event) {
+    event.stopPropagation();
+    chrome.runtime.sendMessage({ Message: "fakeNoDrm", tabId: data.tabId, enable: true }, function () {
+      G.refreshClear && $('#Clear').click();
+      updateButton();
+    });
   });
   // 猫抓下载器 下载
   data.html.find("#catDown").click(async function () {
@@ -762,6 +772,13 @@ $("#MobileUserAgent").click(function () {
     updateButton();
   });
 });
+// 声称浏览器不支持 DRM 并重新加载 让网站给无加密版本
+$("#FakeNoDrm").click(function () {
+  chrome.runtime.sendMessage({ Message: "fakeNoDrm", tabId: G.tabId }, function () {
+    G.refreshClear && $('#Clear').click();
+    updateButton();
+  });
+});
 // 自动下载
 $("#AutoDown").click(function () {
   chrome.runtime.sendMessage({ Message: "autoDown", tabId: G.tabId }, function () {
@@ -1122,6 +1139,10 @@ function updateButton() {
       }
       if (key == "AutoDown") {
         $DOM.html(state.AutoDown ? i18n.closeDownload : i18n.autoDownload);
+        continue;
+      }
+      if (key == "FakeNoDrm") {
+        $DOM.html(state.FakeNoDrm ? i18n.fakeNoDrmClose : i18n.fakeNoDrm);
         continue;
       }
       if (key == "enable") {

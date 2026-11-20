@@ -110,6 +110,15 @@
   "simulateMobile": {
     "message": "Simular Celular"
   },
+  "fakeNoDrm": {
+    "message": "Fingir Sem DRM"
+  },
+  "fakeNoDrmClose": {
+    "message": "Parar Fingimento DRM"
+  },
+  "fakeNoDrmRetry": {
+    "message": "Fingir que não há DRM e recarregar a página"
+  },
   "autoDownload": {
     "message": "Download Automático"
   },

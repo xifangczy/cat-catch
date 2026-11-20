@@ -110,6 +110,15 @@
   "simulateMobile": {
     "message": "Эмуляция мобильного"
   },
+  "fakeNoDrm": {
+    "message": "Выдать за без DRM"
+  },
+  "fakeNoDrmClose": {
+    "message": "Прекратить выдавать"
+  },
+  "fakeNoDrmRetry": {
+    "message": "Выдать браузер за не поддерживающий DRM и перезагрузить страницу"
+  },
   "autoDownload": {
     "message": "Автозагрузка"
   },

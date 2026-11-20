@@ -110,6 +110,15 @@
   "simulateMobile": {
     "message": "Mobil Cihazı Simüle Et"
   },
+  "fakeNoDrm": {
+    "message": "DRM yok gibi davran"
+  },
+  "fakeNoDrmClose": {
+    "message": "DRM yok davranışını kapat"
+  },
+  "fakeNoDrmRetry": {
+    "message": "DRM desteklenmiyor gibi davran ve sayfayı yeniden yükle"
+  },
   "autoDownload": {
     "message": "Otomatik İndir"
   },
