@@ -7,7 +7,7 @@
  * background.js 只在标签的资源列表变化后调用 videoFloatNotify(tabId)
  * 浮窗发来的消息 和 浮窗提交的下载 都由本文件自己监听
  */
-const VIDEO_FLOAT_MAX = 200;    // 单个frame最多交给浮窗的资源数量 只保留最新的
+const VIDEO_FLOAT_MAX = 200;    // 单个frame最多交给浮窗的资源数量 优先保留清单 再保留最新的
 // 浮窗使用的图标 页面里的 content-script 读取不到扩展文件 由后台转成 data URL 交给浮窗
 const VIDEO_FLOAT_ICONS = [
     // 资源列表
@@ -87,6 +87,18 @@ function videoFloatGetIcons() {
  * @param {Object} sender 消息发送者
  * @returns {Object}
  */
+/**
+ * 资源太多时 优先保留清单 (m3u8 mpd) 再保留最新的 保持原来的顺序
+ * 信息流里分片很多 只留最新的话 前面那些视频的清单会被挤掉 浮窗就找不到它们的资源了
+ */
+function videoFloatLimit(list) {
+    if (list.length <= VIDEO_FLOAT_MAX) { return list; }
+    const keep = new Set(list.filter(item => isM3U8(item) || isMPD(item)).slice(-VIDEO_FLOAT_MAX / 2));
+    for (let i = list.length - 1; i >= 0 && keep.size < VIDEO_FLOAT_MAX; i--) {
+        keep.add(list[i]);
+    }
+    return list.filter(item => keep.has(item));
+}
 function videoFloatGetData(sender) {
     // 浮窗开关由 content-script 自己读取设置判断 这里只看扩展总开关
     const result = { enable: !!G.enable, total: 0, data: [] };
@@ -107,7 +119,7 @@ function videoFloatGetData(sender) {
     // 没有frame信息的资源 归属主框架
     const list = cacheData[tabId].filter(item => item.frameId === frameId || (frameId === 0 && !(item.frameId > 0)));
     result.total = list.length;
-    result.data = list.slice(-VIDEO_FLOAT_MAX).map(function (item) {
+    result.data = videoFloatLimit(list).map(function (item) {
         let name = item.name;
         if (isEmpty(name)) {
             name = (item.title ?? "NULL") + "." + item.ext;

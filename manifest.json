@@ -77,6 +77,7 @@
       ],
       "js": [
         "js/content-script.js",
+        "js/core/media-owner.js",
         "js/video-float.js"
       ],
       "run_at": "document_start",
