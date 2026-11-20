@@ -36,6 +36,8 @@ if (G.umpSupport && !G.isFirefox) {
 let debounce = undefined;
 let debounceCount = 0;
 let debounceTime = 0;
+let saveTimer = 0;      // 资源多的标签 延后保存的定时器
+const SAVE_KEEP = 500;  // 保存时超出配额 每个标签只保留最新的这么多个
 const reFilename = /filename="?([^"]+)"?/;
 
 G.deepSearchTemporarilyClose = null; // 深度搜索临时变量
@@ -245,7 +247,8 @@ function findMedia(data, isRegex = false, filter = false, timer = false) {
 
     // 使用 Set 查重 不随资源数量变慢 整个标签的资源都参与查重 (缓存清空时一起清空)
     if (G.checkDuplicates) {
-        const tabFingerprints = G.urlMap.get(data.tabId) || new Set();
+        // 后台被回收再唤醒之后 查重表是空的 用已有的资源重建 否则同一个资源会重复出现
+        const tabFingerprints = G.urlMap.get(data.tabId) || new Set(cacheData[data.tabId].map(item => item.url));
         if (tabFingerprints.has(data.url)) {
             return; // 找到重复，直接返回
         }
@@ -360,14 +363,31 @@ function save(tabId) {
     debounceTime = Date.now();
     debounceCount = 0;
     if (cacheData[tabId]) {
-        // 单个标签数据超过99条 不再保存到storage
+        // 单个标签数据超过99条 整份数据比较大 不是每次都写 隔一段时间写一次
+        // 数量越多隔得越久 但要赶在后台空闲被回收 (30 秒) 之前 否则回收之后这个标签只剩前 99 条
         if (cacheData[tabId]?.length <= 99) {
-            (chrome.storage.session ?? chrome.storage.local).set({ MediaData: cacheData }, function () {
-                chrome.runtime.lastError && console.log(chrome.runtime.lastError);
-            });
+            saveMedia();
+        } else if (!saveTimer) {
+            saveTimer = setTimeout(saveMedia, Math.min(5000 + cacheData[tabId].length * 4, 20000));
         }
         SetIcon({ number: cacheData[tabId].length, tabId: tabId });
     }
+}
+// 资源列表写入 storage 超出配额写不进去时 每个标签只保留最新的一部分再写一次
+function saveMedia() {
+    clearTimeout(saveTimer);
+    saveTimer = 0;
+    const storage = chrome.storage.session ?? chrome.storage.local;
+    storage.set({ MediaData: cacheData }, function () {
+        if (!chrome.runtime.lastError) { return; }
+        const latest = {};
+        for (const key in cacheData) {
+            latest[key] = Array.isArray(cacheData[key]) ? cacheData[key].slice(-SAVE_KEEP) : cacheData[key];
+        }
+        storage.set({ MediaData: latest }, function () {
+            chrome.runtime.lastError && console.log(chrome.runtime.lastError);
+        });
+    });
 }
 
 /**
