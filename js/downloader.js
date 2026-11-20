@@ -104,7 +104,7 @@ function start() {
     streamSaver.mitm = G.streamSaverConfig.url;
 
     const $downBox = $("#downBox"); // 下载列表容器
-    const down = new Downloader(_data);  // 创建下载器 
+    const down = new RangeDownloader(_data);  // 创建下载器 大文件分段下载 (js/downloader.range.js)
     const itemDOM = new Map();  // 提前储存需要平凡操作的dom对象 提高效率
 
     $("#test").click(() => console.log(down));

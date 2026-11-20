@@ -346,6 +346,31 @@
   "autoClosePageAfterDownload": {
     "message": "ダウンロード後自動クローズ"
   },
+  "m3u8Resume": {
+    "message": "ダウンロードの再開"
+  },
+  "resumeSaved": {
+    "message": "前回 $num$/$total$ 個のセグメントを保存済み 続きからダウンロードします",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "resumeExpire": {
+    "message": "リンクの有効期限 $time$",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "resumeExpired": {
+    "message": "リンクの有効期限切れ 元のページからパーサーを開き直すと続きからダウンロードできます"
+  },
   "openDownloaderPageInBackground": {
     "message": "バックグラウンドでダウンローダー開く"
   },

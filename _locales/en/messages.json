@@ -346,6 +346,31 @@
   "autoClosePageAfterDownload": {
     "message": "Automatically Close Page After Download"
   },
+  "m3u8Resume": {
+    "message": "Resume downloads"
+  },
+  "resumeSaved": {
+    "message": "$num$/$total$ segments saved from last time, the download will continue from there",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "resumeExpire": {
+    "message": "Links valid until $time$",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "resumeExpired": {
+    "message": "Links have expired, reopen the parser from the original page to continue"
+  },
   "openDownloaderPageInBackground": {
     "message": "Open Downloader Page in Background"
   },

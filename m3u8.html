@@ -245,7 +245,19 @@
             <label class="m3u8checkbox textColor">
               <p data-i18n-outer="autoClosePageAfterDownload"></p><input type="checkbox" id="autoClose" save="change" />
             </label>
+            <!-- 断点续传 -->
+            <label class="m3u8checkbox textColor">
+              <p data-i18n-outer="m3u8Resume"></p><input type="checkbox" id="resume" save="change" />
+            </label>
 
+          </div>
+
+          <!-- 断点续传 上次保存的进度 -->
+          <div id="resumeBox" class="hide">
+            <div class="merge">
+              <div id="resumeTips" class="textColor"></div>
+              <button id="resumeClear" data-i18n="clear"></button>
+            </div>
           </div>
 
           <!-- 下载进度提示 -->
@@ -288,6 +300,7 @@
   <script src="lib/base64.js"></script>
   <script src="lib/StreamSaver.js"></script>
   <script src="js/m3u8.downloader.js"></script>
+  <script src="js/m3u8.store.js"></script>
   <script src="js/m3u8.js"></script>
   <script src="js/i18n.js"></script>
 </body>

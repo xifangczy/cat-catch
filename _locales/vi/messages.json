@@ -346,6 +346,31 @@
   "autoClosePageAfterDownload": {
     "message": "Tự động đóng trang sau khi tải xong"
   },
+  "m3u8Resume": {
+    "message": "Tiếp tục tải xuống"
+  },
+  "resumeSaved": {
+    "message": "Đã lưu $num$/$total$ phân đoạn từ lần trước, sẽ tải tiếp từ đó",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "resumeExpire": {
+    "message": "Liên kết có hiệu lực đến $time$",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "resumeExpired": {
+    "message": "Liên kết đã hết hạn, hãy mở lại trình phân tích từ trang gốc để tải tiếp"
+  },
   "openDownloaderPageInBackground": {
     "message": "Mở trang tải xuống trong nền"
   },
