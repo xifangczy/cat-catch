@@ -3,6 +3,52 @@
     var _videoSrc = [];
     var _key = new Set();
     var m3u8Text = new Map();
+
+    // ========== DRM ==========
+    // 用了 EME (有 mediaKeys) 的媒体受 DRM 保护 不能下载 浏览器也不给截图
+    // encrypted 事件里 pssh 的 SystemID 可以看出是哪种 DRM
+    const DRM_SYSTEMS = {
+        "edef8ba979d64acea3c827dcd51d21ed": "Widevine",
+        "9a04f07998404286ab92e65be0885f95": "PlayReady",
+        "94ce86fb07ff4f43adb893d2fa968ca2": "FairPlay",
+        "1077efecc0b24d02ace33c1e52e2fb4b": "ClearKey",
+        "e2719d58a985b3c9781ab030af78d30e": "ClearKey"
+    };
+    const drmNames = new WeakMap();    // 媒体元素 => Set DRM 名称
+    window.addEventListener("encrypted", function (event) {
+        const media = event.target;
+        if (!(media instanceof HTMLMediaElement) || event.initDataType != "cenc" || !event.initData) { return; }
+        const names = drmNames.get(media) ?? new Set();
+        try {
+            const view = new DataView(event.initData);
+            // initData 是一个或多个 pssh 盒子 size(4) "pssh"(4) version flags(4) SystemID(16)
+            for (let offset = 0; offset + 28 <= view.byteLength;) {
+                const size = view.getUint32(offset);
+                if (size < 28 || offset + size > view.byteLength) { break; }
+                if (view.getUint32(offset + 4) == 0x70737368) {
+                    let id = "";
+                    for (let i = 0; i < 16; i++) {
+                        id += view.getUint8(offset + 12 + i).toString(16).padStart(2, "0");
+                    }
+                    DRM_SYSTEMS[id] && names.add(DRM_SYSTEMS[id]);
+                }
+                offset += size;
+            }
+        } catch (e) { }
+        drmNames.set(media, names);
+    }, true);
+    /**
+     * 媒体是否受 DRM 保护
+     * @param {HTMLMediaElement} media
+     * @returns {Array|Boolean} DRM 名称 (不知道是哪种时为空数组) 没有 DRM 返回 false
+     */
+    function getDrm(media) {
+        if (!media?.mediaKeys) { return false; }
+        return [...(drmNames.get(media) ?? [])];
+    }
+    // 同一个环境里的视频浮窗也要用
+    globalThis.catCatchGetDrm = getDrm;
+
     chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         if (chrome.runtime.lastError) { return; }
         // 获取页面视频对象
@@ -49,6 +95,7 @@
                     pip: video.ownerDocument.pictureInPictureElement === video,
                     // 只有音轨的 video (浏览器直接打开音频文件时用的就是 video) 也按音频处理
                     type: video.tagName == "AUDIO" || (video.readyState >= 1 && !video.videoWidth && !video.videoHeight) ? "audio" : "video",
+                    drm: getDrm(video),
                     videoStatus: videoObj.map(v => v.paused ? 1 : 0)
                 });
                 return true;
@@ -131,6 +178,11 @@
         if (Message.Message == "screenshot") {
             try {
                 let video = _videoObj[Message.index];
+                // 受 DRM 保护的视频 浏览器给的画面是黑的
+                if (getDrm(video)) {
+                    sendResponse({ drm: true });
+                    return true;
+                }
                 let canvas = document.createElement("canvas");
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
@@ -147,6 +199,18 @@
         }
         if (Message.Message == "getKey") {
             sendResponse(Array.from(_key));
+            return true;
+        }
+        // 本页受 DRM 保护的媒体 返回 DRM 名称 没有返回 false 弹窗用来标记资源
+        if (Message.Message == "getDrm") {
+            let drm = false;
+            document.querySelectorAll("video, audio").forEach(function (media) {
+                const names = getDrm(media);
+                if (names) {
+                    drm = [...new Set([...(drm || []), ...names])];
+                }
+            });
+            sendResponse(drm);
             return true;
         }
         if (Message.Message == "ffmpeg") {

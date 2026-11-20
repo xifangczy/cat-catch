@@ -34,6 +34,12 @@
     // 没有可操控的媒体 控件变灰
     function setIdle(idle) {
         $("#PlayControl").toggleClass("mediaIdle", idle);
+        idle && $("#mediaDrm").hide();
+    }
+    // 受 DRM 保护的媒体 截图是黑的 截图图标变淡 显示不能下载的提示
+    function setDrm(drm) {
+        $("#screenshot").toggleClass("mediaOff", !!drm).attr("title", drm ? i18n.drmScreenshot : i18n.screenshot);
+        $("#mediaDrm").text(drm ? drmText(drm) : "").toggle(!!drm);
     }
 
     // ========== 视频标签下拉列表管理 ==========
@@ -119,6 +125,7 @@
                 if (!G.isFirefox) $("#pip, #fullScreen").show();
                 $("#screenshot").show();
             }
+            setDrm(state.drm);
 
             // 更新音量进度
             setRange("#volume", state.volume);
@@ -347,6 +354,9 @@
     // 截图
     $("#screenshot").click(function () {
         if (_index < 0 || _tabId < 0) return;
-        chrome.tabs.sendMessage(_tabId, { Message: "screenshot", index: _index });
+        chrome.tabs.sendMessage(_tabId, { Message: "screenshot", index: _index }, (result) => {
+            if (chrome.runtime.lastError) return;
+            result?.drm && Tips(i18n.drmScreenshot, 2000);
+        });
     });
 })();

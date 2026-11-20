@@ -852,8 +852,11 @@
   "video": {
     "message": "Hình ảnh"
   },
-  "DRMerror": {
-    "message": "Media có bảo vệ DRM, vui lòng dùng công cụ bên thứ ba để tải"
+  "drmProtected": {
+    "message": "Media được bảo vệ bằng DRM, không thể tải xuống"
+  },
+  "drmScreenshot": {
+    "message": "Không thể chụp ảnh video được bảo vệ bằng DRM"
   },
   "regexTitle": {
     "message": "Khớp biểu thức chính quy hoặc từ tìm kiếm sâu"

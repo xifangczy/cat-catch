@@ -852,8 +852,11 @@
   "video": {
     "message": "视频"
   },
-  "DRMerror": {
-    "message": "媒体有DRM保护, 请使用第三方工具下载."
+  "drmProtected": {
+    "message": "媒体受DRM保护, 不能下载"
+  },
+  "drmScreenshot": {
+    "message": "受DRM保护的视频不能截图"
   },
   "regexTitle": {
     "message": "正则表达式匹配 或 来自深度搜索"

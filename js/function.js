@@ -651,3 +651,32 @@ function sanitizeHtmlString(htmlStr) {
         // 移除 href 或 src 属性中的 javascript: 协议
         .replace(/(href|src)\s*=\s*(['"])\s*javascript:[^'"]*\2/gi, '$1="#"');
 }
+
+/**
+ * DRM 系统的名称
+ * @param {String} id SystemID (可带 urn:uuid:) 或 HLS 的 KEYFORMAT
+ * @returns {String} 名称 不认识的返回空字符串
+ */
+function getDrmName(id) {
+    const names = {
+        "edef8ba979d64acea3c827dcd51d21ed": "Widevine",
+        "com.widevine.alpha": "Widevine",
+        "9a04f07998404286ab92e65be0885f95": "PlayReady",
+        "com.microsoft.playready": "PlayReady",
+        "94ce86fb07ff4f43adb893d2fa968ca2": "FairPlay",
+        "com.apple.streamingkeydelivery": "FairPlay",
+        "1077efecc0b24d02ace33c1e52e2fb4b": "ClearKey",
+        "e2719d58a985b3c9781ab030af78d30e": "ClearKey",
+        "org.w3.clearkey": "ClearKey"
+    };
+    id = String(id ?? "").toLowerCase().replace(/^urn:uuid:/, "");
+    return names[id] ?? names[id.replaceAll("-", "")] ?? "";
+}
+/**
+ * 受 DRM 保护 不能下载 的提示文字
+ * @param {Array} names DRM 名称
+ * @returns {String}
+ */
+function drmText(names) {
+    return i18n.drmProtected + (names?.length ? ` (${names.join(", ")})` : "");
+}

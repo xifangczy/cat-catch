@@ -88,55 +88,35 @@ function init() {
     });
 }
 
-// 加密类型
-function getEncryptionType(schemeIdUri) {
-    if (schemeIdUri.includes("edef8ba9-79d6-4ace-a3c8-27dcd51d21ed")) {
-        return "Widevine";
-    } else if (schemeIdUri.includes("9a04f079-9840-4286-ab92-e65be0885f95")) {
-        return "Microsoft PlayReady";
-    } else if (schemeIdUri.includes("94ce86fb-07ff-4f43-adb8-93d2fa968ca2")) {
-        return "Apple FairPlay";
-    } else {
-        return "Unknown";
-    }
-}
-// 判断DRM
+/**
+ * 判断DRM 有 cenc (urn:mpeg:dash:mp4protection:2011) 或 DRM 系统 (urn:uuid:SystemID) 的 ContentProtection
+ * 清单里不一定带 pssh 不能用它判断
+ * @param {String} mpdContent mpd文件内容
+ * @returns {Array|Boolean} DRM 名称 (不知道是哪种时为空数组) 没有 DRM 返回 false
+ */
 function isDRM(mpdContent) {
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(mpdContent, "application/xml");
-    let drmInfo = new Map();
-    const contentProtections = xmlDoc.getElementsByTagName("ContentProtection");
-    for (let i = 0; i < contentProtections.length; i++) {
-        const protection = contentProtections[i];
-        const schemeIdUri = protection.getAttribute("schemeIdUri");
-        let pssh = protection.getElementsByTagName("cenc:pssh")[0];
-        if (!pssh) {
-            pssh = protection.getElementsByTagName("mspr:pro")[0];
-        }
-
-        if (schemeIdUri && pssh) {
-            if (!drmInfo.has(schemeIdUri)) {
-                drmInfo.set(schemeIdUri, pssh.textContent);
-            }
-        }
+    const xmlDoc = new DOMParser().parseFromString(mpdContent, "application/xml");
+    let names = false;
+    for (const protection of xmlDoc.getElementsByTagName("ContentProtection")) {
+        const schemeIdUri = (protection.getAttribute("schemeIdUri") ?? "").toLowerCase();
+        if (schemeIdUri != "urn:mpeg:dash:mp4protection:2011" && !schemeIdUri.startsWith("urn:uuid:")) { continue; }
+        names = names || new Set();
+        const name = getDrmName(schemeIdUri);
+        name && names.add(name);
     }
-    return Array.from(drmInfo.entries()).map(([schemeIdUri, pssh]) => ({
-        schemeIdUri,
-        pssh,
-        encryptionType: getEncryptionType(schemeIdUri)
-    }));
+    return names && [...names];
 }
 function parseMPD(mpdContent) {
     $("#loading").hide(); $("#main").show();
     mpdJson = mpdParser.parse(mpdContent, { manifestUri: _url });
 
     const drmInfo = isDRM(mpdContent);
-    if (drmInfo.length > 0) {
+    // 受 DRM 保护 不能下载 只显示提示
+    if (drmInfo) {
+        $("#main").hide();
         $("#loading").show();
-        $("#loading .optionBox").html(`<b>${i18n.DRMerror}</b><br><br>`);
-        drmInfo.map(item => {
-            $("#loading .optionBox").append(`<b>${item.encryptionType}</b><input value="${item.pssh}" style="width: 100%;"/>`);
-        });
+        $("#loading .optionBox").html(`<b>${drmText(drmInfo)}</b>`);
+        return;
     }
 
     for (let key in mpdJson.playlists) {
