@@ -1,5 +1,7 @@
 class Downloader {
     MAX_RETRIES = 3; // 最大重试次数
+    TIMEOUT = 30000; // 这么久没有收到任何数据 (连不上 或者传到一半停住) 中断这次请求 算作出错 毫秒
+    MAX_DELAY = 60000; // 服务器限速时 重试之前最多等这么久 毫秒
     constructor(fragments = [], thread = 6) {
         this.fragments = fragments;      // 切片列表
         this.allFragments = fragments;   // 储存所有原始切片列表
@@ -20,6 +22,7 @@ class Downloader {
         this.errorIndexes = new Set();      // 下载错误的列表
         this.buffersize = 0;             // 已下载buffer大小
         this.duration = 0;               // 已下载时长
+        this.pauseUntil = 0;             // 服务器限速时 这个时间之前不发新的请求
         this.pushIndex = 0;              // 推送顺序下载索引
         this.controller = [];            // 储存中断控制器
         this.running = 0;                // 正在下载数量
@@ -208,11 +211,30 @@ class Downloader {
         this.fragments.push(fragment);
     }
     /**
+     * 重试之前等多久
+     * 服务器限速 (429 / 503) 时按它给的 Retry-After 等 没给就逐次加倍 其他线程也跟着停一停
+     * 其他错误和原来一样 逐次多等半秒
+     * @param {object} fragment 切片对象
+     * @param {Error} error
+     * @returns {number} 毫秒
+     */
+    retryDelay(fragment, error) {
+        if (error.cause != 'RateLimit') { return 500 * fragment.retryCount; }
+        const delay = Math.min(error.retryAfter > 0 ? error.retryAfter * 1000 : 1000 * 2 ** fragment.retryCount, this.MAX_DELAY);
+        this.pauseUntil = Math.max(this.pauseUntil, Date.now() + delay);
+        return delay;
+    }
+    /**
      * 下载器 使用fetch下载文件
      * @param {object} fragment 重新下载的对象
      */
     downloader(fragment = null) {
         if (this.state === 'abort') { return; }
+        // 服务器限速 等一会儿再发新的请求
+        if (this.pauseUntil > Date.now()) {
+            setTimeout(() => this.downloader(fragment), this.pauseUntil - Date.now());
+            return;
+        }
         // 是否直接下载对象
         const directDownload = fragment !== null;
 
@@ -240,6 +262,17 @@ class Downloader {
         // 下载前触发事件
         this.emit('start', fragment, options);
 
+        // 连接卡住的保护 一直没有数据就中断 每收到一块数据重新计时
+        fragment.stalled = false;
+        const watch = () => {
+            clearTimeout(fragment.watchdog);
+            fragment.watchdog = setTimeout(() => {
+                fragment.stalled = true;
+                controller.abort();
+            }, this.TIMEOUT);
+        };
+        watch();
+
         // 存在byteRange 添加请求头
         if (fragment.byteRange && fragment.byteRange.length == 2) {
             options.headers = {
@@ -252,6 +285,12 @@ class Downloader {
         fetch(fragment.url, options)
             .then(response => {
                 if (!response.ok) {
+                    // 服务器限速 / 暂时不可用 记下它要求等多久
+                    if (response.status == 429 || response.status == 503) {
+                        const error = new Error(response.status, { cause: 'RateLimit' });
+                        error.retryAfter = parseInt(response.headers.get('retry-after')) || 0;
+                        throw error;
+                    }
                     throw new Error(response.status, { cause: 'HTTPError' });
                 }
                 const reader = response.body?.getReader();
@@ -266,6 +305,7 @@ class Downloader {
                     while (true) {
                         const { value, done } = await reader.read();
                         if (done) { break; }
+                        watch();
 
                         // 流式下载
                         // 等写入完成再读下一块 否则网络比磁盘快时数据会堆在内存里
@@ -304,6 +344,7 @@ class Downloader {
             .then(buffer => {
                 // 储存解密/转码后的buffer
                 this.buffer[fragment.index] = buffer;
+                clearTimeout(fragment.watchdog);
 
                 // 成功数+1 累计buffer大小和视频时长
                 this.success++;
@@ -325,6 +366,11 @@ class Downloader {
                 }
             }).catch((error) => {
                 console.log(error);
+                clearTimeout(fragment.watchdog);
+                // 超时中断的不是用户停止的 按出错处理
+                if (fragment.stalled) {
+                    error = new Error('Timeout', { cause: 'Timeout' });
+                }
                 if (error.name == 'AbortError') {
                     this.emit('stop', fragment, error);
                     return;
@@ -335,7 +381,7 @@ class Downloader {
                         this.emit('retry', fragment, error);
                         // this.downloader(fragment);
                         // 延迟重试
-                        setTimeout(() => this.downloader(fragment), 500 * fragment.retryCount);
+                        setTimeout(() => this.downloader(fragment), this.retryDelay(fragment, error));
                         return;
                     }
                 }
