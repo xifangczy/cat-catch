@@ -346,6 +346,31 @@
   "autoClosePageAfterDownload": {
     "message": "下載完自動關閉頁面"
   },
+  "m3u8Resume": {
+    "message": "斷點續傳"
+  },
+  "resumeSaved": {
+    "message": "上次已儲存 $num$/$total$ 個切片, 下載時接續上次的進度",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "resumeExpire": {
+    "message": "連結有效期至 $time$",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "resumeExpired": {
+    "message": "連結已過期, 回到原頁面重新開啟解析器可以接續下載"
+  },
   "openDownloaderPageInBackground": {
     "message": "後台開啟下載器頁面"
   },

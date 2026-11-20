@@ -346,6 +346,31 @@
   "autoClosePageAfterDownload": {
     "message": "Fechar Página Automaticamente Após Download"
   },
+  "m3u8Resume": {
+    "message": "Retomar downloads"
+  },
+  "resumeSaved": {
+    "message": "$num$/$total$ segmentos salvos da última vez, o download continuará a partir daí",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "resumeExpire": {
+    "message": "Links válidos até $time$",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "resumeExpired": {
+    "message": "Os links expiraram, reabra o analisador na página original para continuar"
+  },
   "openDownloaderPageInBackground": {
     "message": "Abrir a Página do Downloader em Segundo Plano"
   },

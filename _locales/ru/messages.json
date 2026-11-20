@@ -346,6 +346,31 @@
   "autoClosePageAfterDownload": {
     "message": "Автоматически закрывать страницу после загрузки"
   },
+  "m3u8Resume": {
+    "message": "Возобновление загрузки"
+  },
+  "resumeSaved": {
+    "message": "С прошлого раза сохранено сегментов: $num$/$total$, загрузка продолжится с этого места",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "resumeExpire": {
+    "message": "Ссылки действительны до $time$",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "resumeExpired": {
+    "message": "Срок действия ссылок истёк, откройте парсер заново с исходной страницы, чтобы продолжить"
+  },
   "openDownloaderPageInBackground": {
     "message": "Открыть страницу загрузчика в фоновом режиме"
   },

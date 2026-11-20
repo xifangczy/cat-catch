@@ -346,6 +346,31 @@
   "autoClosePageAfterDownload": {
     "message": "Cerrar la página después de descargar"
   },
+  "m3u8Resume": {
+    "message": "Reanudar descargas"
+  },
+  "resumeSaved": {
+    "message": "$num$/$total$ segmentos guardados de la última vez, la descarga continuará desde ahí",
+    "placeholders": {
+      "num": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "resumeExpire": {
+    "message": "Enlaces válidos hasta $time$",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "resumeExpired": {
+    "message": "Los enlaces han caducado, vuelve a abrir el analizador desde la página original para continuar"
+  },
   "openDownloaderPageInBackground": {
     "message": "Abrir la página del descargador en segundo plano"
   },

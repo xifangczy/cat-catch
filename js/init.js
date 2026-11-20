@@ -145,6 +145,7 @@ G.OptionLists = {
     M3u8StreamSaver: false,
     M3u8Ffmpeg: true,
     M3u8AutoClose: false,
+    M3u8Resume: true,   // 断点续传 切片保存到 IndexedDB
 
     // 第三方服务地址
     onlineServiceAddress: 0,
