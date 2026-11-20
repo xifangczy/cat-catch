@@ -20,6 +20,10 @@ body {
   border: 1px solid #ddd0;
   margin-bottom: 1px;
 }
+/* 归并成一行的分片 展开后缩进显示 */
+.streamBox {
+  margin: 1px 0 0 12px;
+}
 .panel-heading {
   padding: 5px 5px 5px 5px;
   background-color: var(--background-color-two);
