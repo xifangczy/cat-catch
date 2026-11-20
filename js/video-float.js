@@ -185,6 +185,7 @@
         .name { flex: auto; min-width: 0; margin-right: 3px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: var(--text-color); }
         .bold { font-weight: bold; }
         .size { flex: none; font-weight: bold; color: var(--size-color); white-space: nowrap; }
+        .drm { flex: none; margin-right: 3px; padding: 0 3px; border: 1px solid currentColor; border-radius: 3px; font-size: 11px; font-weight: bold; color: var(--text-color); }
         .panel-heading .icon { margin-left: 3px; }
         .regex { margin-right: 2px; }
         .DownCheck { flex: 0 0 auto; width: 15px; height: 15px; margin: 0 4px 0 0; -webkit-appearance: auto; appearance: auto; cursor: pointer; }
@@ -590,6 +591,7 @@
         });
         float.list.append(float.ownBox, float.details);
         float.note = h("div", "note");
+        float.drmNote = h("div", "note");   // 受 DRM 保护 不能下载的提示
 
         // 底部按钮 和 popup 一致 对勾选的资源生效
         const down = h("div", "down");
@@ -604,7 +606,7 @@
                 removeFloat(video);
             })
         );
-        float.content.append(float.media.el, float.list, float.note, down);
+        float.content.append(float.media.el, float.drmNote, float.list, float.note, down);
         float.el.append(float.head, float.content);
 
         // 浮窗内的操作不传给页面 不抢走页面的焦点 (输入框 滑块 详情里的文字和预览除外)
@@ -809,6 +811,11 @@
         });
         // 截图
         media.screenshot = icon("screenshot", i18n("screenshot"), function () {
+            // 受 DRM 保护的视频 浏览器给的画面是黑的
+            if (getDrm(video)) {
+                tip(float, i18n("drmScreenshot"));
+                return;
+            }
             try {
                 const canvas = document.createElement("canvas");
                 canvas.width = video.videoWidth;
@@ -852,6 +859,23 @@
         media.el.append(progress, buttons);
         return media;
     }
+    // 媒体是否受 DRM 保护 返回 DRM 名称数组 或 false (检测在 content-script.js)
+    function getDrm(el) {
+        return typeof globalThis.catCatchGetDrm == "function" ? globalThis.catCatchGetDrm(el) : false;
+    }
+    function drmText(drm) {
+        return i18n("drmProtected") + (drm.length ? ` (${drm.join(", ")})` : "");
+    }
+    // 本 frame 已知加密 / 明文的资源地址 (content-script.js) 资源行按地址判断 DRM
+    function mediaUrls() {
+        return typeof globalThis.catCatchMediaUrls == "function" ? globalThis.catCatchMediaUrls() : { names: false, encrypted: new Set(), clear: new Set() };
+    }
+    // 资源行是否标 DRM: 喂给加密轨道的一定标 喂给明文轨道的不标 其余跟着所属 video
+    function itemDrm(item, drm) {
+        const urls = mediaUrls();
+        if (urls.encrypted.has(item.url)) { return drm || urls.names || []; }
+        return drm && !urls.clear.has(item.url) ? drm : false;
+    }
     // 是否没有画面的媒体 audio 元素 或者只有音轨的 video (浏览器直接打开音频文件时用的就是 video)
     function isAudioOnly(el) {
         return el.tagName == "AUDIO" || (el.readyState >= 1 && !el.videoWidth && !el.videoHeight);
@@ -863,6 +887,10 @@
         // 纯音频没有画面 不显示 截图 画中画 全屏 和 popup 一致
         const audio = isAudioOnly(video);
         media.screenshot.style.display = audio ? "none" : "";
+        // 受 DRM 保护 不能截图 图标变淡
+        const drm = getDrm(video);
+        media.screenshot.classList.toggle("mediaOff", !!drm);
+        media.screenshot.title = drm ? i18n("drmScreenshot") : i18n("screenshot");
         media.pip.style.display = audio || media.noPip ? "none" : "";
         media.fullscreen.style.display = audio || media.noFullscreen ? "none" : "";
         setIcon(media.control, video.paused ? "play" : "pause", video.paused ? i18n("play") : i18n("pause"));
@@ -890,15 +918,17 @@
 
     /******************** 资源行 ********************/
     // 一行资源 和 popup 的资源列表一致
-    function createRow(float, item, checked) {
-        const row = { item: item, detail: null, preview: null, hls: null, loaded: false };
+    function createRow(float, item, checked, drm) {
+        // drm: 属于受 DRM 保护的 video 不能勾选 只保留复制和二维码
+        const row = { item: item, detail: null, preview: null, hls: null, loaded: false, drm: !!drm };
         row.panel = h("div", "panel");
         const heading = h("div", "panel-heading");
 
         row.checkbox = h("input", "DownCheck");
         row.checkbox.type = "checkbox";
         row.checkbox.tabIndex = -1;
-        row.checkbox.checked = checked;
+        row.checkbox.checked = checked && !drm;
+        row.checkbox.disabled = !!drm;
         row.checkbox.addEventListener("click", function (event) {
             event.stopPropagation();
             float.checked.set(row.item.key, row.checkbox.checked);
@@ -910,6 +940,11 @@
         const name = h("span", item.parsing || item.isRegex ? "name bold" : "name", item.name);
         name.title = item.name;
         heading.appendChild(name);
+        if (drm) {
+            const badge = h("span", "drm", "DRM");
+            badge.title = drmText(drm);
+            heading.appendChild(badge);
+        }
         const size = sizeText(item);
         if (size || item.capture) {
             row.size = h("span", "size", size);
@@ -948,6 +983,7 @@
             tip(float, i18n("sendingToMQTT"));
             action(float, "mqtt", [row.item]);
         });
+        drm && heading.querySelectorAll(".icon:not(.copy)").forEach(el => el.remove());
 
         // 详情 标题 类型 地址 更多操作 以及预览
         const build = function () {
@@ -981,6 +1017,8 @@
             add(more, "cat-down", i18n("downloadWithRequestHeader"), "catDown");
             add(more, "send2ffmpeg", i18n("sendFfmpeg"), "ffmpeg");
             add(more, "invoke", i18n("invoke"), "invoke");
+            row.drm && more.querySelectorAll(".icon:not(.qrcode)").forEach(el => el.remove());
+            row.drm && addInfo(row, drmText(drm));
             row.link = h("a", "", row.item.url);
             row.link.href = row.item.url;
             row.link.target = "_blank";
@@ -990,7 +1028,7 @@
                 row.image = h("img", "screenshots");
                 row.image.style.display = "none";
                 row.detail.appendChild(row.image);
-            } else if (item.isPlay) {
+            } else if (item.isPlay && !row.drm) {
                 row.preview = h("video", "preview");
                 row.preview.controls = true;
                 row.preview.style.display = "none";
@@ -1151,11 +1189,17 @@
     }
 
     // 把一组资源渲染到容器里 已经存在的行不重建 避免正在点击的图标被替换
-    function renderGroup(float, box, items, checked, used) {
+    function renderGroup(float, box, items, checked, used, drm) {
         const children = items.map(function (item) {
             let row = float.rows.get(item.key);
+            const rowDrm = itemDrm(item, drm);
+            // 资源在 属于该 video 和 本页其他资源 之间移动 DRM 状态不同 重建这一行
+            if (row && row.drm != !!rowDrm) {
+                destroyRow(row);
+                row = null;
+            }
             if (!row) {
-                row = createRow(float, item, float.checked.get(item.key) ?? checked);
+                row = createRow(float, item, float.checked.get(item.key) ?? checked, rowDrm);
                 float.rows.set(item.key, row);
             }
             if (row.item !== item) {
@@ -1184,6 +1228,27 @@
         float.count.textContent = own.length;
         float.summary.textContent = `${i18n("videoFloatOther")} (${other.length})`;
         float.details.style.display = other.length ? "" : "none";
+        // video 受 DRM 保护 属于它的资源不能下载 DRM 状态变化时重建资源行
+        const drm = getDrm(float.video);
+        const drmKey = drm ? "drm:" + drm.join() : "";
+        if (drmKey !== float.drmKey) {
+            float.drmKey = drmKey;
+            float.drm = drm;
+            float.rows.forEach(destroyRow);
+            float.rows.clear();
+            float.ownBox.replaceChildren();
+            float.otherBox.replaceChildren();
+            float.signature = "";
+            float.drmNote.textContent = drm ? drmText(drm) : "";
+            float.drmNote.classList.toggle("show", !!drm);
+        }
+        // 已知加密 / 明文的地址有变化 重新渲染资源行
+        const urls = mediaUrls();
+        const urlsKey = urls.encrypted.size + "/" + urls.clear.size;
+        if (urlsKey !== float.urlsKey) {
+            float.urlsKey = urlsKey;
+            float.signature = "";
+        }
         if (!float.open) { return; }
         syncMedia(float);
 
@@ -1198,8 +1263,8 @@
         float.shownOther = shownOther;
 
         const used = new Set();
-        renderGroup(float, float.ownBox, shownOwn, true, used);
-        renderGroup(float, float.otherBox, shownOther, false, used);
+        renderGroup(float, float.ownBox, shownOwn, true, used, float.drm);
+        renderGroup(float, float.otherBox, shownOther, false, used, false);
         for (const [key, row] of [...float.rows]) {
             if (!used.has(key)) {
                 destroyRow(row);
@@ -1229,7 +1294,7 @@
     function invert(float) {
         for (const item of [...float.shownOwn, ...float.shownOther]) {
             const row = float.rows.get(item.key);
-            if (!row) { continue; }
+            if (!row || row.drm) { continue; }
             row.checkbox.checked = !row.checkbox.checked;
             float.checked.set(item.key, row.checkbox.checked);
         }

@@ -3,6 +3,101 @@
     var _videoSrc = [];
     var _key = new Set();
     var m3u8Text = new Map();
+
+    // ========== DRM ==========
+    // 用了 EME (有 mediaKeys) 的媒体受 DRM 保护 不能下载 浏览器也不给截图
+    // encrypted 事件里 pssh 的 SystemID 可以看出是哪种 DRM
+    const DRM_SYSTEMS = {
+        "edef8ba979d64acea3c827dcd51d21ed": "Widevine",
+        "9a04f07998404286ab92e65be0885f95": "PlayReady",
+        "94ce86fb07ff4f43adb893d2fa968ca2": "FairPlay",
+        "1077efecc0b24d02ace33c1e52e2fb4b": "ClearKey",
+        "e2719d58a985b3c9781ab030af78d30e": "ClearKey"
+    };
+    const drmNames = new WeakMap();    // 媒体元素 => Set DRM 名称
+    window.addEventListener("encrypted", function (event) {
+        const media = event.target;
+        if (!(media instanceof HTMLMediaElement) || event.initDataType != "cenc" || !event.initData) { return; }
+        const names = drmNames.get(media) ?? new Set();
+        try {
+            const view = new DataView(event.initData);
+            // initData 是一个或多个 pssh 盒子 size(4) "pssh"(4) version flags(4) SystemID(16)
+            for (let offset = 0; offset + 28 <= view.byteLength;) {
+                const size = view.getUint32(offset);
+                if (size < 28 || offset + size > view.byteLength) { break; }
+                if (view.getUint32(offset + 4) == 0x70737368) {
+                    let id = "";
+                    for (let i = 0; i < 16; i++) {
+                        id += view.getUint8(offset + 12 + i).toString(16).padStart(2, "0");
+                    }
+                    DRM_SYSTEMS[id] && names.add(DRM_SYSTEMS[id]);
+                }
+                offset += size;
+            }
+        } catch (e) { }
+        drmNames.set(media, names);
+    }, true);
+    /**
+     * 媒体是否受 DRM 保护
+     * @param {HTMLMediaElement} media
+     * @returns {Array|Boolean} DRM 名称 (不知道是哪种时为空数组) 没有 DRM 返回 false
+     */
+    function getDrm(media) {
+        // 页面外的元素以主环境的判断为准
+        if (extDrm.has(media)) { return [...extDrm.get(media)]; }
+        if (!media?.mediaKeys) { return false; }
+        return [...(drmNames.get(media) ?? [])];
+    }
+    // 同一个环境里的视频浮窗也要用
+    globalThis.catCatchGetDrm = getDrm;
+
+    // ========== 不挂在 DOM 上的媒体元素 ==========
+    // 主环境的 external-media.main.js 记着 在 documentElement 上发事件同步问它
+    // 元素经 MouseEvent.relatedTarget 传过来 (DOM 节点跨 world 还是同一个) 其他数据经 CustomEvent.detail (会被复制)
+    const extDrm = new WeakMap();   // 外部元素 => DRM 名称 它们的 encrypted 事件不经过 window 这边收不到
+    function askMain(doc) {
+        const result = { nodes: [], encrypted: [], clear: [] };
+        const root = doc?.documentElement;
+        if (!root) { return result; }
+        let drm = [];
+        const onNode = function (event) {
+            const el = event.relatedTarget;
+            (el?.tagName == "VIDEO" || el?.tagName == "AUDIO") && result.nodes.push(el);
+        };
+        const onData = function (event) {
+            const detail = event.detail || {};
+            drm = detail.drm || [];
+            result.encrypted = detail.encrypted || [];
+            result.clear = detail.clear || [];
+        };
+        root.addEventListener("cat-catch-ext-media-node", onNode);
+        root.addEventListener("cat-catch-ext-media-data", onData);
+        try {
+            root.dispatchEvent(new CustomEvent("cat-catch-ext-media-req", { detail: { action: "list" } }));
+        } catch (e) { }
+        root.removeEventListener("cat-catch-ext-media-node", onNode);
+        root.removeEventListener("cat-catch-ext-media-data", onData);
+        result.nodes.forEach((el, index) => { drm[index] ? extDrm.set(el, drm[index]) : extDrm.delete(el); });
+        return result;
+    }
+    /**
+     * 本 frame 的 DRM 名称 和 已知加密 / 明文的资源地址 浮窗和弹窗用 结果缓存 1 秒
+     * @returns {{names: Array|Boolean, encrypted: Set, clear: Set}}
+     */
+    let urlsCache = null;
+    function mediaUrls(fresh = false) {
+        if (!fresh && urlsCache && Date.now() - urlsCache.time < 1000) { return urlsCache; }
+        const ext = askMain(document);
+        let names = false;
+        [...document.querySelectorAll("video, audio"), ...ext.nodes].forEach(function (media) {
+            const drm = getDrm(media);
+            if (drm) { names = [...new Set([...(names || []), ...drm])]; }
+        });
+        urlsCache = { time: Date.now(), names: names, encrypted: new Set(ext.encrypted), clear: new Set(ext.clear) };
+        return urlsCache;
+    }
+    globalThis.catCatchMediaUrls = mediaUrls;
+
     chrome.runtime.onMessage.addListener(function (Message, sender, sendResponse) {
         if (chrome.runtime.lastError) { return; }
         // 获取页面视频对象
@@ -27,6 +122,15 @@
                     });
                 });
             }
+            // 不挂在 DOM 上的媒体 (本页和同源 iframe 的) 排在后面
+            [document, ...[...iframe].map(item => item.contentDocument)].forEach(function (doc) {
+                askMain(doc).nodes.forEach(function (video) {
+                    if (video.currentSrc && !videoObj.includes(video)) {
+                        videoObj.push(video);
+                        videoSrc.push(video.currentSrc);
+                    }
+                });
+            });
             if (videoObj.length > 0) {
                 if (videoObj.length !== _videoObj.length || videoSrc.toString() !== _videoSrc.toString()) {
                     _videoSrc = videoSrc;
@@ -49,6 +153,7 @@
                     pip: video.ownerDocument.pictureInPictureElement === video,
                     // 只有音轨的 video (浏览器直接打开音频文件时用的就是 video) 也按音频处理
                     type: video.tagName == "AUDIO" || (video.readyState >= 1 && !video.videoWidth && !video.videoHeight) ? "audio" : "video",
+                    drm: getDrm(video),
                     videoStatus: videoObj.map(v => v.paused ? 1 : 0)
                 });
                 return true;
@@ -131,6 +236,11 @@
         if (Message.Message == "screenshot") {
             try {
                 let video = _videoObj[Message.index];
+                // 受 DRM 保护的视频 浏览器给的画面是黑的
+                if (getDrm(video)) {
+                    sendResponse({ drm: true });
+                    return true;
+                }
                 let canvas = document.createElement("canvas");
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
@@ -147,6 +257,15 @@
         }
         if (Message.Message == "getKey") {
             sendResponse(Array.from(_key));
+            return true;
+        }
+        // 本页受 DRM 保护的媒体 弹窗用来标记资源
+        // names: DRM 名称 没有 DRM 是 false
+        // encrypted / clear: 已知喂给加密轨道 / 明文轨道的资源地址 (其余的按 names 整个 frame 标记)
+        // iframe 由弹窗按 frame 单独问 这里只管本 frame
+        if (Message.Message == "getDrm") {
+            const info = mediaUrls(true);
+            sendResponse({ names: info.names, encrypted: [...info.encrypted], clear: [...info.clear] });
             return true;
         }
         if (Message.Message == "ffmpeg") {

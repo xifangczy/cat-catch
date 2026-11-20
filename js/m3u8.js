@@ -79,6 +79,7 @@ const keyContent = new Map(); // 储存key的内容
 const initData = new Map(); // 储存map的url
 const decryptor = new AESDecryptor(); // 解密工具 来自hls.js 分离出来的
 let skipDecrypt = false; // 是否跳过解密
+let drmNames = false;   // 受 DRM 保护时为 DRM 名称数组 不能下载
 let possibleKeys = new Set();   // 储存疑似 密钥
 let downId = 0; // chrome下载api 回调id
 let currentLevel = -1;  // 当前Level
@@ -343,6 +344,12 @@ hls.on(Hls.Events.MANIFEST_LOADED, function (event, data) {
 hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
     // console.log(data);
     $("#m3u8").show(); $("#loading").hide();
+    // 多码率列表里的 EXT-X-SESSION-KEY 是 DRM
+    const drm = getHlsDrm(data.sessionKeys ?? []);
+    if (drm) {
+        showDrm(drm);
+        return;
+    }
     const more = (data.levels.length + data.audioTracks.length + data.subtitleTracks.length >= 2);
     const dataMerge = {};
 
@@ -478,6 +485,7 @@ hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
 hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
     // console.log(data);
     parseTs(data.details);  // 提取Ts链接
+    if (drmNames) { return; }
     // 获取视频信息
     if ($(".videoInfo #info").html() == "") {
         let video = document.createElement("video");
@@ -549,6 +557,8 @@ hls.on(Hls.Events.ERROR, function (event, data) {
     * 否则会被当成下载失败 显示错误面板甚至自动刷新页面
     */
     if (!data.fatal && data.details == "aborted") { return; }
+    // 受 DRM 保护 已经显示了提示 不再处理
+    if (drmNames) { return; }
 
     /**
      * 如果m3u8清单获取错误 尝试从缓存获取 解决部分网站一次性url问题
@@ -668,6 +678,11 @@ hls.on(Hls.Events.BUFFER_CREATED, function (event, data) {
 /* 来自 监听 LEVEL_LOADED 提取所有ts链接 进一步处理 */
 function parseTs(data) {
     // console.log(data);
+    const drm = drmNames || getHlsDrm(data.fragments.map(fragment => fragment.encrypted && fragment.decryptdata));
+    if (drm) {
+        showDrm(drm);
+        return;
+    }
     let isEncrypted = false;
     _fragments.splice(0);   // 清空 防止直播HLS无限添加
     /* 获取 m3u8文件原始内容 MANIFEST_PARSED也能获取但偶尔会为空(BUG?) 放在LEVEL_LOADED获取更安全*/
@@ -869,6 +884,30 @@ function parseTs(data) {
         // 整体放入同一个 flex 容器
         $tips.append(`<div class="key flex">${keyBlock}</div>`);
     }
+}
+/**
+ * 密钥里有 DRM 的 (KEYFORMAT 不是 identity 例如 Widevine PlayReady FairPlay)
+ * @param {Array} keys hls.js 的 LevelKey 数组
+ * @returns {Array|Boolean} DRM 名称 (不知道是哪种时为空数组) 没有 DRM 返回 false
+ */
+function getHlsDrm(keys) {
+    let names = false;
+    for (const key of keys) {
+        if (!key?.keyFormat || key.keyFormat == "identity") { continue; }
+        names = names || new Set();
+        const name = getDrmName(key.keyFormat);
+        name && names.add(name);
+    }
+    return names && [...names];
+}
+// 受 DRM 保护 停止加载 隐藏下载相关的功能 只显示提示
+function showDrm(names) {
+    drmNames = names;
+    hls.stopLoad();
+    $("#loading").hide();
+    $("#m3u8").show();
+    $("#more_m3u8, #more_audio, #more_subtitle, #more_options, #textarea, #button").hide();
+    $("#tips").html(`<b>${drmText(names)}</b>`);
 }
 /**
  * 估算整个视频大小
@@ -1176,6 +1215,7 @@ $("#recorder").click(function () {
 });
 // 在线下载合并ts
 $("#mergeTs").click(async function () {
+    if (drmNames) { return; }
     initDownload(); // 初始化下载变量
     // 设定起始序号
     let start = $("#rangeStart").val();
@@ -1518,6 +1558,7 @@ $("#searchingForRealKey").click(function () {
  * @param {number} end 下载范围 结束索引
  */
 async function downloadNew(start = 0, end = _fragments.length) {
+    if (drmNames) { return; }
 
     $("#video").hide();
     hls.detachMedia($("#video")[0]);

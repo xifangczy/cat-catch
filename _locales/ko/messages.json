@@ -852,8 +852,11 @@
   "video": {
     "message": "비디오"
   },
-  "DRMerror": {
-    "message": "이 미디어는 DRM으로 보호되어 있습니다. 타사 도구를 사용해 다운로드하세요"
+  "drmProtected": {
+    "message": "이 미디어는 DRM으로 보호되어 다운로드할 수 없습니다"
+  },
+  "drmScreenshot": {
+    "message": "DRM으로 보호된 동영상은 스크린샷을 찍을 수 없습니다"
   },
   "regexTitle": {
     "message": "정규식 일치 또는 심층 검색 결과"

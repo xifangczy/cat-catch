@@ -852,8 +852,11 @@
   "video": {
     "message": "映像"
   },
-  "DRMerror": {
-    "message": "DRM保護付き 他ツールでダウンロードしてください"
+  "drmProtected": {
+    "message": "DRMで保護されているため ダウンロードできません"
+  },
+  "drmScreenshot": {
+    "message": "DRMで保護された動画はスクリーンショットできません"
   },
   "regexTitle": {
     "message": "正規表現マッチ 深層検索からの取得"

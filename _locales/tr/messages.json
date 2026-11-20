@@ -852,8 +852,11 @@
   "video": {
     "message": "Video"
   },
-  "DRMerror": {
-    "message": "Medyanın DRM koruması var, lütfen indirmek için üçüncü taraf araçları kullanın"
+  "drmProtected": {
+    "message": "Bu medya DRM ile korunuyor ve indirilemez"
+  },
+  "drmScreenshot": {
+    "message": "DRM ile korunan videonun ekran görüntüsü alınamaz"
   },
   "regexTitle": {
     "message": "Düzenli ifade eşleşmesi veya derin aramadan"

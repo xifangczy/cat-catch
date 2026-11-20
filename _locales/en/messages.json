@@ -852,8 +852,11 @@
   "video": {
     "message": "Video"
   },
-  "DRMerror": {
-    "message": "This media is DRM-protected. Please use a third-party tool to download it."
+  "drmProtected": {
+    "message": "This media is DRM-protected and cannot be downloaded"
+  },
+  "drmScreenshot": {
+    "message": "Screenshots are not available for DRM-protected video"
   },
   "regexTitle": {
     "message": "Matched by a regular expression or found through Deep Search"

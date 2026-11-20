@@ -76,6 +76,19 @@
         "http://*/*"
       ],
       "js": [
+        "js/external-media.main.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true,
+      "match_about_blank": true,
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://*/*",
+        "http://*/*"
+      ],
+      "js": [
         "js/content-script.js",
         "js/video-float.js"
       ],
