@@ -318,8 +318,9 @@ function InitOptions() {
         // 侧边栏
         chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: items.sidePanel });
 
-        // 右键菜单注册
-        contextMenusInit(items.contextMenus);
+        // 右键菜单注册 只由后台来做 (findMedia 只有后台有)
+        // 每个扩展页面都注册一遍的话 几个页面同时删除重建 会报 Cannot create item with duplicate id
+        (typeof findMedia == 'function') && contextMenusInit(items.contextMenus);
 
         G = { ...items, ...G };
 
@@ -397,7 +398,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
             continue;
         }
         if (key == "contextMenus") {
-            contextMenusInit(newValue);
+            (typeof findMedia == 'function') && contextMenusInit(newValue);
             continue;
         }
         G[key] = newValue;
