@@ -1096,9 +1096,9 @@ function mobileUserAgent(tabId, change = false) {
         G.featMobileTabId.add(tabId);
         (chrome.storage.session ?? chrome.storage.local).set({ featMobileTabId: Array.from(G.featMobileTabId) });
         chrome.declarativeNetRequest.updateSessionRules({
-            removeRuleIds: [tabId],
+            removeRuleIds: [getRuleId(tabId, "mobile")],
             addRules: [{
-                "id": tabId,
+                "id": getRuleId(tabId, "mobile"),
                 "action": {
                     "type": "modifyHeaders",
                     "requestHeaders": [{
@@ -1117,7 +1117,7 @@ function mobileUserAgent(tabId, change = false) {
     }
     G.featMobileTabId.delete(tabId) && (chrome.storage.session ?? chrome.storage.local).set({ featMobileTabId: Array.from(G.featMobileTabId) });
     chrome.declarativeNetRequest.updateSessionRules({
-        removeRuleIds: [tabId]
+        removeRuleIds: [getRuleId(tabId, "mobile")]
     });
 }
 
