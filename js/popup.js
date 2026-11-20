@@ -55,7 +55,7 @@ chrome.downloads.onChanged.addListener(function (item) {
 let checkboxState = true;
 
 // 生成资源DOM
-function AddMedia(data, currentTab = true) {
+function createMedia(data, currentTab = true) {
   data._title = data.title;
   data.title = stringModify(data.title);
   //文件名
@@ -265,15 +265,17 @@ function AddMedia(data, currentTab = true) {
     await getClipboardText(data);
     catDownload(data, { ffmpeg: "addFile" });
   });
-  // 页面内解码得到的轨道 一键和同一个视频的另一条轨道 (视频 + 音频) 在线合并
+  // 音频和视频分开的资源 一键和另一条轨道在线合并
+  // 页面内解码得到的轨道按视频编号配对 其余的由关联图配对
   data.html.find("#umpMerge").click(function (event) {
     event.stopPropagation();
-    const other = umpCounterpart(data);
+    const audio = data.ump ? umpIsAudio(data) : MediaAsset.track(data) == "audio";
+    const other = data.ump ? umpCounterpart(data) : mediaGraph.get(currentTab).counterpart(data);
     if (!other) {
-      Tips(umpIsAudio(data) ? i18n.noVideo : i18n.noAudio, 2000);
+      Tips(audio ? i18n.noVideo : i18n.noAudio, 2000);
       return false;
     }
-    catDownload(umpIsAudio(data) ? [other, data] : [data, other], { ffmpeg: "merge" });
+    catDownload(audio ? [other, data] : [data, other], { ffmpeg: "merge" });
     return false;
   });
   umpRefresh(data);
@@ -515,6 +517,159 @@ function AddMedia(data, currentTab = true) {
   return data.html;
 }
 
+/********************资源归并********************/
+// 资源之间的关联 (js/core/media-graph.js) 当前页面和其他页面各一份
+const mediaGraph = new Map([[true, new MediaGraph()], [false, new MediaGraph()]]);
+const streamRow = new WeakMap();    // 分片流 => 归并后的那一行
+const partsRow = new WeakMap();     // 主清单 => 它名下的资源归并成的那一行
+/**
+ * 生成资源的行 并按资源之间的关联归并:
+ * 同一条流的分片归并成一行 点击展开 不再每个分片各占一行
+ * 主清单名下的子清单和零碎的分片 收到主清单下面 展开主清单才看得到
+ * 音频和视频分开的资源 显示合并图标
+ * @param {Object} data 资源对象
+ * @param {Boolean} currentTab 是否当前页面的资源
+ * @returns {jQuery} 要加入列表的元素 资源收进了已有的行时为空
+ */
+function AddMedia(data, currentTab = true) {
+  const graph = mediaGraph.get(currentTab);
+  graph.add(data);
+  createMedia(data, currentTab);
+  const other = !data.ump && graph.counterpart(data);
+  if (other) {
+    data.html.find("#umpMerge").removeClass("hide");
+    other.html.find("#umpMerge").removeClass("hide");
+  }
+  const stream = graph.owner(data);
+  if (!stream) {
+    const root = graph.root(data);
+    if (!root || !root.html) { return data.html; }
+    let parts = partsRow.get(root);
+    if (!parts) {
+      parts = createPartsRow(root, graph);
+      partsRow.set(root, parts);
+    }
+    data.checked = false;
+    data.ump || data.html.find("#umpMerge").addClass("hide");
+    data.partsRow = parts;
+    parts.add(data);
+    return $();
+  }
+  let row = streamRow.get(stream);
+  const created = !row;
+  if (created) {
+    row = createStreamRow(stream, graph);
+    streamRow.set(stream, row);
+  }
+  // 刚确定是分片流时 之前已经列出来的分片一起收进来
+  for (const item of created ? graph.members(stream) : [data]) {
+    item.checked = false;
+    item.ump || item.html.find("#umpMerge").addClass("hide");
+    row.box.append(item.html);
+    // 之前收在主清单名下的 挪走之后那边的数量要更新
+    item.partsRow && item.partsRow.update();
+    item.partsRow = null;
+  }
+  row.update();
+  return created ? row.html : $();
+}
+// 分片流归并后的那一行 名字后面是分片数量 有对应的清单时可以直接打开解析器
+function createStreamRow(stream, graph) {
+  const html = $(`
+        <div class="panel">
+            <div class="panel-heading">
+                <input type="checkbox" class="DownCheck"/>
+                <span class="group"></span>
+                <span class="name"></span>
+                <span class="size"></span>
+                <img src="img/parsing.png" class="icon parsing hide" title="${i18n.parser}"/>
+            </div>
+            <div class="streamBox hide"></div>
+        </div>`);
+  // 分片的行也在 html 里面 这一行自己的元素只在 heading 里找
+  const heading = html.children(".panel-heading");
+  const box = html.children(".streamBox");
+  heading.click(function () {
+    box.toggle();
+  });
+  // 勾选 / 取消 这条流的全部分片
+  heading.find(".DownCheck").click(function (event) {
+    event.stopPropagation();
+    for (const item of graph.members(stream)) {
+      item.checked = this.checked;
+    }
+    mergeDownButton();
+  });
+  heading.find(".parsing").click(function (event) {
+    event.stopPropagation();
+    const manifest = graph.manifest(stream);
+    manifest && openParser(manifest);
+  });
+  return {
+    html: html,
+    box: box,
+    update: function () {
+      const items = graph.members(stream);
+      // 整条流都是音频或者都是视频时 写在名字前面 (分片的名字常常一样)
+      const track = new Set(stream.nodes.map(node => node.track));
+      const label = track.size == 1 ? `[${track.has("audio") ? i18n.audio : i18n.video}]` : "";
+      heading.find(".group").text(label);
+      heading.find(".name").text(`${items[0].name} × ${items.length}`).attr("title", items[0].name);
+      heading.find(".size").text(stream.size ? byteToSize(stream.size) : "");
+      heading.find(".parsing").toggleClass("hide", !graph.manifest(stream));
+    }
+  };
+}
+
+/**
+ * 主清单名下的子清单和零碎分片归并成的一行
+ * 平时不显示 主清单的名字后面写着数量 展开主清单的详情时出现在它下面
+ */
+function createPartsRow(root, graph) {
+  const html = $(`
+        <div class="panel">
+            <div class="panel-heading">
+                <input type="checkbox" class="DownCheck"/>
+                <span class="name"></span>
+            </div>
+            <div class="streamBox hide"></div>
+        </div>`);
+  const heading = html.children(".panel-heading");
+  const box = html.children(".streamBox");
+  const count = $(`<span class="size"></span>`);
+  const exts = new Set();
+  root.html.children(".panel-heading").find(".name").after(count);
+  heading.click(function () {
+    box.toggle();
+  });
+  heading.find(".DownCheck").click(function (event) {
+    event.stopPropagation();
+    for (const item of graph.parts(root)) {
+      item.checked = this.checked;
+    }
+    mergeDownButton();
+  });
+  // 跟着主清单的详情一起出现 / 收起
+  const show = function () {
+    root.urlPanelShow && box.children().length ? root.html.after(html) : html.detach();
+  };
+  root.panelHeading.click(show);
+  const update = function () {
+    const total = box.children().length;
+    count.text(total ? `+${total}` : "");
+    heading.find(".name").text(`${[...exts].join(" / ")} × ${total}`);
+    show();
+  };
+  return {
+    add: function (item) {
+      item.ext && exts.add(item.ext);
+      box.append(item.html);
+      update();
+    },
+    update: update
+  };
+}
+
 function AddKey(key) {
   // 检查key是否合法
   const base64Key = base64ToHex(key);
@@ -753,6 +908,7 @@ $('#Clear').click(function () {
     $all.empty();
   }
   allData.get(activeTab).clear();
+  mediaGraph.get(activeTab).clear();
   UItoggle();
 });
 // 模拟手机端
@@ -1046,6 +1202,7 @@ const interval = setInterval(async function () {
         if (!data) { continue; }
         data.html.remove();
         list.delete(Message.data.requestId);
+        mediaGraph.get(currentTab).remove(data);
         currentTab ? currentCount-- : allCount--;
       }
       UItoggle();
@@ -1217,8 +1374,9 @@ function Tips(text, delay = 200) {
 function UItoggle() {
   const size = getData().size;
   size > 0 ? $tips.hide() : $tips.show().html(i18n.noData);
-  $currentCount.text(currentCount ? `[${currentCount}]` : "");
-  $allCount.text(allCount ? `[${allCount}]` : "");
+  // 显示的是行数 归并成一行的分片只算一个
+  $currentCount.text(currentCount ? `[${$current.children().length || currentCount}]` : "");
+  $allCount.text(allCount ? `[${$all.children().length || allCount}]` : "");
   const id = $('.TabShow').attr("id");
   if (id != "mediaList" && id != "allMediaList") {
     $tips.hide();
