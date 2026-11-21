@@ -841,12 +841,14 @@
                 const type = mime.split('/')[0] == "video" ? "mp4" : "mp3";
                 const fileBlob = new Blob(item.bufferList, { type: mime });
 
-                a.href = URL.createObjectURL(fileBlob);
+                const objectURL = URL.createObjectURL(fileBlob);
+                a.href = objectURL;
                 a.download = `${this.fileName ? this.fileName.innerHTML.trim() : document.title}.${type}`;
                 a.click();
 
                 // 释放URL对象以避免内存泄漏
-                setTimeout(() => URL.revokeObjectURL(a.href), 100);
+                // 用本次创建的 objectURL, 不能读 a.href: 定时器触发时 a.href 已被下一个轨道覆盖
+                setTimeout(() => URL.revokeObjectURL(objectURL), 100);
                 downloadCount++;
             }
 
