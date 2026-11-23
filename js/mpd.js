@@ -32,8 +32,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 function init() {
     loadCSS();
     if (_url) {
-        fetch(_url)
-            .then(response => response.text())
+        loadManifest(_url)
             .then(function (text) {
                 // mpdContent = text;
                 // parseMPD(mpdContent);
@@ -213,7 +212,49 @@ function isDRM(mpdContent) {
         encryptionType: getEncryptionType(schemeIdUri)
     }));
 }
+/**
+ * 下载清单 取不到时显示原因 (之前会一直停在 "载入中")
+ * 失败后不再往下走 所以失败时返回的 Promise 不会有结果
+ * @param {String} url 清单地址
+ * @returns {Promise<String>} 清单内容
+ */
+function loadManifest(url) {
+    const TIMEOUT = 30000;
+    return new Promise(function (resolve) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), TIMEOUT);
+        let content = "";
+        fetch(url, { signal: controller.signal }).then(async function (response) {
+            content = await response.text();
+            if (!response.ok) { throw new Error(`HTTP ${response.status}`); }
+            resolve(content);
+        }).catch(function (error) {
+            showError(controller.signal.aborted ? new Error(`Timeout (${TIMEOUT / 1000}s)`) : error, content);
+        }).finally(() => clearTimeout(timer));
+    });
+}
+/**
+ * 清单取不到 / 解析不了 时在页面上显示原因
+ * @param {Error} error
+ * @param {String} content 服务器返回的内容 显示开头一段 方便看出是登录过期还是别的问题
+ */
+function showError(error, content = "") {
+    console.log(error);
+    $("#main").hide(); $("#loading").show();
+    const box = $("#loading .optionBox").empty();
+    box.append($("<b>").text(`${i18n.dataFetchFailed}: ${error?.message ?? error}`));
+    const head = String(content).trim().slice(0, 300);
+    head && box.append($("<div>").css({ "margin-top": "10px", "white-space": "pre-wrap", "word-break": "break-all" }).text(head));
+}
+// 解析并显示清单 解析出错时显示原因
 function parseMPD(mpdContent) {
+    try {
+        readMPD(mpdContent);
+    } catch (error) {
+        showError(error, mpdContent);
+    }
+}
+function readMPD(mpdContent) {
     $("#loading").hide(); $("#main").show();
     mpdJson = mpdParser.parse(mpdContent, { manifestUri: _url });
     getSegmentKeys(mpdContent);
