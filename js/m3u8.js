@@ -935,10 +935,8 @@ $(".openDir").click(function () {
 // 下载ts列表
 $("#downText").click(function () {
     const filename = GetFileName(_m3u8Url) + '.txt';
-    let text = "data:text/plain,";
-    _fragments.forEach(function (item) {
-        text += item.url + "\n";
-    });
+    // data: 地址的内容会被浏览器解码一次 地址里的 %2F 会变成 / 要再编码一次才能原样导出
+    const text = "data:text/plain," + encodeURIComponent(_fragments.map((item) => item.url + "\n").join(""));
     if (G.isFirefox) {
         downloadDataURL(text, filename);
         return;
