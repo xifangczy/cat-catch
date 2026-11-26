@@ -859,6 +859,42 @@ chrome.downloads.onChanged.addListener(function (item) {
     }
 });
 
+// PATCH: 后台兜底 —— 浏览器下载失败或下到 HTML/XML 假文件时, 自动改用猫抓下载器重试
+// 优点: 监听在后台运行, 弹窗关闭后依然生效; "假200"(CDN返回HTML验证页)也能通过MIME检查识别
+const BG_DL_PREFIX = "bgDown_";
+chrome.downloads.onChanged.addListener(function (item) {
+    if (G.catDownload) return; // 设置了"始终不启用猫抓下载器"时不兜底
+    chrome.storage.local.get(BG_DL_PREFIX + item.id, function (store) {
+        const info = store[BG_DL_PREFIX + item.id];
+        if (!info) return;
+        const errorList = ["SERVER_BAD_CONTENT", "SERVER_UNAUTHORIZED", "SERVER_FORBIDDEN", "SERVER_UNREACHABLE", "SERVER_CROSS_ORIGIN_REDIRECT", "SERVER_FAILED", "NETWORK_FAILED"];
+        if (item.error && errorList.includes(item.error.current)) {
+            bgRescue(item.id, info);
+            return;
+        }
+        if (item.state && item.state.current === "complete") {
+            chrome.downloads.search({ id: item.id }, function (items) {
+                const it = items && items[0];
+                if (it && /text\/html|application\/xml|application\/json/i.test(it.mime || "")) {
+                    bgRescue(item.id, info);
+                } else if (it) {
+                    chrome.storage.local.remove(BG_DL_PREFIX + item.id);
+                }
+            });
+        }
+    });
+});
+function bgRescue(id, info) {
+    chrome.storage.local.remove(BG_DL_PREFIX + id);
+    chrome.downloads.erase({ id: id }, function () {
+        chrome.runtime.lastError && console.error(chrome.runtime.lastError);
+    });
+    const url = info.requestId
+        ? `downloader.html?requestId=${encodeURIComponent(info.requestId)}`
+        : `downloader.html?JSON=${JSON.stringify({ requestHeaders: { referer: info.pageUrl }, url: info.url })}&autoClose=true`;
+    chrome.tabs.create({ url: url, active: false });
+}
+
 /**
  * 浏览器 扩展快捷键
  */
