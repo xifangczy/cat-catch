@@ -42,12 +42,11 @@ let pageDOM = undefined;
 chrome.runtime.sendMessage(chrome.runtime.id, { Message: "HeartBeat" });
 // 清理冗余数据
 chrome.runtime.sendMessage(chrome.runtime.id, { Message: "clearRedundant" });
-// 监听下载 出现服务器拒绝错误 调用下载器
+// 监听下载 失败/假200 的兜底已移至 background.js(弹窗关闭也能生效), 这里只清理数据
 chrome.downloads.onChanged.addListener(function (item) {
   if (G.catDownload) { delete downData[item.id]; return; }
   const errorList = ["SERVER_BAD_CONTENT", "SERVER_UNAUTHORIZED", "SERVER_FORBIDDEN", "SERVER_UNREACHABLE", "SERVER_CROSS_ORIGIN_REDIRECT", "SERVER_FAILED", "NETWORK_FAILED"];
   if (item.error && errorList.includes(item.error.current) && downData[item.id]) {
-    catDownload(downData[item.id]);
     delete downData[item.id];
   }
 });
@@ -349,13 +348,24 @@ function AddMedia(data, currentTab = true) {
       openParser(data, { autoDown: true });
       return false;
     }
+    // PATCH: 先走浏览器原生下载(快), 同时注册到后台
+    // 下载失败或下到 HTML/XML 假文件时, 由 background 自动改用猫抓下载器重试
     chrome.downloads.download({
       url: data.url,
       filename: data.downFileName,
       saveAs: G.saveAs,
       // 嗅探到的是 POST 请求 使用相同的方法下载
       ...(data.method == "POST" ? { method: "POST" } : {})
-    }, function (id) { downData[id] = data; });
+    }, function (id) {
+      if (id) {
+        downData[id] = data;
+        chrome.storage.local.set({ ["bgDown_" + id]: {
+          requestId: data.requestId || "",
+          url: data.url,
+          pageUrl: data.webUrl || data.pageUrl || ""
+        } });
+      }
+    });
     return false;
   });
   // 调用
@@ -610,11 +620,21 @@ $('#DownFile').click(function () {
 
     index++;
     setTimeout(function () {
+      // PATCH: 批量下载同样先走浏览器下载并注册后台兜底
       chrome.downloads.download({
         url: data.url,
         filename: data.downFileName,
         ...(data.method == "POST" ? { method: "POST" } : {})
-      }, function (id) { downData[id] = data; });
+      }, function (id) {
+        if (id) {
+          downData[id] = data;
+          chrome.storage.local.set({ ["bgDown_" + id]: {
+            requestId: data.requestId || "",
+            url: data.url,
+            pageUrl: data.webUrl || data.pageUrl || ""
+          } });
+        }
+      });
     }, index * 100);
   };
 });
